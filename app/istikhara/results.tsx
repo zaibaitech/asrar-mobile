@@ -32,16 +32,31 @@ export default function IstikharaResults() {
 
   useEffect(() => {
     // Parse the data from route params
+    console.log('Results screen params:', params);
+    
     if (params.data && typeof params.data === 'string') {
       try {
         const parsedData = JSON.parse(params.data);
+        console.log('Parsed result data:', parsedData);
+        
+        // Validate that we have the required data structure
+        if (!parsedData.burujProfile) {
+          throw new Error('Invalid data structure: missing burujProfile');
+        }
+        
         setData(parsedData);
       } catch (error) {
         console.error('Failed to parse result data:', error);
-        Alert.alert('Error', 'Failed to load results', [
+        const errorMsg = error instanceof Error ? error.message : 'Failed to load results';
+        Alert.alert('Error', errorMsg, [
           { text: 'OK', onPress: () => router.back() },
         ]);
       }
+    } else {
+      console.error('No data in params or invalid format');
+      Alert.alert('Error', 'No result data available', [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
     }
   }, [params.data]);
 

@@ -29,9 +29,21 @@ export function useIstikhara(): UseIstikharaReturn {
 
     try {
       const response = await calculateIstikhara(personName, motherName, language);
+      console.log('Hook received response:', response);
       setResult(response);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      console.error('Hook caught error:', err);
+      let errorMessage = 'An unknown error occurred';
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err && typeof err === 'object') {
+        errorMessage = JSON.stringify(err);
+      }
+      
+      console.error('Setting error message:', errorMessage);
       setError(errorMessage);
     } finally {
       setLoading(false);

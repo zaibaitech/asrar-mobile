@@ -57,7 +57,8 @@ export default function IstikharaForm() {
   // Show error alert when error changes
   React.useEffect(() => {
     if (error) {
-      Alert.alert('Calculation Error', error, [
+      console.error('Displaying error to user:', error);
+      Alert.alert('Calculation Error', String(error), [
         { text: 'OK', onPress: () => {} },
       ]);
     }
@@ -66,14 +67,20 @@ export default function IstikharaForm() {
   // Navigate to results when result is available
   React.useEffect(() => {
     if (result && !loading && !error) {
-      router.push({
-        pathname: '/istikhara/results',
-        params: {
-          data: JSON.stringify(result.data),
-          personName: personName.trim(),
-          motherName: motherName.trim(),
-        },
-      });
+      console.log('Navigating to results with data:', result.data);
+      try {
+        router.push({
+          pathname: '/istikhara/results',
+          params: {
+            data: JSON.stringify(result.data),
+            personName: personName.trim(),
+            motherName: motherName.trim(),
+          },
+        });
+      } catch (navError) {
+        console.error('Navigation error:', navError);
+        Alert.alert('Error', 'Failed to navigate to results');
+      }
     }
   }, [result, loading, error]);
 
