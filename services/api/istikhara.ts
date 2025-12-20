@@ -26,6 +26,8 @@ export async function calculateIstikhara(
       language,
     };
 
+    console.log('Sending Istikhara request:', requestData);
+
     const response = await axios.post<IstikharaResponse>(
       `${API_BASE_URL}/istikhara`,
       requestData,
@@ -37,6 +39,21 @@ export async function calculateIstikhara(
       }
     );
 
+    console.log('Received Istikhara response:', JSON.stringify(response.data, null, 2));
+
+    // Validate response structure
+    if (!response.data || typeof response.data !== 'object') {
+      throw new Error('Invalid response format from server');
+    }
+
+    if (!response.data.success) {
+      throw new Error('Calculation failed');
+    }
+
+    if (!response.data.data) {
+      throw new Error('Missing data in response');
+    }
+
     // Save successful calculation to history
     if (response.data.success) {
       await saveToHistory(personName, motherName, response.data);
@@ -44,15 +61,23 @@ export async function calculateIstikhara(
 
     return response.data;
   } catch (error) {
+    console.error('Istikhara calculation error:', error);
+    
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<IstikharaError>;
       
+      console.error('Axios error details:', {
+        status: axiosError.response?.status,
+        data: axiosError.response?.data,
+        message: axiosError.message,
+      });
+      
       if (axiosError.response?.data) {
-        throw new Error(
+        const errorMsg = 
           axiosError.response.data.message || 
           axiosError.response.data.error || 
-          'Failed to calculate Istikhara'
-        );
+          'Failed to calculate Istikhara';
+        throw new Error(String(errorMsg));
       }
       
       if (axiosError.code === 'ECONNABORTED') {
@@ -62,6 +87,13 @@ export async function calculateIstikhara(
       if (!axiosError.response) {
         throw new Error('Network error. Please check your internet connection.');
       }
+      
+      throw new Error(`Server error: ${axiosError.response.status}`);
+    }
+    
+    // Handle non-Axios errors
+    if (error instanceof Error) {
+      throw new Error(error.message);
     }
     
     throw new Error('An unexpected error occurred. Please try again.');
