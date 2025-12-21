@@ -1,18 +1,19 @@
-import axios, { AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  IstikharaRequest,
-  IstikharaResponse,
-  IstikharaError,
-  IstikharaHistoryItem,
-  Language,
+    IstikharaHistoryItem,
+    IstikharaRequest,
+    IstikharaResponse,
+    Language
 } from '../../types/istikhara';
 
-const API_BASE_URL = 'https://asrar-everyday.vercel.app/api/v1';
+const API_BASE_URL = __DEV__ 
+  ? 'http://localhost:3000'  // Use proxy in development
+  : 'https://www.asrar.app/api/v1';
 const HISTORY_STORAGE_KEY = 'istikhara_history';
 
 /**
  * Calculate Istikhara using the Asrar Everyday API
+ * Using fetch instead of axios for better Expo compatibility
  */
 export async function calculateIstikhara(
   personName: string,
@@ -28,67 +29,50 @@ export async function calculateIstikhara(
 
     console.log('Sending Istikhara request:', requestData);
 
-    const response = await axios.post<IstikharaResponse>(
-      `${API_BASE_URL}/istikhara`,
-      requestData,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        timeout: 15000, // 15 second timeout
-      }
-    );
+    const response = await fetch(`${API_BASE_URL}/istikhara`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(requestData),
+    });
 
-    console.log('Received Istikhara response:', JSON.stringify(response.data, null, 2));
+    console.log('Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      throw new Error(`Server error: ${response.status} - ${errorText}`);
+    }
+
+    const data: IstikharaResponse = await response.json();
+    console.log('Received Istikhara response:', JSON.stringify(data, null, 2));
 
     // Validate response structure
-    if (!response.data || typeof response.data !== 'object') {
+    if (!data || typeof data !== 'object') {
       throw new Error('Invalid response format from server');
     }
 
-    if (!response.data.success) {
+    if (!data.success) {
       throw new Error('Calculation failed');
     }
 
-    if (!response.data.data) {
+    if (!data.data) {
       throw new Error('Missing data in response');
     }
 
     // Save successful calculation to history
-    if (response.data.success) {
-      await saveToHistory(personName, motherName, response.data);
+    if (data.success) {
+      await saveToHistory(personName, motherName, data);
     }
 
-    return response.data;
+    return data;
   } catch (error) {
     console.error('Istikhara calculation error:', error);
     
-    if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError<IstikharaError>;
-      
-      console.error('Axios error details:', {
-        status: axiosError.response?.status,
-        data: axiosError.response?.data,
-        message: axiosError.message,
-      });
-      
-      if (axiosError.response?.data) {
-        const errorMsg = 
-          axiosError.response.data.message || 
-          axiosError.response.data.error || 
-          'Failed to calculate Istikhara';
-        throw new Error(String(errorMsg));
-      }
-      
-      if (axiosError.code === 'ECONNABORTED') {
-        throw new Error('Request timed out. Please check your connection and try again.');
-      }
-      
-      if (!axiosError.response) {
-        throw new Error('Network error. Please check your internet connection.');
-      }
-      
-      throw new Error(`Server error: ${axiosError.response.status}`);
+    if (error instanceof TypeError && error.message.includes('Network request failed')) {
+      throw new Error('Network error. Please check your internet connection and try again.');
     }
     
     // Handle non-Axios errors

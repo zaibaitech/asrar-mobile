@@ -1,9 +1,24 @@
 import { useState } from 'react';
-import { calculateIstikhara } from '../services/api/istikhara';
-import { IstikharaResponse, Language } from '../types/istikhara';
+import { IstikharaService } from '../services/IstikharaService';
+
+// Legacy response format for compatibility with existing components
+interface IstikharaResponse {
+  success: boolean;
+  data: {
+    personName: string;
+    motherName: string;
+    personTotal: number;
+    motherTotal: number;
+    combinedTotal: number;
+    burujRemainder: number;
+    element: 'fire' | 'earth' | 'air' | 'water';
+    burujProfile: any;
+    repetitionCount: number;
+  };
+}
 
 interface UseIstikharaReturn {
-  calculate: (personName: string, motherName: string, language?: Language) => Promise<void>;
+  calculate: (personName: string, motherName: string, language?: string) => Promise<void>;
   reset: () => void;
   loading: boolean;
   error: string | null;
@@ -12,6 +27,7 @@ interface UseIstikharaReturn {
 
 /**
  * Custom hook for managing Istikhara calculation state
+ * NOW USES LOCAL CALCULATIONS - No API required!
  */
 export function useIstikhara(): UseIstikharaReturn {
   const [loading, setLoading] = useState(false);
@@ -21,18 +37,36 @@ export function useIstikhara(): UseIstikharaReturn {
   const calculate = async (
     personName: string,
     motherName: string,
-    language: Language = 'en'
+    language: string = 'en'
   ): Promise<void> => {
     setLoading(true);
     setError(null);
     setResult(null);
 
     try {
-      const response = await calculateIstikhara(personName, motherName, language);
-      console.log('Hook received response:', response);
+      // Use local calculation service (synchronous, no await needed)
+      const localResult = IstikharaService.calculate(personName, motherName);
+      
+      // Transform to legacy response format for compatibility
+      const response: IstikharaResponse = {
+        success: true,
+        data: {
+          personName: localResult.personName,
+          motherName: localResult.motherName,
+          personTotal: localResult.personTotal,
+          motherTotal: localResult.motherTotal,
+          combinedTotal: localResult.combinedTotal,
+          burujRemainder: localResult.burujRemainder,
+          element: localResult.burujProfile.element,
+          burujProfile: localResult.burujProfile,
+          repetitionCount: localResult.repetitionCount,
+        }
+      };
+      
+      console.log('✅ Local calculation successful:', response);
       setResult(response);
     } catch (err) {
-      console.error('Hook caught error:', err);
+      console.error('❌ Local calculation error:', err);
       let errorMessage = 'An unknown error occurred';
       
       if (err instanceof Error) {

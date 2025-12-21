@@ -1,128 +1,413 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { IstikharaData } from '../../../types/istikhara';
+import * as Haptics from 'expo-haptics';
+import {
+    AlertCircle,
+    Brain,
+    ChevronDown,
+    ChevronUp,
+    Eye,
+    Heart,
+    Info,
+    MessageCircle,
+    Shield,
+    Star,
+    TrendingUp,
+    Users
+} from "lucide-react-native";
+import React, { useState } from "react";
+import {
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { Borders, DarkTheme, ElementAccents, Shadows, Spacing, Typography } from "../../../constants/DarkTheme";
+import { useLanguage } from "../../../contexts/LanguageContext";
+import type { IstikharaData } from "../../../types/istikhara";
+
+const { width } = Dimensions.get('window');
 
 interface PersonalityTabProps {
   data: IstikharaData;
   elementColor: string;
 }
 
+interface PersonalityTrait {
+  key: string;
+  icon: React.ReactNode;
+  label: string;
+  color: string;
+}
+
 export default function PersonalityTab({ data, elementColor }: PersonalityTabProps) {
-  const { personality } = data.burujProfile;
+  const { language } = useLanguage();
+  const profile = data.burujProfile;
+  const elementKey = profile.element.toLowerCase() as "fire" | "earth" | "air" | "water";
+  const accent = ElementAccents[elementKey];
+  const personality = profile.personality[language as 'en' | 'fr'];
+
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['temperament']));
 
-  const toggleSection = (section: string) => {
-    const newExpanded = new Set(expandedSections);
-    if (newExpanded.has(section)) {
-      newExpanded.delete(section);
-    } else {
-      newExpanded.add(section);
-    }
-    setExpandedSections(newExpanded);
+  const toggleSection = async (section: string) => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setExpandedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(section)) {
+        newSet.delete(section);
+      } else {
+        newSet.add(section);
+      }
+      return newSet;
+    });
   };
 
-  const sections = [
-    { key: 'temperament', title: 'Temperament', icon: '🎭', content: personality.temperament },
-    { key: 'communication', title: 'Communication Style', icon: '💬', content: personality.communication },
-    { key: 'loved_by', title: 'Loved By', icon: '❤️', content: personality.loved_by },
-    { key: 'challenged_by', title: 'Challenged By', icon: '⚡', content: personality.challenged_by },
-    { key: 'life_blessings', title: 'Life Blessings', icon: '🌟', content: personality.life_blessings },
-    { key: 'divine_support', title: 'Divine Support', icon: '🤲', content: personality.divine_support },
-    { key: 'dreams', title: 'Dreams & Aspirations', icon: '💭', content: personality.dreams },
-    { key: 'anger', title: 'Anger Management', icon: '😤', content: personality.anger },
+  const traits: PersonalityTrait[] = [
+    {
+      key: 'temperament',
+      icon: <Brain size={24} color={accent.primary} />,
+      label: language === 'en' ? 'Temperament' : 'Tempérament',
+      color: accent.primary,
+    },
+    {
+      key: 'communication',
+      icon: <MessageCircle size={24} color={accent.primary} />,
+      label: language === 'en' ? 'Communication Style' : 'Style de Communication',
+      color: accent.primary,
+    },
+    {
+      key: 'anger',
+      icon: <AlertCircle size={24} color={accent.primary} />,
+      label: language === 'en' ? 'Anger Expression' : 'Expression de la Colère',
+      color: accent.primary,
+    },
+    {
+      key: 'social_loved',
+      icon: <Heart size={24} color={accent.primary} />,
+      label: language === 'en' ? 'Social Strengths' : 'Forces Sociales',
+      color: accent.primary,
+    },
+    {
+      key: 'social_challenge',
+      icon: <Users size={24} color={accent.primary} />,
+      label: language === 'en' ? 'Relationship Dynamics' : 'Dynamiques Relationnelles',
+      color: accent.primary,
+    },
+    {
+      key: 'social_attraction',
+      icon: <Star size={24} color={accent.primary} />,
+      label: language === 'en' ? 'Natural Magnetism' : 'Magnétisme Naturel',
+      color: accent.primary,
+    },
+    {
+      key: 'dreams',
+      icon: <Eye size={24} color={accent.primary} />,
+      label: language === 'en' ? 'Dream Patterns' : 'Motifs de Rêve',
+      color: accent.primary,
+    },
+    {
+      key: 'life_blessing',
+      icon: <Shield size={24} color={accent.primary} />,
+      label: language === 'en' ? 'Life Blessings' : 'Bénédictions de Vie',
+      color: accent.primary,
+    },
+    {
+      key: 'divine_support',
+      icon: <Sparkles size={24} color={accent.primary} />,
+      label: language === 'en' ? 'Divine Support' : 'Soutien Divin',
+      color: accent.primary,
+    },
+    {
+      key: 'challenge',
+      icon: <TrendingUp size={24} color={accent.primary} />,
+      label: language === 'en' ? 'Life Challenges' : 'Défis de Vie',
+      color: accent.primary,
+    },
   ];
 
-  return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.content}>
-        <Text style={styles.headerText}>
-          Understanding your personality traits and spiritual characteristics
-        </Text>
+  const availableTraits = traits.filter(trait => (personality as any)[trait.key]);
 
-        {sections.map((section) => (
-          <View key={section.key} style={[styles.card, { borderLeftColor: elementColor }]}>
+  return (
+    <ScrollView 
+      style={styles.container} 
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>
+          {language === 'en' ? 'Personality Profile' : 'Profil de Personnalité'}
+        </Text>
+        <Text style={styles.subtitle}>
+          {language === 'en' 
+            ? 'Deep insights into your character and nature' 
+            : 'Aperçus profonds de votre caractère et nature'}
+        </Text>
+      </View>
+
+      {/* Element Badge - Compact, not full gradient */}
+      <View style={[styles.elementBadge, { borderColor: accent.primary }]}>
+        <Text style={styles.elementEmoji}>{profile.element_emoji}</Text>
+        <View style={styles.elementInfo}>
+          <Text style={[styles.elementText, { color: accent.primary }]}>
+            {profile.element.charAt(0).toUpperCase() + profile.element.slice(1)} Element
+          </Text>
+          <Text style={styles.elementNumber}>
+            {language === 'en' ? 'Elemental Number' : 'Numéro Élémentaire'}: {profile.element_number}
+          </Text>
+        </View>
+      </View>
+
+      {/* About Profile - Dark card with accent header */}
+      <View style={[styles.summaryCard, { borderColor: accent.primary }]}>
+        <View style={styles.summaryHeader}>
+          <Info size={20} color={accent.primary} />
+          <Text style={[styles.summaryTitle, { color: DarkTheme.textPrimary }]}>
+            {language === 'en' ? 'About This Profile' : 'À Propos de ce Profil'}
+          </Text>
+        </View>
+        <Text style={styles.summaryText}>
+          {language === 'en'
+            ? `Your ${profile.element} nature reveals ${availableTraits.length} key aspects of your personality. Each trait offers insights into your character, relationships, and life path.`
+            : `Votre nature ${profile.element} révèle ${availableTraits.length} aspects clés de votre personnalité. Chaque trait offre des aperçus sur votre caractère, vos relations et votre chemin de vie.`}
+        </Text>
+      </View>
+
+      {/* Personality Traits - Dark with accent icons */}
+      {availableTraits.map((trait, index) => {
+        const isExpanded = expandedSections.has(trait.key);
+        const content = (personality as any)[trait.key];
+        
+        return (
+          <View
+            key={trait.key}
+            style={[styles.traitCard, { borderColor: accent.primary }]}
+          >
             <TouchableOpacity
-              onPress={() => toggleSection(section.key)}
-              style={styles.cardHeader}
+              style={styles.traitHeader}
+              onPress={() => toggleSection(trait.key)}
               activeOpacity={0.7}
             >
-              <View style={styles.cardHeaderLeft}>
-                <Text style={styles.sectionIcon}>{section.icon}</Text>
-                <Text style={styles.sectionTitle}>{section.title}</Text>
+              <View style={styles.traitTitleRow}>
+                <View style={[styles.traitIcon, { backgroundColor: accent.glow }]}>
+                  {trait.icon}
+                </View>
+                <View style={styles.traitTitleContainer}>
+                  <Text style={styles.traitLabel}>{trait.label}</Text>
+                  {!isExpanded && (
+                    <Text style={styles.traitPreview} numberOfLines={1}>
+                      {content}
+                    </Text>
+                  )}
+                </View>
               </View>
-              <Text style={styles.expandIcon}>
-                {expandedSections.has(section.key) ? '▼' : '▶'}
-              </Text>
+              {isExpanded ? (
+                <ChevronUp size={20} color={accent.primary} />
+              ) : (
+                <ChevronDown size={20} color={accent.primary} />
+              )}
             </TouchableOpacity>
 
-            {expandedSections.has(section.key) && (
-              <View style={styles.cardContent}>
-                <Text style={styles.contentText}>{section.content}</Text>
+            {isExpanded && (
+              <View style={styles.traitContent}>
+                <Text style={styles.traitText}>{content}</Text>
+                
+                {/* Special styling for specific traits */}
+                {trait.key === 'life_blessing' && (
+                  <View style={[styles.blessingBadge, { 
+                    backgroundColor: accent.glow, 
+                    borderColor: accent.primary 
+                  }]}>
+                    <Shield size={16} color={accent.primary} />
+                    <Text style={[styles.blessingText, { color: accent.primary }]}>
+                      {language === 'en' ? 'Divine Blessing' : 'Bénédiction Divine'}
+                    </Text>
+                  </View>
+                )}
+                
+                {trait.key === 'challenge' && (
+                  <View style={[styles.challengeBadge, { 
+                    backgroundColor: accent.glow, 
+                    borderColor: accent.primary 
+                  }]}>
+                    <AlertCircle size={16} color={accent.primary} />
+                    <Text style={[styles.challengeText, { color: accent.primary }]}>
+                      {language === 'en' ? 'Area for Growth' : 'Zone de Croissance'}
+                    </Text>
+                  </View>
+                )}
               </View>
             )}
           </View>
-        ))}
-      </View>
+        );
+      })}
+
+      {/* Bottom Spacing */}
+      <View style={styles.bottomSpacer} />
     </ScrollView>
   );
 }
 
+const Sparkles = ({ size, color }: { size: number; color: string }) => (
+  <Star size={size} color={color} />
+);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f1419',
+    backgroundColor: DarkTheme.screenBackground,
   },
-  content: {
-    padding: 16,
+  scrollContent: {
+    padding: Spacing.screenPadding,
+    paddingBottom: 32,
   },
-  headerText: {
-    fontSize: 16,
-    color: '#a8b2d1',
-    marginBottom: 20,
-    lineHeight: 24,
-    fontStyle: 'italic',
+  header: {
+    alignItems: 'center',
+    marginBottom: Spacing.sectionGap,
   },
-  card: {
-    backgroundColor: '#1a1f2e',
-    borderRadius: 12,
-    marginBottom: 12,
-    borderLeftWidth: 4,
+  title: {
+    fontSize: Typography.h1,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
+  },
+  subtitle: {
+    fontSize: Typography.label,
+    color: DarkTheme.textTertiary,
+    textAlign: 'center',
+    paddingHorizontal: Spacing.lg,
+  },
+  elementBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.lg,
+    padding: Spacing.xl,
+    borderRadius: Borders.radiusLg,
+    borderWidth: Borders.standard,
+    marginBottom: Spacing.xl,
+    backgroundColor: DarkTheme.cardBackground,
+    ...Shadows.card,
+  },
+  elementEmoji: {
+    fontSize: 48,
+  },
+  elementInfo: {
+    flex: 1,
+  },
+  elementText: {
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightBold,
+    marginBottom: 4,
+  },
+  elementNumber: {
+    fontSize: Typography.label,
+    color: DarkTheme.textSecondary,
+  },
+  summaryCard: {
+    padding: Spacing.xl,
+    borderRadius: Borders.radiusLg,
+    borderWidth: Borders.standard,
+    marginBottom: Spacing.xl,
+    backgroundColor: DarkTheme.cardBackground,
+    ...Shadows.card,
+  },
+  summaryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  summaryTitle: {
+    fontSize: Typography.body,
+    fontWeight: Typography.weightSemibold,
+  },
+  summaryText: {
+    fontSize: Typography.label,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.label * Typography.lineHeightRelaxed,
+  },
+  traitCard: {
+    borderRadius: Borders.radiusLg,
+    borderWidth: Borders.standard,
+    marginBottom: Spacing.lg,
     overflow: 'hidden',
+    backgroundColor: DarkTheme.cardBackground,
+    ...Shadows.card,
   },
-  cardHeader: {
+  traitHeader: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
+    padding: Spacing.lg,
+    minHeight: 72,
   },
-  cardHeaderLeft: {
+  traitTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: Spacing.md,
     flex: 1,
   },
-  sectionIcon: {
-    fontSize: 24,
-    marginRight: 12,
+  traitIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: Borders.radiusCircle,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#ffffff',
+  traitTitleContainer: {
     flex: 1,
   },
-  expandIcon: {
-    fontSize: 14,
-    color: '#8892b0',
-    marginLeft: 12,
+  traitLabel: {
+    fontSize: Typography.body,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    marginBottom: 4,
   },
-  cardContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    paddingTop: 4,
+  traitPreview: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textMuted,
   },
-  contentText: {
-    fontSize: 15,
-    color: '#e0e6f0',
-    lineHeight: 24,
+  traitContent: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: DarkTheme.borderSubtle,
+  },
+  traitText: {
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.body * Typography.lineHeightRelaxed,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  blessingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Borders.radiusSm,
+    borderWidth: 1,
+  },
+  blessingText: {
+    fontSize: Typography.caption,
+    fontWeight: Typography.weightSemibold,
+  },
+  challengeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Borders.radiusSm,
+    borderWidth: 1,
+  },
+  challengeText: {
+    fontSize: Typography.caption,
+    fontWeight: Typography.weightSemibold,
+  },
+  bottomSpacer: {
+    height: 20,
   },
 });
