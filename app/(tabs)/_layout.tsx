@@ -54,14 +54,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Calculator',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="calculator" color={color} />,
         }}
       />
+      {/* Istikhara tab hidden - content now on main Calculator tab */}
       <Tabs.Screen
         name="istikhara"
         options={{
-          title: 'Istikhara',
-          tabBarIcon: ({ color }) => <TabBarIcon name="moon-o" color={color} />,
+          href: null, // Hide from tab bar
         }}
       />
       <Tabs.Screen
