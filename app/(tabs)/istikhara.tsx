@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { hasHistory } from '../../services/api/istikhara';
 
 const { width, height } = Dimensions.get('window');

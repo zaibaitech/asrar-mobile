@@ -1,4 +1,5 @@
 // Istikhara API Request and Response Types
+import type { BurujProfile } from '../services/istikhara/types';
 
 export type Language = 'en' | 'fr' | 'ar';
 
@@ -8,62 +9,7 @@ export interface IstikharaRequest {
   language?: Language;
 }
 
-export interface MultilingualText {
-  en: string;
-  fr: string;
-  arabic: string;
-}
-
-export interface BurujPersonality {
-  temperament: string;
-  communication: string;
-  loved_by: string;
-  challenged_by: string;
-  life_blessings: string;
-  divine_support: string;
-  dreams: string;
-  anger: string;
-}
-
-export interface BurujCareer {
-  categories: string[];
-  recommended_industries: string[];
-  careers_to_avoid: string[];
-  guiding_principles: string[];
-}
-
-export interface BlessedDay {
-  day: string;
-  activities: string[];
-  prophet: string;
-  special_notes: string;
-}
-
-export interface Sadaqah {
-  description: string;
-  suggested_amount?: string;
-  impact?: string;
-}
-
-export interface SpiritualPractices {
-  divine_names: string[];
-  dhikr_count: number;
-  daily_practices: string[];
-  timing: string;
-}
-
-export interface BurujProfile {
-  buruj_number: number;
-  sign: MultilingualText;
-  element: string;
-  planet: string;
-  personality: BurujPersonality;
-  career: BurujCareer;
-  blessed_day: BlessedDay;
-  monthly_sadaqah: Sadaqah;
-  lifetime_sadaqah: Sadaqah;
-  spiritual_practices: SpiritualPractices;
-}
+export { BurujProfile };
 
 export interface IstikharaData {
   personTotal: number;

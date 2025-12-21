@@ -17,7 +17,20 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.zaibaitech.asrar"
+      "bundleIdentifier": "com.zaibaitech.asrar",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": false,
+          "NSExceptionDomains": {
+            "asrar.app": {
+              "NSIncludesSubdomains": true,
+              "NSTemporaryExceptionAllowsInsecureHTTPLoads": false,
+              "NSExceptionRequiresForwardSecrecy": true,
+              "NSExceptionMinimumTLSVersion": "TLSv1.2"
+            }
+          }
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +39,12 @@
       },
       "package": "com.zaibaitech.asrar",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
+      "usesCleartextTraffic": true
     },
     "web": {
       "bundler": "metro",

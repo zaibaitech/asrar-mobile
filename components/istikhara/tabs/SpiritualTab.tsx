@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { IstikharaData } from '../../../types/istikhara';
 import * as Haptics from 'expo-haptics';
+import { BookOpen, Info, Moon, Plus, RefreshCw, Sparkles, Users } from 'lucide-react-native';
+import { useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Borders, DarkTheme, ElementAccents, Shadows, Spacing, Typography } from '../../../constants/DarkTheme';
+import { IstikharaData } from '../../../types/istikhara';
 
 interface SpiritualTabProps {
   data: IstikharaData;
@@ -9,8 +11,11 @@ interface SpiritualTabProps {
 }
 
 export default function SpiritualTab({ data, elementColor }: SpiritualTabProps) {
-  const { spiritual_practices } = data.burujProfile;
+  const { spiritual_practice } = data.burujProfile;
   const { repetitionCount } = data;
+  const elementKey = data.burujProfile.element.toLowerCase() as "fire" | "earth" | "air" | "water";
+  const accent = ElementAccents[elementKey];
+  
   const [currentCount, setCurrentCount] = useState(0);
 
   const handleIncrement = async () => {
@@ -28,19 +33,28 @@ export default function SpiritualTab({ data, elementColor }: SpiritualTabProps) 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
-        {/* Dhikr Counter */}
-        <View style={[styles.card, { borderLeftColor: elementColor }]}>
-          <Text style={styles.cardTitle}>📿 Dhikr Counter</Text>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Spiritual Practices</Text>
+          <Text style={styles.subtitle}>Sacred practices aligned with your spiritual nature</Text>
+        </View>
+
+        {/* Dhikr Counter - Dark with accent progress bar */}
+        <View style={[styles.card, { borderColor: accent.primary }]}>
+          <View style={styles.cardHeader}>
+            <Sparkles size={24} color={accent.primary} />
+            <Text style={styles.cardTitle}>Dhikr Counter</Text>
+          </View>
           
           <View style={styles.counterContainer}>
             <Text style={styles.targetLabel}>Target: {repetitionCount} repetitions</Text>
             
             <View style={styles.progressBarContainer}>
-              <View style={styles.progressBarBackground}>
+              <View style={[styles.progressBarBackground, { backgroundColor: DarkTheme.cardBackgroundAlt }]}>
                 <View
                   style={[
                     styles.progressBarFill,
-                    { width: `${progress}%`, backgroundColor: elementColor },
+                    { width: `${progress}%`, backgroundColor: accent.primary },
                   ]}
                 />
               </View>
@@ -48,73 +62,122 @@ export default function SpiritualTab({ data, elementColor }: SpiritualTabProps) 
             </View>
 
             <View style={styles.countDisplay}>
-              <Text style={[styles.currentCount, { color: elementColor }]}>{currentCount}</Text>
+              <Text style={[styles.currentCount, { color: accent.primary }]}>{currentCount}</Text>
               <Text style={styles.countSeparator}>/</Text>
               <Text style={styles.targetCount}>{repetitionCount}</Text>
             </View>
 
             <View style={styles.counterButtons}>
               <TouchableOpacity
-                style={[styles.counterButton, { backgroundColor: elementColor }]}
+                style={[styles.counterButton, { backgroundColor: accent.primary }]}
                 onPress={handleIncrement}
                 activeOpacity={0.8}
               >
-                <Text style={styles.counterButtonText}>+ Count</Text>
+                <Plus size={20} color={DarkTheme.textPrimary} />
+                <Text style={styles.counterButtonText}>Count</Text>
               </TouchableOpacity>
 
               {currentCount > 0 && (
                 <TouchableOpacity
-                  style={styles.resetButton}
+                  style={[styles.resetButton, { 
+                    backgroundColor: accent.glow, 
+                    borderColor: accent.secondary 
+                  }]}
                   onPress={handleReset}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.resetButtonText}>Reset</Text>
+                  <RefreshCw size={18} color={accent.secondary} />
+                  <Text style={[styles.resetButtonText, { color: accent.secondary }]}>Reset</Text>
                 </TouchableOpacity>
               )}
             </View>
           </View>
         </View>
 
-        {/* Divine Names */}
-        <View style={[styles.card, { borderLeftColor: elementColor }]}>
-          <Text style={styles.cardTitle}>🕌 Divine Names (Asma ul Husna)</Text>
-          <Text style={styles.sectionDescription}>
-            Recite these divine names {repetitionCount} times each
-          </Text>
-          <View style={styles.namesContainer}>
-            {spiritual_practices.divine_names.map((name, index) => (
-              <View key={index} style={[styles.nameCard, { borderColor: elementColor }]}>
-                <Text style={styles.nameText}>{name}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Daily Practices */}
-        <View style={[styles.card, { borderLeftColor: elementColor }]}>
-          <Text style={styles.cardTitle}>🌅 Daily & Weekly Practices</Text>
-          {spiritual_practices.daily_practices.map((practice, index) => (
-            <View key={index} style={styles.practiceItem}>
-              <View style={[styles.practiceBullet, { backgroundColor: elementColor }]}>
-                <Text style={styles.practiceBulletText}>✓</Text>
-              </View>
-              <Text style={styles.practiceText}>{practice}</Text>
+        {/* Practice Night - Dark card with white text */}
+        {spiritual_practice.practice_night.primary.en && (
+          <View style={[styles.card, { borderColor: accent.primary }]}>
+            <View style={styles.cardHeader}>
+              <Moon size={24} color={accent.primary} />
+              <Text style={styles.cardTitle}>Practice Night</Text>
             </View>
-          ))}
+            <View style={[styles.highlightBox, { borderLeftColor: accent.primary }]}>
+              <Text style={styles.practiceText}>{spiritual_practice.practice_night.primary.en}</Text>
+            </View>
+          </View>
+        )}
+
+        {/* Spiritual Practice Guidance */}
+        <View style={[styles.card, { borderColor: accent.primary }]}>
+          <View style={styles.cardHeader}>
+            <BookOpen size={24} color={accent.primary} />
+            <Text style={styles.cardTitle}>Spiritual Practice</Text>
+          </View>
+          <Text style={styles.practiceText}>{spiritual_practice.en}</Text>
+          {spiritual_practice.fr && (
+            <Text style={[styles.practiceText, styles.frenchText]}>{spiritual_practice.fr}</Text>
+          )}
         </View>
 
-        {/* Timing Recommendations */}
-        <View style={[styles.card, { borderLeftColor: '#fbbf24' }]}>
-          <Text style={styles.cardTitle}>⏰ Timing Recommendations</Text>
-          <View style={styles.timingContainer}>
-            <Text style={styles.timingIcon}>🕐</Text>
-            <Text style={styles.timingText}>{spiritual_practices.timing}</Text>
+        {/* Divine Names - Dark with white Arabic text */}
+        {spiritual_practice.divine_names?.note?.en && (
+          <View style={[styles.card, { 
+            borderColor: accent.primary, 
+            borderLeftWidth: Borders.accent, 
+            borderLeftColor: accent.primary 
+          }]}>
+            <View style={styles.cardHeader}>
+              <Sparkles size={24} color={accent.primary} />
+              <Text style={styles.cardTitle}>Divine Names to Recite</Text>
+            </View>
+            
+            {/* White Arabic text on dark background */}
+            <View style={[styles.arabicContainer, { backgroundColor: DarkTheme.cardBackgroundAlt }]}>
+              <Text style={styles.arabicText}>
+                {spiritual_practice.divine_names.note.en.match(/[\u0600-\u06FF\s]+/)?.[0] || ''}
+              </Text>
+            </View>
+            
+            <Text style={styles.practiceText}>{spiritual_practice.divine_names.note.en}</Text>
           </View>
-        </View>
+        )}
+
+        {/* Spiritual Connections - Angel & Jinn */}
+        {(spiritual_practice.angel.transliteration || spiritual_practice.jinn.transliteration) && (
+          <View style={[styles.card, { borderColor: accent.primary }]}>
+            <View style={styles.cardHeader}>
+              <Users size={24} color={accent.primary} />
+              <Text style={styles.cardTitle}>Spiritual Connections</Text>
+            </View>
+            
+            {spiritual_practice.angel.transliteration && (
+              <View style={styles.connectionItem}>
+                <Text style={styles.connectionLabel}>Angel</Text>
+                <View style={[styles.connectionBox, { borderLeftColor: accent.primary }]}>
+                  <Text style={styles.connectionArabic}>{spiritual_practice.angel.arabic}</Text>
+                  <Text style={styles.connectionTranslit}>({spiritual_practice.angel.transliteration})</Text>
+                </View>
+              </View>
+            )}
+            
+            {spiritual_practice.jinn.transliteration && (
+              <View style={styles.connectionItem}>
+                <Text style={styles.connectionLabel}>Jinn</Text>
+                <View style={[styles.connectionBox, { borderLeftColor: accent.primary }]}>
+                  <Text style={styles.connectionArabic}>{spiritual_practice.jinn.arabic}</Text>
+                  <Text style={styles.connectionTranslit}>({spiritual_practice.jinn.transliteration})</Text>
+                </View>
+              </View>
+            )}
+          </View>
+        )}
 
         {/* Dhikr Count Info */}
-        <View style={[styles.card, { borderLeftColor: '#3b82f6' }]}>
-          <Text style={styles.cardTitle}>ℹ️ About Your Dhikr Count</Text>
+        <View style={[styles.card, { borderColor: accent.secondary, borderLeftWidth: Borders.accent, borderLeftColor: accent.secondary }]}>
+          <View style={styles.cardHeader}>
+            <Info size={24} color={accent.secondary} />
+            <Text style={styles.cardTitle}>About Your Dhikr Count</Text>
+          </View>
           <Text style={styles.infoText}>
             The number {repetitionCount} is calculated from your combined Abjad numerology total. 
             This personalized count is significant for your spiritual practice and should be 
@@ -129,165 +192,178 @@ export default function SpiritualTab({ data, elementColor }: SpiritualTabProps) 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f1419',
+    backgroundColor: DarkTheme.screenBackground,
   },
   content: {
-    padding: 16,
+    padding: Spacing.screenPadding,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: Spacing.sectionGap,
+  },
+  title: {
+    fontSize: Typography.h1,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
+  },
+  subtitle: {
+    fontSize: Typography.label,
+    color: DarkTheme.textTertiary,
+    textAlign: 'center',
+    paddingHorizontal: Spacing.lg,
   },
   card: {
-    backgroundColor: '#1a1f2e',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
-    borderLeftWidth: 4,
+    backgroundColor: DarkTheme.cardBackground,
+    borderRadius: Borders.radiusLg,
+    padding: Spacing.xl,
+    marginBottom: Spacing.lg,
+    borderWidth: Borders.standard,
+    ...Shadows.card,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#ffffff',
-    marginBottom: 16,
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
   },
-  sectionDescription: {
-    fontSize: 14,
-    color: '#a8b2d1',
-    marginBottom: 16,
+  practiceText: {
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.body * Typography.lineHeightRelaxed,
+  },
+  frenchText: {
+    marginTop: Spacing.md,
     fontStyle: 'italic',
+    color: DarkTheme.textTertiary,
+  },
+  highlightBox: {
+    backgroundColor: DarkTheme.cardBackgroundAlt,
+    borderLeftWidth: 4,
+    padding: Spacing.lg,
+    borderRadius: Borders.radiusSm,
+  },
+  arabicContainer: {
+    padding: Spacing.xl,
+    borderRadius: Borders.radiusMd,
+    marginBottom: Spacing.lg,
+    alignItems: 'center',
+  },
+  arabicText: {
+    fontSize: 36,
+    color: DarkTheme.textPrimary,
+    fontWeight: Typography.weightBold,
+    textAlign: 'center',
+    lineHeight: 56,
+  },
+  connectionItem: {
+    marginBottom: Spacing.lg,
+  },
+  connectionLabel: {
+    fontSize: Typography.label,
+    color: DarkTheme.textTertiary,
+    marginBottom: Spacing.sm,
+    fontWeight: Typography.weightSemibold,
+  },
+  connectionBox: {
+    backgroundColor: DarkTheme.cardBackgroundAlt,
+    borderLeftWidth: 4,
+    padding: Spacing.lg,
+    borderRadius: Borders.radiusSm,
+  },
+  connectionArabic: {
+    fontSize: Typography.h2,
+    color: DarkTheme.textPrimary,
+    marginBottom: Spacing.xs,
+  },
+  connectionTranslit: {
+    fontSize: Typography.label,
+    color: DarkTheme.textSecondary,
   },
   counterContainer: {
     alignItems: 'center',
   },
   targetLabel: {
-    fontSize: 14,
-    color: '#a8b2d1',
-    marginBottom: 16,
+    fontSize: Typography.label,
+    color: DarkTheme.textTertiary,
+    marginBottom: Spacing.lg,
   },
   progressBarContainer: {
     width: '100%',
-    marginBottom: 20,
+    marginBottom: Spacing.xl,
   },
   progressBarBackground: {
     height: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 6,
+    borderRadius: Borders.radiusSm,
     overflow: 'hidden',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   progressBarFill: {
     height: '100%',
-    borderRadius: 6,
+    borderRadius: Borders.radiusSm,
   },
   progressText: {
-    fontSize: 12,
-    color: '#8892b0',
+    fontSize: Typography.caption,
+    color: DarkTheme.textMuted,
     textAlign: 'center',
   },
   countDisplay: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: 20,
+    marginBottom: Spacing.xl,
   },
   currentCount: {
     fontSize: 48,
-    fontWeight: 'bold',
+    fontWeight: Typography.weightBold,
   },
   countSeparator: {
     fontSize: 32,
-    color: '#8892b0',
-    marginHorizontal: 8,
+    color: DarkTheme.textMuted,
+    marginHorizontal: Spacing.sm,
   },
   targetCount: {
     fontSize: 32,
-    color: '#a8b2d1',
+    color: DarkTheme.textTertiary,
   },
   counterButtons: {
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.md,
   },
   counterButton: {
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.xxxl,
+    borderRadius: Borders.radiusMd,
   },
   counterButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: DarkTheme.textPrimary,
+    fontSize: Typography.body,
+    fontWeight: Typography.weightBold,
   },
   resetButton: {
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
+    borderRadius: Borders.radiusMd,
     borderWidth: 1,
-    borderColor: '#ef4444',
   },
   resetButtonText: {
-    color: '#ef4444',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  namesContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  nameCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  nameText: {
-    fontSize: 16,
-    color: '#ffffff',
-    fontWeight: '500',
-  },
-  practiceItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  practiceBullet: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-    marginTop: 2,
-  },
-  practiceBulletText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  practiceText: {
-    flex: 1,
-    fontSize: 15,
-    color: '#e0e6f0',
-    lineHeight: 22,
-  },
-  timingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(251, 191, 36, 0.1)',
-    borderRadius: 8,
-    padding: 16,
-  },
-  timingIcon: {
-    fontSize: 32,
-    marginRight: 16,
-  },
-  timingText: {
-    flex: 1,
-    fontSize: 15,
-    color: '#e0e6f0',
-    lineHeight: 22,
+    fontSize: Typography.body,
+    fontWeight: Typography.weightSemibold,
   },
   infoText: {
-    fontSize: 15,
-    color: '#e0e6f0',
-    lineHeight: 24,
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.body * Typography.lineHeightRelaxed,
   },
 });

@@ -1,107 +1,303 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { IstikharaData } from '../../../types/istikhara';
+import * as Haptics from 'expo-haptics';
+import {
+    CheckCircle,
+    ChevronDown,
+    ChevronUp,
+    Heart,
+    Info,
+    Lightbulb,
+    Sparkles,
+    Star,
+    Sun,
+    Target,
+    TrendingUp
+} from "lucide-react-native";
+import React, { useState } from "react";
+import {
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { Borders, DarkTheme, ElementAccents, Shadows, Spacing, Typography } from "../../../constants/DarkTheme";
+import { useLanguage } from "../../../contexts/LanguageContext";
+import type { IstikharaData } from "../../../types/istikhara";
+
+const { width } = Dimensions.get('window');
 
 interface BlessedDayTabProps {
   data: IstikharaData;
   elementColor: string;
 }
 
-export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps) {
-  const { blessed_day, monthly_sadaqah, lifetime_sadaqah } = data.burujProfile;
+const DAYS_OF_WEEK = [
+  { en: 'Sunday', fr: 'Dimanche', emoji: '☀️' },
+  { en: 'Monday', fr: 'Lundi', emoji: '🌙' },
+  { en: 'Tuesday', fr: 'Mardi', emoji: '⚔️' },
+  { en: 'Wednesday', fr: 'Mercredi', emoji: '📚' },
+  { en: 'Thursday', fr: 'Jeudi', emoji: '⚡' },
+  { en: 'Friday', fr: 'Vendredi', emoji: '🌟' },
+  { en: 'Saturday', fr: 'Samedi', emoji: '🪐' },
+];
 
-  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps) {
+  const { language } = useLanguage();
+  const profile = data.burujProfile;
+  const elementKey = profile.element.toLowerCase() as "fire" | "earth" | "air" | "water";
+  const accent = ElementAccents[elementKey];
+  const blessedDay = profile.blessed_day;
+
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['tips']));
+
+  const toggleSection = async (section: string) => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setExpandedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(section)) {
+        newSet.delete(section);
+      } else {
+        newSet.add(section);
+      }
+      return newSet;
+    });
+  };
+
+  const dayIndex = DAYS_OF_WEEK.findIndex(
+    d => d.en === blessedDay.day.en || d.fr === blessedDay.day.fr
+  );
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.content}>
-        {/* Blessed Day Card */}
-        <View style={[styles.card, { borderLeftColor: elementColor }]}>
-          <Text style={styles.cardTitle}>📅 Your Blessed Day</Text>
-          <View style={styles.dayContainer}>
-            <Text style={[styles.dayName, { color: elementColor }]}>{blessed_day.day}</Text>
-            <Text style={styles.daySubtext}>Best day of the week for important activities</Text>
-          </View>
-        </View>
+    <ScrollView 
+      style={styles.container} 
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>
+          {language === 'en' ? 'Your Blessed Day' : 'Votre Jour Béni'}
+        </Text>
+        <Text style={styles.subtitle}>
+          {language === 'en' 
+            ? 'The most auspicious day for important decisions and spiritual practices' 
+            : 'Le jour le plus propice pour les décisions importantes et les pratiques spirituelles'}
+        </Text>
+      </View>
 
-        {/* Days of Week Visual */}
-        <View style={[styles.card, { borderLeftColor: elementColor }]}>
-          <Text style={styles.cardTitle}>Weekly Overview</Text>
-          <View style={styles.daysGrid}>
-            {daysOfWeek.map((day) => (
+      {/* Main Day Display - Dark Card with Accent Highlights */}
+      <View style={[styles.mainDayCard, { borderColor: accent.primary }]}>
+        <View style={[styles.iconCircle, { backgroundColor: accent.glow, borderColor: accent.primary }]}>
+          <Text style={styles.dayEmoji}>
+            {dayIndex >= 0 ? DAYS_OF_WEEK[dayIndex].emoji : '📅'}
+          </Text>
+        </View>
+        
+        <Text style={[styles.dayName, { color: accent.primary }]}>
+          {blessedDay.day[language as 'en' | 'fr']}
+        </Text>
+        
+        <Text style={styles.daySubtext}>
+          {language === 'en' 
+            ? 'Your Power Day of the Week' 
+            : 'Votre Jour de Puissance de la Semaine'}
+        </Text>
+        
+        {blessedDay.day_number !== null && (
+          <View style={[styles.dayNumberBadge, { backgroundColor: accent.glow, borderColor: accent.primary }]}>
+            <Text style={[styles.dayNumberText, { color: accent.primary }]}>
+              {language === 'en' ? 'Day' : 'Jour'} #{blessedDay.day_number}
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {/* Weekly Overview - Dark Card with Colored Day Icons */}
+      <View style={[styles.card, { borderColor: accent.primary }]}>
+        <View style={styles.cardHeader}>
+          <Sun size={20} color={accent.primary} />
+          <Text style={styles.cardTitle}>
+            {language === 'en' ? 'Weekly Overview' : 'Aperçu Hebdomadaire'}
+          </Text>
+        </View>
+        <View style={styles.daysGrid}>
+          {DAYS_OF_WEEK.map((day, idx) => {
+            const isBlessed = day.en === blessedDay.day.en;
+            return (
               <View
-                key={day}
+                key={idx}
                 style={[
                   styles.dayPill,
-                  day === blessed_day.day && {
-                    backgroundColor: elementColor,
+                  { backgroundColor: DarkTheme.cardBackgroundAlt },
+                  isBlessed && { 
+                    backgroundColor: accent.glow,
+                    borderColor: accent.primary,
+                    borderWidth: 2,
                   },
                 ]}
               >
+                <Text style={styles.dayPillEmoji}>{day.emoji}</Text>
                 <Text
                   style={[
                     styles.dayPillText,
-                    day === blessed_day.day && styles.dayPillTextActive,
+                    isBlessed && { color: accent.primary, fontWeight: '700' },
                   ]}
                 >
-                  {day.substring(0, 3)}
+                  {day[language as 'en' | 'fr'].substring(0, 3)}
                 </Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* Best Activities Section */}
+      {blessedDay.best_for[language as 'en' | 'fr'].length > 0 && (
+        <View style={[styles.card, { borderColor: accent.primary, borderLeftWidth: Borders.accent, borderLeftColor: accent.primary }]}>
+          <View style={styles.cardHeader}>
+            <CheckCircle size={20} color={accent.primary} />
+            <Text style={styles.cardTitle}>
+              {language === 'en' ? 'Best Activities' : 'Meilleures Activités'}
+            </Text>
+          </View>
+          <Text style={styles.cardSubtitle}>
+            {language === 'en'
+              ? 'Recommended activities for your blessed day'
+              : 'Activités recommandées pour votre jour béni'}
+          </Text>
+          <View style={styles.activitiesList}>
+            {blessedDay.best_for[language as 'en' | 'fr'].map((activity, index) => (
+              <View key={index} style={styles.activityItem}>
+                <View style={[styles.activityBullet, { backgroundColor: accent.primary }]} />
+                <Text style={styles.activityText}>{activity}</Text>
               </View>
             ))}
           </View>
         </View>
+      )}
 
-        {/* Favored Activities */}
-        <View style={[styles.card, { borderLeftColor: elementColor }]}>
-          <Text style={styles.cardTitle}>✨ Favored Activities</Text>
-          {blessed_day.activities.map((activity, index) => (
-            <View key={index} style={styles.activityItem}>
-              <Text style={styles.activityIcon}>🌟</Text>
-              <Text style={styles.activityText}>{activity}</Text>
+      {/* Special Notes */}
+      {blessedDay.special_notes && blessedDay.special_notes[language as 'en' | 'fr'].length > 0 && (
+        <View style={[styles.card, { borderColor: accent.primary }]}>
+          <View style={styles.cardHeader}>
+            <Star size={20} color={accent.primary} />
+            <Text style={styles.cardTitle}>
+              {language === 'en' ? 'Spiritual Significance' : 'Signification Spirituelle'}
+            </Text>
+          </View>
+          {blessedDay.special_notes[language as 'en' | 'fr'].map((note, index) => (
+            <View key={index} style={styles.noteItem}>
+              <Star size={14} color={accent.primary} />
+              <Text style={styles.noteText}>{note}</Text>
             </View>
           ))}
         </View>
+      )}
 
-        {/* Associated Prophet */}
-        <View style={[styles.card, { borderLeftColor: elementColor }]}>
-          <Text style={styles.cardTitle}>👤 Associated Prophet</Text>
-          <View style={styles.prophetContainer}>
-            <Text style={styles.prophetName}>{blessed_day.prophet}</Text>
+      {/* Associated Prophet */}
+      {blessedDay.associated_prophet && (
+        <View style={[styles.card, { borderColor: accent.primary }]}>
+          <View style={styles.cardHeader}>
+            <Sparkles size={20} color={accent.primary} />
+            <Text style={styles.cardTitle}>
+              {language === 'en' ? 'Associated Prophet' : 'Prophète Associé'}
+            </Text>
+          </View>
+          <View style={styles.prophetContent}>
+            <Text style={styles.prophetArabic}>{blessedDay.associated_prophet.arabic}</Text>
+            <Text style={styles.prophetName}>
+              {blessedDay.associated_prophet[language as 'en' | 'fr']}
+            </Text>
           </View>
         </View>
+      )}
 
-        {/* Special Notes */}
-        {blessed_day.special_notes && (
-          <View style={[styles.card, { borderLeftColor: '#3b82f6' }]}>
-            <Text style={styles.cardTitle}>ℹ️ Special Notes</Text>
-            <Text style={styles.notesText}>{blessed_day.special_notes}</Text>
+      {/* Practical Tips */}
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => toggleSection('tips')}
+      >
+        <View style={[styles.card, { borderColor: accent.primary }]}>
+          <View style={styles.collapsibleHeader}>
+            <View style={styles.cardHeader}>
+              <Lightbulb size={20} color={accent.primary} />
+              <Text style={styles.cardTitle}>
+                {language === 'en' ? 'Practical Tips' : 'Conseils Pratiques'}
+              </Text>
+            </View>
+            {expandedSections.has('tips') ? (
+              <ChevronUp size={20} color={accent.primary} />
+            ) : (
+              <ChevronDown size={20} color={accent.primary} />
+            )}
           </View>
-        )}
 
-        {/* Monthly Sadaqah */}
-        <View style={[styles.card, { borderLeftColor: '#10b981' }]}>
-          <Text style={styles.cardTitle}>💚 Monthly Sadaqah</Text>
-          <Text style={styles.sadaqahDescription}>{monthly_sadaqah.description}</Text>
-          {monthly_sadaqah.suggested_amount && (
-            <View style={styles.amountContainer}>
-              <Text style={styles.amountLabel}>Suggested Amount:</Text>
-              <Text style={styles.amountValue}>{monthly_sadaqah.suggested_amount}</Text>
+          {expandedSections.has('tips') && (
+            <View style={styles.tipsContent}>
+              <View style={[styles.tipCard, { backgroundColor: DarkTheme.cardBackgroundAlt }]}>
+                <View style={styles.tipHeader}>
+                  <Target size={16} color={accent.primary} />
+                  <Text style={styles.tipTitle}>
+                    {language === 'en' ? 'Pro Tip' : 'Conseil Pro'}
+                  </Text>
+                </View>
+                <Text style={styles.tipText}>
+                  {language === 'en'
+                    ? `Schedule your most important decisions and spiritual practices on ${blessedDay.day.en}. This day carries special energy aligned with your elemental nature.`
+                    : `Planifiez vos décisions les plus importantes et vos pratiques spirituelles le ${blessedDay.day.fr}. Ce jour porte une énergie spéciale alignée avec votre nature élémentaire.`}
+                </Text>
+              </View>
+
+              <View style={[styles.tipCard, { backgroundColor: DarkTheme.cardBackgroundAlt }]}>
+                <View style={styles.tipHeader}>
+                  <TrendingUp size={16} color={accent.primary} />
+                  <Text style={styles.tipTitle}>
+                    {language === 'en' ? 'Weekly Planning' : 'Planification Hebdomadaire'}
+                  </Text>
+                </View>
+                <Text style={styles.tipText}>
+                  {language === 'en'
+                    ? 'Start planning your week with this day in mind. Reserve it for high-priority activities and avoid scheduling routine tasks.'
+                    : 'Commencez à planifier votre semaine en gardant ce jour à l\'esprit. Réservez-le pour des activités hautement prioritaires et évitez de planifier des tâches routinières.'}
+                </Text>
+              </View>
+
+              <View style={[styles.tipCard, { backgroundColor: DarkTheme.cardBackgroundAlt }]}>
+                <View style={styles.tipHeader}>
+                  <Heart size={16} color={accent.primary} />
+                  <Text style={styles.tipTitle}>
+                    {language === 'en' ? 'Element Alignment' : 'Alignement Élémentaire'}
+                  </Text>
+                </View>
+                <Text style={styles.tipText}>
+                  {language === 'en'
+                    ? `As a ${profile.element} element person, this day resonates with your core energy. Use it to recharge and align with your true nature.`
+                    : `En tant que personne de l'élément ${profile.element}, ce jour résonne avec votre énergie centrale. Utilisez-le pour vous ressourcer et vous aligner avec votre vraie nature.`}
+                </Text>
+              </View>
             </View>
           )}
         </View>
+      </TouchableOpacity>
 
-        {/* Lifetime Sadaqah */}
-        <View style={[styles.card, { borderLeftColor: '#8b5cf6' }]}>
-          <Text style={styles.cardTitle}>💜 Lifetime Sadaqah</Text>
-          <Text style={styles.sadaqahDescription}>{lifetime_sadaqah.description}</Text>
-          {lifetime_sadaqah.impact && (
-            <View style={styles.impactContainer}>
-              <Text style={styles.impactLabel}>Impact:</Text>
-              <Text style={styles.impactText}>{lifetime_sadaqah.impact}</Text>
-            </View>
-          )}
+      {/* Note or Temporary Suggestion */}
+      {(blessedDay.note || blessedDay.temporary_suggestion) && (
+        <View style={[styles.card, { borderColor: accent.secondary, borderLeftWidth: Borders.accent, borderLeftColor: accent.secondary }]}>
+          <View style={styles.cardHeader}>
+            <Info size={20} color={accent.secondary} />
+            <Text style={[styles.cardTitle, { color: DarkTheme.textPrimary }]}>
+              {language === 'en' ? 'Important Note' : 'Note Importante'}
+            </Text>
+          </View>
+          <Text style={styles.noteInfoText}>
+            {(blessedDay.note || blessedDay.temporary_suggestion)?.[language as 'en' | 'fr']}
+          </Text>
         </View>
-      </View>
+      )}
+
+      {/* Bottom Spacing */}
+      <View style={styles.bottomSpacer} />
     </ScrollView>
   );
 }
@@ -109,131 +305,198 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f1419',
+    backgroundColor: DarkTheme.screenBackground,
   },
-  content: {
-    padding: 16,
+  scrollContent: {
+    padding: Spacing.screenPadding,
+    paddingBottom: 32,
   },
-  card: {
-    backgroundColor: '#1a1f2e',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
-    borderLeftWidth: 4,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#ffffff',
-    marginBottom: 16,
-  },
-  dayContainer: {
+  header: {
     alignItems: 'center',
-    paddingVertical: 16,
+    marginBottom: Spacing.sectionGap,
+  },
+  title: {
+    fontSize: Typography.h1,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
+  },
+  subtitle: {
+    fontSize: Typography.label,
+    color: DarkTheme.textTertiary,
+    textAlign: 'center',
+    paddingHorizontal: Spacing.lg,
+    lineHeight: Typography.label * Typography.lineHeightNormal,
+  },
+  mainDayCard: {
+    borderRadius: Borders.radiusXl,
+    borderWidth: Borders.emphasized,
+    marginBottom: Spacing.xl,
+    padding: Spacing.xxxl,
+    alignItems: 'center',
+    backgroundColor: DarkTheme.cardBackground,
+    ...Shadows.card,
+  },
+  iconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: Borders.radiusCircle,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.lg,
+  },
+  dayEmoji: {
+    fontSize: 48,
   },
   dayName: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    fontSize: 48,
+    fontWeight: Typography.weightBold,
+    marginBottom: Spacing.sm,
   },
   daySubtext: {
-    fontSize: 14,
-    color: '#a8b2d1',
+    fontSize: Typography.label,
+    color: DarkTheme.textSecondary,
     textAlign: 'center',
+    marginBottom: Spacing.md,
+  },
+  dayNumberBadge: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: Borders.radiusLg,
+    borderWidth: 1,
+  },
+  dayNumberText: {
+    fontSize: Typography.label,
+    fontWeight: Typography.weightSemibold,
+  },
+  card: {
+    borderRadius: Borders.radiusLg,
+    padding: Spacing.xl,
+    borderWidth: Borders.standard,
+    marginBottom: Spacing.xl,
+    backgroundColor: DarkTheme.cardBackground,
+    ...Shadows.card,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  cardTitle: {
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+  },
+  cardSubtitle: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textMuted,
+    marginBottom: Spacing.lg,
   },
   daysGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginTop: 8,
+    gap: Spacing.sm,
   },
   dayPill: {
-    width: '13%',
+    width: (width - 72) / 7,
     aspectRatio: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 8,
+    borderRadius: Borders.radiusMd,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+  },
+  dayPillEmoji: {
+    fontSize: 16,
+    marginBottom: 2,
   },
   dayPillText: {
-    fontSize: 11,
-    color: '#a8b2d1',
-    fontWeight: '600',
+    fontSize: 10,
+    color: DarkTheme.textTertiary,
+    fontWeight: Typography.weightSemibold,
   },
-  dayPillTextActive: {
-    color: '#ffffff',
+  activitiesList: {
+    gap: Spacing.md,
   },
   activityItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    gap: Spacing.md,
   },
-  activityIcon: {
-    fontSize: 18,
-    marginRight: 12,
-    marginTop: 2,
+  activityBullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: 8,
   },
   activityText: {
     flex: 1,
-    fontSize: 15,
-    color: '#e0e6f0',
-    lineHeight: 22,
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.body * Typography.lineHeightNormal,
   },
-  prophetContainer: {
-    backgroundColor: 'rgba(233, 69, 96, 0.1)',
-    borderRadius: 8,
-    padding: 16,
+  noteItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  noteText: {
+    flex: 1,
+    fontSize: Typography.label,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.label * Typography.lineHeightNormal,
+  },
+  prophetContent: {
     alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  prophetArabic: {
+    fontSize: Typography.h1,
+    color: DarkTheme.textPrimary,
+    fontWeight: Typography.weightBold,
   },
   prophetName: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#e94560',
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
   },
-  notesText: {
-    fontSize: 15,
-    color: '#e0e6f0',
-    lineHeight: 24,
-    fontStyle: 'italic',
-  },
-  sadaqahDescription: {
-    fontSize: 15,
-    color: '#e0e6f0',
-    lineHeight: 24,
-    marginBottom: 12,
-  },
-  amountContainer: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    borderRadius: 8,
-    padding: 12,
+  collapsibleHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  amountLabel: {
-    fontSize: 14,
-    color: '#a8b2d1',
+  tipsContent: {
+    marginTop: Spacing.lg,
+    gap: Spacing.md,
   },
-  amountValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#10b981',
+  tipCard: {
+    borderRadius: Borders.radiusMd,
+    padding: Spacing.lg,
   },
-  impactContainer: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+  tipHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
-  impactLabel: {
-    fontSize: 14,
-    color: '#a8b2d1',
-    marginBottom: 8,
+  tipTitle: {
+    fontSize: Typography.label,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
   },
-  impactText: {
-    fontSize: 15,
-    color: '#e0e6f0',
-    lineHeight: 24,
+  tipText: {
+    fontSize: Typography.label,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.label * Typography.lineHeightNormal,
+  },
+  noteInfoText: {
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.body * Typography.lineHeightRelaxed,
+  },
+  bottomSpacer: {
+    height: 20,
   },
 });

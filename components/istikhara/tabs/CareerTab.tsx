@@ -1,5 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { BookOpen, CheckCircle, ChevronDown, ChevronUp, Lightbulb, XCircle } from 'lucide-react-native';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Borders, DarkTheme, ElementAccents, Shadows, Spacing, Typography } from '../../../constants/DarkTheme';
 import { IstikharaData } from '../../../types/istikhara';
 
 interface CareerTabProps {
@@ -9,56 +11,171 @@ interface CareerTabProps {
 
 export default function CareerTab({ data, elementColor }: CareerTabProps) {
   const { career } = data.burujProfile;
+  const elementKey = data.burujProfile.element.toLowerCase() as "fire" | "earth" | "air" | "water";
+  const accent = ElementAccents[elementKey];
+  
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+
+  const toggleCategory = (category: string) => {
+    setExpandedCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
-        {/* Categories */}
-        <View style={[styles.card, { borderLeftColor: elementColor }]}>
-          <Text style={styles.cardTitle}>🎯 Career Categories</Text>
-          <View style={styles.tagsContainer}>
-            {career.categories.map((category, index) => (
-              <View key={index} style={[styles.tag, { borderColor: elementColor }]}>
-                <Text style={[styles.tagText, { color: elementColor }]}>{category}</Text>
-              </View>
-            ))}
-          </View>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Career & Vocation Guidance</Text>
+          <Text style={styles.subtitle}>Career paths that resonate with your spiritual energy</Text>
         </View>
 
-        {/* Recommended Industries */}
-        <View style={[styles.card, { borderLeftColor: elementColor }]}>
-          <Text style={styles.cardTitle}>✅ Recommended Industries</Text>
-          {career.recommended_industries.map((industry, index) => (
-            <View key={index} style={styles.listItem}>
-              <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listText}>{industry}</Text>
-            </View>
-          ))}
+        {/* Element Badge */}
+        <View style={[styles.elementBadge, { borderColor: accent.primary }]}>
+          <Text style={styles.elementEmoji}>{data.burujProfile.element_emoji}</Text>
+          <Text style={[styles.elementText, { color: accent.primary }]}>
+            {data.burujProfile.element.charAt(0).toUpperCase() + data.burujProfile.element.slice(1)} Element
+          </Text>
         </View>
+
+        {/* Traditional Wisdom - Dark card with accent border and left bar */}
+        <View style={[styles.wisdomCard, { borderLeftColor: accent.primary, borderColor: accent.primary }]}>
+          <View style={styles.cardHeader}>
+            <BookOpen size={24} color={accent.primary} />
+            <Text style={[styles.cardTitle, { color: DarkTheme.textPrimary }]}>Traditional Wisdom</Text>
+          </View>
+          
+          <View style={[styles.quoteContainer, { borderLeftColor: accent.primary }]}>
+            <Text style={styles.quoteText}>{career.traditional.en}</Text>
+          </View>
+          
+          <Text style={styles.sourceText}>Traditional Islamic Guidance</Text>
+        </View>
+
+        {/* Career Principle */}
+        <View style={[styles.card, { borderColor: accent.primary }]}>
+          <View style={styles.cardHeader}>
+            <Lightbulb size={24} color={accent.primary} />
+            <Text style={[styles.cardTitle, { color: DarkTheme.textPrimary }]}>Guiding Principle</Text>
+          </View>
+          <Text style={styles.guidanceText}>{career.principle.en}</Text>
+          {career.principle.fr && (
+            <Text style={[styles.guidanceText, styles.frenchText]}>{career.principle.fr}</Text>
+          )}
+        </View>
+
+        {/* Modern Recommended Fields */}
+        {career.modern_recommended.en.length > 0 && (
+          <View style={[styles.card, { borderColor: accent.primary }]}>
+            <View style={styles.cardHeader}>
+              <CheckCircle size={24} color={accent.primary} />
+              <Text style={[styles.cardTitle, { color: DarkTheme.textPrimary }]}>Recommended Career Fields</Text>
+            </View>
+            
+            <View style={styles.buttonGroup}>
+              <TouchableOpacity 
+                style={[styles.expandButton, { backgroundColor: accent.glow, borderColor: accent.primary }]}
+                onPress={() => {
+                  const allCategories = career.modern_recommended.en
+                    .filter((item: any) => typeof item === 'object' && item.category)
+                    .map((item: any) => item.category);
+                  setExpandedCategories(new Set(allCategories));
+                }}
+              >
+                <Text style={[styles.expandButtonText, { color: accent.primary }]}>Expand All</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.expandButton, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: DarkTheme.borderSubtle }]}
+                onPress={() => setExpandedCategories(new Set())}
+              >
+                <Text style={[styles.expandButtonText, { color: DarkTheme.textTertiary }]}>Collapse All</Text>
+              </TouchableOpacity>
+            </View>
+
+            {career.modern_recommended.en.map((item: any, index: number) => {
+              // Handle categorized structure (new format)
+              if (typeof item === 'object' && item.category && item.items) {
+                const isExpanded = expandedCategories.has(item.category);
+                const itemCount = item.items.length;
+                
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    style={[styles.categoryCard, { 
+                      borderColor: accent.primary,
+                      backgroundColor: DarkTheme.cardBackgroundAlt
+                    }]}
+                    onPress={() => toggleCategory(item.category)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.categoryHeader}>
+                      <View style={styles.categoryTitleRow}>
+                        <Text style={styles.categoryIcon}>{item.icon}</Text>
+                        <View style={styles.categoryInfo}>
+                          <Text style={styles.categoryTitle}>{item.category}</Text>
+                          <Text style={styles.opportunityCount}>{itemCount} opportunities</Text>
+                        </View>
+                      </View>
+                      {isExpanded ? (
+                        <ChevronUp size={20} color={accent.primary} />
+                      ) : (
+                        <ChevronDown size={20} color={accent.primary} />
+                      )}
+                    </View>
+
+                    {isExpanded && (
+                      <View style={styles.categoryItems}>
+                        {item.items.map((subItem: string, subIndex: number) => (
+                          <View key={subIndex} style={styles.listItem}>
+                            <View style={[styles.bullet, { backgroundColor: accent.primary }]} />
+                            <Text style={styles.listText}>{subItem}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              }
+              // Handle flat array structure (old format) - item is a string
+              return (
+                <View key={index} style={styles.listItem}>
+                  <View style={[styles.bullet, { backgroundColor: accent.primary }]} />
+                  <Text style={styles.listText}>{String(item)}</Text>
+                </View>
+              );
+            })}
+          </View>
+        )}
 
         {/* Careers to Avoid */}
-        <View style={[styles.card, { borderLeftColor: '#ef4444' }]}>
-          <Text style={styles.cardTitle}>⚠️ Careers to Avoid</Text>
-          {career.careers_to_avoid.map((career, index) => (
-            <View key={index} style={styles.listItem}>
-              <Text style={styles.bullet}>•</Text>
-              <Text style={[styles.listText, { color: '#fca5a5' }]}>{career}</Text>
+        {(career.avoid.traditional.en || career.avoid.modern.en) && (
+          <View style={[styles.card, { borderColor: accent.secondary, borderLeftColor: accent.secondary, borderLeftWidth: Borders.accent }]}>
+            <View style={styles.cardHeader}>
+              <XCircle size={24} color={accent.secondary} />
+              <Text style={[styles.cardTitle, { color: DarkTheme.textPrimary }]}>Careers to Avoid</Text>
             </View>
-          ))}
-        </View>
-
-        {/* Guiding Principles */}
-        <View style={[styles.card, { borderLeftColor: elementColor }]}>
-          <Text style={styles.cardTitle}>💡 Guiding Principles</Text>
-          {career.guiding_principles.map((principle, index) => (
-            <View key={index} style={styles.principleItem}>
-              <View style={[styles.principleNumber, { backgroundColor: elementColor }]}>
-                <Text style={styles.principleNumberText}>{index + 1}</Text>
+            {career.avoid.traditional.en && (
+              <View style={styles.avoidSection}>
+                <Text style={styles.avoidLabel}>Traditional:</Text>
+                <Text style={styles.avoidText}>{career.avoid.traditional.en}</Text>
               </View>
-              <Text style={styles.principleText}>{principle}</Text>
-            </View>
-          ))}
-        </View>
+            )}
+            {career.avoid.modern.en && (
+              <View style={styles.avoidSection}>
+                <Text style={styles.avoidLabel}>Modern:</Text>
+                <Text style={styles.avoidText}>{career.avoid.modern.en}</Text>
+              </View>
+            )}
+          </View>
+        )}
       </View>
     </ScrollView>
   );
@@ -67,81 +184,191 @@ export default function CareerTab({ data, elementColor }: CareerTabProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f1419',
+    backgroundColor: DarkTheme.screenBackground,
   },
   content: {
-    padding: 16,
+    padding: Spacing.screenPadding,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: Spacing.sectionGap,
+  },
+  title: {
+    fontSize: Typography.h1,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
+  },
+  subtitle: {
+    fontSize: Typography.label,
+    color: DarkTheme.textTertiary,
+    textAlign: 'center',
+    paddingHorizontal: Spacing.lg,
+  },
+  elementBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    padding: Spacing.lg,
+    borderRadius: Borders.radiusLg,
+    borderWidth: Borders.standard,
+    marginBottom: Spacing.xl,
+    backgroundColor: DarkTheme.cardBackground,
+    justifyContent: 'center',
+    ...Shadows.card,
+  },
+  elementEmoji: {
+    fontSize: 32,
+  },
+  elementText: {
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightBold,
+  },
+  wisdomCard: {
+    backgroundColor: DarkTheme.cardBackground,
+    borderRadius: Borders.radiusLg,
+    padding: Spacing.xl,
+    marginBottom: Spacing.lg,
+    borderLeftWidth: Borders.accent,
+    borderWidth: Borders.standard,
+    ...Shadows.card,
   },
   card: {
-    backgroundColor: '#1a1f2e',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
-    borderLeftWidth: 4,
+    backgroundColor: DarkTheme.cardBackground,
+    borderRadius: Borders.radiusLg,
+    padding: Spacing.xl,
+    marginBottom: Spacing.lg,
+    borderWidth: Borders.standard,
+    ...Shadows.card,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#ffffff',
-    marginBottom: 16,
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightSemibold,
   },
-  tagsContainer: {
+  quoteContainer: {
+    backgroundColor: DarkTheme.cardBackgroundAlt,
+    borderLeftWidth: 4,
+    padding: Spacing.lg,
+    borderRadius: Borders.radiusSm,
+    marginBottom: Spacing.md,
+  },
+  quoteText: {
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    fontStyle: 'italic',
+    lineHeight: Typography.body * Typography.lineHeightRelaxed,
+  },
+  sourceText: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textTertiary,
+    textAlign: 'right',
+  },
+  guidanceText: {
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.body * Typography.lineHeightRelaxed,
+  },
+  frenchText: {
+    marginTop: Spacing.md,
+    fontStyle: 'italic',
+    color: DarkTheme.textTertiary,
+  },
+  buttonGroup: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 8,
+    gap: Spacing.md,
+    marginBottom: Spacing.lg,
   },
-  tag: {
+  expandButton: {
+    flex: 1,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Borders.radiusMd,
     borderWidth: 1,
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    marginRight: 8,
-    marginBottom: 8,
+    alignItems: 'center',
   },
-  tagText: {
-    fontSize: 14,
-    fontWeight: '600',
+  expandButtonText: {
+    fontSize: Typography.label,
+    fontWeight: Typography.weightSemibold,
+  },
+  categoryCard: {
+    borderRadius: Borders.radiusMd,
+    borderWidth: Borders.standard,
+    marginBottom: Spacing.md,
+    overflow: 'hidden',
+    ...Shadows.subtle,
+  },
+  categoryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Spacing.lg,
+  },
+  categoryTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    flex: 1,
+  },
+  categoryIcon: {
+    fontSize: 28,
+  },
+  categoryInfo: {
+    flex: 1,
+  },
+  categoryTitle: {
+    fontSize: Typography.body,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    marginBottom: 2,
+  },
+  opportunityCount: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textMuted,
+  },
+  categoryItems: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: DarkTheme.borderSubtle,
   },
   listItem: {
     flexDirection: 'row',
-    marginBottom: 12,
+    marginBottom: Spacing.md,
+    marginTop: Spacing.sm,
     alignItems: 'flex-start',
   },
   bullet: {
-    fontSize: 20,
-    color: '#a8b2d1',
-    marginRight: 12,
-    marginTop: 2,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: Spacing.md,
+    marginTop: 8,
   },
   listText: {
     flex: 1,
-    fontSize: 15,
-    color: '#e0e6f0',
-    lineHeight: 22,
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.body * Typography.lineHeightNormal,
   },
-  principleItem: {
-    flexDirection: 'row',
-    marginBottom: 16,
-    alignItems: 'flex-start',
+  avoidSection: {
+    marginBottom: Spacing.md,
   },
-  principleNumber: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-    marginTop: 2,
+  avoidLabel: {
+    fontSize: Typography.label,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textTertiary,
+    marginBottom: Spacing.xs,
   },
-  principleNumberText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  principleText: {
-    flex: 1,
-    fontSize: 15,
-    color: '#e0e6f0',
-    lineHeight: 22,
+  avoidText: {
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.body * Typography.lineHeightNormal,
   },
 });
