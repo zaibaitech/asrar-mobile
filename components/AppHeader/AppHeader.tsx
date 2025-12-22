@@ -1,4 +1,4 @@
-import { Clock, Menu, User } from 'lucide-react-native';
+import { History, Menu, User } from 'lucide-react-native';
 import React from 'react';
 import {
     Dimensions,
@@ -19,8 +19,8 @@ interface AppHeaderProps {
   currentLanguage: 'EN' | 'FR';
   onLanguageChange: (lang: 'EN' | 'FR') => void;
   onProfilePress: () => void;
-  onClockPress: () => void;
   onMenuPress: () => void;
+  onHistoryPress?: () => void;
   showLanguageSelector?: boolean;
   backgroundColor?: string;
 }
@@ -30,8 +30,8 @@ export default function AppHeader({
   currentLanguage,
   onLanguageChange,
   onProfilePress,
-  onClockPress,
   onMenuPress,
+  onHistoryPress,
   showLanguageSelector = true,
   backgroundColor = '#FFFFFF',
 }: AppHeaderProps) {
@@ -120,17 +120,17 @@ export default function AppHeader({
             </View>
           )}
 
-          {/* Clock Icon */}
-          {!isSmallScreen && (
+          {/* History Icon */}
+          {onHistoryPress && (
             <TouchableOpacity
               style={styles.iconButton}
-              onPress={onClockPress}
-              accessibilityLabel="Divine timing"
+              onPress={onHistoryPress}
+              accessibilityLabel="Calculation history"
               accessibilityRole="button"
-              accessibilityHint="Opens divine timing and prayer times"
+              accessibilityHint="View saved calculations"
               activeOpacity={0.7}
             >
-              <Clock size={18} color="#6B7280" strokeWidth={2} />
+              <History size={18} color="#6B7280" strokeWidth={2} />
             </TouchableOpacity>
           )}
 

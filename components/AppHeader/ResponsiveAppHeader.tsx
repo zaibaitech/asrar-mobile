@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWindowDimensions, ImageSourcePropType } from 'react-native';
+import { ImageSourcePropType, useWindowDimensions } from 'react-native';
 import AppHeader from './AppHeader';
 import AppHeaderTablet from './AppHeaderTablet';
 
@@ -8,8 +8,8 @@ interface ResponsiveAppHeaderProps {
   currentLanguage: 'EN' | 'FR';
   onLanguageChange: (lang: 'EN' | 'FR') => void;
   onProfilePress: () => void;
-  onClockPress: () => void;
   onMenuPress: () => void;
+  onHistoryPress?: () => void;
   showLanguageSelector?: boolean;
   backgroundColor?: string;
   tabletBreakpoint?: number; // Default: 768px
@@ -27,7 +27,7 @@ interface ResponsiveAppHeaderProps {
  *   currentLanguage="EN"
  *   onLanguageChange={(lang) => setLanguage(lang)}
  *   onProfilePress={() => navigation.navigate('Profile')}
- *   onClockPress={() => navigation.navigate('DivineTiming')}
+ *   onHistoryPress={() => setShowHistory(true)}
  *   onMenuPress={() => navigation.openDrawer()}
  * />
  */
