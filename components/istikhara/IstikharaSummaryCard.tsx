@@ -12,6 +12,20 @@ interface IstikharaSummaryCardProps {
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
+// Helper function to translate element names
+function getElementName(element: string, language: 'en' | 'fr'): string {
+  if (language === 'fr') {
+    const elementMap: Record<string, string> = {
+      fire: 'Feu',
+      earth: 'Terre',
+      air: 'Air',
+      water: 'Eau',
+    };
+    return elementMap[element.toLowerCase()] || element;
+  }
+  return element.charAt(0).toUpperCase() + element.slice(1);
+}
+
 export function IstikharaSummaryCard({ result, language = 'en' }: IstikharaSummaryCardProps) {
   const profile = result.burujProfile;
   const element = profile.element as 'fire' | 'earth' | 'air' | 'water';
@@ -155,7 +169,7 @@ export function IstikharaSummaryCard({ result, language = 'en' }: IstikharaSumma
                 <Text style={[styles.centerScore, { color: config.primarySolid }]}>
                   {scores.main}%
                 </Text>
-                <Text style={styles.centerElement}>{profile.element}</Text>
+                <Text style={styles.centerElement}>{getElementName(profile.element, language)}</Text>
                 <Text style={styles.centerLabel}>
                   {language === 'en' ? 'Element' : 'Élément'}
                 </Text>

@@ -18,6 +18,7 @@ import {
     Keyboard,
     KeyboardAvoidingView,
     Platform,
+    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
@@ -25,10 +26,13 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import ResponsiveAppHeader from '../../components/AppHeader';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useIstikhara } from '../../hooks/useIstikhara';
 
 export default function IstikharaForm() {
   const router = useRouter();
+  const { language, setLanguage } = useLanguage();
   const { calculate, loading, error, result } = useIstikhara();
   
   const [personName, setPersonName] = useState('');
@@ -111,10 +115,17 @@ export default function IstikharaForm() {
   }, [result, loading, error]);
 
   return (
-    <LinearGradient
-      colors={['#0f172a', '#1e1b4b', '#312e81']}
-      style={styles.container}
-    >
+    <SafeAreaView style={styles.outerContainer}>
+      <ResponsiveAppHeader
+        currentLanguage={language === 'en' ? 'EN' : 'FR'}
+        onLanguageChange={(lang) => setLanguage(lang.toLowerCase() as 'en' | 'fr')}
+        onProfilePress={() => router.push('/modal')}
+        onMenuPress={() => console.log('Menu pressed')}
+      />
+      <LinearGradient
+        colors={['#0f172a', '#1e1b4b', '#312e81']}
+        style={styles.container}
+      >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -447,10 +458,15 @@ export default function IstikharaForm() {
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    backgroundColor: '#0f172a',
+  },
   container: {
     flex: 1,
   },

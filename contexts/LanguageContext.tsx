@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { translations } from '../constants/translations';
 
 type Language = 'en' | 'fr' | 'ar';
 
@@ -40,10 +41,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Simple translation function (can be expanded)
+  // Translation function with nested key support (e.g., "common.calculate")
   const t = (key: string) => {
-    // Placeholder - implement your translation logic here
-    return key;
+    const keys = key.split('.');
+    let value: any = translations[language];
+    
+    for (const k of keys) {
+      if (value && typeof value === 'object') {
+        value = value[k];
+      } else {
+        return key; // Return key if translation not found
+      }
+    }
+    
+    return typeof value === 'string' ? value : key;
   };
 
   return (

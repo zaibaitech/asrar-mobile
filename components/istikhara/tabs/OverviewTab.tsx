@@ -2,6 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Borders, DarkTheme, ElementAccents, Shadows, Spacing, Typography } from '../../../constants/DarkTheme';
 import { getElementBackgroundColors, getZodiacSign } from '../../../constants/zodiacData';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { IstikharaData } from '../../../types/istikhara';
 import { IstikharaSummaryCard } from '../IstikharaSummaryCard';
 
@@ -10,7 +11,19 @@ interface OverviewTabProps {
   elementColor: string;
 }
 
+// Helper function to get French element names
+function getElementNameFr(element: string): string {
+  const elementMap: Record<string, string> = {
+    fire: 'Feu',
+    earth: 'Terre',
+    air: 'Air',
+    water: 'Eau',
+  };
+  return elementMap[element.toLowerCase()] || element;
+}
+
 export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
+  const { t, language } = useLanguage();
   const { burujProfile, personTotal, motherTotal, combinedTotal, repetitionCount, burujRemainder } = data;
   const zodiacSign = getZodiacSign(burujRemainder);
   const elementColors = getElementBackgroundColors(burujProfile.element);
@@ -20,7 +33,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Summary Card at Top */}
-      <IstikharaSummaryCard result={data} language="en" />
+      <IstikharaSummaryCard result={data} language={language} />
       
       <View style={styles.content}>
         {/* Enhanced Buruj Sign Card */}
@@ -29,7 +42,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           <View style={styles.zodiacHeader}>
             <View style={styles.badgeContainer}>
               <View style={[styles.badge, { backgroundColor: accent.glow, borderColor: accent.primary }]}>
-                <Text style={[styles.badgeText, { color: accent.primary }]}>Intermediate</Text>
+                <Text style={[styles.badgeText, { color: accent.primary }]}>{t('istikhara.overview.intermediate')}</Text>
               </View>
             </View>
             <Text style={styles.zodiacIcon}>{zodiacSign?.symbol.split(' ')[0] || '♈️'}</Text>
@@ -41,7 +54,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           {/* Calculation Formula */}
           <View style={[styles.calculationBox, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
             <Text style={[styles.calculationText, { color: accent.primary }]}>
-              Calculation: {combinedTotal} ÷ 12 = {burujRemainder}
+              {t('istikhara.overview.calculation')}: {combinedTotal} ÷ 12 = {burujRemainder}
             </Text>
           </View>
 
@@ -49,43 +62,43 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           <View style={styles.infoGrid}>
             {/* Element */}
             <View style={[styles.infoCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>Element</Text>
+              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.element')}</Text>
               <Text style={styles.infoValue}>
-                {burujProfile.element_emoji} {burujProfile.element.charAt(0).toUpperCase() + burujProfile.element.slice(1)}
+                {burujProfile.element_emoji} {language === 'fr' ? getElementNameFr(burujProfile.element) : burujProfile.element.charAt(0).toUpperCase() + burujProfile.element.slice(1)}
               </Text>
             </View>
 
             {/* Modality */}
             <View style={[styles.infoCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>Modality</Text>
-              <Text style={styles.infoValue}>{zodiacSign?.modality || 'N/A'}</Text>
+              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.modality')}</Text>
+              <Text style={styles.infoValue}>{language === 'fr' ? zodiacSign?.modalityFr : zodiacSign?.modality || 'N/A'}</Text>
             </View>
 
             {/* Planetary Ruler */}
             <View style={[styles.infoCard, styles.infoCardFull, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>Planetary Ruler</Text>
+              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.planetaryRuler')}</Text>
               <Text style={styles.infoValue}>
-                {zodiacSign?.planetaryRuler.en || 'N/A'}{' '}
+                {language === 'fr' ? zodiacSign?.planetaryRuler.fr : zodiacSign?.planetaryRuler.en || 'N/A'}{' '}
                 <Text style={styles.arabicSmall}>({zodiacSign?.planetaryRuler.transliteration || ''})</Text>
               </Text>
             </View>
 
             {/* Temperament */}
             <View style={[styles.infoCard, styles.infoCardFull, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>Temperament</Text>
-              <Text style={styles.infoValue}>{zodiacSign?.temperament || 'N/A'}</Text>
+              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.temperament')}</Text>
+              <Text style={styles.infoValue}>{language === 'fr' ? zodiacSign?.temperamentFr : zodiacSign?.temperament || 'N/A'}</Text>
             </View>
 
             {/* Symbolism */}
             <View style={[styles.infoCard, styles.infoCardFull, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>Symbolism</Text>
+              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.symbolism')}</Text>
               <Text style={styles.infoValue}>{zodiacSign?.symbol || 'N/A'}</Text>
             </View>
 
             {/* Spiritual Quality */}
             <View style={[styles.infoCard, styles.infoCardFull, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>Spiritual Quality</Text>
-              <Text style={styles.infoValue}>{zodiacSign?.spiritualQuality || 'N/A'}</Text>
+              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.spiritualQuality')}</Text>
+              <Text style={styles.infoValue}>{language === 'fr' ? zodiacSign?.spiritualQualityFr : zodiacSign?.spiritualQuality || 'N/A'}</Text>
             </View>
           </View>
 
@@ -94,12 +107,12 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
             <View style={styles.referenceHeader}>
               <Text style={styles.referenceIcon}>📚</Text>
               <Text style={[styles.referenceTitle, { color: accent.primary }]}>
-                Classical Reference
+                {t('istikhara.overview.classicalReference')}
               </Text>
             </View>
             <Text style={styles.referenceText}>
-              <Text style={[styles.referenceBold, { color: accent.secondary }]}>Al-Bīrūnī - Al-Qānūn al-Masʿūdī: </Text>
-              {zodiacSign?.classicalReference.split(': ')[1] || 'Classical wisdom'}
+              <Text style={[styles.referenceBold, { color: accent.secondary }]}>{t('istikhara.overview.classicalReferenceSource')}: </Text>
+              {(language === 'fr' ? zodiacSign?.classicalReferenceFr : zodiacSign?.classicalReference)?.split(': ')[1] || 'Classical wisdom'}
             </Text>
           </View>
         </View>
@@ -109,28 +122,30 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           <View style={styles.enhancedCardHeader}>
             <Text style={styles.enhancedCardIcon}>🌟</Text>
             <Text style={[styles.enhancedCardTitle, { color: accent.primary }]}>
-              Element & Colors
+              {t('istikhara.overview.elementColors')}
             </Text>
           </View>
           
           <View style={styles.elementColorGrid}>
             {/* Element Section */}
             <View style={styles.elementSection}>
-              <Text style={[styles.sectionLabel, { color: accent.primary }]}>Your Element</Text>
+              <Text style={[styles.sectionLabel, { color: accent.primary }]}>{t('istikhara.overview.yourElement')}</Text>
               <View style={[styles.elementDisplay, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
                 <Text style={styles.elementEmoji}>{burujProfile.element_emoji}</Text>
                 <View style={styles.elementTextContainer}>
                   <Text style={[styles.elementName, { color: DarkTheme.textPrimary }]}>
-                    {burujProfile.element.charAt(0).toUpperCase() + burujProfile.element.slice(1)}
+                    {language === 'fr' ? getElementNameFr(burujProfile.element) : burujProfile.element.charAt(0).toUpperCase() + burujProfile.element.slice(1)}
                   </Text>
-                  <Text style={[styles.elementSubtext, { color: DarkTheme.textSecondary }]}>Element {burujProfile.element_number} of 4</Text>
+                  <Text style={[styles.elementSubtext, { color: DarkTheme.textSecondary }]}>
+                    {t('istikhara.overview.elementOf').replace('{number}', burujProfile.element_number.toString())}
+                  </Text>
                 </View>
               </View>
             </View>
 
             {/* Colors Section */}
             <View style={styles.colorsSection}>
-              <Text style={[styles.sectionLabel, { color: accent.primary }]}>Associated Colors</Text>
+              <Text style={[styles.sectionLabel, { color: accent.primary }]}>{t('istikhara.overview.associatedColors')}</Text>
               <View style={styles.colorsDisplay}>
                 {burujProfile.colors.map((color, idx) => (
                   <View key={idx} style={[styles.colorItem, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
@@ -145,10 +160,10 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           {/* Element Description */}
           <View style={[styles.elementDescriptionCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderLeftColor: accent.primary, borderLeftWidth: Borders.accent }]}>
             <Text style={[styles.elementDescriptionText, { color: DarkTheme.textSecondary }]}>
-              {burujProfile.element === 'fire' && '🔥 Fire represents passion, transformation, and spiritual illumination'}
-              {burujProfile.element === 'earth' && '🌍 Earth represents stability, manifestation, and grounded wisdom'}
-              {burujProfile.element === 'air' && '💨 Air represents intellect, communication, and spiritual elevation'}
-              {burujProfile.element === 'water' && '💧 Water represents emotion, purification, and divine flow'}
+              {burujProfile.element === 'fire' && t('istikhara.overview.fireDesc')}
+              {burujProfile.element === 'earth' && t('istikhara.overview.earthDesc')}
+              {burujProfile.element === 'air' && t('istikhara.overview.airDesc')}
+              {burujProfile.element === 'water' && t('istikhara.overview.waterDesc')}
             </Text>
           </View>
         </View>
@@ -158,13 +173,13 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           <View style={styles.enhancedCardHeader}>
             <Text style={styles.enhancedCardIcon}>🔢</Text>
             <Text style={[styles.enhancedCardTitle, { color: accent.primary }]}>
-              Abjad Numerology
+              {t('istikhara.overview.abjadNumerology')}
             </Text>
           </View>
 
           <View style={[styles.abjadDescription, { backgroundColor: DarkTheme.cardBackgroundAlt, borderLeftColor: accent.primary, borderLeftWidth: Borders.accent }]}>
             <Text style={[styles.abjadDescriptionText, { color: DarkTheme.textSecondary }]}>
-              The sacred science of ʿIlm al-Ḥurūf (علم الحروف) - calculating spiritual values from Arabic letters
+              {t('istikhara.overview.abjadDesc')}
             </Text>
           </View>
 
@@ -172,7 +187,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           <View style={styles.abjadRow}>
             <View style={styles.abjadLabelContainer}>
               <Text style={styles.abjadIcon}>👤</Text>
-              <Text style={[styles.abjadLabel, { color: DarkTheme.textPrimary }]}>Person's Name Total</Text>
+              <Text style={[styles.abjadLabel, { color: DarkTheme.textPrimary }]}>{t('istikhara.overview.personNameTotal')}</Text>
             </View>
             <View style={[styles.abjadValueBox, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
               <Text style={[styles.abjadValue, { color: accent.primary }]}>{personTotal}</Text>
@@ -183,7 +198,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           <View style={styles.abjadRow}>
             <View style={styles.abjadLabelContainer}>
               <Text style={styles.abjadIcon}>👩</Text>
-              <Text style={[styles.abjadLabel, { color: DarkTheme.textPrimary }]}>Mother's Name Total</Text>
+              <Text style={[styles.abjadLabel, { color: DarkTheme.textPrimary }]}>{t('istikhara.overview.motherNameTotal')}</Text>
             </View>
             <View style={[styles.abjadValueBox, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
               <Text style={[styles.abjadValue, { color: accent.primary }]}>{motherTotal}</Text>
@@ -195,7 +210,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
             <View style={styles.abjadCombinedHeader}>
               <Text style={styles.abjadCombinedIcon}>✨</Text>
               <Text style={[styles.abjadCombinedLabel, { color: accent.primary }]}>
-                Combined Total
+                {t('istikhara.overview.combinedTotal')}
               </Text>
             </View>
             <Text style={[styles.abjadCombinedValue, { color: accent.primary }]}>
@@ -208,7 +223,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
 
           {/* Buruj Calculation */}
           <View style={[styles.burujCalculationCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderLeftColor: accent.primary, borderLeftWidth: Borders.accent }]}>
-            <Text style={[styles.burujCalculationLabel, { color: DarkTheme.textPrimary }]}>Buruj Remainder Calculation:</Text>
+            <Text style={[styles.burujCalculationLabel, { color: DarkTheme.textPrimary }]}>{t('istikhara.overview.burujCalculation')}:</Text>
             <Text style={[styles.burujCalculationFormula, { color: accent.primary }]}>
               {combinedTotal} mod 12 = {burujRemainder}
             </Text>
@@ -220,29 +235,29 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           <View style={styles.enhancedCardHeader}>
             <Text style={styles.enhancedCardIcon}>📿</Text>
             <Text style={[styles.enhancedCardTitle, { color: accent.primary }]}>
-              Divine Names Dhikr
+              {t('istikhara.overview.divineNamesDhikr')}
             </Text>
           </View>
 
           <View style={[styles.dhikrDescription, { backgroundColor: DarkTheme.cardBackgroundAlt, borderLeftColor: accent.primary, borderLeftWidth: Borders.accent }]}>
             <Text style={[styles.dhikrDescriptionText, { color: DarkTheme.textSecondary }]}>
-              Recommended recitation count based on your Abjad calculation
+              {t('istikhara.overview.dhikrDesc')}
             </Text>
           </View>
 
           {/* Repetition Display */}
           <View style={[styles.dhikrCountCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
             <View style={styles.dhikrCountHeader}>
-              <Text style={[styles.dhikrCountLabel, { color: DarkTheme.textPrimary }]}>Recitation Count</Text>
+              <Text style={[styles.dhikrCountLabel, { color: DarkTheme.textPrimary }]}>{t('istikhara.overview.recitationCount')}</Text>
               <View style={[styles.dhikrBadge, { backgroundColor: accent.glow, borderColor: accent.primary }]}>
-                <Text style={[styles.dhikrBadgeText, { color: accent.primary }]}>Personalized</Text>
+                <Text style={[styles.dhikrBadgeText, { color: accent.primary }]}>{t('istikhara.overview.personalized')}</Text>
               </View>
             </View>
             <View style={styles.dhikrCountDisplay}>
               <Text style={[styles.dhikrCountNumber, { color: accent.primary }]}>
                 {repetitionCount}
               </Text>
-              <Text style={[styles.dhikrCountUnit, { color: DarkTheme.textSecondary }]}>repetitions</Text>
+              <Text style={[styles.dhikrCountUnit, { color: DarkTheme.textSecondary }]}>{t('istikhara.overview.repetitions')}</Text>
             </View>
           </View>
 
@@ -250,15 +265,15 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           <View style={[styles.dhikrTipsCard, { backgroundColor: DarkTheme.cardBackgroundAlt }]}>
             <View style={styles.dhikrTipRow}>
               <Text style={styles.dhikrTipIcon}>🕌</Text>
-              <Text style={[styles.dhikrTipText, { color: DarkTheme.textSecondary }]}>Recite after Fajr or Maghrib prayer</Text>
+              <Text style={[styles.dhikrTipText, { color: DarkTheme.textSecondary }]}>{t('istikhara.overview.tip1')}</Text>
             </View>
             <View style={styles.dhikrTipRow}>
               <Text style={styles.dhikrTipIcon}>🧘</Text>
-              <Text style={[styles.dhikrTipText, { color: DarkTheme.textSecondary }]}>Maintain state of wudu (ablution)</Text>
+              <Text style={[styles.dhikrTipText, { color: DarkTheme.textSecondary }]}>{t('istikhara.overview.tip2')}</Text>
             </View>
             <View style={styles.dhikrTipRow}>
               <Text style={styles.dhikrTipIcon}>💫</Text>
-              <Text style={[styles.dhikrTipText, { color: DarkTheme.textSecondary }]}>Focus on intention and presence</Text>
+              <Text style={[styles.dhikrTipText, { color: DarkTheme.textSecondary }]}>{t('istikhara.overview.tip3')}</Text>
             </View>
           </View>
 
@@ -266,7 +281,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           <View style={[styles.spiritualNoteCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderLeftColor: accent.primary, borderLeftWidth: Borders.accent }]}>
             <Text style={styles.spiritualNoteIcon}>🌙</Text>
             <Text style={[styles.spiritualNoteText, { color: DarkTheme.textSecondary }]}>
-              Each recitation carries the barakah (blessing) of your unique spiritual signature
+              {t('istikhara.overview.spiritualNote')}
             </Text>
           </View>
         </View>
