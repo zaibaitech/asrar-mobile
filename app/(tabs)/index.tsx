@@ -62,7 +62,7 @@ const MODULES: Omit<ModuleCardProps, 'onPress'>[] = [
     description: 'Analyze relationship harmony through elemental and numerical balance',
     icon: '💞',
     element: 'air',
-    comingSoon: true,
+    comingSoon: false,
   },
   {
     title: 'Divine Time',
@@ -89,6 +89,9 @@ export default function HomeScreen() {
         break;
       case 'Istikhara':
         router.push('/istikhara');
+        break;
+      case 'Compatibility':
+        router.push('/compatibility');
         break;
       // Add other module navigations as they're implemented
       default:
@@ -177,33 +180,33 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing.md, // Reduced from Spacing.xl (20 → 12)
   },
   welcomeSection: {
     paddingHorizontal: Spacing.screenPadding,
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.md, // Reduced from Spacing.xl (20 → 12) - 40% reduction
   },
   welcomeTitle: {
     fontSize: Typography.h1,
     fontWeight: Typography.weightBold,
     color: DarkTheme.textPrimary,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs, // Reduced from Spacing.sm (8 → 4) - tighter title→subtitle
     textAlign: 'center',
   },
   welcomeSubtitle: {
-    fontSize: Typography.body,
+    fontSize: Typography.label, // Reduced from Typography.body (16 → 14) - supporting text
     fontWeight: Typography.weightRegular,
     color: DarkTheme.textSecondary,
     textAlign: 'center',
-    lineHeight: Typography.body * Typography.lineHeightNormal,
-    opacity: 0.9,
+    lineHeight: Typography.label * Typography.lineHeightNormal, // Adjusted for new size
+    opacity: 0.85, // Slightly more subtle (was 0.9)
   },
   sectionTitle: {
     fontSize: Typography.h2,
     fontWeight: Typography.weightSemibold,
     color: DarkTheme.textPrimary,
     marginHorizontal: Spacing.screenPadding,
-    marginTop: Spacing.xl,
-    marginBottom: Spacing.md,
+    marginTop: Spacing.md, // Reduced from Spacing.xl (20 → 12) - 40% reduction
+    marginBottom: Spacing.sm, // Reduced from Spacing.md (12 → 8) - tighter to cards
   },
 });

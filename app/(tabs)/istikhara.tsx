@@ -41,7 +41,7 @@ export default function IstikharaCalculator() {
   const [personLatin, setPersonLatin] = useState('');
   const [motherLatin, setMotherLatin] = useState('');
   
-  // Collapsible section states
+  // Collapsible section states - ALL COLLAPSED BY DEFAULT
   const [educationExpanded, setEducationExpanded] = useState(false);
   const [discoveryExpanded, setDiscoveryExpanded] = useState(false);
   const [examplesExpanded, setExamplesExpanded] = useState(false);
@@ -140,178 +140,20 @@ export default function IstikharaCalculator() {
           showsVerticalScrollIndicator={false}
           keyboardDismissMode="on-drag"
         >
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.headerIcon}>🌙</Text>
-            <Text style={styles.headerTitle}>{t('istikhara.title')}</Text>
-            <Text style={styles.headerSubtitle}>
-              {t('istikhara.description')}
+          {/* Minimal Header - Reduced visual weight */}
+          <View style={styles.headerMinimal}>
+            <Text style={styles.headerTitleMinimal}>{t('istikhara.title')}</Text>
+            <Text style={styles.headerSubtitleMinimal}>
+              Enter two names to receive spiritual guidance
             </Text>
           </View>
 
-          {/* Educational Section - Collapsible */}
-          <TouchableOpacity
-            style={styles.collapsibleHeader}
-            onPress={() => {
-              setEducationExpanded(!educationExpanded);
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            }}
-            activeOpacity={0.7}
-          >
-            <LinearGradient
-              colors={['rgba(59, 130, 246, 0.2)', 'rgba(79, 70, 229, 0.1)']}
-              style={styles.collapsibleGradient}
-            >
-              <View style={styles.collapsibleHeaderContent}>
-                <View style={styles.collapsibleTitleRow}>
-                  <BookOpen size={20} color="#60a5fa" />
-                  <Text style={styles.collapsibleTitle}>{t('istikhara.educationTitle') || "What is Ilm al-Ḥurūf?"}</Text>
-                </View>
-                {educationExpanded ? (
-                  <ChevronUp size={20} color="#60a5fa" />
-                ) : (
-                  <ChevronDown size={20} color="#60a5fa" />
-                )}
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {educationExpanded && (
-            <View style={styles.collapsibleContent}>
-              <Text style={styles.collapsibleText}>
-                {t('istikhara.educationText') || "Ilm al-Ḥurūf (Science of Letters) is an ancient Islamic mystical tradition that explores the spiritual significance of Arabic letters and their numerical values."}
-              </Text>
-            </View>
-          )}
-
-          {/* What You'll Discover - Collapsible */}
-          <TouchableOpacity
-            style={styles.collapsibleHeader}
-            onPress={() => {
-              setDiscoveryExpanded(!discoveryExpanded);
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            }}
-            activeOpacity={0.7}
-          >
-            <LinearGradient
-              colors={['rgba(168, 85, 247, 0.2)', 'rgba(139, 92, 246, 0.1)']}
-              style={styles.collapsibleGradient}
-            >
-              <View style={styles.collapsibleHeaderContent}>
-                <View style={styles.collapsibleTitleRow}>
-                  <Lightbulb size={20} color="#a78bfa" />
-                  <Text style={styles.collapsibleTitle}>{t('istikhara.discoveryTitle') || "What You'll Discover"}</Text>
-                </View>
-                {discoveryExpanded ? (
-                  <ChevronUp size={20} color="#a78bfa" />
-                ) : (
-                  <ChevronDown size={20} color="#a78bfa" />
-                )}
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {discoveryExpanded && (
-            <View style={styles.collapsibleContent}>
-              {[
-                { icon: '🔥', title: t('istikhara.discovery.element.title'), desc: t('istikhara.discovery.element.desc') },
-                { icon: '🌟', title: t('istikhara.discovery.personality.title'), desc: t('istikhara.discovery.personality.desc') },
-                { icon: '💼', title: t('istikhara.discovery.career.title'), desc: t('istikhara.discovery.career.desc') },
-                { icon: '📅', title: t('istikhara.discovery.powerDay.title'), desc: t('istikhara.discovery.powerDay.desc') },
-                { icon: '🤲', title: t('istikhara.discovery.spiritual.title'), desc: t('istikhara.discovery.spiritual.desc') },
-              ].map((item, idx) => (
-                <View key={idx} style={styles.discoveryItem}>
-                  <Text style={styles.discoveryIcon}>{item.icon}</Text>
-                  <View style={styles.discoveryTextContainer}>
-                    <Text style={styles.discoveryTitle}>{item.title}</Text>
-                    <Text style={styles.discoveryDesc}>{item.desc}</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* Example Names - Collapsible */}
-          <TouchableOpacity
-            style={styles.collapsibleHeader}
-            onPress={() => {
-              setExamplesExpanded(!examplesExpanded);
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            }}
-            activeOpacity={0.7}
-          >
-            <LinearGradient
-              colors={['rgba(34, 197, 94, 0.2)', 'rgba(22, 163, 74, 0.1)']}
-              style={styles.collapsibleGradient}
-            >
-              <View style={styles.collapsibleHeaderContent}>
-                <View style={styles.collapsibleTitleRow}>
-                  <Users size={20} color="#4ade80" />
-                  <Text style={styles.collapsibleTitle}>{t('istikhara.examplesTitle') || "Example Names"}</Text>
-                </View>
-                {examplesExpanded ? (
-                  <ChevronUp size={20} color="#4ade80" />
-                ) : (
-                  <ChevronDown size={20} color="#4ade80" />
-                )}
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {examplesExpanded && (
-            <View style={styles.collapsibleContent}>
-              <Text style={styles.collapsibleText}>
-                {t('istikhara.examplesText') || "For accurate results, names should be in Arabic script. Examples: محمد (Muhammad), علي (Ali), فاطمة (Fatima)"}
-              </Text>
-            </View>
-          )}
-
-          {/* Privacy Section - Collapsible */}
-          <TouchableOpacity
-            style={styles.collapsibleHeader}
-            onPress={() => {
-              setPrivacyExpanded(!privacyExpanded);
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            }}
-            activeOpacity={0.7}
-          >
-            <LinearGradient
-              colors={['rgba(59, 130, 246, 0.2)', 'rgba(37, 99, 235, 0.1)']}
-              style={styles.collapsibleGradient}
-            >
-              <View style={styles.collapsibleHeaderContent}>
-                <View style={styles.collapsibleTitleRow}>
-                  <Shield size={20} color="#60a5fa" />
-                  <Text style={styles.collapsibleTitle}>{t('istikhara.privacyTitle') || "Your Privacy"}</Text>
-                </View>
-                {privacyExpanded ? (
-                  <ChevronUp size={20} color="#60a5fa" />
-                ) : (
-                  <ChevronDown size={20} color="#60a5fa" />
-                )}
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {privacyExpanded && (
-            <View style={styles.collapsibleContent}>
-              <Text style={styles.collapsibleText}>
-                {t('istikhara.privacyText') || "🔒 Your data is never stored or shared. All calculations happen instantly."}
-              </Text>
-            </View>
-          )}
-
-          {/* Main Form */}
+          {/* MAIN FORM - ACTION FIRST! */}
           <View style={styles.formCard}>
             <LinearGradient
-              colors={['rgba(15, 23, 42, 0.8)', 'rgba(30, 41, 59, 0.8)']}
+              colors={['rgba(15, 23, 42, 0.9)', 'rgba(30, 41, 59, 0.9)']}
               style={styles.formGradient}
             >
-              <Text style={styles.formTitle}>{t('istikhara.form.title')}</Text>
-              <Text style={styles.formSubtitle}>
-                {t('istikhara.form.bothNamesRequired')}
-              </Text>
-
               {/* Person's Name Input */}
               <NameInputSection
                 title={t('istikhara.form.personName')}
@@ -382,7 +224,147 @@ export default function IstikharaCalculator() {
                   )}
                 </LinearGradient>
               </TouchableOpacity>
+
+              {/* Mini helper text */}
+              <Text style={styles.helperText}>
+                Names should be in Arabic script for accurate results
+              </Text>
             </LinearGradient>
+          </View>
+
+          {/* Educational Content - Below the form, collapsed by default */}
+          <View style={styles.educationalSection}>
+            {/* What is this? - Collapsible */}
+            <TouchableOpacity
+              style={styles.collapsibleHeaderCompact}
+              onPress={() => {
+                setEducationExpanded(!educationExpanded);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={styles.collapsibleHeaderContentCompact}>
+                <View style={styles.collapsibleTitleRow}>
+                  <BookOpen size={16} color="rgba(96, 165, 250, 0.8)" />
+                  <Text style={styles.collapsibleTitleCompact}>What is Ilm al-Ḥurūf?</Text>
+                </View>
+                {educationExpanded ? (
+                  <ChevronUp size={16} color="rgba(255, 255, 255, 0.5)" />
+                ) : (
+                  <ChevronDown size={16} color="rgba(255, 255, 255, 0.5)" />
+                )}
+              </View>
+            </TouchableOpacity>
+
+            {educationExpanded && (
+              <View style={styles.collapsibleContent}>
+                <Text style={styles.collapsibleText}>
+                  {t('istikhara.educationText') || "Ilm al-Ḥurūf (Science of Letters) is an ancient Islamic mystical tradition that explores the spiritual significance of Arabic letters and their numerical values."}
+                </Text>
+              </View>
+            )}
+
+          {/* What You'll Discover - Collapsible */}
+          <TouchableOpacity
+            style={styles.collapsibleHeaderCompact}
+            onPress={() => {
+              setDiscoveryExpanded(!discoveryExpanded);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            activeOpacity={0.7}
+          >
+            <View style={styles.collapsibleHeaderContentCompact}>
+              <View style={styles.collapsibleTitleRow}>
+                <Lightbulb size={16} color="rgba(167, 139, 250, 0.8)" />
+                <Text style={styles.collapsibleTitleCompact}>What You'll Discover</Text>
+              </View>
+              {discoveryExpanded ? (
+                <ChevronUp size={16} color="rgba(255, 255, 255, 0.5)" />
+              ) : (
+                <ChevronDown size={16} color="rgba(255, 255, 255, 0.5)" />
+              )}
+            </View>
+          </TouchableOpacity>
+
+          {discoveryExpanded && (
+            <View style={styles.collapsibleContent}>
+              {[
+                { icon: '🔥', title: t('istikhara.discovery.element.title'), desc: t('istikhara.discovery.element.desc') },
+                { icon: '🌟', title: t('istikhara.discovery.personality.title'), desc: t('istikhara.discovery.personality.desc') },
+                { icon: '💼', title: t('istikhara.discovery.career.title'), desc: t('istikhara.discovery.career.desc') },
+                { icon: '📅', title: t('istikhara.discovery.powerDay.title'), desc: t('istikhara.discovery.powerDay.desc') },
+                { icon: '🤲', title: t('istikhara.discovery.spiritual.title'), desc: t('istikhara.discovery.spiritual.desc') },
+              ].map((item, idx) => (
+                <View key={idx} style={styles.discoveryItem}>
+                  <Text style={styles.discoveryIcon}>{item.icon}</Text>
+                  <View style={styles.discoveryTextContainer}>
+                    <Text style={styles.discoveryTitle}>{item.title}</Text>
+                    <Text style={styles.discoveryDesc}>{item.desc}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Example Names - Collapsible */}
+          <TouchableOpacity
+            style={styles.collapsibleHeaderCompact}
+            onPress={() => {
+              setExamplesExpanded(!examplesExpanded);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            activeOpacity={0.7}
+          >
+            <View style={styles.collapsibleHeaderContentCompact}>
+              <View style={styles.collapsibleTitleRow}>
+                <Users size={16} color="rgba(74, 222, 128, 0.8)" />
+                <Text style={styles.collapsibleTitleCompact}>Example Names</Text>
+              </View>
+              {examplesExpanded ? (
+                <ChevronUp size={16} color="rgba(255, 255, 255, 0.5)" />
+              ) : (
+                <ChevronDown size={16} color="rgba(255, 255, 255, 0.5)" />
+              )}
+            </View>
+          </TouchableOpacity>
+
+          {examplesExpanded && (
+            <View style={styles.collapsibleContent}>
+              <Text style={styles.collapsibleText}>
+                {t('istikhara.examplesText') || "For accurate results, names should be in Arabic script. Examples: محمد (Muhammad), علي (Ali), فاطمة (Fatima)"}
+              </Text>
+            </View>
+          )}
+
+          {/* Privacy Section - Collapsible */}
+          <TouchableOpacity
+            style={styles.collapsibleHeaderCompact}
+            onPress={() => {
+              setPrivacyExpanded(!privacyExpanded);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            activeOpacity={0.7}
+          >
+            <View style={styles.collapsibleHeaderContentCompact}>
+              <View style={styles.collapsibleTitleRow}>
+                <Shield size={16} color="rgba(96, 165, 250, 0.8)" />
+                <Text style={styles.collapsibleTitleCompact}>Your Privacy</Text>
+              </View>
+              {privacyExpanded ? (
+                <ChevronUp size={16} color="rgba(255, 255, 255, 0.5)" />
+              ) : (
+                <ChevronDown size={16} color="rgba(255, 255, 255, 0.5)" />
+              )}
+            </View>
+          </TouchableOpacity>
+
+          {privacyExpanded && (
+            <View style={styles.collapsibleContent}>
+              <Text style={styles.collapsibleText}>
+                {t('istikhara.privacyText') || "🔒 Your data is never stored or shared. All calculations happen instantly."}
+              </Text>
+            </View>
+          )}
           </View>
 
           <View style={{ height: 40 }} />
@@ -401,57 +383,83 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingVertical: 24,
+    paddingVertical: 16, // Reduced from 24
     paddingHorizontal: 16,
   },
-  header: {
+  
+  // Minimal header - reduced visual weight
+  headerMinimal: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 16, // Reduced from 24
+    paddingTop: 8,
   },
-  headerIcon: {
-    fontSize: 48,
-    marginBottom: 12,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
+  headerTitleMinimal: {
+    fontSize: 24, // Reduced from 28
+    fontWeight: '700', // Changed from 'bold'
     color: '#ffffff',
-    marginBottom: 8,
+    marginBottom: 6, // Reduced from 8
   },
-  headerSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
+  headerSubtitleMinimal: {
+    fontSize: 13, // Reduced from 14
+    color: 'rgba(255, 255, 255, 0.6)', // More faded
     textAlign: 'center',
     paddingHorizontal: 20,
   },
 
-  // Collapsible sections
-  collapsibleHeader: {
-    marginBottom: 12,
-    borderRadius: 12,
+  // Main form - HERO ELEMENT with enhanced visual prominence
+  formCard: {
+    marginBottom: 20, // Changed from marginTop: 8
+    borderRadius: 16,
     overflow: 'hidden',
-  },
-  collapsibleGradient: {
     borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Purple accent border
+    // Glow effect
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  collapsibleHeaderContent: {
+  formGradient: {
+    padding: 20,
+  },
+  helperText: {
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.5)',
+    textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
+  },
+
+  // Educational section - below form, lower visual weight
+  educationalSection: {
+    marginTop: 8,
+  },
+
+  // Compact collapsible sections
+  collapsibleHeaderCompact: {
+    marginBottom: 8, // Reduced from 12
+    borderRadius: 10, // Reduced from 12
+    backgroundColor: 'rgba(255, 255, 255, 0.05)', // Subtle background
+    borderWidth: 1, // Reduced from 2
+    borderColor: 'rgba(255, 255, 255, 0.08)', // More subtle
+  },
+  collapsibleHeaderContentCompact: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: 12, // Reduced from 16
   },
   collapsibleTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8, // Reduced from 10
     flex: 1,
   },
-  collapsibleTitle: {
-    fontSize: 15,
+  collapsibleTitleCompact: {
+    fontSize: 13, // Reduced from 15
     fontWeight: '600',
-    color: '#ffffff',
+    color: 'rgba(255, 255, 255, 0.8)', // Slightly faded
   },
   collapsibleContent: {
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
@@ -492,96 +500,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.8)',
     lineHeight: 18,
-  },
-
-  // Main form
-  formCard: {
-    marginTop: 8,
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  formGradient: {
-    padding: 20,
-  },
-  formTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  formSubtitle: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.7)',
-    textAlign: 'center',
-    marginBottom: 24,
-    paddingHorizontal: 8,
-  },
-
-  // Input sections
-  inputSection: {
-    marginBottom: 16,
-  },
-  inputGradient: {
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  inputHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  inputTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  inputEmoji: {
-    fontSize: 20,
-  },
-  inputTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'rgba(255, 255, 255, 0.9)',
-  },
-  inputWrapper: {
-    gap: 8,
-  },
-  inputLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#ffffff',
-  },
-  input: {
-    backgroundColor: 'rgba(15, 23, 42, 0.5)',
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    fontSize: 18,
-    color: '#ffffff',
-  },
-  inputError: {
-    borderColor: '#ef4444',
-  },
-  inputSuccess: {
-    borderColor: '#22c55e',
-  },
-  errorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 4,
-  },
-  errorText: {
-    fontSize: 12,
-    color: '#fca5a5',
   },
 
   // Calculate button
