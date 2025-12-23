@@ -63,7 +63,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      initialRouteName="istikhara"
+      initialRouteName="index"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         // Disable the static render of the header on web
@@ -73,6 +73,13 @@ export default function TabLayout() {
       }}>
       <Tabs.Screen
         name="index"
+        options={{
+          title: t('nav.home'),
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="calculator"
         options={{
           title: t('nav.calculator'),
           tabBarIcon: ({ color }) => <TabBarIcon name="calculator" color={color} />,

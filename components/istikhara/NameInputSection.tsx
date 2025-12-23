@@ -1,5 +1,5 @@
 import { CheckCircle, Keyboard, Search, X } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     ScrollView,
     StyleSheet,
@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { NameSuggestion } from '../../hooks/useNameSuggestions';
+import ArabicKeyboard from './ArabicKeyboard';
 
 interface NameInputSectionProps {
   title: string;
@@ -38,6 +39,34 @@ export default function NameInputSection({
 }: NameInputSectionProps) {
   const { t } = useLanguage();
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const arabicInputRef = useRef<TextInput>(null);
+
+  const handleKeyPress = (key: string) => {
+    // Insert character at cursor position
+    const newValue =
+      arabicValue.slice(0, cursorPosition) + key + arabicValue.slice(cursorPosition);
+    onArabicChange(newValue);
+    setCursorPosition(cursorPosition + 1);
+  };
+
+  const handleBackspace = () => {
+    if (cursorPosition > 0) {
+      const newValue =
+        arabicValue.slice(0, cursorPosition - 1) + arabicValue.slice(cursorPosition);
+      onArabicChange(newValue);
+      setCursorPosition(cursorPosition - 1);
+    }
+  };
+
+  const handleSpace = () => {
+    handleKeyPress(' ');
+  };
+
+  const handleSelectionChange = (event: any) => {
+    setCursorPosition(event.nativeEvent.selection.start);
+  };
 
   return (
     <View style={[styles.nameCard, { borderColor }]}>
@@ -110,7 +139,10 @@ export default function NameInputSection({
           <Text style={styles.arabicLabel}>
             {t('istikhara.arabicName') || 'Arabic Name'} <Text style={styles.required}>*</Text>
           </Text>
-          <TouchableOpacity style={styles.keyboardButton}>
+          <TouchableOpacity 
+            style={styles.keyboardButton}
+            onPress={() => setShowKeyboard(true)}
+          >
             <Keyboard size={16} color="#E5E7EB" strokeWidth={2} />
             <Text style={styles.keyboardButtonText}>{t('common.showKeyboard') || 'Show Keyboard'}</Text>
           </TouchableOpacity>
@@ -118,15 +150,27 @@ export default function NameInputSection({
 
         <View style={[styles.arabicInputContainer, { borderColor }]}>
           <TextInput
+            ref={arabicInputRef}
             style={styles.arabicInput}
             value={arabicValue}
             onChangeText={onArabicChange}
             placeholder="أدخل الاسم بالعربية"
             placeholderTextColor="#6B7280"
             textAlign="right"
+            onSelectionChange={handleSelectionChange}
+            selection={{ start: cursorPosition, end: cursorPosition }}
           />
         </View>
       </View>
+
+      {/* Arabic Keyboard Modal */}
+      <ArabicKeyboard
+        visible={showKeyboard}
+        onClose={() => setShowKeyboard(false)}
+        onKeyPress={handleKeyPress}
+        onBackspace={handleBackspace}
+        onSpace={handleSpace}
+      />
     </View>
   );
 }

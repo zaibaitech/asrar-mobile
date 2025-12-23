@@ -63,56 +63,40 @@ export default function IstikharaForm() {
 
     // Provide haptic feedback
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-
+    
     try {
+      // Perform the calculation
       await calculate(personName.trim(), motherName.trim(), 'en');
-      
-      // If calculation was successful, navigate to results
-      if (!error) {
-        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        // Note: We'll pass result via route params
-        router.push({
-          pathname: '/istikhara/results',
-          params: {
-            personName: personName.trim(),
-            motherName: motherName.trim(),
-          },
-        });
-      }
     } catch (err) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     }
   };
 
+
+
   // Show error alert when error changes
   React.useEffect(() => {
     if (error) {
-      console.error('Displaying error to user:', error);
       Alert.alert('Calculation Error', String(error), [
         { text: 'OK', onPress: () => {} },
       ]);
     }
   }, [error]);
 
-  // Navigate to results when result is available
+  // Navigate to results when calculation completes successfully
   React.useEffect(() => {
-    if (result && !loading && !error) {
-      console.log('Navigating to results with data:', result.data);
-      try {
-        router.push({
-          pathname: '/istikhara/results',
-          params: {
-            data: JSON.stringify(result.data),
-            personName: personName.trim(),
-            motherName: motherName.trim(),
-          },
-        });
-      } catch (navError) {
-        console.error('Navigation error:', navError);
-        Alert.alert('Error', 'Failed to navigate to results');
-      }
+    if (result && !error && !loading) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.push({
+        pathname: '/istikhara/results',
+        params: {
+          data: JSON.stringify(result.data),
+          personName: personName.trim(),
+          motherName: motherName.trim(),
+        },
+      });
     }
-  }, [result, loading, error]);
+  }, [result, error, loading]);
 
   return (
     <SafeAreaView style={styles.outerContainer}>
@@ -698,5 +682,21 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: 'rgba(255, 255, 255, 0.6)',
     fontWeight: '500',
+  },
+  testButton: {
+    backgroundColor: '#DC2626',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    marginTop: 16,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+  },
+  testButtonText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: '900',
+    textAlign: 'center',
+    letterSpacing: 1,
   },
 });
