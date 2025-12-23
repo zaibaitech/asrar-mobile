@@ -1,15 +1,16 @@
 /**
  * WidgetBar Component
- * Compact horizontal bar containing secondary features
+ * 2x2 grid of quick access widgets
  * 
  * Design principles:
- * - Quick access without cluttering main navigation
+ * - All options visible instantly (no scrolling)
+ * - Balanced 2x2 grid layout
+ * - Quick access without hunting or swiping
  * - Glassmorphism for visual consistency
- * - Scrollable for extensibility
  */
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { DarkTheme, Shadows, Spacing, Typography } from '../../constants/DarkTheme';
 import { QuickDhikrWidget } from './QuickDhikrWidget';
 import { BlessedDayWidget } from './widgets/BlessedDayWidget';
@@ -21,58 +22,60 @@ export function WidgetBar() {
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Quick Access</Text>
       
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        style={styles.scroll}
-      >
-        {/* Prayer Times Widget */}
-        <View style={styles.widgetWrapper}>
-          <PrayerTimesWidget />
+      {/* 2x2 Grid - All visible, no scrolling */}
+      <View style={styles.gridContainer}>
+        {/* Row 1 */}
+        <View style={styles.gridRow}>
+          <View style={styles.widgetWrapper}>
+            <PrayerTimesWidget />
+          </View>
+          
+          <View style={styles.widgetWrapper}>
+            <DailyQuoteWidget />
+          </View>
         </View>
         
-        {/* Daily Quote Widget */}
-        <View style={styles.widgetWrapper}>
-          <DailyQuoteWidget />
+        {/* Row 2 */}
+        <View style={styles.gridRow}>
+          <View style={styles.widgetWrapper}>
+            <QuickDhikrWidget />
+          </View>
+          
+          <View style={styles.widgetWrapper}>
+            <BlessedDayWidget />
+          </View>
         </View>
-        
-        {/* Quick Dhikr Counter */}
-        <View style={styles.widgetWrapper}>
-          <QuickDhikrWidget />
-        </View>
-        
-        {/* Blessed Day Widget */}
-        <View style={styles.widgetWrapper}>
-          <BlessedDayWidget />
-        </View>
-      </ScrollView>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.md,
+    marginTop: Spacing.sm, // Reduced from Spacing.lg (16 → 8) - tighter to Welcome
+    marginBottom: Spacing.sm, // Reduced from Spacing.md (12 → 8)
   },
   sectionTitle: {
     fontSize: Typography.h3,
     fontWeight: Typography.weightSemibold,
     color: DarkTheme.textPrimary,
     marginHorizontal: Spacing.screenPadding,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm, // Reduced from Spacing.md (12 → 8) - closer to tiles
   },
-  scroll: {
-    flexGrow: 0,
-  },
-  scrollContent: {
+  
+  // 2x2 Grid Layout
+  gridContainer: {
     paddingHorizontal: Spacing.screenPadding,
-    gap: Spacing.md,
+    gap: Spacing.sm, // Reduced from Spacing.md (12 → 8) - more compact
+  },
+  gridRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm, // Reduced from Spacing.md (12 → 8)
+    marginBottom: 0, // Removed extra margin (gap handles spacing)
   },
   widgetWrapper: {
-    width: 160,
-    height: 140,
+    flex: 1, // Equal width for both tiles in row
+    height: 120, // Kept compact size
     ...Shadows.subtle,
   },
 });
