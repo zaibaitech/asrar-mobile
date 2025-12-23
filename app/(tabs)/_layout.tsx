@@ -6,7 +6,6 @@ import ResponsiveAppHeader from '@/components/AppHeader';
 import HistoryModal from '@/components/istikhara/HistoryModal';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useColorScheme } from '@/components/useColorScheme';
-import Colors from '@/constants/Colors';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SavedCalculation } from '@/services/HistoryService';
 
@@ -65,7 +64,21 @@ export default function TabLayout() {
     <Tabs
       initialRouteName="index"
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        // Dark theme tab bar styling
+        tabBarActiveTintColor: '#6B5CA5', // Muted purple (matches header)
+        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.4)', // Faded white
+        tabBarStyle: {
+          backgroundColor: '#1A1625', // Dark theme background
+          borderTopWidth: 1,
+          borderTopColor: 'rgba(255, 255, 255, 0.1)', // Subtle border
+          elevation: 0, // Remove Android shadow
+          shadowOpacity: 0, // Remove iOS shadow
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+          letterSpacing: 0.3,
+        },
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
@@ -79,17 +92,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="calculator"
-        options={{
-          title: t('nav.calculator'),
-          tabBarIcon: ({ color }) => <TabBarIcon name="calculator" color={color} />,
-        }}
-      />
-      <Tabs.Screen
         name="istikhara"
         options={{
           title: t('nav.advanced'),
           tabBarIcon: ({ color }) => <TabBarIcon name="moon-o" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="calculator"
+        options={{
+          title: t('nav.calculator'),
+          tabBarIcon: ({ color }) => <TabBarIcon name="calculator" color={color} />,
         }}
       />
       <Tabs.Screen

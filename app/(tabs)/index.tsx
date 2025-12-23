@@ -38,7 +38,7 @@ const MODULES: Omit<ModuleCardProps, 'onPress'>[] = [
     description: 'Advanced Abjad numerology calculations and letter analysis',
     icon: '🧮',
     element: 'fire',
-    comingSoon: true,
+    comingSoon: false,
   },
   {
     title: 'Name Destiny',
@@ -84,6 +84,9 @@ export default function HomeScreen() {
    */
   const handleModulePress = useCallback((moduleTitle: string) => {
     switch (moduleTitle) {
+      case 'Calculator':
+        router.push('/calculator');
+        break;
       case 'Istikhara':
         router.push('/istikhara');
         break;

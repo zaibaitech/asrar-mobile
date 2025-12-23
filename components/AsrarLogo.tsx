@@ -36,6 +36,8 @@ interface AsrarLogoProps {
   element?: ElementType;
   /** Use monochrome colors (for light/dark mode) */
   mono?: boolean;
+  /** Custom mono color (when mono=true) */
+  monoColor?: string;
   /** Show background (for app icons) */
   showBackground?: boolean;
   /** Show sacred geometry grid */
@@ -112,6 +114,7 @@ export const AsrarLogo: React.FC<AsrarLogoProps> = ({
   variant = 'icon',
   element = 'aether',
   mono = false,
+  monoColor,
   showBackground = false,
   showGrid = false,
 }) => {
@@ -129,7 +132,7 @@ export const AsrarLogo: React.FC<AsrarLogoProps> = ({
 
   const getColor = (type: keyof typeof colors) => {
     if (mono) {
-      return '#6B21A8'; // Purple color for mono mode
+      return monoColor || '#6B21A8'; // Use custom color or default purple
     }
     return colors[type];
   };
@@ -219,16 +222,20 @@ export const AsrarLogo: React.FC<AsrarLogoProps> = ({
         cx={cx}
         cy={cy}
         r={innerR * 0.5}
-        fill={mono ? 'transparent' : colors.glow}
-        opacity="0.9"
+        fill={mono ? getColor('primary') : colors.glow}
+        fillOpacity={mono ? 0.2 : 0.9}
+        stroke={mono ? getColor('primary') : 'none'}
+        strokeWidth={mono ? 1.5 : 0}
+        strokeOpacity={mono ? 0.6 : 0}
       />
 
       {/* Center dot - the pupil/seed */}
       <Circle
         cx={cx}
         cy={cy}
-        r={innerR * 0.15}
+        r={innerR * 0.25}
         fill={mono ? getColor('primary') : `url(#${gradientId})`}
+        opacity={1}
       />
 
       {/* Subtle ع (Ayn) inspired curves in the geometry */}

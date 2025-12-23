@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { History, Menu, User } from 'lucide-react-native';
 import React from 'react';
 import {
@@ -23,6 +24,8 @@ interface AppHeaderProps {
   onHistoryPress?: () => void;
   showLanguageSelector?: boolean;
   backgroundColor?: string;
+  variant?: 'default' | 'centered' | 'minimal'; // New: Choose header style
+  showSubtitle?: boolean; // New: Optional subtitle
 }
 
 export default function AppHeader({
@@ -34,10 +37,110 @@ export default function AppHeader({
   onHistoryPress,
   showLanguageSelector = true,
   backgroundColor = '#FFFFFF',
+  variant = 'centered', // Default to new centered style
+  showSubtitle = false,
 }: AppHeaderProps) {
   const isSmallScreen = SCREEN_WIDTH < 350;
   const insets = useSafeAreaInsets();
 
+  // Centered/Minimal variant - matches Home page aesthetic
+  if (variant === 'centered' || variant === 'minimal') {
+    return (
+      <LinearGradient
+        colors={[
+          '#0f172a', // Deep navy blue (matching Home)
+          '#1e1b4b', // Deep purple
+          'rgba(26, 22, 37, 0.95)', // Theme background
+        ]}
+        style={styles.headerWrapperGradient}
+      >
+        {/* Safe Area Top Spacer */}
+        <View style={{ height: insets.top }} />
+        
+        {/* Header Content - Centered Design */}
+        <View style={styles.centeredContainer}>
+          {/* Left Icon */}
+          {variant === 'centered' && (
+            <TouchableOpacity
+              style={styles.sideIconButton}
+              onPress={onMenuPress}
+              accessibilityLabel="Menu"
+              accessibilityRole="button"
+              activeOpacity={0.7}
+            >
+              <Menu size={20} color="rgba(255, 255, 255, 0.7)" strokeWidth={2} />
+            </TouchableOpacity>
+          )}
+
+          {/* Center Section - Logo + Title */}
+          <View style={styles.centerSection}>
+            <View style={styles.titleRow}>
+              <AsrarLogo 
+                size={28} 
+                variant="icon" 
+                element="aether" 
+                mono={true}
+                monoColor="rgba(255, 255, 255, 0.9)"
+              />
+              <Text style={styles.centeredTitle}>Asrār</Text>
+            </View>
+            {showSubtitle && (
+              <Text style={styles.centeredSubtitle}>ʿIlm al-Ḥurūf & ʿAdad</Text>
+            )}
+          </View>
+
+          {/* Right Icons */}
+          {variant === 'centered' && (
+            <View style={styles.centeredRightSection}>
+              {showLanguageSelector && (
+                <View style={styles.languageContainerMinimal}>
+                  <TouchableOpacity
+                    style={[
+                      styles.languageButtonMinimal,
+                      currentLanguage === 'EN' && styles.languageButtonMinimalActive,
+                    ]}
+                    onPress={() => onLanguageChange('EN')}
+                    accessibilityLabel="English"
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.languageTextMinimal,
+                        currentLanguage === 'EN' && styles.languageTextMinimalActive,
+                      ]}
+                    >
+                      EN
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.languageButtonMinimal,
+                      currentLanguage === 'FR' && styles.languageButtonMinimalActive,
+                    ]}
+                    onPress={() => onLanguageChange('FR')}
+                    accessibilityLabel="French"
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.languageTextMinimal,
+                        currentLanguage === 'FR' && styles.languageTextMinimalActive,
+                      ]}
+                    >
+                      FR
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          )}
+        </View>
+      </LinearGradient>
+    );
+  }
+
+  // Default variant - original left-aligned design
   return (
     <View style={[styles.headerWrapper, { backgroundColor }]}>
       {/* Safe Area Top Spacer */}
@@ -194,6 +297,105 @@ function AppLogo({ source, isSmallScreen }: AppLogoProps) {
 }
 
 const styles = StyleSheet.create({
+  // ==================== CENTERED/MINIMAL VARIANT ====================
+  headerWrapperGradient: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+
+  centeredContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    minHeight: 56, // Compact height
+  },
+
+  centerSection: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+
+  centeredTitle: {
+    fontSize: 20,
+    fontWeight: '600', // Semi-bold
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
+
+  centeredSubtitle: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: 'rgba(255, 255, 255, 0.6)',
+    letterSpacing: 0.8,
+    marginTop: 2,
+    textAlign: 'center',
+  },
+
+  sideIconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+
+  centeredRightSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+
+  languageContainerMinimal: {
+    flexDirection: 'row',
+    gap: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    padding: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+
+  languageButtonMinimal: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    minWidth: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  languageButtonMinimalActive: {
+    backgroundColor: '#6B5CA5', // Muted purple - matches recommendation
+  },
+
+  languageTextMinimal: {
+    color: 'rgba(255, 255, 255, 0.5)',
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+
+  languageTextMinimalActive: {
+    color: '#FFFFFF',
+  },
+
+  // ==================== DEFAULT VARIANT ====================
   headerWrapper: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

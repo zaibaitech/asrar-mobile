@@ -1,12 +1,13 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { Stack } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { CalculatorInput } from '../../components/calculator/CalculatorInput';
-import { HistoryPanel } from '../../components/calculator/HistoryPanel';
-import { ResultsDisplay } from '../../components/calculator/ResultsDisplay';
-import { CalculatorColors } from '../../constants/CalculatorColors';
-import { CalculatorService } from '../../services/CalculatorService';
-import { CalculationResult, HistoryItem } from '../../types/calculator';
+import { CalculatorInput } from '../components/calculator/CalculatorInput';
+import { HistoryPanel } from '../components/calculator/HistoryPanel';
+import { ResultsDisplay } from '../components/calculator/ResultsDisplay';
+import { CalculatorColors } from '../constants/CalculatorColors';
+import { CalculatorService } from '../services/CalculatorService';
+import { CalculationResult, HistoryItem } from '../types/calculator';
 
 export default function CalculatorScreen() {
   const colors = CalculatorColors;
@@ -65,7 +66,9 @@ export default function CalculatorScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <>
+      <Stack.Screen options={{ title: 'Abjad Calculator', headerShown: true }} />
+      <KeyboardAvoidingView 
         style={[styles.container, { backgroundColor: colors.background }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={100}
@@ -151,6 +154,7 @@ export default function CalculatorScreen() {
           )}
         </View>
       </KeyboardAvoidingView>
+    </>
   );
 }
 
