@@ -10,21 +10,20 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
     useAnimatedStyle,
-    useSharedValue,
-    withSequence,
-    withSpring,
-    withTiming,
+    useSharedValue
 } from 'react-native-reanimated';
 import { DarkTheme, Spacing, Typography } from '../../constants/DarkTheme';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-const DHIKR_STORAGE_KEY = '@asrar_quick_dhikr_count';
+const DHIKR_STORAGE_KEY = '@asrar_dhikr_count';
 
 export function QuickDhikrWidget() {
+  const router = useRouter();
   const [count, setCount] = useState(0);
   const scale = useSharedValue(1);
   const glowOpacity = useSharedValue(0);
@@ -33,13 +32,6 @@ export function QuickDhikrWidget() {
   useEffect(() => {
     loadCount();
   }, []);
-
-  // Save count whenever it changes
-  useEffect(() => {
-    if (count > 0) {
-      saveCount(count);
-    }
-  }, [count]);
 
   const loadCount = async () => {
     try {
@@ -52,37 +44,10 @@ export function QuickDhikrWidget() {
     }
   };
 
-  const saveCount = async (value: number) => {
-    try {
-      await AsyncStorage.setItem(DHIKR_STORAGE_KEY, value.toString());
-    } catch (error) {
-      console.error('Failed to save dhikr count:', error);
-    }
-  };
-
-  const handleIncrement = () => {
-    // Haptic feedback
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    
-    // Increment count
-    setCount(prev => prev + 1);
-    
-    // Animate
-    scale.value = withSequence(
-      withSpring(1.1, { damping: 10 }),
-      withSpring(1, { damping: 10 })
-    );
-    
-    glowOpacity.value = withSequence(
-      withTiming(0.8, { duration: 100 }),
-      withTiming(0, { duration: 400 })
-    );
-  };
-
-  const handleReset = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    setCount(0);
-    AsyncStorage.removeItem(DHIKR_STORAGE_KEY);
+  const handlePress = () => {
+    // Navigate to full dhikr counter screen
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push('/dhikr-counter');
   };
 
   const animatedCounterStyle = useAnimatedStyle(() => ({
@@ -94,27 +59,18 @@ export function QuickDhikrWidget() {
   }));
 
   return (
-    <View style={styles.container}>
+    <Pressable onPress={handlePress} style={styles.container}>
       {/* Glow effect */}
       <Animated.View style={[styles.glow, animatedGlowStyle]} />
       
       {/* Counter display */}
-      <AnimatedPressable
-        onPress={handleIncrement}
-        style={[styles.counter, animatedCounterStyle]}
-      >
+      <View style={styles.counter}>
         <Text style={styles.icon}>📿</Text>
         <Animated.Text style={styles.count}>{count}</Animated.Text>
-        <Text style={styles.label}>Dhikr</Text>
-      </AnimatedPressable>
-      
-      {/* Reset button (only show if count > 0) */}
-      {count > 0 && (
-        <Pressable onPress={handleReset} style={styles.resetButton}>
-          <Text style={styles.resetText}>Reset</Text>
-        </Pressable>
-      )}
-    </View>
+        <Text style={styles.label}>Dhikr Counter</Text>
+        <Text style={styles.hint}>Tap to open</Text>
+      </View>
+    </Pressable>
   );
 }
 
@@ -165,6 +121,11 @@ const styles = StyleSheet.create({
   resetText: {
     fontSize: Typography.caption,
     color: DarkTheme.textMuted,
-    textDecorationLine: 'underline',
+    marginBottom: Spacing.xs,
+  },
+  hint: {
+    fontSize: 10,
+    color: DarkTheme.textMuted,
+    fontStyle: 'italic',
   },
 });

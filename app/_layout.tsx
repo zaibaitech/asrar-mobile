@@ -70,6 +70,10 @@ function RootLayoutNav() {
                 },
               }} 
             />
+            <Stack.Screen 
+              name="dhikr-counter" 
+              options={{ headerShown: false }} 
+            />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
         </ThemeProvider>
