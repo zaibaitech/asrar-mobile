@@ -145,7 +145,7 @@ export function PrayerTimesWidget() {
   return (
     <Pressable 
       style={styles.container} 
-      onPress={handleRetry}
+      onPress={() => router.push('/prayer-times')}
       onLongPress={() => router.push('/adhan-settings')}
     >
       <Text style={styles.icon}>🕌</Text>
@@ -155,7 +155,7 @@ export function PrayerTimesWidget() {
       {countdown && (
         <Text style={styles.countdown}>in {countdown}</Text>
       )}
-      <Text style={styles.hintText}>Hold to configure</Text>
+      <Text style={styles.hintText}>Tap for details</Text>
     </Pressable>
   );
 }
