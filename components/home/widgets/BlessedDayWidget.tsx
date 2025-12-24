@@ -1,52 +1,45 @@
 /**
  * BlessedDayWidget Component
- * Shows today's blessed day information based on Islamic calendar
+ * Shows today's blessed day information based on authentic Maghribi Ilm al-Nujum
  * 
- * Each day of the week has spiritual significance and recommended practices
+ * Uses traditional Islamic planetary hour calculations (Sā'āt al-Kawākib)
+ * following the Maghribi methodology from classical sources
+ * 
+ * SOURCES:
+ * - Shams al-Ma'ārif by al-Būnī
+ * - Ghāyat al-Ḥakīm (Picatrix) - Andalusian-Maghribi tradition
  */
 
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { DarkTheme, ElementAccents, Spacing, Typography } from '../../../constants/DarkTheme';
-import { ElementType } from '../../../contexts/ThemeContext';
-
-interface DayInfo {
-  dayName: string;
-  dayNameArabic: string;
-  element: ElementType;
-  blessing: string;
-}
-
-const DAYS_INFO: DayInfo[] = [
-  { dayName: 'Sunday', dayNameArabic: 'الأحد', element: 'fire', blessing: '☀️ Solar' },
-  { dayName: 'Monday', dayNameArabic: 'الإثنين', element: 'water', blessing: '🌙 Lunar' },
-  { dayName: 'Tuesday', dayNameArabic: 'الثلاثاء', element: 'fire', blessing: '♂️ Mars' },
-  { dayName: 'Wednesday', dayNameArabic: 'الأربعاء', element: 'air', blessing: '☿️ Mercury' },
-  { dayName: 'Thursday', dayNameArabic: 'الخميس', element: 'air', blessing: '♃ Jupiter' },
-  { dayName: 'Friday', dayNameArabic: 'الجمعة', element: 'earth', blessing: '♀️ Venus' },
-  { dayName: 'Saturday', dayNameArabic: 'السبت', element: 'earth', blessing: '♄ Saturn' },
-];
+import { getTodayBlessing, type DayBlessing } from '../../../services/DayBlessingService';
 
 export function BlessedDayWidget() {
-  const [dayInfo, setDayInfo] = useState<DayInfo>(DAYS_INFO[0]);
+  const [blessing, setBlessing] = useState<DayBlessing | null>(null);
 
   useEffect(() => {
-    const today = new Date().getDay();
-    setDayInfo(DAYS_INFO[today]);
+    // Get today's blessing using authentic Maghribi system
+    const todayBlessing = getTodayBlessing();
+    setBlessing(todayBlessing);
   }, []);
 
-  const accent = ElementAccents[dayInfo.element];
+  if (!blessing) {
+    return null;
+  }
+
+  const accent = ElementAccents[blessing.element];
 
   return (
     <View style={[styles.container, { borderColor: `${accent.primary}40` }]}>
       <Text style={styles.label}>Today's Blessing</Text>
-      <Text style={styles.dayArabic}>{dayInfo.dayNameArabic}</Text>
+      <Text style={styles.dayArabic}>{blessing.dayNameArabic}</Text>
       <Text style={[styles.blessing, { color: accent.primary }]}>
-        {dayInfo.blessing}
+        {blessing.emoji} {blessing.planetArabic}
       </Text>
       <View style={[styles.elementBadge, { backgroundColor: accent.glow }]}>
         <Text style={[styles.elementText, { color: accent.primary }]}>
-          {dayInfo.element.toUpperCase()}
+          {blessing.element.toUpperCase()}
         </Text>
       </View>
     </View>
