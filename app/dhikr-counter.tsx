@@ -8,11 +8,13 @@ import * as Haptics from 'expo-haptics';
 import { Stack, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
+    Modal,
     Pressable,
     SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
+    TextInput,
     View
 } from 'react-native';
 import Animated, {
@@ -48,6 +50,8 @@ export default function DhikrCounterScreen() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [history, setHistory] = useState<SessionHistory[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showCustomModal, setShowCustomModal] = useState(false);
+  const [customAmount, setCustomAmount] = useState('');
 
   const scale = useSharedValue(1);
   const glowOpacity = useSharedValue(0);
@@ -143,6 +147,15 @@ export default function DhikrCounterScreen() {
   const handleTargetChange = (newTarget: number) => {
     setTarget(newTarget);
     AsyncStorage.setItem(DHIKR_TARGET_KEY, newTarget.toString());
+  };
+
+  const handleCustomAmountSubmit = () => {
+    const amount = parseInt(customAmount, 10);
+    if (!isNaN(amount) && amount > 0) {
+      handleTargetChange(amount);
+      setShowCustomModal(false);
+      setCustomAmount('');
+    }
   };
 
   const animatedCountStyle = useAnimatedStyle(() => ({
@@ -249,6 +262,25 @@ export default function DhikrCounterScreen() {
                   </Text>
                 </Pressable>
               ))}
+              {/* Custom Amount Button */}
+              <Pressable
+                style={[
+                  styles.targetButton,
+                  !targetOptions.includes(target) && styles.targetButtonActive,
+                  styles.customButton,
+                ]}
+                onPress={() => setShowCustomModal(true)}
+              >
+                <Text
+                  style={[
+                    styles.targetButtonText,
+                    !targetOptions.includes(target) && styles.targetButtonTextActive,
+                  ]}
+                >
+                  {!targetOptions.includes(target) ? target : (language === 'en' ? 'Custom' : 'Personnalisé')}
+                </Text>
+                <Text style={styles.customButtonIcon}>✏️</Text>
+              </Pressable>
             </View>
           </View>
 
@@ -269,6 +301,55 @@ export default function DhikrCounterScreen() {
               </Text>
             </View>
           )}
+
+          {/* Custom Amount Modal */}
+          <Modal
+            visible={showCustomModal}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={() => setShowCustomModal(false)}
+          >
+            <Pressable 
+              style={styles.modalOverlay}
+              onPress={() => setShowCustomModal(false)}
+            >
+              <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
+                <Text style={styles.modalTitle}>
+                  {language === 'en' ? 'Enter Custom Amount' : 'Entrez un montant personnalisé'}
+                </Text>
+                <TextInput
+                  style={styles.modalInput}
+                  value={customAmount}
+                  onChangeText={setCustomAmount}
+                  keyboardType="number-pad"
+                  placeholder={language === 'en' ? 'Enter number...' : 'Entrez un nombre...'}
+                  placeholderTextColor={DarkTheme.textMuted}
+                  autoFocus
+                />
+                <View style={styles.modalButtons}>
+                  <Pressable
+                    style={styles.modalButtonCancel}
+                    onPress={() => {
+                      setShowCustomModal(false);
+                      setCustomAmount('');
+                    }}
+                  >
+                    <Text style={styles.modalButtonTextCancel}>
+                      {language === 'en' ? 'Cancel' : 'Annuler'}
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.modalButtonSubmit}
+                    onPress={handleCustomAmountSubmit}
+                  >
+                    <Text style={styles.modalButtonTextSubmit}>
+                      {language === 'en' ? 'Set' : 'Définir'}
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            </Pressable>
+          </Modal>
 
           {/* Recent Sessions */}
           {history.length > 0 && (
@@ -402,6 +483,77 @@ const styles = StyleSheet.create({
   targetButtonTextActive: {
     color: '#a78bfa',
     fontWeight: Typography.weightBold,
+  },
+  customButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  customButtonIcon: {
+    fontSize: 14,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: DarkTheme.cardBackground,
+    borderRadius: 20,
+    padding: Spacing.xl,
+    width: '80%',
+    maxWidth: 400,
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+  },
+  modalTitle: {
+    fontSize: Typography.h2,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    marginBottom: Spacing.lg,
+    textAlign: 'center',
+  },
+  modalInput: {
+    backgroundColor: DarkTheme.screenBackground,
+    borderWidth: 2,
+    borderColor: '#a78bfa',
+    borderRadius: 12,
+    padding: Spacing.lg,
+    fontSize: Typography.h3,
+    color: DarkTheme.textPrimary,
+    textAlign: 'center',
+    marginBottom: Spacing.lg,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+  },
+  modalButtonCancel: {
+    flex: 1,
+    backgroundColor: DarkTheme.screenBackground,
+    paddingVertical: Spacing.lg,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+  },
+  modalButtonTextCancel: {
+    fontSize: Typography.body,
+    fontWeight: Typography.weightMedium,
+    color: DarkTheme.textSecondary,
+  },
+  modalButtonSubmit: {
+    flex: 1,
+    backgroundColor: '#a78bfa',
+    paddingVertical: Spacing.lg,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  modalButtonTextSubmit: {
+    fontSize: Typography.body,
+    fontWeight: Typography.weightBold,
+    color: '#fff',
   },
   actionsRow: {
     flexDirection: 'row',

@@ -26,7 +26,7 @@ const GUIDANCE_MODULES: ModuleCardProps[] = [
     description: 'Discover your spiritual path and destiny through your name',
     icon: '📜',
     element: 'water',
-    comingSoon: true,
+    comingSoon: false,
   },
   {
     title: 'Divine Timing',
@@ -49,7 +49,7 @@ export default function TabTwoScreen() {
         router.push('/compatibility');
         break;
       case 'Name Destiny':
-        console.log('Name Destiny - Coming Soon');
+        router.push('/name-destiny');
         break;
       case 'Divine Timing':
         console.log('Divine Timing - Coming Soon');

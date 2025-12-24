@@ -46,7 +46,7 @@ const MODULES: Omit<ModuleCardProps, 'onPress'>[] = [
     description: 'Discover the spiritual significance and destiny encoded in names',
     icon: '📜',
     element: 'earth',
-    comingSoon: true,
+    comingSoon: false,
   },
   {
     title: 'Istikhara',
@@ -92,6 +92,9 @@ export default function HomeScreen() {
         break;
       case 'Compatibility':
         router.push('/compatibility');
+        break;
+      case 'Name Destiny':
+        router.push('/name-destiny');
         break;
       // Add other module navigations as they're implemented
       default:

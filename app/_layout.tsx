@@ -57,6 +57,10 @@ function RootLayoutNav() {
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen 
+              name="name-destiny" 
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen 
               name="compatibility" 
               options={{ 
                 headerShown: true,

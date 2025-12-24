@@ -1,50 +1,83 @@
 /**
  * DailyQuoteWidget Component
- * Displays daily spiritual reminder or wisdom
+ * Displays daily spiritual reminder combining authentic Islamic sources
+ * with Ilm al-Huruf planetary wisdom
  * 
- * Rotates quotes daily based on date
+ * SOURCES:
+ * - Authentic Quranic verses
+ * - Sahih Hadith collections
+ * - Divine Names (Asma ul-Husna)
+ * - Planetary wisdom (Maghribi system)
+ * - Traditional Islamic wisdom
  */
 
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { DarkTheme, Spacing, Typography } from '../../../constants/DarkTheme';
-
-const DAILY_QUOTES = [
-  {
-    text: "Verily, in the remembrance of Allah do hearts find rest.",
-    textArabic: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
-    source: "Qur'an 13:28",
-  },
-  {
-    text: "The best of people are those who are most beneficial to others.",
-    textArabic: "خَيْرُ النَّاسِ أَنْفَعُهُمْ لِلنَّاسِ",
-    source: "Hadith",
-  },
-  {
-    text: "Patience is the key to relief.",
-    textArabic: "الصَّبْرُ مِفْتَاحُ الْفَرَجِ",
-    source: "Islamic Wisdom",
-  },
-];
+import { getDailyReminder, type DailyReminder } from '../../../services/DailyReminderService';
 
 export function DailyQuoteWidget() {
-  const [quote, setQuote] = useState(DAILY_QUOTES[0]);
+  const [reminder, setReminder] = useState<DailyReminder | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get quote based on day of year
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-    const quoteIndex = dayOfYear % DAILY_QUOTES.length;
-    setQuote(DAILY_QUOTES[quoteIndex]);
+    loadDailyReminder();
   }, []);
+
+  const loadDailyReminder = async () => {
+    try {
+      const dailyReminder = await getDailyReminder();
+      setReminder(dailyReminder);
+    } catch (error) {
+      console.error('Error loading daily reminder:', error);
+      // Fallback to a default reminder
+      setReminder({
+        type: 'quran',
+        textArabic: 'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ',
+        text: 'Verily, in the remembrance of Allah do hearts find rest.',
+        source: 'Quran 13:28',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator color={DarkTheme.textSecondary} />
+      </View>
+    );
+  }
+
+  if (!reminder) {
+    return null;
+  }
+
+  // Get icon based on type
+  const getIcon = () => {
+    switch (reminder.type) {
+      case 'quran': return '📖';
+      case 'hadith': return '☪️';
+      case 'divine-name': return '✨';
+      case 'wisdom': return '💎';
+      default: return '✨';
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>✨</Text>
+      <Text style={styles.icon}>{getIcon()}</Text>
       <Text style={styles.label}>Daily Reminder</Text>
-      <Text style={styles.quoteArabic} numberOfLines={2}>
-        {quote.textArabic}
+      <Text style={styles.quoteArabic} numberOfLines={3}>
+        {reminder.textArabic}
       </Text>
-      <Text style={styles.source}>{quote.source}</Text>
+      <Text style={styles.source}>{reminder.source}</Text>
+      {reminder.planetaryContext && (
+        <Text style={styles.planetary} numberOfLines={1}>
+          {reminder.planetaryContext}
+        </Text>
+      )}
     </View>
   );
 }
@@ -82,5 +115,11 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: DarkTheme.textMuted,
     fontStyle: 'italic',
+  },
+  planetary: {
+    fontSize: 9,
+    color: DarkTheme.textTertiary,
+    marginTop: Spacing.xs,
+    textAlign: 'center',
   },
 });
