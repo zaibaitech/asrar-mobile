@@ -4,14 +4,16 @@
  */
 
 import { BalanceGuidanceCard, DestinyHeader, DominantElementCard, ElementHeroCard, ElementProgressBar, InfoNoticeCard, SacredNumberCard } from '@/components/nameDestiny';
+import { QuranResonanceCard } from '@/components/quran/QuranResonanceCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { NameDestinyResult } from '@/features/name-destiny/types';
+import { getQuranResonance, type QuranResonance } from '@/services/QuranResonanceService';
 import { getElementFromString, getElementTheme } from '@/utils/elementTheme';
 import { calculateLetterElementDistribution, getDominantElement } from '@/utils/relationshipCompatibility';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Calendar, Clock, HelpCircle, Sparkles, Star } from 'lucide-react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -26,9 +28,38 @@ export default function ResultsScreen() {
   const { language, setLanguage } = useLanguage();
   const insets = useSafeAreaInsets();
 
+  // Qur'anic Resonance state
+  const [quranResonance, setQuranResonance] = useState<QuranResonance | null>(null);
+  const [quranLoading, setQuranLoading] = useState(false);
+  const [quranError, setQuranError] = useState<string | null>(null);
+
   const result: NameDestinyResult | null = params.data ? JSON.parse(params.data as string) : null;
   const personName = params.personName as string;
   const motherName = params.motherName as string;
+
+  // Load Qur'anic Resonance on mount
+  useEffect(() => {
+    if (result?.personKabir) {
+      loadQuranResonance();
+    }
+  }, [result?.personKabir, language]);
+
+  const loadQuranResonance = async () => {
+    setQuranLoading(true);
+    setQuranError(null);
+    try {
+      const resonance = await getQuranResonance(
+        result!.personKabir, // ✅ Use personKabir instead of totalKabir to match web app
+        language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'
+      );
+      setQuranResonance(resonance);
+    } catch (err) {
+      console.error('[QuranResonance] Failed to load:', err);
+      setQuranError('Failed to load verse');
+    } finally {
+      setQuranLoading(false);
+    }
+  };
 
   if (!result) {
     return (
@@ -251,6 +282,18 @@ export default function ResultsScreen() {
                 </View>
               </LinearGradient>
             </View>
+          </View>
+
+          {/* Qur'anic Resonance */}
+          <View style={styles.section}>
+            <QuranResonanceCard
+              resonance={quranResonance}
+              loading={quranLoading}
+              error={quranError || undefined}
+              accentColor={theme.accentColor}
+              language={language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'}
+              onRetry={loadQuranResonance}
+            />
           </View>
 
           {/* Spiritual Guidance */}

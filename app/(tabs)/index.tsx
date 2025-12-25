@@ -94,7 +94,7 @@ export default function HomeScreen() {
         router.push('/compatibility');
         break;
       case 'Name Destiny':
-        router.push('/name-destiny');
+        router.push('/(tabs)/name-destiny');
         break;
       // Add other module navigations as they're implemented
       default:
