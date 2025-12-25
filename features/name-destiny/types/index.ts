@@ -3,7 +3,7 @@
  * Mobile Implementation - Expo Go 54
  */
 
-import { ElementData, BurjData } from '../constants/elements';
+import { BurjData, ElementData } from '../constants/elements';
 
 export interface NameDestinyResult {
   // Input names
@@ -16,11 +16,18 @@ export interface NameDestinyResult {
   motherKabir: number;
   totalKabir: number;
   saghir: number;
+  tabIndex?: 1 | 2 | 3 | 4;
+  burjIndex?: number;
   
   // Derived data
   element: ElementData;
   burj: BurjData;
   hour: PlanetaryHour;
+  burjDay?: {
+    en: string;
+    ar: string;
+    fr: string;
+  };
   
   // Metadata
   timestamp?: number;
@@ -33,6 +40,11 @@ export interface PlanetaryHour {
   fr: string;
   planet: string;
   color: string;
+  day?: {
+    en: string;
+    ar: string;
+    fr: string;
+  };
 }
 
 export interface CalculationOptions {
@@ -46,4 +58,5 @@ export interface StoredCalculation extends NameDestinyResult {
   isFavorite?: boolean;
 }
 
-export { ElementData, BurjData };
+export { BurjData, ElementData };
+
