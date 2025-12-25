@@ -49,7 +49,7 @@ export default function TabTwoScreen() {
         router.push('/compatibility');
         break;
       case 'Name Destiny':
-        router.push('/name-destiny');
+        router.push('/(tabs)/name-destiny');
         break;
       case 'Divine Timing':
         console.log('Divine Timing - Coming Soon');

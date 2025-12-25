@@ -1,5 +1,5 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs, useRouter, useSegments } from 'expo-router';
 import React from 'react';
 
 import ResponsiveAppHeader from '@/components/AppHeader';
@@ -21,7 +21,15 @@ function TabBarIcon(props: {
 function CustomHeader() {
   const { language, setLanguage } = useLanguage();
   const router = useRouter();
+  const segments = useSegments();
   const [showHistory, setShowHistory] = React.useState(false);
+
+  // Hide header on name-destiny screens (they have their own DestinyHeader)
+  const isNameDestinyScreen = segments.includes('name-destiny');
+  
+  if (isNameDestinyScreen) {
+    return null;
+  }
 
   const handleLoadFromHistory = (saved: SavedCalculation) => {
     router.push({
@@ -110,6 +118,13 @@ export default function TabLayout() {
         options={{
           title: t('nav.guidance'),
           tabBarIcon: ({ color }) => <TabBarIcon name="compass" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="name-destiny"
+        options={{
+          href: null, // Hide from tab bar - accessed via navigation only
+          title: 'Name Destiny',
         }}
       />
       <Tabs.Screen
