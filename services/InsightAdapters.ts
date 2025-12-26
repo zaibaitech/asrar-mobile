@@ -205,17 +205,30 @@ export function computePhraseInsights(
 // QURAN ADAPTER
 // ============================================================================
 
+/**
+ * Compute Qur'an-specific insights
+ * 
+ * IMPORTANT: "Resonance Link" is derived from the calculated Kabīr value
+ * It shows:
+ * - The dominant element (from Ḥadad calculation)
+ * - The nearest sacred number to the verse's Kabīr
+ * - The spiritual significance of that sacred number
+ * 
+ * This is a CALCULATED association, not a suggestion.
+ */
 export function computeQuranInsights(
   core: CoreResults,
   arabicText?: string,
   surahNumber?: number,
   ayahNumber?: number
 ): QuranInsights {
+  // Find nearest sacred number based on the verse's Kabīr value
   const nearest = sacredSet.reduce((best, x) => 
     Math.abs(x - core.kabir) < Math.abs(best - core.kabir) ? x : best, 
     sacredSet[0]
   );
   
+  const distance = Math.abs(nearest - core.kabir);
   const meaning = sacredSignificance[nearest] || 'Resonates with divine pattern';
   
   // Enhanced: Get surah metadata if provided
@@ -224,6 +237,14 @@ export function computeQuranInsights(
     ? generateQuranLink(surahNumber, ayahNumber)
     : undefined;
   
+  // Build resonance description with transparency
+  let resonanceDescription = meaning;
+  if (distance > 0) {
+    resonanceDescription = `${meaning}\n\n📊 Calculated: Verse Kabīr is ${core.kabir}, nearest sacred number is ${nearest} (distance: ${distance})`;
+  } else {
+    resonanceDescription = `${meaning}\n\n✨ Perfect match: This verse's Kabīr (${core.kabir}) is a sacred number!`;
+  }
+  
   return {
     surahName: surah?.name.transliteration,
     ayahNumber,
@@ -231,7 +252,10 @@ export function computeQuranInsights(
     resonanceLink: {
       dominantElement: core.element,
       sacredNumber: nearest,
-      meaning,
+      meaning: resonanceDescription,
+      isCalculated: true, // Flag to indicate this is derived from Kabīr, not suggested
+      kabir: core.kabir,  // Include the actual Kabīr value for transparency
+      distance,           // Distance from nearest sacred number
     },
     reflectionBlock: {
       prompt: 'Read this ayah slowly, with presence. What word or phrase stands out to you? Write 1-2 words that resonate.',

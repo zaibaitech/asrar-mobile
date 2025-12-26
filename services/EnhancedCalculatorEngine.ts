@@ -1,26 +1,27 @@
 /**
  * Enhanced Calculator Engine
  * Core computation engine for ʿIlm al-Asrār Calculator
- * Computes all numeric values once, then routes to type-specific adapters
+ * 
+ * UPDATED: Now uses unified normalization and calculation pipeline
+ * - Single source of truth: computeAbjadProfile()
+ * - Consistent normalization: normalizeArabic() and normalizeDhikrName()
+ * - Deterministic results across all input types
  */
 
-import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI } from '../constants/abjad-maps';
-import { calculateBurj } from '../constants/buruj';
 import { getDivineNameByNumber } from '../data/divine-names';
 import { getSurahByNumber } from '../data/quran-surahs';
 import {
-    CalculationOptions,
     CalculationRequest,
     CoreResults,
     ElementalAnalytics,
     EnhancedCalculationResult,
     InputMetadata,
-    LetterFrequency,
-    UnifiedInputType,
+    UnifiedInputType
 } from '../types/calculator-enhanced';
-import { calculateAbjadTotal, getDigitalRoot } from '../utils/abjad-calculations';
-import { elementOfLetter, hadathRemainder, hadathToElement, LETTER_ELEMENTS } from '../utils/hadad-core';
-import { dhikrStrict, isArabicText } from '../utils/text-normalize';
+import { computeAbjadProfile } from '../utils/abjad-unified-pipeline';
+import { debugCurrentCalculation } from '../utils/abjadDebugTools';
+import { normalizeArabic, normalizeDhikrName } from '../utils/arabic-normalization';
+import { isArabicText } from '../utils/text-normalize';
 import { ElementType } from '../utils/types';
 import {
     computeDhikrInsights,
@@ -33,6 +34,20 @@ import {
 import { fetchAyahText } from './QuranResonanceService';
 
 export class EnhancedCalculatorEngine {
+  /**
+   * Debug mode flag - set to true to enable detailed calculation logging
+   * Useful for diagnosing Web vs Mobile calculation discrepancies
+   */
+  private static DEBUG_MODE = false;
+  
+  /**
+   * Enable/disable debug mode
+   */
+  static setDebugMode(enabled: boolean): void {
+    this.DEBUG_MODE = enabled;
+    console.log(`[EnhancedCalculatorEngine] Debug mode ${enabled ? 'ENABLED' : 'DISABLED'}`);
+  }
+  
   private static async resolveSourceText(
     request: CalculationRequest
   ): Promise<{ rawText: string; inputType: UnifiedInputType; sourceMeta?: InputMetadata['sourceMeta'] }> {
@@ -130,159 +145,14 @@ export class EnhancedCalculatorEngine {
   }
 
   /**
-   * Normalize Arabic input
-   * - Remove diacritics/tashkeel
-   * - Normalize forms (أ/إ/آ -> ا, ة -> ه, ى -> ي)
-   * - Optionally remove spaces and punctuation
-   */
-  static normalizeArabic(
-    text: string,
-    options: CalculationOptions = { removeVowels: true, ignorePunctuation: true, ignoreSpaces: true }
-  ): string {
-    if (!text) return '';
-    
-    let normalized = text.trim();
-    
-    // Remove tashkeel (diacritics) - always
-    if (options.removeVowels) {
-      normalized = normalized.replace(/[\u064B-\u065F\u0670]/g, '');
-    }
-    
-    // Normalize Arabic letter forms
-    normalized = normalized
-      .replace(/[أإآ]/g, 'ا')  // Normalize alif forms
-      .replace(/ى/g, 'ي')      // Alif maqsura to ya
-      .replace(/ة/g, 'ه');     // Ta marbuta to ha (optional)
-    
-    // Remove punctuation
-    if (options.ignorePunctuation) {
-      normalized = normalized.replace(/[.,;:!?'"(){}[\]،؛]/g, '');
-    }
-    
-    // Remove spaces
-    if (options.ignoreSpaces) {
-      normalized = normalized.replace(/\s+/g, '');
-    } else {
-      normalized = normalized.replace(/\s+/g, ' '); // Normalize whitespace
-    }
-    
-    return normalized;
-  }
-
-  /**
-   * Compute all core numbers in one pass
-   */
-  static computeCore(
-    normalizedText: string,
-    system: 'maghribi' | 'mashriqi' = 'maghribi'
-  ): CoreResults {
-    const map = system === 'maghribi' ? ABJAD_MAGHRIBI : ABJAD_MASHRIQI;
-    
-    const kabir = calculateAbjadTotal(normalizedText, map);
-    const saghir = getDigitalRoot(kabir);
-    const hadadMod4 = hadathRemainder(kabir);
-    const element = hadathToElement(hadadMod4);
-    const burjCalc = calculateBurj(kabir);
-    
-    const sirr = kabir - saghir;
-    const wusta = Math.floor((kabir + saghir) / 2);
-    const kamal = kabir + saghir;
-    const bast = kabir * saghir;
-    
-    return {
-      kabir,
-      saghir,
-      hadadMod4,
-      burj: burjCalc.name,
-      element,
-      sirr,
-      wusta,
-      kamal,
-      bast,
-    };
-  }
-
-  /**
-   * Compute elemental analytics
-   * - Letter frequency
-   * - Elemental composition percentages
-   * - Dominant/weakest elements
-   * - Balance score (FIXED formula)
-   */
-  static computeAnalytics(normalizedText: string): ElementalAnalytics {
-    // Count letter frequencies
-    const letterMap = new Map<string, { count: number; value: number; element: ElementType }>();
-    
-    Array.from(normalizedText).forEach(char => {
-      if (LETTER_ELEMENTS[char]) {
-        const existing = letterMap.get(char);
-        const element = elementOfLetter(char);
-        const value = ABJAD_MAGHRIBI[char] || 0;
-        
-        if (existing) {
-          letterMap.set(char, { count: existing.count + 1, value, element });
-        } else {
-          letterMap.set(char, { count: 1, value, element });
-        }
-      }
-    });
-    
-    const letterFreq: LetterFrequency[] = Array.from(letterMap.entries())
-      .map(([letter, data]) => ({
-        letter,
-        count: data.count,
-        value: data.value,
-        element: data.element,
-      }))
-      .sort((a, b) => b.count - a.count);
-    
-    // Calculate elemental composition
-    const elementCounts = { fire: 0, water: 0, air: 0, earth: 0 };
-    let totalLetters = 0;
-    
-    letterFreq.forEach(({ element, count }) => {
-      elementCounts[element] += count;
-      totalLetters += count;
-    });
-    
-    const elementPercents = {
-      fire: totalLetters > 0 ? Math.round((elementCounts.fire / totalLetters) * 100) : 0,
-      water: totalLetters > 0 ? Math.round((elementCounts.water / totalLetters) * 100) : 0,
-      air: totalLetters > 0 ? Math.round((elementCounts.air / totalLetters) * 100) : 0,
-      earth: totalLetters > 0 ? Math.round((elementCounts.earth / totalLetters) * 100) : 0,
-    };
-    
-    // Find dominant and weakest
-    const sorted = (Object.entries(elementPercents) as [ElementType, number][])
-      .sort((a, b) => b[1] - a[1]);
-    const dominantElement = sorted[0][0];
-    const weakElement = sorted.find(([_, pct]) => pct === 0)?.[0] || null;
-    
-    // FIXED balance score calculation
-    // Perfect balance = 25% each element
-    // Calculate standard deviation and convert to 0-100 scale
-    const ideal = 25;
-    const values = Object.values(elementPercents);
-    const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
-    const variance = values.reduce((sum, v) => sum + Math.pow(v - ideal, 2), 0) / values.length;
-    const stdDev = Math.sqrt(variance);
-    
-    // Scale: 0 deviation = 100%, high deviation = 0%
-    // Max reasonable deviation is ~43 (one element 100%, others 0%)
-    const balanceScore = Math.max(0, Math.min(100, Math.round(100 - (stdDev * 2.3))));
-    
-    return {
-      letterFreq,
-      elementPercents,
-      dominantElement,
-      weakElement,
-      balanceScore,
-    };
-  }
-
-  /**
    * Main calculation method
-   * Routes to type-specific adapters after computing core
+   * Routes to type-specific adapters after computing core using unified pipeline
+   * 
+   * CRITICAL CHANGES:
+   * - Uses normalizeArabic() for all text (except Dhikr)
+   * - Uses normalizeDhikrName() for Dhikr input
+   * - Uses computeAbjadProfile() for all calculations
+   * - Ensures consistency across Qur'an sources
    */
   static async calculate(request: CalculationRequest): Promise<EnhancedCalculationResult> {
     const { rawText, inputType, sourceMeta } = await this.resolveSourceText(request);
@@ -292,39 +162,42 @@ export class EnhancedCalculatorEngine {
       throw new Error('EMPTY_SOURCE_TEXT');
     }
 
-    // Normalize input
-    const options: CalculationOptions = {
-      removeVowels: request.removeVowels !== false,
-      ignorePunctuation: request.ignorePunctuation !== false,
-      ignoreSpaces: request.ignoreSpaces !== false,
-    };
+    // Determine normalization strategy based on input type
+    let normalizedText = '';
+    let calculatedFrom: string | undefined;
+    let calculationNote: string | undefined;
+    let warning: string | undefined;
     
-    const normalizedDefault = this.normalizeArabic(rawText, options);
+    if (request.type === 'dhikr') {
+      // Special handling for Dhikr: strip "ال" and "يا"
+      normalizedText = normalizeDhikrName(rawText);
+      calculatedFrom = normalizedText;
+      
+      if (!normalizedText) {
+        warning = 'Could not extract Divine Name from input';
+        normalizedText = normalizeArabic(rawText); // Fallback
+      } else if (normalizedText !== normalizeArabic(rawText)) {
+        calculationNote = 'Calculated without ال/يا prefixes';
+      }
+    } else {
+      // Standard normalization for all other types
+      normalizedText = normalizeArabic(rawText);
+    }
+
+    // Detect language
     const hasArabic = /[\u0600-\u06FF]/.test(rawText);
     const hasLatin = /[A-Za-z]/.test(rawText);
     let languageDetected: InputMetadata['languageDetected'] = 'latin';
     if (hasArabic && hasLatin) {
       languageDetected = 'mixed';
+    }
+    
+    // Optional: Debug detailed normalization (when DEBUG_MODE is true)
+    if (this.DEBUG_MODE && request.type === 'quran') {
+      console.log('[EnhancedCalculatorEngine] 🔍 QURAN CALCULATION DEBUG MODE ACTIVE');
+      debugCurrentCalculation(rawText, undefined, undefined, request.system || 'maghribi');
     } else if (hasArabic || isArabicText(rawText)) {
       languageDetected = 'arabic';
-    }
-
-    let calculationText = normalizedDefault;
-    let calculatedFrom: string | undefined;
-    let calculationNote: string | undefined;
-    let warning: string | undefined;
-
-    if (request.type === 'dhikr') {
-      const strict = dhikrStrict(rawText);
-      calculatedFrom = strict;
-
-      if (strict) {
-        calculationText = strict;
-        calculationNote = 'Calculated without ال/يا';
-      } else {
-        calculationText = '';
-        warning = 'Invalid input';
-      }
     }
 
     if (process.env.NODE_ENV !== 'production') {
@@ -334,20 +207,21 @@ export class EnhancedCalculatorEngine {
         surah: sourceMeta?.surahNumber,
         ayah: sourceMeta?.ayahNumber,
         sourceLength: rawText.length,
-        normalizedLength: calculationText.length,
+        normalizedLength: normalizedText.length,
+        normalized: normalizedText.substring(0, 50) + (normalizedText.length > 50 ? '...' : ''),
       });
     }
     
     // Build input metadata
     const input: InputMetadata = {
       raw: rawText,
-      normalized: calculationText,
+      normalized: normalizedText,
       languageDetected,
       inputType,
       sourceMeta,
     };
 
-    if (typeof calculatedFrom === 'string') {
+    if (calculatedFrom) {
       input.calculatedFrom = calculatedFrom;
     }
 
@@ -359,32 +233,78 @@ export class EnhancedCalculatorEngine {
       input.warning = warning;
     }
     
-    // Compute core numerics
-    const emptyInput = calculationText.length === 0;
-
-    const core = emptyInput
-      ? {
-          kabir: 0,
-          saghir: 0,
-          hadadMod4: 0,
-          burj: '—',
-          element: 'water' as ElementType,
-          sirr: 0,
-          wusta: 0,
-          kamal: 0,
-          bast: 0,
-        }
-      : this.computeCore(calculationText, request.system);
-
-    const analytics = emptyInput
-      ? {
-          letterFreq: [] as LetterFrequency[],
-          elementPercents: { fire: 0, water: 0, air: 0, earth: 0 },
-          dominantElement: 'fire' as ElementType,
-          weakElement: null,
-          balanceScore: 0,
-        }
-      : this.computeAnalytics(calculationText);
+    // USE UNIFIED PIPELINE - Single source of truth
+    const emptyInput = normalizedText.length === 0;
+    
+    if (emptyInput) {
+      // Return empty result
+      const core: CoreResults = {
+        kabir: 0,
+        saghir: 0,
+        hadadMod4: 0,
+        burj: '—',
+        element: 'water' as ElementType,
+        sirr: 0,
+        wusta: 0,
+        kamal: 0,
+        bast: 0,
+      };
+      
+      const analytics: ElementalAnalytics = {
+        letterFreq: [],
+        elementPercents: { fire: 0, water: 0, air: 0, earth: 0 },
+        dominantElement: 'fire' as ElementType,
+        weakElement: null,
+        balanceScore: 0,
+      };
+      
+      const result: EnhancedCalculationResult = {
+        id: Date.now().toString(),
+        timestamp: Date.now(),
+        type: request.type,
+        input,
+        core,
+        analytics,
+        system: request.system,
+      };
+      
+      return result;
+    }
+    
+    // Compute using unified pipeline
+    const profile = computeAbjadProfile(
+      rawText,
+      normalizedText,
+      request.system,
+      inputType === 'quran' ? 'quran' : inputType === 'custom' ? 'general' : 'general'
+    );
+    
+    // Convert profile to legacy CoreResults format (for compatibility)
+    const core: CoreResults = {
+      kabir: profile.core.kabir,
+      saghir: profile.core.saghir,
+      hadadMod4: profile.core.hadad,
+      burj: profile.core.burjName,
+      element: profile.core.element,
+      sirr: profile.advanced.sirr,
+      wusta: profile.advanced.wusta,
+      kamal: profile.advanced.kamal,
+      bast: profile.advanced.bast,
+    };
+    
+    // Convert profile to legacy ElementalAnalytics format
+    const analytics: ElementalAnalytics = {
+      letterFreq: profile.letterFrequency,
+      elementPercents: {
+        fire: profile.elemental.firePercent,
+        water: profile.elemental.waterPercent,
+        air: profile.elemental.airPercent,
+        earth: profile.elemental.earthPercent,
+      },
+      dominantElement: profile.elemental.dominantElement,
+      weakElement: profile.elemental.weakestElement,
+      balanceScore: profile.elemental.balanceScore,
+    };
     
     // Create base result
     const result: EnhancedCalculationResult = {
@@ -405,20 +325,24 @@ export class EnhancedCalculatorEngine {
       
       case 'lineage':
         if (request.yourName && request.motherName) {
-          const yourNameCore = this.computeCore(
-            this.normalizeArabic(request.yourName, options),
-            request.system
+          const yourProfile = computeAbjadProfile(
+            request.yourName,
+            normalizeArabic(request.yourName),
+            request.system,
+            'general'
           );
-          const motherNameCore = this.computeCore(
-            this.normalizeArabic(request.motherName, options),
-            request.system
+          const motherProfile = computeAbjadProfile(
+            request.motherName,
+            normalizeArabic(request.motherName),
+            request.system,
+            'general'
           );
           
           result.lineageInsights = computeLineageInsights(
-            yourNameCore.kabir,
-            motherNameCore.kabir,
-            yourNameCore.element,
-            motherNameCore.element,
+            yourProfile.core.kabir,
+            motherProfile.core.kabir,
+            yourProfile.core.element,
+            motherProfile.core.element,
             core
           );
         }
