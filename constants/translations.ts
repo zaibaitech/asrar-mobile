@@ -704,6 +704,55 @@ export const translations = {
         tip: "Tip",
         tipIntro: "Use these colors for clothing, journaling, meditation, or personal spaces.",
       },
+      
+      // Mode Selectors
+      inputTypeLabel: "Input Type",
+      understandingLevelLabel: "Understanding Level",
+      
+      // Input Types
+      inputTypes: {
+        namePerson: "Name (Person)",
+        nameMotherPair: "Name + Mother",
+        divineName: "Divine Name",
+        quranVerse: "Quranic Verse",
+        sentence: "Sentence/Phrase",
+        freeText: "Free Text",
+      },
+      
+      // Understanding Levels
+      levels: {
+        beginner: "Beginner",
+        intermediate: "Intermediate",
+        classical: "Classical",
+      },
+      
+      // Results
+      results: {
+        yourResults: "Your Results",
+        newCalculation: "New Calculation",
+        keyTakeaways: "Key Takeaways",
+        practicalGuidance: "Practical Guidance",
+        do: "Do",
+        avoid: "Avoid",
+        bestTime: "Best Time",
+        sacredNumbers: "Sacred Numbers",
+        grandTotal: "Grand Total",
+        essence: "Essence",
+        yourPersonalElement: "Your Personal Element",
+        zodiacInfluence: "Zodiac Influence",
+        rulingPlanet: "Ruling Planet",
+        dayOfPower: "Day of Power",
+        activeHourPlanet: "Active Hour Planet",
+        advancedContent: "Advanced Content",
+        classicalDetails: "Classical Details",
+        classicalDetailsSubtitle: "Traditional Maghribi terminology",
+        deepInterpretation: "Deep Interpretation",
+        deepInterpretationSubtitle: "Sirr, Basṭ, Kamāl",
+        deepInterpretationText: "This section is reserved for advanced classical interpretation of Sirr (hidden essence), Basṭ (expansion), and Kamāl (perfection). Additional calculations may be added in future updates.",
+        maghribiSystem: "Maghribī System",
+        goBack: "Go Back",
+        noResults: "No results to display",
+      },
     },
 
     // Planetary Hours
@@ -3591,6 +3640,55 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         avoidColors: "Couleurs à éviter",
         tip: "Conseil",
         tipIntro: "Utilisez ces couleurs pour les vêtements, l'écriture, la méditation ou les espaces personnels.",
+      },
+      
+      // Sélecteurs de Mode
+      inputTypeLabel: "Type d'Entrée",
+      understandingLevelLabel: "Niveau de Compréhension",
+      
+      // Types d'Entrée
+      inputTypes: {
+        namePerson: "Nom (Personne)",
+        nameMotherPair: "Nom + Mère",
+        divineName: "Nom Divin",
+        quranVerse: "Verset Coranique",
+        sentence: "Phrase",
+        freeText: "Texte Libre",
+      },
+      
+      // Niveaux de Compréhension
+      levels: {
+        beginner: "Débutant",
+        intermediate: "Intermédiaire",
+        classical: "Classique",
+      },
+      
+      // Résultats
+      results: {
+        yourResults: "Vos Résultats",
+        newCalculation: "Nouveau Calcul",
+        keyTakeaways: "Points Clés",
+        practicalGuidance: "Conseils Pratiques",
+        do: "Faire",
+        avoid: "Éviter",
+        bestTime: "Meilleur Moment",
+        sacredNumbers: "Nombres Sacrés",
+        grandTotal: "Total",
+        essence: "Essence",
+        yourPersonalElement: "Votre Élément Personnel",
+        zodiacInfluence: "Influence Zodiacale",
+        rulingPlanet: "Planète Maîtresse",
+        dayOfPower: "Jour de Puissance",
+        activeHourPlanet: "Planète Heure Active",
+        advancedContent: "Contenu Avancé",
+        classicalDetails: "Détails Classiques",
+        classicalDetailsSubtitle: "Terminologie maghribine traditionnelle",
+        deepInterpretation: "Interprétation Profonde",
+        deepInterpretationSubtitle: "Sirr, Basṭ, Kamāl",
+        deepInterpretationText: "Cette section est réservée à l'interprétation classique avancée de Sirr (essence cachée), Basṭ (expansion) et Kamāl (perfection). Des calculs supplémentaires peuvent être ajoutés dans les futures mises à jour.",
+        maghribiSystem: "Système Maghribi",
+        goBack: "Retour",
+        noResults: "Aucun résultat à afficher",
       },
     },
 

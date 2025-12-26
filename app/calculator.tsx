@@ -1,73 +1,175 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { CalculationTypeSelector } from '../components/calculator/CalculationTypeSelector';
 import { CalculatorInput } from '../components/calculator/CalculatorInput';
-import { HistoryPanel } from '../components/calculator/HistoryPanel';
-import { ResultsDisplay } from '../components/calculator/ResultsDisplay';
+import { EnhancedResultsDisplay } from '../components/calculator/EnhancedResultsDisplay';
 import { CalculatorColors } from '../constants/CalculatorColors';
-import { CalculatorService } from '../services/CalculatorService';
-import { CalculationResult, HistoryItem } from '../types/calculator';
+import { EnhancedCalculatorEngine } from '../services/EnhancedCalculatorEngine';
+import { CalculationType, EnhancedCalculationResult } from '../types/calculator-enhanced';
 
 export default function CalculatorScreen() {
   const colors = CalculatorColors;
 
-  const [latinInput, setLatinInput] = useState('');
-  const [arabicInput, setArabicInput] = useState('');
+  // Enhanced Calculator State
+  const [calculationType, setCalculationType] = useState<CalculationType>('name');
   const [system, setSystem] = useState<'maghribi' | 'mashriqi'>('maghribi');
   const [isLoading, setIsLoading] = useState(false);
-  const [currentResult, setCurrentResult] = useState<CalculationResult | null>(null);
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [activeTab, setActiveTab] = useState<'input' | 'results' | 'history'>('input');
-
-  useEffect(() => {
-    loadHistory();
-  }, []);
-
-  const loadHistory = async () => {
-    const hist = await CalculatorService.getHistory();
-    setHistory(hist);
-  };
+  const [currentResult, setCurrentResult] = useState<EnhancedCalculationResult | null>(null);
+  const [activeTab, setActiveTab] = useState<'input' | 'results'>('input');
+  const [calculationWarning, setCalculationWarning] = useState<string | null>(null);
+  const handleCalculateRef = useRef<() => Promise<void>>(async () => {});
+  const lastQuranSelectionRef = useRef<string>('');
+  
+  // Input fields
+  const [arabicInput, setArabicInput] = useState('');
+  const [yourName, setYourName] = useState('');
+  const [motherName, setMotherName] = useState('');
+  const [selectedDivineName, setSelectedDivineName] = useState<number | null>(null);
+  const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
+  const [selectedAyah, setSelectedAyah] = useState<number | null>(null);
+  
+  // Phrase options
+  const [removeVowels, setRemoveVowels] = useState(false);
+  const [ignorePunctuation, setIgnorePunctuation] = useState(true);
+  const [ignoreSpaces, setIgnoreSpaces] = useState(false);
 
   const handleCalculate = async () => {
-    const input = arabicInput || latinInput;
-    if (!input.trim()) return;
+    if (isLoading) {
+      return;
+    }
 
+    setCalculationWarning(null);
     setIsLoading(true);
     try {
-      const result = await CalculatorService.calculate(input, system);
+      let result: EnhancedCalculationResult;
+
+      switch (calculationType) {
+        case 'name':
+          if (!arabicInput.trim()) return;
+          result = await EnhancedCalculatorEngine.calculate({
+            type: 'name',
+            arabicInput: arabicInput.trim(),
+            system
+          });
+          break;
+
+        case 'lineage':
+          if (!yourName.trim() || !motherName.trim()) return;
+          result = await EnhancedCalculatorEngine.calculate({
+            type: 'lineage',
+            yourName: yourName.trim(),
+            motherName: motherName.trim(),
+            system
+          });
+          break;
+
+        case 'phrase':
+          if (!arabicInput.trim()) return;
+          result = await EnhancedCalculatorEngine.calculate({
+            type: 'phrase',
+            arabicInput: arabicInput.trim(),
+            system,
+            removeVowels,
+            ignorePunctuation,
+            ignoreSpaces,
+          });
+          break;
+
+        case 'quran':
+          if (selectedSurah && selectedAyah) {
+            result = await EnhancedCalculatorEngine.calculate({
+              type: 'quran',
+              surahNumber: selectedSurah,
+              ayahNumber: selectedAyah,
+              system
+            });
+          } else if (arabicInput.trim()) {
+            result = await EnhancedCalculatorEngine.calculate({
+              type: 'quran',
+              pastedAyahText: arabicInput.trim(),
+              system
+            });
+          } else {
+            return;
+          }
+          break;
+
+        case 'dhikr':
+          if (!selectedDivineName) return;
+          result = await EnhancedCalculatorEngine.calculate({
+            type: 'dhikr',
+            divineNameId: selectedDivineName.toString(),
+            system
+          });
+          break;
+
+        case 'general':
+          if (!arabicInput.trim()) return;
+          result = await EnhancedCalculatorEngine.calculate({
+            type: 'general',
+            arabicInput: arabicInput.trim(),
+            system,
+            ignoreSpaces,
+          });
+          break;
+
+        default:
+          return;
+      }
+
       setCurrentResult(result);
-      await CalculatorService.saveToHistory(result);
-      await loadHistory();
       setActiveTab('results');
+      if (calculationType === 'quran' && selectedSurah && selectedAyah) {
+        lastQuranSelectionRef.current = `${selectedSurah}:${selectedAyah}:${system}`;
+      }
     } catch (error) {
       console.error('Calculation error:', error);
+      setCurrentResult(null);
+      setActiveTab('results');
+
+      if (error instanceof Error && error.message === 'EMPTY_SOURCE_TEXT') {
+        setCalculationWarning('No text to calculate. Please select a verse or provide Arabic text.');
+        return;
+      }
+
+      setCalculationWarning('Something went wrong while calculating. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSelectHistory = (item: HistoryItem) => {
-    setCurrentResult(item.result);
-    setArabicInput(item.result.isArabic ? item.result.input : '');
-    setLatinInput(!item.result.isArabic ? item.result.input : '');
-    setSystem(item.result.system);
-    setActiveTab('results');
-  };
+  handleCalculateRef.current = handleCalculate;
 
-  const handleDeleteHistory = async (id: string) => {
-    await CalculatorService.deleteHistoryItem(id);
-    await loadHistory();
-  };
+  useEffect(() => {
+    if (calculationType !== 'quran') {
+      return;
+    }
+    if (!selectedSurah || !selectedAyah) {
+      return;
+    }
+    if (isLoading) {
+      return;
+    }
 
-  const handleClearHistory = async () => {
-    await CalculatorService.clearHistory();
-    await loadHistory();
-  };
+    const selectionKey = `${selectedSurah}:${selectedAyah}:${system}`;
+    if (lastQuranSelectionRef.current === selectionKey) {
+      return;
+    }
+
+    lastQuranSelectionRef.current = selectionKey;
+
+    handleCalculateRef.current();
+  }, [calculationType, selectedSurah, selectedAyah, system, isLoading]);
+
+  useEffect(() => {
+    setCalculationWarning(null);
+  }, [calculationType]);
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Abjad Calculator', headerShown: true }} />
+      <Stack.Screen options={{ title: 'ʿIlm al-Asrār Calculator', headerShown: true }} />
       <KeyboardAvoidingView 
         style={[styles.container, { backgroundColor: colors.background }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -107,52 +209,64 @@ export default function CalculatorScreen() {
             )}
             <Text style={[styles.tabText, { color: activeTab === 'results' ? '#fff' : '#94a3b8', opacity: currentResult ? 1 : 0.4 }]}>✨ Results</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.tab, activeTab === 'history' && styles.tabActive]} 
-            onPress={() => setActiveTab('history')}
-          >
-            {activeTab === 'history' && (
-              <LinearGradient
-                colors={['#6366f1', '#8b5cf6']}
-                style={styles.tabGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              />
-            )}
-            <Text style={[styles.tabText, { color: activeTab === 'history' ? '#fff' : '#94a3b8' }]}>📜 History</Text>
-          </TouchableOpacity>
         </LinearGradient>
 
         {/* Content */}
-        <View style={styles.content}>
-          {activeTab === 'input' && (
-            <ScrollView>
-              <CalculatorInput
-                latinInput={latinInput}
-                arabicInput={arabicInput}
-                onLatinChange={setLatinInput}
-                onArabicChange={setArabicInput}
-                onCalculate={handleCalculate}
-                isLoading={isLoading}
+        {activeTab === 'input' && (
+          <ScrollView 
+            style={{ flex: 1 }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
+            {/* Calculation Type Selector */}
+            <CalculationTypeSelector
+              selectedType={calculationType}
+              onTypeChange={setCalculationType}
+            />
+
+            {/* Enhanced Calculator Input */}
+            <CalculatorInput
+                calculationType={calculationType}
                 system={system}
                 onSystemChange={setSystem}
+                arabicInput={arabicInput}
+                onArabicInputChange={setArabicInput}
+                yourName={yourName}
+                onYourNameChange={setYourName}
+                motherName={motherName}
+                onMotherNameChange={setMotherName}
+                selectedDivineName={selectedDivineName}
+                onDivineNameChange={setSelectedDivineName}
+                selectedSurah={selectedSurah}
+                onSurahChange={setSelectedSurah}
+                selectedAyah={selectedAyah}
+                onAyahChange={setSelectedAyah}
+                removeVowels={removeVowels}
+                onRemoveVowelsChange={setRemoveVowels}
+                ignorePunctuation={ignorePunctuation}
+                onIgnorePunctuationChange={setIgnorePunctuation}
+                ignoreSpaces={ignoreSpaces}
+                onIgnoreSpacesChange={setIgnoreSpaces}
+                onCalculate={handleCalculate}
+                isLoading={isLoading}
               />
-            </ScrollView>
-          )}
+          </ScrollView>
+        )}
 
-          {activeTab === 'results' && currentResult && (
-            <ResultsDisplay result={currentResult} />
-          )}
-
-          {activeTab === 'history' && (
-            <HistoryPanel
-              history={history}
-              onSelectItem={handleSelectHistory}
-              onDeleteItem={handleDeleteHistory}
-              onClearAll={handleClearHistory}
-            />
-          )}
-        </View>
+        {activeTab === 'results' && (
+          currentResult ? (
+            <EnhancedResultsDisplay result={currentResult} />
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateTitle}>
+                {calculationWarning ? 'No Text to Calculate' : 'Awaiting Calculation'}
+              </Text>
+              <Text style={styles.emptyStateMessage}>
+                {calculationWarning ?? 'Calculate from the Input tab to view your results.'}
+              </Text>
+            </View>
+          )
+        )}
       </KeyboardAvoidingView>
     </>
   );
@@ -198,5 +312,27 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     zIndex: 1
   },
-  content: { flex: 1 }
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 40,
+  },
+  emptyState: {
+    flex: 1,
+    backgroundColor: '#0f172a',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    gap: 12,
+  },
+  emptyStateTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#f8fafc',
+  },
+  emptyStateMessage: {
+    fontSize: 14,
+    color: '#94a3b8',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
 });

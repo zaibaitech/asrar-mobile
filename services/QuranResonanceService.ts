@@ -81,7 +81,7 @@ export async function getQuranResonance(
  * Fetch Arabic text for a specific ayah from Al-Quran Cloud API
  * Falls back to placeholder if API fails
  */
-async function fetchAyahText(surahNumber: number, ayahNumber: number): Promise<string> {
+export async function fetchAyahText(surahNumber: number, ayahNumber: number): Promise<string> {
   try {
     const response = await fetch(
       `https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/ar.asad`,

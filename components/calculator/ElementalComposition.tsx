@@ -1,84 +1,54 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { LETTER_ELEMENTS, elementOfLetter } from '../../utils/hadad-core';
-import { normalizeArabicText } from '../../utils/text-normalize';
+import { ElementalAnalytics } from '../../types/calculator-enhanced';
 
 interface ElementalCompositionProps {
-  input: string;
+  analytics: ElementalAnalytics;
 }
 
-type ElementCounts = {
-  fire: number;
-  water: number;
-  air: number;
-  earth: number;
-};
-
-export const ElementalComposition: React.FC<ElementalCompositionProps> = ({ input }) => {
-  const normalized = normalizeArabicText(input);
-  
-  // Count letters by element
-  const elementCounts: ElementCounts = {
+export const ElementalComposition: React.FC<ElementalCompositionProps> = ({ analytics }) => {
+  const elementCounts: Record<'fire' | 'water' | 'air' | 'earth', number> = {
     fire: 0,
     water: 0,
     air: 0,
     earth: 0,
   };
-  
+
   let totalLetters = 0;
-  Array.from(normalized).forEach(char => {
-    if (LETTER_ELEMENTS[char]) {
-      const element = elementOfLetter(char);
-      elementCounts[element]++;
-      totalLetters++;
-    }
+  analytics.letterFreq.forEach(({ element, count }) => {
+    elementCounts[element] += count;
+    totalLetters += count;
   });
-  
-  // Calculate percentages
-  const percentages = {
-    fire: totalLetters > 0 ? Math.round((elementCounts.fire / totalLetters) * 100) : 0,
-    water: totalLetters > 0 ? Math.round((elementCounts.water / totalLetters) * 100) : 0,
-    air: totalLetters > 0 ? Math.round((elementCounts.air / totalLetters) * 100) : 0,
-    earth: totalLetters > 0 ? Math.round((elementCounts.earth / totalLetters) * 100) : 0,
-  };
-  
-  // Find dominant and weakest elements
-  const sorted = Object.entries(percentages).sort((a, b) => b[1] - a[1]);
-  const dominant = sorted[0][0];
-  const weakest = sorted.find(([_, pct]) => pct === 0)?.[0];
-  
-  // Calculate balance score (0-100, where 100 is perfectly balanced at 25% each)
-  const ideal = 25;
-  const deviation = Object.values(percentages).reduce((sum, pct) => sum + Math.abs(pct - ideal), 0);
-  const balanceScore = Math.max(0, Math.round(100 - deviation));
+
+  const { elementPercents, dominantElement, weakElement, balanceScore } = analytics;
   
   // Harmonizing recommendation
   const getHarmonizingAdvice = (): string => {
     if (balanceScore >= 75) {
       return 'Your elemental balance is harmonious. Maintain equilibrium through balanced practices.';
     }
-    
-    if (weakest === 'water' && percentages.water === 0) {
+
+    if (weakElement === 'water' && elementPercents.water === 0) {
       return 'Your Water element (0%) could use more attention. Try: Cultivate emotional depth, intuition, and flow. Practice dhikr near water or during wuḍū.';
     }
-    if (weakest === 'fire' && percentages.fire === 0) {
+    if (weakElement === 'fire' && elementPercents.fire === 0) {
       return 'Your Fire element (0%) could use more attention. Try: Engage passionate spiritual practices. Dhikr at dawn or sunrise to kindle inner light.';
     }
-    if (weakest === 'air' && percentages.air === 0) {
+    if (weakElement === 'air' && elementPercents.air === 0) {
       return 'Your Air element (0%) could use more attention. Try: Focus on knowledge and communication. Practice dhikr with breath awareness (habs al-nafas).';
     }
-    if (weakest === 'earth' && percentages.earth === 0) {
+    if (weakElement === 'earth' && elementPercents.earth === 0) {
       return 'Your Earth element (0%) could use more attention. Try: Ground yourself through patience and gratitude. Practice dhikr while in sujūd or standing on earth.';
     }
-    
-    return `Balance your ${dominant} dominance by incorporating practices from other elements.`;
+
+    return `Balance your ${dominantElement} dominance by incorporating practices from other elements.`;
   };
-  
+
   const elements = [
-    { name: 'Fire', key: 'fire', color: '#ef4444', emoji: '🔥', percentage: percentages.fire, count: elementCounts.fire },
-    { name: 'Water', key: 'water', color: '#3b82f6', emoji: '💧', percentage: percentages.water, count: elementCounts.water },
-    { name: 'Air', key: 'air', color: '#06b6d4', emoji: '🌬️', percentage: percentages.air, count: elementCounts.air },
-    { name: 'Earth', key: 'earth', color: '#84cc16', emoji: '🌳', percentage: percentages.earth, count: elementCounts.earth },
+    { name: 'Fire', key: 'fire', color: '#ef4444', emoji: '🔥', percentage: elementPercents.fire, count: elementCounts.fire },
+    { name: 'Water', key: 'water', color: '#3b82f6', emoji: '💧', percentage: elementPercents.water, count: elementCounts.water },
+    { name: 'Air', key: 'air', color: '#06b6d4', emoji: '🌬️', percentage: elementPercents.air, count: elementCounts.air },
+    { name: 'Earth', key: 'earth', color: '#84cc16', emoji: '🌳', percentage: elementPercents.earth, count: elementCounts.earth },
   ];
 
   return (
