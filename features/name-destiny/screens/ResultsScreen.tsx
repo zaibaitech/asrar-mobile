@@ -1,25 +1,166 @@
 /**
- * Name Destiny Results Screen - Premium Enhanced
- * Mobile-first dark theme with subtle personal element theming
+ * Name Destiny Results Screen - Enhanced UX
+ * Staged revelation with beginner-friendly presentation
  */
 
-import { BalanceGuidanceCard, DestinyHeader, DominantElementCard, ElementHeroCard, ElementProgressBar, InfoNoticeCard, SacredNumberCard } from '@/components/nameDestiny';
+import {
+    AccordionSection,
+    DestinyHeader,
+    ElementHeroCard,
+    ElementProgressBar,
+    InfoNoticeCard,
+    KeyTakeawaysCard,
+    PracticalGuidanceCard,
+    SacredNumberCard
+} from '@/components/nameDestiny';
 import { QuranResonanceCard } from '@/components/quran/QuranResonanceCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { NameDestinyResult } from '@/features/name-destiny/types';
+import { InputType, UnderstandingLevel } from '@/features/name-destiny/types/enums';
+import { generateKeyTakeaways } from '@/features/name-destiny/utils/takeawayGenerator';
 import { getQuranResonance, type QuranResonance } from '@/services/QuranResonanceService';
+import { getBalancingActions, getPracticalGuidance } from '@/utils/elementBalancing';
 import { getElementFromString, getElementTheme } from '@/utils/elementTheme';
 import { calculateLetterElementDistribution, getDominantElement } from '@/utils/relationshipCompatibility';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Calendar, Clock, HelpCircle, Sparkles, Star } from 'lucide-react-native';
+import { AlertCircle, Calendar, Clock, HelpCircle, Sparkles, Star } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
+
+/**
+ * Alignment mode configuration
+ * If true: Best Time day will match Power Day (from Burj ruler)
+ * If false: Best Time follows element-based schedule independently
+ */
+const ALIGN_BEST_TIME_WITH_POWER_DAY = false;
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
 // Format number with thousands separator
 function formatNumber(num: number): string {
   return num.toLocaleString('en-US');
+}
+
+// Get friendly label for input type
+function getInputTypeLabel(
+  inputType: InputType,
+  language: 'en' | 'fr' | 'ar'
+): string {
+  const labels = {
+    en: {
+      [InputType.NAME_PERSON]: 'Name only',
+      [InputType.NAME_MOTHER_PAIR]: 'Name + Mother (Lineage)',
+      [InputType.DIVINE_NAME]: 'Divine Name',
+      [InputType.QURAN_VERSE]: 'Quranic Verse',
+      [InputType.SENTENCE]: 'Sentence/Phrase',
+      [InputType.FREE_TEXT]: 'Free Text',
+    },
+    fr: {
+      [InputType.NAME_PERSON]: 'Nom seulement',
+      [InputType.NAME_MOTHER_PAIR]: 'Nom + Mère (Lignée)',
+      [InputType.DIVINE_NAME]: 'Nom Divin',
+      [InputType.QURAN_VERSE]: 'Verset Coranique',
+      [InputType.SENTENCE]: 'Phrase',
+      [InputType.FREE_TEXT]: 'Texte Libre',
+    },
+    ar: {
+      [InputType.NAME_PERSON]: 'الاسم فقط',
+      [InputType.NAME_MOTHER_PAIR]: 'الاسم + الأم (النسب)',
+      [InputType.DIVINE_NAME]: 'الاسم الإلهي',
+      [InputType.QURAN_VERSE]: 'آية قرآنية',
+      [InputType.SENTENCE]: 'جملة',
+      [InputType.FREE_TEXT]: 'نص حر',
+    },
+  };
+  return labels[language][inputType] || labels.en[inputType];
+}
+
+// Compute dominant and weak elements from composition
+function computeDominantAndWeakElements(composition: {
+  fire: number;
+  air: number;
+  water: number;
+  earth: number;
+}): {
+  dominant: { element: string; percentage: number };
+  weak: { element: string; percentage: number };
+} {
+  const total = composition.fire + composition.air + composition.water + composition.earth;
+  const percentages = {
+    fire: (composition.fire / total) * 100,
+    air: (composition.air / total) * 100,
+    water: (composition.water / total) * 100,
+    earth: (composition.earth / total) * 100,
+  };
+
+  const sorted = Object.entries(percentages).sort((a, b) => b[1] - a[1]);
+  
+  return {
+    dominant: {
+      element: sorted[0][0].charAt(0).toUpperCase() + sorted[0][0].slice(1),
+      percentage: Math.round(sorted[0][1]),
+    },
+    weak: {
+      element: sorted[sorted.length - 1][0].charAt(0).toUpperCase() + sorted[sorted.length - 1][0].slice(1),
+      percentage: Math.round(sorted[sorted.length - 1][1]),
+    },
+  };
+}
+
+/**
+ * Get Best Time Window based on element and optionally aligned with Power Day
+ * @param dominantElement - The dominant element type
+ * @param powerDay - The power day from Burj ruler (e.g., "Sunday")
+ * @param language - Display language
+ * @returns Best time window string with day, time of day, and season
+ */
+function getBestTimeWindow(
+  dominantElement: 'Fire' | 'Air' | 'Water' | 'Earth',
+  powerDay: string | undefined,
+  language: 'en' | 'fr' | 'ar'
+): string {
+  // Get the base best time from element (contains day + time + season)
+  const elementGuidance = getPracticalGuidance(dominantElement, language);
+  const baseBestTime = elementGuidance.bestTime;
+
+  // If alignment is disabled or no power day, return as-is
+  if (!ALIGN_BEST_TIME_WITH_POWER_DAY || !powerDay) {
+    return baseBestTime;
+  }
+
+  // Replace the day in bestTime with powerDay
+  // Pattern: "DayName at/morning/evening/night • Season"
+  // We need to extract everything after the day
+  
+  const dayMapping: Record<string, { en: string; fr: string; ar: string }> = {
+    Sunday: { en: 'Sunday', fr: 'Dimanche', ar: 'الأحد' },
+    Monday: { en: 'Monday', fr: 'Lundi', ar: 'الإثنين' },
+    Tuesday: { en: 'Tuesday', fr: 'Mardi', ar: 'الثلاثاء' },
+    Wednesday: { en: 'Wednesday', fr: 'Mercredi', ar: 'الأربعاء' },
+    Thursday: { en: 'Thursday', fr: 'Jeudi', ar: 'الخميس' },
+    Friday: { en: 'Friday', fr: 'Vendredi', ar: 'الجمعة' },
+    Saturday: { en: 'Saturday', fr: 'Samedi', ar: 'السبت' },
+  };
+
+  const translatedPowerDay = dayMapping[powerDay]?.[language] || powerDay;
+
+  // Extract time of day and season from baseBestTime
+  // English pattern: "Day at time • season"
+  // French pattern: "Jour au/matin/soir • saison"
+  // Arabic pattern: "اليوم في/صباحًا/مساءً • الموسم"
+  
+  const parts = baseBestTime.split(/(?:at |au |في |morning|matin|صباحًا|evening|soir|مساءً|night|nuit|ليلاً)/);
+  const timeAndSeasonPart = baseBestTime.substring(baseBestTime.indexOf(' '));
+
+  return `${translatedPowerDay}${timeAndSeasonPart}`;
 }
 
 export default function ResultsScreen() {
@@ -36,6 +177,9 @@ export default function ResultsScreen() {
   const result: NameDestinyResult | null = params.data ? JSON.parse(params.data as string) : null;
   const personName = params.personName as string;
   const motherName = params.motherName as string;
+  const inputType = (params.inputType as InputType) || InputType.NAME_MOTHER_PAIR;
+  const understandingLevel =
+    (params.understandingLevel as UnderstandingLevel) || UnderstandingLevel.BEGINNER;
 
   // Load Qur'anic Resonance on mount
   useEffect(() => {
@@ -65,7 +209,13 @@ export default function ResultsScreen() {
     return (
       <SafeAreaView style={styles.root}>
         <LinearGradient colors={['#0f172a', '#1e1b4b', '#312e81']} style={styles.gradient}>
-          <Text style={styles.errorText}>No results to display</Text>
+          <View style={styles.errorContainer}>
+            <AlertCircle size={48} color="#ef4444" />
+            <Text style={styles.errorText}>No results to display</Text>
+            <TouchableOpacity onPress={() => router.back()} style={styles.errorButton}>
+              <Text style={styles.errorButtonText}>Go Back</Text>
+            </TouchableOpacity>
+          </View>
         </LinearGradient>
       </SafeAreaView>
     );
@@ -74,10 +224,50 @@ export default function ResultsScreen() {
   const elementType = getElementFromString(result.element?.en);
   const theme = getElementTheme(elementType);
 
-  // Calculate letter-based element composition (distinct from Personal Element)
+  // Calculate letter-based element composition
   const fullName = `${personName}${motherName ? ' ' + motherName : ''}`;
   const letterDistribution = calculateLetterElementDistribution(fullName);
   const dominantLetterElement = getDominantElement(letterDistribution);
+
+  // Find the weakest element for balancing tips
+  const elementEntries = Object.entries(letterDistribution) as [
+    'fire' | 'air' | 'water' | 'earth',
+    number
+  ][];
+  const sortedElements = elementEntries.sort((a, b) => a[1] - b[1]);
+  const weakestElement = sortedElements[0][0];
+  const weakestElementType =
+    weakestElement.charAt(0).toUpperCase() + weakestElement.slice(1);
+
+  // Generate content
+  const lang = language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en';
+  const keyTakeaways = generateKeyTakeaways(
+    result.totalKabir,
+    result.saghir,
+    elementType,
+    result.burj?.en || 'Pisces',
+    inputType,
+    lang
+  );
+  const balancingActions = getBalancingActions(
+    weakestElementType as any,
+    lang
+  );
+  const practicalGuidance = getPracticalGuidance(elementType, lang);
+  
+  // Get best time window (optionally aligned with power day)
+  const bestTimeWindow = getBestTimeWindow(
+    elementType,
+    result.burjDay?.en,
+    lang
+  );
+
+  // Compute dominant and weak elements for composition summary
+  const elementStats = computeDominantAndWeakElements(letterDistribution);
+
+  // Determine what sections to show based on understanding level
+  const showAdvanced = understandingLevel !== UnderstandingLevel.BEGINNER;
+  const showClassical = understandingLevel === UnderstandingLevel.CLASSICAL;
 
   if (__DEV__) {
     console.log('[name-destiny/results] Displaying results:', {
@@ -85,20 +275,29 @@ export default function ResultsScreen() {
       totalKabir: result.totalKabir,
       saghir: result.saghir,
       burj: result.burj?.en,
+      inputType,
+      understandingLevel,
     });
   }
 
   return (
     <SafeAreaView style={styles.root}>
       <LinearGradient colors={['#0f172a', '#1e1b4b', '#312e81']} style={styles.gradient}>
+        {/* 1) Header */}
         <DestinyHeader
-          title="Your Destiny"
+          title={language === 'ar' ? 'نتائجك' : language === 'fr' ? 'Vos Résultats' : 'Your Results'}
           onBack={() => router.back()}
           language={language === 'ar' ? 'en' : language}
           onLanguageChange={setLanguage}
         />
 
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: insets.bottom + 24 }, // Safe area + buffer
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
           {/* New Calculation Button */}
           <TouchableOpacity
             style={styles.newCalcButton}
@@ -106,41 +305,105 @@ export default function ResultsScreen() {
             activeOpacity={0.75}
           >
             <Sparkles size={16} color="#a78bfa" strokeWidth={2.5} />
-            <Text style={styles.newCalcText}>New Calculation</Text>
+            <Text style={styles.newCalcText}>
+              {language === 'ar'
+                ? 'حساب جديد'
+                : language === 'fr'
+                ? 'Nouveau Calcul'
+                : 'New Calculation'}
+            </Text>
           </TouchableOpacity>
 
-          {/* Hero Title */}
-          <View style={styles.heroSection}>
-            <Text style={styles.heroTitle}>✨ Your Destiny Revealed</Text>
-            <Text style={styles.heroNames}>
-              {personName} • {motherName}
-            </Text>
+          {/* 2) Identity Summary Card */}
+          <View style={styles.identityCard}>
+            <Text style={styles.identityName}>✨ {personName}</Text>
+            {motherName && <Text style={styles.identityMother}>{motherName}</Text>}
+            
+            {/* MAGHRIBI SYSTEM Badge */}
+            <View style={styles.maghribiBadge}>
+              <Text style={styles.maghribiText}>MAGHRIBI SYSTEM</Text>
+            </View>
+            
+            {/* Calculation Context Chip */}
+            <View style={styles.contextChip}>
+              <Text style={styles.contextText}>
+                {getInputTypeLabel(inputType, lang)} • Abjad Kabīr + Ṣaghīr
+              </Text>
+            </View>
           </View>
 
-          {/* Sacred Numbers */}
+          {/* 3) Sacred Numbers */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Sacred Numbers</Text>
+            <Text style={styles.sectionTitle}>
+              {language === 'ar'
+                ? 'الأرقام المقدسة'
+                : language === 'fr'
+                ? 'Nombres Sacrés'
+                : 'Sacred Numbers'}
+            </Text>
             <View style={styles.numbersRow}>
               <SacredNumberCard
-                label="Total (Kabīr)"
+                label={
+                  language === 'ar'
+                    ? showClassical
+                      ? 'كبير'
+                      : 'الإجمالي'
+                    : language === 'fr'
+                    ? showClassical
+                      ? 'Kabīr'
+                      : 'Total'
+                    : showClassical
+                    ? 'Kabīr'
+                    : 'Grand Total'
+                }
                 value={formatNumber(result.totalKabir)}
-                description="Grand Total"
+                description={
+                  language === 'ar'
+                    ? 'المجموع الكلي'
+                    : language === 'fr'
+                    ? 'Total global'
+                    : 'Complete sum'
+                }
                 gradientColors={['rgba(168, 85, 247, 0.25)', 'rgba(139, 92, 246, 0.15)']}
                 accentColor="#a78bfa"
               />
               <SacredNumberCard
-                label="Digital Root (Ṣaghīr)"
+                label={
+                  language === 'ar'
+                    ? showClassical
+                      ? 'صغير'
+                      : 'الجوهر'
+                    : language === 'fr'
+                    ? showClassical
+                      ? 'Ṣaghīr'
+                      : 'Essence'
+                    : showClassical
+                    ? 'Ṣaghīr'
+                    : 'Essence'
+                }
                 value={result.saghir.toString()}
-                description="Spiritual Essence"
+                description={
+                  language === 'ar'
+                    ? 'الجذر الرقمي'
+                    : language === 'fr'
+                    ? 'Racine numérique'
+                    : 'Digital root'
+                }
                 gradientColors={['rgba(236, 72, 153, 0.25)', 'rgba(219, 39, 119, 0.15)']}
                 accentColor="#ec4899"
               />
             </View>
           </View>
 
-          {/* Element Hero Card - PRIMARY FOCUS */}
+          {/* 4) Your Personal Element (Ṭabʿ) */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Your Personal Element</Text>
+            <Text style={styles.sectionTitle}>
+              {language === 'ar'
+                ? 'عنصرك الشخصي (طبع)'
+                : language === 'fr'
+                ? 'Votre Élément Personnel (Ṭabʿ)'
+                : 'Your Personal Element (Ṭabʿ)'}
+            </Text>
             <ElementHeroCard
               element={elementType}
               elementAr={result.element?.ar}
@@ -148,71 +411,130 @@ export default function ResultsScreen() {
             />
           </View>
 
-          {/* Name Element Chart - LETTER-BASED COMPOSITION */}
+          {/* 5) Elemental Composition with Dominance Summary */}
           <View style={styles.section}>
-            <View style={styles.chartHeaderContainer}>
-              <Text style={styles.sectionTitle}>Name Element Chart</Text>
-              <Text style={styles.chartSubtitle}>
-                {language === 'ar'
-                  ? 'التركيب العنصري بناءً على حروف اسمك'
-                  : language === 'fr'
-                  ? 'Composition élémentaire basée sur les lettres de votre nom'
-                  : 'Elemental composition based on the letters of your name'}
+            <Text style={styles.sectionTitle}>
+              {language === 'ar'
+                ? 'التكوين العنصري'
+                : language === 'fr'
+                ? 'Composition Élémentaire'
+                : 'Elemental Composition'}
+            </Text>
+            <Text style={styles.sectionExplainer}>
+              {language === 'ar'
+                ? 'بناءً على الحروف في اسمك (التعبير الخارجي).'
+                : language === 'fr'
+                ? 'Basé sur les lettres de votre nom (expression extérieure).'
+                : 'Based on letters in your name (outward expression).'}
+            </Text>
+            
+            {/* Dominance Summary */}
+            <View style={styles.dominanceSummary}>
+              <Text style={styles.dominanceText}>
+                <Text style={styles.dominanceLabel}>
+                  {language === 'ar'
+                    ? 'التعبير المهيمن: '
+                    : language === 'fr'
+                    ? 'Expression Dominante : '
+                    : 'Dominant Expression: '}
+                </Text>
+                <Text style={[styles.dominanceValue, { color: getElementTheme(elementStats.dominant.element as any).accentColor }]}>
+                  {elementStats.dominant.element} ({elementStats.dominant.percentage}%)
+                </Text>
+              </Text>
+              <Text style={styles.dominanceText}>
+                <Text style={styles.dominanceLabel}>
+                  {language === 'ar'
+                    ? 'العنصر الضعيف: '
+                    : language === 'fr'
+                    ? 'Élément Faible : '
+                    : 'Weak Element: '}
+                </Text>
+                <Text style={[styles.dominanceValue, { color: getElementTheme(elementStats.weak.element as any).accentColor }]}>
+                  {elementStats.weak.element} ({elementStats.weak.percentage}%)
+                </Text>
               </Text>
             </View>
 
-            {/* Element Progress Bars */}
-            <View style={styles.chartBarsContainer}>
-              <ElementProgressBar
-                element="fire"
-                percentage={letterDistribution.fire}
-                isDominant={dominantLetterElement === 'fire'}
-                language={language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'}
-              />
-              <ElementProgressBar
-                element="air"
-                percentage={letterDistribution.air}
-                isDominant={dominantLetterElement === 'air'}
-                language={language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'}
-              />
-              <ElementProgressBar
-                element="water"
-                percentage={letterDistribution.water}
-                isDominant={dominantLetterElement === 'water'}
-                language={language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'}
-              />
-              <ElementProgressBar
-                element="earth"
-                percentage={letterDistribution.earth}
-                isDominant={dominantLetterElement === 'earth'}
-                language={language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'}
-              />
-            </View>
-
-            {/* Dominant Element Summary */}
-            <DominantElementCard
-              element={dominantLetterElement}
-              percentage={letterDistribution[dominantLetterElement]}
-              language={language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'}
-            />
-
-            {/* Balance & Guidance */}
-            <View style={{ marginTop: 14 }}>
-              <BalanceGuidanceCard
-                element={dominantLetterElement}
-                language={language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'}
-              />
-            </View>
-
-            {/* Important Distinction Notice */}
-            <View style={{ marginTop: 14 }}>
-              <InfoNoticeCard language={language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'} />
+            {/* Element Bars */}
+            <View style={styles.elementBars}>
+              {Object.entries(letterDistribution).map(([element, count]) => {
+                const total =
+                  letterDistribution.fire +
+                  letterDistribution.air +
+                  letterDistribution.water +
+                  letterDistribution.earth;
+                const percentage = Math.round((count / total) * 100);
+                const isDominant = element === elementStats.dominant.element.toLowerCase();
+                
+                return (
+                  <ElementProgressBar
+                    key={element}
+                    element={element as 'fire' | 'air' | 'water' | 'earth'}
+                    percentage={percentage}
+                    isDominant={isDominant}
+                    language={lang}
+                  />
+                );
+              })}
             </View>
           </View>
 
-          {/* Zodiac Influence */}
+          {/* 6) Balancing Actions */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Zodiac Influence</Text>
+            <Text style={styles.sectionTitle}>
+              {language === 'ar'
+                ? 'إجراءات الموازنة'
+                : language === 'fr'
+                ? 'Actions d\'Équilibrage'
+                : 'Balancing Actions'}
+            </Text>
+            <Text style={styles.sectionExplainer}>
+              {language === 'ar'
+                ? `لتقوية ${weakestElementType} (العنصر الأضعف):`
+                : language === 'fr'
+                ? `Pour renforcer ${weakestElementType} (l'élément faible) :`
+                : `To strengthen ${weakestElementType} (weakest element):`}
+            </Text>
+            <View style={styles.balancingList}>
+              {balancingActions.map((action, index) => (
+                <View key={index} style={styles.balancingItem}>
+                  <View style={styles.balancingBullet} />
+                  <Text style={styles.balancingText}>{action}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* 7) Zodiac Influence */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              {language === 'ar'
+                ? 'التأثير الفلكي'
+                : language === 'fr'
+                ? 'Influence Zodiacale'
+                : 'Zodiac Influence'}
+            </Text>
+            <Text style={styles.sectionExplainer}>
+              {language === 'ar'
+                ? 'الكوكب الحاكم يعكس طبيعتك؛ كوكب الساعة النشطة يعكس التوقيت الحالي.'
+                : language === 'fr'
+                ? 'La planète maîtresse reflète votre nature ; la planète heure active reflète le timing actuel.'
+                : 'Ruling planet reflects your nature; active hour reflects current timing.'}
+            </Text>
+            
+            {/* Helper Caption */}
+            <View style={styles.helperCaption}>
+              <HelpCircle size={14} color="#94a3b8" strokeWidth={2} />
+              <Text style={styles.helperCaptionText}>
+                {language === 'ar'
+                  ? 'يوم القوة من الكوكب الحاكم لبرجك. أفضل وقت هو نافذة ممارسة تعتمد على العنصر والموسم.'
+                  : language === 'fr'
+                  ? 'Le Jour de Puissance vient de la planète maîtresse de votre Burj. Le Meilleur Moment est une fenêtre de pratique basée sur l\'élément et la saison.'
+                  : 'Power Day comes from your Burj\'s ruling planet. Best Time is a practice window based on element + seasonal resonance.'}
+              </Text>
+            </View>
+
             <View style={[styles.zodiacCard, { borderColor: `${theme.accentColor}40` }]}>
               <View style={[styles.topAccent, { backgroundColor: theme.accentColor }]} />
               <LinearGradient
@@ -239,20 +561,32 @@ export default function ResultsScreen() {
                         <Star size={14} color="#fbbf24" />
                       </View>
                       <View style={styles.infoContent}>
-                        <Text style={styles.infoLabel}>Ruling Planet</Text>
+                        <Text style={styles.infoLabel}>
+                          {language === 'ar'
+                            ? 'الكوكب الحاكم'
+                            : language === 'fr'
+                            ? 'Planète Maîtresse'
+                            : 'Ruling Planet'}
+                        </Text>
                         <Text style={styles.infoValue}>{result.burj.planet}</Text>
                       </View>
                     </View>
                   )}
 
-                  {/* Day */}
+                  {/* Power Day (Burj Ruler) */}
                   {result.burjDay && (
                     <View style={styles.infoRow}>
                       <View style={styles.infoIcon}>
                         <Calendar size={14} color="#60a5fa" />
                       </View>
                       <View style={styles.infoContent}>
-                        <Text style={styles.infoLabel}>Day of Power</Text>
+                        <Text style={styles.infoLabel}>
+                          {language === 'ar'
+                            ? 'يوم القوة (حاكم البرج)'
+                            : language === 'fr'
+                            ? 'Jour de Puissance (Maître du Burj)'
+                            : 'Power Day (Burj Ruler)'}
+                        </Text>
                         <Text style={styles.infoValue}>
                           {result.burjDay.en}{' '}
                           <Text style={styles.infoValueAr}>({result.burjDay.ar})</Text>
@@ -268,10 +602,13 @@ export default function ResultsScreen() {
                         <Clock size={14} color="#a78bfa" />
                       </View>
                       <View style={styles.infoContent}>
-                        <View style={styles.labelWithTooltip}>
-                          <Text style={styles.infoLabel}>Active Hour Planet</Text>
-                          <HelpCircle size={12} color="#64748b" />
-                        </View>
+                        <Text style={styles.infoLabel}>
+                          {language === 'ar'
+                            ? 'كوكب الساعة النشطة'
+                            : language === 'fr'
+                            ? 'Planète Heure Active'
+                            : 'Active Hour Planet'}
+                        </Text>
                         <Text style={styles.infoValue}>
                           {result.hour.name}{' '}
                           <Text style={styles.infoValueAr}>({result.hour.ar})</Text>
@@ -284,74 +621,157 @@ export default function ResultsScreen() {
             </View>
           </View>
 
-          {/* Qur'anic Resonance */}
+          {/* 8) Qur'anic Resonance with Reflection Prompt */}
           <View style={styles.section}>
             <QuranResonanceCard
               resonance={quranResonance}
               loading={quranLoading}
               error={quranError || undefined}
               accentColor={theme.accentColor}
-              language={language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'}
+              language={lang}
               onRetry={loadQuranResonance}
+            />
+            {quranResonance && (
+              <View style={styles.reflectionPrompt}>
+                <HelpCircle size={16} color="#a78bfa" strokeWidth={2} />
+                <Text style={styles.reflectionText}>
+                  {language === 'ar'
+                    ? 'أي كلمة أو عبارة تبرز أكثر لموقفك الحالي؟'
+                    : language === 'fr'
+                    ? 'Quel mot ou phrase ressort le plus pour votre situation actuelle ?'
+                    : 'Which word or phrase stands out most for your current situation?'}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* 9) Key Takeaways + Practical Guidance - MOVED HERE */}
+          <View style={styles.section}>
+            <KeyTakeawaysCard takeaways={keyTakeaways} language={lang} />
+          </View>
+
+          <View style={styles.section}>
+            <PracticalGuidanceCard
+              doActions={practicalGuidance.doActions}
+              avoidActions={practicalGuidance.avoidActions}
+              bestTime={bestTimeWindow}
+              language={lang}
             />
           </View>
 
-          {/* Spiritual Guidance */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Spiritual Guidance</Text>
-            <View style={styles.guidanceCard}>
-              <LinearGradient
-                colors={['rgba(30, 41, 59, 0.75)', 'rgba(15, 23, 42, 0.85)']}
-                style={styles.cardGradient}
+          {/* 10) Advanced/Classical Sections - LAST */}
+          {showAdvanced && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                {language === 'ar'
+                  ? 'المحتوى المتقدم'
+                  : language === 'fr'
+                  ? 'Contenu Avancé'
+                  : 'Advanced Content'}
+              </Text>
+
+              <AccordionSection
+                title={
+                  language === 'ar'
+                    ? 'التفاصيل الكلاسيكية'
+                    : language === 'fr'
+                    ? 'Détails Classiques'
+                    : 'Classical Details'
+                }
+                subtitle={
+                  language === 'ar'
+                    ? 'المصطلحات المغربية التقليدية'
+                    : language === 'fr'
+                    ? 'Terminologie maghribine traditionnelle'
+                    : 'Traditional Maghribi terminology'
+                }
+                defaultOpen={showClassical}
+                accentColor="#a78bfa"
               >
-                {/* Key Takeaways */}
-                <View style={styles.takeawaysSection}>
-                  <Text style={styles.takeawaysTitle}>Key Insights</Text>
-                  <View style={styles.bulletPoint}>
-                    <Text style={styles.bullet}>•</Text>
-                    <Text style={styles.bulletText}>
-                      Your Kabir ({formatNumber(result.totalKabir)}) and Saghir ({result.saghir}) reveal your spiritual blueprint
+                <View style={styles.advancedContent}>
+                  <View style={styles.advancedRow}>
+                    <Text style={styles.advancedLabel}>Tab Index (Ṭabʿ):</Text>
+                    <Text style={styles.advancedValue}>
+                      {result.tabIndex || 'N/A'} → {result.element?.en}
                     </Text>
                   </View>
-                  <View style={styles.bulletPoint}>
-                    <Text style={styles.bullet}>•</Text>
-                    <Text style={styles.bulletText}>
-                      {elementType} element connects you to specific practices and power times
+                  <View style={styles.advancedRow}>
+                    <Text style={styles.advancedLabel}>Burj Index:</Text>
+                    <Text style={styles.advancedValue}>
+                      {result.burjIndex || 'N/A'}/12 → {result.burj?.en}
                     </Text>
                   </View>
-                  <View style={styles.bulletPoint}>
-                    <Text style={styles.bullet}>•</Text>
-                    <Text style={styles.bulletText}>
-                      {result.burj?.en} influence marks your most potent spiritual moments
+                  <View style={styles.advancedRow}>
+                    <Text style={styles.advancedLabel}>Person Kabir:</Text>
+                    <Text style={styles.advancedValue}>{formatNumber(result.personKabir)}</Text>
+                  </View>
+                  {result.motherKabir > 0 && (
+                    <View style={styles.advancedRow}>
+                      <Text style={styles.advancedLabel}>Mother Kabir:</Text>
+                      <Text style={styles.advancedValue}>{formatNumber(result.motherKabir)}</Text>
+                    </View>
+                  )}
+                  <View style={styles.advancedRow}>
+                    <Text style={styles.advancedLabel}>Divisibility by 4:</Text>
+                    <Text style={styles.advancedValue}>
+                      {result.totalKabir % 4 === 0 ? 'Yes ✓' : 'No'}
+                    </Text>
+                  </View>
+                  <View style={styles.advancedRow}>
+                    <Text style={styles.advancedLabel}>Divisibility by 12:</Text>
+                    <Text style={styles.advancedValue}>
+                      {result.totalKabir % 12 === 0 ? 'Yes ✓' : 'No'}
                     </Text>
                   </View>
                 </View>
+              </AccordionSection>
 
-                {/* Main Guidance */}
-                <View style={styles.guidanceDivider} />
-                <Text style={styles.guidanceText}>
-                  Your destiny is encoded in the sacred numerology of your name. The Kabir represents
-                  your overall spiritual journey, while the Saghir reveals your essential nature.
-                  {'\n\n'}
-                  Your {elementType} element provides guidance on spiritual practices and power times.
-                  The {result.burj?.en} constellation and active planetary hour {result.hour?.name}{' '}
-                  mark moments of heightened spiritual potential.
-                  {'\n\n'}
-                  Use this knowledge for self-understanding and spiritual growth. Remember: destiny is
-                  a guide, not a fixed path. Your choices and devotion shape your journey.
-                </Text>
-              </LinearGradient>
+              <AccordionSection
+                title={
+                  language === 'ar'
+                    ? 'التفسير العميق'
+                    : language === 'fr'
+                    ? 'Interprétation Profonde'
+                    : 'Deep Interpretation'
+                }
+                subtitle={
+                  language === 'ar'
+                    ? 'السر، البسط، الكمال'
+                    : language === 'fr'
+                    ? 'Sirr, Basṭ, Kamāl'
+                    : 'Sirr, Basṭ, Kamāl'
+                }
+                defaultOpen={false}
+                accentColor="#ec4899"
+              >
+                <View style={styles.advancedContent}>
+                  <Text style={styles.advancedText}>
+                    {language === 'ar'
+                      ? 'هذا القسم محجوز للتفسير الكلاسيكي المتقدم للسر (الجوهر الخفي)، البسط (التوسع)، والكمال (الكمال). قد يتم إضافة حسابات إضافية في التحديثات المستقبلية.'
+                      : language === 'fr'
+                      ? 'Cette section est réservée à l\'interprétation classique avancée de Sirr (essence cachée), Basṭ (expansion) et Kamāl (perfection). Des calculs supplémentaires peuvent être ajoutés dans les futures mises à jour.'
+                      : 'This section is reserved for advanced classical interpretation of Sirr (hidden essence), Basṭ (expansion), and Kamāl (perfection). Additional calculations may be added in future updates.'}
+                  </Text>
+                </View>
+              </AccordionSection>
             </View>
+          )}
+
+          {/* Distinction Notice */}
+          <View style={styles.section}>
+            <InfoNoticeCard language={lang} />
           </View>
 
           {/* Footer */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              For reflection only • Not divination or legal ruling
+              {language === 'ar'
+                ? 'للتأمل فقط • ليس تنجيمًا أو حكمًا قانونيًا'
+                : language === 'fr'
+                ? 'Pour réflexion uniquement • Pas de divination ou de décision juridique'
+                : 'For reflection only • Not divination or legal ruling'}
             </Text>
           </View>
-
-          <View style={{ height: Math.max(insets.bottom, 20) }} />
         </ScrollView>
       </LinearGradient>
     </SafeAreaView>
@@ -396,18 +816,194 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heroTitle: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '700',
     color: '#ffffff',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
     letterSpacing: 0.3,
   },
-  heroNames: {
-    fontSize: 15,
+  heroSubtitle: {
+    fontSize: 18,
     color: '#94a3b8',
     textAlign: 'center',
     fontWeight: '500',
+    marginBottom: 12,
+  },
+  identityCard: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(30, 41, 59, 0.6)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.25)',
+    alignItems: 'center',
+    gap: 10,
+  },
+  identityName: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#ffffff',
+    textAlign: 'center',
+    letterSpacing: 0.3,
+  },
+  identityMother: {
+    fontSize: 18,
+    color: '#94a3b8',
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  maghribiBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    marginTop: 4,
+  },
+  maghribiText: {
+    fontSize: 11,
+    color: '#a78bfa',
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  contextChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    backgroundColor: 'rgba(100, 116, 139, 0.15)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(148, 163, 184, 0.2)',
+  },
+  contextText: {
+    fontSize: 12,
+    color: '#cbd5e1',
+    fontWeight: '600',
+    letterSpacing: 0.3,
+    textAlign: 'center',
+  },
+  sectionExplainer: {
+    fontSize: 13,
+    color: '#94a3b8',
+    marginBottom: 12,
+    marginTop: -8,
+    fontStyle: 'italic',
+    lineHeight: 18,
+  },
+  helperCaption: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    marginBottom: 14,
+    padding: 10,
+    backgroundColor: 'rgba(148, 163, 184, 0.08)',
+    borderRadius: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#94a3b8',
+  },
+  helperCaptionText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#94a3b8',
+    lineHeight: 17,
+  },
+  dominanceSummary: {
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(148, 163, 184, 0.1)',
+  },
+  dominanceText: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  dominanceLabel: {
+    color: '#94a3b8',
+    fontWeight: '600',
+  },
+  dominanceValue: {
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  elementBars: {
+    gap: 10,
+  },
+  balancingList: {
+    gap: 10,
+  },
+  balancingItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    backgroundColor: 'rgba(15, 23, 42, 0.4)',
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(148, 163, 184, 0.08)',
+  },
+  balancingBullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#a78bfa',
+    marginTop: 6,
+  },
+  balancingText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#e2e8f0',
+    lineHeight: 20,
+  },
+  reflectionPrompt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: 'rgba(167, 139, 250, 0.08)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(167, 139, 250, 0.15)',
+  },
+  reflectionText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#cbd5e1',
+    lineHeight: 19,
+    fontStyle: 'italic',
+  },
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    gap: 16,
+  },
+  errorText: {
+    fontSize: 18,
+    color: '#f87171',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  errorButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    backgroundColor: 'rgba(167, 139, 250, 0.2)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#a78bfa',
+  },
+  errorButtonText: {
+    fontSize: 16,
+    color: '#a78bfa',
+    fontWeight: '600',
   },
   section: {
     paddingHorizontal: 20,
@@ -514,48 +1110,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#cbd5e1',
   },
-  guidanceCard: {
-    borderRadius: 18,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(30, 41, 59, 0.35)',
-    borderWidth: 1,
-    borderColor: 'rgba(148, 163, 184, 0.12)',
+  advancedContent: {
+    gap: 12,
   },
-  takeawaysSection: {
-    marginBottom: 16,
-  },
-  takeawaysTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#a78bfa',
-    marginBottom: 12,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-  },
-  bulletPoint: {
+  advancedRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-    gap: 10,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(148, 163, 184, 0.1)',
   },
-  bullet: {
-    fontSize: 16,
-    color: '#a78bfa',
-    fontWeight: '700',
-    marginTop: 1,
+  advancedLabel: {
+    fontSize: 13,
+    color: '#94a3b8',
+    fontWeight: '600',
   },
-  bulletText: {
-    flex: 1,
+  advancedValue: {
     fontSize: 14,
-    color: '#cbd5e1',
-    lineHeight: 20,
+    color: '#f1f5f9',
+    fontWeight: '600',
   },
-  guidanceDivider: {
-    height: 1,
-    backgroundColor: 'rgba(148, 163, 184, 0.15)',
-    marginVertical: 16,
-  },
-  guidanceText: {
+  advancedText: {
     fontSize: 14,
     color: '#cbd5e1',
     lineHeight: 22,
@@ -571,28 +1147,5 @@ const styles = StyleSheet.create({
     color: '#64748b',
     textAlign: 'center',
     fontStyle: 'italic',
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#f87171',
-    textAlign: 'center',
-    marginTop: 40,
-  },
-  chartHeaderContainer: {
-    marginBottom: 18,
-  },
-  chartSubtitle: {
-    fontSize: 12,
-    color: '#94a3b8',
-    marginTop: 4,
-    lineHeight: 18,
-  },
-  chartBarsContainer: {
-    marginBottom: 18,
-    backgroundColor: 'rgba(15, 23, 42, 0.4)',
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(148, 163, 184, 0.08)',
   },
 });

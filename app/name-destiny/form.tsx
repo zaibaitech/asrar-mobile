@@ -1,8 +1,9 @@
-import { CollapsibleSection, DestinyHeader } from '@/components/nameDestiny';
+import { CollapsibleSection, DestinyHeader, ModeSelector } from '@/components/nameDestiny';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI } from '@/features/name-destiny/constants/abjadMaps';
 import { useAbjad } from '@/features/name-destiny/contexts/AbjadContext';
 import { buildDestiny } from '@/features/name-destiny/services/nameDestinyCalculator';
+import { InputType, UnderstandingLevel } from '@/features/name-destiny/types/enums';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -36,6 +37,12 @@ export default function NameDestinyForm() {
   const [motherName, setMotherName] = useState('');
   const [touched, setTouched] = useState({ person: false, mother: false });
   const [loading, setLoading] = useState(false);
+
+  // Mode selectors
+  const [inputType, setInputType] = useState<InputType>(InputType.NAME_MOTHER_PAIR);
+  const [understandingLevel, setUnderstandingLevel] = useState<UnderstandingLevel>(
+    UnderstandingLevel.BEGINNER
+  );
 
   const [educationOpen, setEducationOpen] = useState(false);
   const [insightsOpen, setInsightsOpen] = useState(false);
@@ -88,6 +95,8 @@ export default function NameDestinyForm() {
           data: JSON.stringify(result),
           personName: trimmedPerson,
           motherName: trimmedMother,
+          inputType,
+          understandingLevel,
         },
       });
     } catch (error) {
@@ -127,7 +136,18 @@ export default function NameDestinyForm() {
               </Text>
             </View>
 
-            {/* Input Section - MUST BE FIRST */}
+            {/* Mode Selectors */}
+            <View style={styles.modeSection}>
+              <ModeSelector
+                inputType={inputType}
+                understandingLevel={understandingLevel}
+                onInputTypeChange={setInputType}
+                onUnderstandingLevelChange={setUnderstandingLevel}
+                language={language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'}
+              />
+            </View>
+
+            {/* Input Section */}
             <View style={styles.inputSection}>
               <Text style={styles.sectionTitle}>Enter Names</Text>
               <Text style={styles.sectionSubtitle}>Both names must be in Arabic script</Text>
@@ -353,6 +373,10 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     textAlign: 'center',
     lineHeight: 20,
+  },
+  modeSection: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
   },
   inputSection: {
     paddingHorizontal: 20,
