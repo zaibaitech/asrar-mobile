@@ -69,6 +69,22 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
             style={styles.headerGradient}
           >
             <Text style={styles.inputText}>{result.input.raw}</Text>
+            {(result.input.calculatedFrom !== undefined || result.input.calculationNote || result.input.warning) && (
+              <View style={styles.calculationMeta}>
+                <Text style={styles.metaLabel}>Calculated from</Text>
+                <Text style={styles.metaValue}>
+                  {result.input.calculatedFrom && result.input.calculatedFrom.length > 0
+                    ? result.input.calculatedFrom
+                    : '—'}
+                </Text>
+                {result.input.calculationNote ? (
+                  <Text style={styles.metaNote}>{result.input.calculationNote}</Text>
+                ) : null}
+                {result.input.warning ? (
+                  <Text style={styles.metaWarning}>{result.input.warning}</Text>
+                ) : null}
+              </View>
+            )}
             <View style={styles.badges}>
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{result.system === 'maghribi' ? '🌙 Maghribi' : '☀️ Mashriqi'}</Text>
@@ -238,6 +254,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     justifyContent: 'center',
+  },
+
+  calculationMeta: {
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    borderWidth: 1,
+    borderColor: '#3b82f6',
+    gap: 4,
+  },
+
+  metaLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#93c5fd',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+
+  metaValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#f8fafc',
+    textAlign: 'center',
+  },
+
+  metaNote: {
+    fontSize: 12,
+    color: '#bae6fd',
+    textAlign: 'center',
+  },
+
+  metaWarning: {
+    fontSize: 12,
+    color: '#fbbf24',
+    textAlign: 'center',
   },
   
   badge: {
