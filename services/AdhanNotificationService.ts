@@ -14,11 +14,15 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import { PrayerTimings } from './api/prayerTimes';
 
 // Lazy import to avoid Expo Go warning on initial load
 let Notifications: any;
 let SchedulableTriggerInputTypes: any;
+
+const ADHAN_CHANNEL_ID = 'adhan-notifications';
+let channelsInitialized = false;
 
 const initNotifications = async () => {
   if (!Notifications) {
@@ -36,9 +40,41 @@ const initNotifications = async () => {
         shouldShowList: true,
       }),
     });
+
+    // Setup Android notification channels (required for production builds)
+    if (Platform.OS === 'android' && !channelsInitialized) {
+      await setupAndroidChannels();
+      channelsInitialized = true;
+    }
   }
   return Notifications;
 };
+
+/**
+ * Setup Android notification channels with sound support
+ * Required for sound to play in production Android builds
+ */
+async function setupAndroidChannels() {
+  try {
+    // Main adhan channel with high importance for sound
+    await Notifications.setNotificationChannelAsync(ADHAN_CHANNEL_ID, {
+      name: 'Prayer Call (Adhan)',
+      description: 'Notifications for prayer times with adhan audio',
+      importance: Notifications.AndroidImportance.MAX,
+      sound: 'default', // Will be overridden per notification
+      vibrationPattern: [0, 250, 250, 250],
+      enableVibrate: true,
+      enableLights: true,
+      lightColor: '#64B5F6',
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+      bypassDnd: true, // Allow sound even in Do Not Disturb mode
+    });
+
+    console.log('Android notification channels configured');
+  } catch (error) {
+    console.error('Failed to setup Android channels:', error);
+  }
+}
 
 const SETTINGS_KEY = '@asrar_adhan_settings';
 const SCHEDULED_NOTIFICATIONS_KEY = '@asrar_scheduled_notifications';
@@ -181,17 +217,28 @@ export async function schedulePrayerNotifications(
 
       // Schedule main notification
       try {
-        const notificationId = await Notifications.scheduleNotificationAsync({
-          content: {
-            title: `🕌 ${prayer.name} Prayer Time`,
-            body: `It's time for ${prayer.name} prayer (${prayer.nameArabic})`,
-            sound: settings.playSound ? getAdhanSound(prayer.isFajr, settings) : undefined,
-            data: {
-              type: 'prayer',
-              prayerName: prayer.name,
-              isFajr: prayer.isFajr,
-            },
+        const soundFile = getAdhanSound(prayer.isFajr, settings);
+        
+        const notificationContent: any = {
+          title: `🕌 ${prayer.name} Prayer Time`,
+          body: `It's time for ${prayer.name} prayer (${prayer.nameArabic})`,
+          sound: soundFile,
+          data: {
+            type: 'prayer',
+            prayerName: prayer.name,
+            isFajr: prayer.isFajr,
           },
+        };
+
+        // Android-specific configuration
+        if (Platform.OS === 'android') {
+          notificationContent.channelId = ADHAN_CHANNEL_ID;
+          notificationContent.priority = 'max';
+          notificationContent.vibrate = settings.vibrate ? [0, 250, 250, 250] : undefined;
+        }
+
+        const notificationId = await Notifications.scheduleNotificationAsync({
+          content: notificationContent,
           trigger: {
             type: SchedulableTriggerInputTypes.DATE,
             date: prayerDate,
@@ -294,50 +341,97 @@ function parsePrayerTime(timeStr: string, baseDate: Date = new Date()): Date {
 
 /**
  * Get adhan sound based on settings
+ * Returns proper format for both Android and iOS
+ * 
+ * IMPORTANT: Custom notification sounds only work in:
+ * - EAS Development builds
+ * - EAS Production builds  
+ * - NOT in Expo Go (will use default system sound)
  */
-function getAdhanSound(isFajr: boolean, settings: AdhanSettings): string | undefined {
-  if (!settings.playSound) return undefined;
+function getAdhanSound(isFajr: boolean, settings: AdhanSettings): string | null {
+  if (!settings.playSound) {
+    console.log('[AdhanSound] Sound disabled in settings');
+    return null;
+  }
 
   const adhanType = isFajr ? settings.fajrAdhan : settings.otherAdhan;
 
-  // Audio files are in assets/sounds/ directory
-  switch (adhanType) {
-    case 'mishary':
-      return 'adhan_mishary.mp3';
-    case 'mecca':
-      return 'adhan_mecca.mp3';
-    case 'medina':
-      return 'adhan_medina.mp3';
-    case 'default':
-    default:
-      return isFajr ? 'adhan_fajr.mp3' : 'adhan_default.mp3';
-  }
+  // Sound file paths:
+  // - Android EAS builds: no extension (e.g., 'adhan_default')
+  // - iOS EAS builds: with extension (e.g., 'adhan_default.mp3')
+  // - Expo Go: will use system default sound regardless
+  const sounds = {
+    mishary: Platform.OS === 'android' ? 'adhan_mishary' : 'adhan_mishary.mp3',
+    mecca: Platform.OS === 'android' ? 'adhan_mecca' : 'adhan_mecca.mp3',
+    medina: Platform.OS === 'android' ? 'adhan_medina' : 'adhan_medina.mp3',
+    default: isFajr 
+      ? (Platform.OS === 'android' ? 'adhan_fajr' : 'adhan_fajr.mp3')
+      : (Platform.OS === 'android' ? 'adhan_default' : 'adhan_default.mp3'),
+  };
+
+  const soundFile = sounds[adhanType] || sounds.default;
+  console.log(`[AdhanSound] Selected sound: ${soundFile} (prayer: ${isFajr ? 'Fajr' : 'Other'}, type: ${adhanType})`);
+  
+  return soundFile;
 }
 
 /**
  * Test notification (for debugging)
- * Works with local notifications in Expo Go
+ * 
+ * IMPORTANT LIMITATION:
+ * - In Expo Go: Only default system notification sound will play
+ * - In EAS Build: Custom adhan audio will play correctly
+ * 
+ * This is an Expo Go limitation, not a bug in our code.
  */
 export async function sendTestNotification(): Promise<void> {
   try {
     await initNotifications();
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: '🕌 Test Prayer Notification',
-        body: 'This is a test adhan notification',
-        sound: true,
-        data: {
-          type: 'test',
-        },
+    const settings = await getAdhanSettings();
+    const soundFile = getAdhanSound(false, settings); // Use default adhan sound
+    
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🔔 SENDING TEST NOTIFICATION');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('Platform:', Platform.OS);
+    console.log('Sound file:', soundFile);
+    console.log('Play sound:', settings.playSound);
+    console.log('Vibrate:', settings.vibrate);
+    console.log('Channel ID:', ADHAN_CHANNEL_ID);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
+    const notificationContent: any = {
+      title: '🕌 Test Prayer Notification',
+      body: soundFile 
+        ? 'Testing adhan sound (EAS build required for custom sound)'
+        : 'Testing notification (sound disabled in settings)',
+      sound: soundFile || 'default',
+      data: {
+        type: 'test',
+        soundFile: soundFile || 'none',
       },
+    };
+
+    // Android-specific configuration
+    if (Platform.OS === 'android') {
+      notificationContent.channelId = ADHAN_CHANNEL_ID;
+      notificationContent.priority = 'max';
+      notificationContent.vibrate = settings.vibrate ? [0, 250, 250, 250] : undefined;
+      console.log('Android config: channelId =', ADHAN_CHANNEL_ID);
+    }
+
+    await Notifications.scheduleNotificationAsync({
+      content: notificationContent,
       trigger: {
         type: SchedulableTriggerInputTypes.TIME_INTERVAL,
         seconds: 2,
       },
     });
-    console.log('Test notification scheduled in 2 seconds');
+    
+    console.log('✅ Test notification scheduled for 2 seconds from now');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
   } catch (error) {
-    console.error('Failed to send test notification:', error);
+    console.error('❌ Failed to send test notification:', error);
     throw error;
   }
 }

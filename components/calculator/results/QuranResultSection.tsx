@@ -42,6 +42,11 @@ export const QuranResultSection: React.FC<QuranResultSectionProps> = ({ insights
       {/* Resonance Link */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>🌟 Resonance Link</Text>
+        <Text style={styles.resonanceSubtitle}>
+          {insights.resonanceLink.isCalculated 
+            ? '📊 Calculated from verse Abjad value' 
+            : '💭 Suggested association'}
+        </Text>
         <View style={styles.resonanceRow}>
           <View style={styles.resonanceItem}>
             <Text style={styles.resonanceLabel}>Element</Text>
@@ -51,6 +56,12 @@ export const QuranResultSection: React.FC<QuranResultSectionProps> = ({ insights
             <Text style={styles.resonanceLabel}>Sacred Number</Text>
             <Text style={styles.resonanceValue}>{insights.resonanceLink.sacredNumber}</Text>
           </View>
+          {insights.resonanceLink.kabir && (
+            <View style={styles.resonanceItem}>
+              <Text style={styles.resonanceLabel}>Verse Kabīr</Text>
+              <Text style={styles.resonanceValue}>{insights.resonanceLink.kabir}</Text>
+            </View>
+          )}
         </View>
         <Text style={styles.resonanceMeaning}>{insights.resonanceLink.meaning}</Text>
       </View>
@@ -100,6 +111,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   cardTitle: { fontSize: 16, fontWeight: '700', color: '#f1f5f9' },
+  resonanceSubtitle: { fontSize: 12, color: '#94a3b8', fontStyle: 'italic', marginTop: -4 },
   surahCard: {
     padding: 20,
     borderRadius: 16,

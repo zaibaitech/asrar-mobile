@@ -4,10 +4,14 @@
  */
 
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getAllSurahs, getSurahByNumber, Surah } from '../../data/quran-surahs';
 
 interface SurahAyahSelectorProps {
+  /**
+   * Callback when surah and ayah are selected
+   * REQUIRED: Parent component must provide this handler
+   */
   onSelect: (surahNumber: number, ayahNumber: number) => void;
   selectedSurah?: number | null;
   selectedAyah?: number | null;
@@ -32,14 +36,17 @@ export const SurahAyahSelector: React.FC<SurahAyahSelectorProps> = ({
   
   const handleAyahSelect = (ayahNumber: number) => {
     if (!chosenSurah) {
+      console.warn('[SurahAyahSelector] No surah selected');
       return;
     }
 
-    if (typeof onSelect !== 'function') {
-      console.warn('[SurahAyahSelector] onSelect handler missing');
+    // Safety check: ensure onSelect is provided
+    if (!onSelect || typeof onSelect !== 'function') {
+      console.error('[SurahAyahSelector] CRITICAL: onSelect handler is missing or invalid');
       return;
     }
 
+    // Safe to call now
     onSelect(chosenSurah, ayahNumber);
   };
   
@@ -98,10 +105,12 @@ export const SurahAyahSelector: React.FC<SurahAyahSelectorProps> = ({
           </Text>
         </View>
         
-        <View style={styles.ayahGrid}>
-          {ayahs.map(ayahNum => (
+        <FlatList
+          data={ayahs}
+          numColumns={5}
+          keyExtractor={(item) => String(item)}
+          renderItem={({ item: ayahNum }) => (
             <TouchableOpacity
-              key={ayahNum}
               style={[
                 styles.ayahButton,
                 selectedAyah === ayahNum && styles.ayahButtonSelected,
@@ -118,8 +127,12 @@ export const SurahAyahSelector: React.FC<SurahAyahSelectorProps> = ({
                 {ayahNum}
               </Text>
             </TouchableOpacity>
-          ))}
-        </View>
+          )}
+          contentContainerStyle={styles.ayahGridContent}
+          columnWrapperStyle={styles.ayahGridRow}
+          showsVerticalScrollIndicator={true}
+          style={styles.ayahGrid}
+        />
       </View>
     );
   };
@@ -268,9 +281,16 @@ const styles = StyleSheet.create({
   },
   
   ayahGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flex: 1,
+  },
+  
+  ayahGridContent: {
+    paddingBottom: 24,
+  },
+  
+  ayahGridRow: {
     gap: 8,
+    marginBottom: 8,
   },
   
   ayahButton: {

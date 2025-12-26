@@ -149,6 +149,12 @@ export interface QuranInsights {
     dominantElement: ElementType;
     sacredNumber: number;
     meaning: string;
+    /** Flag indicating this is calculated from Kabīr, not suggested */
+    isCalculated?: boolean;
+    /** The actual Kabīr value of the verse */
+    kabir?: number;
+    /** Distance from nearest sacred number */
+    distance?: number;
   };
   reflectionBlock: {
     prompt: string;
