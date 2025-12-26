@@ -20,7 +20,7 @@ import {
 } from '../types/calculator-enhanced';
 import { calculateAbjadTotal, getDigitalRoot } from '../utils/abjad-calculations';
 import { elementOfLetter, hadathRemainder, hadathToElement, LETTER_ELEMENTS } from '../utils/hadad-core';
-import { isArabicText } from '../utils/text-normalize';
+import { dhikrStrict, isArabicText } from '../utils/text-normalize';
 import { ElementType } from '../utils/types';
 import {
     computeDhikrInsights,
@@ -299,7 +299,7 @@ export class EnhancedCalculatorEngine {
       ignoreSpaces: request.ignoreSpaces !== false,
     };
     
-    const normalized = this.normalizeArabic(rawText, options);
+    const normalizedDefault = this.normalizeArabic(rawText, options);
     const hasArabic = /[\u0600-\u06FF]/.test(rawText);
     const hasLatin = /[A-Za-z]/.test(rawText);
     let languageDetected: InputMetadata['languageDetected'] = 'latin';
@@ -309,6 +309,24 @@ export class EnhancedCalculatorEngine {
       languageDetected = 'arabic';
     }
 
+    let calculationText = normalizedDefault;
+    let calculatedFrom: string | undefined;
+    let calculationNote: string | undefined;
+    let warning: string | undefined;
+
+    if (request.type === 'dhikr') {
+      const strict = dhikrStrict(rawText);
+      calculatedFrom = strict;
+
+      if (strict) {
+        calculationText = strict;
+        calculationNote = 'Calculated without ال/يا';
+      } else {
+        calculationText = '';
+        warning = 'Invalid input';
+      }
+    }
+
     if (process.env.NODE_ENV !== 'production') {
       console.log('[EnhancedCalculatorEngine] CALC_INPUT', {
         calculationType: request.type,
@@ -316,22 +334,57 @@ export class EnhancedCalculatorEngine {
         surah: sourceMeta?.surahNumber,
         ayah: sourceMeta?.ayahNumber,
         sourceLength: rawText.length,
-        normalizedLength: normalized.length,
+        normalizedLength: calculationText.length,
       });
     }
     
     // Build input metadata
     const input: InputMetadata = {
       raw: rawText,
-      normalized,
+      normalized: calculationText,
       languageDetected,
       inputType,
       sourceMeta,
     };
+
+    if (typeof calculatedFrom === 'string') {
+      input.calculatedFrom = calculatedFrom;
+    }
+
+    if (calculationNote) {
+      input.calculationNote = calculationNote;
+    }
+
+    if (warning) {
+      input.warning = warning;
+    }
     
     // Compute core numerics
-    const core = this.computeCore(normalized, request.system);
-    const analytics = this.computeAnalytics(normalized);
+    const emptyInput = calculationText.length === 0;
+
+    const core = emptyInput
+      ? {
+          kabir: 0,
+          saghir: 0,
+          hadadMod4: 0,
+          burj: '—',
+          element: 'water' as ElementType,
+          sirr: 0,
+          wusta: 0,
+          kamal: 0,
+          bast: 0,
+        }
+      : this.computeCore(calculationText, request.system);
+
+    const analytics = emptyInput
+      ? {
+          letterFreq: [] as LetterFrequency[],
+          elementPercents: { fire: 0, water: 0, air: 0, earth: 0 },
+          dominantElement: 'fire' as ElementType,
+          weakElement: null,
+          balanceScore: 0,
+        }
+      : this.computeAnalytics(calculationText);
     
     // Create base result
     const result: EnhancedCalculationResult = {
@@ -387,7 +440,7 @@ export class EnhancedCalculatorEngine {
       case 'dhikr':
         result.dhikrInsights = computeDhikrInsights(
           core,
-          request.arabicInput
+          request.arabicInput || input.sourceMeta?.divineNameArabic || input.raw
         );
         break;
       

@@ -1,8 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Modal, SafeAreaView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { CalculatorColors } from '../../constants/CalculatorColors';
 import { CalculationType } from '../../types/calculator-enhanced';
+import ArabicKeyboard from './ArabicKeyboard';
 import { DivineNamesPicker } from './DivineNamesPicker';
 import { SurahAyahSelector } from './SurahAyahSelector';
 
@@ -72,6 +73,66 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
   const colors = CalculatorColors;
   const [showDivineNamesPicker, setShowDivineNamesPicker] = useState(false);
   const [showSurahSelector, setShowSurahSelector] = useState(false);
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [activeInput, setActiveInput] = useState<'arabic' | 'yourName' | 'motherName' | null>(null);
+  
+  // Refs for text inputs to track cursor position
+  const arabicInputRef = useRef<TextInput>(null);
+  const yourNameInputRef = useRef<TextInput>(null);
+  const motherNameInputRef = useRef<TextInput>(null);
+  const [cursorPosition, setCursorPosition] = useState(0);
+  
+  // Keyboard handlers
+  const handleKeyPress = (key: string) => {
+    if (activeInput === 'arabic') {
+      const newText = arabicInput.slice(0, cursorPosition) + key + arabicInput.slice(cursorPosition);
+      onArabicInputChange(newText);
+      setCursorPosition(cursorPosition + 1);
+    } else if (activeInput === 'yourName') {
+      const newText = yourName.slice(0, cursorPosition) + key + yourName.slice(cursorPosition);
+      onYourNameChange(newText);
+      setCursorPosition(cursorPosition + 1);
+    } else if (activeInput === 'motherName') {
+      const newText = motherName.slice(0, cursorPosition) + key + motherName.slice(cursorPosition);
+      onMotherNameChange(newText);
+      setCursorPosition(cursorPosition + 1);
+    }
+  };
+  
+  const handleBackspace = () => {
+    if (cursorPosition === 0) return;
+    
+    if (activeInput === 'arabic') {
+      const newText = arabicInput.slice(0, cursorPosition - 1) + arabicInput.slice(cursorPosition);
+      onArabicInputChange(newText);
+      setCursorPosition(cursorPosition - 1);
+    } else if (activeInput === 'yourName') {
+      const newText = yourName.slice(0, cursorPosition - 1) + yourName.slice(cursorPosition);
+      onYourNameChange(newText);
+      setCursorPosition(cursorPosition - 1);
+    } else if (activeInput === 'motherName') {
+      const newText = motherName.slice(0, cursorPosition - 1) + motherName.slice(cursorPosition);
+      onMotherNameChange(newText);
+      setCursorPosition(cursorPosition - 1);
+    }
+  };
+  
+  const handleSpace = () => {
+    handleKeyPress(' ');
+  };
+  
+  const openKeyboard = (inputType: 'arabic' | 'yourName' | 'motherName') => {
+    setActiveInput(inputType);
+    // Set cursor to end of current text
+    if (inputType === 'arabic') {
+      setCursorPosition(arabicInput.length);
+    } else if (inputType === 'yourName') {
+      setCursorPosition(yourName.length);
+    } else if (inputType === 'motherName') {
+      setCursorPosition(motherName.length);
+    }
+    setShowKeyboard(true);
+  };
 
   // Render type-specific inputs
   const renderTypeSpecificInputs = () => {
@@ -81,12 +142,19 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
           <View style={styles.inputCard}>
             <View style={styles.inputHeader}>
               <Text style={styles.inputLabel}>👤 Name</Text>
-              <Text style={styles.inputHint}>Arabic or transliterated</Text>
+              <TouchableOpacity 
+                style={styles.keyboardButton}
+                onPress={() => openKeyboard('arabic')}
+              >
+                <Text style={styles.keyboardButtonText}>⌨️ Arabic Keyboard</Text>
+              </TouchableOpacity>
             </View>
             <TextInput
+              ref={arabicInputRef}
               style={styles.arabicInput}
               value={arabicInput}
               onChangeText={onArabicInputChange}
+              onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
               placeholder="محمد"
               placeholderTextColor="#64748b"
             />
@@ -99,12 +167,19 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
             <View style={styles.inputCard}>
               <View style={styles.inputHeader}>
                 <Text style={styles.inputLabel}>👤 Your Name</Text>
-                <Text style={styles.inputHint}>Arabic or transliterated</Text>
+                <TouchableOpacity 
+                  style={styles.keyboardButton}
+                  onPress={() => openKeyboard('yourName')}
+                >
+                  <Text style={styles.keyboardButtonText}>⌨️</Text>
+                </TouchableOpacity>
               </View>
               <TextInput
+                ref={yourNameInputRef}
                 style={styles.arabicInput}
                 value={yourName}
                 onChangeText={onYourNameChange}
+                onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
                 placeholder="محمد"
                 placeholderTextColor="#64748b"
               />
@@ -113,12 +188,19 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
             <View style={styles.inputCard}>
               <View style={styles.inputHeader}>
                 <Text style={styles.inputLabel}>👩 Mother's Name</Text>
-                <Text style={styles.inputHint}>Arabic or transliterated</Text>
+                <TouchableOpacity 
+                  style={styles.keyboardButton}
+                  onPress={() => openKeyboard('motherName')}
+                >
+                  <Text style={styles.keyboardButtonText}>⌨️</Text>
+                </TouchableOpacity>
               </View>
               <TextInput
+                ref={motherNameInputRef}
                 style={styles.arabicInput}
                 value={motherName}
                 onChangeText={onMotherNameChange}
+                onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
                 placeholder="فاطمة"
                 placeholderTextColor="#64748b"
               />
@@ -132,12 +214,19 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
             <View style={styles.inputCard}>
               <View style={styles.inputHeader}>
                 <Text style={styles.inputLabel}>📝 Phrase or Sentence</Text>
-                <Text style={styles.inputHint}>Any length</Text>
+                <TouchableOpacity 
+                  style={styles.keyboardButton}
+                  onPress={() => openKeyboard('arabic')}
+                >
+                  <Text style={styles.keyboardButtonText}>⌨️</Text>
+                </TouchableOpacity>
               </View>
               <TextInput
+                ref={arabicInputRef}
                 style={[styles.arabicInput, { minHeight: 120 }]}
                 value={arabicInput}
                 onChangeText={onArabicInputChange}
+                onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
                 placeholder="بسم الله الرحمن الرحيم"
                 placeholderTextColor="#64748b"
                 multiline
@@ -267,12 +356,19 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
           <View style={styles.inputCard}>
             <View style={styles.inputHeader}>
               <Text style={styles.inputLabel}>🔤 Any Text</Text>
-              <Text style={styles.inputHint}>Word, name, or phrase</Text>
+              <TouchableOpacity 
+                style={styles.keyboardButton}
+                onPress={() => openKeyboard('arabic')}
+              >
+                <Text style={styles.keyboardButtonText}>⌨️</Text>
+              </TouchableOpacity>
             </View>
             <TextInput
+              ref={arabicInputRef}
               style={styles.arabicInput}
               value={arabicInput}
               onChangeText={onArabicInputChange}
+              onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
               placeholder="أي نص عربي"
               placeholderTextColor="#64748b"
               multiline
@@ -371,6 +467,15 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
           </Text>
         </LinearGradient>
       </TouchableOpacity>
+      
+      {/* Arabic Keyboard */}
+      <ArabicKeyboard
+        visible={showKeyboard}
+        onClose={() => setShowKeyboard(false)}
+        onKeyPress={handleKeyPress}
+        onBackspace={handleBackspace}
+        onSpace={handleSpace}
+      />
     </View>
   );
 };
@@ -589,5 +694,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginVertical: 12,
+  },
+  
+  // Arabic Keyboard Button
+  keyboardButton: {
+    backgroundColor: '#6366f1',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  
+  keyboardButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
   },
 });

@@ -28,6 +28,9 @@ export interface InputMetadata {
   normalized: string;
   languageDetected: 'arabic' | 'latin' | 'mixed';
   inputType: UnifiedInputType;
+  calculatedFrom?: string;
+  calculationNote?: string;
+  warning?: string;
   
   // Type-specific metadata
   sourceMeta?: {
