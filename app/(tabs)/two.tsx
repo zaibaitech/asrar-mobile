@@ -30,11 +30,19 @@ const GUIDANCE_MODULES: ModuleCardProps[] = [
   },
   {
     title: 'Divine Timing',
-    titleArabic: 'الوقت المبارك',
-    description: 'Find auspicious timing for important decisions and spiritual practices',
-    icon: '⏰',
+    titleArabic: 'التوقيت الإلهي',
+    description: 'Spiritual reflection on timing quality and Qur\'an guidance',
+    icon: '🕰️',
     element: 'fire',
-    comingSoon: true,
+    comingSoon: false,
+  },
+  {
+    title: 'Guided Istikhārah',
+    titleArabic: 'الاستخارة الموجهة',
+    description: 'Preparation and reflection support for ṣalāt al-istikhārah',
+    icon: '🕊️',
+    element: 'earth',
+    comingSoon: false,
   },
 ];
 
@@ -52,7 +60,10 @@ export default function TabTwoScreen() {
         router.push('/(tabs)/name-destiny');
         break;
       case 'Divine Timing':
-        console.log('Divine Timing - Coming Soon');
+        router.push('/divine-timing');
+        break;
+      case 'Guided Istikhārah':
+        router.push('/istikhara-sessions');
         break;
       default:
         console.log(`${moduleTitle} - Coming Soon`);
