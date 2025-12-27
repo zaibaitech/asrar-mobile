@@ -26,10 +26,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DailyCheckInCard } from '../../components/divine-timing/DailyCheckInCard';
+import { PeakWindowsCard } from '../../components/divine-timing/PeakWindowsCard';
 import { ModuleCard, WidgetBar } from '../../components/home';
 import { ModuleCardProps } from '../../components/home/types';
 import { DarkTheme, Spacing, Typography } from '../../constants/DarkTheme';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useProfile } from '../../contexts/ProfileContext';
 import { getDailyCheckInSummary } from '../../services/DivineTimingStorage';
 import { DailyCheckInSummary } from '../../types/daily-checkin';
 
@@ -84,6 +86,7 @@ export default function HomeScreen() {
   const { t } = useLanguage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { profile, completionStatus } = useProfile();
   
   const [dailySummary, setDailySummary] = useState<DailyCheckInSummary>({
     hasCheckedInToday: false,
@@ -153,15 +156,45 @@ export default function HomeScreen() {
       {/* Compact Header */}
       <View style={styles.compactHeader}>
         <Text style={styles.brandName}>Asrār ✦</Text>
-        <Text style={styles.dateLabel}>
-          {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-        </Text>
+        <TouchableOpacity onPress={() => router.push('/profile')}>
+          <Ionicons name="person-circle" size={28} color={DarkTheme.accent} />
+        </TouchableOpacity>
       </View>
+      
+      <Text style={styles.dateLabel}>
+        {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+      </Text>
+      
+      {/* Profile Completion Banner */}
+      {!completionStatus.hasDOB && (
+        <TouchableOpacity 
+          style={styles.profileBanner}
+          onPress={() => router.push('/profile')}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={['rgba(139, 115, 85, 0.2)', 'rgba(139, 115, 85, 0.1)']}
+            style={styles.profileBannerGradient}
+          >
+            <Ionicons name="calendar" size={20} color={DarkTheme.accent} />
+            <View style={styles.profileBannerText}>
+              <Text style={styles.profileBannerTitle}>Complete Your Profile</Text>
+              <Text style={styles.profileBannerSubtitle}>
+                Add your DOB to unlock Divine Timing personalization
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
 
       {/* Hero: Daily Check-In Card */}
       <View style={styles.heroSection}>
         <DailyCheckInCard summary={dailySummary} colorScheme="dark" />
       </View>
+
+      {/* Phase 7: Peak Windows Card */}
+      <PeakWindowsCard userElement={profile.derived?.element || 'fire'} />
 
       {/* Quick Access: 2×2 Grid */}
       <WidgetBar />
@@ -197,7 +230,7 @@ export default function HomeScreen() {
         )}
       </View>
     </View>
-  ), [t, dailySummary, modulesExpanded]);
+  ), [t, dailySummary, modulesExpanded, completionStatus.hasDOB, profile.derived?.element, router]);
 
   /**
    * Conditionally render modules based on expansion state
@@ -256,9 +289,11 @@ const styles = StyleSheet.create({
   
   // Compact Header (40% reduced)
   compactHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: Spacing.screenPadding,
-    paddingBottom: Spacing.md,
-    gap: 2,
+    paddingBottom: Spacing.xs,
   },
   brandName: {
     fontSize: 20,
@@ -271,6 +306,35 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weightRegular,
     color: DarkTheme.textSecondary,
     opacity: 0.7,
+    paddingHorizontal: Spacing.screenPadding,
+    marginBottom: Spacing.sm,
+  },
+  
+  // Profile Banner
+  profileBanner: {
+    marginHorizontal: Spacing.screenPadding,
+    marginBottom: Spacing.md,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  profileBannerGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    gap: 12,
+  },
+  profileBannerText: {
+    flex: 1,
+  },
+  profileBannerTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: DarkTheme.textPrimary,
+    marginBottom: 2,
+  },
+  profileBannerSubtitle: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
   },
   
   // Hero Section

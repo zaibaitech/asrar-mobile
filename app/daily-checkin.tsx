@@ -1,11 +1,18 @@
 /**
  * Daily Check-In Screen
  * =====================
- * Phase 4: Quick daily reflection flow
+ * Phase 4 + Phase 7: Quick daily reflection flow with personalization
+ * 
+ * Enhanced Features (Phase 7):
+ * - Energy level slider (0-100)
+ * - Harmony score computation from ephemeris
+ * - Save check-in to personalization storage
+ * - Support for outcome tracking (added later)
  */
 
 import { DivineTimingCard } from '@/components/divine-timing/DivineTimingCard';
 import { QuranReflectionCard } from '@/components/divine-timing/QuranReflectionCard';
+import { SimpleSlider } from '@/components/SimpleSlider';
 import Colors from '@/constants/Colors';
 import {
     computeDivineTiming,
@@ -19,12 +26,21 @@ import {
     QuranReflection,
     selectReflectionVerse,
 } from '@/services/QuranReflectionService';
+// Phase 7 imports
+import { loadCheckIns, loadUserTimingProfile, saveCheckIn as saveEnhancedCheckIn } from '@/services/CheckInStorage';
+import { getPlanetPositions } from '@/services/EphemerisService';
+import {
+    computeHarmonyScore,
+    getTimeSegmentFromDate,
+} from '@/services/IlmNujumMapping';
+import { getRecentOutcomesForSegment } from '@/services/PeakWindowLearner';
 import { DailyCheckInEntry } from '@/types/daily-checkin';
 import {
     DivineTimingResult,
     IntentionCategory,
     UserAbjadResult,
 } from '@/types/divine-timing';
+import { CheckInRecord } from '@/types/divine-timing-personal';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -74,8 +90,10 @@ export default function DailyCheckInScreen() {
   const [step, setStep] = useState<'input' | 'result'>('input');
   const [selectedIntention, setSelectedIntention] = useState<IntentionCategory | null>(null);
   const [note, setNote] = useState('');
+  const [energy, setEnergy] = useState(70); // Phase 7: Energy level (0-100)
   const [result, setResult] = useState<DivineTimingResult | null>(null);
   const [reflection, setReflection] = useState<QuranReflection | null>(null);
+  const [harmonyScore, setHarmonyScore] = useState<number | null>(null); // Phase 7
   const [hasCheckedInToday, setHasCheckedInToday] = useState(false);
   const [saving, setSaving] = useState(false);
   
@@ -88,7 +106,7 @@ export default function DailyCheckInScreen() {
     setHasCheckedInToday(summary.hasCheckedInToday);
   };
   
-  const handleGetGuidance = () => {
+  const handleGetGuidance = async () => {
     if (!selectedIntention) return;
     
     const now = new Date();
@@ -114,6 +132,35 @@ export default function DailyCheckInScreen() {
     });
     
     setReflection(verseReflection);
+    
+    // Phase 7: Compute harmony score
+    try {
+      const profile = await loadUserTimingProfile();
+      const checkins = await loadCheckIns();
+      const segment = getTimeSegmentFromDate(now);
+      const positions = await getPlanetPositions(now, profile.timezone);
+      const recentOutcomes = getRecentOutcomesForSegment(checkins, segment, 30);
+      
+      const harmonyResult = computeHarmonyScore({
+        datetime: now,
+        timezone: profile.timezone,
+        userElement: PLACEHOLDER_USER_ABJAD.dominantElement,
+        userBurjRuler: undefined,
+        intentionCategory: selectedIntention,
+        timeSegment: segment,
+        planetPositions: positions || undefined,
+        peakWindowScore: profile.peakWindowModel.segmentScores[segment],
+        recentOutcomes,
+      });
+      
+      setHarmonyScore(harmonyResult.score);
+    } catch (error) {
+      if (__DEV__) {
+        console.error('[CheckIn] Error computing harmony:', error);
+      }
+      setHarmonyScore(50); // Fallback
+    }
+    
     setStep('result');
   };
   
@@ -126,6 +173,7 @@ export default function DailyCheckInScreen() {
       const now = new Date();
       const dateISO = now.toISOString().split('T')[0];
       
+      // Save to original storage (Phase 4)
       const entry: DailyCheckInEntry = {
         id: `${dateISO}-${now.getTime()}`,
         dateISO,
@@ -143,6 +191,26 @@ export default function DailyCheckInScreen() {
       };
       
       await saveCheckIn(entry);
+      
+      // Phase 7: Save enhanced check-in for personalization
+      const profile = await loadUserTimingProfile();
+      const segment = getTimeSegmentFromDate(now);
+      const positions = await getPlanetPositions(now, profile.timezone);
+      
+      const enhancedEntry: CheckInRecord = {
+        id: entry.id,
+        createdAt: now.getTime(),
+        localDayKey: dateISO,
+        intentionKey: selectedIntention,
+        note: note.trim() || undefined,
+        timingSnapshot: result,
+        timeSegment: segment,
+        energy,
+        harmonyScore: harmonyScore || undefined,
+        planetarySnapshot: positions || undefined,
+      };
+      
+      await saveEnhancedCheckIn(enhancedEntry);
       
       Alert.alert(
         'Check-In Saved',
@@ -272,6 +340,41 @@ export default function DailyCheckInScreen() {
               <Text style={[styles.charCount, { color: colors.textSecondary }]}>
                 {note.length}/120
               </Text>
+            </View>
+            
+            {/* Phase 7: Energy Level */}
+            <View style={[styles.card, { backgroundColor: colors.card }]}>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>
+                How's your energy right now?
+              </Text>
+              
+              <View style={styles.energyContainer}>
+                <View style={styles.energyLabels}>
+                  <Text style={[styles.energyLabel, { color: colors.textSecondary }]}>
+                    Low
+                  </Text>
+                  <Text style={[styles.energyValue, { color: colors.primary }]}>
+                    {energy}%
+                  </Text>
+                  <Text style={[styles.energyLabel, { color: colors.textSecondary }]}>
+                    High
+                  </Text>
+                </View>
+                
+                <SimpleSlider
+                  value={energy}
+                  onValueChange={setEnergy}
+                  minimumValue={0}
+                  maximumValue={100}
+                  minimumTrackTintColor={colors.primary}
+                  maximumTrackTintColor={colorScheme === 'dark' ? '#333' : '#ddd'}
+                  thumbTintColor={colors.primary}
+                />
+                
+                <Text style={[styles.energyHint, { color: colors.textSecondary }]}>
+                  This helps us learn your peak windows over time
+                </Text>
+              </View>
             </View>
             
             {/* Get Guidance Button */}
@@ -462,5 +565,26 @@ const styles = StyleSheet.create({
   resetButtonText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  // Phase 7: Energy section styles
+  energyContainer: {
+    gap: 12,
+  },
+  energyLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  energyLabel: {
+    fontSize: 12,
+  },
+  energyValue: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  energyHint: {
+    fontSize: 11,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });

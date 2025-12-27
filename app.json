@@ -77,7 +77,8 @@
             "./assets/sounds/adhan_fajr.mp3"
           ]
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

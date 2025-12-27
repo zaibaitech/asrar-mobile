@@ -13,7 +13,7 @@ import {
     Shield,
     Users
 } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -27,6 +27,7 @@ import {
 } from 'react-native';
 import NameInputSection from '../../components/istikhara/NameInputSection';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useProfile } from '../../contexts/ProfileContext';
 import { useIstikhara } from '../../hooks/useIstikhara';
 import { useNameSuggestions } from '../../hooks/useNameSuggestions';
 import { HistoryService } from '../../services/HistoryService';
@@ -34,12 +35,26 @@ import { HistoryService } from '../../services/HistoryService';
 export default function IstikharaCalculator() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { profile } = useProfile();
   const { calculate, loading, error, result } = useIstikhara();
   
   const [personName, setPersonName] = useState('');
   const [motherName, setMotherName] = useState('');
   const [personLatin, setPersonLatin] = useState('');
   const [motherLatin, setMotherLatin] = useState('');
+  
+  // Auto-fill from profile if available
+  useEffect(() => {
+    if (profile.nameAr && !personName) {
+      setPersonName(profile.nameAr);
+      if (profile.nameLatin) {
+        setPersonLatin(profile.nameLatin);
+      }
+    }
+    if (profile.motherName && !motherName) {
+      setMotherName(profile.motherName);
+    }
+  }, [profile.nameAr, profile.nameLatin, profile.motherName]);
   
   // Collapsible section states - ALL COLLAPSED BY DEFAULT
   const [educationExpanded, setEducationExpanded] = useState(false);
