@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { ProfileProvider } from '@/contexts/ProfileContext';
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -52,32 +53,34 @@ function RootLayoutNav() {
 
   return (
     <SafeAreaProvider>
-      <LanguageProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen 
-              name="compatibility" 
-              options={{ 
-                headerShown: true,
-                headerTitle: 'Compatibility Analysis',
-                headerStyle: {
-                  backgroundColor: '#1A1625',
-                },
-                headerTintColor: '#fff',
-                headerTitleStyle: {
-                  fontWeight: 'bold',
-                },
-              }} 
-            />
-            <Stack.Screen 
-              name="dhikr-counter" 
-              options={{ headerShown: false }} 
-            />
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-          </Stack>
-        </ThemeProvider>
-      </LanguageProvider>
+      <ProfileProvider>
+        <LanguageProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen 
+                name="compatibility" 
+                options={{ 
+                  headerShown: true,
+                  headerTitle: 'Compatibility Analysis',
+                  headerStyle: {
+                    backgroundColor: '#1A1625',
+                  },
+                  headerTintColor: '#fff',
+                  headerTitleStyle: {
+                    fontWeight: 'bold',
+                  },
+                }} 
+              />
+              <Stack.Screen 
+                name="dhikr-counter" 
+                options={{ headerShown: false }} 
+              />
+              <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+            </Stack>
+          </ThemeProvider>
+        </LanguageProvider>
+      </ProfileProvider>
     </SafeAreaProvider>
   );
 }

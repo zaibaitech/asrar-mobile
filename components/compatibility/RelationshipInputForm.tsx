@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { DarkTheme } from '../../constants/DarkTheme';
+import { useProfile } from '../../contexts/ProfileContext';
 
 interface RelationshipInputFormProps {
   onCalculate: (
@@ -16,10 +17,22 @@ interface RelationshipInputFormProps {
 
 export function RelationshipInputForm({ onCalculate, language = 'en' }: RelationshipInputFormProps) {
   const isFrench = language === 'fr';
+  const { profile } = useProfile();
+  
   const [person1Name, setPerson1Name] = useState('');
   const [person1Arabic, setPerson1Arabic] = useState('');
   const [person2Name, setPerson2Name] = useState('');
   const [person2Arabic, setPerson2Arabic] = useState('');
+  
+  // Auto-fill Person 1 from profile if available
+  useEffect(() => {
+    if (profile.nameAr && !person1Arabic) {
+      setPerson1Arabic(profile.nameAr);
+      if (profile.nameLatin) {
+        setPerson1Name(profile.nameLatin);
+      }
+    }
+  }, [profile.nameAr, profile.nameLatin]);
   
   const handleSubmit = () => {
     if (!person1Arabic.trim() || !person2Arabic.trim()) {
