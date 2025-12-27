@@ -4,15 +4,15 @@
  * Validates that normalization produces consistent results across different sources
  */
 
-import {
-  DHIKR_TEST_CASES,
-  isArabicText,
-  isNormalizedArabic,
-  normalizeArabic,
-  normalizeDhikrName,
-  NORMALIZATION_TEST_CASES,
-} from '../arabic-normalization';
 import { computeAbjadProfile } from '../abjad-unified-pipeline';
+import {
+    DHIKR_TEST_CASES,
+    isArabicText,
+    isNormalizedArabic,
+    NORMALIZATION_TEST_CASES,
+    normalizeArabic,
+    normalizeDhikrName,
+} from '../arabic-normalization';
 
 describe('Arabic Normalization', () => {
   describe('normalizeArabic()', () => {
@@ -221,7 +221,7 @@ describe('Arabic Normalization', () => {
     it('should always produce same results for same input', () => {
       const text = 'الرحمن الرحيم';
       const runs = 5;
-      const results = [];
+      const results: Array<{ kabir: number; saghir: number; hadad: number; burj: string }> = [];
       
       for (let i = 0; i < runs; i++) {
         const normalized = normalizeArabic(text);

@@ -1,31 +1,37 @@
 /**
  * Asrār Everyday - Home Screen
  * 
- * Two-tier layout:
- * 1. Primary Modules: Large glassmorphic cards for main features
- * 2. Widget Bar: Compact horizontal scroll for quick access features
+ * Design Philosophy: Daily Companion
+ * - Show less, guide more
+ * - Respect the user's time
+ * - Focus on daily alignment, not overwhelming features
  * 
- * Design Philosophy:
- * - Islamic aesthetic principles (symmetry, layered depth, calligraphy)
- * - Element-based theming (Fire/Earth/Air/Water color associations)
- * - Glassmorphism effects matching web app (asrar.app)
- * - Culturally authentic with modern UX patterns
+ * Structure:
+ * 1. Compact Header (40% reduced)
+ * 2. Hero: Daily Check-In Card
+ * 3. Quick Access: 2×2 grid (always visible)
+ * 4. Spiritual Modules: Collapsible (reduced scroll)
  * 
  * Performance Optimizations:
- * - FlatList for module cards (virtualization ready for expansion)
- * - Memoized components to prevent unnecessary re-renders
- * - Optimized animations using react-native-reanimated
+ * - Memoized components
+ * - Collapsible modules reduce initial render
+ * - Optimized animations
  */
 
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useMemo } from 'react';
-import { FlatList, Platform, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { DailyCheckInCard } from '../../components/divine-timing/DailyCheckInCard';
 import { ModuleCard, WidgetBar } from '../../components/home';
 import { ModuleCardProps } from '../../components/home/types';
 import { DarkTheme, Spacing, Typography } from '../../constants/DarkTheme';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { getDailyCheckInSummary } from '../../services/DivineTimingStorage';
+import { DailyCheckInSummary } from '../../types/daily-checkin';
 
 /**
  * Module configuration for primary features
@@ -65,12 +71,12 @@ const MODULES: Omit<ModuleCardProps, 'onPress'>[] = [
     comingSoon: false,
   },
   {
-    title: 'Divine Time',
-    titleArabic: 'الوقت المبارك',
-    description: 'Find auspicious timing for important decisions and spiritual practices',
-    icon: '⏰',
+    title: 'Divine Timing',
+    titleArabic: 'التوقيت الإلهي',
+    description: 'Spiritual reflection tool for understanding timing and intention',
+    icon: '🕰️',
     element: 'fire',
-    comingSoon: true,
+    comingSoon: false,
   },
 ];
 
@@ -78,6 +84,29 @@ export default function HomeScreen() {
   const { t } = useLanguage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  
+  const [dailySummary, setDailySummary] = useState<DailyCheckInSummary>({
+    hasCheckedInToday: false,
+    streak: 0,
+  });
+  
+  const [modulesExpanded, setModulesExpanded] = useState(false);
+
+  // Load daily check-in summary on mount and when screen focuses
+  const loadDailySummary = useCallback(async () => {
+    const summary = await getDailyCheckInSummary();
+    setDailySummary(summary);
+  }, []);
+  
+  useEffect(() => {
+    loadDailySummary();
+  }, [loadDailySummary]);
+  
+  useFocusEffect(
+    useCallback(() => {
+      loadDailySummary();
+    }, [loadDailySummary])
+  );
 
   /**
    * Handle module card press - navigate to appropriate screen
@@ -95,6 +124,9 @@ export default function HomeScreen() {
         break;
       case 'Name Destiny':
         router.push('/(tabs)/name-destiny');
+        break;
+      case 'Divine Timing':
+        router.push('/divine-timing');
         break;
       // Add other module navigations as they're implemented
       default:
@@ -118,23 +150,59 @@ export default function HomeScreen() {
    */
   const ListHeaderComponent = useMemo(() => (
     <View style={styles.header}>
-      {/* Welcome Section */}
-      <View style={styles.welcomeSection}>
-        <Text style={styles.welcomeTitle}>
-          {t('welcome.title') || 'Welcome to Asrār Everyday'}
-        </Text>
-        <Text style={styles.welcomeSubtitle}>
-          Explore the ancient science of ʿIlm al-Ḥurūf through modern spiritual guidance
+      {/* Compact Header */}
+      <View style={styles.compactHeader}>
+        <Text style={styles.brandName}>Asrār ✦</Text>
+        <Text style={styles.dateLabel}>
+          {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
         </Text>
       </View>
 
-      {/* Widget Bar - Secondary Features */}
+      {/* Hero: Daily Check-In Card */}
+      <View style={styles.heroSection}>
+        <DailyCheckInCard summary={dailySummary} colorScheme="dark" />
+      </View>
+
+      {/* Quick Access: 2×2 Grid */}
       <WidgetBar />
 
-      {/* Section Divider */}
-      <Text style={styles.sectionTitle}>Spiritual Modules</Text>
+      {/* Spiritual Modules: Collapsible */}
+      <View style={styles.modulesSection}>
+        <TouchableOpacity 
+          style={styles.modulesSectionHeader}
+          onPress={() => setModulesExpanded(!modulesExpanded)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.sectionTitle}>Spiritual Modules</Text>
+          <Ionicons 
+            name={modulesExpanded ? 'chevron-up' : 'chevron-down'} 
+            size={20} 
+            color={DarkTheme.textSecondary} 
+          />
+        </TouchableOpacity>
+        
+        {!modulesExpanded && (
+          <View style={styles.modulesCollapsed}>
+            {MODULES.map((module) => (
+              <TouchableOpacity
+                key={module.title}
+                style={styles.moduleIcon}
+                onPress={() => handleModulePress(module.title)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.moduleIconEmoji}>{module.icon}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </View>
     </View>
-  ), [t]);
+  ), [t, dailySummary, modulesExpanded]);
+
+  /**
+   * Conditionally render modules based on expansion state
+   */
+  const data = modulesExpanded ? MODULES : [];
 
   /**
    * List footer with spacing for safe area
@@ -158,7 +226,7 @@ export default function HomeScreen() {
       style={styles.container}
     >
       <FlatList
-        data={MODULES}
+        data={data}
         renderItem={renderModuleCard}
         keyExtractor={keyExtractor}
         ListHeaderComponent={ListHeaderComponent}
@@ -183,33 +251,69 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
-    paddingTop: Spacing.md, // Reduced from Spacing.xl (20 → 12)
+    paddingTop: Spacing.sm,
   },
-  welcomeSection: {
+  
+  // Compact Header (40% reduced)
+  compactHeader: {
     paddingHorizontal: Spacing.screenPadding,
-    marginBottom: Spacing.md, // Reduced from Spacing.xl (20 → 12) - 40% reduction
+    paddingBottom: Spacing.md,
+    gap: 2,
   },
-  welcomeTitle: {
-    fontSize: Typography.h1,
+  brandName: {
+    fontSize: 20,
     fontWeight: Typography.weightBold,
     color: DarkTheme.textPrimary,
-    marginBottom: Spacing.xs, // Reduced from Spacing.sm (8 → 4) - tighter title→subtitle
-    textAlign: 'center',
+    letterSpacing: 0.5,
   },
-  welcomeSubtitle: {
-    fontSize: Typography.label, // Reduced from Typography.body (16 → 14) - supporting text
+  dateLabel: {
+    fontSize: 13,
     fontWeight: Typography.weightRegular,
     color: DarkTheme.textSecondary,
-    textAlign: 'center',
-    lineHeight: Typography.label * Typography.lineHeightNormal, // Adjusted for new size
-    opacity: 0.85, // Slightly more subtle (was 0.9)
+    opacity: 0.7,
+  },
+  
+  // Hero Section
+  heroSection: {
+    paddingHorizontal: Spacing.screenPadding,
+    marginBottom: Spacing.md,
+  },
+  
+  // Modules Section
+  modulesSection: {
+    marginTop: Spacing.md,
+  },
+  modulesSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.screenPadding,
+    paddingVertical: Spacing.xs,
   },
   sectionTitle: {
     fontSize: Typography.h2,
     fontWeight: Typography.weightSemibold,
     color: DarkTheme.textPrimary,
-    marginHorizontal: Spacing.screenPadding,
-    marginTop: Spacing.md, // Reduced from Spacing.xl (20 → 12) - 40% reduction
-    marginBottom: Spacing.sm, // Reduced from Spacing.md (12 → 8) - tighter to cards
+  },
+  modulesCollapsed: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: Spacing.screenPadding,
+    paddingVertical: Spacing.md,
+    gap: Spacing.sm,
+    flexWrap: 'wrap',
+  },
+  moduleIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  moduleIconEmoji: {
+    fontSize: 28,
   },
 });
