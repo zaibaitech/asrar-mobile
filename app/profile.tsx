@@ -60,6 +60,7 @@ export default function ProfileScreen() {
     completionStatus,
     personalizationLevel,
     resetProfile,
+    reloadProfile,
   } = useProfile();
   
   // Local form state
@@ -283,8 +284,12 @@ export default function ProfileScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
+              // Sign out clears the session tokens
               await signOut();
-              await setProfile({ mode: 'guest' });
+              
+              // Reload profile - this will re-check session (now null) and switch to guest mode
+              await reloadProfile();
+              
               Alert.alert('Success', 'You have been signed out');
               router.replace('/(tabs)');
             } catch (error) {

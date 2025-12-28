@@ -152,7 +152,13 @@ export async function signUp(data: SignUpData): Promise<{
 }> {
   try {
     if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      throw new Error('Supabase not configured');
+      return {
+        session: null,
+        error: {
+          code: 'NOT_CONFIGURED',
+          message: 'Account creation is not available. Backend not configured. Please continue as Guest.',
+        },
+      };
     }
     
     const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
@@ -170,7 +176,7 @@ export async function signUp(data: SignUpData): Promise<{
     
     const result = await response.json();
     
-    if (!response.ok) {
+    if (!response.ok || !result.user) {
       return {
         session: null,
         error: {
@@ -213,7 +219,13 @@ export async function signIn(data: SignInData): Promise<{
 }> {
   try {
     if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      throw new Error('Supabase not configured');
+      return {
+        session: null,
+        error: {
+          code: 'NOT_CONFIGURED',
+          message: 'Sign in is not available. Backend not configured. Please continue as Guest.',
+        },
+      };
     }
     
     const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
@@ -230,7 +242,7 @@ export async function signIn(data: SignInData): Promise<{
     
     const result = await response.json();
     
-    if (!response.ok) {
+    if (!response.ok || !result.user) {
       return {
         session: null,
         error: {

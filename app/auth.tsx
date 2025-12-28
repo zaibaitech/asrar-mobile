@@ -34,6 +34,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 type AuthMode = 'signin' | 'signup';
 
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+const IS_BACKEND_CONFIGURED = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+
 export default function AuthScreen() {
   const router = useRouter();
   const { profile, setProfile } = useProfile();
@@ -180,6 +184,19 @@ export default function AuthScreen() {
               </TouchableOpacity>
             </View>
             
+            {/* Backend Not Configured Notice */}
+            {!IS_BACKEND_CONFIGURED && (
+              <View style={styles.notConfiguredBanner}>
+                <Ionicons name="information-circle" size={24} color="#f59e0b" />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.notConfiguredTitle}>Accounts Not Available</Text>
+                  <Text style={styles.notConfiguredText}>
+                    Account creation requires backend setup. Please continue as Guest to use all features.
+                  </Text>
+                </View>
+              </View>
+            )}
+            
             {/* Benefits Card */}
             <View style={styles.benefitsCard}>
               <Text style={styles.benefitsTitle}>
@@ -264,9 +281,9 @@ export default function AuthScreen() {
               
               {/* Submit Button */}
               <TouchableOpacity
-                style={styles.submitButton}
+                style={[styles.submitButton, !IS_BACKEND_CONFIGURED && styles.submitButtonDisabled]}
                 onPress={mode === 'signup' ? handleSignUp : handleSignIn}
-                disabled={loading}
+                disabled={loading || !IS_BACKEND_CONFIGURED}
               >
                 <LinearGradient
                   colors={['#8B7355', '#6B5645']}
@@ -388,6 +405,30 @@ const styles = StyleSheet.create({
     color: '#8B7355',
   },
   
+  // Not Configured Banner
+  notConfiguredBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+  },
+  notConfiguredTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#f59e0b',
+    marginBottom: 4,
+  },
+  notConfiguredText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+  },
+  
   // Benefits
   benefitsCard: {
     backgroundColor: 'rgba(139, 115, 85, 0.1)',
@@ -453,6 +494,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
     marginTop: 8,
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
   },
   submitGradient: {
     flexDirection: 'row',
