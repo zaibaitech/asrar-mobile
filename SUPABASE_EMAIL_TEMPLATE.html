@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm Your Email - Asrār</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%); min-height: 100vh;">
+  
+  <!-- Main Container -->
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%); padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        
+        <!-- Email Card -->
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+          
+          <!-- Header with Logo -->
+          <tr>
+            <td align="center" style="background: linear-gradient(135deg, #4F46E5 0%, #8B5CF6 50%, #EC4899 100%); padding: 48px 40px;">
+              <!-- Asrār Logo SVG -->
+              <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#F0ABFC;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:1" />
+                  </linearGradient>
+                  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                
+                <!-- Outer circle rings -->
+                <circle cx="60" cy="60" r="52" fill="none" stroke="url(#logoGradient)" stroke-width="1" opacity="0.2"/>
+                <circle cx="60" cy="60" r="46" fill="none" stroke="url(#logoGradient)" stroke-width="1" opacity="0.3"/>
+                <circle cx="60" cy="60" r="40" fill="none" stroke="url(#logoGradient)" stroke-width="1" opacity="0.4"/>
+                
+                <!-- 8-pointed star -->
+                <path d="M 60 25 L 64 48 L 85 40 L 72 56 L 95 60 L 72 64 L 85 80 L 64 72 L 60 95 L 56 72 L 35 80 L 48 64 L 25 60 L 48 56 L 35 40 L 56 48 Z" 
+                      fill="url(#logoGradient)" 
+                      filter="url(#glow)"/>
+                
+                <!-- Center circle (eye) -->
+                <circle cx="60" cy="60" r="18" fill="rgba(255, 255, 255, 0.9)"/>
+                
+                <!-- Center dot (pupil) -->
+                <circle cx="60" cy="60" r="6" fill="url(#logoGradient)"/>
+                
+                <!-- Three dots in triangle -->
+                <circle cx="60" cy="40" r="3" fill="url(#logoGradient)" opacity="0.7"/>
+                <circle cx="50" cy="70" r="3" fill="url(#logoGradient)" opacity="0.7"/>
+                <circle cx="70" cy="70" r="3" fill="url(#logoGradient)" opacity="0.7"/>
+              </svg>
+              
+              <!-- Title -->
+              <h1 style="margin: 24px 0 0 0; font-size: 32px; font-weight: 300; letter-spacing: 0.15em; color: #FFFFFF; text-align: center;">
+                ASRĀR
+              </h1>
+              <p style="margin: 8px 0 0 0; font-size: 14px; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.8); text-align: center;">
+                Sacred Geometry • ʿIlm al-Ḥurūf
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Main Content -->
+          <tr>
+            <td style="padding: 48px 40px;">
+              
+              <!-- Greeting -->
+              <h2 style="margin: 0 0 16px 0; font-size: 28px; font-weight: 600; color: #1F2937; text-align: center;">
+                Welcome to Asrār! 🌟
+              </h2>
+              
+              <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #4B5563; text-align: center;">
+                We're excited to have you join our community exploring the mystical science of Arabic letter numerology.
+              </p>
+              
+              <!-- Mobile App Notice -->
+              <div style="margin: 0 0 24px 0; padding: 16px; background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 12px; border-left: 4px solid #8B5CF6;">
+                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #4F46E5; text-align: center;">
+                  📱 <strong>Mobile App User?</strong> The button below will open the Asrār app automatically!
+                </p>
+              </div>
+              
+              <!-- Confirmation Button - UPDATED FOR MOBILE DEEP LINKING -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding: 24px 0;">
+                    <a href="asrar://auth/callback?access_token={{ .Token }}&refresh_token={{ .RefreshToken }}&type=signup" 
+                       style="display: inline-block; padding: 18px 48px; background: linear-gradient(135deg, #4F46E5 0%, #8B5CF6 100%); color: #FFFFFF; text-decoration: none; border-radius: 12px; font-size: 16px; font-weight: 600; letter-spacing: 0.05em; box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);">
+                      ✨ Open Asrār App
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Web Fallback Section -->
+              <div style="margin: 24px 0 0 0; padding: 20px; background: #F9FAFB; border-radius: 12px; border: 1px solid #E5E7EB;">
+                <p style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: #1F2937; text-align: center;">
+                  💻 Using a web browser or button not working?
+                </p>
+                <p style="margin: 0 0 16px 0; font-size: 13px; color: #6B7280; text-align: center;">
+                  Copy and paste this link into your browser:
+                </p>
+                <p style="margin: 0; padding: 12px; background: #FFFFFF; border-radius: 8px; font-size: 11px; color: #4B5563; word-break: break-all; text-align: center; font-family: 'Courier New', monospace; border: 1px solid #E5E7EB;">
+                  {{ .ConfirmationURL }}
+                </p>
+              </div>
+              
+              <!-- Divider -->
+              <div style="margin: 32px 0; height: 1px; background: linear-gradient(to right, transparent, #E5E7EB, transparent);"></div>
+              
+              <!-- What's Next -->
+              <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: #1F2937;">
+                What's Next?
+              </h3>
+              
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td style="padding: 12px 0;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td width="40" valign="top">
+                          <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-align: center; line-height: 32px;">1</div>
+                        </td>
+                        <td style="padding-left: 16px;">
+                          <p style="margin: 0; font-size: 15px; font-weight: 600; color: #1F2937;">Tap the Button Above</p>
+                          <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7280;">The Asrār mobile app will open automatically</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td style="padding: 12px 0;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td width="40" valign="top">
+                          <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #8B5CF6, #EC4899); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-align: center; line-height: 32px;">2</div>
+                        </td>
+                        <td style="padding-left: 16px;">
+                          <p style="margin: 0; font-size: 15px; font-weight: 600; color: #1F2937;">Complete Your Profile</p>
+                          <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7280;">Add your name, birth date, and location for personalized insights</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td style="padding: 12px 0;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td width="40" valign="top">
+                          <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #EC4899, #F472B6); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-align: center; line-height: 32px;">3</div>
+                        </td>
+                        <td style="padding-left: 16px;">
+                          <p style="margin: 0; font-size: 15px; font-weight: 600; color: #1F2937;">Explore Your Destiny</p>
+                          <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7280;">Discover your name's numerology, divine timing, and spiritual resonance</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 32px 40px; background: #F9FAFB; border-top: 1px solid #E5E7EB;">
+              
+              <!-- Social Links -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding-bottom: 16px;">
+                    <a href="https://twitter.com/AsrarEveryday" style="display: inline-block; margin: 0 8px; color: #6B7280; text-decoration: none; font-size: 14px;">Twitter</a>
+                    <span style="color: #D1D5DB;">•</span>
+                    <a href="https://instagram.com/asrar_everyday" style="display: inline-block; margin: 0 8px; color: #6B7280; text-decoration: none; font-size: 14px;">Instagram</a>
+                    <span style="color: #D1D5DB;">•</span>
+                    <a href="https://asrareveryday.vercel.app" style="display: inline-block; margin: 0 8px; color: #6B7280; text-decoration: none; font-size: 14px;">Website</a>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Copyright -->
+              <p style="margin: 16px 0 0 0; font-size: 12px; color: #9CA3AF; text-align: center; line-height: 1.5;">
+                © 2025 Asrār. All rights reserved.<br>
+                You received this email because you signed up for Asrār.
+              </p>
+              
+              <!-- Security Note -->
+              <p style="margin: 16px 0 0 0; padding: 12px; background: #FEF3C7; border-left: 3px solid #F59E0B; border-radius: 6px; font-size: 12px; color: #92400E; line-height: 1.5;">
+                <strong>🔒 Security:</strong> This confirmation link expires in 24 hours. If you didn't create an account, you can safely ignore this email.
+              </p>
+              
+            </td>
+          </tr>
+          
+        </table>
+        
+      </td>
+    </tr>
+  </table>
+  
+</body>
+</html>

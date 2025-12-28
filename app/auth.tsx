@@ -48,6 +48,35 @@ export default function AuthScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   
+  // Helper function for user-friendly error messages
+  const getErrorMessage = (errorCode: string): string => {
+    switch (errorCode) {
+      case 'auth/email-already-in-use':
+      case 'User already registered':
+      case 'SIGNUP_FAILED':
+        return 'This email is already registered. Try signing in instead.';
+      
+      case 'auth/invalid-email':
+      case 'Invalid email':
+        return 'Please enter a valid email address.';
+      
+      case 'auth/weak-password':
+      case 'Password should be at least 6 characters':
+        return 'Password must be at least 6 characters.';
+      
+      case 'auth/network-request-failed':
+      case 'Network request failed':
+      case 'NETWORK_ERROR':
+        return 'No internet connection. Please check your network.';
+      
+      case 'NOT_CONFIGURED':
+        return 'Account creation is not available. Please continue as Guest.';
+      
+      default:
+        return 'Something went wrong. Please try again.';
+    }
+  };
+  
   const handleSignUp = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
@@ -69,7 +98,7 @@ export default function AuthScreen() {
       const result = await signUp({ email, password });
       
       if (result.session) {
-        // Update profile to account mode
+        // ✅ SUCCESS - Account created and auto-signed in (no email verification required)
         await setProfile({ 
           mode: 'account',
         });
@@ -84,8 +113,17 @@ export default function AuthScreen() {
             },
           ]
         );
+      } else if (result.error?.code === 'EMAIL_CONFIRMATION_REQUIRED') {
+        // ✅ SUCCESS - Account created, needs email verification
+        // Navigate to email verification screen instead of showing error
+        router.push({
+          pathname: '/email-verification' as any,
+          params: { email }
+        });
       } else {
-        Alert.alert('Error', result.error?.message || 'Failed to create account');
+        // ❌ ACTUAL ERROR - Only show error for real failures
+        const errorMessage = getErrorMessage(result.error?.code || result.error?.message || '');
+        Alert.alert('Error', errorMessage);
       }
     } catch (error) {
       Alert.alert('Error', 'An unexpected error occurred');
@@ -118,6 +156,17 @@ export default function AuthScreen() {
             {
               text: 'Continue',
               onPress: () => router.replace('/(tabs)'),
+            },
+          ]
+        );
+      } else if (result.error?.code === 'EMAIL_CONFIRMATION_REQUIRED') {
+        // Email not confirmed yet
+        Alert.alert(
+          'Email Not Confirmed',
+          'Please check your email and click the confirmation link before signing in. Check your spam folder if you don\'t see it.',
+          [
+            {
+              text: 'OK',
             },
           ]
         );
@@ -281,7 +330,7 @@ export default function AuthScreen() {
               
               {/* Submit Button */}
               <TouchableOpacity
-                style={[styles.submitButton, !IS_BACKEND_CONFIGURED && styles.submitButtonDisabled]}
+                style={[styles.submitButton, (!IS_BACKEND_CONFIGURED || loading) && styles.submitButtonDisabled]}
                 onPress={mode === 'signup' ? handleSignUp : handleSignIn}
                 disabled={loading || !IS_BACKEND_CONFIGURED}
               >
@@ -290,7 +339,12 @@ export default function AuthScreen() {
                   style={styles.submitGradient}
                 >
                   {loading ? (
-                    <ActivityIndicator color="#fff" />
+                    <>
+                      <ActivityIndicator color="#fff" />
+                      <Text style={styles.submitText}>
+                        {mode === 'signup' ? 'Creating Account...' : 'Signing In...'}
+                      </Text>
+                    </>
                   ) : (
                     <>
                       <Ionicons 

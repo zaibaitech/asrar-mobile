@@ -171,16 +171,41 @@ export async function signUp(data: SignUpData): Promise<{
         email: data.email,
         password: data.password,
         data: data.profile || {},
+        options: {
+          emailRedirectTo: 'asrar://auth/callback',
+        },
       }),
     });
     
     const result = await response.json();
     
-    if (!response.ok || !result.user) {
+    if (!response.ok) {
       return {
         session: null,
         error: {
           code: result.error_code || 'SIGNUP_FAILED',
+          message: result.error_description || result.message || 'Sign up failed',
+        },
+      };
+    }
+    
+    // Check if email confirmation is required
+    if (result.user && !result.access_token) {
+      return {
+        session: null,
+        error: {
+          code: 'EMAIL_CONFIRMATION_REQUIRED',
+          message: 'Please check your email to confirm your account before signing in.',
+        },
+      };
+    }
+    
+    // Ensure we have all required session data
+    if (!result.user || !result.access_token || !result.refresh_token) {
+      return {
+        session: null,
+        error: {
+          code: 'SIGNUP_FAILED',
           message: result.error_description || result.message || 'Sign up failed',
         },
       };
@@ -242,11 +267,33 @@ export async function signIn(data: SignInData): Promise<{
     
     const result = await response.json();
     
-    if (!response.ok || !result.user) {
+    if (!response.ok) {
       return {
         session: null,
         error: {
           code: result.error_code || 'SIGNIN_FAILED',
+          message: result.error_description || result.message || 'Sign in failed',
+        },
+      };
+    }
+    
+    // Check if email confirmation is required
+    if (result.user && !result.access_token) {
+      return {
+        session: null,
+        error: {
+          code: 'EMAIL_CONFIRMATION_REQUIRED',
+          message: 'Please check your email and confirm your account before signing in.',
+        },
+      };
+    }
+    
+    // Ensure we have all required session data
+    if (!result.user || !result.access_token || !result.refresh_token) {
+      return {
+        session: null,
+        error: {
+          code: 'SIGNIN_FAILED',
           message: result.error_description || result.message || 'Sign in failed',
         },
       };

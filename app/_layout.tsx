@@ -1,15 +1,17 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import * as Linking from 'expo-linking';
+import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Alert } from 'react-native';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { ProfileProvider } from '@/contexts/ProfileContext';
+import { ProfileProvider, useProfile } from '@/contexts/ProfileContext';
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -56,6 +58,7 @@ function RootLayoutNav() {
       <ProfileProvider>
         <LanguageProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <DeepLinkHandler />
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen 
@@ -77,10 +80,112 @@ function RootLayoutNav() {
                 options={{ headerShown: false }} 
               />
               <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="email-verification" options={{ headerShown: false }} />
+              <Stack.Screen name="auth" options={{ headerShown: false }} />
+              <Stack.Screen name="profile" options={{ headerShown: false }} />
             </Stack>
           </ThemeProvider>
         </LanguageProvider>
       </ProfileProvider>
     </SafeAreaProvider>
   );
+}
+
+// Deep Link Handler Component
+function DeepLinkHandler() {
+  const router = useRouter();
+  const { profile, setProfile } = useProfile();
+
+  // Deep link handler for email verification
+  useEffect(() => {
+    const handleDeepLink = async (event: { url: string }) => {
+      const { path, queryParams } = Linking.parse(event.url);
+
+      console.log('📱 Deep link received:', event.url);
+      console.log('📱 Path:', path);
+      console.log('📱 Query params:', queryParams);
+
+      // Check if it's auth callback
+      if (path === 'auth/callback' || path?.includes('auth/callback')) {
+        const { access_token, refresh_token, type, error, error_description } = queryParams as {
+          access_token?: string;
+          refresh_token?: string;
+          type?: string;
+          error?: string;
+          error_description?: string;
+        };
+
+        // Handle errors from email verification
+        if (error) {
+          console.error('❌ Auth callback error:', error, error_description);
+          Alert.alert(
+            'Verification Failed',
+            error_description || error,
+            [{ text: 'OK', onPress: () => router.replace('/auth') }]
+          );
+          return;
+        }
+
+        if (type === 'signup' && access_token && refresh_token) {
+          try {
+            console.log('✅ Email verified! Processing...');
+            
+            // Update profile to account mode
+            await setProfile({ mode: 'account' });
+            
+            // Check if profile has essential data
+            const hasEssentialData = profile.nameAr || profile.nameLatin || profile.dobISO;
+            
+            if (!hasEssentialData) {
+              // Redirect to profile screen to complete setup
+              Alert.alert(
+                '✅ Email Verified!',
+                'Please complete your profile to unlock personalized features.',
+                [
+                  {
+                    text: 'Complete Profile',
+                    onPress: () => router.replace('/profile'),
+                  }
+                ]
+              );
+            } else {
+              // Profile already has data, go to home
+              Alert.alert(
+                '✅ Welcome!',
+                'Your email has been verified successfully.',
+                [
+                  {
+                    text: 'Continue',
+                    onPress: () => router.replace('/(tabs)'),
+                  }
+                ]
+              );
+            }
+            
+          } catch (error) {
+            console.error('❌ Verification processing failed:', error);
+            Alert.alert(
+              'Error',
+              'Verification failed. Please try signing in manually.',
+              [{ text: 'OK', onPress: () => router.replace('/auth') }]
+            );
+          }
+        }
+      }
+    };
+
+    // Listen for deep links while app is open
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+
+    // Check if app was opened via deep link
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        handleDeepLink({ url });
+      }
+    });
+
+    return () => subscription.remove();
+  }, [profile, setProfile, router]);
+
+  return null; // This component doesn't render anything
 }
