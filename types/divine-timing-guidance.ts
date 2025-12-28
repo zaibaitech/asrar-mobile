@@ -51,6 +51,13 @@ export interface GuidanceInput {
   
   /** Optional Qur'an reflection from Phase 2 */
   reflectionVerse?: QuranReflection;
+  
+  /** Optional user profile for personalization */
+  userProfile?: {
+    nameAr?: string;
+    element?: 'fire' | 'water' | 'air' | 'earth';
+    burj?: string;
+  };
 }
 
 /**

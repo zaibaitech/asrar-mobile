@@ -3,10 +3,14 @@
  * Reorganized with jump navigation
  */
 
+import { useProfile } from '@/contexts/ProfileContext';
+import { enhanceCalculatorWithAI, isAIAvailable, loadAISettings } from '@/services/AIReflectionService';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { EnhancedCalculationResult } from '../../types/calculator-enhanced';
+import { AIBadge } from '../divine-timing/AIBadge';
 import { CoreResultsGrid } from '../results/CoreResultsGrid';
 import { AdvancedMethods } from './AdvancedMethods';
 import { BurjSign } from './BurjSign';
@@ -30,6 +34,77 @@ interface EnhancedResultsDisplayProps {
 export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ result }) => {
   const scrollViewRef = useRef<ScrollView>(null);
   const [sectionOffsets, setSectionOffsets] = useState<{ [key: string]: number }>({});
+  
+  // AI enhancement state
+  const [aiAvailable, setAiAvailable] = useState(false);
+  const [aiEnhanced, setAiEnhanced] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [enhancedNumerical, setEnhancedNumerical] = useState('');
+  const [enhancedElement, setEnhancedElement] = useState('');
+  const [enhancedBurj, setEnhancedBurj] = useState('');
+  const [enhancedTypeInsight, setEnhancedTypeInsight] = useState('');
+  const [personalizedInsight, setPersonalizedInsight] = useState('');
+  
+  const { profile } = useProfile();
+  
+  // Check if AI is available on mount
+  useEffect(() => {
+    checkAIAvailability();
+  }, []);
+  
+  const checkAIAvailability = async () => {
+    const available = await isAIAvailable();
+    setAiAvailable(available);
+  };
+  
+  const handleEnhanceWithAI = async () => {
+    if (!aiAvailable || aiEnhanced || aiLoading) return;
+    
+    setAiLoading(true);
+    
+    try {
+      const settings = await loadAISettings();
+      
+      // Build context based on calculation type
+      const context: any = {};
+      if (result.type === 'lineage' && result.lineageInsights) {
+        context.yourName = result.input.sourceMeta?.yourName;
+        context.motherName = result.input.sourceMeta?.motherName;
+      } else if (result.type === 'quran' && result.quranInsights) {
+        context.surahName = result.input.sourceMeta?.surahName;
+        context.ayahNumber = result.input.sourceMeta?.ayahNumber;
+      } else if (result.type === 'dhikr' && result.dhikrInsights) {
+        context.divineName = result.input.sourceMeta?.divineName;
+      }
+      
+      const response = await enhanceCalculatorWithAI({
+        calculationType: result.type,
+        inputText: result.input.raw,
+        kabir: result.core.kabir,
+        saghir: result.core.saghir,
+        element: result.core.element,
+        burj: result.core.burj,
+        userElement: profile?.derived?.element,
+        userBurj: profile?.derived?.burj,
+        context: Object.keys(context).length > 0 ? context : undefined,
+        tone: settings.tone,
+        language: 'en',
+      });
+      
+      if (response.aiAssisted) {
+        setEnhancedNumerical(response.enhancedNumericalExplanation);
+        setEnhancedElement(response.enhancedElementExplanation);
+        setEnhancedBurj(response.enhancedBurjExplanation);
+        setEnhancedTypeInsight(response.enhancedTypeInsight || '');
+        setPersonalizedInsight(response.personalizedInsight || '');
+        setAiEnhanced(true);
+      }
+    } catch (error) {
+      // Silent fallback - do nothing
+    } finally {
+      setAiLoading(false);
+    }
+  };
   
   const scrollToSection = (section: string) => {
     if (sectionOffsets[section] !== undefined) {
@@ -111,6 +186,87 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
           <NumericalEssence saghir={result.core.saghir} element={result.core.element} />
           <BurjSign kabir={result.core.kabir} />
         </View>
+        
+        {/* AI Enhancement Button */}
+        {aiAvailable && !aiEnhanced && (
+          <TouchableOpacity 
+            onPress={handleEnhanceWithAI}
+            activeOpacity={0.8}
+            disabled={aiLoading}
+          >
+            <LinearGradient
+              colors={['#6366f1', '#8b5cf6']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.aiEnhanceButton}
+            >
+              {aiLoading ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Ionicons name="sparkles" size={18} color="#fff" />
+              )}
+              <Text style={styles.aiEnhanceButtonText}>
+                {aiLoading ? 'Enhancing...' : '✨ Personalize Explanation'}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+        
+        {/* AI Enhanced Explanations */}
+        {aiEnhanced && enhancedNumerical && (
+          <View style={styles.aiEnhancedCard}>
+            <View style={styles.enhancedHeader}>
+              <Ionicons name="calculator" size={20} color="#6366f1" />
+              <Text style={styles.enhancedTitle}>✨ Enhanced Numerical Insight</Text>
+            </View>
+            <Text style={styles.enhancedText}>{enhancedNumerical}</Text>
+            <View style={{ alignSelf: 'flex-start', marginTop: 8 }}><AIBadge show={true} /></View>
+          </View>
+        )}
+        
+        {aiEnhanced && enhancedElement && (
+          <View style={styles.aiEnhancedCard}>
+            <View style={styles.enhancedHeader}>
+              <Ionicons name="flame" size={20} color="#6366f1" />
+              <Text style={styles.enhancedTitle}>✨ Enhanced Element Insight</Text>
+            </View>
+            <Text style={styles.enhancedText}>{enhancedElement}</Text>
+            <View style={{ alignSelf: 'flex-start', marginTop: 8 }}><AIBadge show={true} /></View>
+          </View>
+        )}
+        
+        {aiEnhanced && enhancedBurj && (
+          <View style={styles.aiEnhancedCard}>
+            <View style={styles.enhancedHeader}>
+              <Ionicons name="planet" size={20} color="#6366f1" />
+              <Text style={styles.enhancedTitle}>✨ Enhanced Burj Insight</Text>
+            </View>
+            <Text style={styles.enhancedText}>{enhancedBurj}</Text>
+            <View style={{ alignSelf: 'flex-start', marginTop: 8 }}><AIBadge show={true} /></View>
+          </View>
+        )}
+        
+        {aiEnhanced && enhancedTypeInsight && (
+          <View style={styles.aiEnhancedCard}>
+            <View style={styles.enhancedHeader}>
+              <Ionicons name="bulb" size={20} color="#6366f1" />
+              <Text style={styles.enhancedTitle}>✨ {getTypeLabel(result.type)} Insight</Text>
+            </View>
+            <Text style={styles.enhancedText}>{enhancedTypeInsight}</Text>
+            <View style={{ alignSelf: 'flex-start', marginTop: 8 }}><AIBadge show={true} /></View>
+          </View>
+        )}
+        
+        {aiEnhanced && personalizedInsight && (
+          <View style={styles.personalizedInsightCard}>
+            <View style={styles.insightHeader}>
+              <Ionicons name="person" size={20} color="#8b5cf6" />
+              <Text style={styles.insightTitle}>💫 Your Personal Insight</Text>
+            </View>
+            <Text style={styles.insightText}>{personalizedInsight}</Text>
+            <View style={{ alignSelf: 'flex-start', marginTop: 8 }}><AIBadge show={true} /></View>
+          </View>
+        )}
         
         {/* Type-Specific Insights Section */}
         <View onLayout={(e) => handleSectionLayout('insights', e.nativeEvent.layout.y)}>
@@ -329,6 +485,78 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#fbbf24',
     textAlign: 'center',
+    lineHeight: 20,
+  },
+  
+  // AI Enhancement Styles
+  aiEnhanceButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    gap: 8,
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: '#6366f1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  aiEnhanceButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  aiEnhancedCard: {
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+    borderRadius: 12,
+    padding: 16,
+    gap: 8,
+    marginBottom: 12,
+  },
+  enhancedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  enhancedTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#f1f5f9',
+  },
+  enhancedText: {
+    fontSize: 14,
+    color: '#cbd5e1',
+    lineHeight: 20,
+  },
+  personalizedInsightCard: {
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 12,
+    padding: 16,
+    gap: 8,
+    marginBottom: 12,
+  },
+  insightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  insightTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#f1f5f9',
+  },
+  insightText: {
+    fontSize: 14,
+    color: '#cbd5e1',
     lineHeight: 20,
   },
 });

@@ -16,6 +16,7 @@
  * - Optional cloud sync (future - account mode)
  */
 
+import { getSession } from '@/services/AuthService';
 import {
     deriveAstrologicalData,
     updateProfileWithDerivedData,
@@ -113,7 +114,20 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       
       const initialProfile = await initializeProfile();
       
-      updateProfileState(initialProfile);
+      // Check if user has active auth session
+      const session = await getSession();
+      if (session && initialProfile.mode !== 'account') {
+        // User is signed in but profile is still in guest mode
+        // Update to account mode
+        const updatedProfile: UserProfile = {
+          ...initialProfile,
+          mode: 'account',
+        };
+        await saveProfile(updatedProfile);
+        updateProfileState(updatedProfile);
+      } else {
+        updateProfileState(initialProfile);
+      }
       
     } catch (error) {
       if (__DEV__) {

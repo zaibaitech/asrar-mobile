@@ -362,6 +362,7 @@ export function generateDivineTimingGuidance(
     urgency,
     divineTimingResult,
     reflectionVerse,
+    userProfile,
   } = input;
 
   const { timingQuality, cycleState, elementalTone } = divineTimingResult;
@@ -372,11 +373,16 @@ export function generateDivineTimingGuidance(
   // Summary title
   const summaryTitle = SUMMARY_TITLES[timingQuality];
   
-  // Timing signal
-  const timingSignal = selectDeterministic(
+  // Timing signal - personalize if profile available
+  let timingSignal = selectDeterministic(
     TIMING_SIGNALS[timingQuality],
     seed
   );
+  
+  // Personalize timing signal if user profile available
+  if (userProfile?.burj) {
+    timingSignal = personalizeTimingSignal(timingSignal, userProfile.burj, userProfile.element);
+  }
   
   // Category templates
   const categoryTemplate = CATEGORY_TEMPLATES[category];
@@ -385,19 +391,33 @@ export function generateDivineTimingGuidance(
   const recommendedApproach: string[] = [];
   
   // Add category-specific guidance
-  const categoryGuidance = selectDeterministic(
+  let categoryGuidance = selectDeterministic(
     categoryTemplate[timingQuality],
     seed
   );
+  
+  // Personalize category guidance if profile available
+  if (userProfile?.element) {
+    categoryGuidance = personalizeGuidance(categoryGuidance, userProfile.element, category);
+  }
+  
   recommendedApproach.push(categoryGuidance);
   
   // Add cycle modifier
   const cycleInfo = CYCLE_MODIFIERS[cycleState] || CYCLE_MODIFIERS.reflection;
   recommendedApproach.push(cycleInfo.approach);
   
-  // Add elemental guidance (strength)
-  const elementalInfo = ELEMENTAL_GUIDANCE[elementalTone];
-  recommendedApproach.push(elementalInfo.strength);
+  // Add elemental guidance (strength) - use user's element if available
+  const userElement = userProfile?.element || elementalTone;
+  const elementalInfo = ELEMENTAL_GUIDANCE[userElement];
+  let elementalStrength = elementalInfo.strength;
+  
+  // Add personal touch if element matches user
+  if (userProfile?.element === userElement) {
+    elementalStrength = `Your ${userElement} nature suggests: ${elementalStrength.toLowerCase()}`;
+  }
+  
+  recommendedApproach.push(elementalStrength);
   
   // Build watch-outs
   const watchOuts: string[] = [];
@@ -502,3 +522,90 @@ export function getUrgencyName(urgency: UrgencyLevel): string {
  */
 export const GUIDANCE_DISCLAIMER =
   'This is spiritual reflection, not religious rulings or certainty about outcomes. For fatwa or istikhārah, consult qualified scholars. This is not professional advice.';
+
+// ============================================================================
+// PERSONALIZATION HELPERS
+// ============================================================================
+
+/**
+ * Personalize timing signal with user's Burj information
+ */
+function personalizeTimingSignal(
+  signal: string,
+  burj: string,
+  element?: 'fire' | 'water' | 'air' | 'earth'
+): string {
+  // Add element-based personalization
+  if (element) {
+    const elementPhrases: Record<string, string> = {
+      fire: 'aligned with your natural initiative',
+      water: 'resonating with your intuitive nature',
+      air: 'supporting your intellectual approach',
+      earth: 'grounding your practical steps',
+    };
+    
+    return `${signal} As a ${burj}, this period may be ${elementPhrases[element]}.`;
+  }
+  
+  return `${signal} (${burj} influence noted).`;
+}
+
+/**
+ * Personalize guidance based on user's element and category
+ */
+function personalizeGuidance(
+  guidance: string,
+  element: 'fire' | 'water' | 'air' | 'earth',
+  category: GuidanceCategory
+): string {
+  // Element-specific modifiers for different categories
+  const elementModifiers: Record<string, Record<GuidanceCategory, string>> = {
+    fire: {
+      study_exam: 'your energetic focus',
+      work_career: 'your leadership qualities',
+      money_business: 'your entrepreneurial spirit',
+      travel: 'your adventurous nature',
+      relationships_family: 'your passionate commitment',
+      health_wellbeing: 'your active approach',
+      spiritual_practice: 'your devoted intensity',
+      decisions_general: 'your decisive nature',
+    },
+    water: {
+      study_exam: 'your deep understanding',
+      work_career: 'your collaborative strengths',
+      money_business: 'your intuitive insights',
+      travel: 'your adaptable nature',
+      relationships_family: 'your emotional depth',
+      health_wellbeing: 'your holistic awareness',
+      spiritual_practice: 'your heartfelt devotion',
+      decisions_general: 'your intuitive wisdom',
+    },
+    air: {
+      study_exam: 'your analytical mind',
+      work_career: 'your communication skills',
+      money_business: 'your strategic thinking',
+      travel: 'your curiosity and openness',
+      relationships_family: 'your intellectual connection',
+      health_wellbeing: 'your mindful approach',
+      spiritual_practice: 'your contemplative nature',
+      decisions_general: 'your rational analysis',
+    },
+    earth: {
+      study_exam: 'your methodical approach',
+      work_career: 'your reliable consistency',
+      money_business: 'your practical wisdom',
+      travel: 'your careful planning',
+      relationships_family: 'your steady loyalty',
+      health_wellbeing: 'your grounded discipline',
+      spiritual_practice: 'your sustained commitment',
+      decisions_general: 'your practical discernment',
+    },
+  };
+  
+  const modifier = elementModifiers[element]?.[category];
+  if (modifier) {
+    return `${guidance} Drawing on ${modifier} will serve you well.`;
+  }
+  
+  return guidance;
+}

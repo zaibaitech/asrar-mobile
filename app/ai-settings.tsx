@@ -69,14 +69,17 @@ export default function AISettingsScreen() {
   
   const checkAIAvailability = async () => {
     const available = await isAIAvailable();
+    console.log('[AI Settings] AI Available:', available);
     setAiAvailable(available);
   };
   
   const loadSettings = async () => {
     try {
       const data = await loadAISettings();
+      console.log('[AI Settings] Loaded settings:', data);
       setSettings(data);
     } catch (error) {
+      console.error('[AI Settings] Error loading settings:', error);
       Alert.alert('Error', 'Failed to load AI settings.');
     } finally {
       setLoading(false);
@@ -84,9 +87,11 @@ export default function AISettingsScreen() {
   };
   
   const handleToggleAI = async (enabled: boolean) => {
+    console.log('[AI Settings] Toggle clicked, enabled:', enabled);
     if (!settings) return;
     
     if (enabled && !settings.disclaimerAcknowledged) {
+      console.log('[AI Settings] Showing disclaimer...');
       // Show disclaimer first time
       Alert.alert(
         'Important: AI Assistance',
@@ -107,6 +112,7 @@ Do you want to enable AI assistance?`,
           {
             text: 'Enable AI',
             onPress: async () => {
+              console.log('[AI Settings] User accepted disclaimer');
               const updated: AISettings = {
                 ...settings,
                 enabled: true,
@@ -114,17 +120,20 @@ Do you want to enable AI assistance?`,
               };
               setSettings(updated);
               await saveAISettings(updated);
+              console.log('[AI Settings] Settings saved:', updated);
             },
           },
         ]
       );
     } else {
+      console.log('[AI Settings] Updating enabled state to:', enabled);
       const updated: AISettings = {
         ...settings,
         enabled,
       };
       setSettings(updated);
       await saveAISettings(updated);
+      console.log('[AI Settings] Settings saved:', updated);
     }
   };
   
@@ -193,11 +202,24 @@ Do you want to enable AI assistance?`,
               <Text style={[styles.toggleDesc, { color: colors.textSecondary }]}>
                 Improve wording clarity with AI
               </Text>
+              {!aiAvailable && (
+                <Text style={{ color: '#ef4444', fontSize: 12, marginTop: 4 }}>
+                  AI is currently unavailable
+                </Text>
+              )}
             </View>
             <Switch
               value={settings.enabled}
-              onValueChange={handleToggleAI}
-              disabled={!aiAvailable}
+              onValueChange={(value) => {
+                console.log('[AI Settings] Switch tapped! New value:', value);
+                console.log('[AI Settings] AI Available:', aiAvailable);
+                console.log('[AI Settings] Current settings:', settings);
+                handleToggleAI(value);
+              }}
+              trackColor={{ false: '#767577', true: '#6366f1' }}
+              thumbColor={settings.enabled ? '#fff' : '#f4f3f4'}
+              ios_backgroundColor="#3e3e3e"
+              style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }}
             />
           </View>
         </View>

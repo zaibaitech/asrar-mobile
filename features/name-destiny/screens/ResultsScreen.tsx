@@ -3,6 +3,7 @@
  * Staged revelation with beginner-friendly presentation
  */
 
+import { AIBadge } from '@/components/divine-timing/AIBadge';
 import {
     AccordionSection,
     DestinyHeader,
@@ -15,9 +16,11 @@ import {
 } from '@/components/nameDestiny';
 import { QuranResonanceCard } from '@/components/quran/QuranResonanceCard';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useProfile } from '@/contexts/ProfileContext';
 import type { NameDestinyResult } from '@/features/name-destiny/types';
 import { InputType, UnderstandingLevel } from '@/features/name-destiny/types/enums';
 import { generateKeyTakeaways } from '@/features/name-destiny/utils/takeawayGenerator';
+import { enhanceNameDestinyWithAI, isAIAvailable, loadAISettings } from '@/services/AIReflectionService';
 import { getQuranResonance, type QuranResonance } from '@/services/QuranResonanceService';
 import { getBalancingActions, getPracticalGuidance } from '@/utils/elementBalancing';
 import { getElementFromString, getElementTheme } from '@/utils/elementTheme';
@@ -167,12 +170,21 @@ export default function ResultsScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
   const { language, setLanguage } = useLanguage();
+  const { profile } = useProfile();
   const insets = useSafeAreaInsets();
 
   // Qur'anic Resonance state
   const [quranResonance, setQuranResonance] = useState<QuranResonance | null>(null);
   const [quranLoading, setQuranLoading] = useState(false);
   const [quranError, setQuranError] = useState<string | null>(null);
+
+  // AI Enhancement state
+  const [aiEnhanced, setAiEnhanced] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiElementExplanation, setAiElementExplanation] = useState('');
+  const [aiBurjExplanation, setAiBurjExplanation] = useState('');
+  const [aiPersonalizedInsight, setAiPersonalizedInsight] = useState<string | undefined>();
+  const [aiAvailable, setAiAvailable] = useState(false);
 
   const result: NameDestinyResult | null = params.data ? JSON.parse(params.data as string) : null;
   const personName = params.personName as string;
@@ -181,12 +193,55 @@ export default function ResultsScreen() {
   const understandingLevel =
     (params.understandingLevel as UnderstandingLevel) || UnderstandingLevel.BEGINNER;
 
+  // Check AI availability on mount
+  useEffect(() => {
+    checkAIAvailability();
+  }, []);
+
+  const checkAIAvailability = async () => {
+    const available = await isAIAvailable();
+    setAiAvailable(available);
+  };
+
   // Load Qur'anic Resonance on mount
   useEffect(() => {
     if (result?.personKabir) {
       loadQuranResonance();
     }
   }, [result?.personKabir, language]);
+
+  const handleEnhanceWithAI = async () => {
+    if (!result || aiLoading || aiEnhanced) return;
+
+    setAiLoading(true);
+    try {
+      const settings = await loadAISettings();
+      
+      const response = await enhanceNameDestinyWithAI({
+        element: result.element?.en || '',
+        burj: result.burj?.en || '',
+        planetaryRuler: result.burj?.planet,
+        userElement: profile.derived?.element,
+        userBurj: profile.derived?.burj,
+        userLocationCity: profile.location?.label,
+        tone: settings.tone,
+        language: language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en',
+      });
+
+      if (response.aiAssisted) {
+        setAiEnhanced(true);
+        setAiElementExplanation(response.elementExplanation);
+        setAiBurjExplanation(response.burjExplanation);
+        setAiPersonalizedInsight(response.personalizedInsight);
+      }
+    } catch (error) {
+      if (__DEV__) {
+        console.error('[AI Enhancement] Failed:', error);
+      }
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const loadQuranResonance = async () => {
     setQuranLoading(true);
@@ -409,6 +464,51 @@ export default function ResultsScreen() {
               elementAr={result.element?.ar}
               elementFr={result.element?.fr}
             />
+
+            {/* AI Enhancement Button */}
+            {aiAvailable && !aiEnhanced && (
+              <TouchableOpacity
+                style={styles.aiEnhanceButton}
+                onPress={handleEnhanceWithAI}
+                disabled={aiLoading}
+                activeOpacity={0.7}
+              >
+                <LinearGradient
+                  colors={['rgba(139, 115, 85, 0.3)', 'rgba(139, 115, 85, 0.15)']}
+                  style={styles.aiEnhanceGradient}
+                >
+                  <Sparkles size={18} color="#8B7355" />
+                  <Text style={styles.aiEnhanceText}>
+                    {aiLoading
+                      ? (language === 'ar' ? 'جاري التحسين...' : language === 'fr' ? 'Amélioration...' : 'Enhancing...')
+                      : (language === 'ar' ? '✨ تخصيص التفسير' : language === 'fr' ? '✨ Personnaliser' : '✨ Personalize Explanation')}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
+
+            {/* AI Enhanced Content */}
+            {aiEnhanced && aiElementExplanation && (
+              <View style={styles.aiEnhancedCard}>
+                <View style={styles.aiEnhancedHeader}>
+                  <Sparkles size={16} color="#8B7355" />
+                  <Text style={styles.aiEnhancedTitle}>
+                    {language === 'ar' ? 'شرح محسّن' : language === 'fr' ? 'Explication Améliorée' : 'Enhanced Explanation'}
+                  </Text>
+                  <AIBadge size="small" />
+                </View>
+                <Text style={styles.aiEnhancedText}>{aiElementExplanation}</Text>
+                
+                {aiPersonalizedInsight && (
+                  <View style={styles.personalizedInsightCard}>
+                    <Text style={styles.personalizedInsightLabel}>
+                      {language === 'ar' ? '💫 رؤية شخصية' : language === 'fr' ? '💫 Aperçu Personnel' : '💫 Personalized Insight'}
+                    </Text>
+                    <Text style={styles.personalizedInsightText}>{aiPersonalizedInsight}</Text>
+                  </View>
+                )}
+              </View>
+            )}
           </View>
 
           {/* 5) Elemental Composition with Dominance Summary */}
@@ -619,6 +719,20 @@ export default function ResultsScreen() {
                 </View>
               </LinearGradient>
             </View>
+
+            {/* AI Enhanced Burj Explanation */}
+            {aiEnhanced && aiBurjExplanation && (
+              <View style={styles.aiEnhancedCard}>
+                <View style={styles.aiEnhancedHeader}>
+                  <Sparkles size={16} color="#fbbf24" />
+                  <Text style={styles.aiEnhancedTitle}>
+                    {language === 'ar' ? 'شرح البرج' : language === 'fr' ? 'Explication du Burj' : 'Burj Insight'}
+                  </Text>
+                  <AIBadge size="small" />
+                </View>
+                <Text style={styles.aiEnhancedText}>{aiBurjExplanation}</Text>
+              </View>
+            )}
           </View>
 
           {/* 8) Qur'anic Resonance with Reflection Prompt */}
@@ -1147,5 +1261,71 @@ const styles = StyleSheet.create({
     color: '#64748b',
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  
+  // AI Enhancement styles
+  aiEnhanceButton: {
+    marginTop: 16,
+    overflow: 'hidden',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 115, 85, 0.3)',
+  },
+  aiEnhanceGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    gap: 8,
+  },
+  aiEnhanceText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#8B7355',
+  },
+  aiEnhancedCard: {
+    marginTop: 16,
+    backgroundColor: 'rgba(139, 115, 85, 0.1)',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 115, 85, 0.2)',
+  },
+  aiEnhancedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  aiEnhancedTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8B7355',
+    flex: 1,
+  },
+  aiEnhancedText: {
+    fontSize: 15,
+    lineHeight: 24,
+    color: '#e2e8f0',
+  },
+  personalizedInsightCard: {
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: 'rgba(251, 191, 36, 0.1)',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#fbbf24',
+  },
+  personalizedInsightLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#fbbf24',
+    marginBottom: 6,
+  },
+  personalizedInsightText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#f1f5f9',
   },
 });

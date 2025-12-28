@@ -24,9 +24,17 @@ import {
     AIRewriteResponse,
     AISettings,
     AITone,
+    CalculatorAIRequest,
+    CalculatorAIResponse,
+    CompatibilityAIRequest,
+    CompatibilityAIResponse,
     DEFAULT_AI_SETTINGS,
     IstikharaAIRewriteRequest,
     IstikharaAIRewriteResponse,
+    NameDestinyAIRequest,
+    NameDestinyAIResponse,
+    PeakWindowsAIRequest,
+    PeakWindowsAIResponse,
 } from '@/types/ai-settings';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
@@ -187,8 +195,10 @@ export async function saveAISettings(settings: AISettings): Promise<void> {
  * Check if AI is available
  * Requires:
  * 1. Build-time capability flag (ENABLE_AI_CAPABILITY)
- * 2. User settings enabled
- * 3. API key present
+ * 2. API key present
+ * 
+ * Note: Does NOT check settings.enabled - that's a user preference
+ * This only checks if AI CAN be used, not if it IS enabled
  */
 export async function isAIAvailable(): Promise<boolean> {
   // Build-time capability check
@@ -204,9 +214,7 @@ export async function isAIAvailable(): Promise<boolean> {
     return false;
   }
   
-  // User settings check
-  const settings = await loadAISettings();
-  return settings.enabled;
+  return true;
 }
 
 // ============================================================================
@@ -532,3 +540,587 @@ RETURN ONLY VALID JSON:
     };
   }
 }
+
+// ============================================================================
+// NAME DESTINY AI ENHANCEMENT
+// ============================================================================
+
+/**
+ * Enhance Name Destiny explanation with AI
+ * Returns enhanced explanations or empty strings on failure
+ */
+export async function enhanceNameDestinyWithAI(
+  request: NameDestinyAIRequest
+): Promise<NameDestinyAIResponse> {
+  try {
+    // Check if AI is enabled
+    const settings = await loadAISettings();
+    if (!isAIAvailable() || !settings.enabled) {
+      return {
+        elementExplanation: '',
+        burjExplanation: '',
+        aiAssisted: false,
+      };
+    }
+
+    const systemPrompt = `You are a spiritual guidance educator specializing in Islamic numerology.
+
+STRICT RULES:
+1. Explain element and zodiac meanings ONLY
+2. NEVER predict future events
+3. NEVER give religious rulings
+4. Keep explanations educational and reflective
+5. If user profile provided, connect their birth chart to name calculation
+6. Use 2-3 sentences per explanation
+7. Maintain humility and avoid certainty
+
+Your role: Educate and contextualize, not predict.`;
+
+    const toneInstructions = getToneInstructions(request.tone);
+    
+    // Build user prompt with personalization
+    let userPrompt = `
+Tone: ${toneInstructions}
+
+Name Calculation Results:
+- Element: ${request.element}
+- Burj (Zodiac): ${request.burj}
+${request.planetaryRuler ? `- Planetary Ruler: ${request.planetaryRuler}` : ''}
+`;
+
+    if (request.userElement || request.userBurj) {
+      userPrompt += `\nUser's Birth Chart:
+- Birth Element: ${request.userElement || 'Unknown'}
+- Birth Burj: ${request.userBurj || 'Unknown'}
+${request.userLocationCity ? `- Location: ${request.userLocationCity}` : ''}
+`;
+    }
+
+    userPrompt += `\nProvide:
+1. Element explanation (2-3 sentences)
+2. Burj explanation (2-3 sentences)
+${request.userElement || request.userBurj ? '3. Personalized insight connecting birth chart to name calculation (2-3 sentences)' : ''}
+
+RETURN ONLY VALID JSON:
+{
+  "elementExplanation": "...",
+  "burjExplanation": "...",
+  ${request.userElement || request.userBurj ? '"personalizedInsight": "...",' : ''}
+  "aiAssisted": true
+}
+`;
+
+    const response = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      }),
+    });
+
+    if (!response.ok) {
+      if (__DEV__) {
+        console.warn(`[AI] Groq API error for name destiny: ${response.status}`);
+      }
+      throw new Error(`Groq API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+
+    // Extract JSON from response
+    const extractedJSON = extractJSON(content);
+    if (!extractedJSON) {
+      if (__DEV__) {
+        console.warn('[AI] No valid JSON found in name destiny response');
+      }
+      throw new Error('No valid JSON in AI response');
+    }
+
+    // Parse and return
+    const parsed = JSON.parse(extractedJSON);
+    
+    return {
+      elementExplanation: parsed.elementExplanation || '',
+      burjExplanation: parsed.burjExplanation || '',
+      personalizedInsight: parsed.personalizedInsight,
+      aiAssisted: true,
+    };
+
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('[AI] Name destiny enhancement failed:', error);
+    }
+    
+    // Silent fallback to empty strings
+    return {
+      elementExplanation: '',
+      burjExplanation: '',
+      aiAssisted: false,
+    };
+  }
+}
+
+/**
+ * Enhance Relationship Compatibility analysis with AI
+ * 
+ * Phase 6.3: AI-assisted compatibility explanation
+ * 
+ * AI RULES:
+ * - Explains relationship dynamics ONLY
+ * - NEVER predicts relationship outcomes
+ * - NEVER gives relationship rulings or advice
+ * - Educational and reflective tone
+ * - Respects user privacy
+ * 
+ * @param request Compatibility AI request
+ * @returns Enhanced compatibility explanations or fallback
+ */
+export async function enhanceCompatibilityWithAI(
+  request: CompatibilityAIRequest
+): Promise<CompatibilityAIResponse> {
+  try {
+    // Check capability
+    if (!ENABLE_AI_CAPABILITY || !GROQ_API_KEY) {
+      return {
+        enhancedSummary: '',
+        enhancedSpiritualExplanation: '',
+        enhancedElementalExplanation: '',
+        enhancedPlanetaryExplanation: '',
+        aiAssisted: false,
+      };
+    }
+
+    // System prompt with strict rules
+    const systemPrompt = `You are a spiritual guidance educator specializing in Islamic numerology and relationship compatibility analysis.
+
+STRICT RULES:
+1. Explain compatibility patterns and elemental dynamics ONLY
+2. NEVER predict relationship outcomes or future events
+3. NEVER give relationship advice or rulings
+4. Keep explanations educational and reflective
+5. If user profile provided, contextualize the relationship analysis
+6. Use 2-3 sentences per explanation
+7. Maintain humility and avoid certainty
+8. Respect cultural sensitivity around relationships
+
+Your role: Educate about compatibility patterns, not predict or advise.`;
+
+    const toneInstructions = getToneInstructions(request.tone);
+    
+    const relationshipContext = request.relationshipType 
+      ? `\nRelationship Type: ${request.relationshipType}` 
+      : '';
+    
+    // Build user prompt
+    let userPrompt = `
+Tone: ${toneInstructions}
+
+Compatibility Analysis:
+- ${request.person1Name} (${request.person1Element} element)
+- ${request.person2Name} (${request.person2Element} element)
+- Overall Score: ${request.overallScore}/100 (${request.overallQuality})
+- Spiritual Destiny: ${request.spiritualScore}/100
+- Elemental Temperament: ${request.elementalScore}/100
+- Planetary Cosmic: ${request.planetaryScore}/100${relationshipContext}
+`;
+
+    if (request.userElement || request.userBurj) {
+      userPrompt += `\nUser's Context:
+- Birth Element: ${request.userElement || 'Unknown'}
+- Birth Burj: ${request.userBurj || 'Unknown'}
+`;
+    }
+
+    userPrompt += `\nProvide:
+1. Enhanced overall summary (2-3 sentences explaining the score)
+2. Enhanced spiritual destiny explanation (2-3 sentences)
+3. Enhanced elemental temperament explanation (2-3 sentences)
+4. Enhanced planetary cosmic explanation (2-3 sentences)
+${request.userElement || request.userBurj ? '5. Personalized insight for the user viewing this analysis (2-3 sentences)' : ''}
+
+RETURN ONLY VALID JSON:
+{
+  "enhancedSummary": "...",
+  "enhancedSpiritualExplanation": "...",
+  "enhancedElementalExplanation": "...",
+  "enhancedPlanetaryExplanation": "...",
+  ${request.userElement || request.userBurj ? '"personalizedInsight": "...",' : ''}
+  "aiAssisted": true
+}
+`;
+
+    const response = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 800,
+      }),
+    });
+
+    if (!response.ok) {
+      if (__DEV__) {
+        console.warn(`[AI] Groq API error for compatibility: ${response.status}`);
+      }
+      throw new Error(`Groq API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+
+    // Extract JSON from response
+    const extractedJSON = extractJSON(content);
+    if (!extractedJSON) {
+      if (__DEV__) {
+        console.warn('[AI] No valid JSON found in compatibility response');
+      }
+      throw new Error('No valid JSON in AI response');
+    }
+
+    // Parse and return
+    const parsed = JSON.parse(extractedJSON);
+    
+    return {
+      enhancedSummary: parsed.enhancedSummary || '',
+      enhancedSpiritualExplanation: parsed.enhancedSpiritualExplanation || '',
+      enhancedElementalExplanation: parsed.enhancedElementalExplanation || '',
+      enhancedPlanetaryExplanation: parsed.enhancedPlanetaryExplanation || '',
+      personalizedInsight: parsed.personalizedInsight,
+      aiAssisted: true,
+    };
+
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('[AI] Compatibility enhancement failed:', error);
+    }
+    
+    // Silent fallback to empty strings
+    return {
+      enhancedSummary: '',
+      enhancedSpiritualExplanation: '',
+      enhancedElementalExplanation: '',
+      enhancedPlanetaryExplanation: '',
+      aiAssisted: false,
+    };
+  }
+}
+
+/**
+ * Enhance Abjad Calculator results with AI
+ * 
+ * Phase 6.4: AI-assisted calculator explanation
+ * 
+ * AI RULES:
+ * - Explains numerical meanings and patterns ONLY
+ * - NEVER predicts outcomes or future events
+ * - NEVER gives spiritual or religious rulings
+ * - Educational and reflective tone
+ * - Type-aware (name, lineage, phrase, Quran, dhikr)
+ * 
+ * @param request Calculator AI request
+ * @returns Enhanced calculator explanations or fallback
+ */
+export async function enhanceCalculatorWithAI(
+  request: CalculatorAIRequest
+): Promise<CalculatorAIResponse> {
+  try {
+    // Check capability
+    if (!ENABLE_AI_CAPABILITY || !GROQ_API_KEY) {
+      return {
+        enhancedNumericalExplanation: '',
+        enhancedElementExplanation: '',
+        enhancedBurjExplanation: '',
+        aiAssisted: false,
+      };
+    }
+
+    // System prompt with strict rules
+    const systemPrompt = `You are a spiritual guidance educator specializing in Islamic numerology (ʿIlm al-Ḥurūf).
+
+STRICT RULES:
+1. Explain numerical patterns and letter values ONLY
+2. NEVER predict outcomes or future events
+3. NEVER give spiritual or religious rulings
+4. Keep explanations educational and reflective
+5. If user profile provided, contextualize the calculation
+6. Use 2-3 sentences per explanation
+7. Maintain humility and avoid certainty
+8. Type-specific context: ${request.calculationType}
+
+Your role: Educate about numerical meanings, not predict or prescribe.`;
+
+    const toneInstructions = getToneInstructions(request.tone);
+    
+    // Build context description
+    const contextDesc = request.context 
+      ? (request.calculationType === 'lineage' 
+          ? `\nNames: ${request.context.yourName} + ${request.context.motherName}`
+          : request.calculationType === 'quran'
+          ? `\nSurah: ${request.context.surahName}, Ayah ${request.context.ayahNumber}`
+          : request.calculationType === 'dhikr'
+          ? `\nDivine Name: ${request.context.divineName}`
+          : '')
+      : '';
+    
+    // Build user prompt
+    let userPrompt = `
+Tone: ${toneInstructions}
+
+Abjad Calculation Results:
+- Type: ${request.calculationType}
+- Input: ${request.inputText}${contextDesc}
+- Kabīr (Grand Total): ${request.kabir}
+- Ṣaghīr (Digital Root): ${request.saghir}
+- Element: ${request.element}
+- Burj (Zodiac): ${request.burj}
+`;
+
+    if (request.userElement || request.userBurj) {
+      userPrompt += `\nUser's Context:
+- Birth Element: ${request.userElement || 'Unknown'}
+- Birth Burj: ${request.userBurj || 'Unknown'}
+`;
+    }
+
+    userPrompt += `\nProvide:
+1. Enhanced numerical explanation for Kabīr ${request.kabir} and Ṣaghīr ${request.saghir} (2-3 sentences)
+2. Enhanced element explanation for ${request.element} (2-3 sentences)
+3. Enhanced Burj explanation for ${request.burj} (2-3 sentences)
+4. Type-specific insight for ${request.calculationType} calculation (2-3 sentences)
+${request.userElement || request.userBurj ? '5. Personalized insight connecting user\'s birth chart to this calculation (2-3 sentences)' : ''}
+
+RETURN ONLY VALID JSON:
+{
+  "enhancedNumericalExplanation": "...",
+  "enhancedElementExplanation": "...",
+  "enhancedBurjExplanation": "...",
+  "enhancedTypeInsight": "...",
+  ${request.userElement || request.userBurj ? '"personalizedInsight": "...",' : ''}
+  "aiAssisted": true
+}
+`;
+
+    const response = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 900,
+      }),
+    });
+
+    if (!response.ok) {
+      if (__DEV__) {
+        console.warn(`[AI] Groq API error for calculator: ${response.status}`);
+      }
+      throw new Error(`Groq API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+
+    // Extract JSON from response
+    const extractedJSON = extractJSON(content);
+    if (!extractedJSON) {
+      if (__DEV__) {
+        console.warn('[AI] No valid JSON found in calculator response');
+      }
+      throw new Error('No valid JSON in AI response');
+    }
+
+    // Parse and return
+    const parsed = JSON.parse(extractedJSON);
+    
+    return {
+      enhancedNumericalExplanation: parsed.enhancedNumericalExplanation || '',
+      enhancedElementExplanation: parsed.enhancedElementExplanation || '',
+      enhancedBurjExplanation: parsed.enhancedBurjExplanation || '',
+      enhancedTypeInsight: parsed.enhancedTypeInsight,
+      personalizedInsight: parsed.personalizedInsight,
+      aiAssisted: true,
+    };
+
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('[AI] Calculator enhancement failed:', error);
+    }
+    
+    // Silent fallback to empty strings
+    return {
+      enhancedNumericalExplanation: '',
+      enhancedElementExplanation: '',
+      enhancedBurjExplanation: '',
+      aiAssisted: false,
+    };
+  }
+}
+
+/**
+ * Enhance Peak Windows timing guidance with AI
+ * 
+ * Phase 6.5: AI-assisted peak windows explanation
+ * 
+ * AI RULES:
+ * - Explains time segment characteristics ONLY
+ * - NEVER predicts specific outcomes
+ * - NEVER gives deterministic timing advice
+ * - Educational and reflective tone
+ * - Location and element-aware
+ * 
+ * @param request Peak Windows AI request
+ * @returns Enhanced timing explanations or fallback
+ */
+export async function enhancePeakWindowsWithAI(
+  request: PeakWindowsAIRequest
+): Promise<PeakWindowsAIResponse> {
+  try {
+    // Check capability
+    if (!ENABLE_AI_CAPABILITY || !GROQ_API_KEY) {
+      return {
+        enhancedSegmentExplanation: '',
+        enhancedActivityRecommendations: '',
+        enhancedTimingWisdom: '',
+        aiAssisted: false,
+      };
+    }
+
+    // System prompt with strict rules
+    const systemPrompt = `You are a spiritual guidance educator specializing in Islamic sacred timing wisdom.
+
+STRICT RULES:
+1. Explain time segment characteristics and general patterns ONLY
+2. NEVER predict specific outcomes or success
+3. NEVER give deterministic timing advice
+4. Keep explanations educational and reflective
+5. If user profile provided, contextualize with their element/location
+6. Use 2-3 sentences per explanation
+7. Maintain humility and avoid certainty
+8. Focus on reflection and intention, not prediction
+
+Your role: Educate about time patterns, not prescribe or predict.`;
+
+    const toneInstructions = getToneInstructions(request.tone);
+    
+    // Build user prompt
+    let userPrompt = `
+Tone: ${toneInstructions}
+
+Peak Window Analysis:
+- Time Segment: ${request.segment}
+- Time Range: ${request.timeRange.start} - ${request.timeRange.end}
+- Harmony Score: ${request.harmonyScore}/100
+- Guidance: ${request.guidance}
+`;
+
+    if (request.userElement || request.userBurj) {
+      userPrompt += `\nUser's Context:
+- Birth Element: ${request.userElement || 'Unknown'}
+- Birth Burj: ${request.userBurj || 'Unknown'}
+${request.userLocationCity ? `- Location: ${request.userLocationCity}` : ''}
+`;
+    }
+
+    userPrompt += `\nProvide:
+1. Enhanced time segment explanation (2-3 sentences about ${request.segment} characteristics)
+2. Enhanced activity recommendations (2-3 sentences suggesting general activity types)
+3. Enhanced timing wisdom (2-3 sentences about spiritual reflection during this period)
+${request.userElement || request.userBurj ? '4. Personalized insight connecting user\'s element/burj to this time window (2-3 sentences)' : ''}
+
+RETURN ONLY VALID JSON:
+{
+  "enhancedSegmentExplanation": "...",
+  "enhancedActivityRecommendations": "...",
+  "enhancedTimingWisdom": "...",
+  ${request.userElement || request.userBurj ? '"personalizedInsight": "...",' : ''}
+  "aiAssisted": true
+}
+`;
+
+    const response = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 700,
+      }),
+    });
+
+    if (!response.ok) {
+      if (__DEV__) {
+        console.warn(`[AI] Groq API error for peak windows: ${response.status}`);
+      }
+      throw new Error(`Groq API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+
+    // Extract JSON from response
+    const extractedJSON = extractJSON(content);
+    if (!extractedJSON) {
+      if (__DEV__) {
+        console.warn('[AI] No valid JSON found in peak windows response');
+      }
+      throw new Error('No valid JSON in AI response');
+    }
+
+    // Parse and return
+    const parsed = JSON.parse(extractedJSON);
+    
+    return {
+      enhancedSegmentExplanation: parsed.enhancedSegmentExplanation || '',
+      enhancedActivityRecommendations: parsed.enhancedActivityRecommendations || '',
+      enhancedTimingWisdom: parsed.enhancedTimingWisdom || '',
+      personalizedInsight: parsed.personalizedInsight,
+      aiAssisted: true,
+    };
+
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('[AI] Peak windows enhancement failed:', error);
+    }
+    
+    // Silent fallback to empty strings
+    return {
+      enhancedSegmentExplanation: '',
+      enhancedActivityRecommendations: '',
+      enhancedTimingWisdom: '',
+      aiAssisted: false,
+    };
+  }
+}
+

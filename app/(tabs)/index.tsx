@@ -25,15 +25,14 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DailyCheckInCard } from '../../components/divine-timing/DailyCheckInCard';
 import { PeakWindowsCard } from '../../components/divine-timing/PeakWindowsCard';
+import { RealTimeDailyGuidance } from '../../components/divine-timing/RealTimeDailyGuidance';
 import { ModuleCard, WidgetBar } from '../../components/home';
 import { ModuleCardProps } from '../../components/home/types';
 import { DarkTheme, Spacing, Typography } from '../../constants/DarkTheme';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useProfile } from '../../contexts/ProfileContext';
-import { getDailyCheckInSummary } from '../../services/DivineTimingStorage';
-import { DailyCheckInSummary } from '../../types/daily-checkin';
+import { DailyGuidance, getDailyGuidance } from '../../services/DailyGuidanceService';
 
 /**
  * Module configuration for primary features
@@ -88,27 +87,24 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { profile, completionStatus } = useProfile();
   
-  const [dailySummary, setDailySummary] = useState<DailyCheckInSummary>({
-    hasCheckedInToday: false,
-    streak: 0,
-  });
+  const [dailyGuidance, setDailyGuidance] = useState<DailyGuidance | null>(null);
   
   const [modulesExpanded, setModulesExpanded] = useState(false);
-
-  // Load daily check-in summary on mount and when screen focuses
-  const loadDailySummary = useCallback(async () => {
-    const summary = await getDailyCheckInSummary();
-    setDailySummary(summary);
-  }, []);
+  
+  // Load real-time daily guidance
+  const loadDailyGuidance = useCallback(async () => {
+    const guidance = await getDailyGuidance(profile);
+    setDailyGuidance(guidance);
+  }, [profile]);
   
   useEffect(() => {
-    loadDailySummary();
-  }, [loadDailySummary]);
+    loadDailyGuidance();
+  }, [loadDailyGuidance]);
   
   useFocusEffect(
     useCallback(() => {
-      loadDailySummary();
-    }, [loadDailySummary])
+      loadDailyGuidance();
+    }, [loadDailyGuidance])
   );
 
   /**
@@ -156,9 +152,31 @@ export default function HomeScreen() {
       {/* Compact Header */}
       <View style={styles.compactHeader}>
         <Text style={styles.brandName}>Asrār ✦</Text>
-        <TouchableOpacity onPress={() => router.push('/profile')}>
-          <Ionicons name="person-circle" size={28} color={DarkTheme.accent} />
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity 
+            onPress={() => router.push('/ai-settings')}
+            style={styles.headerButton}
+          >
+            <Ionicons name="sparkles" size={24} color="#6366f1" />
+          </TouchableOpacity>
+          
+          {/* Conditional Auth/Profile Button */}
+          {profile?.mode === 'account' ? (
+            // Account Mode: Show Profile Button
+            <TouchableOpacity onPress={() => router.push('/profile')}>
+              <Ionicons name="person-circle" size={28} color="#8B7355" />
+            </TouchableOpacity>
+          ) : (
+            // Guest Mode: Show Sign Up Button
+            <TouchableOpacity 
+              onPress={() => router.push('/auth')}
+              style={styles.signUpButton}
+            >
+              <Ionicons name="person-add" size={18} color="#fff" />
+              <Text style={styles.signUpText}>Sign Up</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
       
       <Text style={styles.dateLabel}>
@@ -188,9 +206,9 @@ export default function HomeScreen() {
         </TouchableOpacity>
       )}
 
-      {/* Hero: Daily Check-In Card */}
+      {/* Hero: Real-Time Daily Guidance */}
       <View style={styles.heroSection}>
-        <DailyCheckInCard summary={dailySummary} colorScheme="dark" />
+        <RealTimeDailyGuidance guidance={dailyGuidance} loading={!dailyGuidance} />
       </View>
 
       {/* Phase 7: Peak Windows Card */}
@@ -230,7 +248,7 @@ export default function HomeScreen() {
         )}
       </View>
     </View>
-  ), [t, dailySummary, modulesExpanded, completionStatus.hasDOB, profile.derived?.element, router]);
+  ), [t, modulesExpanded, completionStatus.hasDOB, profile.derived?.element, router]);
 
   /**
    * Conditionally render modules based on expansion state
@@ -300,6 +318,28 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weightBold,
     color: DarkTheme.textPrimary,
     letterSpacing: 0.5,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerButton: {
+    padding: 4,
+  },
+  signUpButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#8B7355',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  signUpText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
   },
   dateLabel: {
     fontSize: 13,

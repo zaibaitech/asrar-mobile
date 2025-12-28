@@ -19,8 +19,10 @@
 
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { documentDirectory, writeAsStringAsync } from 'expo-file-system/legacy';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
+import * as Sharing from 'expo-sharing';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
@@ -47,8 +49,10 @@ import {
     getElementNameAr,
     getPlanetaryAttributes,
 } from '@/services/ProfileDerivationService';
+import { exportProfile } from '@/services/UserProfileStorage';
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const {
     profile,
     setProfile,
@@ -222,6 +226,46 @@ export default function ProfileScreen() {
         },
       ]
     );
+  };
+  
+  const handleExportData = async () => {
+    try {
+      const jsonData = await exportProfile();
+      
+      if (!jsonData) {
+        Alert.alert('Error', 'No profile data to export');
+        return;
+      }
+      
+      // Create a filename with timestamp
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `asrar-profile-${timestamp}.json`;
+      
+      // For web/development - copy to clipboard
+      if (Platform.OS === 'web') {
+        // @ts-ignore - clipboard API exists in web
+        navigator.clipboard.writeText(jsonData);
+        Alert.alert('Success', 'Profile data copied to clipboard');
+        return;
+      }
+      
+      // For mobile - share the JSON file
+      const fileUri = `${documentDirectory}${filename}`;
+      await writeAsStringAsync(fileUri, jsonData);
+      
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri, {
+          mimeType: 'application/json',
+          dialogTitle: 'Export Profile Data',
+        });
+      } else {
+        Alert.alert('Success', 'Profile exported to: ' + fileUri);
+      }
+      
+    } catch (error) {
+      console.error('Export error:', error);
+      Alert.alert('Error', 'Failed to export profile data');
+    }
   };
   
   // ============================================================================
@@ -458,8 +502,41 @@ export default function ProfileScreen() {
           </LinearGradient>
         </TouchableOpacity>
         
+        {/* AI Settings Button */}
+        <TouchableOpacity 
+          style={styles.aiSettingsButton} 
+          onPress={() => router.push('/ai-settings')}
+        >
+          <Ionicons name="sparkles" size={20} color="#6366f1" />
+          <Text style={styles.aiSettingsButtonText}>AI Settings</Text>
+          <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
+        </TouchableOpacity>
+        
+        {/* Privacy & Data Section */}
+        <View style={styles.privacySection}>
+          <Text style={styles.privacySectionTitle}>Privacy & Data</Text>
+          
+          {/* Export Data Button */}
+          <TouchableOpacity 
+            style={styles.exportButton} 
+            onPress={handleExportData}
+          >
+            <Ionicons name="download-outline" size={20} color="#10b981" />
+            <Text style={styles.exportButtonText}>Export My Data</Text>
+            <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
+          </TouchableOpacity>
+          
+          {/* Privacy Notice */}
+          <View style={styles.privacyNoticeCard}>
+            <Ionicons name="shield-checkmark" size={16} color="#10b981" />
+            <Text style={styles.privacyNoticeText}>
+              All your data is stored locally on this device. We never send your personal information to external servers in guest mode.
+            </Text>
+          </View>
+        </View>
+        
         <TouchableOpacity style={styles.clearButton} onPress={handleClearProfile}>
-          <Text style={styles.clearButtonText}>Clear All Data</Text>
+          <Text style={styles.clearButtonText}>Delete All My Data</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -689,6 +766,73 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 8,
   },
+  aiSettingsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+  },
+  aiSettingsButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6366f1',
+    marginLeft: 8,
+    flex: 1,
+  },
+  
+  // Privacy & Data Section
+  privacySection: {
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  privacySectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: DarkTheme.textSecondary,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  exportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+  },
+  exportButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#10b981',
+    marginLeft: 8,
+    flex: 1,
+  },
+  privacyNoticeCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+    padding: 12,
+    borderRadius: 8,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.1)',
+  },
+  privacyNoticeText: {
+    flex: 1,
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+  },
+  
   clearButton: {
     padding: 16,
     alignItems: 'center',

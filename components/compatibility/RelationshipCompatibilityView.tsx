@@ -1,9 +1,12 @@
+import { useProfile } from '@/contexts/ProfileContext';
+import { enhanceCompatibilityWithAI, isAIAvailable, loadAISettings } from '@/services/AIReflectionService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { DarkTheme } from '../../constants/DarkTheme';
 import { RelationshipCompatibility } from '../../types/compatibility';
+import { AIBadge } from '../divine-timing/AIBadge';
 import { CompatibilityGauge } from './CompatibilityGauge';
 
 interface RelationshipCompatibilityViewProps {
@@ -21,6 +24,73 @@ export function RelationshipCompatibilityView({
 }: RelationshipCompatibilityViewProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'spiritual' | 'elemental' | 'planetary' | 'recommendations'>('overview');
   const isFrench = language === 'fr';
+  
+  // AI enhancement state
+  const [aiAvailable, setAiAvailable] = useState(false);
+  const [aiEnhanced, setAiEnhanced] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [enhancedSummary, setEnhancedSummary] = useState('');
+  const [enhancedSpiritualExplanation, setEnhancedSpiritualExplanation] = useState('');
+  const [enhancedElementalExplanation, setEnhancedElementalExplanation] = useState('');
+  const [enhancedPlanetaryExplanation, setEnhancedPlanetaryExplanation] = useState('');
+  const [personalizedInsight, setPersonalizedInsight] = useState('');
+  
+  const { profile } = useProfile();
+  
+  // Check if AI is available on mount
+  useEffect(() => {
+    checkAIAvailability();
+  }, []);
+  
+  const checkAIAvailability = async () => {
+    const available = await isAIAvailable();
+    setAiAvailable(available);
+  };
+  
+  const handleEnhanceWithAI = async () => {
+    if (!aiAvailable || aiEnhanced || aiLoading) return;
+    
+    setAiLoading(true);
+    
+    try {
+      const settings = await loadAISettings();
+      console.log('[Compatibility] Calling AI enhancement...');
+      const response = await enhanceCompatibilityWithAI({
+        person1Name: analysis.person1.name,
+        person2Name: analysis.person2.name,
+        person1Element: analysis.person1.element,
+        person2Element: analysis.person2.element,
+        overallScore: analysis.overallScore,
+        overallQuality: analysis.overallQuality,
+        spiritualScore: analysis.methods.spiritualDestiny.score,
+        elementalScore: analysis.methods.elementalTemperament.score,
+        planetaryScore: analysis.methods.planetaryCosmic.score,
+        userElement: profile?.derived?.element,
+        userBurj: profile?.derived?.burj,
+        tone: settings.tone,
+        language: language,
+      });
+      
+      console.log('[Compatibility] AI Response:', response);
+      
+      if (response.aiAssisted) {
+        console.log('[Compatibility] Setting enhanced content...');
+        setEnhancedSummary(response.enhancedSummary);
+        setEnhancedSpiritualExplanation(response.enhancedSpiritualExplanation);
+        setEnhancedElementalExplanation(response.enhancedElementalExplanation);
+        setEnhancedPlanetaryExplanation(response.enhancedPlanetaryExplanation);
+        setPersonalizedInsight(response.personalizedInsight || '');
+        setAiEnhanced(true);
+        console.log('[Compatibility] Enhanced state set to true');
+      } else {
+        console.log('[Compatibility] AI response indicated not assisted');
+      }
+    } catch (error) {
+      console.error('[Compatibility] AI enhancement error:', error);
+    } finally {
+      setAiLoading(false);
+    }
+  };
   
   const tabs = [
     { id: 'overview' as const, label: isFrench ? 'Vue d\'ensemble' : 'Overview', icon: 'eye' },
@@ -133,9 +203,51 @@ export function RelationshipCompatibilityView({
                 </Text>
               </View>
               <Text style={styles.summaryText}>
-                {isFrench ? analysis.summaryFrench : analysis.summary}
+                {aiEnhanced && enhancedSummary ? enhancedSummary : (isFrench ? analysis.summaryFrench : analysis.summary)}
               </Text>
+              {aiEnhanced && enhancedSummary && <AIBadge show={true} />}
             </View>
+            
+            {/* AI Enhancement Button */}
+            {aiAvailable && !aiEnhanced && (
+              <TouchableOpacity 
+                onPress={handleEnhanceWithAI}
+                activeOpacity={0.8}
+                disabled={aiLoading}
+              >
+                <LinearGradient
+                  colors={['#6366f1', '#8b5cf6']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.aiEnhanceButton}
+                >
+                  {aiLoading ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Ionicons name="sparkles" size={18} color="#fff" />
+                  )}
+                  <Text style={styles.aiEnhanceButtonText}>
+                    {aiLoading 
+                      ? (isFrench ? 'Amélioration...' : 'Enhancing...') 
+                      : (isFrench ? '✨ Personnaliser l\'Analyse' : '✨ Personalize Analysis')}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
+            
+            {/* Personalized Insight */}
+            {aiEnhanced && personalizedInsight && (
+              <View style={styles.personalizedInsightCard}>
+                <View style={styles.insightHeader}>
+                  <Ionicons name="person" size={20} color="#8b5cf6" />
+                  <Text style={styles.insightTitle}>
+                    {isFrench ? '💫 Perspective Personnelle' : '💫 Your Personal Insight'}
+                  </Text>
+                </View>
+                <Text style={styles.insightText}>{personalizedInsight}</Text>
+                <AIBadge show={true} />
+              </View>
+            )}
             
             {/* Method Scores */}
             <View style={styles.methodsGrid}>
@@ -225,10 +337,15 @@ export function RelationshipCompatibilityView({
               <View style={styles.dividerHorizontal} />
               
               <Text style={styles.detailDescription}>
-                {isFrench 
-                  ? analysis.methods.spiritualDestiny.descriptionFrench 
-                  : analysis.methods.spiritualDestiny.description}
+                {aiEnhanced && enhancedSpiritualExplanation 
+                  ? enhancedSpiritualExplanation 
+                  : (isFrench 
+                    ? analysis.methods.spiritualDestiny.descriptionFrench 
+                    : analysis.methods.spiritualDestiny.description)}
               </Text>
+              {aiEnhanced && enhancedSpiritualExplanation && (
+                <AIBadge show={true} />
+              )}
               
               <View style={styles.metadataRow}>
                 <View style={styles.metadataItem}>
@@ -277,10 +394,15 @@ export function RelationshipCompatibilityView({
               <View style={styles.dividerHorizontal} />
               
               <Text style={styles.detailDescription}>
-                {isFrench 
-                  ? analysis.methods.elementalTemperament.descriptionFrench 
-                  : analysis.methods.elementalTemperament.description}
+                {aiEnhanced && enhancedElementalExplanation 
+                  ? enhancedElementalExplanation 
+                  : (isFrench 
+                    ? analysis.methods.elementalTemperament.descriptionFrench 
+                    : analysis.methods.elementalTemperament.description)}
               </Text>
+              {aiEnhanced && enhancedElementalExplanation && (
+                <AIBadge show={true} />
+              )}
               
               <View style={styles.elementBadges}>
                 <View style={styles.elementBadge}>
@@ -327,10 +449,15 @@ export function RelationshipCompatibilityView({
               <View style={styles.dividerHorizontal} />
               
               <Text style={styles.detailDescription}>
-                {isFrench 
-                  ? analysis.methods.planetaryCosmic.descriptionFrench 
-                  : analysis.methods.planetaryCosmic.description}
+                {aiEnhanced && enhancedPlanetaryExplanation 
+                  ? enhancedPlanetaryExplanation 
+                  : (isFrench 
+                    ? analysis.methods.planetaryCosmic.descriptionFrench 
+                    : analysis.methods.planetaryCosmic.description)}
               </Text>
+              {aiEnhanced && enhancedPlanetaryExplanation && (
+                <AIBadge show={true} />
+              )}
               
               <View style={styles.planetaryRow}>
                 <View style={styles.planetCard}>
@@ -726,4 +853,49 @@ const styles = StyleSheet.create({
     color: DarkTheme.textSecondary,
     lineHeight: 20,
   },
+  // AI Enhancement Styles
+  aiEnhanceButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    gap: 8,
+    elevation: 3,
+    shadowColor: '#6366f1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  aiEnhanceButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  personalizedInsightCard: {
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 12,
+    padding: 16,
+    gap: 8,
+  },
+  insightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  insightTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: DarkTheme.textPrimary,
+  },
+  insightText: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
 });
+

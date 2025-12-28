@@ -3,6 +3,7 @@ import { Tabs, useRouter, useSegments } from 'expo-router';
 import React from 'react';
 
 import ResponsiveAppHeader from '@/components/AppHeader';
+import DrawerMenu from '@/components/DrawerMenu';
 import HistoryModal from '@/components/istikhara/HistoryModal';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -23,6 +24,7 @@ function CustomHeader() {
   const router = useRouter();
   const segments = useSegments();
   const [showHistory, setShowHistory] = React.useState(false);
+  const [showDrawer, setShowDrawer] = React.useState(false);
 
   // Hide header on name-destiny screens (they have their own DestinyHeader)
   const isNameDestinyScreen = segments.includes('name-destiny');
@@ -50,10 +52,11 @@ function CustomHeader() {
         onLanguageChange={(lang) => setLanguage(lang.toLowerCase() as 'en' | 'fr' | 'ar')}
         onProfilePress={() => router.push('/modal')}
         onHistoryPress={() => setShowHistory(true)}
-        onMenuPress={() => {
-          // Open menu/drawer when implemented
-          console.log('Menu pressed - Navigation drawer coming soon');
-        }}
+        onMenuPress={() => setShowDrawer(true)}
+      />
+      <DrawerMenu
+        visible={showDrawer}
+        onClose={() => setShowDrawer(false)}
       />
       <HistoryModal
         visible={showHistory}

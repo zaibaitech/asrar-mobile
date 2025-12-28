@@ -11,6 +11,8 @@
  */
 
 import { DarkTheme, ElementAccents } from '@/constants/DarkTheme';
+import { useProfile } from '@/contexts/ProfileContext';
+import { enhancePeakWindowsWithAI, isAIAvailable, loadAISettings } from '@/services/AIReflectionService';
 import { loadCheckIns, loadUserTimingProfile } from '@/services/CheckInStorage';
 import { getPlanetPositions } from '@/services/EphemerisService';
 import {
@@ -29,11 +31,14 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
+    Modal,
+    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
+import { AIBadge } from './AIBadge';
 
 /**
  * Peak Windows Card Props
@@ -51,13 +56,70 @@ export function PeakWindowsCard({
   userBurjRuler,
 }: PeakWindowsCardProps) {
   const router = useRouter();
+  const { profile: userProfile } = useProfile();
   const [windows, setWindows] = useState<PeakWindow[]>([]);
   const [loading, setLoading] = useState(true);
   const [dataQuality, setDataQuality] = useState<'full' | 'partial' | 'minimal'>('minimal');
   
+  // AI enhancement state
+  const [aiAvailable, setAiAvailable] = useState(false);
+  const [selectedWindow, setSelectedWindow] = useState<PeakWindow | null>(null);
+  const [aiEnhanced, setAiEnhanced] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [enhancedSegment, setEnhancedSegment] = useState('');
+  const [enhancedActivities, setEnhancedActivities] = useState('');
+  const [enhancedWisdom, setEnhancedWisdom] = useState('');
+  const [personalizedInsight, setPersonalizedInsight] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  
   useEffect(() => {
     loadPeakWindows();
+    checkAIAvailability();
   }, []);
+  
+  const checkAIAvailability = async () => {
+    const available = await isAIAvailable();
+    setAiAvailable(available);
+  };
+  
+  const handleEnhanceWindow = async (window: PeakWindow) => {
+    if (!aiAvailable || aiLoading) return;
+    
+    setSelectedWindow(window);
+    setShowModal(true);
+    setAiLoading(true);
+    setAiEnhanced(false);
+    
+    try {
+      const settings = await loadAISettings();
+      const response = await enhancePeakWindowsWithAI({
+        segment: window.segment,
+        harmonyScore: window.harmonyScore,
+        guidance: window.guidance,
+        timeRange: {
+          start: window.startTime,
+          end: window.endTime,
+        },
+        userElement: userProfile?.derived?.element,
+        userBurj: userProfile?.derived?.burj,
+        userLocationCity: userProfile?.location?.label,
+        tone: settings.tone,
+        language: 'en',
+      });
+      
+      if (response.aiAssisted) {
+        setEnhancedSegment(response.enhancedSegmentExplanation);
+        setEnhancedActivities(response.enhancedActivityRecommendations);
+        setEnhancedWisdom(response.enhancedTimingWisdom);
+        setPersonalizedInsight(response.personalizedInsight || '');
+        setAiEnhanced(true);
+      }
+    } catch (error) {
+      // Silent fallback
+    } finally {
+      setAiLoading(false);
+    }
+  };
   
   /**
    * Load and compute today's peak windows
@@ -89,6 +151,7 @@ export function PeakWindowsCard({
         segment: TimeSegment;
         score: number;
         guidance: string;
+        explanationBullets: string[];
       }> = [];
       
       for (const segment of allSegments) {
@@ -117,6 +180,7 @@ export function PeakWindowsCard({
             segment,
             score: result.score,
             guidance: getQuickGuidance(result.score),
+            explanationBullets: result.explanationBullets,
           });
           
           // Track data quality
@@ -144,6 +208,7 @@ export function PeakWindowsCard({
           harmonyScore: w.score,
           guidance: w.guidance,
           rank: index + 1,
+          explanationBullets: w.explanationBullets,
         };
       });
       
@@ -237,6 +302,36 @@ export function PeakWindowsCard({
         )}
       </View>
       
+      {/* Personalization Info */}
+      {(userProfile?.derived?.element || userProfile?.derived?.burj) && (
+        <View style={styles.personalizationInfo}>
+          <Text style={styles.personalizationLabel}>
+            <Ionicons name="person" size={12} color="#8B7355" /> Personalized for you:
+          </Text>
+          <View style={styles.personalizationTags}>
+            {userProfile?.derived?.element && (
+              <View style={styles.tag}>
+                <Text style={styles.tagText}>
+                  {userElement.charAt(0).toUpperCase() + userElement.slice(1)} Element
+                </Text>
+              </View>
+            )}
+            {userProfile?.derived?.burj && (
+              <View style={styles.tag}>
+                <Text style={styles.tagText}>
+                  {userProfile.derived.burj} {userBurjRuler ? `(${userBurjRuler})` : ''}
+                </Text>
+              </View>
+            )}
+            {windows.length > 0 && windows[0].harmonyScore > 60 && (
+              <View style={styles.tag}>
+                <Text style={styles.tagText}>Your Patterns</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      )}
+      
       {/* Windows List */}
       {windows.length === 0 ? (
         <View style={styles.emptyContainer}>
@@ -272,6 +367,20 @@ export function PeakWindowsCard({
                 <Text style={styles.guidance} numberOfLines={2}>
                   {window.guidance}
                 </Text>
+                
+                {/* Explanation Bullets */}
+                {window.explanationBullets && window.explanationBullets.length > 0 && (
+                  <View style={styles.explanationContainer}>
+                    {window.explanationBullets.slice(0, 2).map((bullet, idx) => (
+                      <View key={idx} style={styles.explanationBullet}>
+                        <Text style={styles.bulletDot}>•</Text>
+                        <Text style={styles.bulletText} numberOfLines={1}>
+                          {bullet}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
               </View>
               
               {/* Harmony Score */}
@@ -281,10 +390,120 @@ export function PeakWindowsCard({
                 </Text>
                 <Text style={styles.scoreLabel}>harmony</Text>
               </View>
+              
+              {/* AI Enhancement Button */}
+              {aiAvailable && (
+                <TouchableOpacity
+                  style={styles.aiButton}
+                  onPress={() => handleEnhanceWindow(window)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="sparkles" size={16} color="#6366f1" />
+                </TouchableOpacity>
+              )}
             </View>
           ))}
         </View>
       )}
+      
+      {/* AI Enhancement Modal */}
+      <Modal
+        visible={showModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {selectedWindow && (
+                  <>
+                    {getSegmentIcon(selectedWindow.segment)} {formatSegmentName(selectedWindow.segment)}
+                  </>
+                )}
+              </Text>
+              <TouchableOpacity onPress={() => setShowModal(false)}>
+                <Ionicons name="close" size={24} color={DarkTheme.textPrimary} />
+              </TouchableOpacity>
+            </View>
+            
+            {/* Modal Content */}
+            <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
+              {aiLoading ? (
+                <View style={styles.aiLoadingContainer}>
+                  <ActivityIndicator size="large" color="#6366f1" />
+                  <Text style={styles.aiLoadingText}>Personalizing guidance...</Text>
+                </View>
+              ) : aiEnhanced ? (
+                <>
+                  {/* Enhanced Segment Explanation */}
+                  {enhancedSegment && (
+                    <View style={styles.enhancedSection}>
+                      <View style={styles.sectionHeader}>
+                        <Ionicons name="time" size={20} color="#6366f1" />
+                        <Text style={styles.sectionTitle}>Time Window Insight</Text>
+                      </View>
+                      <Text style={styles.sectionText}>{enhancedSegment}</Text>
+                      <View style={{ alignSelf: 'flex-start', marginTop: 8 }}>
+                        <AIBadge show={true} />
+                      </View>
+                    </View>
+                  )}
+                  
+                  {/* Enhanced Activities */}
+                  {enhancedActivities && (
+                    <View style={styles.enhancedSection}>
+                      <View style={styles.sectionHeader}>
+                        <Ionicons name="list" size={20} color="#6366f1" />
+                        <Text style={styles.sectionTitle}>Activity Suggestions</Text>
+                      </View>
+                      <Text style={styles.sectionText}>{enhancedActivities}</Text>
+                      <View style={{ alignSelf: 'flex-start', marginTop: 8 }}>
+                        <AIBadge show={true} />
+                      </View>
+                    </View>
+                  )}
+                  
+                  {/* Enhanced Wisdom */}
+                  {enhancedWisdom && (
+                    <View style={styles.enhancedSection}>
+                      <View style={styles.sectionHeader}>
+                        <Ionicons name="book" size={20} color="#6366f1" />
+                        <Text style={styles.sectionTitle}>Timing Wisdom</Text>
+                      </View>
+                      <Text style={styles.sectionText}>{enhancedWisdom}</Text>
+                      <View style={{ alignSelf: 'flex-start', marginTop: 8 }}>
+                        <AIBadge show={true} />
+                      </View>
+                    </View>
+                  )}
+                  
+                  {/* Personalized Insight */}
+                  {personalizedInsight && (
+                    <View style={styles.personalizedSection}>
+                      <View style={styles.sectionHeader}>
+                        <Ionicons name="person" size={20} color="#8b5cf6" />
+                        <Text style={styles.sectionTitle}>💫 Your Personal Context</Text>
+                      </View>
+                      <Text style={styles.sectionText}>{personalizedInsight}</Text>
+                      <View style={{ alignSelf: 'flex-start', marginTop: 8 }}>
+                        <AIBadge show={true} />
+                      </View>
+                    </View>
+                  )}
+                </>
+              ) : (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyIcon}>✨</Text>
+                  <Text style={styles.emptyText}>AI enhancement unavailable</Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
       
       {/* Action Buttons */}
       <View style={styles.actions}>
@@ -460,5 +679,140 @@ const styles = StyleSheet.create({
     color: DarkTheme.textTertiary,
     textAlign: 'center',
     marginTop: 12,
+  },
+  
+  // Personalization Info Styles
+  personalizationInfo: {
+    backgroundColor: 'rgba(139, 115, 85, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 115, 85, 0.2)',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  personalizationLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#8B7355',
+    marginBottom: 8,
+  },
+  personalizationTags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  tag: {
+    backgroundColor: 'rgba(139, 115, 85, 0.15)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 115, 85, 0.3)',
+  },
+  tagText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#8B7355',
+  },
+  explanationContainer: {
+    marginTop: 8,
+    gap: 4,
+  },
+  explanationBullet: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 6,
+  },
+  bulletDot: {
+    fontSize: 10,
+    color: '#8B7355',
+    marginTop: 2,
+  },
+  bulletText: {
+    flex: 1,
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    lineHeight: 16,
+  },
+  
+  // AI Enhancement Styles
+  aiButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: DarkTheme.cardBackground,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 16,
+    maxHeight: '85%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: DarkTheme.borderSubtle,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+  },
+  modalScroll: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  aiLoadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    gap: 12,
+  },
+  aiLoadingText: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+  },
+  enhancedSection: {
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  },
+  personalizedSection: {
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: DarkTheme.textPrimary,
+  },
+  sectionText: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
   },
 });

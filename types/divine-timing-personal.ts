@@ -323,6 +323,9 @@ export interface PeakWindow {
   
   /** Ranking among today's windows (1 = best) */
   rank: number;
+  
+  /** Explanation bullets showing what contributes to the score */
+  explanationBullets?: string[];
 }
 
 /**

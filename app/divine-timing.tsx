@@ -14,6 +14,7 @@ import { DivineTimingQuestionCard } from '@/components/divine-timing/DivineTimin
 import { ManualVerseSelector } from '@/components/divine-timing/ManualVerseSelector';
 import { QuranReflectionCard } from '@/components/divine-timing/QuranReflectionCard';
 import Colors from '@/constants/Colors';
+import { useProfile } from '@/contexts/ProfileContext';
 import {
     generateDivineTimingGuidance,
 } from '@/services/DivineTimingGuidanceService';
@@ -100,6 +101,7 @@ const INTENTION_TO_CATEGORY: Record<IntentionCategory, GuidanceCategory> = {
 export default function DivineTimingScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
+  const { profile } = useProfile();
   
   // Phase 1 & 2 state
   const [selectedIntention, setSelectedIntention] = useState<IntentionCategory | null>(null);
@@ -262,7 +264,14 @@ export default function DivineTimingScreen() {
   ) => {
     if (!result || !selectedIntention) return;
     
-    // Generate guidance
+    // Prepare user profile data for personalization
+    const userProfileData = profile.derived ? {
+      nameAr: profile.nameAr,
+      element: profile.derived.element,
+      burj: profile.derived.burj,
+    } : undefined;
+    
+    // Generate guidance with profile personalization
     const guidance = generateDivineTimingGuidance({
       questionText: question,
       category,
@@ -270,6 +279,7 @@ export default function DivineTimingScreen() {
       urgency,
       divineTimingResult: result,
       reflectionVerse: reflection || undefined,
+      userProfile: userProfileData,
     });
     
     setGuidanceResponse(guidance);
