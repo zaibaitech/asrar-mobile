@@ -39,6 +39,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DarkTheme } from '@/constants/DarkTheme';
 import { useProfile } from '@/contexts/ProfileContext';
+import { signOut } from '@/services/AuthService';
 import {
     getCurrentLocation,
     requestLocationPermission,
@@ -266,6 +267,34 @@ export default function ProfileScreen() {
       console.error('Export error:', error);
       Alert.alert('Error', 'Failed to export profile data');
     }
+  };
+  
+  const handleSignOut = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out? Your local data will remain on this device.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+              await setProfile({ mode: 'guest' });
+              Alert.alert('Success', 'You have been signed out');
+              router.replace('/(tabs)');
+            } catch (error) {
+              console.error('Sign out error:', error);
+              Alert.alert('Error', 'Failed to sign out. Please try again.');
+            }
+          },
+        },
+      ]
+    );
   };
   
   // ============================================================================
@@ -525,6 +554,18 @@ export default function ProfileScreen() {
             <Text style={styles.exportButtonText}>Export My Data</Text>
             <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
           </TouchableOpacity>
+          
+          {/* Sign Out Button (only show if in account mode) */}
+          {profile.mode === 'account' && (
+            <TouchableOpacity 
+              style={styles.signOutButton} 
+              onPress={handleSignOut}
+            >
+              <Ionicons name="log-out-outline" size={20} color="#ef4444" />
+              <Text style={styles.signOutButtonText}>Sign Out</Text>
+              <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
+            </TouchableOpacity>
+          )}
           
           {/* Privacy Notice */}
           <View style={styles.privacyNoticeCard}>
@@ -813,6 +854,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#10b981',
+    marginLeft: 8,
+    flex: 1,
+  },
+  signOutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+  },
+  signOutButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ef4444',
     marginLeft: 8,
     flex: 1,
   },
