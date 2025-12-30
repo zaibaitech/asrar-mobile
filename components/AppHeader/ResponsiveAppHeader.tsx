@@ -13,6 +13,7 @@ interface ResponsiveAppHeaderProps {
   showLanguageSelector?: boolean;
   backgroundColor?: string;
   tabletBreakpoint?: number; // Default: 768px
+  showProfileIcon?: boolean; // New: Show profile icon in header
 }
 
 /**
@@ -33,14 +34,15 @@ interface ResponsiveAppHeaderProps {
  */
 export default function ResponsiveAppHeader({
   tabletBreakpoint = 768,
+  showProfileIcon = true,
   ...props
 }: ResponsiveAppHeaderProps) {
   const { width } = useWindowDimensions();
   const isTablet = width >= tabletBreakpoint;
 
   if (isTablet) {
-    return <AppHeaderTablet {...props} />;
+    return <AppHeaderTablet {...props} showProfileIcon={showProfileIcon} />;
   }
 
-  return <AppHeader {...props} />;
+  return <AppHeader {...props} showProfileIcon={showProfileIcon} />;
 }

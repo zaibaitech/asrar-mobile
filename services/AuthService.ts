@@ -25,6 +25,34 @@ const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 const SECURE_TOKEN_KEY = 'asrar.auth.token';
 const SECURE_REFRESH_KEY = 'asrar.auth.refresh';
 
+// Sends a new confirmation email when Supabase reports an existing user
+async function resendEmailConfirmation(email: string): Promise<void> {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    return;
+  }
+
+  try {
+    await fetch(`${SUPABASE_URL}/auth/v1/resend`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: 'asrar://auth/callback',
+        },
+      }),
+    });
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[AuthService] Resend confirmation error:', error);
+    }
+  }
+}
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -180,11 +208,25 @@ export async function signUp(data: SignUpData): Promise<{
     const result = await response.json();
     
     if (!response.ok) {
+      const errorCode = result.error_code || '';
+      const errorMessage = result.error_description || result.message || '';
+
+      if (errorCode === 'email_exists' || errorMessage === 'User already registered') {
+        await resendEmailConfirmation(data.email);
+        return {
+          session: null,
+          error: {
+            code: 'EMAIL_CONFIRMATION_REQUIRED',
+            message: 'We just sent you a new confirmation email. Please verify your address before signing in.',
+          },
+        };
+      }
+
       return {
         session: null,
         error: {
-          code: result.error_code || 'SIGNUP_FAILED',
-          message: result.error_description || result.message || 'Sign up failed',
+          code: errorCode || 'SIGNUP_FAILED',
+          message: errorMessage || 'Sign up failed',
         },
       };
     }
@@ -268,11 +310,25 @@ export async function signIn(data: SignInData): Promise<{
     const result = await response.json();
     
     if (!response.ok) {
+      const errorCode = result.error_code || '';
+      const errorMessage = result.error_description || result.message || '';
+
+      if (errorCode === 'email_not_confirmed' || errorMessage === 'Email not confirmed') {
+        await resendEmailConfirmation(data.email);
+        return {
+          session: null,
+          error: {
+            code: 'EMAIL_CONFIRMATION_REQUIRED',
+            message: 'Please confirm your email address before signing in. We have sent another link to your inbox.',
+          },
+        };
+      }
+
       return {
         session: null,
         error: {
-          code: result.error_code || 'SIGNIN_FAILED',
-          message: result.error_description || result.message || 'Sign in failed',
+          code: errorCode || 'SIGNIN_FAILED',
+          message: errorMessage || 'Sign in failed',
         },
       };
     }

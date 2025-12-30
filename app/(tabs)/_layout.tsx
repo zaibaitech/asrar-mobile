@@ -50,7 +50,7 @@ function CustomHeader() {
       <ResponsiveAppHeader
         currentLanguage={language === 'en' ? 'EN' : 'FR'}
         onLanguageChange={(lang) => setLanguage(lang.toLowerCase() as 'en' | 'fr' | 'ar')}
-        onProfilePress={() => router.push('/modal')}
+        onProfilePress={() => router.push('/profile')}
         onHistoryPress={() => setShowHistory(true)}
         onMenuPress={() => setShowDrawer(true)}
       />

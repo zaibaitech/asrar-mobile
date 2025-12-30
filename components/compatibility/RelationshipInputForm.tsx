@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
-import { Alert, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { DarkTheme } from '../../constants/DarkTheme';
 import { useProfile } from '../../contexts/ProfileContext';
+import ArabicKeyboard from '../istikhara/ArabicKeyboard';
 
 interface RelationshipInputFormProps {
   onCalculate: (
@@ -13,9 +14,20 @@ interface RelationshipInputFormProps {
     person2Arabic: string
   ) => void;
   language?: 'en' | 'fr' | 'ar';
+  system?: 'maghribi' | 'mashriqi';
+  onSystemChange?: (system: 'maghribi' | 'mashriqi') => void;
+  isLoading?: boolean;
+  errorMessage?: string | null;
 }
 
-export function RelationshipInputForm({ onCalculate, language = 'en' }: RelationshipInputFormProps) {
+export function RelationshipInputForm({ 
+  onCalculate, 
+  language = 'en',
+  system = 'maghribi',
+  onSystemChange,
+  isLoading = false,
+  errorMessage = null
+}: RelationshipInputFormProps) {
   const isFrench = language === 'fr';
   const { profile } = useProfile();
   
@@ -23,6 +35,15 @@ export function RelationshipInputForm({ onCalculate, language = 'en' }: Relation
   const [person1Arabic, setPerson1Arabic] = useState('');
   const [person2Name, setPerson2Name] = useState('');
   const [person2Arabic, setPerson2Arabic] = useState('');
+  
+  // Keyboard state
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [activeInput, setActiveInput] = useState<'person1' | 'person2' | null>(null);
+  const [cursorPosition, setCursorPosition] = useState(0);
+  
+  // Refs for text inputs
+  const person1InputRef = useRef<TextInput>(null);
+  const person2InputRef = useRef<TextInput>(null);
   
   // Auto-fill Person 1 from profile if available
   useEffect(() => {
@@ -34,14 +55,51 @@ export function RelationshipInputForm({ onCalculate, language = 'en' }: Relation
     }
   }, [profile.nameAr, profile.nameLatin]);
   
+  // Keyboard handlers
+  const handleKeyPress = (key: string) => {
+    if (activeInput === 'person1') {
+      const newText = person1Arabic.slice(0, cursorPosition) + key + person1Arabic.slice(cursorPosition);
+      setPerson1Arabic(newText);
+      setCursorPosition(cursorPosition + 1);
+    } else if (activeInput === 'person2') {
+      const newText = person2Arabic.slice(0, cursorPosition) + key + person2Arabic.slice(cursorPosition);
+      setPerson2Arabic(newText);
+      setCursorPosition(cursorPosition + 1);
+    }
+  };
+  
+  const handleBackspace = () => {
+    if (cursorPosition === 0) return;
+    
+    if (activeInput === 'person1') {
+      const newText = person1Arabic.slice(0, cursorPosition - 1) + person1Arabic.slice(cursorPosition);
+      setPerson1Arabic(newText);
+      setCursorPosition(cursorPosition - 1);
+    } else if (activeInput === 'person2') {
+      const newText = person2Arabic.slice(0, cursorPosition - 1) + person2Arabic.slice(cursorPosition);
+      setPerson2Arabic(newText);
+      setCursorPosition(cursorPosition - 1);
+    }
+  };
+  
+  const handleSpace = () => {
+    handleKeyPress(' ');
+  };
+  
+  const openKeyboard = (inputType: 'person1' | 'person2') => {
+    setActiveInput(inputType);
+    if (inputType === 'person1') {
+      setCursorPosition(person1Arabic.length);
+    } else {
+      setCursorPosition(person2Arabic.length);
+    }
+    setShowKeyboard(true);
+  };
+  
   const handleSubmit = () => {
+    if (isLoading) return;
+    
     if (!person1Arabic.trim() || !person2Arabic.trim()) {
-      Alert.alert(
-        isFrench ? 'Erreur' : 'Error',
-        isFrench 
-          ? 'Veuillez entrer les noms arabes pour les deux personnes' 
-          : 'Please enter Arabic names for both people'
-      );
       return;
     }
     
@@ -61,7 +119,10 @@ export function RelationshipInputForm({ onCalculate, language = 'en' }: Relation
     >
       <ScrollView 
         style={styles.container}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[
+          styles.contentContainer,
+          showKeyboard && styles.contentContainerWithKeyboard
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         
@@ -84,6 +145,55 @@ export function RelationshipInputForm({ onCalculate, language = 'en' }: Relation
               : 'Calculate compatibility using traditional Islamic numerology'}
           </Text>
         </View>
+        
+        {/* System Selector */}
+        {onSystemChange && (
+          <View style={styles.systemSelector}>
+            <Text style={styles.systemLabel}>
+              {isFrench ? 'Système Abjad' : 'Abjad System'}
+            </Text>
+            <View style={styles.systemButtons}>
+              <TouchableOpacity
+                style={[styles.systemButton, system === 'maghribi' && styles.systemButtonActive]}
+                onPress={() => onSystemChange('maghribi')}
+                disabled={isLoading}
+              >
+                <Text style={[styles.systemButtonText, system === 'maghribi' && styles.systemButtonTextActive]}>
+                  {isFrench ? 'Maghribi' : 'Maghribi'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.systemButton, system === 'mashriqi' && styles.systemButtonActive]}
+                onPress={() => onSystemChange('mashriqi')}
+                disabled={isLoading}
+              >
+                <Text style={[styles.systemButtonText, system === 'mashriqi' && styles.systemButtonTextActive]}>
+                  {isFrench ? 'Mashriqi' : 'Mashriqi'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+        
+        {/* Error Message */}
+        {errorMessage && (
+          <View style={styles.errorContainer}>
+            <Ionicons name="alert-circle" size={20} color="#ef4444" />
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        )}
+        
+        {/* Validation Warning */}
+        {!person1Arabic.trim() || !person2Arabic.trim() ? (
+          <View style={styles.warningContainer}>
+            <Ionicons name="information-circle" size={18} color="#f59e0b" />
+            <Text style={styles.warningText}>
+              {isFrench 
+                ? 'Les noms arabes sont requis pour les deux personnes'
+                : 'Arabic names are required for both people'}
+            </Text>
+          </View>
+        ) : null}
         
         {/* Person 1 */}
         <LinearGradient
@@ -115,17 +225,31 @@ export function RelationshipInputForm({ onCalculate, language = 'en' }: Relation
           </View>
           
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>
-              {isFrench ? 'Nom Arabe (Requis)' : 'Arabic Name (Required)'} 
-              <Text style={styles.required}> *</Text>
-            </Text>
+            <View style={styles.labelRow}>
+              <Text style={styles.label}>
+                {isFrench ? 'Nom Arabe (Requis)' : 'Arabic Name (Required)'} 
+                <Text style={styles.required}> *</Text>
+              </Text>
+              <TouchableOpacity 
+                style={styles.keyboardButton}
+                onPress={() => openKeyboard('person1')}
+              >
+                <Text style={styles.keyboardButtonText}>⌨️ {isFrench ? 'Clavier' : 'Keyboard'}</Text>
+              </TouchableOpacity>
+            </View>
             <View style={styles.inputContainer}>
               <TextInput
+                ref={person1InputRef}
                 value={person1Arabic}
-                onChangeText={setPerson1Arabic}
+                onChangeText={(text) => {
+                  setPerson1Arabic(text);
+                  setCursorPosition(text.length);
+                }}
+                onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
                 placeholder="أحمد"
                 style={[styles.input, styles.rtlInput]}
                 placeholderTextColor={DarkTheme.textMuted}
+                editable={!showKeyboard || activeInput !== 'person1'}
               />
             </View>
           </View>
@@ -168,17 +292,31 @@ export function RelationshipInputForm({ onCalculate, language = 'en' }: Relation
           </View>
           
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>
-              {isFrench ? 'Nom Arabe (Requis)' : 'Arabic Name (Required)'} 
-              <Text style={styles.required}> *</Text>
-            </Text>
+            <View style={styles.labelRow}>
+              <Text style={styles.label}>
+                {isFrench ? 'Nom Arabe (Requis)' : 'Arabic Name (Required)'} 
+                <Text style={styles.required}> *</Text>
+              </Text>
+              <TouchableOpacity 
+                style={styles.keyboardButton}
+                onPress={() => openKeyboard('person2')}
+              >
+                <Text style={styles.keyboardButtonText}>⌨️ {isFrench ? 'Clavier' : 'Keyboard'}</Text>
+              </TouchableOpacity>
+            </View>
             <View style={styles.inputContainer}>
               <TextInput
+                ref={person2InputRef}
                 value={person2Arabic}
-                onChangeText={setPerson2Arabic}
+                onChangeText={(text) => {
+                  setPerson2Arabic(text);
+                  setCursorPosition(text.length);
+                }}
+                onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
                 placeholder="فاطمة"
                 style={[styles.input, styles.rtlInput]}
                 placeholderTextColor={DarkTheme.textMuted}
+                editable={!showKeyboard || activeInput !== 'person2'}
               />
             </View>
           </View>
@@ -189,21 +327,39 @@ export function RelationshipInputForm({ onCalculate, language = 'en' }: Relation
           onPress={handleSubmit}
           activeOpacity={0.8}
           style={styles.calculateButtonContainer}
+          disabled={isLoading || !person1Arabic.trim() || !person2Arabic.trim()}
         >
           <LinearGradient
-            colors={['#ec4899', '#f43f5e']}
+            colors={isLoading || !person1Arabic.trim() || !person2Arabic.trim() 
+              ? ['#64748b', '#475569'] 
+              : ['#ec4899', '#f43f5e']}
             style={styles.calculateButton}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
-            <Ionicons name="calculator" size={20} color="#fff" />
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Ionicons name="calculator" size={20} color="#fff" />
+            )}
             <Text style={styles.calculateButtonText}>
-              {isFrench ? 'Calculer la Compatibilité' : 'Calculate Compatibility'}
+              {isLoading 
+                ? (isFrench ? 'Calcul...' : 'Calculating...') 
+                : (isFrench ? 'Calculer la Compatibilité' : 'Calculate Compatibility')}
             </Text>
           </LinearGradient>
         </TouchableOpacity>
         
       </ScrollView>
+      
+      {/* Arabic Keyboard */}
+      <ArabicKeyboard
+        visible={showKeyboard}
+        onClose={() => setShowKeyboard(false)}
+        onKeyPress={handleKeyPress}
+        onBackspace={handleBackspace}
+        onSpace={handleSpace}
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -217,6 +373,9 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 20,
     paddingBottom: 100, // Extra padding to avoid bottom navigation
+  },
+  contentContainerWithKeyboard: {
+    paddingBottom: 420, // Extra padding when keyboard is visible (keyboard height ~400px + padding)
   },
   header: {
     alignItems: 'center',
@@ -245,6 +404,74 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     paddingHorizontal: 20,
   },
+  systemSelector: {
+    gap: 8,
+  },
+  systemLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: DarkTheme.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  systemButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  systemButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    alignItems: 'center',
+  },
+  systemButtonActive: {
+    backgroundColor: 'rgba(236, 72, 153, 0.2)',
+    borderColor: '#ec4899',
+  },
+  systemButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: DarkTheme.textSecondary,
+  },
+  systemButtonTextActive: {
+    color: '#ec4899',
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+    borderRadius: 12,
+    padding: 12,
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#ef4444',
+    lineHeight: 18,
+  },
+  warningContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+    borderRadius: 12,
+    padding: 12,
+  },
+  warningText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#f59e0b',
+    lineHeight: 18,
+  },
   personContainer: {
     padding: 16,
     borderRadius: 16,
@@ -272,6 +499,11 @@ const styles = StyleSheet.create({
   inputGroup: {
     gap: 8,
   },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   label: {
     fontSize: 13,
     fontWeight: '500',
@@ -279,6 +511,19 @@ const styles = StyleSheet.create({
   },
   required: {
     color: '#f43f5e',
+  },
+  keyboardButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: 'rgba(236, 72, 153, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.3)',
+  },
+  keyboardButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#ec4899',
   },
   inputContainer: {
     backgroundColor: DarkTheme.cardBackground,

@@ -7,32 +7,41 @@
  * - Focus on daily alignment, not overwhelming features
  * 
  * Structure:
- * 1. Compact Header (40% reduced)
- * 2. Hero: Daily Check-In Card
- * 3. Quick Access: 2×2 grid (always visible)
- * 4. Spiritual Modules: Collapsible (reduced scroll)
+ * 1. Compact Header (minimal padding)
+ * 2. Daily Overview Section:
+ *    - Daily Guidance (full-width primary)
+ *    - Action Pills (inline buttons)
+ *    - Next Prayer + Today's Blessing (2-column row)
+ * 3. Quick Access: 2×2 grid shortcuts
+ * 4. Spiritual Modules: Collapsible
  * 
  * Performance Optimizations:
  * - Memoized components
- * - Collapsible modules reduce initial render
+ * - Reduced vertical spacing
  * - Optimized animations
  */
 
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PeakWindowsCard } from '../../components/divine-timing/PeakWindowsCard';
 import { RealTimeDailyGuidance } from '../../components/divine-timing/RealTimeDailyGuidance';
-import { ModuleCard, WidgetBar } from '../../components/home';
+import { ModuleCard } from '../../components/home';
 import { ModuleCardProps } from '../../components/home/types';
-import { DarkTheme, Spacing, Typography } from '../../constants/DarkTheme';
+import { DarkTheme, ElementAccents, Spacing, Typography } from '../../constants/DarkTheme';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useProfile } from '../../contexts/ProfileContext';
 import { DailyGuidance, getDailyGuidance } from '../../services/DailyGuidanceService';
+import { getTodayBlessing, type DayBlessing } from '../../services/DayBlessingService';
+import {
+    fetchPrayerTimes,
+    getNextPrayer,
+    getTimeUntilPrayer
+} from '../../services/api/prayerTimes';
 
 /**
  * Module configuration for primary features
@@ -88,8 +97,15 @@ export default function HomeScreen() {
   const { profile, completionStatus } = useProfile();
   
   const [dailyGuidance, setDailyGuidance] = useState<DailyGuidance | null>(null);
-  
   const [modulesExpanded, setModulesExpanded] = useState(false);
+  
+  // Prayer times state
+  const [nextPrayer, setNextPrayer] = useState<{ name: string; nameArabic: string; time: string } | null>(null);
+  const [prayerCountdown, setPrayerCountdown] = useState('');
+  const [prayerLoading, setPrayerLoading] = useState(true);
+  
+  // Today's blessing state
+  const [todayBlessing, setTodayBlessing] = useState<DayBlessing | null>(null);
   
   // Load real-time daily guidance
   const loadDailyGuidance = useCallback(async () => {
@@ -97,14 +113,64 @@ export default function HomeScreen() {
     setDailyGuidance(guidance);
   }, [profile]);
   
+  // Load prayer times
+  const loadPrayerTimes = useCallback(async () => {
+    try {
+      setPrayerLoading(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      
+      if (status === 'granted') {
+        const location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+        
+        const { latitude, longitude } = location.coords;
+        const data = await fetchPrayerTimes(latitude, longitude);
+        const next = getNextPrayer(data.timings);
+        setNextPrayer(next);
+      }
+    } catch (error) {
+      console.error('Error loading prayer times:', error);
+    } finally {
+      setPrayerLoading(false);
+    }
+  }, []);
+  
+  // Load today's blessing
+  const loadTodayBlessing = useCallback(() => {
+    const blessing = getTodayBlessing();
+    setTodayBlessing(blessing);
+  }, []);
+  
   useEffect(() => {
     loadDailyGuidance();
-  }, [loadDailyGuidance]);
+    loadPrayerTimes();
+    loadTodayBlessing();
+  }, [loadDailyGuidance, loadPrayerTimes, loadTodayBlessing]);
+  
+  // Update countdown every minute
+  useEffect(() => {
+    if (!nextPrayer?.time) return;
+
+    const updateCountdown = () => {
+      const { hours, minutes } = getTimeUntilPrayer(nextPrayer.time);
+      if (hours > 0) {
+        setPrayerCountdown(`${hours}h ${minutes}m`);
+      } else {
+        setPrayerCountdown(`${minutes}m`);
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000);
+    return () => clearInterval(interval);
+  }, [nextPrayer]);
   
   useFocusEffect(
     useCallback(() => {
       loadDailyGuidance();
-    }, [loadDailyGuidance])
+      loadPrayerTimes();
+    }, [loadDailyGuidance, loadPrayerTimes])
   );
 
   /**
@@ -149,40 +215,6 @@ export default function HomeScreen() {
    */
   const ListHeaderComponent = useMemo(() => (
     <View style={styles.header}>
-      {/* Compact Header */}
-      <View style={styles.compactHeader}>
-        <Text style={styles.brandName}>Asrār ✦</Text>
-        <View style={styles.headerButtons}>
-          <TouchableOpacity 
-            onPress={() => router.push('/ai-settings')}
-            style={styles.headerButton}
-          >
-            <Ionicons name="sparkles" size={24} color="#6366f1" />
-          </TouchableOpacity>
-          
-          {/* Conditional Auth/Profile Button */}
-          {profile?.mode === 'account' ? (
-            // Account Mode: Show Profile Button
-            <TouchableOpacity onPress={() => router.push('/profile')}>
-              <Ionicons name="person-circle" size={28} color="#8B7355" />
-            </TouchableOpacity>
-          ) : (
-            // Guest Mode: Show Sign Up Button
-            <TouchableOpacity 
-              onPress={() => router.push('/auth')}
-              style={styles.signUpButton}
-            >
-              <Ionicons name="person-add" size={18} color="#fff" />
-              <Text style={styles.signUpText}>Sign Up</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-      
-      <Text style={styles.dateLabel}>
-        {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-      </Text>
-      
       {/* Profile Completion Banner */}
       {!completionStatus.hasDOB && (
         <TouchableOpacity 
@@ -206,16 +238,101 @@ export default function HomeScreen() {
         </TouchableOpacity>
       )}
 
-      {/* Hero: Real-Time Daily Guidance */}
-      <View style={styles.heroSection}>
-        <RealTimeDailyGuidance guidance={dailyGuidance} loading={!dailyGuidance} />
+      {/* Daily Overview Section - Moved Up */}
+      <View style={styles.dailyOverview}>
+        {/* Daily Guidance - Full Width Primary Card */}
+        <RealTimeDailyGuidance 
+          guidance={dailyGuidance} 
+          loading={!dailyGuidance} 
+          compact 
+          showDayLabel
+          dayLabel={new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+        />
+        
+        {/* 2. Action Pills - Inline Buttons */}
+        <View style={styles.actionPills}>
+          <TouchableOpacity 
+            style={styles.pillButton}
+            onPress={() => router.push('/daily-checkin')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="checkmark-circle-outline" size={16} color="#10b981" />
+            <Text style={styles.pillText}>Check In Now</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.pillButton}
+            onPress={() => router.push('/divine-timing-insights')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="trending-up-outline" size={16} color="#6366f1" />
+            <Text style={styles.pillText}>View Insights</Text>
+          </TouchableOpacity>
+        </View>
+        
+        {/* 3. Next Prayer + Today's Blessing - Two Column Row */}
+        <View style={styles.twoColumnRow}>
+          {/* Next Prayer Card */}
+          <TouchableOpacity 
+            style={styles.compactCard}
+            onPress={() => router.push('/prayer-times')}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.cardGradient, { backgroundColor: 'rgba(16, 185, 129, 0.08)' }]}>
+              <Text style={styles.compactLabel}>Next Prayer</Text>
+              {prayerLoading ? (
+                <ActivityIndicator size="small" color="#10b981" />
+              ) : nextPrayer ? (
+                <>
+                  <Text style={styles.compactPrimary}>{nextPrayer.nameArabic}</Text>
+                  <Text style={[styles.compactSecondary, { color: '#10b981' }]}>
+                    {nextPrayer.time}
+                  </Text>
+                  {prayerCountdown && (
+                    <Text style={styles.compactTertiary}>in {prayerCountdown}</Text>
+                  )}
+                </>
+              ) : (
+                <Text style={styles.compactTertiary}>Tap to set location</Text>
+              )}
+            </View>
+          </TouchableOpacity>
+          
+          {/* Today's Blessing Card */}
+          <TouchableOpacity 
+            style={styles.compactCard}
+            onPress={() => router.push('/divine-timing')}
+            activeOpacity={0.7}
+          >
+            {todayBlessing && (
+              <View style={[
+                styles.cardGradient,
+                { backgroundColor: `${ElementAccents[todayBlessing.element].primary}15` }
+              ]}>
+                <Text style={styles.compactLabel}>Today's Blessing</Text>
+                <Text style={styles.compactPrimary}>{todayBlessing.dayNameArabic}</Text>
+                <Text style={[
+                  styles.compactSecondary,
+                  { color: ElementAccents[todayBlessing.element].primary }
+                ]}>
+                  {todayBlessing.emoji} {todayBlessing.planetArabic}
+                </Text>
+                <View style={[
+                  styles.miniElementBadge,
+                  { backgroundColor: ElementAccents[todayBlessing.element].glow }
+                ]}>
+                  <Text style={[
+                    styles.miniElementText,
+                    { color: ElementAccents[todayBlessing.element].primary }
+                  ]}>
+                    {todayBlessing.element.toUpperCase()}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
-
-      {/* Phase 7: Peak Windows Card */}
-      <PeakWindowsCard userElement={profile.derived?.element || 'fire'} />
-
-      {/* Quick Access: 2×2 Grid */}
-      <WidgetBar />
 
       {/* Spiritual Modules: Collapsible */}
       <View style={styles.modulesSection}>
@@ -237,18 +354,91 @@ export default function HomeScreen() {
             {MODULES.map((module) => (
               <TouchableOpacity
                 key={module.title}
-                style={styles.moduleIcon}
+                style={styles.moduleIconContainer}
                 onPress={() => handleModulePress(module.title)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.moduleIconEmoji}>{module.icon}</Text>
+                <View style={styles.moduleIcon}>
+                  <Text style={styles.moduleIconEmoji}>{module.icon}</Text>
+                </View>
+                <Text style={styles.moduleIconLabel} numberOfLines={1}>
+                  {module.title}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
         )}
       </View>
+
+      {/* Quick Access Grid - 2×2 Shortcuts */}
+      <View style={styles.quickAccessSection}>
+        <Text style={styles.sectionTitle}>Quick Access</Text>
+        
+        <View style={styles.quickGrid}>
+          {/* Row 1 */}
+          <View style={styles.quickRow}>
+            <TouchableOpacity 
+              style={styles.quickTile}
+              onPress={() => router.push('/prayer-times')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.quickTileContent}>
+                <Text style={styles.quickIcon}>🕌</Text>
+                <Text style={styles.quickLabel}>Prayer Times</Text>
+              </View>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.quickTile}
+              onPress={() => router.push('/daily-reminder')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.quickTileContent}>
+                <Text style={styles.quickIcon}>🔔</Text>
+                <Text style={styles.quickLabel}>Daily Reminder</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          
+          {/* Row 2 */}
+          <View style={styles.quickRow}>
+            <TouchableOpacity 
+              style={styles.quickTile}
+              onPress={() => router.push('/dhikr-counter')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.quickTileContent}>
+                <Text style={styles.quickIcon}>📿</Text>
+                <Text style={styles.quickLabel}>Dhikr Counter</Text>
+              </View>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.quickTile}
+              onPress={() => router.push('/calculator')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.quickTileContent}>
+                <Text style={styles.quickIcon}>🧮</Text>
+                <Text style={styles.quickLabel}>Calculator</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
     </View>
-  ), [t, modulesExpanded, completionStatus.hasDOB, profile.derived?.element, router]);
+  ), [
+    router,
+    profile,
+    completionStatus.hasDOB,
+    dailyGuidance,
+    nextPrayer,
+    prayerLoading,
+    prayerCountdown,
+    todayBlessing,
+    modulesExpanded,
+    handleModulePress,
+  ]);
 
   /**
    * Conditionally render modules based on expansion state
@@ -302,58 +492,13 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
-    paddingTop: Spacing.sm,
-  },
-  
-  // Compact Header (40% reduced)
-  compactHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.screenPadding,
-    paddingBottom: Spacing.xs,
-  },
-  brandName: {
-    fontSize: 20,
-    fontWeight: Typography.weightBold,
-    color: DarkTheme.textPrimary,
-    letterSpacing: 0.5,
-  },
-  headerButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  headerButton: {
-    padding: 4,
-  },
-  signUpButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#8B7355',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  signUpText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  dateLabel: {
-    fontSize: 13,
-    fontWeight: Typography.weightRegular,
-    color: DarkTheme.textSecondary,
-    opacity: 0.7,
-    paddingHorizontal: Spacing.screenPadding,
-    marginBottom: Spacing.sm,
+    paddingTop: 0, // No padding - content starts immediately
   },
   
   // Profile Banner
   profileBanner: {
     marginHorizontal: Spacing.screenPadding,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -377,10 +522,123 @@ const styles = StyleSheet.create({
     color: DarkTheme.textSecondary,
   },
   
-  // Hero Section
-  heroSection: {
+  // Daily Overview Section - Moved Up
+  dailyOverview: {
     paddingHorizontal: Spacing.screenPadding,
-    marginBottom: Spacing.md,
+    paddingTop: Spacing.xs, // Minimal top padding
+    gap: Spacing.sm,
+  },
+  
+  // Action Pills
+  actionPills: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  pillButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  pillText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: DarkTheme.textPrimary,
+  },
+  
+  // Two Column Row (Prayer + Blessing)
+  twoColumnRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  compactCard: {
+    flex: 1,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    overflow: 'hidden',
+  },
+  cardGradient: {
+    padding: 12, // Reduced internal padding
+    alignItems: 'center',
+    minHeight: 120, // Equal height for both cards
+    justifyContent: 'center',
+  },
+  compactLabel: {
+    fontSize: 11,
+    fontWeight: Typography.weightMedium,
+    color: DarkTheme.textTertiary,
+    marginBottom: 6,
+  },
+  compactPrimary: {
+    fontSize: 16,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    marginBottom: 4,
+  },
+  compactSecondary: {
+    fontSize: 14,
+    fontWeight: Typography.weightSemibold,
+    marginBottom: 4,
+  },
+  compactTertiary: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+  },
+  miniElementBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginTop: 4,
+  },
+  miniElementText: {
+    fontSize: 9,
+    fontWeight: Typography.weightBold,
+    letterSpacing: 0.5,
+  },
+  
+  // Quick Access Grid
+  quickAccessSection: {
+    marginTop: Spacing.md,
+  },
+  quickGrid: {
+    paddingHorizontal: Spacing.screenPadding,
+    gap: Spacing.sm,
+  },
+  quickRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  quickTile: {
+    flex: 1,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    overflow: 'hidden',
+  },
+  quickTileContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+  },
+  quickIcon: {
+    fontSize: 28,
+    marginBottom: 6,
+  },
+  quickLabel: {
+    fontSize: 11,
+    fontWeight: Typography.weightMedium,
+    color: DarkTheme.textPrimary,
+    textAlign: 'center',
   },
   
   // Modules Section
@@ -407,6 +665,10 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     flexWrap: 'wrap',
   },
+  moduleIconContainer: {
+    alignItems: 'center',
+    width: 70,
+  },
   moduleIcon: {
     width: 56,
     height: 56,
@@ -416,8 +678,15 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 4,
   },
   moduleIconEmoji: {
     fontSize: 28,
+  },
+  moduleIconLabel: {
+    fontSize: 10,
+    fontWeight: Typography.weightMedium,
+    color: DarkTheme.textSecondary,
+    textAlign: 'center',
   },
 });

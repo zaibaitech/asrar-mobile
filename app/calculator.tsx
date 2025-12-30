@@ -169,7 +169,7 @@ export default function CalculatorScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'ʿIlm al-Asrār Calculator', headerShown: true }} />
+      <Stack.Screen options={{ title: 'Calculator', headerShown: true }} />
       <KeyboardAvoidingView 
         style={[styles.container, { backgroundColor: colors.background }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

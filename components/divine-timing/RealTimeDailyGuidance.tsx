@@ -16,9 +16,18 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 interface RealTimeDailyGuidanceProps {
   guidance: DailyGuidance | null;
   loading?: boolean;
+  compact?: boolean;
+  showDayLabel?: boolean;
+  dayLabel?: string;
 }
 
-export function RealTimeDailyGuidance({ guidance, loading }: RealTimeDailyGuidanceProps) {
+export function RealTimeDailyGuidance({ 
+  guidance, 
+  loading, 
+  compact = false,
+  showDayLabel = false,
+  dayLabel = ''
+}: RealTimeDailyGuidanceProps) {
   const router = useRouter();
   
   const getStatusColor = (quality?: string) => {
@@ -95,13 +104,16 @@ export function RealTimeDailyGuidance({ guidance, loading }: RealTimeDailyGuidan
     >
       <LinearGradient
         colors={[`${statusColor}15`, `${statusColor}05`]}
-        style={styles.gradient}
+        style={compact ? styles.gradientCompact : styles.gradient}
       >
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.titleRow}>
             <Ionicons name="compass-outline" size={28} color={statusColor} />
-            <View>
+            <View style={styles.titleContainer}>
+              {showDayLabel && dayLabel && (
+                <Text style={styles.dayBadge}>{dayLabel}</Text>
+              )}
               <Text style={styles.title}>Daily Guidance</Text>
               <Text style={[styles.subtitle, { color: statusColor }]}>
                 {statusLabel}
@@ -130,7 +142,7 @@ export function RealTimeDailyGuidance({ guidance, loading }: RealTimeDailyGuidan
         </View>
         
         {/* Message */}
-        <Text style={styles.message} numberOfLines={3}>
+        <Text style={compact ? styles.messageCompact : styles.message} numberOfLines={3}>
           {guidance.message}
         </Text>
         
@@ -158,8 +170,8 @@ export function RealTimeDailyGuidance({ guidance, loading }: RealTimeDailyGuidan
         
         {/* Footer */}
         <View style={styles.footer}>
-          <Ionicons name="information-circle-outline" size={14} color={DarkTheme.textTertiary} />
-          <Text style={styles.footerText}>
+          <Ionicons name="information-circle-outline" size={12} color={DarkTheme.textTertiary} />
+          <Text style={compact ? styles.footerTextCompact : styles.footerText}>
             For reflection only • Not a ruling
           </Text>
         </View>
@@ -184,6 +196,10 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 14,
   },
+  gradientCompact: {
+    padding: 14,
+    gap: 10,
+  },
   
   // Header
   header: {
@@ -193,6 +209,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  titleContainer: {
+    flex: 1,
+  },
+  dayBadge: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: DarkTheme.textTertiary,
+    opacity: 0.6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 2,
   },
   title: {
     fontSize: 18,
@@ -241,6 +269,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: DarkTheme.textPrimary,
   },
+  messageCompact: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: DarkTheme.textPrimary,
+  },
   
   // Activity
   activityRow: {
@@ -286,6 +319,11 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 11,
     color: DarkTheme.textTertiary,
+  },
+  footerTextCompact: {
+    fontSize: 10,
+    color: DarkTheme.textTertiary,
+    opacity: 0.8,
   },
   
   // Loading

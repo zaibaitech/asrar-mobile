@@ -26,6 +26,7 @@ interface AppHeaderProps {
   backgroundColor?: string;
   variant?: 'default' | 'centered' | 'minimal'; // New: Choose header style
   showSubtitle?: boolean; // New: Optional subtitle
+  showProfileIcon?: boolean; // New: Show profile icon in header
 }
 
 export default function AppHeader({
@@ -39,6 +40,7 @@ export default function AppHeader({
   backgroundColor = '#FFFFFF',
   variant = 'centered', // Default to new centered style
   showSubtitle = false,
+  showProfileIcon = true,
 }: AppHeaderProps) {
   const isSmallScreen = SCREEN_WIDTH < 350;
   const insets = useSafeAreaInsets();
@@ -132,6 +134,19 @@ export default function AppHeader({
                     </Text>
                   </TouchableOpacity>
                 </View>
+              )}
+              
+              {/* Profile Icon */}
+              {showProfileIcon && (
+                <TouchableOpacity
+                  style={styles.profileIconButton}
+                  onPress={onProfilePress}
+                  accessibilityLabel="Profile"
+                  accessibilityRole="button"
+                  activeOpacity={0.7}
+                >
+                  <User size={18} color="rgba(139, 115, 85, 0.9)" strokeWidth={2} />
+                </TouchableOpacity>
               )}
             </View>
           )}
@@ -393,6 +408,17 @@ const styles = StyleSheet.create({
 
   languageTextMinimalActive: {
     color: '#FFFFFF',
+  },
+
+  profileIconButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(139, 115, 85, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 115, 85, 0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   // ==================== DEFAULT VARIANT ====================

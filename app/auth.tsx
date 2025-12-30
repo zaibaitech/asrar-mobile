@@ -120,6 +120,26 @@ export default function AuthScreen() {
           pathname: '/email-verification' as any,
           params: { email }
         });
+      } else if (result.error?.message?.includes('User already registered') || 
+                 result.error?.message?.includes('already been registered')) {
+        // ✅ UNVERIFIED USER - Supabase resends confirmation email automatically
+        Alert.alert(
+          'Check Your Email',
+          'This email is registered but not verified yet. We just sent you a new confirmation email. Please check your inbox and spam folder.',
+          [
+            {
+              text: 'Go to Verification',
+              onPress: () => router.push({
+                pathname: '/email-verification' as any,
+                params: { email }
+              }),
+            },
+            {
+              text: 'OK',
+              style: 'cancel'
+            }
+          ]
+        );
       } else {
         // ❌ ACTUAL ERROR - Only show error for real failures
         const errorMessage = getErrorMessage(result.error?.code || result.error?.message || '');
