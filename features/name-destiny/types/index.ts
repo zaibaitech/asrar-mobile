@@ -4,6 +4,7 @@
  */
 
 import { BurjData, ElementData } from '../constants/elements';
+import { DivineResonanceResult } from '../services/divineResonance';
 
 export interface NameDestinyResult {
   // Input names
@@ -28,6 +29,9 @@ export interface NameDestinyResult {
     ar: string;
     fr: string;
   };
+  
+  // Divine Name Resonance
+  divineResonance?: DivineResonanceResult;
   
   // Metadata
   timestamp?: number;

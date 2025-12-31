@@ -3,28 +3,29 @@
  * Mobile Implementation - Expo Go 54
  */
 
-import React, { useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
-  Pressable,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ArabicKeyboard from '@/components/istikhara/ArabicKeyboard';
-import { buildDestiny } from '../services/nameDestinyCalculator';
-import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI } from '../constants/abjadMaps';
-import { NameDestinyResult } from '../types';
-import { useAbjad } from '../contexts/AbjadContext';
 import { DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useRef, useState } from 'react';
+import {
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { DivineResonanceCard } from '../components/DivineResonanceCard';
+import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI } from '../constants/abjadMaps';
+import { useAbjad } from '../contexts/AbjadContext';
+import { buildDestiny } from '../services/nameDestinyCalculator';
+import { NameDestinyResult } from '../types';
 
 type ReadingType = 'explore' | 'personal';
 
@@ -354,6 +355,13 @@ export default function NameDestinyHomeScreen() {
                 <Text style={styles.hourValue}>{result.hour.name}</Text>
                 <Text style={styles.hourArabic}>{result.hour.ar}</Text>
               </View>
+
+              {/* Divine Resonance */}
+              {result.divineResonance && (
+                <View style={styles.divineResonanceSection}>
+                  <DivineResonanceCard resonance={result.divineResonance} />
+                </View>
+              )}
             </View>
           )}
 
@@ -740,6 +748,9 @@ const styles = StyleSheet.create({
     fontSize: Typography.h3,
     color: ElementAccents.water.secondary,
     marginTop: 4,
+  },
+  divineResonanceSection: {
+    marginTop: Spacing.cardMargin,
   },
   bottomSpacer: {
     height: 20,

@@ -15,6 +15,7 @@ import {
 import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI } from '../constants/abjadMaps';
 import { BURUJ, ELEMENTS } from '../constants/elements';
 import { NameDestinyResult, PlanetaryHour } from '../types';
+import { computeDivineResonance } from './divineResonance';
 
 /**
  * Calculate digital root (Ṣaghīr) of a number using shared logic
@@ -167,6 +168,16 @@ export function buildDestiny(
   // Calculate burj's ruling planet day (e.g., Scorpio -> Mars -> Tuesday)
   const burjDay = getPlanetaryDay(burj.planet);
 
+  // Calculate Divine Name Resonance for the person's name
+  let divineResonance;
+  try {
+    divineResonance = computeDivineResonance(sanitizedPerson, abjad);
+  } catch (error) {
+    // If divine resonance calculation fails, continue without it
+    console.warn('[NameDestiny] Divine resonance calculation failed:', error);
+    divineResonance = undefined;
+  }
+
   return {
     personName: coreResult.personName,
     motherName: coreResult.motherName || undefined,
@@ -180,6 +191,7 @@ export function buildDestiny(
     burjDay,
     tabIndex,
     burjIndex,
+    divineResonance,
     timestamp: Date.now(),
     abjadSystem: abjad === ABJAD_MASHRIQI ? 'mashriqi' : 'maghribi',
   };

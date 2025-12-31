@@ -17,6 +17,7 @@ import {
 import { QuranResonanceCard } from '@/components/quran/QuranResonanceCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
+import { DivineResonanceCard } from '@/features/name-destiny/components';
 import type { NameDestinyResult } from '@/features/name-destiny/types';
 import { InputType, UnderstandingLevel } from '@/features/name-destiny/types/enums';
 import { generateKeyTakeaways } from '@/features/name-destiny/utils/takeawayGenerator';
@@ -510,6 +511,27 @@ export default function ResultsScreen() {
               </View>
             )}
           </View>
+
+          {/* Divine Name Resonance */}
+          {result.divineResonance && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                {language === 'ar'
+                  ? 'رنين الاسم الإلهي'
+                  : language === 'fr'
+                  ? 'Résonance du Nom Divin'
+                  : 'Divine Name Resonance'}
+              </Text>
+              <Text style={styles.sectionExplainer}>
+                {language === 'ar'
+                  ? 'الاسم الإلهي الذي يتردد صداه مع اسمك'
+                  : language === 'fr'
+                  ? 'Le Nom Divin qui résonne avec votre nom'
+                  : 'The Divine Name that resonates with your name'}
+              </Text>
+              <DivineResonanceCard resonance={result.divineResonance} />
+            </View>
+          )}
 
           {/* 5) Elemental Composition with Dominance Summary */}
           <View style={styles.section}>
