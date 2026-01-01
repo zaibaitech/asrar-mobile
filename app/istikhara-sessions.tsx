@@ -1,333 +1,152 @@
 /**
- * Istikhārah Sessions List
- * ========================
- * View all active and completed istikhārah sessions
+ * Guided Istikhārah - Main Screen
+ * ================================
+ * Introduction to authentic Istikhārah prayer with access to complete guide
  */
 
+import ResponsiveAppHeader from '@/components/AppHeader';
+import BottomTabBar from '@/components/BottomTabBar';
 import Colors from '@/constants/Colors';
-import {
-    closeIstikharaSession,
-    deleteIstikharaSession,
-    getActiveSessions,
-    loadIstikharaSessions,
-} from '@/services/GuidedIstikharaStorage';
-import { GuidedIstikharaSession } from '@/types/guided-istikhara';
 import { Ionicons } from '@expo/vector-icons';
-import { router, useFocusEffect } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import { router, Stack } from 'expo-router';
+import React, { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
+    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
     useColorScheme,
+    View,
 } from 'react-native';
 
 export default function IstikharaSessionsScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
-  
-  const [loading, setLoading] = useState(true);
-  const [sessions, setSessions] = useState<GuidedIstikharaSession[]>([]);
-  
-  useFocusEffect(
-    useCallback(() => {
-      loadSessions();
-    }, [])
-  );
-  
-  const loadSessions = async () => {
-    try {
-      setLoading(true);
-      const data = await loadIstikharaSessions();
-      setSessions(data);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to load sessions.');
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const handleCloseSession = async (sessionId: string) => {
-    Alert.alert(
-      'Close Session',
-      'Are you sure you want to mark this session as complete? You can still view it later.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Close',
-          style: 'default',
-          onPress: async () => {
-            try {
-              await closeIstikharaSession(sessionId);
-              await loadSessions();
-              Alert.alert('Success', 'Session marked as complete.');
-            } catch (error) {
-              Alert.alert('Error', 'Failed to close session.');
-            }
-          },
-        },
-      ]
-    );
-  };
-  
-  const handleDeleteSession = async (sessionId: string) => {
-    Alert.alert(
-      'Delete Session',
-      'Are you sure? This will permanently delete this session and all reflections.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteIstikharaSession(sessionId);
-              await loadSessions();
-              Alert.alert('Success', 'Session deleted.');
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete session.');
-            }
-          },
-        },
-      ]
-    );
-  };
-  
-  const handleNewSession = () => {
-    const canStartNew = async () => {
-      const active = await getActiveSessions();
-      if (active.length >= 5) {
-        Alert.alert(
-          'Session Limit',
-          'You can have up to 5 active sessions. Please complete or delete an existing session first.',
-          [{ text: 'OK' }]
-        );
-        return false;
-      }
-      return true;
-    };
-    
-    canStartNew().then((allowed) => {
-      if (allowed) {
-        router.push('/istikhara-preparation');
-      }
-    });
-  };
-  
-  const activeSessions = sessions.filter((s) => !s.closedAt);
-  const completedSessions = sessions.filter((s) => s.closedAt);
-  
-  if (loading) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      </View>
-    );
-  }
+  const [language, setLanguage] = useState<'en' | 'fr'>('en');
   
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.card }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>
-            🕊️ Istikhārah Sessions
-          </Text>
-          <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-            {activeSessions.length} active · {completedSessions.length} completed
-          </Text>
-        </View>
-      </View>
+    <>
+      <Stack.Screen 
+        options={{
+          headerShown: false,
+        }}
+      />
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <ResponsiveAppHeader
+          currentLanguage={language === 'en' ? 'EN' : 'FR'}
+          onLanguageChange={(lang) => setLanguage(lang.toLowerCase() as 'en' | 'fr')}
+          onProfilePress={() => router.push('/profile')}
+          onMenuPress={() => router.push('/(tabs)/two')}
+        />
       
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* New Session Button */}
-        <TouchableOpacity
-          style={[styles.newSessionButton, { backgroundColor: colors.primary }]}
-          onPress={handleNewSession}
-        >
-          <Ionicons name="add-circle" size={22} color="#fff" />
-          <Text style={styles.newSessionButtonText}>Start New Istikhārah Session</Text>
-        </TouchableOpacity>
-        
-        {/* Disclaimer */}
-        <View style={[styles.disclaimerCard, { backgroundColor: '#fee2e2' }]}>
-          <Ionicons name="alert-circle" size={18} color="#dc2626" />
-          <Text style={[styles.disclaimerText, { color: '#7f1d1d' }]}>
-            These sessions support your reflection journey. They do not provide verdicts or authoritative interpretations.
+        {/* Hero Introduction */}
+        <View style={[styles.heroCard, { backgroundColor: colors.card }]}>
+          <View style={styles.heroIcon}>
+            <Ionicons name="moon" size={32} color="#a78bfa" />
+          </View>
+          <Text style={[styles.heroTitle, { color: colors.text }]}>
+            Ṣalāt al-Istikhārah
           </Text>
-        </View>
-        
-        {/* Active Sessions */}
-        {activeSessions.length > 0 && (
-          <>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Active Sessions
-            </Text>
-            
-            {activeSessions.map((session) => (
-              <TouchableOpacity
-                key={session.id}
-                style={[styles.sessionCard, { backgroundColor: colors.card }]}
-                onPress={() => router.push(`/istikhara-reflection/${session.id}`)}
-              >
-                <View style={styles.sessionHeader}>
-                  <View style={styles.sessionIcon}>
-                    <Ionicons name="timer-outline" size={20} color={colors.primary} />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.sessionTitle, { color: colors.text }]} numberOfLines={2}>
-                      {session.decisionText}
-                    </Text>
-                    <Text style={[styles.sessionDate, { color: colors.textSecondary }]}>
-                      Started {new Date(session.createdAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                    </Text>
-                  </View>
-                </View>
-                
-                <View style={styles.sessionStats}>
-                  <View style={[styles.statBadge, { backgroundColor: '#dbeafe' }]}>
-                    <Ionicons name="book-outline" size={14} color="#1e40af" />
-                    <Text style={[styles.statText, { color: '#1e40af' }]}>
-                      {session.reflections.length} reflections
-                    </Text>
-                  </View>
-                  
-                  {session.timingSnapshot && (
-                    <View style={[styles.statBadge, { backgroundColor: '#fef3c7' }]}>
-                      <Text style={[styles.statText, { color: '#92400e' }]}>
-                        {session.timingSnapshot.timingQuality}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-                
-                <View style={styles.sessionActions}>
-                  <TouchableOpacity
-                    style={[styles.actionButton, { borderColor: colors.border }]}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      handleCloseSession(session.id);
-                    }}
-                  >
-                    <Ionicons name="checkmark-done" size={16} color={colors.text} />
-                    <Text style={[styles.actionButtonText, { color: colors.text }]}>
-                      Complete
-                    </Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={[styles.actionButton, { borderColor: '#dc2626' }]}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      handleDeleteSession(session.id);
-                    }}
-                  >
-                    <Ionicons name="trash-outline" size={16} color="#dc2626" />
-                    <Text style={[styles.actionButtonText, { color: '#dc2626' }]}>
-                      Delete
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </>
-        )}
-        
-        {/* Completed Sessions */}
-        {completedSessions.length > 0 && (
-          <>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Completed Sessions
-            </Text>
-            
-            {completedSessions.map((session) => (
-              <TouchableOpacity
-                key={session.id}
-                style={[
-                  styles.sessionCard,
-                  { backgroundColor: colors.card, opacity: 0.8 },
-                ]}
-                onPress={() => router.push(`/istikhara-reflection/${session.id}`)}
-              >
-                <View style={styles.sessionHeader}>
-                  <View style={styles.sessionIcon}>
-                    <Ionicons name="checkmark-circle" size={20} color="#10b981" />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.sessionTitle, { color: colors.text }]} numberOfLines={2}>
-                      {session.decisionText}
-                    </Text>
-                    <Text style={[styles.sessionDate, { color: colors.textSecondary }]}>
-                      Completed {session.closedAt
-                        ? new Date(session.closedAt).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                          })
-                        : 'Unknown'}
-                    </Text>
-                  </View>
-                </View>
-                
-                <View style={styles.sessionStats}>
-                  <View style={[styles.statBadge, { backgroundColor: '#d1fae5' }]}>
-                    <Ionicons name="book-outline" size={14} color="#047857" />
-                    <Text style={[styles.statText, { color: '#047857' }]}>
-                      {session.reflections.length} reflections
-                    </Text>
-                  </View>
-                </View>
-                
-                <TouchableOpacity
-                  style={[styles.deleteOnlyButton, { borderColor: '#dc2626' }]}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleDeleteSession(session.id);
-                  }}
-                >
-                  <Ionicons name="trash-outline" size={16} color="#dc2626" />
-                  <Text style={[styles.actionButtonText, { color: '#dc2626' }]}>
-                    Delete
-                  </Text>
-                </TouchableOpacity>
-              </TouchableOpacity>
-            ))}
-          </>
-        )}
-        
-        {/* Empty State */}
-        {sessions.length === 0 && (
-          <View style={styles.emptyState}>
-            <Ionicons name="leaf-outline" size={64} color={colors.textSecondary} />
-            <Text style={[styles.emptyTitle, { color: colors.text }]}>
-              No Sessions Yet
-            </Text>
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-              Start a new istikhārah preparation session to begin your reflection journey.
+          <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
+            The Prayer of Seeking Guidance - a Sunnah practice to seek Allah's guidance when making important decisions
+          </Text>
+          <View style={styles.heroHadith}>
+            <Ionicons name="bookmarks" size={16} color="#fbbf24" />
+            <Text style={[styles.heroHadithText, { color: colors.textSecondary }]}>
+              "When one of you is concerned about a matter, let him pray two rak'ahs..."
             </Text>
           </View>
-        )}
+          <Text style={[styles.heroReference, { color: colors.textTertiary }]}>
+            — Sahih al-Bukhari 1162
+          </Text>
+        </View>
+
+        {/* Primary Action - Prayer Guide */}
+        <View style={styles.primarySection}>
+          <Text style={[styles.sectionLabel, { color: colors.text }]}>
+            📖 LEARN THE AUTHENTIC METHOD
+          </Text>
+          <TouchableOpacity
+            style={[styles.prayerGuideButton, { backgroundColor: '#dcfce7', borderColor: '#16a34a' }]}
+            onPress={() => router.push('/istikhara-prayer-guide')}
+          >
+            <View style={styles.prayerGuideContent}>
+              <View style={styles.prayerGuideIcon}>
+                <Ionicons name="book" size={28} color="#16a34a" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.prayerGuideTitle, { color: '#15803d' }]}>
+                  Complete Prayer Guide
+                </Text>
+                <Text style={[styles.prayerGuideSubtitle, { color: '#166534' }]}>
+                  Step-by-step instructions • Authentic dua • Prerequisites • Post-prayer guidance
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#16a34a" />
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Additional Information */}
+        <View style={[styles.infoCard, { backgroundColor: '#fef3c7', borderColor: '#f59e0b' }]}>
+          <Ionicons name="bulb" size={18} color="#b45309" />
+          <Text style={[styles.infoText, { color: '#78350f' }]}>
+            Istikhārah is performed when facing an important decision. The prayer consists of 2 rak'ahs followed by a specific supplication taught by the Prophet Muhammad ﷺ.
+          </Text>
+        </View>
+
+        {/* When to Perform */}
+        <View style={styles.whenCard}>
+          <Text style={[styles.whenTitle, { color: colors.text }]}>
+            When to Perform Istikhārah
+          </Text>
+          <View style={styles.whenList}>
+            <View style={styles.whenItem}>
+              <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+              <Text style={[styles.whenItemText, { color: colors.textSecondary }]}>
+                Marriage or important relationships
+              </Text>
+            </View>
+            <View style={styles.whenItem}>
+              <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+              <Text style={[styles.whenItemText, { color: colors.textSecondary }]}>
+                Career decisions or job changes
+              </Text>
+            </View>
+            <View style={styles.whenItem}>
+              <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+              <Text style={[styles.whenItemText, { color: colors.textSecondary }]}>
+                Major purchases or investments
+              </Text>
+            </View>
+            <View style={styles.whenItem}>
+              <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+              <Text style={[styles.whenItemText, { color: colors.textSecondary }]}>
+                Travel or relocation decisions
+              </Text>
+            </View>
+            <View style={styles.whenItem}>
+              <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+              <Text style={[styles.whenItemText, { color: colors.textSecondary }]}>
+                Any permissible matter requiring guidance
+              </Text>
+            </View>
+          </View>
+        </View>
         
         {/* Bottom Padding */}
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+      
+      <BottomTabBar />
+      </SafeAreaView>
+    </>
   );
 }
 
@@ -335,158 +154,123 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    gap: 16,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerContent: {
-    flex: 1,
-    gap: 4,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     padding: 20,
-    gap: 16,
+    gap: 20,
   },
-  newSessionButton: {
-    flexDirection: 'row',
+  heroCard: {
+    padding: 24,
+    borderRadius: 20,
+    alignItems: 'center',
+    gap: 12,
+  },
+  heroIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    padding: 16,
-    borderRadius: 12,
+    backgroundColor: 'rgba(167, 139, 250, 0.15)',
+    marginBottom: 8,
   },
-  newSessionButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  heroTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  heroSubtitle: {
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  heroHadith: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 8,
+  },
+  heroHadithText: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    lineHeight: 19,
+    flex: 1,
+  },
+  heroReference: {
+    fontSize: 12,
     fontWeight: '600',
   },
-  disclaimerCard: {
+  primarySection: {
+    gap: 12,
+  },
+  infoCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,
     padding: 14,
     borderRadius: 12,
+    borderWidth: 1.5,
   },
-  disclaimerText: {
+  infoText: {
     flex: 1,
     fontSize: 13,
     lineHeight: 19,
     fontWeight: '500',
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 8,
+  whenCard: {
+    gap: 16,
   },
-  sessionCard: {
-    padding: 16,
-    borderRadius: 16,
+  whenTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  whenList: {
     gap: 12,
   },
-  sessionHeader: {
+  whenItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
   },
-  sessionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.05)',
-  },
-  sessionTitle: {
+  whenItemText: {
     fontSize: 15,
-    fontWeight: '600',
     lineHeight: 21,
-  },
-  sessionDate: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  sessionStats: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  statBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  statText: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  sessionActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  actionButton: {
     flex: 1,
+  },
+  prayerGuideButton: {
+    borderRadius: 16,
+    borderWidth: 2,
+    padding: 18,
+  },
+  prayerGuideContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1.5,
+    gap: 14,
   },
-  actionButtonText: {
+  prayerGuideIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(22, 163, 74, 0.15)',
+  },
+  prayerGuideTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  prayerGuideSubtitle: {
     fontSize: 13,
+    lineHeight: 18,
     fontWeight: '500',
   },
-  deleteOnlyButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1.5,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 60,
-    gap: 12,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  emptyText: {
-    fontSize: 14,
-    textAlign: 'center',
-    maxWidth: 280,
-    lineHeight: 20,
+  sectionLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.8,
   },
 });

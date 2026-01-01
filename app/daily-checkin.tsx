@@ -14,6 +14,9 @@ import { DivineTimingCard } from '@/components/divine-timing/DivineTimingCard';
 import { QuranReflectionCard } from '@/components/divine-timing/QuranReflectionCard';
 import { SimpleSlider } from '@/components/SimpleSlider';
 import Colors from '@/constants/Colors';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useProfile } from '@/contexts/ProfileContext';
+import { AsrarTimingSnapshot, buildAsrarTimingSnapshot } from '@/services/DivineTimingAsrarService';
 import {
     computeDivineTiming,
     getIntentionDisplayName,
@@ -86,6 +89,8 @@ const INTENTION_ICONS: Record<IntentionCategory, keyof typeof Ionicons.glyphMap>
 export default function DailyCheckInScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
+  const { t } = useLanguage();
+  const { profile } = useProfile();
   
   const [step, setStep] = useState<'input' | 'result'>('input');
   const [selectedIntention, setSelectedIntention] = useState<IntentionCategory | null>(null);
@@ -96,10 +101,26 @@ export default function DailyCheckInScreen() {
   const [harmonyScore, setHarmonyScore] = useState<number | null>(null); // Phase 7
   const [hasCheckedInToday, setHasCheckedInToday] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [timingSnapshot, setTimingSnapshot] = useState<AsrarTimingSnapshot>(() =>
+    buildAsrarTimingSnapshot({
+      userProfile: profile,
+      userAbjad: PLACEHOLDER_USER_ABJAD,
+      intention: null,
+    })
+  );
   
   useEffect(() => {
     checkTodayStatus();
   }, []);
+
+  useEffect(() => {
+    const snapshot = buildAsrarTimingSnapshot({
+      userProfile: profile,
+      userAbjad: PLACEHOLDER_USER_ABJAD,
+      intention: selectedIntention,
+    });
+    setTimingSnapshot(snapshot);
+  }, [profile, selectedIntention]);
   
   const checkTodayStatus = async () => {
     const summary = await getDailyCheckInSummary();
@@ -213,17 +234,20 @@ export default function DailyCheckInScreen() {
       await saveEnhancedCheckIn(enhancedEntry);
       
       Alert.alert(
-        'Check-In Saved',
-        'Your daily reflection has been recorded. Consistency brings clarity.',
+        t('dailyCheckIn.alerts.savedTitle'),
+        t('dailyCheckIn.alerts.savedMessage'),
         [
           {
-            text: 'Done',
+            text: t('dailyCheckIn.alerts.done'),
             onPress: () => router.back(),
           },
         ]
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to save check-in. Please try again.');
+      Alert.alert(
+        t('dailyCheckIn.alerts.errorTitle'),
+        t('dailyCheckIn.alerts.errorMessage')
+      );
     } finally {
       setSaving(false);
     }
@@ -249,10 +273,10 @@ export default function DailyCheckInScreen() {
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            📅 Daily Check-In
+            {t('dailyCheckIn.header.title')}
           </Text>
           <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-            Reflect on today's timing
+            {t('dailyCheckIn.header.subtitle')}
           </Text>
         </View>
       </View>
@@ -262,22 +286,152 @@ export default function DailyCheckInScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <View style={[styles.disclaimerPill, { borderColor: colors.textSecondary }]}> 
+          <Text style={[styles.disclaimerText, { color: colors.textSecondary }]}>
+            {t('dailyCheckIn.disclaimer')}
+          </Text>
+        </View>
+
         {/* Already checked in notice */}
         {hasCheckedInToday && step === 'input' && (
           <View style={[styles.noticeCard, { backgroundColor: '#fef3c7' }]}>
             <Ionicons name="checkmark-circle" size={20} color="#f59e0b" />
             <Text style={[styles.noticeText, { color: '#92400e' }]}>
-              You've already checked in today. You can update your reflection below.
+              {t('dailyCheckIn.notice.alreadyCheckedIn')}
             </Text>
           </View>
         )}
         
+        {/* Configuration Snapshot */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <Text style={[styles.cardTitle, { color: colors.text }]}> 
+            {t('dailyCheckIn.sections.configuration.title')}
+          </Text>
+          <View style={styles.sectionBlock}>
+            <View style={styles.configLabelColumn}>
+              <Text style={[styles.labelHeading, { color: colors.textSecondary }]}>
+                {t('dailyCheckIn.labels.planetaryDay')}
+              </Text>
+              <Text style={[styles.configPrimaryText, { color: colors.text }]}> 
+                {t(timingSnapshot.day.translationKey)}
+              </Text>
+              <Text style={[styles.configSecondaryText, { color: colors.textSecondary }]}> 
+                {`${timingSnapshot.day.planetArabic} • ${timingSnapshot.day.planet}`}
+              </Text>
+            </View>
+            <View style={styles.configLabelColumn}>
+              <Text style={[styles.labelHeading, { color: colors.textSecondary }]}>
+                {t('dailyCheckIn.labels.cycleTone')}
+              </Text>
+              <Text style={[styles.configPrimaryText, { color: colors.text }]}>
+                {t(timingSnapshot.cycle.stateKey)}
+              </Text>
+              <Text style={[styles.configSecondaryText, { color: colors.textSecondary }]}> 
+                {t(timingSnapshot.cycle.timingKey)}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.sectionBlock}>
+            <View style={styles.configLabelColumn}>
+              <Text style={[styles.labelHeading, { color: colors.textSecondary }]}>
+                {t('dailyCheckIn.labels.zahir')}
+              </Text>
+              {timingSnapshot.elements.zahir ? (
+                <Text style={[styles.configPrimaryText, { color: colors.text }]}>
+                  {t(timingSnapshot.elements.zahir.translationKey)}
+                </Text>
+              ) : (
+                <Text style={[styles.configSecondaryText, { color: colors.textSecondary }]}> 
+                  {t('dailyCheckIn.elements.zahirMissing')}
+                </Text>
+              )}
+            </View>
+            <View style={styles.configLabelColumn}>
+              <Text style={[styles.labelHeading, { color: colors.textSecondary }]}>
+                {t('dailyCheckIn.labels.batin')}
+              </Text>
+              {timingSnapshot.elements.batin ? (
+                <Text style={[styles.configPrimaryText, { color: colors.text }]}>
+                  {t(timingSnapshot.elements.batin.translationKey)}
+                </Text>
+              ) : (
+                <Text style={[styles.configSecondaryText, { color: colors.textSecondary }]}> 
+                  {t('dailyCheckIn.elements.batinMissing')}
+                </Text>
+              )}
+            </View>
+          </View>
+          <View style={styles.divider} />
+          <View style={[styles.sectionBlock, styles.alignmentRow]}>
+            <View style={styles.alignmentColumn}>
+              <Text style={[styles.labelHeading, { color: colors.textSecondary }]}>
+                {t('dailyCheckIn.labels.harmony')}
+              </Text>
+              <Text style={[styles.harmonyValue, { color: colors.primary }]}> 
+                {Math.round(timingSnapshot.elements.alignment.alignment.harmonyScore)}
+              </Text>
+              <Text style={[styles.configSecondaryText, { color: colors.textSecondary }]}> 
+                {t(timingSnapshot.elements.alignment.qualityKey)}
+              </Text>
+            </View>
+            <View style={styles.alignmentDescription}>
+              <Text style={[styles.alignmentHint, { color: colors.textSecondary }]}> 
+                {t(timingSnapshot.elements.alignment.descriptionKey)}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Action Window */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <Text style={[styles.cardTitle, { color: colors.text }]}> 
+            {t('dailyCheckIn.sections.actionWindow.title')}
+          </Text>
+          <View style={styles.sectionBlock}>
+            <View style={styles.configLabelColumn}>
+              <Text style={[styles.labelHeading, { color: colors.textSecondary }]}>
+                {t('dailyCheckIn.labels.hourElement')}
+              </Text>
+              <Text style={[styles.configPrimaryText, { color: colors.text }]}>
+                {`${timingSnapshot.hour.raw.planetArabic} • ${timingSnapshot.hour.raw.planet}`}
+              </Text>
+              <Text style={[styles.configSecondaryText, { color: colors.textSecondary }]}> 
+                {t(`dailyCheckIn.elements.hour.${timingSnapshot.hour.element}`)}
+              </Text>
+            </View>
+            <View style={styles.configLabelColumn}>
+              <Text style={[styles.labelHeading, { color: colors.textSecondary }]}>
+                {t('dailyCheckIn.labels.closesIn')}
+              </Text>
+              <Text style={[styles.configPrimaryText, { color: colors.text }]}>
+                {timingSnapshot.hour.closesIn}
+              </Text>
+              <Text style={[styles.configSecondaryText, { color: colors.textSecondary }]}> 
+                {t(timingSnapshot.hour.translationKey)}
+              </Text>
+            </View>
+          </View>
+          {timingSnapshot.hour.nextWindowIn ? (
+            <View style={styles.sectionBlock}>
+              <View style={styles.configLabelColumn}>
+                <Text style={[styles.labelHeading, { color: colors.textSecondary }]}>
+                  {t('dailyCheckIn.labels.nextWindow')}
+                </Text>
+                <Text style={[styles.configPrimaryText, { color: colors.text }]}>
+                  {timingSnapshot.hour.nextWindowIn}
+                </Text>
+              </View>
+            </View>
+          ) : null}
+        </View>
+
         {step === 'input' && (
           <>
             {/* Intention Selection */}
             <View style={[styles.card, { backgroundColor: colors.card }]}>
               <Text style={[styles.cardTitle, { color: colors.text }]}>
-                What's your intention today?
+                {t('dailyCheckIn.sections.intention.title')}
               </Text>
               
               <View style={styles.intentionGrid}>
@@ -313,11 +467,59 @@ export default function DailyCheckInScreen() {
                 })}
               </View>
             </View>
+
+            {/* Intention Compatibility */}
+            <View style={[styles.card, { backgroundColor: colors.card }]}> 
+              <Text style={[styles.cardTitle, { color: colors.text }]}> 
+                {t('dailyCheckIn.sections.intention.compatibilityTitle')}
+              </Text>
+              {selectedIntention && timingSnapshot.intention ? (
+                <View style={styles.intentionInsight}>
+                  <View style={styles.intentionInsightHeader}>
+                    <Text style={[styles.intentionInsightIcon, { color: colors.primary }]}> 
+                      {timingSnapshot.intention.icon}
+                    </Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.intentionInsightTitle, { color: colors.text }]}> 
+                        {t(timingSnapshot.intention.readinessKey)}
+                      </Text>
+                      <Text style={[styles.intentionInsightScore, { color: colors.textSecondary }]}> 
+                        {Math.round(timingSnapshot.intention.score)} / 100
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.tagRow}>
+                    {timingSnapshot.intention.tags.map(tag => (
+                      <View
+                        key={tag.id}
+                        style={[styles.tagChip, { backgroundColor: colorScheme === 'dark' ? '#121212' : '#f5f5f5', borderColor: colors.primary }]}
+                      >
+                        <Text style={[styles.tagIcon, { color: colors.primary }]}>{tag.icon}</Text>
+                        <Text style={[styles.tagLabel, { color: colors.text }]}>
+                          {t(tag.labelKey)}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                  <View style={styles.tagDescriptions}>
+                    {timingSnapshot.intention.tags.map(tag => (
+                      <Text key={`${tag.id}-desc`} style={[styles.tagDescriptionText, { color: colors.textSecondary }]}> 
+                        {t(tag.descriptionKey)}
+                      </Text>
+                    ))}
+                  </View>
+                </View>
+              ) : (
+                <Text style={[styles.configSecondaryText, { color: colors.textSecondary }]}> 
+                  {t('dailyCheckIn.sections.intention.empty')}
+                </Text>
+              )}
+            </View>
             
             {/* Optional Note */}
             <View style={[styles.card, { backgroundColor: colors.card }]}>
               <Text style={[styles.cardTitle, { color: colors.text }]}>
-                What's on your mind? (Optional)
+                {t('dailyCheckIn.sections.note.title')}
               </Text>
               
               <TextInput
@@ -328,7 +530,7 @@ export default function DailyCheckInScreen() {
                     color: colors.text,
                   },
                 ]}
-                placeholder="A brief note about your day..."
+                placeholder={t('dailyCheckIn.sections.note.placeholder')}
                 placeholderTextColor={colors.textSecondary}
                 value={note}
                 onChangeText={setNote}
@@ -345,19 +547,19 @@ export default function DailyCheckInScreen() {
             {/* Phase 7: Energy Level */}
             <View style={[styles.card, { backgroundColor: colors.card }]}>
               <Text style={[styles.cardTitle, { color: colors.text }]}>
-                How's your energy right now?
+                {t('dailyCheckIn.sections.energy.title')}
               </Text>
               
               <View style={styles.energyContainer}>
                 <View style={styles.energyLabels}>
                   <Text style={[styles.energyLabel, { color: colors.textSecondary }]}>
-                    Low
+                    {t('dailyCheckIn.sections.energy.low')}
                   </Text>
                   <Text style={[styles.energyValue, { color: colors.primary }]}>
                     {energy}%
                   </Text>
                   <Text style={[styles.energyLabel, { color: colors.textSecondary }]}>
-                    High
+                    {t('dailyCheckIn.sections.energy.high')}
                   </Text>
                 </View>
                 
@@ -372,7 +574,7 @@ export default function DailyCheckInScreen() {
                 />
                 
                 <Text style={[styles.energyHint, { color: colors.textSecondary }]}>
-                  This helps us learn your peak windows over time
+                  {t('dailyCheckIn.sections.energy.helper')}
                 </Text>
               </View>
             </View>
@@ -390,7 +592,7 @@ export default function DailyCheckInScreen() {
               disabled={!selectedIntention}
             >
               <Ionicons name="sparkles" size={20} color="#fff" />
-              <Text style={styles.actionButtonText}>Get Today's Guidance</Text>
+              <Text style={styles.actionButtonText}>{t('dailyCheckIn.actions.requestReflection')}</Text>
             </TouchableOpacity>
           </>
         )}
@@ -416,7 +618,7 @@ export default function DailyCheckInScreen() {
             >
               <Ionicons name="checkmark-circle" size={20} color="#fff" />
               <Text style={styles.saveButtonText}>
-                {saving ? 'Saving...' : 'Save Check-In'}
+                {saving ? t('dailyCheckIn.actions.saving') : t('dailyCheckIn.actions.saveCheckIn')}
               </Text>
             </TouchableOpacity>
             
@@ -427,7 +629,7 @@ export default function DailyCheckInScreen() {
             >
               <Ionicons name="refresh" size={18} color={colors.text} />
               <Text style={[styles.resetButtonText, { color: colors.text }]}>
-                Change Intention
+                {t('dailyCheckIn.actions.changeIntention')}
               </Text>
             </TouchableOpacity>
           </>
@@ -488,6 +690,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
   },
+  disclaimerPill: {
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  disclaimerText: {
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    fontWeight: '600',
+  },
   card: {
     borderRadius: 16,
     padding: 20,
@@ -496,6 +711,53 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  sectionBlock: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 16,
+  },
+  configLabelColumn: {
+    flex: 1,
+    gap: 4,
+  },
+  labelHeading: {
+    fontSize: 12,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    fontWeight: '600',
+  },
+  configPrimaryText: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  configSecondaryText: {
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: 'rgba(120,120,120,0.18)',
+    marginVertical: 4,
+    borderRadius: 999,
+  },
+  alignmentRow: {
+    alignItems: 'flex-start',
+  },
+  alignmentColumn: {
+    width: 120,
+    gap: 6,
+  },
+  harmonyValue: {
+    fontSize: 28,
+    fontWeight: '700',
+  },
+  alignmentDescription: {
+    flex: 1,
+  },
+  alignmentHint: {
+    fontSize: 13,
+    lineHeight: 20,
   },
   intentionGrid: {
     flexDirection: 'row',
@@ -515,6 +777,52 @@ const styles = StyleSheet.create({
   intentionText: {
     fontSize: 13,
     fontWeight: '500',
+  },
+  intentionInsight: {
+    gap: 12,
+  },
+  intentionInsightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  intentionInsightIcon: {
+    fontSize: 28,
+  },
+  intentionInsightTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  intentionInsightScore: {
+    fontSize: 12,
+  },
+  tagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  tagChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  tagIcon: {
+    fontSize: 14,
+  },
+  tagLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  tagDescriptions: {
+    gap: 6,
+  },
+  tagDescriptionText: {
+    fontSize: 12,
+    lineHeight: 18,
   },
   noteInput: {
     borderRadius: 12,

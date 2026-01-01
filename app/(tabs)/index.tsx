@@ -31,12 +31,14 @@ import { ActivityIndicator, FlatList, Platform, StyleSheet, Text, TouchableOpaci
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RealTimeDailyGuidance } from '../../components/divine-timing/RealTimeDailyGuidance';
 import { ModuleCard } from '../../components/home';
+import { MomentAlignmentCard } from '../../components/home/MomentAlignmentCard';
 import { ModuleCardProps } from '../../components/home/types';
 import { DarkTheme, ElementAccents, Spacing, Typography } from '../../constants/DarkTheme';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useProfile } from '../../contexts/ProfileContext';
 import { DailyGuidance, getDailyGuidance } from '../../services/DailyGuidanceService';
 import { getTodayBlessing, type DayBlessing } from '../../services/DayBlessingService';
+import { MomentAlignment, getMomentAlignment } from '../../services/MomentAlignmentService';
 import {
     fetchPrayerTimes,
     getNextPrayer,
@@ -44,7 +46,8 @@ import {
 } from '../../services/api/prayerTimes';
 
 /**
- * Module configuration for primary features
+ * Module configuration for all spiritual features
+ * Unified grid combining primary modules and quick access tools
  * Each module has element-based theming and navigation
  */
 const MODULES: Omit<ModuleCardProps, 'onPress'>[] = [
@@ -73,6 +76,14 @@ const MODULES: Omit<ModuleCardProps, 'onPress'>[] = [
     comingSoon: false,
   },
   {
+    title: 'Guided Istikhārah',
+    titleArabic: 'الاستخارة الموجهة',
+    description: 'Learn the authentic prayer method and track your spiritual decisions',
+    icon: '🕊️',
+    element: 'earth',
+    comingSoon: false,
+  },
+  {
     title: 'Compatibility',
     titleArabic: 'التوافق',
     description: 'Analyze relationship harmony through elemental and numerical balance',
@@ -88,6 +99,38 @@ const MODULES: Omit<ModuleCardProps, 'onPress'>[] = [
     element: 'fire',
     comingSoon: false,
   },
+  {
+    title: 'Prayer Times',
+    titleArabic: 'مواقيت الصلاة',
+    description: 'Daily prayer times based on your location',
+    icon: '🕌',
+    element: 'water',
+    comingSoon: false,
+  },
+  {
+    title: 'Quran',
+    titleArabic: 'القرآن الكريم',
+    description: 'Read the complete Quran with translations and bookmarks',
+    icon: '📖',
+    element: 'water',
+    comingSoon: false,
+  },
+  {
+    title: 'Qibla',
+    titleArabic: 'القبلة',
+    description: 'Find the direction to Kaaba for prayer',
+    icon: '🧭',
+    element: 'earth',
+    comingSoon: false,
+  },
+  {
+    title: 'Dhikr Counter',
+    titleArabic: 'عداد الأذكار',
+    description: 'Digital tasbih for counting dhikr and remembrance',
+    icon: '📿',
+    element: 'air',
+    comingSoon: false,
+  },
 ];
 
 export default function HomeScreen() {
@@ -95,8 +138,10 @@ export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile, completionStatus } = useProfile();
+  const hasProfileName = Boolean(profile?.nameAr || profile?.nameLatin);
   
   const [dailyGuidance, setDailyGuidance] = useState<DailyGuidance | null>(null);
+  const [momentAlignment, setMomentAlignment] = useState<MomentAlignment | null>(null);
   const [modulesExpanded, setModulesExpanded] = useState(false);
   
   // Prayer times state
@@ -111,6 +156,12 @@ export default function HomeScreen() {
   const loadDailyGuidance = useCallback(async () => {
     const guidance = await getDailyGuidance(profile);
     setDailyGuidance(guidance);
+  }, [profile]);
+  
+  // Load moment alignment
+  const loadMomentAlignment = useCallback(async () => {
+    const alignment = await getMomentAlignment(profile);
+    setMomentAlignment(alignment);
   }, [profile]);
   
   // Load prayer times
@@ -144,9 +195,10 @@ export default function HomeScreen() {
   
   useEffect(() => {
     loadDailyGuidance();
+    loadMomentAlignment();
     loadPrayerTimes();
     loadTodayBlessing();
-  }, [loadDailyGuidance, loadPrayerTimes, loadTodayBlessing]);
+  }, [loadDailyGuidance, loadMomentAlignment, loadPrayerTimes, loadTodayBlessing]);
   
   // Update countdown every minute
   useEffect(() => {
@@ -169,8 +221,9 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       loadDailyGuidance();
+      loadMomentAlignment();
       loadPrayerTimes();
-    }, [loadDailyGuidance, loadPrayerTimes])
+    }, [loadDailyGuidance, loadMomentAlignment, loadPrayerTimes])
   );
 
   /**
@@ -182,10 +235,13 @@ export default function HomeScreen() {
         router.push('/calculator');
         break;
       case 'Istikhara':
-        router.push('/istikhara');
+        router.push('/(tabs)/istikhara');
+        break;
+      case 'Guided Istikhārah':
+        router.push('/istikhara-sessions');
         break;
       case 'Compatibility':
-        router.push('/compatibility');
+        router.push('/universal-compatibility');
         break;
       case 'Name Destiny':
         router.push('/(tabs)/name-destiny');
@@ -193,7 +249,18 @@ export default function HomeScreen() {
       case 'Divine Timing':
         router.push('/divine-timing');
         break;
-      // Add other module navigations as they're implemented
+      case 'Prayer Times':
+        router.push('/prayer-times');
+        break;
+      case 'Quran':
+        router.push('/quran');
+        break;
+      case 'Qibla':
+        router.push('/(tabs)/qibla');
+        break;
+      case 'Dhikr Counter':
+        router.push('/dhikr-counter');
+        break;
       default:
         console.log(`${moduleTitle} - Coming Soon`);
     }
@@ -240,14 +307,35 @@ export default function HomeScreen() {
 
       {/* Daily Overview Section - Moved Up */}
       <View style={styles.dailyOverview}>
-        {/* Daily Guidance - Full Width Primary Card */}
-        <RealTimeDailyGuidance 
-          guidance={dailyGuidance} 
-          loading={!dailyGuidance} 
-          compact 
-          showDayLabel
-          dayLabel={new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-        />
+        {/* Hero Row: Daily Guidance (60%) + Moment Alignment (40%) */}
+        <View style={styles.heroRow}>
+          {/* Daily Guidance - Left Side (Slightly Tightened) */}
+          <View style={styles.dailyGuidanceColumn}>
+            <RealTimeDailyGuidance 
+              guidance={dailyGuidance} 
+              loading={!dailyGuidance} 
+              compact 
+              showDayLabel
+              dayLabel={new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+              showDetailsHint
+            />
+          </View>
+          
+          {/* Moment Alignment - Right Side (Micro Card) */}
+          <View style={styles.momentAlignmentColumn}>
+            <MomentAlignmentCard
+              status={momentAlignment?.status}
+              statusLabel={momentAlignment ? t(momentAlignment.shortLabelKey) : undefined}
+              hintText={momentAlignment ? t(momentAlignment.shortHintKey) : undefined}
+              zahirElement={momentAlignment?.zahirElement}
+              timeElement={momentAlignment?.timeElement}
+              updatedAt={momentAlignment?.updatedAt}
+              loading={!momentAlignment && hasProfileName}
+              hasProfileName={hasProfileName}
+              t={t}
+            />
+          </View>
+        </View>
         
         {/* 2. Action Pills - Inline Buttons */}
         <View style={styles.actionPills}>
@@ -334,7 +422,7 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Spiritual Modules: Collapsible */}
+      {/* Spiritual Modules: Unified Grid */}
       <View style={styles.modulesSection}>
         <TouchableOpacity 
           style={styles.modulesSectionHeader}
@@ -350,11 +438,11 @@ export default function HomeScreen() {
         </TouchableOpacity>
         
         {!modulesExpanded && (
-          <View style={styles.modulesCollapsed}>
+          <View style={styles.modulesGrid}>
             {MODULES.map((module) => (
               <TouchableOpacity
                 key={module.title}
-                style={styles.moduleIconContainer}
+                style={styles.moduleGridItem}
                 onPress={() => handleModulePress(module.title)}
                 activeOpacity={0.7}
               >
@@ -368,63 +456,6 @@ export default function HomeScreen() {
             ))}
           </View>
         )}
-      </View>
-
-      {/* Quick Access Grid - 2×2 Shortcuts */}
-      <View style={styles.quickAccessSection}>
-        <Text style={styles.sectionTitle}>Quick Access</Text>
-        
-        <View style={styles.quickGrid}>
-          {/* Row 1 */}
-          <View style={styles.quickRow}>
-            <TouchableOpacity 
-              style={styles.quickTile}
-              onPress={() => router.push('/prayer-times')}
-              activeOpacity={0.7}
-            >
-              <View style={styles.quickTileContent}>
-                <Text style={styles.quickIcon}>🕌</Text>
-                <Text style={styles.quickLabel}>Prayer Times</Text>
-              </View>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.quickTile}
-              onPress={() => router.push('/daily-reminder')}
-              activeOpacity={0.7}
-            >
-              <View style={styles.quickTileContent}>
-                <Text style={styles.quickIcon}>🔔</Text>
-                <Text style={styles.quickLabel}>Daily Reminder</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-          
-          {/* Row 2 */}
-          <View style={styles.quickRow}>
-            <TouchableOpacity 
-              style={styles.quickTile}
-              onPress={() => router.push('/dhikr-counter')}
-              activeOpacity={0.7}
-            >
-              <View style={styles.quickTileContent}>
-                <Text style={styles.quickIcon}>📿</Text>
-                <Text style={styles.quickLabel}>Dhikr Counter</Text>
-              </View>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.quickTile}
-              onPress={() => router.push('/calculator')}
-              activeOpacity={0.7}
-            >
-              <View style={styles.quickTileContent}>
-                <Text style={styles.quickIcon}>🧮</Text>
-                <Text style={styles.quickLabel}>Calculator</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
       </View>
     </View>
   ), [
@@ -529,6 +560,18 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   
+  // Hero Row: Daily Guidance + Moment Alignment
+  heroRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  dailyGuidanceColumn: {
+    flex: 6, // 60% width
+  },
+  momentAlignmentColumn: {
+    flex: 4, // 40% width
+  },
+  
   // Action Pills
   actionPills: {
     flexDirection: 'row',
@@ -604,43 +647,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   
-  // Quick Access Grid
-  quickAccessSection: {
-    marginTop: Spacing.md,
-  },
-  quickGrid: {
-    paddingHorizontal: Spacing.screenPadding,
-    gap: Spacing.sm,
-  },
-  quickRow: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-  },
-  quickTile: {
-    flex: 1,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    overflow: 'hidden',
-  },
-  quickTileContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 8,
-  },
-  quickIcon: {
-    fontSize: 28,
-    marginBottom: 6,
-  },
-  quickLabel: {
-    fontSize: 11,
-    fontWeight: Typography.weightMedium,
-    color: DarkTheme.textPrimary,
-    textAlign: 'center',
-  },
-  
   // Modules Section
   modulesSection: {
     marginTop: Spacing.md,
@@ -653,21 +659,22 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
   },
   sectionTitle: {
-    fontSize: Typography.h2,
+    fontSize: 18,
     fontWeight: Typography.weightSemibold,
     color: DarkTheme.textPrimary,
   },
-  modulesCollapsed: {
+  modulesGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexWrap: 'wrap',
     paddingHorizontal: Spacing.screenPadding,
     paddingVertical: Spacing.md,
     gap: Spacing.sm,
-    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
   },
-  moduleIconContainer: {
+  moduleGridItem: {
     alignItems: 'center',
-    width: 70,
+    width: '31%', // 3-column grid with gap
+    minWidth: 90,
   },
   moduleIcon: {
     width: 56,
@@ -678,7 +685,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   moduleIconEmoji: {
     fontSize: 28,

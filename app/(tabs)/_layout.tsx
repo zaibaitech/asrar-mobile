@@ -131,10 +131,24 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="moment-alignment-detail"
+        options={{
+          href: null, // Hide from tab bar
+          title: 'Moment Alignment',
+        }}
+      />
+      <Tabs.Screen
         name="results"
         options={{
           href: null, // Hide from tab bar
           title: 'Results',
+        }}
+      />
+      <Tabs.Screen
+        name="qibla"
+        options={{
+          href: null, // Hide from tab bar - accessed via navigation only
+          title: 'Qibla',
         }}
       />
     </Tabs>

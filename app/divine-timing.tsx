@@ -8,6 +8,8 @@
  * Phase 3: Interactive Question + Guidance Response
  */
 
+import { AdvancedAnalysisCard } from '@/components/divine-timing/AdvancedAnalysisCard';
+import { AdvancedDivineTimingGuidanceCard } from '@/components/divine-timing/AdvancedDivineTimingGuidanceCard';
 import { DivineTimingCard } from '@/components/divine-timing/DivineTimingCard';
 import { DivineTimingGuidanceCard } from '@/components/divine-timing/DivineTimingGuidanceCard';
 import { DivineTimingQuestionCard } from '@/components/divine-timing/DivineTimingQuestionCard';
@@ -15,6 +17,11 @@ import { ManualVerseSelector } from '@/components/divine-timing/ManualVerseSelec
 import { QuranReflectionCard } from '@/components/divine-timing/QuranReflectionCard';
 import Colors from '@/constants/Colors';
 import { useProfile } from '@/contexts/ProfileContext';
+import {
+    getAdvancedDivineTimingAnalysis,
+    type IntentionTimingAnalysis,
+} from '@/services/AdvancedDivineTimingService';
+import { getCurrentPlanetaryHour } from '@/services/DayBlessingService';
 import {
     generateDivineTimingGuidance,
 } from '@/services/DivineTimingGuidanceService';
@@ -111,9 +118,15 @@ export default function DivineTimingScreen() {
   const [manualVerse, setManualVerse] = useState<{ surah: number; ayah: number } | null>(null);
   const [showManualSelector, setShowManualSelector] = useState(false);
   
-  // Phase 3 state
+  // Advanced analysis state
+  const [advancedAnalysis, setAdvancedAnalysis] = useState<IntentionTimingAnalysis | null>(null);
+  const [showAdvancedView, setShowAdvancedView] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  // Phase 3: Divine Timing Guidance - Interactive Q&A
   const [showGuidanceInput, setShowGuidanceInput] = useState(false);
   const [guidanceResponse, setGuidanceResponse] = useState<GuidanceResponse | null>(null);
+  const [advancedGuidanceResponse, setAdvancedGuidanceResponse] = useState<any | null>(null);
   const [guidanceHistory, setGuidanceHistory] = useState<GuidanceHistoryItem[]>([]);
   const [guidancePrefs, setGuidancePrefs] = useState<GuidancePreferences>({});
   
@@ -170,46 +183,60 @@ export default function DivineTimingScreen() {
     }
   };
   
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     if (!selectedIntention) return;
     
-    // Get current date
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    const date = now.toISOString().split('T')[0];
-    
-    // Compute Divine Timing
-    const timingResult = computeDivineTiming({
-      userAbjadResult: PLACEHOLDER_USER_ABJAD,
-      currentDate: { dayOfWeek, date },
-      userIntentionCategory: selectedIntention,
-    });
-    
-    setResult(timingResult);
-    
-    // Select Qur'an reflection verse
-    let verseReflection: QuranReflection | null;
-    
-    if (verseMode === 'manual' && manualVerse) {
-      // Manual mode: use manually selected verse
-      verseReflection = getManualReflection(
-        manualVerse.surah,
-        manualVerse.ayah,
-        timingResult.timingQuality,
-        date
-      );
-    } else {
-      // Auto mode: select verse based on Divine Timing result
-      verseReflection = selectReflectionVerse({
-        timingQuality: timingResult.timingQuality,
-        cycleState: timingResult.cycleState,
-        elementalTone: timingResult.elementalTone,
-        intentionCategory: selectedIntention,
-        seedKey: date,
+    setLoading(true);
+    try {
+      // Get current date
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const date = now.toISOString().split('T')[0];
+      
+      // Compute basic Divine Timing
+      const timingResult = computeDivineTiming({
+        userAbjadResult: PLACEHOLDER_USER_ABJAD,
+        currentDate: { dayOfWeek, date },
+        userIntentionCategory: selectedIntention,
       });
+      
+      setResult(timingResult);
+      
+      // Get advanced analysis integrating all timing components
+      const analysis = await getAdvancedDivineTimingAnalysis(
+        profile,
+        selectedIntention,
+        PLACEHOLDER_USER_ABJAD
+      );
+      
+      setAdvancedAnalysis(analysis);
+      
+      // Select Qur'an reflection verse
+      let verseReflection: QuranReflection | null;
+      
+      if (verseMode === 'manual' && manualVerse) {
+        // Manual mode: use manually selected verse
+        verseReflection = getManualReflection(
+          manualVerse.surah,
+          manualVerse.ayah,
+          timingResult.timingQuality,
+          date
+        );
+      } else {
+        // Auto mode: select verse based on Divine Timing result
+        verseReflection = selectReflectionVerse({
+          timingQuality: timingResult.timingQuality,
+          cycleState: timingResult.cycleState,
+          elementalTone: timingResult.elementalTone,
+          intentionCategory: selectedIntention,
+          seedKey: date,
+        });
+      }
+      
+      setReflection(verseReflection);
+    } finally {
+      setLoading(false);
     }
-    
-    setReflection(verseReflection);
   };
   
   const handleToggleVerseMode = () => {
@@ -262,39 +289,39 @@ export default function DivineTimingScreen() {
     timeHorizon: TimeHorizon,
     urgency: UrgencyLevel
   ) => {
-    if (!result || !selectedIntention) return;
+    if (!result || !selectedIntention || !profile.derived) return;
     
-    // Prepare user profile data for personalization
-    const userProfileData = profile.derived ? {
-      nameAr: profile.nameAr,
-      element: profile.derived.element,
-      burj: profile.derived.burj,
-    } : undefined;
+    setLoading(true);
     
-    // Generate guidance with profile personalization
-    const guidance = generateDivineTimingGuidance({
-      questionText: question,
-      category,
-      timeHorizon,
-      urgency,
-      divineTimingResult: result,
-      reflectionVerse: reflection || undefined,
-      userProfile: userProfileData,
-    });
-    
-    setGuidanceResponse(guidance);
-    
-    // Save to history
-    const historyItem: GuidanceHistoryItem = {
-      id: Date.now().toString(),
-      timestamp: Date.now(),
-      question,
-      category,
-      response: guidance,
-    };
-    
-    const updatedHistory = [historyItem, ...guidanceHistory].slice(0, MAX_HISTORY_ITEMS);
-    setGuidanceHistory(updatedHistory);
+    try {
+      // Generate advanced AI-powered guidance
+      const { generateAdvancedDivineTimingGuidance } = await import('@/services/AdvancedDivineTimingGuidanceService');
+      const advancedGuidance = await generateAdvancedDivineTimingGuidance({
+        questionText: question,
+        category,
+        timeHorizon,
+        urgency,
+        divineTimingResult: result,
+        userProfile: profile,
+        userAbjad: PLACEHOLDER_USER_ABJAD,
+        intention: selectedIntention,
+        advancedAnalysis: advancedAnalysis || undefined,
+      });
+      
+      setAdvancedGuidanceResponse(advancedGuidance);
+      setGuidanceResponse(advancedGuidance); // Also set base response for compatibility
+      
+      // Save to history
+      const historyItem: GuidanceHistoryItem = {
+        id: Date.now().toString(),
+        timestamp: Date.now(),
+        question,
+        category,
+        response: advancedGuidance,
+      };
+      
+      const updatedHistory = [historyItem, ...guidanceHistory].slice(0, MAX_HISTORY_ITEMS);
+      setGuidanceHistory(updatedHistory);
     
     try {
       await AsyncStorage.setItem(
@@ -322,12 +349,34 @@ export default function DivineTimingScreen() {
       console.error('Failed to save guidance preferences:', error);
     }
     
-    // Hide input, show response
-    setShowGuidanceInput(false);
+      // Hide input, show response
+      setShowGuidanceInput(false);
+    } catch (error) {
+      console.error('Failed to generate advanced guidance:', error);
+      // Fallback to basic guidance if advanced fails
+      const basicGuidance = generateDivineTimingGuidance({
+        questionText: question,
+        category,
+        timeHorizon,
+        urgency,
+        divineTimingResult: result,
+        reflectionVerse: reflection || undefined,
+        userProfile: profile.derived ? {
+          nameAr: profile.nameAr,
+          element: profile.derived.element,
+          burj: profile.derived.burj,
+        } : undefined,
+      });
+      setGuidanceResponse(basicGuidance);
+      setShowGuidanceInput(false);
+    } finally {
+      setLoading(false);
+    }
   };
   
   const handleGuidanceReset = () => {
     setGuidanceResponse(null);
+    setAdvancedGuidanceResponse(null);
     setShowGuidanceInput(true);
   };
   
@@ -345,6 +394,7 @@ export default function DivineTimingScreen() {
     setResult(null);
     setReflection(null);
     setGuidanceResponse(null);
+    setAdvancedGuidanceResponse(null);
     setShowGuidanceInput(false);
   };
   
@@ -353,11 +403,17 @@ export default function DivineTimingScreen() {
       {/* Compact Header - Orientation & Context */}
       <View style={[styles.header, { backgroundColor: colors.card }]}>
         <View style={styles.headerLeft}>
-          <Ionicons name="moon-outline" size={24} color={colors.primary} />
+          <Ionicons name="sparkles" size={24} color="#FFD700" />
           <View>
-            <Text style={[styles.headerTitle, { color: colors.text }]}>
-              Divine Timing
-            </Text>
+            <View style={styles.headerTitleRow}>
+              <Text style={[styles.headerTitle, { color: colors.text }]}>
+                Divine Timing
+              </Text>
+              <View style={styles.premiumBadge}>
+                <Ionicons name="flash" size={10} color="#FFD700" />
+                <Text style={styles.premiumBadgeText}>ADVANCED</Text>
+              </View>
+            </View>
             <View style={styles.headerSubtitleRow}>
               <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
                 {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
@@ -393,13 +449,59 @@ export default function DivineTimingScreen() {
         {/* Introduction */}
         {!result && (
           <View style={[styles.introCard, { backgroundColor: colors.card }]}>
-            <Text style={[styles.introTitle, { color: colors.text }]}>
-              Reflect on Your Intention
-            </Text>
+            <View style={styles.introHeader}>
+              <Ionicons name="compass" size={32} color={colors.primary} />
+              <Text style={[styles.introTitle, { color: colors.text }]}>
+                Advanced Timing Analysis
+              </Text>
+            </View>
             <Text style={[styles.introText, { color: colors.textSecondary }]}>
-              Divine Timing provides reflective guidance based on elemental cycles and your personal Abjad signature.
-              Select your intention below to receive spiritual insight for today.
+              Receive comprehensive guidance by integrating all timing systems:
+              Moment Alignment, Daily Guidance, and Planetary Hours.
             </Text>
+            
+            {/* Live Preview Stats */}
+            <View style={styles.introStatsContainer}>
+              <View style={[styles.introStatCard, { backgroundColor: colors.background }]}>
+                <Ionicons name="time" size={16} color={colors.primary} />
+                <Text style={[styles.introStatLabel, { color: colors.textSecondary }]}>Current Hour</Text>
+                <Text style={[styles.introStatValue, { color: colors.text }]}>
+                  {(() => {
+                    const ph = getCurrentPlanetaryHour();
+                    return ph.planet;
+                  })()}
+                </Text>
+              </View>
+              <View style={[styles.introStatCard, { backgroundColor: colors.background }]}>
+                <Ionicons name="sunny" size={16} color={colors.primary} />
+                <Text style={[styles.introStatLabel, { color: colors.textSecondary }]}>Daily Energy</Text>
+                <Text style={[styles.introStatValue, { color: colors.text }]}>
+                  {new Date().toLocaleDateString('en-US', { weekday: 'short' })}
+                </Text>
+              </View>
+            </View>
+
+            {/* Feature Highlights */}
+            <View style={styles.introFeaturesContainer}>
+              <View style={styles.introFeature}>
+                <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+                <Text style={[styles.introFeatureText, { color: colors.textSecondary }]}>
+                  Harmony Score (0-100)
+                </Text>
+              </View>
+              <View style={styles.introFeature}>
+                <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+                <Text style={[styles.introFeatureText, { color: colors.textSecondary }]}>
+                  7-Day Optimal Timeline
+                </Text>
+              </View>
+              <View style={styles.introFeature}>
+                <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+                <Text style={[styles.introFeatureText, { color: colors.textSecondary }]}>
+                  Practical Action Steps
+                </Text>
+              </View>
+            </View>
           </View>
         )}
         
@@ -413,6 +515,15 @@ export default function DivineTimingScreen() {
             <View style={styles.intentionGrid}>
               {INTENTION_CATEGORIES.map((category) => {
                 const isSelected = selectedIntention === category;
+                // Get element color for the intention
+                const elementColors: Record<string, string> = {
+                  growth: '#4CAF50',      // Earth
+                  protection: '#2196F3',  // Water
+                  clarity: '#FFC107',     // Air
+                  action: '#FF5722',      // Fire
+                };
+                const elementColor = elementColors[category] || colors.primary;
+                
                 return (
                   <TouchableOpacity
                     key={category}
@@ -420,16 +531,24 @@ export default function DivineTimingScreen() {
                       styles.intentionCard,
                       {
                         backgroundColor: isSelected ? colors.primary : colors.card,
-                        borderColor: isSelected ? colors.primary : 'transparent',
+                        borderColor: isSelected ? colors.primary : elementColor + '33',
+                        borderWidth: 2,
                       },
                     ]}
                     onPress={() => setSelectedIntention(category)}
                   >
-                    <Ionicons
-                      name={INTENTION_ICONS[category]}
-                      size={28}
-                      color={isSelected ? '#fff' : colors.text}
-                    />
+                    <View style={styles.intentionCardHeader}>
+                      <Ionicons
+                        name={INTENTION_ICONS[category]}
+                        size={32}
+                        color={isSelected ? '#fff' : elementColor}
+                      />
+                      {!isSelected && (
+                        <View style={[styles.elementBadge, { backgroundColor: elementColor + '22' }]}>
+                          <View style={[styles.elementDot, { backgroundColor: elementColor }]} />
+                        </View>
+                      )}
+                    </View>
                     <Text
                       style={[
                         styles.intentionText,
@@ -438,6 +557,11 @@ export default function DivineTimingScreen() {
                     >
                       {getIntentionDisplayName(category)}
                     </Text>
+                    {isSelected && (
+                      <View style={styles.selectedIndicator}>
+                        <Ionicons name="checkmark-circle" size={16} color="#fff" />
+                      </View>
+                    )}
                   </TouchableOpacity>
                 );
               })}
@@ -453,12 +577,23 @@ export default function DivineTimingScreen() {
                 },
               ]}
               onPress={handleCalculate}
-              disabled={!selectedIntention}
+              disabled={!selectedIntention || loading}
             >
-              <Ionicons name="sparkles" size={20} color="#fff" />
-              <Text style={styles.calculateButtonText}>
-                Reflect on Divine Timing
-              </Text>
+              {loading ? (
+                <>
+                  <Ionicons name="hourglass" size={20} color="#fff" />
+                  <Text style={styles.calculateButtonText}>
+                    Analyzing Timing...
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons name="sparkles" size={20} color="#fff" />
+                  <Text style={styles.calculateButtonText}>
+                    Get Advanced Analysis
+                  </Text>
+                </>
+              )}
             </TouchableOpacity>
           </View>
         )}
@@ -485,6 +620,11 @@ export default function DivineTimingScreen() {
             
             {/* Divine Timing Result */}
             <DivineTimingCard result={result} colorScheme={colorScheme} />
+            
+            {/* Advanced Analysis Card */}
+            {advancedAnalysis && (
+              <AdvancedAnalysisCard analysis={advancedAnalysis} />
+            )}
             
             {/* Qur'an Reflection Controls */}
             <View style={[styles.reflectionControls, { backgroundColor: colors.card }]}>
@@ -556,23 +696,31 @@ export default function DivineTimingScreen() {
             {/* Phase 3: Interactive Guidance Section */}
             <View style={[styles.guidanceSection, { backgroundColor: colors.card }]}>
               <View style={styles.guidanceSectionHeader}>
-                <Ionicons name="chatbubble-ellipses-outline" size={20} color={colors.primary} />
-                <Text style={[styles.guidanceSectionTitle, { color: colors.text }]}>
-                  Ask a Question
-                </Text>
+                <Ionicons name="bulb" size={24} color="#FFD700" />
+                <View style={{ flex: 1 }}>
+                  <View style={styles.guidanceTitleRow}>
+                    <Text style={[styles.guidanceSectionTitle, { color: colors.text }]}>
+                      AI-Powered Spiritual Guidance
+                    </Text>
+                    <View style={styles.aiBadge}>
+                      <Ionicons name="sparkles" size={10} color="#000" />
+                      <Text style={styles.aiBadgeText}>AI</Text>
+                    </View>
+                  </View>
+                  <Text style={[styles.guidanceSectionDesc, { color: colors.textSecondary }]}>
+                    Get personalized guidance based on your Abjad profile and current timing
+                  </Text>
+                </View>
               </View>
-              <Text style={[styles.guidanceSectionDesc, { color: colors.textSecondary }]}>
-                Get personalized guidance for specific decisions or actions
-              </Text>
               
               {!showGuidanceInput && !guidanceResponse && (
                 <TouchableOpacity
                   style={[styles.showGuidanceButton, { backgroundColor: colors.primary }]}
                   onPress={() => setShowGuidanceInput(true)}
                 >
-                  <Ionicons name="add-circle-outline" size={20} color="#fff" />
+                  <Ionicons name="chatbubble-ellipses" size={20} color="#fff" />
                   <Text style={styles.showGuidanceButtonText}>
-                    Ask Divine Timing
+                    Ask AI Guidance
                   </Text>
                 </TouchableOpacity>
               )}
@@ -590,7 +738,13 @@ export default function DivineTimingScreen() {
             )}
             
             {/* Guidance Response Card */}
-            {guidanceResponse && (
+            {advancedGuidanceResponse ? (
+              <AdvancedDivineTimingGuidanceCard
+                response={advancedGuidanceResponse}
+                colorScheme={colorScheme}
+                onReset={handleGuidanceReset}
+              />
+            ) : guidanceResponse ? (
               <DivineTimingGuidanceCard
                 response={guidanceResponse}
                 colorScheme={colorScheme}
@@ -604,7 +758,7 @@ export default function DivineTimingScreen() {
                     : undefined
                 }
               />
-            )}
+            ) : null}
             
             {/* Reset Button */}
             <TouchableOpacity
@@ -830,12 +984,33 @@ const styles = StyleSheet.create({
   },
   guidanceSectionHeader: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  guidanceTitleRow: {
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginBottom: 4,
   },
   guidanceSectionTitle: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  aiBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#FFD700',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  aiBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 0.5,
   },
   guidanceSectionDesc: {
     fontSize: 13,
@@ -854,5 +1029,93 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     fontWeight: '600',
+  },
+  
+  // Enhanced Premium Styles
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  premiumBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#FFD700',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  premiumBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 0.5,
+  },
+  introHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
+  },
+  introStatsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  introStatCard: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 10,
+    gap: 6,
+    alignItems: 'center',
+  },
+  introStatLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  introStatValue: {
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  introFeaturesContainer: {
+    gap: 8,
+    marginTop: 8,
+  },
+  introFeature: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  introFeatureText: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  intentionCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 8,
+  },
+  elementBadge: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  elementDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  selectedIndicator: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
   },
 });

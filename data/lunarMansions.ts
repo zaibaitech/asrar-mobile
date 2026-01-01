@@ -1,0 +1,107 @@
+/**
+ * Manazil al-Qamar (Lunar Mansions)
+ * ==================================
+ * The 28 lunar mansions used in Islamic astronomy and spiritual timing
+ */
+
+export interface LunarMansion {
+  index: number; // 0-27
+  nameArabic: string;
+  nameTransliteration: string;
+  nameEnglish: string;
+  element: 'fire' | 'water' | 'air' | 'earth';
+}
+
+/**
+ * Normalize any raw lunar mansion index to 0-27 range
+ */
+export function normalizeMansionIndex(raw?: number | null): number | null {
+  if (raw === undefined || raw === null || Number.isNaN(raw)) {
+    return null;
+  }
+
+  // Ensure integer index before normalization
+  const intIndex = Math.floor(raw);
+  const normalized = ((intIndex % 28) + 28) % 28;
+  return normalized;
+}
+
+/**
+ * The 28 Manazil al-Qamar (Lunar Mansions)
+ * Based on classical Islamic astronomy
+ */
+export const LUNAR_MANSIONS: LunarMansion[] = [
+  // Fire Mansions (0-6)
+  { index: 0, nameArabic: 'الشرطان', nameTransliteration: 'Al-Sharatān', nameEnglish: 'The Two Signs', element: 'fire' },
+  { index: 1, nameArabic: 'البطين', nameTransliteration: 'Al-Buṭayn', nameEnglish: 'The Little Belly', element: 'earth' },
+  { index: 2, nameArabic: 'الثريا', nameTransliteration: 'Al-Thurayyā', nameEnglish: 'The Pleiades', element: 'air' },
+  { index: 3, nameArabic: 'الدبران', nameTransliteration: 'Al-Dabarān', nameEnglish: 'The Follower', element: 'water' },
+  { index: 4, nameArabic: 'الهقعة', nameTransliteration: 'Al-Haqʿah', nameEnglish: 'The White Spot', element: 'fire' },
+  { index: 5, nameArabic: 'الهنعة', nameTransliteration: 'Al-Hanʿah', nameEnglish: 'The Brand', element: 'earth' },
+  { index: 6, nameArabic: 'الذراع', nameTransliteration: 'Al-Dhirāʿ', nameEnglish: 'The Arm', element: 'air' },
+  
+  // Earth Mansions (7-13)
+  { index: 7, nameArabic: 'النثرة', nameTransliteration: 'Al-Nathrah', nameEnglish: 'The Tip of the Nose', element: 'water' },
+  { index: 8, nameArabic: 'الطرف', nameTransliteration: 'Al-Ṭarf', nameEnglish: 'The Glance', element: 'fire' },
+  { index: 9, nameArabic: 'الجبهة', nameTransliteration: 'Al-Jabhah', nameEnglish: 'The Forehead', element: 'earth' },
+  { index: 10, nameArabic: 'الزبرة', nameTransliteration: 'Al-Zubrah', nameEnglish: 'The Mane', element: 'air' },
+  { index: 11, nameArabic: 'الصرفة', nameTransliteration: 'Al-Ṣarfah', nameEnglish: 'The Changer', element: 'water' },
+  { index: 12, nameArabic: 'العواء', nameTransliteration: 'Al-ʿAwwāʾ', nameEnglish: 'The Barker', element: 'fire' },
+  { index: 13, nameArabic: 'السماك', nameTransliteration: 'Al-Simāk', nameEnglish: 'The Unarmed', element: 'earth' },
+  
+  // Air Mansions (14-20)
+  { index: 14, nameArabic: 'الغفر', nameTransliteration: 'Al-Ghafr', nameEnglish: 'The Covering', element: 'air' },
+  { index: 15, nameArabic: 'الزبانى', nameTransliteration: 'Al-Zubānā', nameEnglish: 'The Claws', element: 'water' },
+  { index: 16, nameArabic: 'الإكليل', nameTransliteration: 'Al-Iklīl', nameEnglish: 'The Crown', element: 'fire' },
+  { index: 17, nameArabic: 'القلب', nameTransliteration: 'Al-Qalb', nameEnglish: 'The Heart', element: 'earth' },
+  { index: 18, nameArabic: 'الشولة', nameTransliteration: 'Al-Shawlah', nameEnglish: 'The Stinger', element: 'air' },
+  { index: 19, nameArabic: 'النعائم', nameTransliteration: 'Al-Naʿāʾim', nameEnglish: 'The Ostriches', element: 'water' },
+  { index: 20, nameArabic: 'البلدة', nameTransliteration: 'Al-Baldah', nameEnglish: 'The City', element: 'fire' },
+  
+  // Water Mansions (21-27)
+  { index: 21, nameArabic: 'سعد الذابح', nameTransliteration: 'Saʿd al-Dhābiḥ', nameEnglish: 'The Luck of the Slaughterer', element: 'earth' },
+  { index: 22, nameArabic: 'سعد بلع', nameTransliteration: 'Saʿd Bulaʿ', nameEnglish: 'The Luck of the Swallower', element: 'air' },
+  { index: 23, nameArabic: 'سعد السعود', nameTransliteration: 'Saʿd al-Suʿūd', nameEnglish: 'The Luck of Lucks', element: 'water' },
+  { index: 24, nameArabic: 'سعد الأخبية', nameTransliteration: 'Saʿd al-Akhbiyah', nameEnglish: 'The Luck of the Tents', element: 'fire' },
+  { index: 25, nameArabic: 'الفرغ المقدم', nameTransliteration: 'Al-Fargh al-Muqaddam', nameEnglish: 'The First Pourer', element: 'earth' },
+  { index: 26, nameArabic: 'الفرغ المؤخر', nameTransliteration: 'Al-Fargh al-Muʾakhkhar', nameEnglish: 'The Second Pourer', element: 'air' },
+  { index: 27, nameArabic: 'بطن الحوت', nameTransliteration: 'Baṭn al-Ḥūt', nameEnglish: 'The Belly of the Fish', element: 'water' },
+];
+
+/**
+ * Get lunar mansion by index (0-27)
+ */
+export function getLunarMansionByIndex(index: number): LunarMansion | null {
+  const normalizedIndex = normalizeMansionIndex(index);
+  if (normalizedIndex === null) {
+    return null;
+  }
+  return LUNAR_MANSIONS[normalizedIndex];
+}
+
+/**
+ * Get lunar mansion name in preferred language
+ */
+export function getLunarMansionName(
+  index: number,
+  language: 'en' | 'fr' | 'ar' = 'en',
+  format: 'full' | 'transliteration' | 'arabic' = 'full'
+): string {
+  const mansion = getLunarMansionByIndex(index);
+  if (!mansion) return '';
+  
+  if (format === 'arabic') {
+    return mansion.nameArabic;
+  }
+  
+  if (format === 'transliteration') {
+    return mansion.nameTransliteration;
+  }
+  
+  // Full format
+  if (language === 'ar') {
+    return mansion.nameArabic;
+  }
+  
+  return `${mansion.nameTransliteration} (${mansion.nameArabic})`;
+}

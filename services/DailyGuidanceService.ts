@@ -46,14 +46,15 @@ export async function getDailyGuidance(profile?: UserProfile): Promise<DailyGuid
   const dayOfWeek = now.getDay();
   
   // Get day's element from planetary ruler
+  // Based on traditional Maghribi planetary associations
   const dayElements: Record<number, 'fire' | 'water' | 'air' | 'earth'> = {
-    0: 'fire',   // Sunday - Sun
-    1: 'water',  // Monday - Moon
-    2: 'fire',   // Tuesday - Mars
-    3: 'air',    // Wednesday - Mercury
-    4: 'air',    // Thursday - Jupiter
-    5: 'water',  // Friday - Venus
-    6: 'earth',  // Saturday - Saturn
+    0: 'fire',   // Sunday - Sun (fire)
+    1: 'water',  // Monday - Moon (water)
+    2: 'fire',   // Tuesday - Mars (fire)
+    3: 'air',    // Wednesday - Mercury (air)
+    4: 'air',    // Thursday - Jupiter (air)
+    5: 'earth',  // Friday - Venus (earth) - CORRECTED from water
+    6: 'earth',  // Saturday - Saturn (earth)
   };
   
   const dayElement = dayElements[dayOfWeek];
@@ -87,9 +88,9 @@ export async function getDailyGuidance(profile?: UserProfile): Promise<DailyGuid
     dayElement,
     userElement,
     relationship,
-    message: guidance.message,
-    bestFor: guidance.bestFor,
-    avoid: guidance.avoid,
+    message: guidance.message || 'Balanced energies today',
+    bestFor: Array.isArray(guidance.bestFor) ? guidance.bestFor : [],
+    avoid: Array.isArray(guidance.avoid) ? guidance.avoid : [],
     peakHours: guidance.peakHours,
   };
 }

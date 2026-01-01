@@ -12,6 +12,7 @@
  * Uses classical Islamic astronomy framework (Ilm al-Nujum)
  */
 
+import { normalizeMansionIndex } from '@/data/lunarMansions';
 import {
     DerivedAstrologicalData,
     UserProfile,
@@ -230,11 +231,13 @@ export function calculateManazilBaseline(dobISO: string): number {
     const daysSinceEpoch = Math.floor((dobTime - epochStart) / (24 * 60 * 60 * 1000));
     
     // Map to Manazil (28 lunar mansions)
-    // Full cycle = ~27.3 days (sidereal month)
-    const siderealMonthDays = 27.3;
-    const manazilIndex = Math.floor((daysSinceEpoch % siderealMonthDays) / siderealMonthDays * 28);
+    // Full cycle = ~27.321661 days (sidereal month)
+    const siderealMonthDays = 27.321661;
+    const cyclePosition = ((daysSinceEpoch % siderealMonthDays) + siderealMonthDays) % siderealMonthDays;
+    const rawIndex = Math.floor((cyclePosition / siderealMonthDays) * 28);
+    const normalizedIndex = normalizeMansionIndex(rawIndex);
     
-    return manazilIndex;
+    return normalizedIndex ?? 0;
     
   } catch (error) {
     if (__DEV__) {

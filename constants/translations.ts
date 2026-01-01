@@ -56,6 +56,315 @@ export const translations = {
       share: "Share",
       export: "Export",
       showKeyboard: "Show Keyboard",
+      tapForDetails: "Tap for details",
+    },
+    
+    // Home Screen
+    home: {
+      daily: {
+        summary: "Balanced energies today",
+        bestFor: "Routine tasks",
+      },
+      moment: {
+        title: "Moment",
+        addNamePrompt: "Add name to enable",
+        details: "Details",
+        you: "You",
+        now: "Now",
+        status: {
+          act: "ACT",
+          maintain: "MAINTAIN",
+          hold: "HOLD",
+        },
+        hint: {
+          act: "Aligned — good to initiate",
+          maintain: "Supportive — keep steady",
+          hold: "Not aligned — avoid rushing",
+        },
+        updated: {
+          justNow: "Updated just now",
+          minute: "Updated 1 minute ago",
+          minutes: "Updated {count} minutes ago",
+          hour: "Updated 1 hour ago",
+          hours: "Updated {count} hours ago",
+        },
+      },
+    },
+
+    qibla: {
+      title: "Qibla",
+      locating: "Finding your location...",
+      toKaaba: "to Kaaba",
+      facing: "Facing",
+      qibla: "Qibla",
+      howToUse: "How to use",
+      instruction1: "Lay your phone flat and away from metal objects.",
+      instruction2: "Rotate until the arrow points toward the Kaaba icon.",
+      instruction3: "If it seems off, move away from magnets and tap Refresh.",
+      refresh: "Refresh",
+      yourLocation: "Your Location",
+      locationDenied: "Location access is required to calculate the Qibla.",
+      locationUnavailable: "Unable to determine your location right now.",
+      permissionRequired: "Location Permission Required",
+      permissionMessage: "Asrār needs access to your location to calculate the Qibla direction. Please enable location services in your device settings.",
+      enableLocation: "Enable Location",
+      noCompass: "Compass sensor not available. Showing static Qibla direction only.",
+      calibrate: "Move your device in a figure-8 pattern to calibrate the compass.",
+      calibrating: "Calibrating compass...",
+    },
+
+    quran: {
+      title: "Quran",
+      subtitle: "The Noble Quran - Complete with translations",
+      allSurahs: "All Surahs (114)",
+      surah: "Surah",
+      ayah: "Ayah",
+      ayahs: "Ayahs",
+      searchPlaceholder: "Search by name or number...",
+      results: "Results",
+      continueReading: "Continue Reading",
+      lastRead: "Last Read",
+      loading: "Loading...",
+      loadingSurah: "Loading Surah...",
+      errorLoading: "Failed to load Quran. Please check your connection and try again.",
+      bookmarks: "Bookmarks",
+      noBookmarks: "No Bookmarks Yet",
+      noBookmarksDesc: "Long press any ayah to bookmark it for later",
+      removeBookmark: "Remove Bookmark",
+      removeBookmarkConfirm: "Are you sure you want to remove this bookmark?",
+      bookmarkError: "Could not save bookmark. Please try again.",
+    },
+    
+    // Moment Alignment Detail
+    momentDetail: {
+      title: "Moment Alignment",
+      noName: "No Name Set",
+      addNameMessage: "Add your name in Name Destiny to unlock moment alignment guidance.",
+      goToNameDestiny: "Go to Name Destiny",
+      updated: "Updated",
+      zahirOutward: "Ẓāhir (Outward)",
+      hourQuality: "Hour Quality",
+      whyThisStatus: "Why This Status?",
+      guidanceTitle: "Guidance",
+      bestNow: "Better for:",
+      avoidNow: "Avoid for now:",
+      disclaimer: "For reflection only • Not a ruling",
+      
+      // Timeline
+      timeline: {
+        title: "Next 24 Hours",
+        currentWindow: "Current Hour",
+        windowEnds: "Hour ends",
+        nextOptimal: "Next Optimal Hours",
+        showTimeline: "Show Timeline",
+        hideTimeline: "Hide Timeline",
+        noOptimalWindows: "No optimal hours found in next 24 hours",
+        daysAway: "{count} days away",
+        tomorrow: "Tomorrow",
+        today: "Today",
+        in: "in",
+        hours: "{count}h",
+        minutes: "{count}m",
+        planetaryHour: "Planetary Hour",
+        hour: "Hour",
+      },
+      
+      equation: {
+        zahir: "Ẓāhir",
+        hour: "Hour",
+      },
+      
+      zahirShort: {
+        fire: "Active, initiating energy",
+        earth: "Stable, grounding energy",
+        air: "Expressive, clear energy",
+        water: "Intuitive, flowing energy",
+      },
+      
+      timeShort: {
+        fire: "Dynamic, active quality",
+        earth: "Grounded, steady quality",
+        air: "Lucid, intellectual quality",
+        water: "Receptive, emotional quality",
+      },
+      
+      reasons: {
+        act: {
+          bullet1: "Your Ẓāhir element perfectly matches the hour's element—natural alignment.",
+          bullet2: "This creates flow for initiating, communicating, and deciding.",
+          bullet3: "Alignment window lasts for this planetary hour; observe how it shifts.",
+        },
+        maintain: {
+          bullet1: "Your Ẓāhir element is compatible with the hour's element—supportive conditions.",
+          bullet2: "Good for steady progress and follow-through without forcing.",
+          bullet3: "Maintain calm effort; alignment shifts each hour.",
+        },
+        hold: {
+          bullet1: "Your Ẓāhir element contrasts with the hour's element—suggests gentler pace.",
+          bullet2: "Better for observation, patience, and review than major initiatives.",
+          bullet3: "Alignment changes hourly; next window may suit your rhythm better.",
+        },
+      },
+      
+      guidance: {
+        act: {
+          best1: "Initiating conversations or decisions",
+          best2: "Communicating important messages",
+          best3: "Taking action on ideas you've been holding",
+          avoid1: "Overthinking simple choices",
+          avoid2: "Waiting unnecessarily when flow is present",
+        },
+        maintain: {
+          best1: "Routine tasks and follow-through",
+          best2: "Steady effort on ongoing projects",
+          best3: "Building momentum calmly",
+          avoid1: "Forcing breakthroughs or rushing",
+          avoid2: "Starting major new initiatives",
+        },
+        hold: {
+          best1: "Reflection and observation",
+          best2: "Planning and reviewing ideas",
+          best3: "Patience with timing",
+          avoid1: "Rushed decisions or commitments",
+          avoid2: "Forcing action when flow is absent",
+        },
+      },
+    },
+
+    // Daily Check-In
+    dailyCheckIn: {
+      header: {
+        title: "Daily Check-In",
+        subtitle: "Attune to today's flow",
+      },
+      disclaimer: "For reflection only • Not a ruling",
+      notice: {
+        alreadyCheckedIn: "You've already checked in today. You can update your reflection below.",
+      },
+      sections: {
+        configuration: {
+          title: "Today's Configuration",
+        },
+        actionWindow: {
+          title: "Action Window",
+        },
+        intention: {
+          title: "Focus Intention",
+          compatibilityTitle: "Intention Compatibility",
+          empty: "Select an intention to see alignment notes.",
+        },
+        note: {
+          title: "What's on your mind? (Optional)",
+          placeholder: "A brief note about your day...",
+        },
+        energy: {
+          title: "How's your energy right now?",
+          low: "Low",
+          high: "High",
+          helper: "This helps us learn your peak windows over time.",
+        },
+      },
+      labels: {
+        planetaryDay: "Planetary Day",
+        cycleTone: "Cycle Tone",
+        zahir: "Ẓāhir Alignment",
+        batin: "Bāṭin Element",
+        harmony: "Harmony",
+        hourElement: "Current Hour",
+        closesIn: "Closes in",
+        nextWindow: "Next window",
+      },
+      days: {
+        sun: { title: "Sunday • Solar current" },
+        moon: { title: "Monday • Lunar flow" },
+        mars: { title: "Tuesday • Mars initiative" },
+        mercury: { title: "Wednesday • Mercury insight" },
+        jupiter: { title: "Thursday • Jupiter expansion" },
+        venus: { title: "Friday • Venus harmony" },
+        saturn: { title: "Saturday • Saturn grounding" },
+      },
+      elements: {
+        zahir: {
+          fire: "Fire • Outward initiative",
+          water: "Water • Outward intuition",
+          air: "Air • Outward expression",
+          earth: "Earth • Outward steadiness",
+        },
+        batin: {
+          fire: "Fire • Inner drive",
+          water: "Water • Inner depth",
+          air: "Air • Inner clarity",
+          earth: "Earth • Inner steadiness",
+        },
+        hour: {
+          fire: "Hour carries active fire quality",
+          water: "Hour carries receptive water quality",
+          air: "Hour carries lucid air quality",
+          earth: "Hour carries grounded earth quality",
+        },
+        zahirMissing: "Add your name to reveal Ẓāhir alignment.",
+        batinMissing: "Add your birth date to reveal your Bāṭin element.",
+      },
+      alignment: {
+        labels: {
+          perfect: "Perfect alignment",
+          strong: "Supportive alignment",
+          moderate: "Balanced alignment",
+          opposing: "Contrasting alignment",
+        },
+        descriptions: {
+          perfect: "Your inner rhythm fully resonates with the current hour.",
+          strong: "Conditions are supportive; stay steady and engaged.",
+          moderate: "Balanced flow — proceed with awareness.",
+          opposing: "Energy contrasts the hour; move gently and observe.",
+        },
+      },
+      timing: {
+        favorable: "Supportive flow",
+        neutral: "Balanced flow",
+        delicate: "Reflective pace",
+      },
+      actionWindow: {
+        urgency: {
+          high: "Focused opportunity — window closing soon",
+          medium: "Flowing window — stay attentive",
+          low: "Gentle window — pacing is spacious",
+        },
+      },
+      intention: {
+        readiness: {
+          aligned: "Flowing",
+          steady: "Steady",
+          reflect: "Reflect first",
+        },
+        tags: {
+          flowing: "Flow is with you",
+          steady: "Keep a grounded pace",
+          reflect: "Pause and observe",
+          hourOpen: "Hour is open",
+          hourNext: "Next window noted",
+        },
+        descriptions: {
+          flowing: "Alignment is high — move with confidence and grace.",
+          steady: "Momentum is steady — build calmly and stay present.",
+          reflect: "The moment invites reflection before action.",
+          hourOpen: "The current hour supports mindful engagement.",
+          hourNext: "Note the next opening to continue with ease.",
+        },
+      },
+      actions: {
+        requestReflection: "Request Reflection",
+        saving: "Saving...",
+        saveCheckIn: "Save Check-In",
+        changeIntention: "Change Intention",
+      },
+      alerts: {
+        savedTitle: "Check-In Saved",
+        savedMessage: "Your daily reflection has been recorded. Consistency brings clarity.",
+        done: "Done",
+        errorTitle: "Error",
+        errorMessage: "Failed to save check-in. Please try again.",
+      },
     },
 
     // User Profile
@@ -558,6 +867,94 @@ export const translations = {
         good: "Good",
         moderate: "Moderate",
         challenging: "Challenging",
+      },
+
+      // Universal Compatibility System (ʿIlm al-Asrār)
+      universal: {
+        title: "Universal Compatibility",
+        subtitle: "Resonance Analysis through ʿIlm al-Asrār",
+        selectType: "Select Compatibility Type",
+        calculate: "Calculate",
+        newCalculation: "New Calculation",
+        
+        types: {
+          personPerson: "Person ↔ Person",
+          personPersonDesc: "Universal compatibility for any relationship",
+          personDivineName: "Person ↔ Divine Name",
+          personDivineNameDesc: "How a Divine Name resonates with you",
+          divineIntention: "Divine Name ↔ Intention",
+          divineIntentionDesc: "Match Names to your spiritual goals",
+        },
+
+        relationshipContext: {
+          title: "Relationship Context",
+          universal: "Universal",
+          marriage: "Marriage",
+          friendship: "Friendship",
+          family: "Family",
+          work: "Work",
+        },
+
+        inputs: {
+          yourInfo: "Your Information",
+          displayName: "Display Name (Optional)",
+          arabicName: "Arabic Name",
+          arabicNameRequired: "Arabic Name *",
+          selectDivineName: "Select Divine Name",
+          chooseDivineName: "Choose a Divine Name",
+          selectIntention: "Select Intention",
+          chooseIntention: "Choose Your Intention",
+        },
+
+        intentions: {
+          clarity: "Clarity",
+          patience: "Patience",
+          provision: "Provision",
+          healing: "Healing",
+          protection: "Protection",
+          guidance: "Guidance",
+          strength: "Strength",
+          peace: "Peace",
+          knowledge: "Knowledge",
+          forgiveness: "Forgiveness",
+        },
+
+        results: {
+          resonanceAnalysis: "Resonance Analysis",
+          divineNameResonance: "Divine Name Resonance",
+          nameIntentionAlignment: "Name-Intention Alignment",
+          resonanceScore: "Resonance Score",
+          
+          elementalRelationship: "Elemental Relationship",
+          zahirBatinDynamics: "Zāhir-Bāṭin Dynamics",
+          planetaryResonance: "Planetary Resonance",
+          modeOfAction: "Mode of Action",
+          
+          spiritualGuidance: "Spiritual Guidance",
+          whatFlowsEasily: "What Flows Easily",
+          whatRequiresPatience: "What Requires Patience",
+          whatToAvoidForcing: "What to Avoid Forcing",
+          
+          howNameActs: "How This Name Acts Upon You",
+          manifestationGuidance: "Manifestation Guidance",
+          speed: "Speed",
+          
+          alignment: "Alignment",
+          recommendedAlternatives: "Recommended Alternatives",
+        },
+
+        disclaimer: {
+          title: "Reflection Only",
+          text: "This analysis is for spiritual reflection within the traditional sciences of ʿIlm al-Asrār. It does not constitute religious rulings, future predictions, or guarantees of outcomes.",
+        },
+
+        errors: {
+          bothNamesRequired: "Both Arabic names are required",
+          arabicNameRequired: "Arabic name is required",
+          selectDivineName: "Please select a Divine Name",
+          selectIntention: "Please select an intention",
+          calculationFailed: "Calculation failed. Please check your inputs.",
+        },
       },
     },
 
@@ -2226,6 +2623,127 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       titleTemplate: "%s | Asrār Everyday",
     },
 
+    dailyGuidance: {
+      title: "Daily Guidance",
+      todaysFlow: "Today's Flow",
+      elementHarmony: "Element Harmony",
+      dayElement: "Day Element",
+      yourElement: "Your Element",
+      noElement: "No Element",
+      addProfileHint: "Add your birth date to reveal your element",
+      lunarMansion: "Lunar Mansion",
+      yourMansion: "Your Mansion",
+      mansionHint: "Based on your birth date",
+      missingDobCta: "Add your birth date to calculate your Lunar Mansion",
+      addBirthDate: "Add Birth Date",
+      recommendations: "Guidance for Today",
+      bestFor: "Better for:",
+      avoid: "Avoid for now:",
+      peakHours: "Peak Hours",
+      reflection: "Quranic Reflection",
+      wisdom: "Classical Wisdom",
+      wisdomQuote: "Li-kulli shay'in waqtun — For everything there is a time. Success comes from right action at the right moment.",
+      wisdomSource: "Classical Islamic Wisdom",
+      empty: {
+        title: "No Guidance Available",
+        message: "Unable to load daily guidance. Please try again.",
+      },
+      timing: {
+        favorable: "Favorable Flow",
+        transformative: "Transformative Window",
+        delicate: "Delicate Timing",
+        neutral: "Neutral Flow",
+      },
+      relationship: {
+        harmonious: "Perfect Harmony — Your element matches today's energy",
+        complementary: "Supportive Flow — Your element complements today's energy",
+        transformative: "Transformative Dynamic — Opposing energies invite growth",
+        neutral: "Balanced State — Neutral energy flow",
+      },
+      elements: {
+        fire: {
+          description: "Dynamic, initiating, outward expression",
+        },
+        water: {
+          description: "Intuitive, receptive, flowing nature",
+        },
+        air: {
+          description: "Intellectual, communicative, clear",
+        },
+        earth: {
+          description: "Stable, grounding, practical",
+        },
+      },
+    },
+
+    divineTimingInsights: {
+      header: {
+        title: "Insights",
+        loading: "Gathering your timeline...",
+      },
+      loading: {
+        message: "Analyzing your patterns...",
+      },
+      empty: {
+        title: "No Data Yet",
+        subtitle: "Check in daily to build your personalized insights.",
+        cta: "Start Check-In",
+      },
+      disclaimer: "For reflection only • Not a ruling",
+      metrics: {
+        checkIns: "check-ins",
+        dayStreak: "day streak",
+        harmony: "harmony",
+      },
+      summary: {
+        thisWeek: "This Week",
+        avgHarmony: "Avg Harmony",
+        trend: "Trend",
+      },
+      trendStates: {
+        improving: "Momentum rising",
+        declining: "Momentum softening",
+        stable: "Holding steady",
+        change: "{value}% vs prior period",
+      },
+      sections: {
+        currentAlignment: "Current Alignment",
+        patternMap: "Pattern Map",
+        patternHint: "Tap a cell to review its harmony and consistency.",
+        segments: "Time Segments",
+        intentions: "Intention Themes",
+        recommendations: "Recommendations",
+      },
+      patternDetail: {
+        title: "{day} • {segment}",
+        count: "{count} check-ins recorded",
+        empty: "No check-ins recorded yet.",
+        placeholder: "Tap a square to view its detail.",
+      },
+      segments: {
+        preDawn: "Pre-dawn",
+        morning: "Morning",
+        midday: "Midday",
+        afternoon: "Afternoon",
+        evening: "Evening",
+        night: "Night",
+      },
+      segmentStats: {
+        checkins: "{count} check-ins",
+        success: "{value}% favorable",
+        energy: "{value}% avg energy",
+      },
+      intentions: {
+        summary: "{count} check-ins • Best at: {segments}",
+      },
+      heatmapLegend: {
+        title: "Harmony scale",
+        low: "Low",
+        medium: "Balanced",
+        high: "High",
+      },
+    },
+
     // DIVINE TIMING SPIRITUAL COMPONENTS
     divineTiming: {
       spiritualDepth: {
@@ -2788,11 +3306,319 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       skip: "Passer",
       edit: "Modifier",
       upload: "Télécharger",
-      remove: "Supprimer",
+      remove: "Retirer",
       optional: "Optionnel",
       share: "Partager",
       export: "Exporter",
       showKeyboard: "Afficher le Clavier",
+      tapForDetails: "Appuyez pour détails",
+    },
+    
+    // Home Screen
+    home: {
+      daily: {
+        summary: "Énergies équilibrées",
+        bestFor: "Tâches routinières",
+      },
+      moment: {
+        title: "Moment",
+        addNamePrompt: "Ajoutez un nom pour activer",
+        details: "Détails",
+        you: "Vous",
+        now: "Maintenant",
+        status: {
+          act: "AGIR",
+          maintain: "MAINTENIR",
+          hold: "ATTENDRE",
+        },
+        hint: {
+          act: "Aligné — bon moment pour initier",
+          maintain: "Supportif — avance régulière",
+          hold: "Pas aligné — éviter la précipitation",
+        },
+        updated: {
+          justNow: "Mis à jour à l'instant",
+          minute: "Mis à jour il y a 1 minute",
+          minutes: "Mis à jour il y a {count} minutes",
+          hour: "Mis à jour il y a 1 heure",
+          hours: "Mis à jour il y a {count} heures",
+        },
+      },
+    },
+
+    qibla: {
+      title: "Qibla",
+      locating: "Localisation en cours...",
+      toKaaba: "vers la Kaaba",
+      facing: "Orientation",
+      qibla: "Qibla",
+      howToUse: "Mode d'emploi",
+      instruction1: "Posez le téléphone à plat, loin des objets métalliques.",
+      instruction2: "Tournez jusqu'à ce que la flèche pointe vers l'icône de la Kaaba.",
+      instruction3: "Si cela semble incorrect, éloignez-vous des aimants et appuyez sur Actualiser.",
+      refresh: "Actualiser",
+      yourLocation: "Votre position",
+      locationDenied: "L'accès à la localisation est nécessaire pour calculer la Qibla.",
+      locationUnavailable: "Impossible de déterminer votre position pour le moment.",
+      permissionRequired: "Permission de localisation requise",
+      permissionMessage: "Asrār a besoin d'accéder à votre position pour calculer la direction de la Qibla. Veuillez activer les services de localisation dans les paramètres de votre appareil.",
+      enableLocation: "Activer la localisation",
+      noCompass: "Capteur de boussole non disponible. Affichage de la direction Qibla statique uniquement.",
+      calibrate: "Déplacez votre appareil en formant un 8 pour calibrer la boussole.",
+      calibrating: "Calibration de la boussole...",
+    },
+
+    quran: {
+      title: "Coran",
+      subtitle: "Le Noble Coran - Complet avec traductions",
+      allSurahs: "Toutes les Sourates (114)",
+      surah: "Sourate",
+      ayah: "Verset",
+      ayahs: "Versets",
+      searchPlaceholder: "Rechercher par nom ou numéro...",
+      results: "Résultats",
+      continueReading: "Continuer la Lecture",
+      lastRead: "Dernière Lecture",
+      loading: "Chargement...",
+      loadingSurah: "Chargement de la Sourate...",
+      errorLoading: "Échec du chargement du Coran. Veuillez vérifier votre connexion et réessayer.",
+      bookmarks: "Favoris",
+      noBookmarks: "Aucun Favori",
+      noBookmarksDesc: "Appuyez longuement sur un verset pour le mettre en favori",
+      removeBookmark: "Supprimer le Favori",
+      removeBookmarkConfirm: "Êtes-vous sûr de vouloir supprimer ce favori?",
+      bookmarkError: "Impossible d'enregistrer le favori. Veuillez réessayer.",
+    },
+    
+    // Moment Alignment Detail
+    momentDetail: {
+      title: "Alignement du Moment",
+      noName: "Aucun Nom Défini",
+      addNameMessage: "Ajoutez votre nom dans Destinée du Nom pour débloquer l'alignement du moment.",
+      goToNameDestiny: "Aller à Destinée du Nom",
+      updated: "Mis à jour",
+      zahirOutward: "Ẓāhir (Extérieur)",
+      hourQuality: "Qualité de l'heure",
+      whyThisStatus: "Pourquoi ce statut ?",
+      guidanceTitle: "Guidance",
+      bestNow: "Favorable pour :",
+      avoidNow: "Éviter pour l'instant :",
+      disclaimer: "Pour réflexion seulement • Pas une règle",
+      
+      // Timeline
+      timeline: {
+        title: "Prochaines 24 Heures",
+        currentWindow: "Heure Actuelle",
+        windowEnds: "L'heure se termine",
+        nextOptimal: "Prochaines Heures Optimales",
+        showTimeline: "Afficher la Chronologie",
+        hideTimeline: "Masquer la Chronologie",
+        noOptimalWindows: "Aucune heure optimale trouvée dans les 24 prochaines heures",
+        daysAway: "dans {count} jours",
+        tomorrow: "Demain",
+        today: "Aujourd'hui",
+        in: "dans",
+        hours: "{count}h",
+        minutes: "{count}m",
+        planetaryHour: "Heure Planétaire",
+        hour: "Heure",
+      },
+      
+      equation: {
+        zahir: "Ẓāhir",
+        hour: "Heure",
+      },
+      
+      zahirShort: {
+        fire: "Énergie active, initiatrice",
+        earth: "Énergie stable, ancrée",
+        air: "Énergie expressive, claire",
+        water: "Énergie intuitive, fluide",
+      },
+      
+      timeShort: {
+        fire: "Qualité dynamique, active",
+        earth: "Qualité ancrée, stable",
+        air: "Qualité lucide, intellectuelle",
+        water: "Qualité réceptive, émotionnelle",
+      },
+      
+      reasons: {
+        act: {
+          bullet1: "Votre élément Ẓāhir correspond parfaitement à l'élément de l'heure—alignement naturel.",
+          bullet2: "Cela crée un flux pour initier, communiquer et décider.",
+          bullet3: "La fenêtre d'alignement dure cette heure planétaire ; observez comment elle évolue.",
+        },
+        maintain: {
+          bullet1: "Votre élément Ẓāhir est compatible avec l'élément de l'heure—conditions favorables.",
+          bullet2: "Bon pour un progrès régulier et le suivi sans forcer.",
+          bullet3: "Maintenez un effort calme ; l'alignement change chaque heure.",
+        },
+        hold: {
+          bullet1: "Votre élément Ẓāhir contraste avec l'élément de l'heure—suggère un rythme plus doux.",
+          bullet2: "Mieux pour l'observation, la patience et la révision que pour des initiatives majeures.",
+          bullet3: "L'alignement change chaque heure ; la prochaine fenêtre pourrait mieux convenir à votre rythme.",
+        },
+      },
+      
+      guidance: {
+        act: {
+          best1: "Initier des conversations ou prendre des décisions",
+          best2: "Communiquer des messages importants",
+          best3: "Agir sur des idées que vous reteniez",
+          avoid1: "Trop réfléchir aux choix simples",
+          avoid2: "Attendre inutilement quand le flux est présent",
+        },
+        maintain: {
+          best1: "Tâches routinières et suivi",
+          best2: "Effort régulier sur projets en cours",
+          best3: "Construire un élan calmement",
+          avoid1: "Forcer des percées ou se précipiter",
+          avoid2: "Commencer de nouvelles initiatives majeures",
+        },
+        hold: {
+          best1: "Réflexion et observation",
+          best2: "Planification et révision d'idées",
+          best3: "Patience avec le timing",
+          avoid1: "Décisions ou engagements précipités",
+          avoid2: "Forcer l'action quand le flux est absent",
+        },
+      },
+    },
+
+    dailyCheckIn: {
+      header: {
+        title: "Bilan Quotidien",
+        subtitle: "Accordez-vous au flux du jour",
+      },
+      disclaimer: "Pour la réflexion seulement • Pas une règle",
+      notice: {
+        alreadyCheckedIn: "Vous avez déjà fait votre bilan aujourd'hui. Vous pouvez mettre à jour votre réflexion ci-dessous.",
+      },
+      sections: {
+        configuration: {
+          title: "Configuration du jour",
+        },
+        actionWindow: {
+          title: "Fenêtre d'action",
+        },
+        intention: {
+          title: "Intention du moment",
+          compatibilityTitle: "Compatibilité de l'intention",
+          empty: "Choisissez une intention pour voir les notes d'alignement.",
+        },
+        note: {
+          title: "Qu'avez-vous en tête ? (Optionnel)",
+          placeholder: "Une courte note sur votre journée...",
+        },
+        energy: {
+          title: "Quel est votre niveau d'énergie ?",
+          low: "Faible",
+          high: "Élevé",
+          helper: "Cela nous aide à apprendre vos fenêtres optimales.",
+        },
+      },
+      labels: {
+        planetaryDay: "Jour planétaire",
+        cycleTone: "Tonalité du cycle",
+        zahir: "Alignement Ẓāhir",
+        batin: "Élément Bāṭin",
+        harmony: "Harmonie",
+        hourElement: "Heure actuelle",
+        closesIn: "Se termine dans",
+        nextWindow: "Prochaine fenêtre",
+      },
+      days: {
+        sun: { title: "Dimanche • Courant solaire" },
+        moon: { title: "Lundi • Flux lunaire" },
+        mars: { title: "Mardi • Initiative de Mars" },
+        mercury: { title: "Mercredi • Clairvoyance de Mercure" },
+        jupiter: { title: "Jeudi • Expansion de Jupiter" },
+        venus: { title: "Vendredi • Harmonie de Vénus" },
+        saturn: { title: "Samedi • Ancrage de Saturne" },
+      },
+      elements: {
+        zahir: {
+          fire: "Feu • Élan extérieur",
+          water: "Eau • Intuition extérieure",
+          air: "Air • Expression extérieure",
+          earth: "Terre • Stabilité extérieure",
+        },
+        batin: {
+          fire: "Feu • Élan intérieur",
+          water: "Eau • Profondeur intérieure",
+          air: "Air • Clarté intérieure",
+          earth: "Terre • Stabilité intérieure",
+        },
+        hour: {
+          fire: "L'heure porte une qualité de feu active",
+          water: "L'heure porte une qualité d'eau réceptive",
+          air: "L'heure porte une qualité d'air lucide",
+          earth: "L'heure porte une qualité de terre ancrée",
+        },
+        zahirMissing: "Ajoutez votre nom pour révéler l'alignement Ẓāhir.",
+        batinMissing: "Ajoutez votre date de naissance pour révéler votre élément Bāṭin.",
+      },
+      alignment: {
+        labels: {
+          perfect: "Alignement parfait",
+          strong: "Alignement favorable",
+          moderate: "Alignement équilibré",
+          opposing: "Alignement contrasté",
+        },
+        descriptions: {
+          perfect: "Votre rythme intérieur résonne pleinement avec l'heure actuelle.",
+          strong: "Les conditions sont favorables ; avancez avec constance.",
+          moderate: "Flux équilibré — progressez avec conscience.",
+          opposing: "L'énergie contraste avec l'heure ; avancez doucement.",
+        },
+      },
+      timing: {
+        favorable: "Flux favorable",
+        neutral: "Flux équilibré",
+        delicate: "Rythme réfléchi",
+      },
+      actionWindow: {
+        urgency: {
+          high: "Fenêtre concentrée — se referme bientôt",
+          medium: "Fenêtre fluide — restez attentif",
+          low: "Fenêtre douce — rythme spacieux",
+        },
+      },
+      intention: {
+        readiness: {
+          aligned: "En phase",
+          steady: "Stable",
+          reflect: "Réfléchir d'abord",
+        },
+        tags: {
+          flowing: "Le flux est avec vous",
+          steady: "Gardez un rythme posé",
+          reflect: "Pause et observation",
+          hourOpen: "Heure ouverte",
+          hourNext: "Prochaine fenêtre notée",
+        },
+        descriptions: {
+          flowing: "L'alignement est élevé — avancez avec confiance.",
+          steady: "L'élan est stable — construisez calmement.",
+          reflect: "Le moment invite à la réflexion avant d'agir.",
+          hourOpen: "L'heure actuelle soutient une implication attentive.",
+          hourNext: "Notez la prochaine ouverture pour poursuivre sereinement.",
+        },
+      },
+      actions: {
+        requestReflection: "Demander une réflexion",
+        saving: "Enregistrement...",
+        saveCheckIn: "Enregistrer le bilan",
+        changeIntention: "Changer d'intention",
+      },
+      alerts: {
+        savedTitle: "Bilan enregistré",
+        savedMessage: "Votre réflexion quotidienne a été enregistrée. La constance apporte de la clarté.",
+        done: "Terminer",
+        errorTitle: "Erreur",
+        errorMessage: "Impossible d'enregistrer le bilan. Veuillez réessayer.",
+      },
     },
 
     // Profil Utilisateur
@@ -4954,6 +5780,127 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     seo: {
       siteTitle: "Asrār Everyday - Calculatrice ʿIlm al-Ḥurūf & ʿIlm al-ʿAdad",
       titleTemplate: "%s | Asrār Everyday",
+    },
+
+    dailyGuidance: {
+      title: "Guidance Quotidienne",
+      todaysFlow: "Flux du Jour",
+      elementHarmony: "Harmonie Élémentaire",
+      dayElement: "Élément du Jour",
+      yourElement: "Votre Élément",
+      noElement: "Aucun Élément",
+      addProfileHint: "Ajoutez votre date de naissance pour révéler votre élément",
+      lunarMansion: "Manoir Lunaire",
+      yourMansion: "Votre Manoir",
+      mansionHint: "Basé sur votre date de naissance",
+      missingDobCta: "Ajoutez votre date de naissance pour calculer votre Manoir Lunaire",
+      addBirthDate: "Ajouter la Date de Naissance",
+      recommendations: "Guidance pour Aujourd'hui",
+      bestFor: "Favorable pour :",
+      avoid: "Éviter pour l'instant :",
+      peakHours: "Heures de Pointe",
+      reflection: "Réflexion Coranique",
+      wisdom: "Sagesse Classique",
+      wisdomQuote: "Li-kulli shay'in waqtun — Pour chaque chose il y a un temps. Le succès vient de la bonne action au bon moment.",
+      wisdomSource: "Sagesse Islamique Classique",
+      empty: {
+        title: "Guidance Non Disponible",
+        message: "Impossible de charger la guidance quotidienne. Veuillez réessayer.",
+      },
+      timing: {
+        favorable: "Flux Favorable",
+        transformative: "Fenêtre Transformative",
+        delicate: "Timing Délicat",
+        neutral: "Flux Neutre",
+      },
+      relationship: {
+        harmonious: "Harmonie Parfaite — Votre élément correspond à l'énergie d'aujourd'hui",
+        complementary: "Flux Favorable — Votre élément complète l'énergie d'aujourd'hui",
+        transformative: "Dynamique Transformative — Les énergies opposées invitent à la croissance",
+        neutral: "État Équilibré — Flux d'énergie neutre",
+      },
+      elements: {
+        fire: {
+          description: "Dynamique, initiatrice, expression extérieure",
+        },
+        water: {
+          description: "Intuitive, réceptive, nature fluide",
+        },
+        air: {
+          description: "Intellectuelle, communicative, claire",
+        },
+        earth: {
+          description: "Stable, ancrée, pratique",
+        },
+      },
+    },
+
+    divineTimingInsights: {
+      header: {
+        title: "Aperçus",
+        loading: "Synchronisation de votre chronologie...",
+      },
+      loading: {
+        message: "Analyse de vos schémas...",
+      },
+      empty: {
+        title: "Pas encore de données",
+        subtitle: "Enregistrez vos bilans quotidiens pour construire vos aperçus personnalisés.",
+        cta: "Commencer le bilan",
+      },
+      disclaimer: "Pour la réflexion seulement • Pas une règle",
+      metrics: {
+        checkIns: "bilans",
+        dayStreak: "jours consécutifs",
+        harmony: "harmonie",
+      },
+      summary: {
+        thisWeek: "Cette semaine",
+        avgHarmony: "Harmonie moyenne",
+        trend: "Tendance",
+      },
+      trendStates: {
+        improving: "Élan en hausse",
+        declining: "Élan en repli",
+        stable: "Rythme stable",
+        change: "{value}% vs période précédente",
+      },
+      sections: {
+        currentAlignment: "Alignement actuel",
+        patternMap: "Carte des motifs",
+        patternHint: "Touchez une case pour revoir son harmonie et sa constance.",
+        segments: "Segments temporels",
+        intentions: "Thèmes d'intention",
+        recommendations: "Recommandations",
+      },
+      patternDetail: {
+        title: "{day} • {segment}",
+        count: "{count} bilans enregistrés",
+        empty: "Aucun bilan enregistré pour le moment.",
+        placeholder: "Touchez un carré pour afficher ses détails.",
+      },
+      segments: {
+        preDawn: "Avant l'aube",
+        morning: "Matin",
+        midday: "Midi",
+        afternoon: "Après-midi",
+        evening: "Soir",
+        night: "Nuit",
+      },
+      segmentStats: {
+        checkins: "{count} bilans",
+        success: "{value}% favorables",
+        energy: "{value}% énergie moyenne",
+      },
+      intentions: {
+        summary: "{count} bilans • Favorable : {segments}",
+      },
+      heatmapLegend: {
+        title: "Échelle d'harmonie",
+        low: "Faible",
+        medium: "Équilibrée",
+        high: "Élevée",
+      },
     },
 
     // DIVINE TIMING SPIRITUAL COMPONENTS

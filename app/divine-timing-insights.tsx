@@ -13,11 +13,14 @@
 
 import { WeeklyHeatmap } from '@/components/divine-timing/WeeklyHeatmap';
 import { DarkTheme } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useProfile } from '@/contexts/ProfileContext';
 import {
     getCheckInSummary,
     loadCheckIns,
     loadUserTimingProfile,
 } from '@/services/CheckInStorage';
+import { AsrarTimingSnapshot, buildAsrarTimingSnapshot } from '@/services/DivineTimingAsrarService';
 import {
     calculateHarmonyTrend,
     getIntentionStatistics,
@@ -31,7 +34,7 @@ import {
 } from '@/types/divine-timing-personal';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     ScrollView,
@@ -45,6 +48,8 @@ import {
  * Divine Timing Insights Screen
  */
 export default function DivineTimingInsightsScreen() {
+  const { t } = useLanguage();
+  const { profile } = useProfile();
   const [loading, setLoading] = useState(true);
   const [checkins, setCheckins] = useState<CheckInRecord[]>([]);
   const [heatmapData, setHeatmapData] = useState<any[]>([]);
@@ -53,10 +58,33 @@ export default function DivineTimingInsightsScreen() {
   const [harmonyTrend, setHarmonyTrend] = useState<any>(null);
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [summary, setSummary] = useState<any>(null);
+  const [snapshot, setSnapshot] = useState<AsrarTimingSnapshot>(() =>
+    buildAsrarTimingSnapshot({
+      userProfile: profile,
+    })
+  );
+  const [selectedCell, setSelectedCell] = useState<any | null>(null);
+  const segmentOrder: TimeSegment[] = useMemo(
+    () => ['preDawn', 'morning', 'midday', 'afternoon', 'evening', 'night'],
+    []
+  );
+  const trendDirection = harmonyTrend?.direction ?? 'stable';
+  const trendIcon = trendDirection === 'improving' ? '📈' : trendDirection === 'declining' ? '📉' : '➡️';
+  const hasTrendData = Boolean(harmonyTrend);
+  const trendChangeValue = Math.abs(harmonyTrend?.changePercent ?? 0);
+  const trendValueDisplay = hasTrendData ? `${trendChangeValue}%` : '—';
   
   useEffect(() => {
     loadInsights();
   }, []);
+
+  useEffect(() => {
+    setSnapshot(
+      buildAsrarTimingSnapshot({
+        userProfile: profile,
+      })
+    );
+  }, [profile]);
   
   /**
    * Load all insights data
@@ -75,19 +103,20 @@ export default function DivineTimingInsightsScreen() {
       // Compute heatmap data
       const heatmap = computeHeatmapData(allCheckins);
       setHeatmapData(heatmap);
+      const bestCell = heatmap.reduce<any | null>((best, cell) => {
+        if (cell.count === 0) {
+          return best;
+        }
+        if (!best) {
+          return cell;
+        }
+        return cell.value > best.value ? cell : best;
+      }, null);
+      setSelectedCell(bestCell ?? heatmap.find(cell => cell.count > 0) ?? heatmap[0] ?? null);
       
       // Compute segment statistics
-      const segments: TimeSegment[] = [
-        'preDawn',
-        'morning',
-        'midday',
-        'afternoon',
-        'evening',
-        'night',
-      ];
-      
       const segmentStatsMap = new Map<TimeSegment, SegmentAnalytics>();
-      for (const segment of segments) {
+      for (const segment of segmentOrder) {
         const stats = getSegmentStatistics(allCheckins, segment);
         if (stats.count > 0) {
           segmentStatsMap.set(segment, stats as any);
@@ -123,16 +152,7 @@ export default function DivineTimingInsightsScreen() {
     const data: any[] = [];
     
     for (let day = 0; day < 7; day++) {
-      const segments: TimeSegment[] = [
-        'preDawn',
-        'morning',
-        'midday',
-        'afternoon',
-        'evening',
-        'night',
-      ];
-      
-      for (const segment of segments) {
+      for (const segment of segmentOrder) {
         // Filter check-ins for this day and segment
         const filteredCheckins = checkins.filter(c => {
           const date = new Date(c.createdAt);
@@ -167,19 +187,24 @@ export default function DivineTimingInsightsScreen() {
     return data;
   };
   
+  const getDayNameKey = (dayOfWeek: number): string => {
+    const mapping: Record<number, string> = {
+      0: 'dailyCheckIn.days.sun.title',
+      1: 'dailyCheckIn.days.moon.title',
+      2: 'dailyCheckIn.days.mars.title',
+      3: 'dailyCheckIn.days.mercury.title',
+      4: 'dailyCheckIn.days.jupiter.title',
+      5: 'dailyCheckIn.days.venus.title',
+      6: 'dailyCheckIn.days.saturn.title',
+    };
+    return mapping[dayOfWeek] ?? mapping[0];
+  };
+  
   /**
    * Format segment name
    */
   const formatSegmentName = (segment: TimeSegment): string => {
-    const names: Record<TimeSegment, string> = {
-      preDawn: 'Pre-Dawn',
-      morning: 'Morning',
-      midday: 'Midday',
-      afternoon: 'Afternoon',
-      evening: 'Evening',
-      night: 'Night',
-    };
-    return names[segment];
+    return t(`divineTimingInsights.segments.${segment}`);
   };
   
   /**
@@ -197,12 +222,12 @@ export default function DivineTimingInsightsScreen() {
             <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
           </TouchableOpacity>
           <View style={styles.headerContent}>
-            <Text style={styles.headerTitle}>Insights</Text>
+            <Text style={styles.headerTitle}>{t('divineTimingInsights.header.title')}</Text>
           </View>
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#8B7355" />
-          <Text style={styles.loadingText}>Analyzing your patterns...</Text>
+          <Text style={styles.loadingText}>{t('divineTimingInsights.loading.message')}</Text>
         </View>
       </View>
     );
@@ -216,20 +241,20 @@ export default function DivineTimingInsightsScreen() {
             <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
           </TouchableOpacity>
           <View style={styles.headerContent}>
-            <Text style={styles.headerTitle}>Insights</Text>
+            <Text style={styles.headerTitle}>{t('divineTimingInsights.header.title')}</Text>
           </View>
         </View>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon}>📊</Text>
-          <Text style={styles.emptyTitle}>No Data Yet</Text>
+          <Text style={styles.emptyTitle}>{t('divineTimingInsights.empty.title')}</Text>
           <Text style={styles.emptyText}>
-            Check in daily to build your personalized insights
+            {t('divineTimingInsights.empty.subtitle')}
           </Text>
           <TouchableOpacity
             style={styles.emptyButton}
             onPress={() => router.push('/daily-checkin')}
           >
-            <Text style={styles.emptyButtonText}>Start Check-In</Text>
+            <Text style={styles.emptyButtonText}>{t('divineTimingInsights.empty.cta')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -244,54 +269,135 @@ export default function DivineTimingInsightsScreen() {
           <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Your Insights</Text>
+          <Text style={styles.headerTitle}>{t('divineTimingInsights.header.title')}</Text>
           <Text style={styles.headerSubtitle}>
-            {summary?.totalCheckins} check-ins • {summary?.currentStreak} day streak
+            {summary
+              ? `${summary?.totalCheckins ?? 0} ${t('divineTimingInsights.metrics.checkIns')} • ${summary?.currentStreak ?? 0} ${t('divineTimingInsights.metrics.dayStreak')}`
+              : t('divineTimingInsights.header.loading')}
           </Text>
         </View>
       </View>
       
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <View style={[styles.disclaimerPill, { borderColor: DarkTheme.textSecondary }]}> 
+          <Text style={[styles.disclaimerText, { color: DarkTheme.textSecondary }]}> 
+            {t('divineTimingInsights.disclaimer')}
+          </Text>
+        </View>
+        
+        {/* Current Alignment Snapshot */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('divineTimingInsights.sections.currentAlignment')}</Text>
+          <View style={styles.sectionCard}>
+            <View style={styles.currentAlignmentRow}>
+              <View style={styles.currentAlignmentColumn}>
+                <Text style={styles.currentAlignmentLabel}>{t('dailyCheckIn.labels.planetaryDay')}</Text>
+                <Text style={styles.currentAlignmentValue}>{t(snapshot.day.translationKey)}</Text>
+                <Text style={styles.currentAlignmentHint}>
+                  {`${snapshot.day.planetArabic} • ${snapshot.day.planet}`}
+                </Text>
+              </View>
+              <View style={styles.currentAlignmentColumn}>
+                <Text style={styles.currentAlignmentLabel}>{t('dailyCheckIn.labels.cycleTone')}</Text>
+                <Text style={styles.currentAlignmentValue}>{t(snapshot.cycle.stateKey)}</Text>
+                <Text style={styles.currentAlignmentHint}>{t(snapshot.cycle.timingKey)}</Text>
+              </View>
+              <View style={styles.currentAlignmentColumn}>
+                <Text style={styles.currentAlignmentLabel}>{t('dailyCheckIn.labels.harmony')}</Text>
+                <Text style={styles.currentAlignmentScore}>{Math.round(snapshot.elements.alignment.alignment.harmonyScore)}</Text>
+                <Text style={styles.currentAlignmentHint}>{t(snapshot.elements.alignment.qualityKey)}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
         {/* Summary Stats */}
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>{summary?.checkinsLast7Days || 0}</Text>
-            <Text style={styles.statLabel}>This Week</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{summary?.avgHarmonyScore || 0}</Text>
-            <Text style={styles.statLabel}>Avg Harmony</Text>
+            <Text style={styles.statValue}>{summary?.checkinsLast7Days ?? '—'}</Text>
+            <Text style={styles.statLabel}>{t('divineTimingInsights.summary.thisWeek')}</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>
-              {harmonyTrend?.direction === 'improving' ? '📈' : 
-               harmonyTrend?.direction === 'declining' ? '📉' : '➡️'}
+              {summary?.avgHarmonyScore !== undefined && summary?.avgHarmonyScore !== null
+                ? Math.round(summary.avgHarmonyScore)
+                : '—'}
             </Text>
-            <Text style={styles.statLabel}>Trend</Text>
+            <Text style={styles.statLabel}>{t('divineTimingInsights.summary.avgHarmony')}</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{`${trendIcon} ${trendValueDisplay}`}</Text>
+            <Text style={styles.statLabel}>{t(`divineTimingInsights.trendStates.${trendDirection}`)}</Text>
+            {hasTrendData && (
+              <Text style={styles.statSubLabel}>
+                {t('divineTimingInsights.trendStates.change', {
+                  value: trendChangeValue,
+                })}
+              </Text>
+            )}
           </View>
         </View>
         
         {/* Weekly Heatmap */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📊 Weekly Pattern</Text>
+          <Text style={styles.sectionTitle}>{t('divineTimingInsights.sections.patternMap')}</Text>
+          <Text style={styles.sectionHint}>{t('divineTimingInsights.sections.patternHint')}</Text>
           <View style={styles.sectionCard}>
             <WeeklyHeatmap
               data={heatmapData}
               metric="harmony"
               onCellPress={(cell) => {
-                // Could show detail modal
-                if (__DEV__) {
-                  console.log('Cell pressed:', cell);
-                }
+                setSelectedCell(cell);
               }}
             />
+          </View>
+          <View style={styles.heatmapLegendRow}>
+            <Text style={styles.legendTitle}>{t('divineTimingInsights.heatmapLegend.title')}</Text>
+            <View style={styles.legendItems}>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendSwatch, { backgroundColor: '#3E3A36' }]} />
+                <Text style={styles.legendLabel}>{t('divineTimingInsights.heatmapLegend.low')}</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendSwatch, { backgroundColor: '#8B7355' }]} />
+                <Text style={styles.legendLabel}>{t('divineTimingInsights.heatmapLegend.medium')}</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendSwatch, { backgroundColor: '#C9A66B' }]} />
+                <Text style={styles.legendLabel}>{t('divineTimingInsights.heatmapLegend.high')}</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.sectionCard}>
+            {selectedCell ? (
+              <View style={styles.patternDetail}>
+                <Text style={styles.patternDetailTitle}>
+                  {t('divineTimingInsights.patternDetail.title', {
+                    day: t(getDayNameKey(selectedCell.dayOfWeek)),
+                    segment: formatSegmentName(selectedCell.segment),
+                  })}
+                </Text>
+                <Text style={styles.patternDetailMetric}>
+                  {Math.round(selectedCell.value)} {t('divineTimingInsights.metrics.harmony')}
+                </Text>
+                <Text style={styles.patternDetailHint}>
+                  {selectedCell.count > 0
+                    ? t('divineTimingInsights.patternDetail.count', { count: selectedCell.count })
+                    : t('divineTimingInsights.patternDetail.empty')}
+                </Text>
+              </View>
+            ) : (
+              <Text style={styles.patternDetailHint}>
+                {t('divineTimingInsights.patternDetail.placeholder')}
+              </Text>
+            )}
           </View>
         </View>
         
         {/* Segment Analytics */}
         {segmentStats.size > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>⏰ Time Segments</Text>
+            <Text style={styles.sectionTitle}>{t('divineTimingInsights.sections.segments')}</Text>
             {Array.from(segmentStats.entries()).map(([segment, stats]) => (
               <View key={segment} style={styles.segmentCard}>
                 <View style={styles.segmentHeader}>
@@ -304,13 +410,13 @@ export default function DivineTimingInsightsScreen() {
                 </View>
                 <View style={styles.segmentStats}>
                   <Text style={styles.segmentStat}>
-                    {stats.checkinCount} check-ins
+                    {t('divineTimingInsights.segmentStats.checkins', { count: stats.checkinCount })}
                   </Text>
                   <Text style={styles.segmentStat}>
-                    {Math.round(stats.successRate)}% success
+                    {t('divineTimingInsights.segmentStats.success', { value: Math.round(stats.successRate) })}
                   </Text>
                   <Text style={styles.segmentStat}>
-                    {Math.round(stats.avgEnergy)}% energy
+                    {t('divineTimingInsights.segmentStats.energy', { value: Math.round(stats.avgEnergy) })}
                   </Text>
                 </View>
               </View>
@@ -321,7 +427,7 @@ export default function DivineTimingInsightsScreen() {
         {/* Intention Insights */}
         {intentionStats.size > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🎯 Best Intentions</Text>
+            <Text style={styles.sectionTitle}>{t('divineTimingInsights.sections.intentions')}</Text>
             {Array.from(intentionStats.entries())
               .sort(([, a], [, b]) => b.successRate - a.successRate)
               .slice(0, 3)
@@ -336,7 +442,12 @@ export default function DivineTimingInsightsScreen() {
                     </Text>
                   </View>
                   <Text style={styles.intentionDetail}>
-                    {stats.count} check-ins • Best at: {stats.bestSegments.map((s: TimeSegment) => formatSegmentName(s)).join(', ')}
+                    {t('divineTimingInsights.intentions.summary', {
+                      count: stats.count,
+                      segments: stats.bestSegments
+                        .map((s: TimeSegment) => formatSegmentName(s))
+                        .join(', '),
+                    })}
                   </Text>
                 </View>
               ))}
@@ -346,7 +457,7 @@ export default function DivineTimingInsightsScreen() {
         {/* Recommendations */}
         {recommendations.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>💡 Recommendations</Text>
+            <Text style={styles.sectionTitle}>{t('divineTimingInsights.sections.recommendations')}</Text>
             <View style={styles.sectionCard}>
               {recommendations.map((rec, index) => (
                 <View key={index} style={styles.recommendationRow}>
@@ -448,9 +559,23 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 20,
   },
+  disclaimerPill: {
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+  },
+  disclaimerText: {
+    fontSize: 11,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    fontWeight: '600',
+  },
   statsRow: {
     flexDirection: 'row',
     gap: 12,
+    flexWrap: 'wrap',
   },
   statCard: {
     flex: 1,
@@ -468,6 +593,12 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 11,
     color: DarkTheme.textSecondary,
+    textAlign: 'center',
+  },
+  statSubLabel: {
+    fontSize: 11,
+    color: DarkTheme.textSecondary,
+    textAlign: 'center',
   },
   section: {
     gap: 12,
@@ -477,10 +608,73 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: DarkTheme.textPrimary,
   },
+  sectionHint: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+  },
   sectionCard: {
     backgroundColor: DarkTheme.cardBackground,
     borderRadius: 12,
     padding: 16,
+  },
+  heatmapLegendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
+  },
+  legendTitle: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: '500',
+  },
+  legendItems: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  legendSwatch: {
+    width: 16,
+    height: 16,
+    borderRadius: 4,
+  },
+  legendLabel: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+  },
+  currentAlignmentRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+  },
+  currentAlignmentColumn: {
+    minWidth: '28%',
+    flexGrow: 1,
+    gap: 4,
+  },
+  currentAlignmentLabel: {
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+    color: DarkTheme.textSecondary,
+  },
+  currentAlignmentValue: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: DarkTheme.textPrimary,
+  },
+  currentAlignmentHint: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+  },
+  currentAlignmentScore: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#8B7355',
   },
   segmentCard: {
     backgroundColor: DarkTheme.cardBackground,
@@ -553,5 +747,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: DarkTheme.textPrimary,
     lineHeight: 20,
+  },
+  patternDetail: {
+    gap: 6,
+  },
+  patternDetailTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: DarkTheme.textPrimary,
+  },
+  patternDetailMetric: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#8B7355',
+  },
+  patternDetailHint: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
   },
 });

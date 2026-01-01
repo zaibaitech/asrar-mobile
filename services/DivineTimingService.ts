@@ -39,7 +39,7 @@ const HADAD_TO_CYCLE_STATE: Record<number, CycleState> = {
 
 /**
  * Map day of week to elemental tone
- * Simple fixed mapping for Phase 1
+ * Based on traditional Maghribi planetary-element associations
  * 
  * 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
  */
@@ -49,7 +49,7 @@ const DAY_TO_ELEMENT: Record<number, ElementalTone> = {
   2: 'fire',   // Tuesday - Mars (fire)
   3: 'air',    // Wednesday - Mercury (air)
   4: 'air',    // Thursday - Jupiter (air)
-  5: 'water',  // Friday - Venus (water)
+  5: 'earth',  // Friday - Venus (earth) - CORRECTED from water
   6: 'earth',  // Saturday - Saturn (earth)
 };
 

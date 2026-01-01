@@ -39,7 +39,7 @@ const GUIDANCE_MODULES: ModuleCardProps[] = [
   {
     title: 'Guided Istikhārah',
     titleArabic: 'الاستخارة الموجهة',
-    description: 'Preparation and reflection support for ṣalāt al-istikhārah',
+    description: 'Learn the authentic prayer method and track your spiritual decisions',
     icon: '🕊️',
     element: 'earth',
     comingSoon: false,

@@ -4,10 +4,12 @@ import { translations } from '../constants/translations';
 
 type Language = 'en' | 'fr' | 'ar';
 
+type TranslationParams = Record<string, string | number>;
+
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: TranslationParams) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -42,19 +44,56 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   // Translation function with nested key support (e.g., "common.calculate")
-  const t = (key: string) => {
-    const keys = key.split('.');
-    let value: any = translations[language];
-    
+  const resolveTranslation = (lang: Language, keys: string[]) => {
+    let value: any = translations[lang];
+
     for (const k of keys) {
-      if (value && typeof value === 'object') {
+      if (value && typeof value === 'object' && k in value) {
         value = value[k];
       } else {
-        return key; // Return key if translation not found
+        return undefined;
       }
     }
-    
-    return typeof value === 'string' ? value : key;
+
+    return typeof value === 'string' ? value : undefined;
+  };
+
+  const applyParams = (text: string, params?: TranslationParams) => {
+    if (!params) {
+      return text;
+    }
+
+    return Object.entries(params).reduce((acc, [paramKey, paramValue]) => {
+      const pattern = new RegExp(`{${paramKey}}`, 'g');
+      return acc.replace(pattern, String(paramValue));
+    }, text);
+  };
+
+  const t = (key: string, params?: TranslationParams) => {
+    const keys = key.split('.');
+    const fallbackLanguage: Language = 'en';
+
+    const primaryValue = resolveTranslation(language, keys);
+    if (primaryValue) {
+      return applyParams(primaryValue, params);
+    }
+
+    const fallbackValue = language === fallbackLanguage
+      ? undefined
+      : resolveTranslation(fallbackLanguage, keys);
+
+    if (fallbackValue) {
+      if (__DEV__) {
+        console.warn(`Missing translation for "${key}" in language "${language}". Falling back to ${fallbackLanguage}.`);
+      }
+      return applyParams(fallbackValue, params);
+    }
+
+    if (__DEV__) {
+      console.warn(`Missing translation for "${key}" in language "${language}" and fallback language.`);
+    }
+
+    return key;
   };
 
   return (
