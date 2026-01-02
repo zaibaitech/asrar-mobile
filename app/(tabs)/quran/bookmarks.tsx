@@ -3,6 +3,10 @@
  * Display all saved bookmarks
  */
 
+import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getBookmarks, removeBookmark } from '@/services/QuranService';
+import { QuranBookmark } from '@/types/quran';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -16,10 +20,6 @@ import {
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DarkTheme, Spacing, Typography } from '../../constants/DarkTheme';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { getBookmarks, removeBookmark } from '../../services/QuranService';
-import { QuranBookmark } from '../../types/quran';
 
 export default function QuranBookmarksScreen() {
   const router = useRouter();

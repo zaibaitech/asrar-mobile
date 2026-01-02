@@ -1,6 +1,6 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Borders, DarkTheme, ElementAccents, Shadows, Spacing, Typography } from '../../../constants/DarkTheme';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ElementAccents, Spacing } from '../../../constants/DarkTheme';
 import { getElementBackgroundColors, getZodiacSign } from '../../../constants/zodiacData';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { IstikharaData } from '../../../types/istikhara';
@@ -29,6 +29,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
   const elementColors = getElementBackgroundColors(burujProfile.element);
   const elementKey = burujProfile.element.toLowerCase() as "fire" | "earth" | "air" | "water";
   const accent = ElementAccents[elementKey];
+  const [showDetails, setShowDetails] = React.useState(false);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -36,255 +37,256 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
       <IstikharaSummaryCard result={data} language={language} />
       
       <View style={styles.content}>
-        {/* Enhanced Buruj Sign Card */}
-        <View style={[styles.zodiacCard, { borderColor: accent.primary }]}>
-          {/* Header Section */}
-          <View style={styles.zodiacHeader}>
-            <View style={styles.badgeContainer}>
-              <View style={[styles.badge, { backgroundColor: accent.glow, borderColor: accent.primary }]}>
-                <Text style={[styles.badgeText, { color: accent.primary }]}>{t('istikhara.overview.intermediate')}</Text>
-              </View>
+        {/* Core Spiritual Pattern - Matches Overview Style */}
+        <View style={[styles.coreInsightCard, {
+          backgroundColor: `${accent.primary}15`,
+          borderColor: `${accent.primary}33`,
+          shadowColor: accent.primary,
+        }]}>
+          <View style={styles.coreInsightHeader}>
+            <View style={[styles.coreInsightIconContainer, {
+              backgroundColor: `${accent.primary}26`,
+              borderColor: `${accent.primary}4D`,
+            }]}>
+              <Text style={styles.coreInsightIcon}>{zodiacSign?.symbol.split(' ')[0] || '♈️'}</Text>
             </View>
-            <Text style={styles.zodiacIcon}>{zodiacSign?.symbol.split(' ')[0] || '♈️'}</Text>
-            <Text style={styles.zodiacNameEn}>{zodiacSign?.nameEn || 'Unknown'}</Text>
-            <Text style={styles.zodiacNameAr}>{zodiacSign?.nameAr || ''}</Text>
-            <Text style={styles.zodiacTranslit}>{zodiacSign?.transliteration || ''}</Text>
-          </View>
-
-          {/* Calculation Formula */}
-          <View style={[styles.calculationBox, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-            <Text style={[styles.calculationText, { color: accent.primary }]}>
-              {t('istikhara.overview.calculation')}: {combinedTotal} ÷ 12 = {burujRemainder}
-            </Text>
-          </View>
-
-          {/* Information Grid */}
-          <View style={styles.infoGrid}>
-            {/* Element */}
-            <View style={[styles.infoCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.element')}</Text>
-              <Text style={styles.infoValue}>
-                {burujProfile.element_emoji} {language === 'fr' ? getElementNameFr(burujProfile.element) : burujProfile.element.charAt(0).toUpperCase() + burujProfile.element.slice(1)}
+            <View style={styles.coreInsightTitleContainer}>
+              <Text style={[styles.coreInsightLabel, { color: accent.primary }]}>
+                {t('istikhara.overview.spiritualPattern').toUpperCase()}
               </Text>
+              <Text style={styles.coreInsightValue}>{zodiacSign?.nameEn || 'Unknown'} · {language === 'fr' ? getElementNameFr(burujProfile.element) : burujProfile.element.charAt(0).toUpperCase() + burujProfile.element.slice(1)}</Text>
             </View>
-
-            {/* Modality */}
-            <View style={[styles.infoCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.modality')}</Text>
-              <Text style={styles.infoValue}>{language === 'fr' ? zodiacSign?.modalityFr : zodiacSign?.modality || 'N/A'}</Text>
-            </View>
-
-            {/* Planetary Ruler */}
-            <View style={[styles.infoCard, styles.infoCardFull, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.planetaryRuler')}</Text>
-              <Text style={styles.infoValue}>
-                {language === 'fr' ? zodiacSign?.planetaryRuler.fr : zodiacSign?.planetaryRuler.en || 'N/A'}{' '}
-                <Text style={styles.arabicSmall}>({zodiacSign?.planetaryRuler.transliteration || ''})</Text>
-              </Text>
-            </View>
-
-            {/* Temperament */}
-            <View style={[styles.infoCard, styles.infoCardFull, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.temperament')}</Text>
-              <Text style={styles.infoValue}>{language === 'fr' ? zodiacSign?.temperamentFr : zodiacSign?.temperament || 'N/A'}</Text>
-            </View>
-
-            {/* Symbolism */}
-            <View style={[styles.infoCard, styles.infoCardFull, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.symbolism')}</Text>
-              <Text style={styles.infoValue}>{zodiacSign?.symbol || 'N/A'}</Text>
-            </View>
-
-            {/* Spiritual Quality */}
-            <View style={[styles.infoCard, styles.infoCardFull, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.infoLabel, { color: accent.primary }]}>{t('istikhara.overview.spiritualQuality')}</Text>
-              <Text style={styles.infoValue}>{language === 'fr' ? zodiacSign?.spiritualQualityFr : zodiacSign?.spiritualQuality || 'N/A'}</Text>
-            </View>
-          </View>
-
-          {/* Classical Reference */}
-          <View style={[styles.referenceCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderLeftColor: accent.primary, borderLeftWidth: Borders.accent }]}>
-            <View style={styles.referenceHeader}>
-              <Text style={styles.referenceIcon}>📚</Text>
-              <Text style={[styles.referenceTitle, { color: accent.primary }]}>
-                {t('istikhara.overview.classicalReference')}
-              </Text>
-            </View>
-            <Text style={styles.referenceText}>
-              <Text style={[styles.referenceBold, { color: accent.secondary }]}>{t('istikhara.overview.classicalReferenceSource')}: </Text>
-              {(language === 'fr' ? zodiacSign?.classicalReferenceFr : zodiacSign?.classicalReference)?.split(': ')[1] || 'Classical wisdom'}
-            </Text>
-          </View>
-        </View>
-
-        {/* Enhanced Element & Colors Card */}
-        <View style={[styles.enhancedCard, { borderColor: accent.primary }]}>
-          <View style={styles.enhancedCardHeader}>
-            <Text style={styles.enhancedCardIcon}>🌟</Text>
-            <Text style={[styles.enhancedCardTitle, { color: accent.primary }]}>
-              {t('istikhara.overview.elementColors')}
-            </Text>
           </View>
           
-          <View style={styles.elementColorGrid}>
-            {/* Element Section */}
-            <View style={styles.elementSection}>
-              <Text style={[styles.sectionLabel, { color: accent.primary }]}>{t('istikhara.overview.yourElement')}</Text>
-              <View style={[styles.elementDisplay, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-                <Text style={styles.elementEmoji}>{burujProfile.element_emoji}</Text>
-                <View style={styles.elementTextContainer}>
-                  <Text style={[styles.elementName, { color: DarkTheme.textPrimary }]}>
-                    {language === 'fr' ? getElementNameFr(burujProfile.element) : burujProfile.element.charAt(0).toUpperCase() + burujProfile.element.slice(1)}
-                  </Text>
-                  <Text style={[styles.elementSubtext, { color: DarkTheme.textSecondary }]}>
-                    {t('istikhara.overview.elementOf').replace('{number}', burujProfile.element_number.toString())}
+          <Text style={styles.coreInsightDescription}>
+            {language === 'fr' ? zodiacSign?.spiritualQualityFr : zodiacSign?.spiritualQuality || 'N/A'}
+          </Text>
+        </View>
+
+        {/* Core Spiritual Attributes - 3 Compact Cards */}
+        <View style={styles.supportingSignsSection}>
+          <Text style={styles.supportingSignsTitle}>Core Spiritual Attributes</Text>
+          
+          <View style={styles.supportingSignsGrid}>
+            {/* Element */}
+            <View style={[styles.signCard, {
+              backgroundColor: `${accent.primary}33`,
+              borderColor: `${accent.primary}33`,
+              shadowColor: accent.primary,
+            }]}>
+              <Text style={styles.signIcon}>{burujProfile.element_emoji}</Text>
+              <Text style={[styles.signLabel, { color: accent.primary }]}>{t('istikhara.overview.element').toUpperCase()}</Text>
+              <Text style={styles.signValue}>
+                {language === 'fr' ? getElementNameFr(burujProfile.element) : burujProfile.element.charAt(0).toUpperCase() + burujProfile.element.slice(1)}
+              </Text>
+            </View>
+
+            {/* Ruler */}
+            <View style={[styles.signCard, {
+              backgroundColor: `${accent.primary}33`,
+              borderColor: `${accent.primary}33`,
+              shadowColor: accent.primary,
+            }]}>
+              <Text style={styles.signIcon}>⭐</Text>
+              <Text style={[styles.signLabel, { color: accent.primary }]}>{t('istikhara.overview.ruler').toUpperCase()}</Text>
+              <Text style={styles.signValue}>
+                {language === 'fr' ? zodiacSign?.planetaryRuler.fr : zodiacSign?.planetaryRuler.en || 'N/A'}
+              </Text>
+            </View>
+
+            {/* Quality */}
+            <View style={[styles.signCard, {
+              backgroundColor: `${accent.primary}33`,
+              borderColor: `${accent.primary}33`,
+              shadowColor: accent.primary,
+            }]}>
+              <Text style={styles.signIcon}>🌙</Text>
+              <Text style={[styles.signLabel, { color: accent.primary }]}>{t('istikhara.overview.quality').toUpperCase()}</Text>
+              <Text style={styles.signValue}>{language === 'fr' ? zodiacSign?.modalityFr : zodiacSign?.modality || 'N/A'}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Key Insights - Professional Card Style */}
+        <View style={styles.keyInsightsSection}>
+          <Text style={styles.keyInsightsTitle}>Key Insights</Text>
+          
+          <View style={[styles.insightCard, {
+            backgroundColor: `${accent.primary}33`,
+            borderColor: `${accent.primary}33`,
+            shadowColor: accent.primary,
+          }]}>
+            <View style={[styles.insightIcon, {
+              backgroundColor: `${accent.primary}26`,
+            }]}>
+              <Text style={styles.insightIconText}>📿</Text>
+            </View>
+            <View style={styles.insightContent}>
+              <Text style={[styles.insightLabel, { color: accent.primary }]}>Practice Focus</Text>
+              <Text style={styles.insightText}>
+                Recite Divine Names {repetitionCount} times for spiritual alignment
+              </Text>
+            </View>
+          </View>
+          
+          <View style={[styles.insightCard, {
+            backgroundColor: `${accent.primary}33`,
+            borderColor: `${accent.primary}33`,
+            shadowColor: accent.primary,
+          }]}>
+            <View style={[styles.insightIcon, {
+              backgroundColor: `${accent.primary}26`,
+            }]}>
+              <Text style={styles.insightIconText}>{burujProfile.element_emoji}</Text>
+            </View>
+            <View style={styles.insightContent}>
+              <Text style={[styles.insightLabel, { color: accent.primary }]}>Elemental Advice</Text>
+              <Text style={styles.insightText}>
+                Embrace {language === 'fr' ? getElementNameFr(burujProfile.element).toLowerCase() : burujProfile.element.toLowerCase()} qualities through mindful presence
+              </Text>
+            </View>
+          </View>
+          
+          <View style={[styles.insightCard, {
+            backgroundColor: `${accent.primary}33`,
+            borderColor: `${accent.primary}33`,
+            shadowColor: accent.primary,
+          }]}>
+            <View style={[styles.insightIcon, {
+              backgroundColor: `${accent.primary}26`,
+            }]}>
+              <Text style={styles.insightIconText}>🧭</Text>
+            </View>
+            <View style={styles.insightContent}>
+              <Text style={[styles.insightLabel, { color: accent.primary }]}>Path Guidance</Text>
+              <Text style={styles.insightText}>
+                Contemplate {zodiacSign?.nameEn} wisdom in moments of decision
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Collapsible Spiritual Details */}
+        <TouchableOpacity
+          style={[styles.detailsToggle, {
+            backgroundColor: `${accent.primary}26`,
+            borderColor: `${accent.primary}33`,
+          }]}
+          onPress={() => setShowDetails(!showDetails)}
+          activeOpacity={0.7}
+        >
+          <View style={styles.detailsToggleHeader}>
+            <Text style={styles.detailsToggleIcon}>📊</Text>
+            <Text style={styles.detailsToggleText}>
+              {showDetails ? t('istikhara.overview.hideDetails') : t('istikhara.overview.showDetails')}
+            </Text>
+          </View>
+          <Text style={[styles.detailsToggleChevron, { color: accent.primary }]}>{showDetails ? '▼' : '▶'}</Text>
+        </TouchableOpacity>
+
+        {showDetails && (
+          <View style={[styles.detailsSection, {
+            backgroundColor: `${accent.primary}33`,
+            borderColor: `${accent.primary}33`,
+          }]}>
+            {/* Spiritual Practice */}
+            <Text style={[styles.detailSectionTitle, { color: accent.primary }]}>
+              {language === 'en' ? 'SPIRITUAL PRACTICE' : 'PRATIQUE SPIRITUELLE'}
+            </Text>
+            
+            {/* Divine Names */}
+            {burujProfile.spiritual_practice?.divine_names && 'arabic' in burujProfile.spiritual_practice.divine_names && (
+              <View style={styles.practiceCard}>
+                <View style={styles.practiceHeader}>
+                  <Text style={styles.practiceIcon}>✨</Text>
+                  <Text style={[styles.practiceTitle, { color: accent.primary }]}>
+                    {language === 'en' ? 'Divine Names' : 'Noms Divins'}
                   </Text>
                 </View>
+                <Text style={styles.practiceArabic}>{burujProfile.spiritual_practice.divine_names.arabic}</Text>
+                <Text style={styles.practiceTransliteration}>{burujProfile.spiritual_practice.divine_names.transliteration}</Text>
+                <Text style={styles.practiceTranslation}>
+                  {burujProfile.spiritual_practice.divine_names.translation[language as 'en' | 'fr']}
+                </Text>
+                <View style={[styles.practiceCount, { backgroundColor: `${accent.primary}1A` }]}>
+                  <Text style={styles.practiceCountLabel}>{language === 'en' ? 'Recite' : 'Réciter'}</Text>
+                  <Text style={[styles.practiceCountValue, { color: accent.primary }]}>{repetitionCount}×</Text>
+                </View>
               </View>
-            </View>
+            )}
 
-            {/* Colors Section */}
-            <View style={styles.colorsSection}>
-              <Text style={[styles.sectionLabel, { color: accent.primary }]}>{t('istikhara.overview.associatedColors')}</Text>
-              <View style={styles.colorsDisplay}>
-                {burujProfile.colors.map((color, idx) => (
-                  <View key={idx} style={[styles.colorItem, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-                    <View style={[styles.colorCircle, { backgroundColor: color, borderColor: accent.primary }]} />
-                    <Text style={[styles.colorHex, { color: DarkTheme.textPrimary }]}>{color}</Text>
-                  </View>
-                ))}
+            <View style={[styles.detailDivider, { backgroundColor: `${accent.primary}26` }]} />
+
+            {/* Practice Night */}
+            {burujProfile.spiritual_practice?.practice_night && (
+              <View style={styles.practiceCard}>
+                <View style={styles.practiceHeader}>
+                  <Text style={styles.practiceIcon}>🌙</Text>
+                  <Text style={[styles.practiceTitle, { color: accent.primary }]}>
+                    {language === 'en' ? 'Practice Night' : 'Nuit de Pratique'}
+                  </Text>
+                </View>
+                <Text style={styles.practiceValue}>
+                  {burujProfile.spiritual_practice.practice_night.primary[language as 'en' | 'fr']}
+                </Text>
+                {burujProfile.spiritual_practice.practice_night.note && (
+                  <Text style={styles.practiceNote}>
+                    {burujProfile.spiritual_practice.practice_night.note[language as 'en' | 'fr']}
+                  </Text>
+                )}
               </View>
+            )}
+
+            <View style={[styles.detailDivider, { backgroundColor: `${accent.primary}26` }]} />
+
+            {/* Spiritual Guardians */}
+            <Text style={[styles.detailSectionTitle, { color: accent.primary }]}>
+              {language === 'en' ? 'SPIRITUAL GUARDIANS' : 'GARDIENS SPIRITUELS'}
+            </Text>
+            
+            <View style={styles.guardiansGrid}>
+              {/* Angel */}
+              {burujProfile.spiritual_practice?.angel && (
+                <View style={[styles.guardianCard, { borderColor: `${accent.primary}26` }]}>
+                  <Text style={styles.guardianIcon}>👼</Text>
+                  <Text style={[styles.guardianLabel, { color: accent.primary }]}>{language === 'en' ? 'Angel' : 'Ange'}</Text>
+                  <Text style={styles.guardianArabic}>{burujProfile.spiritual_practice.angel.arabic}</Text>
+                  <Text style={styles.guardianName}>{burujProfile.spiritual_practice.angel.transliteration}</Text>
+                </View>
+              )}
+
+              {/* Jinn */}
+              {burujProfile.spiritual_practice?.jinn && (
+                <View style={[styles.guardianCard, { borderColor: `${accent.primary}26` }]}>
+                  <Text style={styles.guardianIcon}>🔮</Text>
+                  <Text style={[styles.guardianLabel, { color: accent.primary }]}>{language === 'en' ? 'Jinn King' : 'Roi Jinn'}</Text>
+                  <Text style={styles.guardianArabic}>{burujProfile.spiritual_practice.jinn.arabic}</Text>
+                  <Text style={styles.guardianName}>{burujProfile.spiritual_practice.jinn.transliteration}</Text>
+                </View>
+              )}
             </View>
-          </View>
 
-          {/* Element Description */}
-          <View style={[styles.elementDescriptionCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderLeftColor: accent.primary, borderLeftWidth: Borders.accent }]}>
-            <Text style={[styles.elementDescriptionText, { color: DarkTheme.textSecondary }]}>
-              {burujProfile.element === 'fire' && t('istikhara.overview.fireDesc')}
-              {burujProfile.element === 'earth' && t('istikhara.overview.earthDesc')}
-              {burujProfile.element === 'air' && t('istikhara.overview.airDesc')}
-              {burujProfile.element === 'water' && t('istikhara.overview.waterDesc')}
-            </Text>
-          </View>
-        </View>
+            <View style={[styles.detailDivider, { backgroundColor: `${accent.primary}26` }]} />
 
-        {/* Enhanced Abjad Numerology Card */}
-        <View style={[styles.enhancedCard, { borderColor: accent.primary }]}>
-          <View style={styles.enhancedCardHeader}>
-            <Text style={styles.enhancedCardIcon}>🔢</Text>
-            <Text style={[styles.enhancedCardTitle, { color: accent.primary }]}>
-              {t('istikhara.overview.abjadNumerology')}
-            </Text>
-          </View>
-
-          <View style={[styles.abjadDescription, { backgroundColor: DarkTheme.cardBackgroundAlt, borderLeftColor: accent.primary, borderLeftWidth: Borders.accent }]}>
-            <Text style={[styles.abjadDescriptionText, { color: DarkTheme.textSecondary }]}>
-              {t('istikhara.overview.abjadDesc')}
-            </Text>
-          </View>
-
-          {/* Person's Name */}
-          <View style={styles.abjadRow}>
-            <View style={styles.abjadLabelContainer}>
-              <Text style={styles.abjadIcon}>👤</Text>
-              <Text style={[styles.abjadLabel, { color: DarkTheme.textPrimary }]}>{t('istikhara.overview.personNameTotal')}</Text>
-            </View>
-            <View style={[styles.abjadValueBox, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.abjadValue, { color: accent.primary }]}>{personTotal}</Text>
-            </View>
-          </View>
-
-          {/* Mother's Name */}
-          <View style={styles.abjadRow}>
-            <View style={styles.abjadLabelContainer}>
-              <Text style={styles.abjadIcon}>👩</Text>
-              <Text style={[styles.abjadLabel, { color: DarkTheme.textPrimary }]}>{t('istikhara.overview.motherNameTotal')}</Text>
-            </View>
-            <View style={[styles.abjadValueBox, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-              <Text style={[styles.abjadValue, { color: accent.primary }]}>{motherTotal}</Text>
-            </View>
-          </View>
-
-          {/* Combined Total - Highlighted */}
-          <View style={[styles.abjadCombinedCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-            <View style={styles.abjadCombinedHeader}>
-              <Text style={styles.abjadCombinedIcon}>✨</Text>
-              <Text style={[styles.abjadCombinedLabel, { color: accent.primary }]}>
-                {t('istikhara.overview.combinedTotal')}
-              </Text>
-            </View>
-            <Text style={[styles.abjadCombinedValue, { color: accent.primary }]}>
-              {combinedTotal}
-            </Text>
-            <Text style={[styles.abjadFormula, { color: DarkTheme.textSecondary }]}>
-              {personTotal} + {motherTotal} = {combinedTotal}
-            </Text>
-          </View>
-
-          {/* Buruj Calculation */}
-          <View style={[styles.burujCalculationCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderLeftColor: accent.primary, borderLeftWidth: Borders.accent }]}>
-            <Text style={[styles.burujCalculationLabel, { color: DarkTheme.textPrimary }]}>{t('istikhara.overview.burujCalculation')}:</Text>
-            <Text style={[styles.burujCalculationFormula, { color: accent.primary }]}>
-              {combinedTotal} mod 12 = {burujRemainder}
-            </Text>
-          </View>
-        </View>
-
-        {/* Enhanced Dhikr Repetitions Card */}
-        <View style={[styles.enhancedCard, { borderColor: accent.primary }]}>
-          <View style={styles.enhancedCardHeader}>
-            <Text style={styles.enhancedCardIcon}>📿</Text>
-            <Text style={[styles.enhancedCardTitle, { color: accent.primary }]}>
-              {t('istikhara.overview.divineNamesDhikr')}
-            </Text>
-          </View>
-
-          <View style={[styles.dhikrDescription, { backgroundColor: DarkTheme.cardBackgroundAlt, borderLeftColor: accent.primary, borderLeftWidth: Borders.accent }]}>
-            <Text style={[styles.dhikrDescriptionText, { color: DarkTheme.textSecondary }]}>
-              {t('istikhara.overview.dhikrDesc')}
-            </Text>
-          </View>
-
-          {/* Repetition Display */}
-          <View style={[styles.dhikrCountCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderColor: accent.primary }]}>
-            <View style={styles.dhikrCountHeader}>
-              <Text style={[styles.dhikrCountLabel, { color: DarkTheme.textPrimary }]}>{t('istikhara.overview.recitationCount')}</Text>
-              <View style={[styles.dhikrBadge, { backgroundColor: accent.glow, borderColor: accent.primary }]}>
-                <Text style={[styles.dhikrBadgeText, { color: accent.primary }]}>{t('istikhara.overview.personalized')}</Text>
+            {/* Quranic Verse */}
+            {burujProfile.spiritual_practice?.quranic_verse && (
+              <View style={styles.practiceCard}>
+                <View style={styles.practiceHeader}>
+                  <Text style={styles.practiceIcon}>📖</Text>
+                  <Text style={[styles.practiceTitle, { color: accent.primary }]}>
+                    {language === 'en' ? 'Quranic Connection' : 'Connexion Coranique'}
+                  </Text>
+                </View>
+                <Text style={[styles.verseReference, { color: accent.primary }]}>{burujProfile.spiritual_practice.quranic_verse.reference}</Text>
+                <Text style={styles.practiceArabic}>{burujProfile.spiritual_practice.quranic_verse.arabic}</Text>
+                <Text style={styles.practiceTransliteration}>{burujProfile.spiritual_practice.quranic_verse.transliteration}</Text>
+                <Text style={styles.practiceTranslation}>
+                  {burujProfile.spiritual_practice.quranic_verse.translation[language as 'en' | 'fr']}
+                </Text>
               </View>
-            </View>
-            <View style={styles.dhikrCountDisplay}>
-              <Text style={[styles.dhikrCountNumber, { color: accent.primary }]}>
-                {repetitionCount}
-              </Text>
-              <Text style={[styles.dhikrCountUnit, { color: DarkTheme.textSecondary }]}>{t('istikhara.overview.repetitions')}</Text>
-            </View>
+            )}
           </View>
-
-          {/* Practice Tips */}
-          <View style={[styles.dhikrTipsCard, { backgroundColor: DarkTheme.cardBackgroundAlt }]}>
-            <View style={styles.dhikrTipRow}>
-              <Text style={styles.dhikrTipIcon}>🕌</Text>
-              <Text style={[styles.dhikrTipText, { color: DarkTheme.textSecondary }]}>{t('istikhara.overview.tip1')}</Text>
-            </View>
-            <View style={styles.dhikrTipRow}>
-              <Text style={styles.dhikrTipIcon}>🧘</Text>
-              <Text style={[styles.dhikrTipText, { color: DarkTheme.textSecondary }]}>{t('istikhara.overview.tip2')}</Text>
-            </View>
-            <View style={styles.dhikrTipRow}>
-              <Text style={styles.dhikrTipIcon}>💫</Text>
-              <Text style={[styles.dhikrTipText, { color: DarkTheme.textSecondary }]}>{t('istikhara.overview.tip3')}</Text>
-            </View>
-          </View>
-
-          {/* Spiritual Note */}
-          <View style={[styles.spiritualNoteCard, { backgroundColor: DarkTheme.cardBackgroundAlt, borderLeftColor: accent.primary, borderLeftWidth: Borders.accent }]}>
-            <Text style={styles.spiritualNoteIcon}>🌙</Text>
-            <Text style={[styles.spiritualNoteText, { color: DarkTheme.textSecondary }]}>
-              {t('istikhara.overview.spiritualNote')}
-            </Text>
-          </View>
-        </View>
+        )}
       </View>
     </ScrollView>
   );
@@ -293,406 +295,334 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DarkTheme.screenBackground,
+    backgroundColor: '#0B1020',
   },
   content: {
     padding: Spacing.lg,
   },
-  // Enhanced Card Base Styles
-  enhancedCard: {
-    backgroundColor: DarkTheme.cardBackground,
-    borderRadius: Borders.radiusLg,
-    borderWidth: Borders.width,
+  // Core Insight Card - Matches Blue Overview
+  coreInsightCard: {
+    borderRadius: 16,
+    borderWidth: 1,
     padding: Spacing.xl,
     marginBottom: Spacing.lg,
-    ...Shadows.medium,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
   },
-  enhancedCardHeader: {
+  coreInsightHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: Spacing.lg,
   },
-  enhancedCardIcon: {
-    fontSize: Typography.iconLg,
-    marginRight: Spacing.sm,
-  },
-  enhancedCardTitle: {
-    fontSize: Typography.h2,
-    fontWeight: Typography.weightBold,
-  },
-  // Zodiac Card Styles
-  zodiacCard: {
-    backgroundColor: DarkTheme.cardBackground,
-    borderRadius: Borders.radiusLg,
-    borderWidth: Borders.width,
-    padding: Spacing.xl,
-    marginBottom: Spacing.lg,
-    ...Shadows.medium,
-  },
-  zodiacHeader: {
+  coreInsightIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
-    marginBottom: Spacing.lg,
+    justifyContent: 'center',
+    marginRight: Spacing.md,
+    borderWidth: 2,
   },
-  badgeContainer: {
-    position: 'absolute',
-    top: -8,
-    right: 0,
-  },
-  badge: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderRadius: Borders.radiusMd,
-    borderWidth: Borders.width,
-  },
-  badgeText: {
-    fontSize: Typography.caption,
-    fontWeight: Typography.weightSemibold,
-  },
-  zodiacIcon: {
-    fontSize: 64,
-    marginBottom: Spacing.md,
-  },
-  zodiacNameEn: {
-    fontSize: 36,
-    fontWeight: Typography.weightBold,
-    color: DarkTheme.textPrimary,
-    marginBottom: Spacing.sm,
-  },
-  zodiacNameAr: {
+  coreInsightIcon: {
     fontSize: 28,
-    color: DarkTheme.textPrimary,
-    marginBottom: Spacing.xs,
   },
-  zodiacTranslit: {
-    fontSize: 20,
-    color: DarkTheme.textSecondary,
-    fontStyle: 'italic',
-  },
-  calculationBox: {
-    backgroundColor: DarkTheme.cardBackgroundAlt,
-    borderRadius: Borders.radiusMd,
-    borderWidth: Borders.width,
-    padding: Spacing.lg,
-    marginBottom: Spacing.lg,
-    alignItems: 'center',
-    ...Shadows.small,
-  },
-  calculationText: {
-    fontSize: Typography.body,
-    fontWeight: Typography.weightSemibold,
-    color: DarkTheme.textPrimary,
-  },
-  infoGrid: {
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  infoCard: {
-    backgroundColor: DarkTheme.cardBackgroundAlt,
-    borderRadius: Borders.radiusMd,
-    borderWidth: Borders.width,
-    padding: Spacing.lg,
-    ...Shadows.small,
-  },
-  infoCardFull: {
-    width: '100%',
-  },
-  infoLabel: {
-    fontSize: Typography.caption,
-    fontWeight: Typography.weightSemibold,
-    marginBottom: Spacing.sm,
-  },
-  infoValue: {
-    fontSize: Typography.body,
-    color: DarkTheme.textPrimary,
-    lineHeight: 24,
-  },
-  arabicSmall: {
-    fontSize: Typography.body,
-    color: DarkTheme.textSecondary,
-  },
-  referenceCard: {
-    backgroundColor: DarkTheme.cardBackgroundAlt,
-    borderRadius: Borders.radiusMd,
-    borderLeftWidth: Borders.accent,
-    padding: Spacing.lg,
-    ...Shadows.small,
-  },
-  referenceHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Spacing.md,
-  },
-  referenceIcon: {
-    fontSize: Typography.iconMd,
-    marginRight: Spacing.sm,
-  },
-  referenceTitle: {
-    fontSize: Typography.body,
-    fontWeight: Typography.weightSemibold,
-    color: DarkTheme.textPrimary,
-  },
-  referenceText: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textSecondary,
-    lineHeight: 20,
-  },
-  referenceBold: {
-    fontWeight: Typography.weightSemibold,
-  },
-  // Element & Colors Card Styles
-  elementColorGrid: {
-    gap: Spacing.lg,
-  },
-  sectionLabel: {
-    fontSize: Typography.caption,
-    fontWeight: Typography.weightSemibold,
-    marginBottom: Spacing.md,
-  },
-  elementSection: {
-    marginBottom: Spacing.lg,
-  },
-  elementDisplay: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: Borders.radiusMd,
-    borderWidth: Borders.width,
-    padding: Spacing.lg,
-    ...Shadows.small,
-  },
-  elementEmoji: {
-    fontSize: 48,
-    marginRight: Spacing.lg,
-  },
-  elementTextContainer: {
+  coreInsightTitleContainer: {
     flex: 1,
   },
-  elementName: {
-    fontSize: Typography.h2,
-    fontWeight: Typography.weightBold,
-    marginBottom: Spacing.xs,
+  coreInsightLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 1,
+    marginBottom: 4,
   },
-  elementSubtext: {
-    fontSize: Typography.caption,
+  coreInsightValue: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#fff',
   },
-  colorsSection: {
+  coreInsightDescription: {
+    fontSize: 15,
+    color: '#cbd5e1',
+    lineHeight: 22,
+  },
+  // Supporting Signs Section - Matches Your Numbers Cards
+  supportingSignsSection: {
     marginBottom: Spacing.lg,
   },
-  colorsDisplay: {
-    gap: Spacing.sm,
+  supportingSignsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#94a3b8',
+    marginBottom: Spacing.lg,
   },
-  colorItem: {
+  supportingSignsGrid: {
     flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: Borders.radiusMd,
-    borderWidth: Borders.width,
-    padding: Spacing.md,
-    ...Shadows.small,
+    gap: Spacing.cardMargin,
   },
-  colorCircle: {
+  signCard: {
+    flex: 1,
+    borderRadius: 12,
+    padding: Spacing.lg,
+    alignItems: 'center',
+    borderWidth: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  signIcon: {
+    fontSize: 32,
+    marginBottom: Spacing.sm,
+  },
+  signLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  signValue: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
+    textAlign: 'center',
+  },
+  // Key Insights Section - Professional Cards
+  keyInsightsSection: {
+    marginBottom: Spacing.lg,
+  },
+  keyInsightsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#94a3b8',
+    marginBottom: Spacing.lg,
+  },
+  insightCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: Spacing.lg,
+    marginBottom: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  insightIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: Spacing.md,
-    borderWidth: Borders.width,
   },
-  colorHex: {
-    fontSize: Typography.body,
-    fontWeight: Typography.weightSemibold,
+  insightIconText: {
+    fontSize: 20,
   },
-  elementDescriptionCard: {
-    borderRadius: Borders.radiusMd,
-    borderLeftWidth: Borders.accent,
-    padding: Spacing.lg,
-    ...Shadows.small,
+  insightContent: {
+    flex: 1,
   },
-  elementDescriptionText: {
-    fontSize: Typography.caption,
-    lineHeight: 20,
-    textAlign: 'center',
-  },
-  // Abjad Numerology Card Styles
-  abjadDescription: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
-  },
-  abjadDescriptionText: {
+  insightLabel: {
     fontSize: 13,
-    color: '#2C3E50',
-    lineHeight: 18,
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  abjadRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  abjadLabelContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  abjadIcon: {
-    fontSize: 20,
-    marginRight: 8,
-  },
-  abjadLabel: {
-    fontSize: Typography.body,
-    fontWeight: Typography.weightMedium,
-  },
-  abjadValueBox: {
-    borderRadius: Borders.radiusSm,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    minWidth: 70,
-    alignItems: 'center',
-    borderWidth: Borders.width,
-    ...Shadows.small,
-  },
-  abjadValue: {
-    fontSize: Typography.h3,
-    fontWeight: Typography.weightBold,
-  },
-  abjadCombinedCard: {
-    borderRadius: Borders.radiusMd,
-    borderWidth: Borders.width,
-    padding: Spacing.lg,
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.lg,
-    alignItems: 'center',
-    ...Shadows.medium,
-  },
-  abjadCombinedHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  abjadCombinedIcon: {
-    fontSize: 20,
-    marginRight: 8,
-  },
-  abjadCombinedLabel: {
-    fontSize: 16,
     fontWeight: '600',
+    marginBottom: 4,
   },
-  abjadCombinedValue: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  abjadFormula: {
-    fontSize: Typography.caption,
-  },
-  burujCalculationCard: {
-    borderRadius: Borders.radiusMd,
-    borderLeftWidth: Borders.accent,
-    padding: Spacing.md,
-    alignItems: 'center',
-    ...Shadows.small,
-  },
-  burujCalculationLabel: {
-    fontSize: Typography.caption,
-    marginBottom: Spacing.xs,
-  },
-  burujCalculationFormula: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  // Dhikr Card Styles
-  dhikrDescription: {
-    borderRadius: Borders.radiusMd,
-    borderLeftWidth: Borders.accent,
-    padding: Spacing.lg,
-    marginBottom: Spacing.lg,
-    ...Shadows.small,
-  },
-  dhikrDescriptionText: {
-    fontSize: Typography.caption,
+  insightText: {
+    fontSize: 14,
+    color: '#cbd5e1',
     lineHeight: 20,
-    textAlign: 'center',
   },
-  dhikrCountCard: {
-    borderRadius: Borders.radiusMd,
-    borderWidth: Borders.width,
+  // Collapsible Details Toggle
+  detailsToggle: {
+    borderRadius: 12,
     padding: Spacing.lg,
-    marginBottom: Spacing.lg,
-    ...Shadows.medium,
+    marginBottom: Spacing.cardMargin,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
   },
-  dhikrCountHeader: {
+  detailsToggleHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  detailsToggleIcon: {
+    fontSize: 20,
+    marginRight: Spacing.sm,
+  },
+  detailsToggleText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#cbd5e1',
+  },
+  detailsToggleChevron: {
+    fontSize: 14,
+  },
+  // Details Section (Collapsible)
+  detailsSection: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: Spacing.xl,
+    marginBottom: Spacing.lg,
+  },
+  detailSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: Spacing.lg,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    paddingVertical: Spacing.cardMargin,
   },
-  dhikrCountLabel: {
-    fontSize: Typography.body,
-    fontWeight: Typography.weightMedium,
+  detailRowLabel: {
+    fontSize: 14,
+    color: '#94a3b8',
+    fontWeight: '500',
   },
-  dhikrBadge: {
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
-    borderRadius: Borders.radiusMd,
-    borderWidth: Borders.width,
-  },
-  dhikrBadgeText: {
-    fontSize: Typography.caption,
-    fontWeight: Typography.weightSemibold,
-  },
-  dhikrCountDisplay: {
-    alignItems: 'center',
-  },
-  dhikrCountNumber: {
-    fontSize: 56,
-    fontWeight: Typography.weightBold,
-    marginBottom: Spacing.xs,
-  },
-  dhikrCountUnit: {
-    fontSize: Typography.body,
-  },
-  dhikrTipsCard: {
-    borderRadius: Borders.radiusMd,
-    padding: Spacing.lg,
-    marginBottom: Spacing.lg,
-    gap: Spacing.md,
-    ...Shadows.small,
-  },
-  dhikrTipRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dhikrTipIcon: {
+  detailRowValue: {
     fontSize: 18,
-    marginRight: 10,
+    fontWeight: '700',
+    color: '#fff',
   },
-  dhikrTipText: {
-    fontSize: Typography.caption,
-    flex: 1,
-    lineHeight: 20,
+  detailDivider: {
+    height: 1,
+    marginVertical: Spacing.lg,
   },
-  spiritualNoteCard: {
-    borderRadius: Borders.radiusMd,
-    borderLeftWidth: Borders.accent,
-    padding: Spacing.lg,
+  colorsList: {
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
+  },
+  colorDetailItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    ...Shadows.small,
+    paddingVertical: Spacing.sm,
   },
-  spiritualNoteIcon: {
-    fontSize: Typography.iconMd,
+  colorDetailCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     marginRight: Spacing.md,
+    borderWidth: 2,
   },
-  spiritualNoteText: {
-    fontSize: Typography.caption,
-    flex: 1,
-    lineHeight: 18,
+  colorDetailText: {
+    fontSize: 14,
+    color: '#cbd5e1',
+    fontFamily: 'monospace',
+  },
+  detailNote: {
+    fontSize: 13,
+    color: '#64748b',
     fontStyle: 'italic',
+    lineHeight: 18,
+  },
+  // Spiritual Practice Styles
+  practiceCard: {
+    marginBottom: Spacing.md,
+  },
+  practiceHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  practiceIcon: {
+    fontSize: 20,
+    marginRight: Spacing.sm,
+  },
+  practiceTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  practiceArabic: {
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: '600',
+    marginBottom: Spacing.sm,
+    textAlign: 'right',
+    lineHeight: 36,
+  },
+  practiceTransliteration: {
+    fontSize: 16,
+    color: '#93c5fd',
+    marginBottom: Spacing.sm,
+    fontStyle: 'italic',
+  },
+  practiceTranslation: {
+    fontSize: 14,
+    color: '#cbd5e1',
+    lineHeight: 20,
+    marginBottom: Spacing.sm,
+  },
+  practiceCount: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 8,
+    padding: Spacing.md,
+    marginTop: Spacing.sm,
+  },
+  practiceCountLabel: {
+    fontSize: 13,
+    color: '#94a3b8',
+    fontWeight: '600',
+  },
+  practiceCountValue: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  practiceValue: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '600',
+    marginBottom: Spacing.sm,
+  },
+  practiceNote: {
+    fontSize: 13,
+    color: '#94a3b8',
+    lineHeight: 18,
+  },
+  verseReference: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: Spacing.sm,
+  },
+  guardiansGrid: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  guardianCard: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+    borderRadius: 12,
+    padding: Spacing.lg,
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  guardianIcon: {
+    fontSize: 28,
+    marginBottom: Spacing.sm,
+  },
+  guardianLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    marginBottom: Spacing.sm,
+    textTransform: 'uppercase',
+  },
+  guardianArabic: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  guardianName: {
+    fontSize: 12,
+    color: '#93c5fd',
+    textAlign: 'center',
   },
 });

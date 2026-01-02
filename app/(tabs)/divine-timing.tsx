@@ -400,47 +400,6 @@ export default function DivineTimingScreen() {
   
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Compact Header - Orientation & Context */}
-      <View style={[styles.header, { backgroundColor: colors.card }]}>
-        <View style={styles.headerLeft}>
-          <Ionicons name="sparkles" size={24} color="#FFD700" />
-          <View>
-            <View style={styles.headerTitleRow}>
-              <Text style={[styles.headerTitle, { color: colors.text }]}>
-                Divine Timing
-              </Text>
-              <View style={styles.premiumBadge}>
-                <Ionicons name="flash" size={10} color="#FFD700" />
-                <Text style={styles.premiumBadgeText}>ADVANCED</Text>
-              </View>
-            </View>
-            <View style={styles.headerSubtitleRow}>
-              <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-                {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-              </Text>
-              {result && (
-                <>
-                  <Text style={[styles.headerDot, { color: colors.textSecondary }]}>•</Text>
-                  <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-                    {result.elementalTone.charAt(0).toUpperCase() + result.elementalTone.slice(1)} Energy
-                  </Text>
-                </>
-              )}
-            </View>
-          </View>
-        </View>
-        <View style={styles.headerRight}>
-          {result && (
-            <TouchableOpacity
-              onPress={handleReset}
-              style={styles.headerAction}
-            >
-              <Ionicons name="refresh" size={20} color={colors.textSecondary} />
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-      
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}

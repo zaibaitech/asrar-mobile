@@ -3,6 +3,10 @@
  * Browse all 114 surahs with metadata
  */
 
+import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { QURAN_SURAHS, Surah } from '@/data/quran-surahs';
+import { getProgress } from '@/services/QuranService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -16,10 +20,6 @@ import {
     View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DarkTheme, Spacing, Typography } from '../constants/DarkTheme';
-import { useLanguage } from '../contexts/LanguageContext';
-import { QURAN_SURAHS, Surah } from '../data/quran-surahs';
-import { getProgress } from '../services/QuranService';
 
 export default function QuranReaderScreen() {
   const { t, language } = useLanguage();

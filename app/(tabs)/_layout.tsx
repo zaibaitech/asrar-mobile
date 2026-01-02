@@ -151,6 +151,41 @@ export default function TabLayout() {
           title: 'Qibla',
         }}
       />
+      <Tabs.Screen
+        name="divine-timing"
+        options={{
+          href: null, // Hide from tab bar - accessed via navigation only
+          title: 'Divine Timing',
+        }}
+      />
+      <Tabs.Screen
+        name="divine-timing-insights"
+        options={{
+          href: null, // Hide from tab bar - accessed via navigation only
+          title: 'Divine Timing Insights',
+        }}
+      />
+      <Tabs.Screen
+        name="quran"
+        options={{
+          href: null, // Hide from tab bar - accessed via navigation only
+          title: 'Quran',
+        }}
+      />
+      <Tabs.Screen
+        name="quran/bookmarks"
+        options={{
+          href: null, // Hide bookmarks route from bottom tabs
+          title: 'Quran Bookmarks',
+        }}
+      />
+      <Tabs.Screen
+        name="quran/[surahNumber]"
+        options={{
+          href: null, // Hide individual surah route from bottom tabs
+          title: 'Quran Surah Detail',
+        }}
+      />
     </Tabs>
   );
 }

@@ -1,33 +1,32 @@
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+import {
+    AlertTriangle,
+    Briefcase,
+    CheckCircle,
+    ChevronDown,
+    ChevronUp,
+    Download,
+    Info,
+    MessageCircle,
+    Share2,
+    Sparkles,
+    TrendingUp
+} from "lucide-react-native";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  Alert,
-  Animated,
-  Dimensions
+    Alert,
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
-import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
-import * as Sharing from 'expo-sharing';
-import * as Print from 'expo-print';
-import {
-  AlertTriangle,
-  Briefcase,
-  CheckCircle,
-  ChevronDown,
-  ChevronUp,
-  Download,
-  Info,
-  MessageCircle,
-  Share2,
-  Sparkles,
-  TrendingUp
-} from "lucide-react-native";
-import { useLanguage } from "../../../contexts/LanguageContext";
 import { getElementColors } from "../../../constants/ElementColors";
+import { useLanguage } from "../../../contexts/LanguageContext";
 import type { IstikharaCalculationResult } from "../../../services/istikhara/types";
 
 const { width } = Dimensions.get('window');
@@ -173,32 +172,30 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
         </Text>
         
         {/* Element Badge */}
-        <LinearGradient
-          colors={colors.primary}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={[styles.elementBadge, { borderColor: colors.border }]}
-        >
+        <View style={[styles.elementBadge, { 
+          backgroundColor: `${colors.accent}33`,
+          borderColor: `${colors.accent}33`,
+          shadowColor: colors.accent
+        }]}>
           <Text style={styles.elementEmoji}>{profile.element_emoji}</Text>
-          <Text style={styles.elementText}>
+          <Text style={[styles.elementText, { color: colors.accent }]}>
             {profile.element} {language === 'en' ? 'Element' : 'Élément'}
           </Text>
-        </LinearGradient>
+        </View>
       </View>
 
       {/* Traditional Guidance */}
-      <LinearGradient
-        colors={colors.primary}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.card, { borderColor: colors.border }]}
-      >
+      <View style={[styles.card, { 
+        backgroundColor: `${colors.accent}33`,
+        borderColor: `${colors.accent}33`,
+        shadowColor: colors.accent
+      }]}>
         <View style={styles.cardHeader}>
-          <View style={[styles.cardIcon, { backgroundColor: colors.background }]}>
+          <View style={[styles.cardIcon, { backgroundColor: `${colors.accent}26` }]}>
             <Text style={styles.emoji}>📜</Text>
           </View>
           <View style={styles.cardHeaderText}>
-            <Text style={styles.cardTitle}>
+            <Text style={[styles.cardTitle, { color: colors.accent }]}>
               {language === 'en' ? 'Traditional Wisdom' : 'Sagesse Traditionnelle'}
             </Text>
           </View>
@@ -210,26 +207,25 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
           </Text>
         </View>
         
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: `${colors.accent}26` }]} />
         <Text style={styles.quoteLabel}>
           {language === 'en' ? 'Traditional Islamic Guidance' : 'Guidance Islamique Traditionnelle'}
         </Text>
-      </LinearGradient>
+      </View>
 
       {/* Special Blessing Notice */}
       {hasSpecialBlessing && (
-        <LinearGradient
-          colors={['#581c87', '#9333ea', '#581c87']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.card, styles.blessingCard]}
-        >
+        <View style={[styles.card, styles.blessingCard, {
+          backgroundColor: `${colors.accent}33`,
+          borderColor: `${colors.accent}33`,
+          shadowColor: colors.accent
+        }]}>
           <View style={styles.cardHeader}>
-            <View style={styles.blessingIcon}>
-              <Sparkles size={24} color="#e9d5ff" />
+            <View style={[styles.blessingIcon, { backgroundColor: `${colors.accent}26` }]}>
+              <Sparkles size={24} color={colors.accent} />
             </View>
             <View style={styles.cardHeaderText}>
-              <Text style={styles.blessingTitle}>
+              <Text style={[styles.blessingTitle, { color: colors.accent }]}>
                 ✨ {language === 'en' ? 'Special Spiritual Blessing' : 'Bénédiction Spirituelle Spéciale'}
               </Text>
             </View>
@@ -239,7 +235,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
               ? 'Despite being a Water element, you receive special blessings from Earth industries. This unique gift allows you to thrive in both water-related AND earth-based careers.'
               : 'Bien que vous soyez un élément Eau, vous recevez des bénédictions spéciales des industries terrestres. Ce don unique vous permet de prospérer dans les carrières liées à l\'eau ET terrestres.'}
           </Text>
-        </LinearGradient>
+        </View>
       )}
 
       {/* Control Buttons */}
@@ -277,12 +273,13 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
             const isExpanded = expandedCategories.has(index);
             
             return (
-              <LinearGradient
+              <View
                 key={index}
-                colors={colors.primary}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={[styles.categoryCard, { borderColor: colors.border }]}
+                style={[styles.categoryCard, { 
+                  backgroundColor: `${colors.accent}33`,
+                  borderColor: `${colors.accent}33`,
+                  shadowColor: colors.accent
+                }]}
               >
                 <TouchableOpacity
                   style={styles.categoryHeader}
@@ -298,7 +295,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
                       </Text>
                     </View>
                   </View>
-                  <View style={[styles.chevronContainer, { backgroundColor: colors.background }]}>
+                  <View style={[styles.chevronContainer, { backgroundColor: `${colors.accent}26` }]}>
                     {isExpanded ? (
                       <ChevronUp size={20} color={colors.accent} />
                     ) : (
@@ -323,7 +320,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
                     </View>
                   </View>
                 )}
-              </LinearGradient>
+              </View>
             );
           })
         ) : (
@@ -339,17 +336,16 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
       </View>
 
       {/* Guiding Principle */}
-      <LinearGradient
-        colors={colors.primary}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.card, { borderColor: colors.border }]}
-      >
+      <View style={[styles.card, { 
+        backgroundColor: `${colors.accent}33`,
+        borderColor: `${colors.accent}33`,
+        shadowColor: colors.accent
+      }]}>
         <View style={styles.cardHeader}>
-          <View style={[styles.cardIcon, { backgroundColor: colors.background }]}>
+          <View style={[styles.cardIcon, { backgroundColor: `${colors.accent}26` }]}>
             <Text style={styles.emoji}>💡</Text>
           </View>
-          <Text style={styles.cardTitle}>
+          <Text style={[styles.cardTitle, { color: colors.accent }]}>
             {language === 'en' ? 'Guiding Principle' : 'Principe Directeur'}
           </Text>
         </View>
@@ -361,23 +357,22 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
             ? 'Let this principle guide your career decisions and professional journey.'
             : 'Laissez ce principe guider vos décisions de carrière et votre parcours professionnel.'}
         </Text>
-      </LinearGradient>
+      </View>
 
       {/* Fields to Avoid */}
       {(career.avoid.traditional[language as 'en' | 'fr'] !== "None specified" && 
         career.avoid.traditional[language as 'en' | 'fr'] !== "Aucun spécifié") && (
-        <LinearGradient
-          colors={['#713f12', '#b45309', '#713f12']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.card, styles.avoidCard]}
-        >
+        <View style={[styles.card, styles.avoidCard, {
+          backgroundColor: `${colors.accent}33`,
+          borderColor: `${colors.accent}33`,
+          shadowColor: colors.accent
+        }]}>
           <View style={styles.cardHeader}>
-            <View style={styles.warningIcon}>
-              <AlertTriangle size={24} color="#fbbf24" />
+            <View style={[styles.warningIcon, { backgroundColor: `${colors.accent}26` }]}>
+              <AlertTriangle size={24} color={colors.accent} />
             </View>
             <View style={styles.cardHeaderText}>
-              <Text style={styles.avoidTitle}>
+              <Text style={[styles.avoidTitle, { color: colors.accent }]}>
                 {language === 'en' ? 'Fields to Consider Carefully' : 'Domaines à Considérer Attentivement'}
               </Text>
               <Text style={styles.avoidSubtitle}>
@@ -414,7 +409,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
                 : 'Concentrez vos efforts sur les domaines recommandés ci-dessus pour des résultats optimaux.'}
             </Text>
           </View>
-        </LinearGradient>
+        </View>
       )}
 
       {/* Action Buttons */}
@@ -510,7 +505,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f1e',
+    backgroundColor: '#0B1020',
     padding: 16,
   },
   header: {
@@ -534,7 +529,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#d1d5db',
+    color: '#94a3b8',
     textAlign: 'center',
     paddingHorizontal: 16,
     marginBottom: 16,
@@ -561,6 +556,10 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 2,
     marginBottom: 16,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -584,37 +583,32 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFF',
   },
   quoteContainer: {
     paddingLeft: 16,
     borderLeftWidth: 4,
-    borderLeftColor: 'rgba(255,255,255,0.3)',
     marginBottom: 16,
   },
   quote: {
     fontSize: 16,
-    color: '#e5e7eb',
+    color: '#cbd5e1',
     fontStyle: 'italic',
     lineHeight: 24,
   },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
     marginVertical: 12,
   },
   quoteLabel: {
     fontSize: 12,
-    color: '#d1d5db',
+    color: '#94a3b8',
     textAlign: 'center',
   },
   blessingCard: {
-    borderColor: '#a855f7',
   },
   blessingIcon: {
     width: 48,
     height: 48,
-    backgroundColor: 'rgba(168,85,247,0.2)',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -626,7 +620,7 @@ const styles = StyleSheet.create({
   },
   blessingText: {
     fontSize: 14,
-    color: '#e5e7eb',
+    color: '#cbd5e1',
     lineHeight: 22,
   },
   controls: {
@@ -653,11 +647,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(30, 58, 138, 0.4)',
+    borderWidth: 1,
+    borderColor: 'rgba(96, 165, 250, 0.2)',
   },
   controlButtonText: {
     fontSize: 12,
-    color: '#FFF',
+    color: '#60a5fa',
     fontWeight: '600',
   },
   categoriesContainer: {
@@ -668,6 +664,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 2,
     overflow: 'hidden',
+    backgroundColor: 'rgba(30, 58, 138, 0.2)',
+    borderColor: 'rgba(96, 165, 250, 0.2)',
   },
   categoryHeader: {
     flexDirection: 'row',
@@ -691,7 +689,7 @@ const styles = StyleSheet.create({
   },
   categoryCount: {
     fontSize: 12,
-    color: '#d1d5db',
+    color: '#94a3b8',
     marginTop: 2,
   },
   chevronContainer: {
@@ -707,7 +705,7 @@ const styles = StyleSheet.create({
   },
   itemsDivider: {
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(96, 165, 250, 0.2)',
     marginBottom: 12,
   },
   careerItem: {
@@ -715,38 +713,38 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 12,
     padding: 12,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
     borderRadius: 8,
     marginBottom: 8,
   },
   careerItemText: {
     flex: 1,
     fontSize: 14,
-    color: '#FFF',
+    color: '#cbd5e1',
     lineHeight: 20,
   },
   itemsFooter: {
     paddingTop: 12,
     marginTop: 8,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
+    borderTopColor: 'rgba(96, 165, 250, 0.1)',
   },
   itemsFooterText: {
     fontSize: 11,
-    color: '#9ca3af',
+    color: '#64748b',
     textAlign: 'center',
   },
   emptyState: {
     alignItems: 'center',
     padding: 48,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(30, 58, 138, 0.15)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: 'rgba(96, 165, 250, 0.1)',
   },
   emptyStateText: {
     fontSize: 14,
-    color: '#d1d5db',
+    color: '#94a3b8',
     textAlign: 'center',
     marginTop: 12,
   },
@@ -759,16 +757,16 @@ const styles = StyleSheet.create({
   },
   principleNote: {
     fontSize: 12,
-    color: '#d1d5db',
+    color: '#94a3b8',
     lineHeight: 18,
   },
   avoidCard: {
-    borderColor: '#f59e0b',
+    borderColor: '#60a5fa',
   },
   warningIcon: {
     width: 48,
     height: 48,
-    backgroundColor: 'rgba(251,191,36,0.2)',
+    backgroundColor: 'rgba(96, 165, 250, 0.2)',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -780,11 +778,11 @@ const styles = StyleSheet.create({
   },
   avoidSubtitle: {
     fontSize: 12,
-    color: '#d1d5db',
+    color: '#94a3b8',
     marginTop: 2,
   },
   avoidSection: {
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -792,34 +790,34 @@ const styles = StyleSheet.create({
   avoidSectionTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#fde68a',
+    color: '#60a5fa',
     marginBottom: 8,
   },
   avoidQuote: {
     fontSize: 14,
-    color: '#e5e7eb',
+    color: '#cbd5e1',
     fontStyle: 'italic',
     lineHeight: 20,
   },
   avoidText: {
     fontSize: 14,
-    color: '#e5e7eb',
+    color: '#cbd5e1',
     lineHeight: 20,
   },
   avoidNote: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
-    backgroundColor: 'rgba(251,191,36,0.1)',
+    backgroundColor: 'rgba(30, 58, 138, 0.3)',
     borderRadius: 8,
     padding: 12,
     borderWidth: 1,
-    borderColor: 'rgba(251,191,36,0.2)',
+    borderColor: 'rgba(96, 165, 250, 0.2)',
   },
   avoidNoteText: {
     flex: 1,
     fontSize: 12,
-    color: '#FFF',
+    color: '#cbd5e1',
     lineHeight: 18,
   },
   actionButtons: {
@@ -843,7 +841,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(30, 58, 138, 0.4)',
     paddingVertical: 16,
     borderRadius: 12,
   },
@@ -864,6 +862,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     alignItems: 'center',
+    backgroundColor: 'rgba(30, 58, 138, 0.2)',
+    borderColor: 'rgba(96, 165, 250, 0.2)',
   },
   statValue: {
     fontSize: 32,
@@ -875,7 +875,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.7)',
+    color: '#94a3b8',
     marginTop: 4,
   },
 });

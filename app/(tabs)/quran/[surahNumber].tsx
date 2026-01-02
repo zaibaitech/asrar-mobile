@@ -3,10 +3,20 @@
  * Display full surah with Arabic text and translation
  */
 
+import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { QURAN_SURAHS } from '@/data/quran-surahs';
+import {
+    addBookmark,
+    fetchSurah,
+    isBookmarked,
+    removeBookmark,
+    saveProgress,
+} from '@/services/QuranService';
+import { QuranAyahWithTranslation, QuranSurah, QuranTranslationEdition } from '@/types/quran';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -17,17 +27,6 @@ import {
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DarkTheme, Spacing, Typography } from '../../constants/DarkTheme';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { QURAN_SURAHS } from '../../data/quran-surahs';
-import {
-    addBookmark,
-    fetchSurah,
-    isBookmarked,
-    removeBookmark,
-    saveProgress,
-} from '../../services/QuranService';
-import { QuranAyahWithTranslation, QuranSurah, QuranTranslationEdition } from '../../types/quran';
 
 export default function SurahDetailScreen() {
   const { surahNumber, scrollToAyah } = useLocalSearchParams();
@@ -124,77 +123,83 @@ export default function SurahDetailScreen() {
     saveProgress(surahNum, ayah.numberInSurah);
   };
 
+  // Helper to strip Bismillah from ayah text if needed
+  const getCleanArabicText = (ayah: QuranAyahWithTranslation): string => {
+    let text = ayah.arabic.text;
+    
+    // For Ayah 1 of all surahs except Al-Fatiha (1) and At-Tawbah (9),
+    // remove Bismillah from the text since we show it separately
+    if (ayah.numberInSurah === 1 && surahNum !== 1 && surahNum !== 9) {
+      // Remove common Bismillah variations from the beginning
+      text = text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ\s*/, '');
+      text = text.replace(/^بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\s*/, '');
+      text = text.replace(/^﻿بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\s*/, '');
+    }
+    
+    return text;
+  };
+
   const renderAyah = useCallback(({ item: ayah }: { item: QuranAyahWithTranslation }) => {
     const isBookmarked = bookmarkedAyahs.has(ayah.numberInSurah);
+    const cleanArabicText = getCleanArabicText(ayah);
 
     return (
       <TouchableOpacity
-        style={styles.ayahCard}
+        style={styles.ayahContainer}
         onPress={() => handleAyahPress(ayah)}
         onLongPress={() => handleBookmarkToggle(ayah)}
-        activeOpacity={0.7}
+        activeOpacity={0.9}
       >
-        <View style={styles.ayahNumber}>
-          <Text style={styles.ayahNumberText}>{ayah.numberInSurah}</Text>
+        {/* Arabic Text - Full width, prominent */}
+        <View style={styles.arabicSection}>
+          <Text style={styles.arabicText}>
+            {cleanArabicText}
+            {' '}
+            <Text style={styles.ayahNumberInline}>﴿{ayah.numberInSurah}﴾</Text>
+          </Text>
         </View>
 
-        <View style={styles.ayahContent}>
-          {/* Arabic Text */}
-          <Text style={styles.arabicText}>{ayah.arabic.text}</Text>
+        {/* Translation - Secondary, clearly separated */}
+        <Text style={styles.translationText}>{ayah.translation.text}</Text>
 
-          {/* Translation */}
-          <Text style={styles.translationText}>{ayah.translation.text}</Text>
-
-          {/* Actions */}
-          <View style={styles.ayahActions}>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => handleBookmarkToggle(ayah)}
-            >
-              <Ionicons
-                name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
-                size={18}
-                color={isBookmarked ? '#10b981' : DarkTheme.textSecondary}
-              />
-            </TouchableOpacity>
+        {/* Bookmark indicator - minimal */}
+        {isBookmarked && (
+          <View style={styles.bookmarkIndicator}>
+            <Ionicons name="bookmark" size={14} color="#3b82f6" />
           </View>
-        </View>
+        )}
       </TouchableOpacity>
     );
-  }, [bookmarkedAyahs, handleBookmarkToggle, handleAyahPress]);
+  }, [bookmarkedAyahs, handleBookmarkToggle, handleAyahPress, surahNum]);
 
   const ListHeaderComponent = useMemo(() => (
     <View style={styles.surahHeader}>
-      <LinearGradient
-        colors={['rgba(139, 115, 85, 0.2)', 'rgba(139, 115, 85, 0.1)']}
-        style={styles.surahHeaderGradient}
-      >
+      {/* Clean Surah Info Header - Minimal, Informational */}
+      <View style={styles.surahInfoContainer}>
         <Text style={styles.surahNameAr}>{surahMeta?.name.arabic}</Text>
         <Text style={styles.surahNameEn}>
           {language === 'fr' && surahMeta?.name.fr ? surahMeta.name.fr : surahMeta?.name.en}
         </Text>
-        <View style={styles.surahMeta}>
-          <Text style={styles.surahMetaText}>
-            {surahMeta?.revelationType} · {surahMeta?.totalAyahs} {t('quran.ayahs')}
-          </Text>
-        </View>
-      </LinearGradient>
+        <Text style={styles.surahMeta}>
+          {surahMeta?.revelationType} · {surahMeta?.totalAyahs} {t('quran.ayahs')}
+        </Text>
+      </View>
 
-      {/* Bismillah (except for Surah 1 and 9) */}
+      {/* Bismillah - Centered, Elegant (except for Surah 1 and 9) */}
       {surahNum !== 1 && surahNum !== 9 && (
         <View style={styles.bismillahContainer}>
           <Text style={styles.bismillah}>بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</Text>
         </View>
       )}
+      
+      {/* Visual separator before ayahs */}
+      <View style={styles.separator} />
     </View>
   ), [surahMeta, language, t, surahNum]);
 
   if (loading) {
     return (
-      <LinearGradient
-        colors={['#0f172a', '#1e1b4b', '#1A1625']}
-        style={[styles.container, { paddingTop: insets.top }]}
-      >
+      <View style={[styles.container, { backgroundColor: '#0f172a', paddingTop: insets.top }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
@@ -203,19 +208,16 @@ export default function SurahDetailScreen() {
           <View style={styles.headerSpacer} />
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#8B7355" />
+          <ActivityIndicator size="large" color="#3b82f6" />
           <Text style={styles.loadingText}>{t('quran.loadingSurah')}</Text>
         </View>
-      </LinearGradient>
+      </View>
     );
   }
 
   if (error || !surah) {
     return (
-      <LinearGradient
-        colors={['#0f172a', '#1e1b4b', '#1A1625']}
-        style={[styles.container, { paddingTop: insets.top }]}
-      >
+      <View style={[styles.container, { backgroundColor: '#0f172a', paddingTop: insets.top }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
@@ -230,15 +232,12 @@ export default function SurahDetailScreen() {
             <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
           </TouchableOpacity>
         </View>
-      </LinearGradient>
+      </View>
     );
   }
 
   return (
-    <LinearGradient
-      colors={['#0f172a', '#1e1b4b', '#1A1625']}
-      style={[styles.container, { paddingTop: insets.top }]}
-    >
+    <View style={[styles.container, { backgroundColor: '#0f172a', paddingTop: insets.top }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
@@ -269,7 +268,7 @@ export default function SurahDetailScreen() {
           }, 100);
         }}
       />
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -303,91 +302,104 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: Spacing.screenPadding,
   },
+  
+  // Surah Header - Clean & Minimal
   surahHeader: {
-    marginVertical: Spacing.lg,
-  },
-  surahHeaderGradient: {
-    padding: Spacing.lg,
-    borderRadius: 16,
-    alignItems: 'center',
-    gap: Spacing.sm,
-  },
-  surahNameAr: {
-    fontSize: 32,
-    fontWeight: Typography.weightBold,
-    color: DarkTheme.textPrimary,
-    textAlign: 'center',
-  },
-  surahNameEn: {
-    fontSize: 20,
-    fontWeight: Typography.weightSemibold,
-    color: DarkTheme.textSecondary,
-    textAlign: 'center',
-  },
-  surahMeta: {
-    marginTop: Spacing.xs,
-  },
-  surahMetaText: {
-    fontSize: 14,
-    color: DarkTheme.textTertiary,
-    textAlign: 'center',
-  },
-  bismillahContainer: {
-    alignItems: 'center',
     marginTop: Spacing.lg,
     marginBottom: Spacing.md,
   },
-  bismillah: {
-    fontSize: 24,
-    fontWeight: Typography.weightBold,
-    color: '#8B7355',
-    textAlign: 'center',
-  },
-  ayahCard: {
-    flexDirection: 'row',
-    marginBottom: Spacing.md,
-    padding: Spacing.md,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderRadius: 12,
-    gap: Spacing.md,
-  },
-  ayahNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(139, 115, 85, 0.2)',
+  surahInfoContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: Spacing.md,
+    gap: Spacing.xs,
   },
-  ayahNumberText: {
-    fontSize: 14,
+  surahNameAr: {
+    fontSize: 28,
     fontWeight: Typography.weightBold,
-    color: '#8B7355',
-  },
-  ayahContent: {
-    flex: 1,
-    gap: Spacing.sm,
-  },
-  arabicText: {
-    fontSize: 22,
-    lineHeight: 40,
     color: DarkTheme.textPrimary,
-    textAlign: 'right',
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  surahNameEn: {
+    fontSize: 16,
     fontWeight: Typography.weightSemibold,
-  },
-  translationText: {
-    fontSize: 15,
-    lineHeight: 24,
-    color: DarkTheme.textSecondary,
-  },
-  ayahActions: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
+    color: 'rgba(255, 255, 255, 0.6)',
+    textAlign: 'center',
     marginTop: Spacing.xs,
   },
-  actionButton: {
-    padding: Spacing.xs,
+  surahMeta: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.4)',
+    textAlign: 'center',
+    marginTop: Spacing.xs / 2,
   },
+  
+  // Bismillah - Centered, Elegant
+  bismillahContainer: {
+    alignItems: 'center',
+    paddingVertical: Spacing.xl,
+    marginVertical: Spacing.md,
+  },
+  bismillah: {
+    fontSize: 22,
+    fontWeight: Typography.weightBold,
+    color: '#3b82f6', // Subtle blue accent
+    textAlign: 'center',
+    letterSpacing: 1,
+  },
+  
+  // Visual separator
+  separator: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    marginTop: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  
+  // Ayah Container - Clean, Breathable
+  ayahContainer: {
+    paddingVertical: Spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.03)',
+    position: 'relative',
+  },
+  
+  // Arabic Section - Prominent, Full Width
+  arabicSection: {
+    marginBottom: Spacing.md,
+  },
+  arabicText: {
+    fontSize: 24,
+    lineHeight: 48,
+    color: DarkTheme.textPrimary,
+    textAlign: 'right',
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+  ayahNumberInline: {
+    fontSize: 18,
+    color: '#3b82f6',
+    fontWeight: Typography.weightBold,
+  },
+  
+  // Translation - Secondary, Clearly Separated
+  translationText: {
+    fontSize: 15,
+    lineHeight: 26,
+    color: 'rgba(255, 255, 255, 0.65)',
+    textAlign: 'left',
+    fontWeight: '400',
+    paddingTop: Spacing.sm,
+  },
+  
+  // Bookmark Indicator - Minimal
+  bookmarkIndicator: {
+    position: 'absolute',
+    top: Spacing.md,
+    left: 0,
+  },
+  
+  // Loading & Error States
   loadingContainer: {
     flex: 1,
     alignItems: 'center',
@@ -412,7 +424,7 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     marginTop: Spacing.md,
-    backgroundColor: '#8B7355',
+    backgroundColor: '#3b82f6',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
     borderRadius: 8,
@@ -420,6 +432,6 @@ const styles = StyleSheet.create({
   retryButtonText: {
     fontSize: 15,
     fontWeight: Typography.weightSemibold,
-    color: '#000',
+    color: '#fff',
   },
 });

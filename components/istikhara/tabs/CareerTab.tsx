@@ -1,7 +1,7 @@
 import { BookOpen, CheckCircle, ChevronDown, ChevronUp, Lightbulb, XCircle } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Borders, DarkTheme, ElementAccents, Shadows, Spacing, Typography } from '../../../constants/DarkTheme';
+import { Borders, DarkTheme, ElementAccents, Spacing, Typography } from '../../../constants/DarkTheme';
 import { IstikharaData } from '../../../types/istikhara';
 
 interface CareerTabProps {
@@ -184,7 +184,7 @@ export default function CareerTab({ data, elementColor }: CareerTabProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DarkTheme.screenBackground,
+    backgroundColor: '#0B1020',
   },
   content: {
     padding: Spacing.screenPadding,
@@ -196,13 +196,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: Typography.h1,
     fontWeight: Typography.weightBold,
-    color: DarkTheme.textPrimary,
+    color: '#fff',
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
   subtitle: {
     fontSize: Typography.label,
-    color: DarkTheme.textTertiary,
+    color: '#94a3b8',
     textAlign: 'center',
     paddingHorizontal: Spacing.lg,
   },
@@ -214,9 +214,14 @@ const styles = StyleSheet.create({
     borderRadius: Borders.radiusLg,
     borderWidth: Borders.standard,
     marginBottom: Spacing.xl,
-    backgroundColor: DarkTheme.cardBackground,
+    backgroundColor: 'rgba(30, 58, 138, 0.2)',
+    borderColor: 'rgba(96, 165, 250, 0.2)',
     justifyContent: 'center',
-    ...Shadows.card,
+    shadowColor: '#60a5fa',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
   },
   elementEmoji: {
     fontSize: 32,
@@ -226,21 +231,31 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weightBold,
   },
   wisdomCard: {
-    backgroundColor: DarkTheme.cardBackground,
+    backgroundColor: 'rgba(30, 58, 138, 0.2)',
     borderRadius: Borders.radiusLg,
     padding: Spacing.xl,
     marginBottom: Spacing.lg,
     borderLeftWidth: Borders.accent,
     borderWidth: Borders.standard,
-    ...Shadows.card,
+    borderColor: 'rgba(96, 165, 250, 0.2)',
+    shadowColor: '#60a5fa',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
   },
   card: {
-    backgroundColor: DarkTheme.cardBackground,
+    backgroundColor: 'rgba(30, 58, 138, 0.2)',
     borderRadius: Borders.radiusLg,
     padding: Spacing.xl,
     marginBottom: Spacing.lg,
     borderWidth: Borders.standard,
-    ...Shadows.card,
+    borderColor: 'rgba(96, 165, 250, 0.2)',
+    shadowColor: '#60a5fa',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -251,34 +266,36 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: Typography.h3,
     fontWeight: Typography.weightSemibold,
+    color: '#fff',
   },
   quoteContainer: {
-    backgroundColor: DarkTheme.cardBackgroundAlt,
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
     borderLeftWidth: 4,
+    borderLeftColor: '#60a5fa',
     padding: Spacing.lg,
     borderRadius: Borders.radiusSm,
     marginBottom: Spacing.md,
   },
   quoteText: {
     fontSize: Typography.body,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
     fontStyle: 'italic',
     lineHeight: Typography.body * Typography.lineHeightRelaxed,
   },
   sourceText: {
     fontSize: Typography.caption,
-    color: DarkTheme.textTertiary,
+    color: '#94a3b8',
     textAlign: 'right',
   },
   guidanceText: {
     fontSize: Typography.body,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
     lineHeight: Typography.body * Typography.lineHeightRelaxed,
   },
   frenchText: {
     marginTop: Spacing.md,
     fontStyle: 'italic',
-    color: DarkTheme.textTertiary,
+    color: '#94a3b8',
   },
   buttonGroup: {
     flexDirection: 'row',
@@ -302,7 +319,11 @@ const styles = StyleSheet.create({
     borderWidth: Borders.standard,
     marginBottom: Spacing.md,
     overflow: 'hidden',
-    ...Shadows.subtle,
+    shadowColor: '#60a5fa',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   categoryHeader: {
     flexDirection: 'row',
@@ -325,18 +346,18 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: Typography.body,
     fontWeight: Typography.weightSemibold,
-    color: DarkTheme.textPrimary,
+    color: '#fff',
     marginBottom: 2,
   },
   opportunityCount: {
     fontSize: Typography.caption,
-    color: DarkTheme.textMuted,
+    color: '#64748b',
   },
   categoryItems: {
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: DarkTheme.borderSubtle,
+    borderTopColor: 'rgba(96, 165, 250, 0.1)',
   },
   listItem: {
     flexDirection: 'row',
@@ -354,7 +375,7 @@ const styles = StyleSheet.create({
   listText: {
     flex: 1,
     fontSize: Typography.body,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
     lineHeight: Typography.body * Typography.lineHeightNormal,
   },
   avoidSection: {
@@ -363,12 +384,12 @@ const styles = StyleSheet.create({
   avoidLabel: {
     fontSize: Typography.label,
     fontWeight: Typography.weightSemibold,
-    color: DarkTheme.textTertiary,
+    color: '#94a3b8',
     marginBottom: Spacing.xs,
   },
   avoidText: {
     fontSize: Typography.body,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
     lineHeight: Typography.body * Typography.lineHeightNormal,
   },
 });

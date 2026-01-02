@@ -22,7 +22,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { Borders, DarkTheme, ElementAccents, Shadows, Spacing, Typography } from "../../../constants/DarkTheme";
+import { DarkTheme, ElementAccents, Spacing, Typography } from "../../../constants/DarkTheme";
 import { useLanguage } from "../../../contexts/LanguageContext";
 import type { IstikharaData } from "../../../types/istikhara";
 
@@ -146,7 +146,11 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
       </View>
 
       {/* Element Badge - Compact, not full gradient */}
-      <View style={[styles.elementBadge, { borderColor: accent.primary }]}>
+      <View style={[styles.elementBadge, { 
+        borderColor: `${accent.primary}33`, 
+        backgroundColor: `${accent.primary}33`,
+        shadowColor: accent.primary 
+      }]}>
         <Text style={styles.elementEmoji}>{profile.element_emoji}</Text>
         <View style={styles.elementInfo}>
           <Text style={[styles.elementText, { color: accent.primary }]}>
@@ -159,7 +163,11 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
       </View>
 
       {/* About Profile - Dark card with accent header */}
-      <View style={[styles.summaryCard, { borderColor: accent.primary }]}>
+      <View style={[styles.summaryCard, { 
+        borderColor: `${accent.primary}33`, 
+        backgroundColor: `${accent.primary}33`,
+        shadowColor: accent.primary 
+      }]}>
         <View style={styles.summaryHeader}>
           <Info size={20} color={accent.primary} />
           <Text style={[styles.summaryTitle, { color: DarkTheme.textPrimary }]}>
@@ -181,7 +189,11 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
         return (
           <View
             key={trait.key}
-            style={[styles.traitCard, { borderColor: accent.primary }]}
+            style={[styles.traitCard, { 
+              borderColor: `${accent.primary}33`, 
+              backgroundColor: `${accent.primary}33`,
+              shadowColor: accent.primary 
+            }]}
           >
             <TouchableOpacity
               style={styles.traitHeader}
@@ -189,7 +201,7 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
               activeOpacity={0.7}
             >
               <View style={styles.traitTitleRow}>
-                <View style={[styles.traitIcon, { backgroundColor: accent.glow }]}>
+                <View style={[styles.traitIcon, { backgroundColor: `${accent.primary}26` }]}>
                   {trait.icon}
                 </View>
                 <View style={styles.traitTitleContainer}>
@@ -255,7 +267,7 @@ const Sparkles = ({ size, color }: { size: number; color: string }) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DarkTheme.screenBackground,
+    backgroundColor: '#0B1020',
   },
   scrollContent: {
     padding: Spacing.screenPadding,
@@ -268,13 +280,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: Typography.h1,
     fontWeight: Typography.weightBold,
-    color: DarkTheme.textPrimary,
+    color: '#fff',
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
   subtitle: {
     fontSize: Typography.label,
-    color: DarkTheme.textTertiary,
+    color: '#94a3b8',
     textAlign: 'center',
     paddingHorizontal: Spacing.lg,
   },
@@ -283,11 +295,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.lg,
     padding: Spacing.xl,
-    borderRadius: Borders.radiusLg,
-    borderWidth: Borders.standard,
+    borderRadius: 16,
+    borderWidth: 1,
     marginBottom: Spacing.xl,
-    backgroundColor: DarkTheme.cardBackground,
-    ...Shadows.card,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   elementEmoji: {
     fontSize: 48,
@@ -302,15 +316,17 @@ const styles = StyleSheet.create({
   },
   elementNumber: {
     fontSize: Typography.label,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
   },
   summaryCard: {
     padding: Spacing.xl,
-    borderRadius: Borders.radiusLg,
-    borderWidth: Borders.standard,
+    borderRadius: 16,
+    borderWidth: 1,
     marginBottom: Spacing.xl,
-    backgroundColor: DarkTheme.cardBackground,
-    ...Shadows.card,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   summaryHeader: {
     flexDirection: 'row',
@@ -321,19 +337,22 @@ const styles = StyleSheet.create({
   summaryTitle: {
     fontSize: Typography.body,
     fontWeight: Typography.weightSemibold,
+    color: '#fff',
   },
   summaryText: {
     fontSize: Typography.label,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
     lineHeight: Typography.label * Typography.lineHeightRelaxed,
   },
   traitCard: {
-    borderRadius: Borders.radiusLg,
-    borderWidth: Borders.standard,
+    borderRadius: 16,
+    borderWidth: 1,
     marginBottom: Spacing.lg,
     overflow: 'hidden',
-    backgroundColor: DarkTheme.cardBackground,
-    ...Shadows.card,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   traitHeader: {
     flexDirection: 'row',
@@ -351,7 +370,7 @@ const styles = StyleSheet.create({
   traitIcon: {
     width: 48,
     height: 48,
-    borderRadius: Borders.radiusCircle,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -361,22 +380,22 @@ const styles = StyleSheet.create({
   traitLabel: {
     fontSize: Typography.body,
     fontWeight: Typography.weightSemibold,
-    color: DarkTheme.textPrimary,
+    color: '#fff',
     marginBottom: 4,
   },
   traitPreview: {
     fontSize: Typography.caption,
-    color: DarkTheme.textMuted,
+    color: '#94a3b8',
   },
   traitContent: {
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: DarkTheme.borderSubtle,
+    borderTopColor: 'rgba(255, 255, 255, 0.05)',
   },
   traitText: {
     fontSize: Typography.body,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
     lineHeight: Typography.body * Typography.lineHeightRelaxed,
     marginTop: Spacing.md,
     marginBottom: Spacing.md,
@@ -387,7 +406,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    borderRadius: Borders.radiusSm,
+    borderRadius: 8,
     borderWidth: 1,
   },
   blessingText: {
@@ -400,7 +419,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    borderRadius: Borders.radiusSm,
+    borderRadius: 8,
     borderWidth: 1,
   },
   challengeText: {

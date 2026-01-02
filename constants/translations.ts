@@ -3140,6 +3140,21 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         tip2: "Maintain state of wudu (ablution)",
         tip3: "Focus on intention and presence",
         spiritualNote: "Each recitation carries the barakah (blessing) of your unique spiritual signature",
+        // New guided UX translations
+        spiritualPattern: "Spiritual Pattern",
+        spiritualIndicators: "Spiritual Indicators",
+        ruler: "Ruler",
+        quality: "Quality",
+        spiritualGuidance: "Spiritual Guidance",
+        reciteNames: "Recite Divine Names",
+        times: "times for spiritual alignment",
+        embraceElement: "Embrace",
+        qualities: "qualities through mindful presence",
+        contemplate: "Contemplate",
+        wisdom: "wisdom in moments of decision",
+        showDetails: "Show Spiritual Details",
+        hideDetails: "Hide Spiritual Details",
+        abjadCalculations: "Abjad Calculations",
       },
       
       // Personality Profile
@@ -6303,6 +6318,21 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         tip2: "Maintenir l'état de wudu (ablution)",
         tip3: "Se concentrer sur l'intention et la présence",
         spiritualNote: "Chaque récitation porte la barakah (bénédiction) de votre signature spirituelle unique",
+        // Nouvelles traductions UX guidée
+        spiritualPattern: "Modèle Spirituel",
+        spiritualIndicators: "Indicateurs Spirituels",
+        ruler: "Maître",
+        quality: "Qualité",
+        spiritualGuidance: "Guidance Spirituelle",
+        reciteNames: "Récitez les Noms Divins",
+        times: "fois pour l'alignement spirituel",
+        embraceElement: "Embrassez",
+        qualities: "qualités par la présence attentive",
+        contemplate: "Contemplez",
+        wisdom: "sagesse dans les moments de décision",
+        showDetails: "Afficher les Détails Spirituels",
+        hideDetails: "Masquer les Détails Spirituels",
+        abjadCalculations: "Calculs Abjad",
       },
       
       // Profil de personnalité

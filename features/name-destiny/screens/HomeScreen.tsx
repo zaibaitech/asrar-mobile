@@ -8,17 +8,17 @@ import { DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/Dark
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState } from 'react';
 import {
-    Keyboard,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DivineResonanceCard } from '../components/DivineResonanceCard';
@@ -44,6 +44,7 @@ export default function NameDestinyHomeScreen() {
   // UI state
   const [showNameKeyboard, setShowNameKeyboard] = useState(false);
   const [showMotherKeyboard, setShowMotherKeyboard] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [result, setResult] = useState<NameDestinyResult | null>(null);
 
@@ -307,59 +308,153 @@ export default function NameDestinyHomeScreen() {
             </View>
           )}
 
-          {/* Results Section */}
+          {/* Results Section - Guided Spiritual Insight */}
           {result && (
             <View style={styles.resultsSection}>
-              <Text style={styles.resultsTitle}>✨ Your Spiritual Destiny</Text>
-              
+              {/* Hero Section - Spiritual Overview */}
+              <View style={styles.heroSection}>
+                <Text style={styles.heroIcon}>✨</Text>
+                <Text style={styles.heroTitle}>Your Spiritual Essence</Text>
+                <Text style={styles.heroSubtitle}>
+                  {result.personName}
+                  {result.motherName && ` • ${result.motherName}`}
+                </Text>
+              </View>
+
+              {/* Core Insight - Primary Spiritual Pattern */}
               <LinearGradient
-                colors={['#4f46e5', '#7c3aed']}
-                style={styles.resultCard}
+                colors={['rgba(139, 92, 246, 0.15)', 'rgba(79, 70, 229, 0.1)']}
+                style={styles.coreInsightCard}
               >
-                <Text style={styles.resultLabel}>Name</Text>
-                <Text style={styles.resultValue}>{result.personName}</Text>
-                {result.motherName && (
-                  <>
-                    <Text style={[styles.resultLabel, styles.mtSmall]}>Mother's Name</Text>
-                    <Text style={styles.resultValue}>{result.motherName}</Text>
-                  </>
-                )}
+                <View style={styles.coreInsightHeader}>
+                  <View style={styles.coreInsightIconContainer}>
+                    <Text style={styles.coreInsightIcon}>🌙</Text>
+                  </View>
+                  <Text style={styles.coreInsightLabel}>Core Spiritual Pattern</Text>
+                </View>
+                
+                <Text style={styles.coreInsightValue}>
+                  {result.element.en} Nature with {result.burj.en} Influence
+                </Text>
+                
+                <Text style={styles.coreInsightDescription}>
+                  The spiritual pattern surrounding your name shows a dominant {result.element.en.toLowerCase()} energy, 
+                  guided by the qualities of {result.burj.en}. This combination suggests a path of{' '}
+                  {result.element.en === 'Fire' ? 'transformation and spiritual illumination' :
+                   result.element.en === 'Water' ? 'emotional depth and intuitive wisdom' :
+                   result.element.en === 'Air' ? 'intellectual clarity and spiritual communication' :
+                   'groundedness and spiritual stability'}.
+                </Text>
               </LinearGradient>
 
-              <View style={styles.statsGrid}>
-                <View style={styles.statCard}>
-                  <Text style={styles.statLabel}>Total Kabir</Text>
-                  <Text style={styles.statValue}>{result.totalKabir}</Text>
+              {/* Supporting Signs - Compact Cards */}
+              <View style={styles.supportingSignsSection}>
+                <Text style={styles.supportingSignsTitle}>Spiritual Indicators</Text>
+                
+                <View style={styles.supportingSignsGrid}>
+                  {/* Element Harmony */}
+                  <View style={styles.signCard}>
+                    <Text style={styles.signIcon}>🌊</Text>
+                    <Text style={styles.signLabel}>Element</Text>
+                    <Text style={styles.signValue}>{result.element.en}</Text>
+                    <Text style={styles.signArabic}>{result.element.ar}</Text>
+                  </View>
+
+                  {/* Celestial Alignment */}
+                  <View style={styles.signCard}>
+                    <Text style={styles.signIcon}>⭐</Text>
+                    <Text style={styles.signLabel}>Celestial</Text>
+                    <Text style={styles.signValue}>{result.burj.en}</Text>
+                    <Text style={styles.signArabic}>{result.burj.ar}</Text>
+                  </View>
+
+                  {/* Temporal Quality */}
+                  <View style={styles.signCard}>
+                    <Text style={styles.signIcon}>🕰️</Text>
+                    <Text style={styles.signLabel}>Hour</Text>
+                    <Text style={styles.signValue}>{result.hour.name}</Text>
+                    <Text style={styles.signArabic}>{result.hour.ar}</Text>
+                  </View>
                 </View>
-                <View style={styles.statCard}>
-                  <Text style={styles.statLabel}>Saghir</Text>
-                  <Text style={styles.statValue}>{result.saghir}</Text>
-                </View>
               </View>
 
-              <View style={styles.elementCard}>
-                <Text style={styles.elementLabel}>Element</Text>
-                <Text style={styles.elementValue}>{result.element.en}</Text>
-                <Text style={styles.elementArabic}>{result.element.ar}</Text>
+              {/* Recommended Spiritual Actions */}
+              <View style={styles.recommendedActionsSection}>
+                <LinearGradient
+                  colors={['rgba(79, 70, 229, 0.15)', 'rgba(99, 102, 241, 0.1)']}
+                  style={styles.recommendedActionsCard}
+                >
+                  <View style={styles.recommendedActionsHeader}>
+                    <Text style={styles.recommendedActionsIcon}>🤲</Text>
+                    <Text style={styles.recommendedActionsTitle}>Spiritual Guidance</Text>
+                  </View>
+                  
+                  <View style={styles.guidanceItem}>
+                    <Text style={styles.guidanceDot}>•</Text>
+                    <Text style={styles.guidanceText}>
+                      Reflect during {result.hour.name} hours for enhanced clarity
+                    </Text>
+                  </View>
+                  
+                  <View style={styles.guidanceItem}>
+                    <Text style={styles.guidanceDot}>•</Text>
+                    <Text style={styles.guidanceText}>
+                      Embrace {result.element.en.toLowerCase()} qualities through mindful presence
+                    </Text>
+                  </View>
+                  
+                  <View style={styles.guidanceItem}>
+                    <Text style={styles.guidanceDot}>•</Text>
+                    <Text style={styles.guidanceText}>
+                      Contemplate {result.burj.en} wisdom in moments of decision
+                    </Text>
+                  </View>
+                </LinearGradient>
               </View>
 
-              <View style={styles.burjCard}>
-                <Text style={styles.burjLabel}>Zodiac Sign</Text>
-                <Text style={styles.burjValue}>{result.burj.en}</Text>
-                <Text style={styles.burjArabic}>{result.burj.ar}</Text>
-                <Text style={styles.burjPlanet}>Planet: {result.burj.planet}</Text>
-              </View>
-
-              <View style={styles.hourCard}>
-                <Text style={styles.hourLabel}>Planetary Hour</Text>
-                <Text style={styles.hourValue}>{result.hour.name}</Text>
-                <Text style={styles.hourArabic}>{result.hour.ar}</Text>
-              </View>
-
-              {/* Divine Resonance */}
+              {/* Divine Resonance - Enhanced Presentation */}
               {result.divineResonance && (
                 <View style={styles.divineResonanceSection}>
                   <DivineResonanceCard resonance={result.divineResonance} />
+                </View>
+              )}
+
+              {/* Collapsible Spiritual Details */}
+              <Pressable
+                style={styles.detailsToggle}
+                onPress={() => setShowDetails(!showDetails)}
+              >
+                <View style={styles.detailsToggleHeader}>
+                  <Text style={styles.detailsToggleIcon}>📊</Text>
+                  <Text style={styles.detailsToggleText}>
+                    {showDetails ? 'Hide' : 'Show'} Spiritual Details
+                  </Text>
+                </View>
+                <Text style={styles.detailsToggleChevron}>
+                  {showDetails ? '▲' : '▼'}
+                </Text>
+              </Pressable>
+
+              {showDetails && (
+                <View style={styles.detailsSection}>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailRowLabel}>Total Kabīr</Text>
+                    <Text style={styles.detailRowValue}>{result.totalKabir}</Text>
+                  </View>
+                  
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailRowLabel}>Ṣaghīr</Text>
+                    <Text style={styles.detailRowValue}>{result.saghir}</Text>
+                  </View>
+                  
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailRowLabel}>Planetary Ruler</Text>
+                    <Text style={styles.detailRowValue}>{result.burj.planet}</Text>
+                  </View>
+
+                  <Text style={styles.detailNote}>
+                    These values represent the traditional Abjad calculations following the Maghribi system.
+                  </Text>
                 </View>
               )}
             </View>
@@ -609,145 +704,224 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weightMedium,
   },
   resultsSection: {
-    backgroundColor: DarkTheme.cardBackground,
+    backgroundColor: DarkTheme.screenBackground,
     marginTop: Spacing.cardMargin,
     paddingHorizontal: Spacing.screenPadding,
     paddingVertical: Spacing.sectionGap,
   },
-  resultsTitle: {
-    fontSize: Typography.h2,
+  // Hero Section - Spiritual Overview
+  heroSection: {
+    alignItems: 'center',
+    marginBottom: Spacing.xl,
+    paddingVertical: Spacing.lg,
+  },
+  heroIcon: {
+    fontSize: 48,
+    marginBottom: Spacing.sm,
+  },
+  heroTitle: {
+    fontSize: Typography.h1,
     fontWeight: Typography.weightBold,
     color: DarkTheme.textPrimary,
+    marginBottom: 6,
     textAlign: 'center',
-    marginBottom: Spacing.xl,
   },
-  resultCard: {
-    padding: Spacing.cardPadding,
+  heroSubtitle: {
+    fontSize: Typography.body,
+    color: DarkTheme.textTertiary,
+    textAlign: 'center',
+  },
+  // Core Insight Card
+  coreInsightCard: {
     borderRadius: 16,
+    padding: Spacing.cardPadding,
+    marginBottom: Spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+  },
+  coreInsightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: Spacing.lg,
   },
-  resultLabel: {
+  coreInsightIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Spacing.cardMargin,
+  },
+  coreInsightIcon: {
+    fontSize: 20,
+  },
+  coreInsightLabel: {
     fontSize: Typography.label,
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#c084fc',
     fontWeight: Typography.weightSemibold,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  resultValue: {
+  coreInsightValue: {
     fontSize: 24,
-    color: DarkTheme.textPrimary,
     fontWeight: Typography.weightBold,
-    marginTop: 4,
+    color: DarkTheme.textPrimary,
+    marginBottom: Spacing.cardMargin,
   },
-  mtSmall: {
-    marginTop: Spacing.lg,
+  coreInsightDescription: {
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    lineHeight: 22,
   },
-  statsGrid: {
-    flexDirection: 'row',
-    gap: Spacing.cardMargin,
+  // Supporting Signs Section
+  supportingSignsSection: {
     marginBottom: Spacing.lg,
   },
-  statCard: {
+  supportingSignsTitle: {
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textSecondary,
+    marginBottom: Spacing.lg,
+  },
+  supportingSignsGrid: {
+    flexDirection: 'row',
+    gap: Spacing.cardMargin,
+  },
+  signCard: {
     flex: 1,
     backgroundColor: DarkTheme.cardBackgroundAlt,
-    padding: Spacing.lg,
     borderRadius: 12,
+    padding: Spacing.lg,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: DarkTheme.borderSubtle,
   },
-  statLabel: {
-    fontSize: Typography.label,
-    color: DarkTheme.textTertiary,
-    fontWeight: Typography.weightSemibold,
-    marginBottom: 6,
-  },
-  statValue: {
+  signIcon: {
     fontSize: 28,
-    color: ElementAccents.fire.primary,
-    fontWeight: Typography.weightBold,
-  },
-  elementCard: {
-    backgroundColor: DarkTheme.cardBackgroundAlt,
-    padding: Spacing.cardPadding,
-    borderRadius: 12,
-    marginBottom: Spacing.lg,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: ElementAccents.air.primary,
-  },
-  elementLabel: {
-    fontSize: Typography.label,
-    color: ElementAccents.air.primary,
-    fontWeight: Typography.weightSemibold,
-    textTransform: 'uppercase',
     marginBottom: Spacing.sm,
   },
-  elementValue: {
-    fontSize: 26,
-    color: DarkTheme.textPrimary,
-    fontWeight: Typography.weightBold,
-  },
-  elementArabic: {
-    fontSize: Typography.h3,
-    color: ElementAccents.air.secondary,
-    marginTop: 4,
-  },
-  burjCard: {
-    backgroundColor: DarkTheme.cardBackgroundAlt,
-    padding: Spacing.cardPadding,
-    borderRadius: 12,
-    marginBottom: Spacing.lg,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: ElementAccents.earth.primary,
-  },
-  burjLabel: {
-    fontSize: Typography.label,
-    color: ElementAccents.earth.primary,
+  signLabel: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textTertiary,
     fontWeight: Typography.weightSemibold,
     textTransform: 'uppercase',
-    marginBottom: Spacing.sm,
+    marginBottom: 4,
   },
-  burjValue: {
-    fontSize: 26,
-    color: DarkTheme.textPrimary,
+  signValue: {
+    fontSize: Typography.body,
     fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    textAlign: 'center',
+    marginBottom: 2,
   },
-  burjArabic: {
-    fontSize: Typography.h3,
-    color: ElementAccents.earth.secondary,
-    marginTop: 4,
-  },
-  burjPlanet: {
+  signArabic: {
     fontSize: Typography.label,
     color: DarkTheme.textTertiary,
-    marginTop: Spacing.sm,
+  },
+  // Recommended Actions Section
+  recommendedActionsSection: {
+    marginBottom: Spacing.lg,
+  },
+  recommendedActionsCard: {
+    borderRadius: 16,
+    padding: Spacing.cardPadding,
+    borderWidth: 1,
+    borderColor: 'rgba(79, 70, 229, 0.3)',
+  },
+  recommendedActionsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.lg,
+  },
+  recommendedActionsIcon: {
+    fontSize: 24,
+    marginRight: Spacing.sm,
+  },
+  recommendedActionsTitle: {
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+  },
+  guidanceItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: Spacing.cardMargin,
+  },
+  guidanceDot: {
+    fontSize: Typography.h3,
+    color: '#818cf8',
+    marginRight: Spacing.sm,
+    lineHeight: 22,
+  },
+  guidanceText: {
+    flex: 1,
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    lineHeight: 22,
+  },
+  // Collapsible Details
+  detailsToggle: {
+    backgroundColor: DarkTheme.cardBackgroundAlt,
+    borderRadius: 12,
+    padding: Spacing.lg,
+    marginTop: Spacing.cardMargin,
+    marginBottom: Spacing.cardMargin,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+  },
+  detailsToggleHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  detailsToggleIcon: {
+    fontSize: 20,
+    marginRight: Spacing.sm,
+  },
+  detailsToggleText: {
+    fontSize: Typography.body,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textSecondary,
+  },
+  detailsToggleChevron: {
+    fontSize: 16,
+    color: DarkTheme.textTertiary,
+  },
+  detailsSection: {
+    backgroundColor: DarkTheme.cardBackgroundAlt,
+    borderRadius: 12,
+    padding: Spacing.cardPadding,
+    marginBottom: Spacing.lg,
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: Spacing.cardMargin,
+    borderBottomWidth: 1,
+    borderBottomColor: DarkTheme.borderSubtle,
+  },
+  detailRowLabel: {
+    fontSize: Typography.body,
+    color: DarkTheme.textTertiary,
     fontWeight: Typography.weightMedium,
   },
-  hourCard: {
-    backgroundColor: DarkTheme.cardBackgroundAlt,
-    padding: Spacing.cardPadding,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: ElementAccents.water.primary,
-  },
-  hourLabel: {
-    fontSize: Typography.label,
-    color: ElementAccents.water.primary,
-    fontWeight: Typography.weightSemibold,
-    textTransform: 'uppercase',
-    marginBottom: Spacing.sm,
-  },
-  hourValue: {
-    fontSize: 26,
+  detailRowValue: {
+    fontSize: Typography.h3,
     color: DarkTheme.textPrimary,
     fontWeight: Typography.weightBold,
   },
-  hourArabic: {
-    fontSize: Typography.h3,
-    color: ElementAccents.water.secondary,
-    marginTop: 4,
+  detailNote: {
+    fontSize: Typography.label,
+    color: DarkTheme.textMuted,
+    fontStyle: 'italic',
+    marginTop: Spacing.lg,
+    lineHeight: 18,
   },
   divineResonanceSection: {
     marginTop: Spacing.cardMargin,

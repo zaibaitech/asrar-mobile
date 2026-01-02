@@ -1,30 +1,29 @@
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
 import {
-  BookOpen,
-  Calendar,
-  Check,
-  CheckSquare,
-  ChevronDown,
-  ChevronUp,
-  Copy,
-  Gift,
-  Moon,
-  Shield,
-  Sparkles,
-  Star,
-  Target,
-  Zap
+    BookOpen,
+    Calendar,
+    Check,
+    CheckSquare,
+    ChevronDown,
+    ChevronUp,
+    Copy,
+    Gift,
+    Moon,
+    Shield,
+    Sparkles,
+    Star,
+    Target,
+    Zap
 } from "lucide-react-native";
 import React, { useState } from "react";
 import {
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 import { getElementColors } from "../../../constants/ElementColors";
 import { useLanguage } from "../../../contexts/LanguageContext";
@@ -128,15 +127,14 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
         <View>
           {/* Practice Night Info */}
           {spiritual_practice.practice_night && (
-            <LinearGradient
-              colors={colors.primary}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[styles.card, { borderColor: colors.border }]}
-            >
+            <View style={[styles.card, { 
+              backgroundColor: `${colors.accent}33`,
+              borderColor: `${colors.accent}33`,
+              shadowColor: colors.accent
+            }]}>
               <View style={styles.cardHeader}>
                 <Moon size={24} color={colors.accent} />
-                <Text style={styles.cardTitle}>
+                <Text style={[styles.cardTitle, { color: colors.accent }]}>
                   {language === 'en' ? 'Practice Night' : 'Nuit de Pratique'}
                 </Text>
               </View>
@@ -148,20 +146,19 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                   {spiritual_practice.practice_night.note[language as 'en' | 'fr']}
                 </Text>
               )}
-            </LinearGradient>
+            </View>
           )}
 
           {/* Zodiac Sign */}
           {spiritual_practice.zodiac_sign && 'arabic' in spiritual_practice.zodiac_sign && (
-            <LinearGradient
-              colors={colors.primary}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[styles.card, { borderColor: colors.border }]}
-            >
+            <View style={[styles.card, { 
+              backgroundColor: `${colors.accent}33`,
+              borderColor: `${colors.accent}33`,
+              shadowColor: colors.accent
+            }]}>
               <View style={styles.cardHeader}>
                 <Star size={24} color={colors.accent} />
-                <Text style={styles.cardTitle}>
+                <Text style={[styles.cardTitle, { color: colors.accent }]}>
                   {language === 'en' ? 'Zodiac Sign' : 'Signe Zodiacal'}
                 </Text>
               </View>
@@ -173,20 +170,19 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                   {spiritual_practice.zodiac_sign.arabic}
                 </Text>
               </View>
-            </LinearGradient>
+            </View>
           )}
 
           {/* Divine Names */}
           {'arabic' in spiritual_practice.divine_names && (
-            <LinearGradient
-              colors={colors.primary}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[styles.card, { borderColor: colors.border }]}
-            >
+            <View style={[styles.card, { 
+              backgroundColor: `${colors.accent}33`,
+              borderColor: `${colors.accent}33`,
+              shadowColor: colors.accent
+            }]}>
               <View style={styles.cardHeader}>
                 <Sparkles size={24} color={colors.accent} />
-                <Text style={styles.cardTitle}>
+                <Text style={[styles.cardTitle, { color: colors.accent }]}>
                   {language === 'en' ? 'Divine Names to Recite' : 'Noms Divins à Réciter'}
                 </Text>
               </View>
@@ -219,7 +215,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                     : (language === 'en' ? 'Start Dhikr Counter' : 'Démarrer Compteur')}
                 </Text>
               </TouchableOpacity>
-            </LinearGradient>
+            </View>
           )}
 
           {/* Dhikr Counter */}
@@ -239,19 +235,18 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
 
           {/* Quranic Verse */}
           {showQuranicVerse && spiritual_practice.quranic_verse && (
-            <LinearGradient
-              colors={colors.primary}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[styles.card, { borderColor: colors.border }]}
-            >
+            <View style={[styles.card, { 
+              backgroundColor: `${colors.accent}33`,
+              borderColor: `${colors.accent}33`,
+              shadowColor: colors.accent
+            }]}>
               <TouchableOpacity
                 style={styles.collapsibleHeader}
                 onPress={() => setShowQuranicVerse(!showQuranicVerse)}
               >
                 <View style={styles.cardHeader}>
                   <BookOpen size={24} color={colors.accent} />
-                  <Text style={styles.cardTitle}>
+                  <Text style={[styles.cardTitle, { color: colors.accent }]}>
                     {language === 'en' ? 'Quranic Verse' : 'Verset Coranique'}
                   </Text>
                 </View>
@@ -275,22 +270,21 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                 </Text>
                 <Text style={styles.verseReference}>({spiritual_practice.quranic_verse?.reference})</Text>
               </View>
-            </LinearGradient>
+            </View>
           )}
 
           {/* Angels & Jinn */}
           {showAngelsJinn && (
             <View style={styles.row}>
               {spiritual_practice.angel && (
-                <LinearGradient
-                  colors={colors.primary}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={[styles.smallCard, { borderColor: colors.border }]}
-                >
+                <View style={[styles.smallCard, { 
+                  backgroundColor: `${colors.accent}33`,
+                  borderColor: `${colors.accent}33`,
+                  shadowColor: colors.accent
+                }]}>
                   <View style={styles.smallCardHeader}>
                     <Shield size={20} color={colors.accent} />
-                    <Text style={styles.smallCardTitle}>
+                    <Text style={[styles.smallCardTitle, { color: colors.accent }]}>
                       {language === 'en' ? 'Angel' : 'Ange'}
                     </Text>
                   </View>
@@ -301,19 +295,18 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                       {spiritual_practice.angel.name[language as 'en' | 'fr']}
                     </Text>
                   )}
-                </LinearGradient>
+                </View>
               )}
 
               {spiritual_practice.jinn && (
-                <LinearGradient
-                  colors={colors.primary}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={[styles.smallCard, { borderColor: colors.border }]}
-                >
+                <View style={[styles.smallCard, { 
+                  backgroundColor: `${colors.accent}33`,
+                  borderColor: `${colors.accent}33`,
+                  shadowColor: colors.accent
+                }]}>
                   <View style={styles.smallCardHeader}>
                     <Zap size={20} color={colors.accent} />
-                    <Text style={styles.smallCardTitle}>
+                    <Text style={[styles.smallCardTitle, { color: colors.accent }]}>
                       {language === 'en' ? 'Jinn' : 'Djinn'}
                     </Text>
                   </View>
@@ -324,26 +317,25 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                       {spiritual_practice.jinn.meaning[language as 'en' | 'fr']}
                     </Text>
                   )}
-                </LinearGradient>
+                </View>
               )}
             </View>
           )}
 
           {/* Instructions */}
           {spiritual_practice.instructions && (
-            <LinearGradient
-              colors={colors.primary}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[styles.card, { borderColor: colors.border }]}
-            >
+            <View style={[styles.card, { 
+              backgroundColor: `${colors.accent}33`,
+              borderColor: `${colors.accent}33`,
+              shadowColor: colors.accent
+            }]}>
               <TouchableOpacity
                 style={styles.collapsibleHeader}
                 onPress={() => setShowInstructions(!showInstructions)}
               >
                 <View style={styles.cardHeader}>
                   <CheckSquare size={24} color={colors.accent} />
-                  <Text style={styles.cardTitle}>
+                  <Text style={[styles.cardTitle, { color: colors.accent }]}>
                     {language === 'en' ? 'Practice Instructions' : 'Instructions de Pratique'}
                   </Text>
                 </View>
@@ -364,7 +356,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                   ))}
                 </View>
               )}
-            </LinearGradient>
+            </View>
           )}
         </View>
       )}
@@ -372,15 +364,14 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
       {/* Monthly Sadaqah */}
       {activeType === 'monthly' && profile.sadaqah.monthly && (
         <View>
-          <LinearGradient
-            colors={colors.primary}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.card, { borderColor: colors.border }]}
-          >
+          <View style={[styles.card, { 
+            backgroundColor: `${colors.accent}33`,
+            borderColor: `${colors.accent}33`,
+            shadowColor: colors.accent
+          }]}>
             <View style={styles.cardHeader}>
               <Gift size={24} color={colors.accent} />
-              <Text style={styles.cardTitle}>
+              <Text style={[styles.cardTitle, { color: colors.accent }]}>
                 {language === 'en' ? 'Monthly Sadaqah' : 'Sadaqah Mensuelle'}
               </Text>
             </View>
@@ -425,22 +416,21 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                 ))}
               </View>
             )}
-          </LinearGradient>
+          </View>
         </View>
       )}
 
       {/* Lifetime Offering */}
       {activeType === 'lifetime' && profile.sadaqah.lifetime && (
         <View>
-          <LinearGradient
-            colors={colors.primary}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.card, { borderColor: colors.border }]}
-          >
+          <View style={[styles.card, { 
+            backgroundColor: `${colors.accent}33`,
+            borderColor: `${colors.accent}33`,
+            shadowColor: colors.accent
+          }]}>
             <View style={styles.cardHeader}>
               <Star size={24} color={colors.accent} />
-              <Text style={styles.cardTitle}>
+              <Text style={[styles.cardTitle, { color: colors.accent }]}>
                 {language === 'en' ? 'Lifetime Sacred Offering' : 'Offrande Sacrée de Vie'}
               </Text>
             </View>
@@ -486,7 +476,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                 </View>
               )}
             </View>
-          </LinearGradient>
+          </View>
         </View>
       )}
     </ScrollView>
@@ -496,7 +486,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f1e',
+    backgroundColor: '#0B1020',
   },
   scrollContent: {
     padding: 16,
@@ -523,7 +513,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#d1d5db',
+    color: '#94a3b8',
     textAlign: 'center',
     paddingHorizontal: 16,
   },
@@ -541,17 +531,19 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 12,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(30, 58, 138, 0.2)',
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: 'rgba(96, 165, 250, 0.1)',
     minHeight: 48,
   },
   typeButtonActive: {
     borderWidth: 2,
+    borderColor: 'rgba(96, 165, 250, 0.4)',
+    backgroundColor: 'rgba(30, 58, 138, 0.4)',
   },
   typeButtonText: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: '#94a3b8',
     fontWeight: '600',
   },
   card: {
@@ -559,6 +551,10 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 2,
     marginBottom: 20,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -569,7 +565,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFF',
     flex: 1,
   },
   practiceNight: {
@@ -580,7 +575,7 @@ const styles = StyleSheet.create({
   },
   practiceNote: {
     fontSize: 14,
-    color: '#d1d5db',
+    color: '#cbd5e1',
   },
   zodiacContent: {
     alignItems: 'center',
@@ -592,7 +587,7 @@ const styles = StyleSheet.create({
   },
   zodiacArabic: {
     fontSize: 16,
-    color: '#d1d5db',
+    color: '#cbd5e1',
   },
   divineNamesContent: {
     marginBottom: 16,
@@ -613,13 +608,13 @@ const styles = StyleSheet.create({
   },
   transliteration: {
     fontSize: 18,
-    color: '#e9d5ff',
+    color: '#93c5fd',
     marginBottom: 8,
     fontWeight: '500',
   },
   translation: {
     fontSize: 16,
-    color: '#FFF',
+    color: '#cbd5e1',
     lineHeight: 24,
   },
   dhikrButton: {
@@ -654,17 +649,17 @@ const styles = StyleSheet.create({
   },
   verseTransliteration: {
     fontSize: 16,
-    color: '#e9d5ff',
+    color: '#93c5fd',
     fontStyle: 'italic',
   },
   verseTranslation: {
     fontSize: 14,
-    color: '#d1d5db',
+    color: '#cbd5e1',
     lineHeight: 20,
   },
   verseReference: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: '#94a3b8',
   },
   row: {
     flexDirection: 'row',
@@ -686,7 +681,6 @@ const styles = StyleSheet.create({
   smallCardTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FFF',
   },
   angelArabic: {
     fontSize: 20,
@@ -695,12 +689,12 @@ const styles = StyleSheet.create({
   },
   angelTransliteration: {
     fontSize: 14,
-    color: '#e9d5ff',
+    color: '#93c5fd',
     marginBottom: 4,
   },
   angelName: {
     fontSize: 12,
-    color: '#d1d5db',
+    color: '#cbd5e1',
   },
   instructionsContent: {
     gap: 12,
@@ -724,7 +718,7 @@ const styles = StyleSheet.create({
   instructionText: {
     flex: 1,
     fontSize: 14,
-    color: '#FFF',
+    color: '#cbd5e1',
     lineHeight: 20,
     paddingTop: 6,
   },
@@ -734,24 +728,24 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#fbbf24',
+    color: '#60a5fa',
     marginBottom: 4,
   },
   sadaqahText: {
     fontSize: 14,
-    color: '#FFF',
+    color: '#cbd5e1',
     lineHeight: 20,
   },
   alternativesSection: {
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.2)',
+    borderTopColor: 'rgba(96, 165, 250, 0.2)',
   },
   alternativesTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#fbbf24',
+    color: '#60a5fa',
     marginBottom: 8,
   },
   alternativeItem: {
@@ -762,12 +756,12 @@ const styles = StyleSheet.create({
   },
   bullet: {
     fontSize: 16,
-    color: '#FFF',
+    color: '#60a5fa',
   },
   alternativeText: {
     flex: 1,
     fontSize: 14,
-    color: '#FFF',
+    color: '#cbd5e1',
     lineHeight: 20,
   },
   lifetimeContent: {
@@ -785,7 +779,7 @@ const styles = StyleSheet.create({
   componentsTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#fbbf24',
+    color: '#60a5fa',
     marginBottom: 4,
   },
   componentItem: {
@@ -796,42 +790,42 @@ const styles = StyleSheet.create({
   componentText: {
     flex: 1,
     fontSize: 14,
-    color: '#FFF',
+    color: '#cbd5e1',
     lineHeight: 20,
   },
   timingSection: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
     borderRadius: 12,
     padding: 12,
   },
   timingTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#fbbf24',
+    color: '#60a5fa',
     marginBottom: 8,
   },
   timingText: {
     fontSize: 13,
-    color: '#FFF',
+    color: '#cbd5e1',
     lineHeight: 20,
     marginBottom: 4,
   },
   significanceSection: {
-    backgroundColor: 'rgba(168,85,247,0.1)',
+    backgroundColor: 'rgba(30, 58, 138, 0.3)',
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: 'rgba(168,85,247,0.3)',
+    borderColor: 'rgba(96, 165, 250, 0.3)',
   },
   significanceTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#c084fc',
+    color: '#60a5fa',
     marginBottom: 8,
   },
   significanceText: {
     fontSize: 14,
-    color: '#FFF',
+    color: '#cbd5e1',
     lineHeight: 22,
   },
 });

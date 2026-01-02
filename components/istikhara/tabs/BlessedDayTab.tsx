@@ -21,7 +21,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { Borders, DarkTheme, ElementAccents, Shadows, Spacing, Typography } from "../../../constants/DarkTheme";
+import { Borders, DarkTheme, ElementAccents, Spacing, Typography } from "../../../constants/DarkTheme";
 import { useLanguage } from "../../../contexts/LanguageContext";
 import type { IstikharaData } from "../../../types/istikhara";
 
@@ -87,8 +87,12 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
       </View>
 
       {/* Main Day Display - Dark Card with Accent Highlights */}
-      <View style={[styles.mainDayCard, { borderColor: accent.primary }]}>
-        <View style={[styles.iconCircle, { backgroundColor: accent.glow, borderColor: accent.primary }]}>
+      <View style={[styles.mainDayCard, { 
+        borderColor: `${accent.primary}33`, 
+        backgroundColor: `${accent.primary}33`,
+        shadowColor: accent.primary 
+      }]}>
+        <View style={[styles.iconCircle, { backgroundColor: `${accent.primary}26`, borderColor: accent.primary }]}>
           <Text style={styles.dayEmoji}>
             {dayIndex >= 0 ? DAYS_OF_WEEK[dayIndex].emoji : '📅'}
           </Text>
@@ -105,7 +109,7 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
         </Text>
         
         {blessedDay.day_number !== null && (
-          <View style={[styles.dayNumberBadge, { backgroundColor: accent.glow, borderColor: accent.primary }]}>
+          <View style={[styles.dayNumberBadge, { backgroundColor: `${accent.primary}26`, borderColor: accent.primary }]}>
             <Text style={[styles.dayNumberText, { color: accent.primary }]}>
               {language === 'en' ? 'Day' : 'Jour'} #{blessedDay.day_number}
             </Text>
@@ -114,7 +118,11 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
       </View>
 
       {/* Weekly Overview - Dark Card with Colored Day Icons */}
-      <View style={[styles.card, { borderColor: accent.primary }]}>
+      <View style={[styles.card, { 
+        borderColor: `${accent.primary}33`, 
+        backgroundColor: `${accent.primary}33`,
+        shadowColor: accent.primary 
+      }]}>
         <View style={styles.cardHeader}>
           <Sun size={20} color={accent.primary} />
           <Text style={styles.cardTitle}>
@@ -179,7 +187,11 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
 
       {/* Special Notes */}
       {blessedDay.special_notes && blessedDay.special_notes[language as 'en' | 'fr'].length > 0 && (
-        <View style={[styles.card, { borderColor: accent.primary }]}>
+        <View style={[styles.card, { 
+          borderColor: `${accent.primary}33`, 
+          backgroundColor: `${accent.primary}33`,
+          shadowColor: accent.primary 
+        }]}>
           <View style={styles.cardHeader}>
             <Star size={20} color={accent.primary} />
             <Text style={styles.cardTitle}>
@@ -197,7 +209,11 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
 
       {/* Associated Prophet */}
       {blessedDay.associated_prophet && (
-        <View style={[styles.card, { borderColor: accent.primary }]}>
+        <View style={[styles.card, { 
+          borderColor: `${accent.primary}33`, 
+          backgroundColor: `${accent.primary}33`,
+          shadowColor: accent.primary 
+        }]}>
           <View style={styles.cardHeader}>
             <Sparkles size={20} color={accent.primary} />
             <Text style={styles.cardTitle}>
@@ -305,7 +321,7 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DarkTheme.screenBackground,
+    backgroundColor: '#0B1020',
   },
   scrollContent: {
     padding: Spacing.screenPadding,
@@ -318,13 +334,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: Typography.h1,
     fontWeight: Typography.weightBold,
-    color: DarkTheme.textPrimary,
+    color: '#fff',
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
   subtitle: {
     fontSize: Typography.label,
-    color: DarkTheme.textTertiary,
+    color: '#94a3b8',
     textAlign: 'center',
     paddingHorizontal: Spacing.lg,
     lineHeight: Typography.label * Typography.lineHeightNormal,
@@ -335,8 +351,10 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
     padding: Spacing.xxxl,
     alignItems: 'center',
-    backgroundColor: DarkTheme.cardBackground,
-    ...Shadows.card,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 8,
   },
   iconCircle: {
     width: 80,
@@ -357,7 +375,7 @@ const styles = StyleSheet.create({
   },
   daySubtext: {
     fontSize: Typography.label,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
     textAlign: 'center',
     marginBottom: Spacing.md,
   },
@@ -376,8 +394,10 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
     borderWidth: Borders.standard,
     marginBottom: Spacing.xl,
-    backgroundColor: DarkTheme.cardBackground,
-    ...Shadows.card,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -388,11 +408,11 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: Typography.h3,
     fontWeight: Typography.weightBold,
-    color: DarkTheme.textPrimary,
+    color: '#fff',
   },
   cardSubtitle: {
     fontSize: Typography.caption,
-    color: DarkTheme.textMuted,
+    color: '#64748b',
     marginBottom: Spacing.lg,
   },
   daysGrid: {
@@ -414,7 +434,7 @@ const styles = StyleSheet.create({
   },
   dayPillText: {
     fontSize: 10,
-    color: DarkTheme.textTertiary,
+    color: '#94a3b8',
     fontWeight: Typography.weightSemibold,
   },
   activitiesList: {
@@ -434,7 +454,7 @@ const styles = StyleSheet.create({
   activityText: {
     flex: 1,
     fontSize: Typography.body,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
     lineHeight: Typography.body * Typography.lineHeightNormal,
   },
   noteItem: {
@@ -446,7 +466,7 @@ const styles = StyleSheet.create({
   noteText: {
     flex: 1,
     fontSize: Typography.label,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
     lineHeight: Typography.label * Typography.lineHeightNormal,
   },
   prophetContent: {
@@ -455,12 +475,12 @@ const styles = StyleSheet.create({
   },
   prophetArabic: {
     fontSize: Typography.h1,
-    color: DarkTheme.textPrimary,
+    color: '#fff',
     fontWeight: Typography.weightBold,
   },
   prophetName: {
     fontSize: Typography.body,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
   },
   collapsibleHeader: {
     flexDirection: 'row',
@@ -474,6 +494,7 @@ const styles = StyleSheet.create({
   tipCard: {
     borderRadius: Borders.radiusMd,
     padding: Spacing.lg,
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
   },
   tipHeader: {
     flexDirection: 'row',
@@ -484,16 +505,16 @@ const styles = StyleSheet.create({
   tipTitle: {
     fontSize: Typography.label,
     fontWeight: Typography.weightSemibold,
-    color: DarkTheme.textPrimary,
+    color: '#fff',
   },
   tipText: {
     fontSize: Typography.label,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
     lineHeight: Typography.label * Typography.lineHeightNormal,
   },
   noteInfoText: {
     fontSize: Typography.body,
-    color: DarkTheme.textSecondary,
+    color: '#cbd5e1',
     lineHeight: Typography.body * Typography.lineHeightRelaxed,
   },
   bottomSpacer: {
