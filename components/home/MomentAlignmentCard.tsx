@@ -231,11 +231,11 @@ export function MomentAlignmentCard({
                 <Ionicons name="sparkles-outline" size={18} color={theme.accent} />
               </View>
               <Text style={styles.headerTitle} numberOfLines={1}>
-                {t('home.moment.title')}
+                {t('home.cards.momentAlignment.title')}
               </Text>
             </View>
             <View style={styles.headerAction}>
-              <Text style={styles.headerActionText}>{t('home.moment.details')}</Text>
+              <Text style={styles.headerActionText}>{t('home.cards.momentAlignment.details')}</Text>
               <Ionicons name="chevron-forward" size={14} color={DarkTheme.textTertiary} />
             </View>
           </View>
@@ -252,8 +252,8 @@ export function MomentAlignmentCard({
             <View style={styles.planetaryRow}>
               <Text style={styles.planetaryIcon}>{planetaryData.currentHour.planetInfo.symbol}</Text>
               <View style={styles.planetaryTextContainer}>
-                <Text style={styles.planetaryLabel}>Current Hour: </Text>
-                <Text style={styles.planetaryText}>{planetaryData.currentHour.planet}</Text>
+                <Text style={styles.planetaryLabel}>{t('home.cards.momentAlignment.now')}: </Text>
+                <Text style={styles.planetaryText}>{t(`planets.${planetaryData.currentHour.planet.toLowerCase()}`)}</Text>
                 <Text style={styles.planetaryArabic}> ({planetaryData.currentHour.planetInfo.arabicName})</Text>
               </View>
             </View>
@@ -274,7 +274,7 @@ export function MomentAlignmentCard({
 
         <View style={styles.footerRow}>
           <Ionicons name="arrow-forward" size={12} color={DarkTheme.textTertiary} />
-          <Text style={styles.footerText}>{t('common.tapForDetails')}</Text>
+          <Text style={styles.footerText}>{t('home.cards.momentAlignment.tapForDetails')}</Text>
         </View>
       </LinearGradient>
     </Pressable>

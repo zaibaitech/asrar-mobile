@@ -110,9 +110,9 @@ export const translations = {
         bestFor: "Routine tasks",
       },
       moment: {
-        title: "Moment",
+        title: "Moment Alignment",
         addNamePrompt: "Add name to enable",
-        details: "Details",
+        details: "DETAILS",
         you: "You",
         now: "Now",
         status: {
@@ -132,6 +132,46 @@ export const translations = {
           hour: "Updated 1 hour ago",
           hours: "Updated {count} hours ago",
         },
+      },
+      cards: {
+        dailyGuidance: {
+          title: "Daily Guidance",
+          window: {
+            favorable: "Favorable Window",
+            transformative: "Transformative Window",
+            delicate: "Delicate Window",
+            neutral: "Neutral Window",
+          },
+          dayRuler: "Day Ruler:",
+          energyToday: "Energy Today",
+          yourElement: "Your {element}",
+          supportiveBalance: "Supportive Balance",
+          bestFor: "BEST FOR:",
+          tapForDetails: "Tap for details",
+          disclaimer: "For reflection only • Not a ruling",
+        },
+        momentAlignment: {
+          title: "Moment Alignment",
+          details: "DETAILS",
+          you: "You",
+          now: "Now",
+          tapForDetails: "Tap for details",
+        },
+        nextPlanetaryHour: {
+          title: "Next Planetary Hour",
+          startsAt: "Starts at {time}",
+          inTime: "in {duration}",
+        },
+        tomorrow: {
+          title: "Tomorrow",
+        },
+      },
+      actions: {
+        checkInNow: "Check In Now",
+        viewInsights: "View Insights",
+      },
+      sections: {
+        spiritualModules: "Spiritual Modules",
       },
       nextPrayer: "Next Prayer",
       nextPlanetHour: "Next Planet Hour",
@@ -1295,6 +1335,28 @@ export const translations = {
         venus: "Venus",
         saturn: "Saturn",
       },
+    },
+
+    // Planet names
+    planets: {
+      sun: "Sun",
+      moon: "Moon",
+      mars: "Mars",
+      mercury: "Mercury",
+      jupiter: "Jupiter",
+      venus: "Venus",
+      saturn: "Saturn",
+    },
+
+    // Day names
+    days: {
+      sunday: "Sunday",
+      monday: "Monday",
+      tuesday: "Tuesday",
+      wednesday: "Wednesday",
+      thursday: "Thursday",
+      friday: "Friday",
+      saturday: "Saturday",
     },
 
     // Spiritual Stations
@@ -3524,9 +3586,9 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         bestFor: "Tâches routinières",
       },
       moment: {
-        title: "Moment",
+        title: "Alignement du moment",
         addNamePrompt: "Ajoutez un nom pour activer",
-        details: "Détails",
+        details: "DÉTAILS",
         you: "Vous",
         now: "Maintenant",
         status: {
@@ -3546,6 +3608,46 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           hour: "Mis à jour il y a 1 heure",
           hours: "Mis à jour il y a {count} heures",
         },
+      },
+      cards: {
+        dailyGuidance: {
+          title: "Guidance du jour",
+          window: {
+            favorable: "Fenêtre favorable",
+            transformative: "Fenêtre transformative",
+            delicate: "Fenêtre délicate",
+            neutral: "Fenêtre neutre",
+          },
+          dayRuler: "Planète du jour :",
+          energyToday: "Énergie Terre",
+          yourElement: "Votre {element}",
+          supportiveBalance: "Équilibre favorable",
+          bestFor: "Idéal pour :",
+          tapForDetails: "Appuyez pour détails",
+          disclaimer: "Pour réflexion • Pas un avis religieux",
+        },
+        momentAlignment: {
+          title: "Alignement du moment",
+          details: "DÉTAILS",
+          you: "Vous",
+          now: "Maintenant",
+          tapForDetails: "Appuyez pour détails",
+        },
+        nextPlanetaryHour: {
+          title: "Prochaine heure planétaire",
+          startsAt: "Commence à {time}",
+          inTime: "dans {duration}",
+        },
+        tomorrow: {
+          title: "Demain",
+        },
+      },
+      actions: {
+        checkInNow: "Check-in",
+        viewInsights: "Voir analyses",
+      },
+      sections: {
+        spiritualModules: "Modules spirituels",
       },
       nextPrayer: "Prochaine Prière",
       nextPlanetHour: "Prochaine Heure Planétaire",
@@ -4819,6 +4921,28 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         venus: "Vénus",
         saturn: "Saturne",
       },
+    },
+
+    // Planet names
+    planets: {
+      sun: "Soleil",
+      moon: "Lune",
+      mars: "Mars",
+      mercury: "Mercure",
+      jupiter: "Jupiter",
+      venus: "Vénus",
+      saturn: "Saturne",
+    },
+
+    // Day names
+    days: {
+      sunday: "Dimanche",
+      monday: "Lundi",
+      tuesday: "Mardi",
+      wednesday: "Mercredi",
+      thursday: "Jeudi",
+      friday: "Vendredi",
+      saturday: "Samedi",
     },
 
     stations: {

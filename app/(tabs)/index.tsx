@@ -271,6 +271,13 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, [nextPrayer]);
   
+  // Get translated day name
+  const getDayName = useCallback(() => {
+    const dayIndex = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const dayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    return t(`days.${dayKeys[dayIndex]}`);
+  }, [t]);
+
   useFocusEffect(
     useCallback(() => {
       loadDailyGuidance();
@@ -369,7 +376,7 @@ export default function HomeScreen() {
               loading={!dailyGuidance} 
               compact 
               showDayLabel
-              dayLabel={new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+              dayLabel={getDayName()}
               showDetailsHint
             />
           </View>
@@ -411,7 +418,7 @@ export default function HomeScreen() {
             activeOpacity={0.7}
           >
             <Ionicons name="checkmark-circle-outline" size={16} color="#10b981" />
-            <Text style={styles.pillText}>Check In Now</Text>
+            <Text style={styles.pillText}>{t('home.actions.checkInNow')}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -420,7 +427,7 @@ export default function HomeScreen() {
             activeOpacity={0.7}
           >
             <Ionicons name="trending-up-outline" size={16} color="#6366f1" />
-            <Text style={styles.pillText}>View Insights</Text>
+            <Text style={styles.pillText}>{t('home.actions.viewInsights')}</Text>
           </TouchableOpacity>
         </View>
         
@@ -463,11 +470,11 @@ export default function HomeScreen() {
                 
                 // Slide B: Next Planetary Hour
                 <View key="planet-hour" style={[styles.cardGradient, { backgroundColor: 'rgba(139, 92, 246, 0.08)' }]}>
-                  <Text style={styles.compactLabel}>{t('home.nextPlanetHour')}</Text>
+                  <Text style={styles.compactLabel}>{t('home.cards.nextPlanetaryHour.title')}</Text>
                   {planetaryData ? (
                     <>
                       <Text style={styles.compactPrimary}>
-                        {planetaryData.nextHour.planetInfo.symbol} {planetaryData.nextHour.planet}
+                        {planetaryData.nextHour.planetInfo.symbol} {t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`)}
                       </Text>
                       <Text style={[styles.compactSecondary, { color: '#8b5cf6' }]}>
                         {t('home.startsAt')} {(() => {
@@ -478,14 +485,16 @@ export default function HomeScreen() {
                       </Text>
                       {planetaryData.countdownSeconds > 0 && (
                         <Text style={styles.compactTertiary}>
-                          in {(() => {
+                          {(() => {
                             const seconds = planetaryData.countdownSeconds;
                             const hours = Math.floor(seconds / 3600);
                             const minutes = Math.floor((seconds % 3600) / 60);
                             const secs = seconds % 60;
-                            if (hours > 0) return `${hours}h ${minutes}m`;
-                            if (minutes > 0) return `${minutes}m ${secs}s`;
-                            return `${secs}s`;
+                            let duration = '';
+                            if (hours > 0) duration = `${hours}h ${minutes}m`;
+                            else if (minutes > 0) duration = `${minutes}m ${secs}s`;
+                            else duration = `${secs}s`;
+                            return t('home.cards.nextPlanetaryHour.inTime', { duration });
                           })()}
                         </Text>
                       )}
@@ -497,7 +506,7 @@ export default function HomeScreen() {
                           styles.miniElementText,
                           { color: ElementAccents[planetaryData.nextHour.planetInfo.element].primary }
                         ]}>
-                          {planetaryData.nextHour.planetInfo.element.toUpperCase()}
+                          {t(`elements.${planetaryData.nextHour.planetInfo.element}`).toUpperCase()}
                         </Text>
                       </View>
                     </>
@@ -550,7 +559,7 @@ export default function HomeScreen() {
                         styles.miniElementText,
                         { color: ElementAccents[todayBlessing.element].primary }
                       ]}>
-                        {todayBlessing.element.toUpperCase()}
+                        {t(`elements.${todayBlessing.element}`).toUpperCase()}
                       </Text>
                     </View>
                   </View>,
@@ -566,7 +575,7 @@ export default function HomeScreen() {
                         styles.cardGradient,
                         { backgroundColor: `${ElementAccents[tomorrowBlessing.element].primary}15` }
                       ]}>
-                        <Text style={styles.compactLabel}>{t('home.tomorrow')}</Text>
+                        <Text style={styles.compactLabel}>{t('home.cards.tomorrow.title')}</Text>
                         <Text style={styles.compactPrimary}>{tomorrowBlessing.dayNameArabic}</Text>
                         <Text style={[
                           styles.compactSecondary,
@@ -582,7 +591,7 @@ export default function HomeScreen() {
                             styles.miniElementText,
                             { color: ElementAccents[tomorrowBlessing.element].primary }
                           ]}>
-                            {tomorrowBlessing.element.toUpperCase()}
+                            {t(`elements.${tomorrowBlessing.element}`).toUpperCase()}
                           </Text>
                         </View>
                       </View>
@@ -605,7 +614,7 @@ export default function HomeScreen() {
           onPress={() => setModulesExpanded(!modulesExpanded)}
           activeOpacity={0.7}
         >
-          <Text style={styles.sectionTitle}>Spiritual Modules</Text>
+          <Text style={styles.sectionTitle}>{t('home.sections.spiritualModules')}</Text>
           <Ionicons 
             name={modulesExpanded ? 'chevron-up' : 'chevron-down'} 
             size={20} 
@@ -645,6 +654,13 @@ export default function HomeScreen() {
     todayBlessing,
     modulesExpanded,
     handleModulePress,
+    t,
+    getDayName,
+    momentAlignment,
+    planetaryData,
+    hasProfileName,
+    prayerCardSlide,
+    blessingCardSlide,
   ]);
 
   /**

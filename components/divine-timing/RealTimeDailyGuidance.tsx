@@ -78,13 +78,13 @@ export function RealTimeDailyGuidance({
   const getStatusLabel = (quality?: string) => {
     switch (quality) {
       case 'favorable':
-        return 'Favorable Window';
+        return t('home.cards.dailyGuidance.window.favorable');
       case 'transformative':
-        return 'Transformative Window';
+        return t('home.cards.dailyGuidance.window.transformative');
       case 'delicate':
-        return 'Delicate Window';
+        return t('home.cards.dailyGuidance.window.delicate');
       default:
-        return 'Neutral Window';
+        return t('home.cards.dailyGuidance.window.neutral');
     }
   };
   
@@ -105,7 +105,7 @@ export function RealTimeDailyGuidance({
   
   const getElementLabel = (element?: string) => {
     if (!element) return '';
-    return element.charAt(0).toUpperCase() + element.slice(1);
+    return t(`elements.${element}`);
   };
   
   if (loading || !guidance) {
@@ -159,7 +159,7 @@ export function RealTimeDailyGuidance({
               {showDayLabel && dayLabel && (
                 <Text style={[styles.dayBadge, compact && styles.dayBadgeCompact]}>{dayLabel}</Text>
               )}
-              <Text style={[styles.title, compact && styles.titleCompact]}>Daily Guidance</Text>
+              <Text style={[styles.title, compact && styles.titleCompact]}>{t('home.cards.dailyGuidance.title')}</Text>
               <Text style={[styles.subtitle, { color: statusColor }, compact && styles.subtitleCompact]}>
                 {statusLabel}
               </Text>
@@ -170,8 +170,8 @@ export function RealTimeDailyGuidance({
         {/* Day Ruler Row */}
         <View style={styles.rulerRow}>
           <Text style={styles.rulerIcon}>{dayRulerInfo.symbol}</Text>
-          <Text style={styles.rulerLabel}>Day Ruler:</Text>
-          <Text style={styles.rulerText}>{dayRuler}</Text>
+          <Text style={styles.rulerLabel}>{t('home.cards.dailyGuidance.dayRuler')}</Text>
+          <Text style={styles.rulerText}>{t(`planets.${dayRuler.toLowerCase()}`)}</Text>
           <Text style={styles.rulerArabic}>({dayRulerInfo.arabicName})</Text>
         </View>
         
@@ -181,7 +181,7 @@ export function RealTimeDailyGuidance({
             <View style={[styles.elementBadge, compact && styles.elementBadgeCompact]}>
               <Text style={styles.elementIcon}>{getElementIcon(guidance.dayElement)}</Text>
               <Text style={[styles.elementLabel, compact && styles.elementLabelCompact]}>
-                {getElementLabel(guidance.dayElement)} Energy Today
+                {getElementLabel(guidance.dayElement)} {t('home.cards.dailyGuidance.energyToday')}
               </Text>
             </View>
             
@@ -189,7 +189,7 @@ export function RealTimeDailyGuidance({
               <View style={[styles.elementBadge, styles.userElementBadge, compact && styles.elementBadgeCompact]}>
                 <Text style={styles.elementIcon}>{getElementIcon(guidance.userElement)}</Text>
                 <Text style={[styles.elementLabel, compact && styles.elementLabelCompact]}>
-                  Your {getElementLabel(guidance.userElement)}
+                  {t('home.cards.dailyGuidance.yourElement', { element: getElementLabel(guidance.userElement) })}
                 </Text>
               </View>
             )}
@@ -199,7 +199,7 @@ export function RealTimeDailyGuidance({
           {harmonyData && (
             <View style={styles.harmonyCaption}>
               <Text style={styles.harmonyCaptionText}>
-                <Text style={styles.harmonyCaptionIcon}>◐</Text> {harmonyData.level} Balance
+                <Text style={styles.harmonyCaptionIcon}>◐</Text> {t('home.cards.dailyGuidance.supportiveBalance')}
               </Text>
             </View>
           )}
@@ -209,7 +209,7 @@ export function RealTimeDailyGuidance({
         {hasBestFor && (
           <View style={[styles.activityRow, compact && styles.activityRowCompact]}>
             <View style={styles.activitySection}>
-              <Text style={[styles.activityLabel, compact && styles.activityLabelCompact]}>✅ Best for:</Text>
+              <Text style={[styles.activityLabel, compact && styles.activityLabelCompact]}>{t('home.cards.dailyGuidance.bestFor')}</Text>
               <Text style={[styles.activityText, compact && styles.activityTextCompact]} numberOfLines={1}>
                 {bestForText}
               </Text>
@@ -220,7 +220,7 @@ export function RealTimeDailyGuidance({
         {showDetailsHint && (
           <View style={styles.detailsRow}>
             <Ionicons name="arrow-forward" size={12} color={DarkTheme.textTertiary} />
-            <Text style={styles.detailsText}>{t('common.tapForDetails')}</Text>
+            <Text style={styles.detailsText}>{t('home.cards.dailyGuidance.tapForDetails')}</Text>
           </View>
         )}
 
@@ -228,7 +228,7 @@ export function RealTimeDailyGuidance({
         <View style={[styles.footer, compact && styles.footerCompact]}>
           <Ionicons name="information-circle-outline" size={12} color={DarkTheme.textTertiary} />
           <Text style={compact ? styles.footerTextCompact : styles.footerText}>
-            For reflection only • Not a ruling
+            {t('home.cards.dailyGuidance.disclaimer')}
           </Text>
         </View>
       </LinearGradient>
