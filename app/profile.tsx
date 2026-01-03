@@ -663,6 +663,27 @@ export default function ProfileScreen() {
               All your data is stored locally on this device. We never send your personal information to external servers in guest mode.
             </Text>
           </View>
+          
+          {/* Legal Links */}
+          <View style={styles.legalLinks}>
+            <TouchableOpacity 
+              style={styles.legalLink}
+              onPress={() => router.push('https://zaibaitech.github.io/asrar-mobile/privacy.html' as any)}
+            >
+              <Ionicons name="document-text-outline" size={18} color={DarkTheme.textSecondary} />
+              <Text style={styles.legalLinkText}>Privacy Policy</Text>
+              <Ionicons name="open-outline" size={16} color={DarkTheme.textSecondary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.legalLink}
+              onPress={() => router.push('https://zaibaitech.github.io/asrar-mobile/terms.html' as any)}
+            >
+              <Ionicons name="document-text-outline" size={18} color={DarkTheme.textSecondary} />
+              <Text style={styles.legalLinkText}>Terms of Service</Text>
+              <Ionicons name="open-outline" size={16} color={DarkTheme.textSecondary} />
+            </TouchableOpacity>
+          </View>
         </View>
         
         <TouchableOpacity style={styles.clearButton} onPress={handleClearProfile}>
@@ -997,6 +1018,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: DarkTheme.textSecondary,
     lineHeight: 18,
+  },
+  
+  // Legal Links
+  legalLinks: {
+    marginTop: 16,
+    gap: 8,
+  },
+  legalLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: DarkTheme.cardBackground,
+    borderRadius: 8,
+    gap: 8,
+  },
+  legalLinkText: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    flex: 1,
   },
   
   clearButton: {
