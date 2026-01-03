@@ -8,6 +8,11 @@
  * - expo-secure-store for token storage
  * - Automatic sync on profile changes
  * 
+ * Configuration:
+ * - Email confirmation DISABLED for immediate access
+ * - To disable in Supabase: Authentication → Settings → Email Auth → Uncheck "Enable email confirmations"
+ * - Users can sign in immediately after signup (no email verification)
+ * 
  * IMPORTANT: This requires backend setup
  * See implementation guide at end of file
  */
@@ -231,19 +236,34 @@ export async function signUp(data: SignUpData): Promise<{
       };
     }
     
-    // Check if email confirmation is required
-    if (result.user && !result.access_token) {
-      return {
-        session: null,
-        error: {
-          code: 'EMAIL_CONFIRMATION_REQUIRED',
-          message: 'Please check your email to confirm your account before signing in.',
-        },
-      };
-    }
+    // Skip email confirmation if backend is configured to auto-confirm
+    // Note: To disable email confirmation, go to Supabase Dashboard:
+    // Authentication → Settings → Email Auth → Uncheck "Enable email confirmations"
+    
+    // Check if email confirmation is required (old behavior - disabled)
+    // if (result.user && !result.access_token) {
+    //   return {
+    //     session: null,
+    //     error: {
+    //       code: 'EMAIL_CONFIRMATION_REQUIRED',
+    //       message: 'Please check your email to confirm your account before signing in.',
+    //     },
+    //   };
+    // }
     
     // Ensure we have all required session data
     if (!result.user || !result.access_token || !result.refresh_token) {
+      // If user exists but no tokens, email confirmation might be required
+      if (result.user && !result.access_token) {
+        return {
+          session: null,
+          error: {
+            code: 'EMAIL_CONFIRMATION_REQUIRED',
+            message: 'Email confirmation is enabled. Please check Supabase settings to disable it.',
+          },
+        };
+      }
+      
       return {
         session: null,
         error: {

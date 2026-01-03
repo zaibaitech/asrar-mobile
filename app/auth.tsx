@@ -104,8 +104,8 @@ export default function AuthScreen() {
         });
         
         Alert.alert(
-          'Success!',
-          'Account created successfully. Your guest data will be synced to your account.',
+          '✅ Account Created!',
+          'Welcome to Asrar! Your account is ready to use.',
           [
             {
               text: 'Continue',
@@ -114,25 +114,31 @@ export default function AuthScreen() {
           ]
         );
       } else if (result.error?.code === 'EMAIL_CONFIRMATION_REQUIRED') {
-        // ✅ SUCCESS - Account created, needs email verification
-        // Navigate to email verification screen instead of showing error
-        router.push({
-          pathname: '/email-verification' as any,
-          params: { email }
-        });
-      } else if (result.error?.message?.includes('User already registered') || 
-                 result.error?.message?.includes('already been registered')) {
-        // ✅ UNVERIFIED USER - Supabase resends confirmation email automatically
+        // Email confirmation is enabled in backend - show configuration help
         Alert.alert(
-          'Check Your Email',
-          'This email is registered but not verified yet. We just sent you a new confirmation email. Please check your inbox and spam folder.',
+          '⚠️ Email Confirmation Enabled',
+          'Please disable email confirmation in Supabase Dashboard:\n\nAuthentication → Settings → Email Auth → Uncheck "Enable email confirmations"',
           [
             {
-              text: 'Go to Verification',
-              onPress: () => router.push({
-                pathname: '/email-verification' as any,
-                params: { email }
-              }),
+              text: 'Continue as Guest',
+              onPress: () => router.replace('/(tabs)'),
+            },
+            {
+              text: 'OK',
+              style: 'cancel'
+            }
+          ]
+        );
+      } else if (result.error?.message?.includes('User already registered') || 
+                 result.error?.message?.includes('already been registered')) {
+        // User already exists
+        Alert.alert(
+          'Account Exists',
+          'This email is already registered. Please sign in instead.',
+          [
+            {
+              text: 'Sign In',
+              onPress: () => setMode('signin'),
             },
             {
               text: 'OK',
