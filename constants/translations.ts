@@ -446,6 +446,80 @@ export const translations = {
       lastSeen: "Last seen",
       noProfileYet: "No profile information yet",
       createProfile: "Create Profile",
+      
+      // Privacy & Data
+      privacyDataTitle: "Privacy & Data",
+      exportMyData: "Export My Data",
+      signOut: "Sign Out",
+      deleteAccount: "Delete Account",
+      deleteAllMyData: "Delete All My Data",
+      privacyNotice: "All your data is stored locally on this device. We never send your personal information to external servers in guest mode.",
+      privacyPolicy: "Privacy Policy",
+      termsOfService: "Terms of Service",
+      
+      // Confirmations
+      clearDataTitle: "Clear Profile Data",
+      clearDataMessage: "This will delete all your personalization data. This action cannot be undone.",
+      signOutTitle: "Sign Out",
+      signOutMessage: "Are you sure you want to sign out? Your local data will remain on this device.",
+      deleteAccountTitle: "Delete Account",
+      deleteAccountMessage: "This will permanently delete your account and all associated data. This action cannot be undone.",
+      enterPassword: "Enter your password to confirm",
+      deleteSuccess: "Account deleted successfully",
+      deleteError: "Failed to delete account",
+      exportSuccess: "Profile exported successfully",
+      exportError: "Failed to export profile data",
+    },
+    
+    // Authentication
+    auth: {
+      // Mode Selection
+      welcomeTitle: "Welcome to Asrār",
+      welcomeSubtitle: "Choose how you'd like to use the app",
+      guestMode: "Guest Mode",
+      guestModeDescription: "Quick access, data stored locally",
+      accountMode: "Account Mode",
+      accountModeDescription: "Cloud sync, access from multiple devices",
+      continueAsGuest: "Continue as Guest",
+      createAccount: "Create Account",
+      
+      // Sign Up / Sign In
+      signUp: "Sign Up",
+      signIn: "Sign In",
+      email: "Email",
+      password: "Password",
+      confirmPassword: "Confirm Password",
+      emailPlaceholder: "your@email.com",
+      passwordPlaceholder: "••••••••",
+      
+      // Password Strength
+      passwordStrength: "Password Strength",
+      weak: "Weak",
+      medium: "Medium",
+      strong: "Strong",
+      
+      // Actions
+      createAccountButton: "Create Account",
+      signInButton: "Sign In",
+      alreadyHaveAccount: "Already have an account?",
+      dontHaveAccount: "Don't have an account?",
+      forgotPassword: "Forgot password?",
+      
+      // Errors
+      emailRequired: "Email is required",
+      passwordRequired: "Password is required",
+      passwordMismatch: "Passwords don't match",
+      invalidEmail: "Invalid email address",
+      emailInUse: "Email already in use",
+      weakPassword: "Password is too weak",
+      wrongPassword: "Incorrect password",
+      userNotFound: "No account found with this email",
+      networkError: "Network error. Please check your connection",
+      unknownError: "An error occurred. Please try again",
+      
+      // Success
+      accountCreated: "Account created successfully!",
+      signInSuccess: "Signed in successfully!",
     },
 
     // History & Comparisons
@@ -3741,6 +3815,80 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       lastSeen: "Dernière visite",
       noProfileYet: "Aucune information de profil pour le moment",
       createProfile: "Créer un Profil",
+      
+      // Confidentialité & Données
+      privacyDataTitle: "Confidentialité & Données",
+      exportMyData: "Exporter Mes Données",
+      signOut: "Se Déconnecter",
+      deleteAccount: "Supprimer le Compte",
+      deleteAllMyData: "Supprimer Toutes Mes Données",
+      privacyNotice: "Toutes vos données sont stockées localement sur cet appareil. Nous n'envoyons jamais vos informations personnelles à des serveurs externes en mode invité.",
+      privacyPolicy: "Politique de Confidentialité",
+      termsOfService: "Conditions d'Utilisation",
+      
+      // Confirmations
+      clearDataTitle: "Effacer les Données du Profil",
+      clearDataMessage: "Cela supprimera toutes vos données de personnalisation. Cette action est irréversible.",
+      signOutTitle: "Se Déconnecter",
+      signOutMessage: "Êtes-vous sûr de vouloir vous déconnecter ? Vos données locales resteront sur cet appareil.",
+      deleteAccountTitle: "Supprimer le Compte",
+      deleteAccountMessage: "Cela supprimera définitivement votre compte et toutes les données associées. Cette action est irréversible.",
+      enterPassword: "Entrez votre mot de passe pour confirmer",
+      deleteSuccess: "Compte supprimé avec succès",
+      deleteError: "Échec de la suppression du compte",
+      exportSuccess: "Profil exporté avec succès",
+      exportError: "Échec de l'exportation des données du profil",
+    },
+    
+    // Authentification
+    auth: {
+      // Sélection du mode
+      welcomeTitle: "Bienvenue sur Asrār",
+      welcomeSubtitle: "Choisissez comment vous souhaitez utiliser l'application",
+      guestMode: "Mode Invité",
+      guestModeDescription: "Accès rapide, données stockées localement",
+      accountMode: "Mode Compte",
+      accountModeDescription: "Synchronisation cloud, accès depuis plusieurs appareils",
+      continueAsGuest: "Continuer en Invité",
+      createAccount: "Créer un Compte",
+      
+      // Inscription / Connexion
+      signUp: "S'inscrire",
+      signIn: "Se Connecter",
+      email: "Email",
+      password: "Mot de Passe",
+      confirmPassword: "Confirmer le Mot de Passe",
+      emailPlaceholder: "votre@email.com",
+      passwordPlaceholder: "••••••••",
+      
+      // Force du mot de passe
+      passwordStrength: "Force du Mot de Passe",
+      weak: "Faible",
+      medium: "Moyen",
+      strong: "Fort",
+      
+      // Actions
+      createAccountButton: "Créer un Compte",
+      signInButton: "Se Connecter",
+      alreadyHaveAccount: "Vous avez déjà un compte ?",
+      dontHaveAccount: "Vous n'avez pas de compte ?",
+      forgotPassword: "Mot de passe oublié ?",
+      
+      // Erreurs
+      emailRequired: "L'email est requis",
+      passwordRequired: "Le mot de passe est requis",
+      passwordMismatch: "Les mots de passe ne correspondent pas",
+      invalidEmail: "Adresse email invalide",
+      emailInUse: "Email déjà utilisé",
+      weakPassword: "Le mot de passe est trop faible",
+      wrongPassword: "Mot de passe incorrect",
+      userNotFound: "Aucun compte trouvé avec cet email",
+      networkError: "Erreur réseau. Veuillez vérifier votre connexion",
+      unknownError: "Une erreur s'est produite. Veuillez réessayer",
+      
+      // Succès
+      accountCreated: "Compte créé avec succès !",
+      signInSuccess: "Connexion réussie !",
     },
 
     history: {

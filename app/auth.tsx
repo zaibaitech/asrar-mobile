@@ -12,6 +12,7 @@
  */
 
 import { DarkTheme } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { signIn, signUp } from '@/services/AuthService';
 import { evaluatePasswordStrength, getPasswordStrengthLabel } from '@/utils/passwordStrength';
@@ -41,6 +42,7 @@ const IS_BACKEND_CONFIGURED = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
 
 export default function AuthScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
   const { profile, setProfile } = useProfile();
   
   const [mode, setMode] = useState<AuthMode>('signup');
@@ -249,16 +251,16 @@ export default function AuthScreen() {
                 onPress={() => setMode('signup')}
               >
                 <Text style={[styles.tabText, mode === 'signup' && styles.tabTextActive]}>
-                  Sign Up
+                  {t.auth.signUp}
                 </Text>
               </TouchableOpacity>
               
-              <TouchableOpacity
+              <TouchableOpacity 
                 style={[styles.tab, mode === 'signin' && styles.tabActive]}
                 onPress={() => setMode('signin')}
               >
                 <Text style={[styles.tabText, mode === 'signin' && styles.tabTextActive]}>
-                  Sign In
+                  {t.auth.signIn}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -308,14 +310,14 @@ export default function AuthScreen() {
             {/* Form */}
             <View style={styles.form}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email</Text>
+                <Text style={styles.label}>{t.auth.email}</Text>
                 <View style={styles.inputWrapper}>
                   <Ionicons name="mail" size={20} color={DarkTheme.textSecondary} />
                   <TextInput
                     style={styles.input}
                     value={email}
                     onChangeText={setEmail}
-                    placeholder="your@email.com"
+                    placeholder={t.auth.emailPlaceholder}
                     placeholderTextColor={DarkTheme.textSecondary}
                     keyboardType="email-address"
                     autoCapitalize="none"
@@ -325,14 +327,14 @@ export default function AuthScreen() {
               </View>
               
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Password</Text>
+                <Text style={styles.label}>{t.auth.password}</Text>
                 <View style={styles.inputWrapper}>
                   <Ionicons name="lock-closed" size={20} color={DarkTheme.textSecondary} />
                   <TextInput
                     style={styles.input}
                     value={password}
                     onChangeText={setPassword}
-                    placeholder="••••••••"
+                    placeholder={t.auth.passwordPlaceholder}
                     placeholderTextColor={DarkTheme.textSecondary}
                     secureTextEntry
                     autoComplete="password"
@@ -402,7 +404,7 @@ export default function AuthScreen() {
               {/* Forgot Password */}
               {mode === 'signin' && (
                 <TouchableOpacity style={styles.forgotButton}>
-                  <Text style={styles.forgotText}>Forgot Password?</Text>
+                  <Text style={styles.forgotText}>{t.auth.forgotPassword}</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -420,7 +422,7 @@ export default function AuthScreen() {
               onPress={handleContinueAsGuest}
             >
               <Ionicons name="person-outline" size={20} color={DarkTheme.textSecondary} />
-              <Text style={styles.guestButtonText}>Continue as Guest</Text>
+              <Text style={styles.guestButtonText}>{t.auth.continueAsGuest}</Text>
             </TouchableOpacity>
             
             {/* Privacy Notice */}

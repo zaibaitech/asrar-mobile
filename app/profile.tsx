@@ -38,6 +38,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DarkTheme } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { deleteAccount, signOut } from '@/services/AuthService';
 import {
@@ -54,6 +55,7 @@ import { exportProfile } from '@/services/UserProfileStorage';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
   const {
     profile,
     setProfile,
@@ -208,12 +210,12 @@ export default function ProfileScreen() {
   
   const handleClearProfile = () => {
     Alert.alert(
-      'Clear Profile?',
-      'This will delete all your personalization data. This action cannot be undone.',
+      t.profile.clearDataTitle,
+      t.profile.clearDataMessage,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t.common.cancel, style: 'cancel' },
         {
-          text: 'Clear',
+          text: t.common.delete,
           style: 'destructive',
           onPress: async () => {
             await resetProfile();
@@ -235,7 +237,7 @@ export default function ProfileScreen() {
       const jsonData = await exportProfile();
       
       if (!jsonData) {
-        Alert.alert('Error', 'No profile data to export');
+        Alert.alert(t.common.error, t.profile.exportError);
         return;
       }
       
@@ -247,7 +249,7 @@ export default function ProfileScreen() {
       if (Platform.OS === 'web') {
         // @ts-ignore - clipboard API exists in web
         navigator.clipboard.writeText(jsonData);
-        Alert.alert('Success', 'Profile data copied to clipboard');
+        Alert.alert(t.common.success, t.profile.exportSuccess);
         return;
       }
       
@@ -258,29 +260,29 @@ export default function ProfileScreen() {
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(fileUri, {
           mimeType: 'application/json',
-          dialogTitle: 'Export Profile Data',
+          dialogTitle: t.profile.exportMyData,
         });
       } else {
-        Alert.alert('Success', 'Profile exported to: ' + fileUri);
+        Alert.alert(t.common.success, t.profile.exportSuccess);
       }
       
     } catch (error) {
       console.error('Export error:', error);
-      Alert.alert('Error', 'Failed to export profile data');
+      Alert.alert(t.common.error, t.profile.exportError);
     }
   };
   
   const handleSignOut = () => {
     Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out? Your local data will remain on this device.',
+      t.profile.signOutTitle,
+      t.profile.signOutMessage,
       [
         {
-          text: 'Cancel',
+          text: t.common.cancel,
           style: 'cancel',
         },
         {
-          text: 'Sign Out',
+          text: t.profile.signOut,
           style: 'destructive',
           onPress: async () => {
             try {
@@ -290,11 +292,11 @@ export default function ProfileScreen() {
               // Reload profile - this will re-check session (now null) and switch to guest mode
               await reloadProfile();
               
-              Alert.alert('Success', 'You have been signed out');
+              Alert.alert(t.common.success, t.profile.signOutMessage);
               router.replace('/(tabs)');
             } catch (error) {
               console.error('Sign out error:', error);
-              Alert.alert('Error', 'Failed to sign out. Please try again.');
+              Alert.alert(t.common.error, t.profile.deleteError);
             }
           },
         },
@@ -304,32 +306,32 @@ export default function ProfileScreen() {
   
   const handleDeleteAccount = () => {
     Alert.alert(
-      '⚠️ Delete Account',
-      'This will permanently delete your account and all cloud data. Local data will remain until you uninstall the app.\n\nThis action cannot be undone.',
+      t.profile.deleteAccountTitle,
+      t.profile.deleteAccountMessage,
       [
         {
-          text: 'Cancel',
+          text: t.common.cancel,
           style: 'cancel',
         },
         {
-          text: 'Delete Account',
+          text: t.profile.deleteAccount,
           style: 'destructive',
           onPress: () => {
             // Require password confirmation
             Alert.prompt(
-              'Confirm Deletion',
-              'Enter your password to confirm account deletion:',
+              t.profile.deleteAccountTitle,
+              t.profile.enterPassword,
               [
                 {
-                  text: 'Cancel',
+                  text: t.common.cancel,
                   style: 'cancel',
                 },
                 {
-                  text: 'Delete',
+                  text: t.common.delete,
                   style: 'destructive',
                   onPress: async (password?: string) => {
                     if (!password || password.trim() === '') {
-                      Alert.alert('Error', 'Password is required to delete account');
+                      Alert.alert(t.common.error, t.auth.passwordRequired);
                       return;
                     }
                     
@@ -340,7 +342,7 @@ export default function ProfileScreen() {
                       const result = await deleteAccount(password);
                       
                       if (result.error) {
-                        Alert.alert('Error', result.error.message);
+                        Alert.alert(t.common.error, result.error.message);
                         return;
                       }
                       
@@ -348,18 +350,18 @@ export default function ProfileScreen() {
                       await resetProfile();
                       
                       Alert.alert(
-                        'Account Deleted',
-                        'Your account has been permanently deleted.',
+                        t.profile.deleteSuccess,
+                        t.profile.deleteAccountMessage,
                         [
                           {
-                            text: 'OK',
+                            text: t.common.close,
                             onPress: () => router.replace('/auth'),
                           },
                         ]
                       );
                     } catch (error) {
                       console.error('Delete account error:', error);
-                      Alert.alert('Error', 'Failed to delete account. Please try again.');
+                      Alert.alert(t.common.error, t.profile.deleteError);
                     } finally {
                       setLoadingLocation(false);
                     }
@@ -620,7 +622,7 @@ export default function ProfileScreen() {
         
         {/* Privacy & Data Section */}
         <View style={styles.privacySection}>
-          <Text style={styles.privacySectionTitle}>Privacy & Data</Text>
+          <Text style={styles.privacySectionTitle}>{t.profile.privacyDataTitle}</Text>
           
           {/* Export Data Button */}
           <TouchableOpacity 
@@ -628,7 +630,7 @@ export default function ProfileScreen() {
             onPress={handleExportData}
           >
             <Ionicons name="download-outline" size={20} color="#10b981" />
-            <Text style={styles.exportButtonText}>Export My Data</Text>
+            <Text style={styles.exportButtonText}>{t.profile.exportMyData}</Text>
             <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
           </TouchableOpacity>
           
@@ -640,7 +642,7 @@ export default function ProfileScreen() {
                 onPress={handleSignOut}
               >
                 <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-                <Text style={styles.signOutButtonText}>Sign Out</Text>
+                <Text style={styles.signOutButtonText}>{t.profile.signOut}</Text>
                 <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
               </TouchableOpacity>
               
@@ -650,7 +652,7 @@ export default function ProfileScreen() {
                 onPress={handleDeleteAccount}
               >
                 <Ionicons name="trash-outline" size={20} color="#dc2626" />
-                <Text style={styles.deleteAccountButtonText}>Delete Account</Text>
+                <Text style={styles.deleteAccountButtonText}>{t.profile.deleteAccount}</Text>
                 <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
               </TouchableOpacity>
             </>
@@ -660,7 +662,7 @@ export default function ProfileScreen() {
           <View style={styles.privacyNoticeCard}>
             <Ionicons name="shield-checkmark" size={16} color="#10b981" />
             <Text style={styles.privacyNoticeText}>
-              All your data is stored locally on this device. We never send your personal information to external servers in guest mode.
+              {t.profile.privacyNotice}
             </Text>
           </View>
           
@@ -671,7 +673,7 @@ export default function ProfileScreen() {
               onPress={() => router.push('https://zaibaitech.github.io/asrar-mobile/privacy.html' as any)}
             >
               <Ionicons name="document-text-outline" size={18} color={DarkTheme.textSecondary} />
-              <Text style={styles.legalLinkText}>Privacy Policy</Text>
+              <Text style={styles.legalLinkText}>{t.profile.privacyPolicy}</Text>
               <Ionicons name="open-outline" size={16} color={DarkTheme.textSecondary} />
             </TouchableOpacity>
             
@@ -680,14 +682,14 @@ export default function ProfileScreen() {
               onPress={() => router.push('https://zaibaitech.github.io/asrar-mobile/terms.html' as any)}
             >
               <Ionicons name="document-text-outline" size={18} color={DarkTheme.textSecondary} />
-              <Text style={styles.legalLinkText}>Terms of Service</Text>
+              <Text style={styles.legalLinkText}>{t.profile.termsOfService}</Text>
               <Ionicons name="open-outline" size={16} color={DarkTheme.textSecondary} />
             </TouchableOpacity>
           </View>
         </View>
         
         <TouchableOpacity style={styles.clearButton} onPress={handleClearProfile}>
-          <Text style={styles.clearButtonText}>Delete All My Data</Text>
+          <Text style={styles.clearButtonText}>{t.profile.deleteAllMyData}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
