@@ -12,6 +12,50 @@ export const translations = {
       advanced: "Istikharah",
       menu: "Menu",
     },
+    
+    // Home Screen Modules
+    modules: {
+      calculator: {
+        title: "Calculator",
+        description: "Advanced Abjad numerology calculations and letter analysis",
+      },
+      nameDestiny: {
+        title: "Name Destiny",
+        description: "Discover the spiritual significance and destiny encoded in names",
+      },
+      istikhara: {
+        title: "Istikhara",
+        description: "Spiritual consultation combining prayer guidance with numerology",
+      },
+      guidedIstikhara: {
+        title: "Guided Istikhārah",
+        description: "Learn the authentic prayer method and track your spiritual decisions",
+      },
+      compatibility: {
+        title: "Compatibility",
+        description: "Analyze relationship harmony through elemental and numerical balance",
+      },
+      divineTiming: {
+        title: "Divine Timing",
+        description: "Spiritual reflection tool for understanding timing and intention",
+      },
+      prayerTimes: {
+        title: "Prayer Times",
+        description: "Daily prayer times based on your location",
+      },
+      quran: {
+        title: "Quran",
+        description: "Read the complete Quran with translations and bookmarks",
+      },
+      qibla: {
+        title: "Qibla",
+        description: "Find the direction to Kaaba for prayer",
+      },
+      dhikrCounter: {
+        title: "Dhikr Counter",
+        description: "Digital tasbih for counting dhikr and remembrance",
+      },
+    },
 
     // Welcome Section
     welcome: {
@@ -3382,6 +3426,50 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       guidance: "Guide de Vie",
       advanced: "Istikharah",
       menu: "Menu",
+    },
+    
+    // Modules de la Page d'Accueil
+    modules: {
+      calculator: {
+        title: "Calculatrice",
+        description: "Calculs numériques Abjad avancés et analyse des lettres",
+      },
+      nameDestiny: {
+        title: "Destinée des Noms",
+        description: "Découvrez la signification spirituelle et le destin encodés dans les noms",
+      },
+      istikhara: {
+        title: "Istikharah",
+        description: "Consultation spirituelle combinant guidance de prière et numérologie",
+      },
+      guidedIstikhara: {
+        title: "Istikharah Guidée",
+        description: "Apprenez la méthode authentique de prière et suivez vos décisions spirituelles",
+      },
+      compatibility: {
+        title: "Compatibilité",
+        description: "Analysez l'harmonie relationnelle à travers l'équilibre élémentaire et numérique",
+      },
+      divineTiming: {
+        title: "Timing Divin",
+        description: "Outil de réflexion spirituelle pour comprendre le timing et l'intention",
+      },
+      prayerTimes: {
+        title: "Horaires de Prière",
+        description: "Horaires de prière quotidiens basés sur votre localisation",
+      },
+      quran: {
+        title: "Coran",
+        description: "Lisez le Coran complet avec traductions et signets",
+      },
+      qibla: {
+        title: "Qibla",
+        description: "Trouvez la direction de la Kaaba pour la prière",
+      },
+      dhikrCounter: {
+        title: "Compteur de Dhikr",
+        description: "Tasbih numérique pour compter le dhikr et le souvenir",
+      },
     },
 
     // Welcome Section

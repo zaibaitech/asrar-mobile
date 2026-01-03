@@ -53,84 +53,95 @@ import { calculatePlanetaryHours, PlanetaryHourData } from '../../services/Plane
  * Module configuration for all spiritual features
  * Unified grid combining primary modules and quick access tools
  * Each module has element-based theming and navigation
+ * NOTE: Titles and descriptions are now fetched from translations using t() function
  */
-const MODULES: Omit<ModuleCardProps, 'onPress'>[] = [
+const getModules = (t: any): (Omit<ModuleCardProps, 'onPress'> & { id: string })[] => [
   {
-    title: 'Calculator',
+    id: 'calculator',
+    title: t('modules.calculator.title'),
     titleArabic: 'حاسبة الأبجد',
-    description: 'Advanced Abjad numerology calculations and letter analysis',
+    description: t('modules.calculator.description'),
     icon: '🧮',
     element: 'fire',
     comingSoon: false,
   },
   {
-    title: 'Name Destiny',
+    id: 'nameDestiny',
+    title: t('modules.nameDestiny.title'),
     titleArabic: 'قدر الأسماء',
-    description: 'Discover the spiritual significance and destiny encoded in names',
+    description: t('modules.nameDestiny.description'),
     icon: '📜',
     element: 'earth',
     comingSoon: false,
   },
   {
-    title: 'Istikhara',
+    id: 'istikhara',
+    title: t('modules.istikhara.title'),
     titleArabic: 'الاستخارة',
-    description: 'Spiritual consultation combining prayer guidance with numerology',
+    description: t('modules.istikhara.description'),
     icon: '🌙',
     element: 'water',
     comingSoon: false,
   },
   {
-    title: 'Guided Istikhārah',
+    id: 'guidedIstikhara',
+    title: t('modules.guidedIstikhara.title'),
     titleArabic: 'الاستخارة الموجهة',
-    description: 'Learn the authentic prayer method and track your spiritual decisions',
+    description: t('modules.guidedIstikhara.description'),
     icon: '🕊️',
     element: 'earth',
     comingSoon: false,
   },
   {
-    title: 'Compatibility',
+    id: 'compatibility',
+    title: t('modules.compatibility.title'),
     titleArabic: 'التوافق',
-    description: 'Analyze relationship harmony through elemental and numerical balance',
+    description: t('modules.compatibility.description'),
     icon: '💞',
     element: 'air',
     comingSoon: false,
   },
   {
-    title: 'Divine Timing',
+    id: 'divineTiming',
+    title: t('modules.divineTiming.title'),
     titleArabic: 'التوقيت الإلهي',
-    description: 'Spiritual reflection tool for understanding timing and intention',
+    description: t('modules.divineTiming.description'),
     icon: '🕰️',
     element: 'fire',
     comingSoon: false,
   },
   {
-    title: 'Prayer Times',
+    id: 'prayerTimes',
+    title: t('modules.prayerTimes.title'),
     titleArabic: 'مواقيت الصلاة',
-    description: 'Daily prayer times based on your location',
+    description: t('modules.prayerTimes.description'),
     icon: '🕌',
     element: 'water',
     comingSoon: false,
   },
   {
-    title: 'Quran',
+    id: 'quran',
+    title: t('modules.quran.title'),
     titleArabic: 'القرآن الكريم',
-    description: 'Read the complete Quran with translations and bookmarks',
+    description: t('modules.quran.description'),
     icon: '📖',
     element: 'water',
     comingSoon: false,
   },
   {
-    title: 'Qibla',
+    id: 'qibla',
+    title: t('modules.qibla.title'),
     titleArabic: 'القبلة',
-    description: 'Find the direction to Kaaba for prayer',
+    description: t('modules.qibla.description'),
     icon: '🧭',
     element: 'earth',
     comingSoon: false,
   },
   {
-    title: 'Dhikr Counter',
+    id: 'dhikrCounter',
+    title: t('modules.dhikrCounter.title'),
     titleArabic: 'عداد الأذكار',
-    description: 'Digital tasbih for counting dhikr and remembrance',
+    description: t('modules.dhikrCounter.description'),
     icon: '📿',
     element: 'air',
     comingSoon: false,
@@ -143,6 +154,9 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { profile, completionStatus } = useProfile();
   const hasProfileName = Boolean(profile?.nameAr || profile?.nameLatin);
+  
+  // Get modules with translations
+  const MODULES = useMemo(() => getModules(t), [t]);
   
   // Real-time ticker for countdown updates
   const now = useNowTicker(1000);
@@ -268,40 +282,40 @@ export default function HomeScreen() {
   /**
    * Handle module card press - navigate to appropriate screen
    */
-  const handleModulePress = useCallback((moduleTitle: string) => {
-    switch (moduleTitle) {
-      case 'Calculator':
+  const handleModulePress = useCallback((moduleId: string) => {
+    switch (moduleId) {
+      case 'calculator':
         router.push('/calculator');
         break;
-      case 'Istikhara':
+      case 'istikhara':
         router.push('/(tabs)/istikhara');
         break;
-      case 'Guided Istikhārah':
+      case 'guidedIstikhara':
         router.push('/istikhara-sessions');
         break;
-      case 'Compatibility':
+      case 'compatibility':
         router.push('/universal-compatibility');
         break;
-      case 'Name Destiny':
+      case 'nameDestiny':
         router.push('/(tabs)/name-destiny');
         break;
-      case 'Divine Timing':
+      case 'divineTiming':
         router.push('/divine-timing');
         break;
-      case 'Prayer Times':
+      case 'prayerTimes':
         router.push('/prayer-times');
         break;
-      case 'Quran':
+      case 'quran':
         router.push('/quran');
         break;
-      case 'Qibla':
+      case 'qibla':
         router.push('/(tabs)/qibla');
         break;
-      case 'Dhikr Counter':
+      case 'dhikrCounter':
         router.push('/dhikr-counter');
         break;
       default:
-        console.log(`${moduleTitle} - Coming Soon`);
+        console.log(`${moduleId} - Coming Soon`);
     }
   }, [router]);
 
@@ -312,7 +326,7 @@ export default function HomeScreen() {
   const renderModuleCard = useCallback(({ item }: { item: typeof MODULES[0] }) => (
     <ModuleCard
       {...item}
-      onPress={() => handleModulePress(item.title)}
+      onPress={() => handleModulePress(item.id)}
     />
   ), [handleModulePress]);
 
