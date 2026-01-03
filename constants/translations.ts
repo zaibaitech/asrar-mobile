@@ -89,6 +89,12 @@ export const translations = {
           hours: "Updated {count} hours ago",
         },
       },
+      nextPrayer: "Next Prayer",
+      nextPlanetHour: "Next Planet Hour",
+      startsAt: "Starts at",
+      todayBlessing: "Today's Blessing",
+      tomorrow: "Tomorrow",
+      tapToSetLocation: "Tap to set location",
     },
 
     qibla: {
@@ -2227,7 +2233,27 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       veryGood: "Very Good",
       good: "Good",
       moderate: "Moderate",
-      challenging: "Challenging"
+      challenging: "Challenging",
+      supportive: "Supportive",
+      neutral: "Neutral",
+    },
+    
+    // MOMENT STATE
+    moment: {
+      hold: {
+        cause: "Contrasting energies — pause before acting",
+        saturn: "Saturn's reflective influence — time for review",
+      },
+      flow: {
+        cause: "Aligned energies — momentum favors you",
+        neutral: "Balanced energies — steady progress",
+      },
+      act: {
+        cause: "Dynamic hour matches your nature — seize the moment",
+      },
+      rest: {
+        cause: "Gentle hour suits your nature — restore and reflect",
+      },
     },
 
     // ELEMENT GUIDANCE
@@ -3359,6 +3385,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           hours: "Mis à jour il y a {count} heures",
         },
       },
+      nextPrayer: "Prochaine Prière",
+      nextPlanetHour: "Prochaine Heure Planétaire",
+      startsAt: "Commence à",
+      todayBlessing: "Bénédiction d'Aujourd'hui",
+      tomorrow: "Demain",
+      tapToSetLocation: "Appuyez pour définir l'emplacement",
     },
 
     qibla: {
@@ -5401,7 +5433,27 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       veryGood: "Très bien",
       good: "Bon",
       moderate: "Modéré",
-      challenging: "Difficile"
+      challenging: "Difficile",
+      supportive: "Favorable",
+      neutral: "Neutre",
+    },
+    
+    // MOMENT STATE
+    moment: {
+      hold: {
+        cause: "Énergies contrastées — pause avant d'agir",
+        saturn: "Influence réflexive de Saturne — temps de révision",
+      },
+      flow: {
+        cause: "Énergies alignées — l'élan vous favorise",
+        neutral: "Énergies équilibrées — progression régulière",
+      },
+      act: {
+        cause: "Heure dynamique correspond à votre nature — saisissez le moment",
+      },
+      rest: {
+        cause: "Heure douce convient à votre nature — restaurez et réfléchissez",
+      },
     },
 
     // ELEMENT GUIDANCE

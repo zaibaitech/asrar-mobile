@@ -16,6 +16,7 @@ import {
     AlignmentStatus,
     Element,
 } from '@/services/MomentAlignmentService';
+import { PlanetaryHourData } from '@/services/PlanetaryHoursService';
 
 interface MomentAlignmentCardProps {
   status?: AlignmentStatus;
@@ -27,6 +28,8 @@ interface MomentAlignmentCardProps {
   loading?: boolean;
   hasProfileName?: boolean;
   t: (key: string) => string;
+  planetaryData?: PlanetaryHourData | null;
+  causeText?: string; // Cause-based explanation text
 }
 
 type StatusVisual = {
@@ -111,6 +114,8 @@ export function MomentAlignmentCard({
   loading,
   hasProfileName,
   t,
+  planetaryData,
+  causeText,
 }: MomentAlignmentCardProps) {
   const router = useRouter();
 
@@ -120,7 +125,21 @@ export function MomentAlignmentCard({
     } catch (error) {
       // Haptics not available - fail silently
     }
-    router.push('/(tabs)/moment-alignment-detail');
+    
+    // Navigate to moment alignment details with data
+    router.push({
+      pathname: '/(tabs)/moment-alignment-detail',
+      params: {
+        status: status || '',
+        zahirElement: zahirElement || '',
+        timeElement: timeElement || '',
+        causeText: causeText || hintText || '',
+        // Pass planetary data if available
+        currentPlanet: planetaryData?.currentHour.planet || '',
+        nextPlanet: planetaryData?.nextHour.planet || '',
+        countdownSeconds: planetaryData?.countdownSeconds || 0,
+      },
+    });
   };
 
   const goToProfileName = async () => {
@@ -228,9 +247,22 @@ export function MomentAlignmentCard({
             </View>
           )}
 
-          {hintText && (
+          {/* Current Planetary Hour */}
+          {planetaryData && (
+            <View style={styles.planetaryRow}>
+              <Text style={styles.planetaryIcon}>{planetaryData.currentHour.planetInfo.symbol}</Text>
+              <View style={styles.planetaryTextContainer}>
+                <Text style={styles.planetaryLabel}>Current Hour: </Text>
+                <Text style={styles.planetaryText}>{planetaryData.currentHour.planet}</Text>
+                <Text style={styles.planetaryArabic}> ({planetaryData.currentHour.planetInfo.arabicName})</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Cause-based hint text */}
+          {causeText && (
             <Text style={styles.signalText} numberOfLines={2}>
-              {hintText}
+              {causeText}
             </Text>
           )}
 
@@ -243,12 +275,6 @@ export function MomentAlignmentCard({
         <View style={styles.footerRow}>
           <Ionicons name="arrow-forward" size={12} color={DarkTheme.textTertiary} />
           <Text style={styles.footerText}>{t('common.tapForDetails')}</Text>
-          {updatedLabel ? (
-            <>
-              <Text style={styles.footerSeparator}>•</Text>
-              <Text style={styles.updatedText}>{updatedLabel}</Text>
-            </>
-          ) : null}
         </View>
       </LinearGradient>
     </Pressable>
@@ -343,6 +369,40 @@ const styles = StyleSheet.create({
     fontSize: Typography.caption,
     fontWeight: Typography.weightBold,
     letterSpacing: 0.8,
+  },
+  planetaryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: Spacing.xs,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderRadius: Borders.radiusSm,
+  },
+  planetaryIcon: {
+    fontSize: 16,
+    flexShrink: 0,
+  },
+  planetaryTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    flex: 1,
+  },
+  planetaryLabel: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    fontWeight: '600',
+  },
+  planetaryText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: '700',
+  },
+  planetaryArabic: {
+    fontSize: 10,
+    color: DarkTheme.textTertiary,
   },
   signalText: {
     fontSize: Typography.label,

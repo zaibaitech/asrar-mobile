@@ -21,6 +21,7 @@ import {
 import { computeAbjadProfile } from '../utils/abjad-unified-pipeline';
 import { debugCurrentCalculation } from '../utils/abjadDebugTools';
 import { normalizeArabic, normalizeDhikrName } from '../utils/arabic-normalization';
+import { shouldStripBasmalah, startsWithBasmalah, stripLeadingBasmalah } from '../utils/basmalah';
 import { isArabicText } from '../utils/text-normalize';
 import { ElementType } from '../utils/types';
 import {
@@ -31,7 +32,7 @@ import {
     computePhraseInsights,
     computeQuranInsights,
 } from './InsightAdapters';
-import { fetchAyahText } from './QuranResonanceService';
+import { fetchAyahTextForCalculation } from './QuranResonanceService';
 
 export class EnhancedCalculatorEngine {
   /**
@@ -95,13 +96,25 @@ export class EnhancedCalculatorEngine {
         const directText = request.pastedAyahText || request.arabicInput;
         if (directText?.trim()) {
           rawText = directText.trim();
+          
+          // Strip Basmalah from pasted text if applicable
+          // (Ayah 1, except Surah 9 and special cases like Surah 27:30)
+          if (request.ayahNumber && request.surahNumber) {
+            if (shouldStripBasmalah(request.surahNumber, request.ayahNumber)) {
+              if (startsWithBasmalah(rawText)) {
+                rawText = stripLeadingBasmalah(rawText);
+              }
+            }
+          }
+          
           baseMeta.ayahText = rawText;
           break;
         }
 
         if (request.surahNumber && request.ayahNumber) {
           try {
-            const ayahText = await fetchAyahText(request.surahNumber, request.ayahNumber);
+            // Use fetchAyahTextForCalculation which automatically strips Basmalah when needed
+            const ayahText = await fetchAyahTextForCalculation(request.surahNumber, request.ayahNumber);
             rawText = ayahText.trim();
             baseMeta.ayahText = rawText;
           } catch (error) {

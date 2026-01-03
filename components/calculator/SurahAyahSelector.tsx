@@ -6,15 +6,16 @@
 import React, { useState } from 'react';
 import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getAllSurahs, getSurahByNumber, Surah } from '../../data/quran-surahs';
+import { shouldDisplayBasmalah } from '../../utils/basmalah';
 
 interface SurahAyahSelectorProps {
   /**
    * Callback when surah and ayah are selected
    * REQUIRED: Parent component must provide this handler
    */
-  onSelect: (surahNumber: number, ayahNumber: number) => void;
+  onSelect: (surahNumber: number, ayahNumber: number | 'basmalah') => void;
   selectedSurah?: number | null;
-  selectedAyah?: number | null;
+  selectedAyah?: number | 'basmalah' | null;
 }
 
 export const SurahAyahSelector: React.FC<SurahAyahSelectorProps> = ({
@@ -34,7 +35,7 @@ export const SurahAyahSelector: React.FC<SurahAyahSelectorProps> = ({
     setStep('ayah');
   };
   
-  const handleAyahSelect = (ayahNumber: number) => {
+  const handleAyahSelect = (ayahNumber: number | 'basmalah') => {
     if (!chosenSurah) {
       console.warn('[SurahAyahSelector] No surah selected');
       return;
@@ -92,6 +93,8 @@ export const SurahAyahSelector: React.FC<SurahAyahSelectorProps> = ({
     const surah = chosenSurah ? getSurahByNumber(chosenSurah) : null;
     if (!surah) return null;
     
+    // Add Basmalah as option for surahs that have it (all except Surah 9)
+    const hasBasmalah = shouldDisplayBasmalah(surah.number);
     const ayahs = Array.from({ length: surah.totalAyahs }, (_, i) => i + 1);
     
     return (
@@ -105,6 +108,25 @@ export const SurahAyahSelector: React.FC<SurahAyahSelectorProps> = ({
           </Text>
         </View>
         
+        {/* Basmalah option (if applicable) */}
+        {hasBasmalah && (
+          <View style={styles.basmalahSection}>
+            <TouchableOpacity
+              style={styles.basmalahButton}
+              onPress={() => handleAyahSelect('basmalah')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.basmalahIcon}>📿</Text>
+              <View style={styles.basmalahTextContainer}>
+                <Text style={styles.basmalahArabic}>بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</Text>
+                <Text style={styles.basmalahLabel}>Basmalah</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
+        
+        {/* Ayah numbers grid */}
+        <Text style={styles.ayahsLabel}>Ayahs</Text>
         <FlatList
           data={ayahs}
           numColumns={5}
@@ -278,6 +300,51 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#f1f5f9',
     flex: 1,
+  },
+  
+  // Basmalah special button
+  basmalahSection: {
+    marginBottom: 20,
+  },
+  
+  basmalahButton: {
+    backgroundColor: '#1e293b',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderWidth: 2,
+    borderColor: '#6366f1',
+  },
+  
+  basmalahIcon: {
+    fontSize: 32,
+  },
+  
+  basmalahTextContainer: {
+    flex: 1,
+  },
+  
+  basmalahArabic: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#f1f5f9',
+    textAlign: 'right',
+    marginBottom: 4,
+  },
+  
+  basmalahLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#94a3b8',
+  },
+  
+  ayahsLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#94a3b8',
+    marginBottom: 12,
   },
   
   ayahGrid: {

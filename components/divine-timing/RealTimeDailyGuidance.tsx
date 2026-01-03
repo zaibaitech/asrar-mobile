@@ -8,11 +8,14 @@
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DailyGuidance } from '@/services/DailyGuidanceService';
+import { calculateElementalHarmony } from '@/services/ElementalHarmonyService';
+import { getDayRuler, getPlanetInfo } from '@/services/PlanetaryHoursService';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface RealTimeDailyGuidanceProps {
   guidance: DailyGuidance | null;
@@ -33,6 +36,31 @@ export function RealTimeDailyGuidance({
 }: RealTimeDailyGuidanceProps) {
   const router = useRouter();
   const { t } = useLanguage();
+  
+  const handlePress = async () => {
+    try {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (error) {
+      // Haptics not available - fail silently
+    }
+    
+    // Navigate to daily guidance details with data
+    if (guidance) {
+      router.push({
+        pathname: '/(tabs)/daily-guidance-details',
+        params: {
+          timingQuality: guidance.timingQuality,
+          dayElement: guidance.dayElement,
+          userElement: guidance.userElement || '',
+          relationship: guidance.relationship,
+          message: guidance.message,
+          bestFor: JSON.stringify(guidance.bestFor || []),
+          avoid: JSON.stringify(guidance.avoid || []),
+          peakHours: guidance.peakHours || '',
+        },
+      });
+    }
+  };
   
   const getStatusColor = (quality?: string) => {
     switch (quality) {
@@ -82,10 +110,10 @@ export function RealTimeDailyGuidance({
   
   if (loading || !guidance) {
     return (
-      <TouchableOpacity
+      <Pressable
         style={styles.container}
-        onPress={() => router.push('/daily-checkin')}
-        activeOpacity={0.7}
+        onPress={handlePress}
+        android_ripple={{ color: 'rgba(255, 255, 255, 0.1)' }}
       >
         <LinearGradient
           colors={['rgba(139, 115, 85, 0.15)', 'rgba(139, 115, 85, 0.05)']}
@@ -93,7 +121,7 @@ export function RealTimeDailyGuidance({
         >
           <Text style={styles.loadingText}>Loading guidance...</Text>
         </LinearGradient>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
   
@@ -103,11 +131,21 @@ export function RealTimeDailyGuidance({
   const bestForText = t('home.daily.bestFor');
   const hasBestFor = Array.isArray(guidance.bestFor) && guidance.bestFor.length > 0;
   
+  // Get day ruler
+  const now = new Date();
+  const dayRuler = getDayRuler(now);
+  const dayRulerInfo = getPlanetInfo(dayRuler);
+  
+  // Calculate elemental harmony if user element exists
+  const harmonyData = guidance.userElement 
+    ? calculateElementalHarmony(guidance.userElement, guidance.dayElement)
+    : null;
+  
   return (
-    <TouchableOpacity
+    <Pressable
       style={styles.container}
-      onPress={() => router.push('/daily-guidance')}
-      activeOpacity={0.7}
+      onPress={handlePress}
+      android_ripple={{ color: 'rgba(255, 255, 255, 0.1)' }}
     >
       <LinearGradient
         colors={[`${statusColor}15`, `${statusColor}05`]}
@@ -129,32 +167,43 @@ export function RealTimeDailyGuidance({
           </View>
         </View>
         
+        {/* Day Ruler Row */}
+        <View style={styles.rulerRow}>
+          <Text style={styles.rulerIcon}>{dayRulerInfo.symbol}</Text>
+          <Text style={styles.rulerLabel}>Day Ruler:</Text>
+          <Text style={styles.rulerText}>{dayRuler}</Text>
+          <Text style={styles.rulerArabic}>({dayRulerInfo.arabicName})</Text>
+        </View>
+        
         {/* Elements Display */}
-        <View style={[styles.elementsRow, compact && styles.elementsRowCompact]}>
-          <View style={[styles.elementBadge, compact && styles.elementBadgeCompact]}>
-            <Text style={styles.elementIcon}>{getElementIcon(guidance.dayElement)}</Text>
-            <Text style={[styles.elementLabel, compact && styles.elementLabelCompact]}>
-              {getElementLabel(guidance.dayElement)} Energy Today
-            </Text>
+        <View style={styles.elementsContainer}>
+          <View style={[styles.elementsRow, compact && styles.elementsRowCompact]}>
+            <View style={[styles.elementBadge, compact && styles.elementBadgeCompact]}>
+              <Text style={styles.elementIcon}>{getElementIcon(guidance.dayElement)}</Text>
+              <Text style={[styles.elementLabel, compact && styles.elementLabelCompact]}>
+                {getElementLabel(guidance.dayElement)} Energy Today
+              </Text>
+            </View>
+            
+            {guidance.userElement && (
+              <View style={[styles.elementBadge, styles.userElementBadge, compact && styles.elementBadgeCompact]}>
+                <Text style={styles.elementIcon}>{getElementIcon(guidance.userElement)}</Text>
+                <Text style={[styles.elementLabel, compact && styles.elementLabelCompact]}>
+                  Your {getElementLabel(guidance.userElement)}
+                </Text>
+              </View>
+            )}
           </View>
           
-          {guidance.userElement && (
-            <View style={[styles.elementBadge, styles.userElementBadge, compact && styles.elementBadgeCompact]}>
-              <Text style={styles.elementIcon}>{getElementIcon(guidance.userElement)}</Text>
-              <Text style={[styles.elementLabel, compact && styles.elementLabelCompact]}>
-                Your {getElementLabel(guidance.userElement)}
+          {/* Elemental Harmony Caption */}
+          {harmonyData && (
+            <View style={styles.harmonyCaption}>
+              <Text style={styles.harmonyCaptionText}>
+                <Text style={styles.harmonyCaptionIcon}>◐</Text> {harmonyData.level} Balance
               </Text>
             </View>
           )}
         </View>
-        
-        {/* Message */}
-        <Text
-          style={compact ? styles.messageCompact : styles.message}
-          numberOfLines={1}
-        >
-          {summaryText}
-        </Text>
         
         {/* Best For / Avoid */}
         {hasBestFor && (
@@ -165,16 +214,6 @@ export function RealTimeDailyGuidance({
                 {bestForText}
               </Text>
             </View>
-          </View>
-        )}
-        
-        {/* Peak Hours (if available) */}
-        {guidance.peakHours && (
-          <View style={[styles.peakHoursBadge, { backgroundColor: `${statusColor}20` }, compact && styles.peakHoursBadgeCompact]}>
-            <Ionicons name="time-outline" size={compact ? 12 : 14} color={statusColor} />
-            <Text style={[styles.peakHoursText, { color: statusColor }, compact && styles.peakHoursTextCompact]}>
-              Peak: {guidance.peakHours}
-            </Text>
           </View>
         )}
         
@@ -193,8 +232,21 @@ export function RealTimeDailyGuidance({
           </Text>
         </View>
       </LinearGradient>
-    </TouchableOpacity>
+    </Pressable>
   );
+}
+
+function getHarmonyColor(level: string): string {
+  switch (level) {
+    case 'Harmonious':
+      return '#10b981'; // Green
+    case 'Supportive':
+      return '#059669'; // Darker green (matches Favorable Window tone)
+    case 'Challenging':
+      return '#ef4444'; // Red
+    default:
+      return '#64748b'; // Gray
+  }
 }
 
 const styles = StyleSheet.create({
@@ -262,6 +314,51 @@ const styles = StyleSheet.create({
   subtitleCompact: {
     fontSize: Typography.label,
     marginTop: 1,
+  },
+  
+  // Day Ruler Row
+  rulerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: Spacing.xs,
+  },
+  rulerIcon: {
+    fontSize: 14,
+  },
+  rulerLabel: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    fontWeight: '600',
+  },
+  rulerText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: '700',
+  },
+  rulerArabic: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+  },
+  
+  // Elements Container
+  elementsContainer: {
+    gap: Spacing.xs,
+  },
+  
+  // Harmony Caption (under pills)
+  harmonyCaption: {
+    paddingLeft: 2,
+  },
+  harmonyCaptionText: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    fontWeight: '500',
+    opacity: 0.8,
+  },
+  harmonyCaptionIcon: {
+    fontSize: 10,
+    opacity: 0.6,
   },
   
   // Elements

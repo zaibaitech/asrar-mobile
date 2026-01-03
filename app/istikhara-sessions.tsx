@@ -74,7 +74,7 @@ export default function IstikharaSessionsScreen() {
           </Text>
           <TouchableOpacity
             style={[styles.prayerGuideButton, { backgroundColor: '#dcfce7', borderColor: '#16a34a' }]}
-            onPress={() => router.push('/istikhara-prayer-guide')}
+            onPress={() => router.push('/istikhara-prayer-guide' as any)}
           >
             <View style={styles.prayerGuideContent}>
               <View style={styles.prayerGuideIcon}>

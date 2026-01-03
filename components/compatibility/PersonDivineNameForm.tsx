@@ -2,7 +2,9 @@
  * Person ↔ Divine Name Compatibility Form
  */
 
-import React, { useState } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Keyboard } from 'lucide-react-native';
+import React, { useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Modal,
@@ -23,6 +25,8 @@ import {
     PersonDivineNameCompatibility
 } from '../../services/compatibility/types';
 import { buildDestiny } from '../../services/ilm-huruf/core';
+import ArabicKeyboard from '../istikhara/ArabicKeyboard';
+import NameAutocomplete from '../NameAutocomplete';
 
 interface PersonDivineNameFormProps {
   language: 'en' | 'ar';
@@ -32,12 +36,41 @@ interface PersonDivineNameFormProps {
 export function PersonDivineNameForm({ language, onCalculate }: PersonDivineNameFormProps) {
   const [personName, setPersonName] = useState('');
   const [personArabic, setPersonArabic] = useState('');
+  const [personLatin, setPersonLatin] = useState('');
   const [selectedDivineName, setSelectedDivineName] = useState<DivineNameMetadata | null>(null);
   const [showNamePicker, setShowNamePicker] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState('');
 
+  // Arabic keyboard state
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const personInputRef = useRef<TextInput>(null);
+
   const divineNames = getAllCompatibilityDivineNames();
+
+  // Keyboard handlers
+  const handleKeyPress = (key: string) => {
+    const newText = personArabic.slice(0, cursorPosition) + key + personArabic.slice(cursorPosition);
+    setPersonArabic(newText);
+    setCursorPosition(cursorPosition + 1);
+  };
+
+  const handleBackspace = () => {
+    if (cursorPosition === 0) return;
+    const newText = personArabic.slice(0, cursorPosition - 1) + personArabic.slice(cursorPosition);
+    setPersonArabic(newText);
+    setCursorPosition(cursorPosition - 1);
+  };
+
+  const handleSpace = () => {
+    handleKeyPress(' ');
+  };
+
+  const openKeyboard = () => {
+    setCursorPosition(personArabic.length);
+    setShowKeyboard(true);
+  };
 
   const handleCalculate = async () => {
     setError('');
@@ -78,34 +111,83 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
   return (
     <View style={styles.container}>
       {/* Person Input */}
-      <Text style={styles.sectionTitle}>
-        {language === 'en' ? 'Your Information' : 'معلوماتك'}
-      </Text>
-      
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>
-          {language === 'en' ? 'Display Name (Optional)' : 'الاسم للعرض (اختياري)'}
-        </Text>
-        <TextInput
-          style={styles.input}
-          value={personName}
-          onChangeText={setPersonName}
-          placeholder={language === 'en' ? 'e.g., Ahmed' : 'مثال: أحمد'}
-          placeholderTextColor="#64748b"
-        />
-      </View>
+      <View style={styles.inputSection}>
+        <LinearGradient
+          colors={['rgba(147, 51, 234, 0.3)', 'rgba(236, 72, 153, 0.2)']}
+          style={styles.inputGradient}
+        >
+          <View style={styles.inputHeader}>
+            <View style={styles.inputTitleRow}>
+              <Text style={styles.inputEmoji}>👤</Text>
+              <Text style={styles.inputTitle}>
+                {language === 'en' ? 'Your Information' : 'معلوماتك'}
+              </Text>
+            </View>
+          </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>
-          {language === 'en' ? 'Arabic Name *' : 'الاسم العربي *'}
-        </Text>
-        <TextInput
-          style={[styles.input, styles.arabicInput]}
-          value={personArabic}
-          onChangeText={setPersonArabic}
-          placeholder="أحمد"
-          placeholderTextColor="#64748b"
-        />
+          {/* Display Name */}
+          <View style={styles.inputWrapper}>
+            <Text style={styles.label}>
+              {language === 'en' ? 'Display Name (Optional)' : 'الاسم للعرض (اختياري)'}
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={personName}
+              onChangeText={setPersonName}
+              placeholder={language === 'en' ? 'e.g., Ahmed' : 'مثال: أحمد'}
+              placeholderTextColor="#64748b"
+            />
+          </View>
+
+          {/* Latin Name Autocomplete */}
+          <View style={styles.inputWrapper}>
+            <Text style={styles.label}>
+              {language === 'en' ? 'Latin Name (English/French)' : 'الاسم اللاتيني (إنجليزي/فرنسي)'}
+            </Text>
+            <NameAutocomplete
+              value={personLatin}
+              onChange={setPersonLatin}
+              onArabicSelect={(arabic, latin) => {
+                setPersonArabic(arabic);
+                setPersonLatin(latin);
+              }}
+              placeholder="e.g., Fatima, Ibrahima, Amadou"
+              showHelper={false}
+              language={language}
+            />
+          </View>
+
+          {/* Arabic Name Input */}
+          <View style={styles.inputWrapper}>
+            <View style={styles.labelRow}>
+              <Text style={styles.label}>
+                {language === 'en' ? 'Arabic Name *' : 'الاسم العربي *'}
+              </Text>
+              <TouchableOpacity
+                style={styles.keyboardButton}
+                onPress={openKeyboard}
+              >
+                <Keyboard size={14} color="#a78bfa" strokeWidth={2} />
+                <Text style={styles.keyboardButtonText}>
+                  {language === 'en' ? 'Keyboard' : 'لوحة'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <TextInput
+              ref={personInputRef}
+              style={[styles.input, styles.arabicInput]}
+              value={personArabic}
+              onChangeText={(text) => {
+                setPersonArabic(text);
+                setCursorPosition(text.length);
+              }}
+              onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
+              placeholder="أحمد"
+              placeholderTextColor="#64748b"
+              editable={!showKeyboard}
+            />
+          </View>
+        </LinearGradient>
       </View>
 
       {/* Divine Name Selection */}
@@ -199,6 +281,15 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
           </Text>
         )}
       </TouchableOpacity>
+
+      {/* Arabic Keyboard */}
+      <ArabicKeyboard
+        visible={showKeyboard}
+        onClose={() => setShowKeyboard(false)}
+        onKeyPress={handleKeyPress}
+        onBackspace={handleBackspace}
+        onSpace={handleSpace}
+      />
     </View>
   );
 }
@@ -206,6 +297,34 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
 const styles = StyleSheet.create({
   container: {
     marginTop: 24,
+  },
+  inputSection: {
+    marginBottom: 8,
+  },
+  inputGradient: {
+    padding: 18,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  inputHeader: {
+    marginBottom: 16,
+  },
+  inputTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  inputEmoji: {
+    fontSize: 24,
+  },
+  inputTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  inputWrapper: {
+    marginBottom: 12,
   },
   sectionTitle: {
     color: '#ffffff',
@@ -217,11 +336,32 @@ const styles = StyleSheet.create({
   inputGroup: {
     marginBottom: 16,
   },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   label: {
     color: '#cbd5e1',
     fontSize: 14,
     fontWeight: '500',
-    marginBottom: 8,
+  },
+  keyboardButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.4)',
+  },
+  keyboardButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#a78bfa',
   },
   input: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',

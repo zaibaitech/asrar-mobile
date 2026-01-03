@@ -5,6 +5,7 @@
  */
 
 import { QURAN_META } from '@/constants/quranMeta';
+import { shouldStripBasmalah, startsWithBasmalah, stripLeadingBasmalah } from '@/utils/basmalah';
 
 export type QuranResonance = {
   surahNumber: number;
@@ -80,6 +81,10 @@ export async function getQuranResonance(
 /**
  * Fetch Arabic text for a specific ayah from Al-Quran Cloud API
  * Falls back to placeholder if API fails
+ * 
+ * IMPORTANT: This function returns the RAW ayah text from the API.
+ * For calculator purposes, Basmalah should be stripped from Ayah 1
+ * using the stripLeadingBasmalah() utility when needed.
  */
 export async function fetchAyahText(surahNumber: number, ayahNumber: number): Promise<string> {
   try {
@@ -109,6 +114,48 @@ export async function fetchAyahText(surahNumber: number, ayahNumber: number): Pr
     // Fallback: return a respectful placeholder
     return `الآية ${ayahNumber} من سورة ${QURAN_META[surahNumber].nameAr}`;
   }
+}
+
+/**
+ * Fetch ayah text for calculation purposes
+ * Automatically strips Basmalah from Ayah 1 (except for special cases)
+ * 
+ * STRIPPING RULES:
+ * - Surah 9: No Basmalah (return as-is)
+ * - Surah 27, Ayah 30: Contains Basmalah inside verse (do NOT strip)
+ * - Other surahs, Ayah 1: Strip Basmalah if present
+ * - Ayah 2+: Return as-is
+ * 
+ * Use this for calculator calculations to get ONLY the ayah content.
+ * 
+ * @param surahNumber - Surah number (1-114)
+ * @param ayahNumber - Ayah number
+ * @returns Promise<string> - Clean ayah text for calculation
+ */
+export async function fetchAyahTextForCalculation(
+  surahNumber: number, 
+  ayahNumber: number
+): Promise<string> {
+  const rawText = await fetchAyahText(surahNumber, ayahNumber);
+  
+  // Check if we should strip Basmalah from this ayah
+  if (shouldStripBasmalah(surahNumber, ayahNumber)) {
+    if (startsWithBasmalah(rawText)) {
+      const stripped = stripLeadingBasmalah(rawText);
+      
+      // Debug: Warn if stripping seems incomplete
+      if (stripped.includes('الرحمن') || stripped.includes('الرحيم')) {
+        console.warn(
+          `[QuranResonance] Potential incomplete Basmalah stripping in ${surahNumber}:${ayahNumber}`,
+          { original: rawText.substring(0, 100), stripped: stripped.substring(0, 100) }
+        );
+      }
+      
+      return stripped;
+    }
+  }
+  
+  return rawText;
 }
 
 /**

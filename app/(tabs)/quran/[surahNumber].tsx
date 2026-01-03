@@ -14,6 +14,7 @@ import {
     saveProgress,
 } from '@/services/QuranService';
 import { QuranAyahWithTranslation, QuranSurah, QuranTranslationEdition } from '@/types/quran';
+import { getBasmalahText, shouldDisplayBasmalah, shouldStripBasmalah, startsWithBasmalah, stripLeadingBasmalah } from '@/utils/basmalah';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -123,19 +124,41 @@ export default function SurahDetailScreen() {
     saveProgress(surahNum, ayah.numberInSurah);
   };
 
-  // Helper to strip Bismillah from ayah text if needed
+  /**
+   * Get clean Arabic text for display (Mushaf-compliant)
+   * 
+   * BASMALAH STRIPPING RULES:
+   * - Surah 9 (At-Tawbah): No Basmalah, display ayah as-is
+   * - Surah 27, Ayah 30: Contains Basmalah INSIDE verse, do NOT strip
+   * - Other surahs, Ayah 1: Strip Basmalah if present (shown separately as header)
+   * - All Ayah 2+: Display as-is
+   * 
+   * This ensures:
+   * - Basmalah appears only once (as header)
+   * - Ayah text matches standard Mushaf (e.g., Surah 2:1 = "الم" not "بسم الله الرحمن الرحيم الم")
+   */
   const getCleanArabicText = (ayah: QuranAyahWithTranslation): string => {
-    let text = ayah.arabic.text;
+    const text = ayah.arabic.text;
     
-    // For Ayah 1 of all surahs except Al-Fatiha (1) and At-Tawbah (9),
-    // remove Bismillah from the text since we show it separately
-    if (ayah.numberInSurah === 1 && surahNum !== 1 && surahNum !== 9) {
-      // Remove common Bismillah variations from the beginning
-      text = text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ\s*/, '');
-      text = text.replace(/^بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\s*/, '');
-      text = text.replace(/^﻿بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\s*/, '');
+    // Check if we should strip Basmalah from this ayah
+    if (shouldStripBasmalah(surahNum, ayah.numberInSurah)) {
+      // Verify that text actually starts with Basmalah before stripping
+      if (startsWithBasmalah(text)) {
+        const stripped = stripLeadingBasmalah(text);
+        
+        // Debug: Log if stripping seems incomplete
+        if (stripped.includes('الرحمن') || stripped.includes('الرحيم')) {
+          console.warn(
+            `[Qur'an Reader] Potential incomplete Basmalah stripping in Surah ${surahNum}:${ayah.numberInSurah}`,
+            { original: text, stripped }
+          );
+        }
+        
+        return stripped;
+      }
     }
     
+    // Return text as-is for all other cases
     return text;
   };
 
@@ -185,10 +208,10 @@ export default function SurahDetailScreen() {
         </Text>
       </View>
 
-      {/* Bismillah - Centered, Elegant (except for Surah 1 and 9) */}
-      {surahNum !== 1 && surahNum !== 9 && (
+      {/* Bismillah - Centered, Elegant (except for Surah 9 / At-Tawbah) */}
+      {shouldDisplayBasmalah(surahNum) && (
         <View style={styles.bismillahContainer}>
-          <Text style={styles.bismillah}>بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</Text>
+          <Text style={styles.bismillah}>{getBasmalahText(true)}</Text>
         </View>
       )}
       

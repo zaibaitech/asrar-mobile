@@ -28,7 +28,7 @@ export default function CalculatorScreen() {
   const [motherName, setMotherName] = useState('');
   const [selectedDivineName, setSelectedDivineName] = useState<number | null>(null);
   const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
-  const [selectedAyah, setSelectedAyah] = useState<number | null>(null);
+  const [selectedAyah, setSelectedAyah] = useState<number | 'basmalah' | null>(null);
   
   // Phrase options
   const [removeVowels, setRemoveVowels] = useState(false);
@@ -79,12 +79,21 @@ export default function CalculatorScreen() {
 
         case 'quran':
           if (selectedSurah && selectedAyah) {
-            result = await EnhancedCalculatorEngine.calculate({
-              type: 'quran',
-              surahNumber: selectedSurah,
-              ayahNumber: selectedAyah,
-              system
-            });
+            // Special case: User selected "Basmalah" from the picker
+            if (selectedAyah === 'basmalah') {
+              result = await EnhancedCalculatorEngine.calculate({
+                type: 'quran',
+                pastedAyahText: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ',
+                system
+              });
+            } else {
+              result = await EnhancedCalculatorEngine.calculate({
+                type: 'quran',
+                surahNumber: selectedSurah,
+                ayahNumber: selectedAyah,
+                system
+              });
+            }
           } else if (arabicInput.trim()) {
             result = await EnhancedCalculatorEngine.calculate({
               type: 'quran',

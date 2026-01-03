@@ -1,11 +1,17 @@
 /**
  * Prayer Times Screen
  * Full daily prayer timetable with countdowns and details
+ * 
+ * Performance optimizations:
+ * - Caches location and prayer times data
+ * - Uses stale-while-revalidate pattern
+ * - Minimal initial load time
  */
 
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
@@ -16,7 +22,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '../contexts/LanguageContext';
 import {
     fetchPrayerTimes,
@@ -25,6 +30,14 @@ import {
 } from '../services/api/prayerTimes';
 
 type LoadingState = 'idle' | 'loading' | 'loaded' | 'error' | 'permission-denied';
+
+const CACHE_KEYS = {
+  PRAYER_TIMES: 'prayer_times_cache',
+  LOCATION: 'prayer_location_cache',
+  LAST_FETCH: 'prayer_last_fetch',
+};
+
+const CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hours
 
 interface PrayerInfo {
   name: string;
@@ -46,8 +59,68 @@ export default function PrayerTimesScreen() {
   const [nextPrayerIndex, setNextPrayerIndex] = useState<number>(0);
 
   useEffect(() => {
-    loadPrayerTimes();
+    loadCachedDataThenFresh();
   }, []);
+
+  const loadCachedDataThenFresh = async () => {
+    // Load cached data first for instant display
+    const cached = await loadFromCache();
+    
+    if (cached) {
+      // Show cached data immediately
+      setTimings(cached.timings);
+      setLocation(cached.location);
+      setHijriDate(cached.hijriDate);
+      setGregorianDate(cached.gregorianDate);
+      setState('loaded');
+    }
+    
+    // Then fetch fresh data in background
+    await loadPrayerTimes(!!cached);
+  };
+
+  const loadFromCache = async () => {
+    try {
+      const [cachedTimings, cachedLocation, lastFetch] = await Promise.all([
+        AsyncStorage.getItem(CACHE_KEYS.PRAYER_TIMES),
+        AsyncStorage.getItem(CACHE_KEYS.LOCATION),
+        AsyncStorage.getItem(CACHE_KEYS.LAST_FETCH),
+      ]);
+
+      if (!cachedTimings || !cachedLocation || !lastFetch) {
+        return null;
+      }
+
+      // Check if cache is still valid
+      const cacheAge = Date.now() - parseInt(lastFetch);
+      if (cacheAge > CACHE_DURATION) {
+        return null;
+      }
+
+      const data = JSON.parse(cachedTimings);
+      return {
+        timings: data.timings,
+        location: JSON.parse(cachedLocation),
+        hijriDate: data.hijriDate,
+        gregorianDate: data.gregorianDate,
+      };
+    } catch (error) {
+      console.error('Failed to load cached data:', error);
+      return null;
+    }
+  };
+
+  const saveToCache = async (data: any, loc: { latitude: number; longitude: number }) => {
+    try {
+      await Promise.all([
+        AsyncStorage.setItem(CACHE_KEYS.PRAYER_TIMES, JSON.stringify(data)),
+        AsyncStorage.setItem(CACHE_KEYS.LOCATION, JSON.stringify(loc)),
+        AsyncStorage.setItem(CACHE_KEYS.LAST_FETCH, Date.now().toString()),
+      ]);
+    } catch (error) {
+      console.error('Failed to save cache:', error);
+    }
+  };
 
   // Update next prayer every minute
   useEffect(() => {
@@ -81,36 +154,53 @@ export default function PrayerTimesScreen() {
     setNextPrayerIndex(nextIndex >= 0 ? nextIndex : 0);
   };
 
-  const loadPrayerTimes = async () => {
+  const loadPrayerTimes = async (isBackgroundRefresh = false) => {
     try {
-      setState('loading');
+      if (!isBackgroundRefresh) {
+        setState('loading');
+      }
 
       // Request location permission
       const { status } = await Location.requestForegroundPermissionsAsync();
       
       if (status !== 'granted') {
-        setState('permission-denied');
+        if (!isBackgroundRefresh) {
+          setState('permission-denied');
+        }
         return;
       }
 
       // Get current location
-      const location = await Location.getCurrentPositionAsync({
+      const locationResult = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
 
-      const { latitude, longitude } = location.coords;
-      setLocation({ latitude, longitude });
+      const { latitude, longitude } = locationResult.coords;
+      const newLocation = { latitude, longitude };
+      setLocation(newLocation);
 
       // Fetch prayer times
       const data = await fetchPrayerTimes(latitude, longitude);
+      const newHijriDate = `${data.date.hijri.day} ${data.date.hijri.month.ar} ${data.date.hijri.year}`;
+      const newGregorianDate = data.date.readable;
+      
       setTimings(data.timings);
-      setHijriDate(`${data.date.hijri.day} ${data.date.hijri.month.ar} ${data.date.hijri.year}`);
-      setGregorianDate(data.date.readable);
+      setHijriDate(newHijriDate);
+      setGregorianDate(newGregorianDate);
+
+      // Cache the data
+      await saveToCache({
+        timings: data.timings,
+        hijriDate: newHijriDate,
+        gregorianDate: newGregorianDate,
+      }, newLocation);
 
       setState('loaded');
     } catch (error) {
       console.error('Failed to load prayer times:', error);
-      setState('error');
+      if (!isBackgroundRefresh) {
+        setState('error');
+      }
     }
   };
 
@@ -135,86 +225,77 @@ export default function PrayerTimesScreen() {
 
   if (state === 'loading') {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Prayer Times</Text>
-          <View style={{ width: 40 }} />
+      <>
+        <Stack.Screen options={{ title: 'Prayer Times' }} />
+        <View style={styles.container}>
+          <View style={styles.centerContent}>
+            <ActivityIndicator size="large" color="#64B5F6" />
+            <Text style={styles.loadingText}>Loading prayer times...</Text>
+          </View>
         </View>
-        <View style={styles.centerContent}>
-          <ActivityIndicator size="large" color="#64B5F6" />
-          <Text style={styles.loadingText}>Loading prayer times...</Text>
-        </View>
-      </SafeAreaView>
+      </>
     );
   }
 
   if (state === 'permission-denied') {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Prayer Times</Text>
-          <View style={{ width: 40 }} />
+      <>
+        <Stack.Screen options={{ title: 'Prayer Times' }} />
+        <View style={styles.container}>
+          <View style={styles.centerContent}>
+            <Text style={styles.errorIcon}>📍</Text>
+            <Text style={styles.errorTitle}>Location Permission Required</Text>
+            <Text style={styles.errorText}>
+              We need your location to calculate accurate prayer times for your area.
+            </Text>
+            <TouchableOpacity style={styles.retryButton} onPress={() => loadPrayerTimes()}>
+              <Text style={styles.retryButtonText}>Grant Permission</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.centerContent}>
-          <Text style={styles.errorIcon}>📍</Text>
-          <Text style={styles.errorTitle}>Location Permission Required</Text>
-          <Text style={styles.errorText}>
-            We need your location to calculate accurate prayer times for your area.
-          </Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadPrayerTimes}>
-            <Text style={styles.retryButtonText}>Grant Permission</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      </>
     );
   }
 
   if (state === 'error') {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Prayer Times</Text>
-          <View style={{ width: 40 }} />
+      <>
+        <Stack.Screen options={{ title: 'Prayer Times' }} />
+        <View style={styles.container}>
+          <View style={styles.centerContent}>
+            <Text style={styles.errorIcon}>⚠️</Text>
+            <Text style={styles.errorTitle}>Failed to Load</Text>
+            <Text style={styles.errorText}>
+              Unable to fetch prayer times. Please check your internet connection.
+            </Text>
+            <TouchableOpacity style={styles.retryButton} onPress={() => loadPrayerTimes()}>
+              <Text style={styles.retryButtonText}>Retry</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.centerContent}>
-          <Text style={styles.errorIcon}>⚠️</Text>
-          <Text style={styles.errorTitle}>Failed to Load</Text>
-          <Text style={styles.errorText}>
-            Unable to fetch prayer times. Please check your internet connection.
-          </Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadPrayerTimes}>
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      </>
     );
   }
 
   const prayers = getPrayersList();
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Prayer Times</Text>
-        <TouchableOpacity onPress={() => router.push('/adhan-settings')} style={styles.settingsButton}>
-          <Ionicons name="settings-outline" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView
+    <>
+      <Stack.Screen 
+        options={{
+          title: 'Prayer Times',
+          headerRight: () => (
+            <TouchableOpacity 
+              onPress={() => router.push('/adhan-settings')} 
+              style={{ marginRight: 8 }}
+            >
+              <Ionicons name="settings-outline" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          ),
+        }} 
+      />
+      <View style={styles.container}>
+        <ScrollView
         style={styles.scrollView}
         refreshControl={
           <RefreshControl
@@ -318,7 +399,8 @@ export default function PrayerTimesScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </SafeAreaView>
+      </View>
+    </>
   );
 }
 
@@ -326,35 +408,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0f172a',
-  },
-
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1e293b',
-  },
-
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-  },
-
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-
-  settingsButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
   },
 
   centerContent: {

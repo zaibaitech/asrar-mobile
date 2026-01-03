@@ -7,13 +7,17 @@
  * - Supports multiple calculation methods
  * - No API key required (free service)
  * - Caches results for 24 hours
+ * - Enhanced: Weekly prefetch for offline capability
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 
 const ALADHAN_API_BASE = 'https://api.aladhan.com/v1';
 const CACHE_KEY = '@asrar_prayer_times_cache';
+const CACHE_KEY_PREFIX = '@asrar_prayer_times_day_';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const PREFETCH_DAYS = 7; // Prefetch 1 week of prayer times
 
 export interface PrayerTimings {
   Fajr: string;
@@ -254,8 +258,201 @@ export function getTimeUntilPrayer(prayerTime: string): {
 export async function clearPrayerTimesCache(): Promise<void> {
   try {
     await AsyncStorage.removeItem(CACHE_KEY);
+    
+    // Also clear all daily caches
+    const keys = await AsyncStorage.getAllKeys();
+    const dailyCacheKeys = keys.filter(key => key.startsWith(CACHE_KEY_PREFIX));
+    await AsyncStorage.multiRemove(dailyCacheKeys);
+    
     console.log('Prayer times cache cleared');
   } catch (error) {
     console.error('Failed to clear prayer times cache:', error);
+  }
+}
+
+/**
+ * Prefetch prayer times for multiple days (WiFi only for bandwidth conservation)
+ * Call this on app launch or when location changes
+ * 
+ * @param latitude - Latitude
+ * @param longitude - Longitude
+ * @param method - Calculation method
+ * @param days - Number of days to prefetch (default 7)
+ */
+export async function prefetchPrayerTimes(
+  latitude: number,
+  longitude: number,
+  method: CalculationMethod = 3,
+  days: number = PREFETCH_DAYS
+): Promise<void> {
+  try {
+    // Check network connection
+    const netInfo = await NetInfo.fetch();
+    
+    // Only prefetch on WiFi to save mobile data
+    if (netInfo.type !== 'wifi') {
+      console.log('Skipping prefetch: Not on WiFi');
+      return;
+    }
+    
+    console.log(`Prefetching prayer times for ${days} days...`);
+    
+    const promises: Promise<void>[] = [];
+    
+    for (let i = 0; i < days; i++) {
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + i);
+      targetDate.setHours(12, 0, 0, 0); // Noon to ensure correct day
+      
+      const dateKey = targetDate.toISOString().split('T')[0]; // YYYY-MM-DD
+      const cacheKey = `${CACHE_KEY_PREFIX}${dateKey}_${latitude.toFixed(2)}_${longitude.toFixed(2)}`;
+      
+      // Check if already cached
+      const cached = await AsyncStorage.getItem(cacheKey);
+      if (cached) {
+        const cacheData: CachedPrayerData = JSON.parse(cached);
+        // Check if still valid
+        if (Date.now() - cacheData.timestamp < CACHE_DURATION) {
+          continue; // Skip if already cached and valid
+        }
+      }
+      
+      // Fetch and cache this day
+      promises.push(
+        fetchAndCacheSingleDay(targetDate, latitude, longitude, method, cacheKey)
+      );
+    }
+    
+    await Promise.all(promises);
+    console.log(`Successfully prefetched ${promises.length} days of prayer times`);
+    
+  } catch (error) {
+    console.error('Failed to prefetch prayer times:', error);
+  }
+}
+
+/**
+ * Fetch and cache prayer times for a single day
+ */
+async function fetchAndCacheSingleDay(
+  date: Date,
+  latitude: number,
+  longitude: number,
+  method: CalculationMethod,
+  cacheKey: string
+): Promise<void> {
+  try {
+    const timestamp = Math.floor(date.getTime() / 1000);
+    const url = `${ALADHAN_API_BASE}/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+    
+    const json = await response.json();
+    
+    if (json.code !== 200 || !json.data) {
+      throw new Error('Invalid API response');
+    }
+    
+    const prayerData: PrayerTimeResponse = json.data;
+    
+    // Cache this day
+    const cacheData: CachedPrayerData = {
+      data: prayerData,
+      timestamp: Date.now(),
+      latitude,
+      longitude,
+    };
+    
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    
+  } catch (error) {
+    console.error(`Failed to fetch prayer times for ${date.toISOString()}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Get prayer times for a specific date (uses daily cache)
+ * 
+ * @param date - Target date
+ * @param latitude - Latitude
+ * @param longitude - Longitude
+ * @param method - Calculation method
+ * @returns Prayer times for the specified date
+ */
+export async function getPrayerTimesForDate(
+  date: Date,
+  latitude: number,
+  longitude: number,
+  method: CalculationMethod = 3
+): Promise<PrayerTimeResponse | null> {
+  try {
+    const dateKey = date.toISOString().split('T')[0];
+    const cacheKey = `${CACHE_KEY_PREFIX}${dateKey}_${latitude.toFixed(2)}_${longitude.toFixed(2)}`;
+    
+    // Check daily cache first
+    const cached = await AsyncStorage.getItem(cacheKey);
+    if (cached) {
+      const cacheData: CachedPrayerData = JSON.parse(cached);
+      
+      // Check if still valid
+      if (Date.now() - cacheData.timestamp < CACHE_DURATION) {
+        console.log(`Using cached prayer times for ${dateKey}`);
+        return cacheData.data;
+      }
+    }
+    
+    // Fetch if not cached
+    console.log(`Fetching prayer times for ${dateKey}...`);
+    await fetchAndCacheSingleDay(date, latitude, longitude, method, cacheKey);
+    
+    // Read from cache
+    const newCached = await AsyncStorage.getItem(cacheKey);
+    if (newCached) {
+      const cacheData: CachedPrayerData = JSON.parse(newCached);
+      return cacheData.data;
+    }
+    
+    return null;
+    
+  } catch (error) {
+    console.error('Failed to get prayer times for date:', error);
+    return null;
+  }
+}
+
+/**
+ * Cleanup expired cache entries (call periodically)
+ */
+export async function cleanupExpiredPrayerCache(): Promise<void> {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const dailyCacheKeys = keys.filter(key => key.startsWith(CACHE_KEY_PREFIX));
+    
+    const toRemove: string[] = [];
+    
+    for (const key of dailyCacheKeys) {
+      const cached = await AsyncStorage.getItem(key);
+      if (cached) {
+        const cacheData: CachedPrayerData = JSON.parse(cached);
+        
+        // Remove if expired
+        if (Date.now() - cacheData.timestamp > CACHE_DURATION) {
+          toRemove.push(key);
+        }
+      }
+    }
+    
+    if (toRemove.length > 0) {
+      await AsyncStorage.multiRemove(toRemove);
+      console.log(`Cleaned up ${toRemove.length} expired prayer time caches`);
+    }
+    
+  } catch (error) {
+    console.error('Failed to cleanup expired cache:', error);
   }
 }

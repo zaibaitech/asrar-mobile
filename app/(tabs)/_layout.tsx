@@ -117,10 +117,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="quran"
+        options={{
+          title: 'Quran',
+          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="two"
         options={{
+          href: null, // Hidden - replaced by direct module access from Home
           title: t('nav.guidance'),
-          tabBarIcon: ({ color }) => <TabBarIcon name="compass" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -135,6 +142,13 @@ export default function TabLayout() {
         options={{
           href: null, // Hide from tab bar
           title: 'Moment Alignment',
+        }}
+      />
+      <Tabs.Screen
+        name="daily-guidance-details"
+        options={{
+          href: null, // Hide from tab bar
+          title: 'Daily Guidance',
         }}
       />
       <Tabs.Screen
@@ -166,13 +180,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="quran"
-        options={{
-          href: null, // Hide from tab bar - accessed via navigation only
-          title: 'Quran',
-        }}
-      />
-      <Tabs.Screen
         name="quran/bookmarks"
         options={{
           href: null, // Hide bookmarks route from bottom tabs
@@ -184,6 +191,13 @@ export default function TabLayout() {
         options={{
           href: null, // Hide individual surah route from bottom tabs
           title: 'Quran Surah Detail',
+        }}
+      />
+      <Tabs.Screen
+        name="istikhara-prayer-guide"
+        options={{
+          href: null, // Hide from tab bar - accessed via navigation only
+          title: 'Istikhara Guide',
         }}
       />
     </Tabs>

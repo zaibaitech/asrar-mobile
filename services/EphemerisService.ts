@@ -20,6 +20,7 @@ import {
     PlanetPositions,
 } from '@/types/divine-timing-personal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 
 // ============================================================================
 // CONFIGURATION
@@ -490,5 +491,119 @@ export async function clearEphemerisCache(): Promise<void> {
     if (__DEV__) {
       console.error('[EphemerisService] Error clearing cache:', error);
     }
+  }
+}
+
+/**
+ * Prefetch ephemeris data for the next 24 hours (WiFi only)
+ * Significantly reduces API calls and improves offline capability
+ * 
+ * @param timezone - IANA timezone for calculations
+ * @param hours - Number of hours to prefetch (default 24)
+ * @returns Number of hours successfully cached
+ */
+export async function prefetchEphemerisData(
+  timezone: string = 'UTC',
+  hours: number = 24
+): Promise<number> {
+  try {
+    // Check network connection
+    const netInfo = await NetInfo.fetch();
+    
+    // Only prefetch on WiFi to save mobile data
+    if (netInfo.type !== 'wifi') {
+      if (__DEV__) {
+        console.log('[EphemerisService] Skipping prefetch: Not on WiFi');
+      }
+      return 0;
+    }
+    
+    if (__DEV__) {
+      console.log(`[EphemerisService] Prefetching ${hours} hours of ephemeris data...`);
+    }
+    
+    let cachedCount = 0;
+    const startDate = new Date();
+    
+    for (let i = 0; i < hours; i++) {
+      const targetDate = new Date(startDate);
+      targetDate.setHours(startDate.getHours() + i, 0, 0, 0);
+      
+      const hourKey = targetDate.toISOString().split(':')[0];
+      const cacheKey = `${STORAGE_KEYS.CACHE_PREFIX}${hourKey}_${timezone}`;
+      
+      // Check if already cached and valid
+      const cached = await getCachedPositions(cacheKey);
+      if (cached) {
+        cachedCount++;
+        continue;
+      }
+      
+      // Fetch and cache
+      const positions = await getPlanetPositions(targetDate, timezone);
+      if (positions) {
+        cachedCount++;
+      }
+      
+      // Small delay to avoid overwhelming the API
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    if (__DEV__) {
+      console.log(`[EphemerisService] Successfully prefetched ${cachedCount}/${hours} hours`);
+    }
+    
+    return cachedCount;
+    
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[EphemerisService] Prefetch error:', error);
+    }
+    return 0;
+  }
+}
+
+/**
+ * Cleanup expired ephemeris cache entries
+ * Call this periodically (e.g., daily) to free up storage
+ */
+export async function cleanupExpiredEphemerisCache(): Promise<number> {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const ephemerisKeys = keys.filter(key => key.startsWith(STORAGE_KEYS.CACHE_PREFIX));
+    
+    const toRemove: string[] = [];
+    const now = Date.now();
+    
+    for (const key of ephemerisKeys) {
+      const cached = await AsyncStorage.getItem(key);
+      if (cached) {
+        try {
+          const positions: PlanetPositions = JSON.parse(cached);
+          if (now > positions.expiresAt) {
+            toRemove.push(key);
+          }
+        } catch {
+          // Invalid cache entry, remove it
+          toRemove.push(key);
+        }
+      }
+    }
+    
+    if (toRemove.length > 0) {
+      await AsyncStorage.multiRemove(toRemove);
+      
+      if (__DEV__) {
+        console.log(`[EphemerisService] Cleaned up ${toRemove.length} expired entries`);
+      }
+    }
+    
+    return toRemove.length;
+    
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[EphemerisService] Cleanup error:', error);
+    }
+    return 0;
   }
 }

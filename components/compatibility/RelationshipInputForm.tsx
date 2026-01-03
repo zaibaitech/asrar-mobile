@@ -5,6 +5,7 @@ import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, ScrollView
 import { DarkTheme } from '../../constants/DarkTheme';
 import { useProfile } from '../../contexts/ProfileContext';
 import ArabicKeyboard from '../istikhara/ArabicKeyboard';
+import NameAutocomplete from '../NameAutocomplete';
 
 interface RelationshipInputFormProps {
   onCalculate: (
@@ -33,8 +34,10 @@ export function RelationshipInputForm({
   
   const [person1Name, setPerson1Name] = useState('');
   const [person1Arabic, setPerson1Arabic] = useState('');
+  const [person1Latin, setPerson1Latin] = useState('');
   const [person2Name, setPerson2Name] = useState('');
   const [person2Arabic, setPerson2Arabic] = useState('');
+  const [person2Latin, setPerson2Latin] = useState('');
   
   // Keyboard state
   const [showKeyboard, setShowKeyboard] = useState(false);
@@ -224,6 +227,24 @@ export function RelationshipInputForm({
             </View>
           </View>
           
+          {/* Latin Name Autocomplete */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>
+              {isFrench ? 'Nom Latin (Anglais/Français)' : 'Latin Name (English/French)'}
+            </Text>
+            <NameAutocomplete
+              value={person1Latin}
+              onChange={setPerson1Latin}
+              onArabicSelect={(arabic, latin) => {
+                setPerson1Arabic(arabic);
+                setPerson1Latin(latin);
+              }}
+              placeholder="e.g., Ibrahima, Amadou, Ousmane"
+              showHelper={false}
+              language={language}
+            />
+          </View>
+          
           <View style={styles.inputGroup}>
             <View style={styles.labelRow}>
               <Text style={styles.label}>
@@ -289,6 +310,24 @@ export function RelationshipInputForm({
                 placeholderTextColor={DarkTheme.textMuted}
               />
             </View>
+          </View>
+          
+          {/* Latin Name Autocomplete */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>
+              {isFrench ? 'Nom Latin (Anglais/Français)' : 'Latin Name (English/French)'}
+            </Text>
+            <NameAutocomplete
+              value={person2Latin}
+              onChange={setPerson2Latin}
+              onArabicSelect={(arabic, latin) => {
+                setPerson2Arabic(arabic);
+                setPerson2Latin(latin);
+              }}
+              placeholder="e.g., Fatima, Khadija, Aisha"
+              showHelper={false}
+              language={language}
+            />
           </View>
           
           <View style={styles.inputGroup}>
@@ -516,14 +555,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: 'rgba(236, 72, 153, 0.15)',
+    backgroundColor: 'rgba(236, 72, 153, 0.25)',
     borderWidth: 1,
-    borderColor: 'rgba(236, 72, 153, 0.3)',
+    borderColor: 'rgba(236, 72, 153, 0.5)',
   },
   keyboardButtonText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#ec4899',
+    color: '#f9a8d4',
   },
   inputContainer: {
     backgroundColor: DarkTheme.cardBackground,

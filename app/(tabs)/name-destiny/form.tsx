@@ -1,3 +1,5 @@
+import ArabicKeyboard from '@/components/istikhara/ArabicKeyboard';
+import NameAutocomplete from '@/components/NameAutocomplete';
 import { CollapsibleSection, DestinyHeader } from '@/components/nameDestiny';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI } from '@/features/name-destiny/constants/abjadMaps';
@@ -6,8 +8,8 @@ import { buildDestiny } from '@/features/name-destiny/services/nameDestinyCalcul
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { AlertCircle, BookOpen, CheckCircle, Lightbulb, Shield, Sparkles, Users } from 'lucide-react-native';
-import React, { useMemo, useState } from 'react';
+import { AlertCircle, BookOpen, CheckCircle, Keyboard as KeyboardIcon, Lightbulb, Shield, Sparkles, Users } from 'lucide-react-native';
+import React, { useMemo, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -34,8 +36,17 @@ export default function NameDestinyForm() {
 
   const [personName, setPersonName] = useState('');
   const [motherName, setMotherName] = useState('');
+  const [personLatin, setPersonLatin] = useState('');
+  const [motherLatin, setMotherLatin] = useState('');
   const [touched, setTouched] = useState({ person: false, mother: false });
   const [loading, setLoading] = useState(false);
+
+  // Arabic keyboard state
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [activeInput, setActiveInput] = useState<'person' | 'mother' | null>(null);
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const personInputRef = useRef<TextInput>(null);
+  const motherInputRef = useRef<TextInput>(null);
 
   const [educationOpen, setEducationOpen] = useState(false);
   const [insightsOpen, setInsightsOpen] = useState(false);
@@ -45,6 +56,49 @@ export default function NameDestinyForm() {
   const isPersonValid = useMemo(() => personName.trim().length > 0, [personName]);
   const isMotherValid = useMemo(() => motherName.trim().length > 0, [motherName]);
   const isFormValid = isPersonValid && isMotherValid;
+
+  // Keyboard handlers
+  const handleKeyPress = (key: string) => {
+    if (activeInput === 'person') {
+      const newText = personName.slice(0, cursorPosition) + key + personName.slice(cursorPosition);
+      setPersonName(newText);
+      setCursorPosition(cursorPosition + 1);
+      if (!touched.person) setTouched((prev) => ({ ...prev, person: true }));
+    } else if (activeInput === 'mother') {
+      const newText = motherName.slice(0, cursorPosition) + key + motherName.slice(cursorPosition);
+      setMotherName(newText);
+      setCursorPosition(cursorPosition + 1);
+      if (!touched.mother) setTouched((prev) => ({ ...prev, mother: true }));
+    }
+  };
+
+  const handleBackspace = () => {
+    if (cursorPosition === 0) return;
+    
+    if (activeInput === 'person') {
+      const newText = personName.slice(0, cursorPosition - 1) + personName.slice(cursorPosition);
+      setPersonName(newText);
+      setCursorPosition(cursorPosition - 1);
+    } else if (activeInput === 'mother') {
+      const newText = motherName.slice(0, cursorPosition - 1) + motherName.slice(cursorPosition);
+      setMotherName(newText);
+      setCursorPosition(cursorPosition - 1);
+    }
+  };
+
+  const handleSpace = () => {
+    handleKeyPress(' ');
+  };
+
+  const openKeyboard = (inputType: 'person' | 'mother') => {
+    setActiveInput(inputType);
+    if (inputType === 'person') {
+      setCursorPosition(personName.length);
+    } else {
+      setCursorPosition(motherName.length);
+    }
+    setShowKeyboard(true);
+  };
 
   const handleCalculate = async () => {
     if (!isFormValid || loading) {
@@ -111,11 +165,13 @@ export default function NameDestinyForm() {
 
         <KeyboardAvoidingView
           style={styles.keyboardAvoider}
-          behavior={Platform.select({ ios: 'padding', default: undefined })}
+          behavior={Platform.select({ ios: 'padding', android: 'height', default: undefined })}
+          keyboardVerticalOffset={Platform.select({ ios: 0, android: 20 })}
         >
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
             showsVerticalScrollIndicator={false}
           >
             {/* Hero Section */}
@@ -134,79 +190,158 @@ export default function NameDestinyForm() {
 
               {/* Person Name Input */}
               <LinearGradient
-                colors={['rgba(147, 51, 234, 0.25)', 'rgba(236, 72, 153, 0.15)']}
-                style={styles.inputCard}
+                colors={['rgba(147, 51, 234, 0.3)', 'rgba(236, 72, 153, 0.2)']}
+                style={styles.inputGradient}
               >
                 <View style={styles.inputHeader}>
-                  <Text style={styles.inputLabel}>Your Name</Text>
-                  {touched.person && isPersonValid && <CheckCircle size={18} color="#86efac" />}
-                </View>
-                <TextInput
-                  style={[
-                    styles.input,
-                    touched.person && !isPersonValid && styles.inputError,
-                    touched.person && isPersonValid && styles.inputSuccess,
-                  ]}
-                  placeholder="محمد"
-                  placeholderTextColor="rgba(255, 255, 255, 0.3)"
-                  value={personName}
-                  onChangeText={(text) => {
-                    setPersonName(text);
-                    if (!touched.person) setTouched((prev) => ({ ...prev, person: true }));
-                  }}
-                  textAlign="right"
-                  editable={!loading}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  returnKeyType="next"
-                />
-                {touched.person && !isPersonValid && (
-                  <View style={styles.errorRow}>
-                    <AlertCircle size={14} color="#fca5a5" />
-                    <Text style={styles.errorText}>Please enter a valid Arabic name</Text>
+                  <View style={styles.inputTitleRow}>
+                    <Text style={styles.inputEmoji}>👤</Text>
+                    <Text style={styles.inputTitle}>Your Name</Text>
                   </View>
-                )}
+                  {touched.person && isPersonValid && (
+                    <CheckCircle size={20} color="#86efac" />
+                  )}
+                </View>
+
+                {/* Latin Name Autocomplete */}
+                <View style={styles.inputWrapper}>
+                  <Text style={styles.inputLabel}>Latin Name (English/French)</Text>
+                  <NameAutocomplete
+                    value={personLatin}
+                    onChange={setPersonLatin}
+                    onArabicSelect={(arabic, latin) => {
+                      setPersonName(arabic);
+                      setPersonLatin(latin);
+                      if (!touched.person) setTouched((prev) => ({ ...prev, person: true }));
+                    }}
+                    placeholder="e.g., Ibrahima, Amadou, Ousmane"
+                    showHelper={false}
+                    language={language}
+                  />
+                </View>
+
+                {/* Arabic Name Input */}
+                <View style={styles.inputWrapper}>
+                  <View style={styles.labelWithButton}>
+                    <Text style={styles.inputLabel}>Arabic Name *</Text>
+                    <TouchableOpacity
+                      style={styles.keyboardButton}
+                      onPress={() => openKeyboard('person')}
+                    >
+                      <KeyboardIcon size={14} color="#e0e7ff" strokeWidth={2} />
+                      <Text style={styles.keyboardButtonText}>Keyboard</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <TextInput
+                    ref={personInputRef}
+                    style={[
+                      styles.input,
+                      touched.person && !isPersonValid && styles.inputError,
+                      touched.person && isPersonValid && styles.inputSuccess,
+                    ]}
+                    placeholder="محمد"
+                    placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                    value={personName}
+                    onChangeText={(text) => {
+                      setPersonName(text);
+                      setCursorPosition(text.length);
+                      if (!touched.person) setTouched((prev) => ({ ...prev, person: true }));
+                    }}
+                    onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
+                    textAlign="right"
+                    editable={!loading && (!showKeyboard || activeInput !== 'person')}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                  />
+                  {touched.person && !isPersonValid && (
+                    <View style={styles.errorRow}>
+                      <AlertCircle size={14} color="#fca5a5" />
+                      <Text style={styles.errorText}>Please enter a valid Arabic name</Text>
+                    </View>
+                  )}
+                </View>
               </LinearGradient>
 
               {/* Mother Name Input */}
               <LinearGradient
-                colors={['rgba(79, 70, 229, 0.25)', 'rgba(59, 130, 246, 0.15)']}
-                style={styles.inputCard}
-              >
-                <View style={styles.inputHeader}>
-                  <Text style={styles.inputLabel}>Mother's Name</Text>
-                  {touched.mother && isMotherValid && <CheckCircle size={18} color="#86efac" />}
-                </View>
-                <TextInput
-                  style={[
-                    styles.input,
-                    touched.mother && !isMotherValid && styles.inputError,
-                    touched.mother && isMotherValid && styles.inputSuccess,
-                  ]}
-                  placeholder="فاطمة"
-                  placeholderTextColor="rgba(255, 255, 255, 0.3)"
-                  value={motherName}
-                  onChangeText={(text) => {
-                    setMotherName(text);
-                    if (!touched.mother) setTouched((prev) => ({ ...prev, mother: true }));
-                  }}
-                  textAlign="right"
-                  editable={!loading}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  returnKeyType="done"
-                  onSubmitEditing={() => {
-                    Keyboard.dismiss();
-                    if (isFormValid) handleCalculate();
-                  }}
-                />
-                {touched.mother && !isMotherValid && (
-                  <View style={styles.errorRow}>
-                    <AlertCircle size={14} color="#fca5a5" />
-                    <Text style={styles.errorText}>Please enter a valid Arabic name</Text>
+                  colors={['rgba(79, 70, 229, 0.3)', 'rgba(59, 130, 246, 0.2)']}
+                  style={styles.inputGradient}
+                >
+                  <View style={styles.inputHeader}>
+                    <View style={styles.inputTitleRow}>
+                      <Text style={styles.inputEmoji}>👩</Text>
+                      <Text style={styles.inputTitle}>Mother's Name</Text>
+                    </View>
+                    {touched.mother && isMotherValid && (
+                      <CheckCircle size={20} color="#86efac" />
+                    )}
                   </View>
-                )}
-              </LinearGradient>
+
+                  {/* Latin Name Autocomplete */}
+                  <View style={styles.inputWrapper}>
+                    <Text style={styles.inputLabel}>Latin Name (English/French)</Text>
+                    <NameAutocomplete
+                      value={motherLatin}
+                      onChange={setMotherLatin}
+                      onArabicSelect={(arabic, latin) => {
+                        setMotherName(arabic);
+                        setMotherLatin(latin);
+                        if (!touched.mother) setTouched((prev) => ({ ...prev, mother: true }));
+                      }}
+                      placeholder="e.g., Fatima, Khadija, Aisha"
+                      showHelper={false}
+                      language={language}
+                    />
+                  </View>
+
+                  {/* Arabic Name Input */}
+                  <View style={styles.inputWrapper}>
+                    <View style={styles.labelWithButton}>
+                      <Text style={styles.inputLabel}>Arabic Name *</Text>
+                      <TouchableOpacity
+                        style={styles.keyboardButton}
+                        onPress={() => openKeyboard('mother')}
+                      >
+                        <KeyboardIcon size={14} color="#e0e7ff" strokeWidth={2} />
+                        <Text style={styles.keyboardButtonText}>Keyboard</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <TextInput
+                      ref={motherInputRef}
+                      style={[
+                        styles.input,
+                        touched.mother && !isMotherValid && styles.inputError,
+                        touched.mother && isMotherValid && styles.inputSuccess,
+                      ]}
+                      placeholder="فاطمة"
+                      placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                      value={motherName}
+                      onChangeText={(text) => {
+                        setMotherName(text);
+                        setCursorPosition(text.length);
+                        if (!touched.mother) setTouched((prev) => ({ ...prev, mother: true }));
+                      }}
+                      onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
+                      textAlign="right"
+                      editable={!loading && (!showKeyboard || activeInput !== 'mother')}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="done"
+                      onSubmitEditing={() => {
+                        Keyboard.dismiss();
+                        if (isFormValid) handleCalculate();
+                      }}
+                    />
+                    {touched.mother && !isMotherValid && (
+                      <View style={styles.errorRow}>
+                        <AlertCircle size={14} color="#fca5a5" />
+                        <Text style={styles.errorText}>Please enter a valid Arabic name</Text>
+                      </View>
+                    )}
+                  </View>
+                </LinearGradient>
 
               {/* Calculate Button */}
               <TouchableOpacity
@@ -315,6 +450,15 @@ export default function NameDestinyForm() {
             <View style={{ height: Math.max(insets.bottom, 24) }} />
           </ScrollView>
         </KeyboardAvoidingView>
+
+        {/* Arabic Keyboard */}
+        <ArabicKeyboard
+          visible={showKeyboard}
+          onClose={() => setShowKeyboard(false)}
+          onKeyPress={handleKeyPress}
+          onBackspace={handleBackspace}
+          onSpace={handleSpace}
+        />
       </LinearGradient>
     </SafeAreaView>
   );
@@ -376,16 +520,74 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(148, 163, 184, 0.2)',
   },
+  inputGradient: {
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 16,
+  },
   inputHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
+  },
+  inputTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  inputEmoji: {
+    fontSize: 24,
+  },
+  inputTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#f8fafc',
+  },
+  inputWrapper: {
+    marginTop: 12,
+  },
+  inputHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   inputLabel: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#f1f5f9',
+    color: '#cbd5e1',
+    marginBottom: 8,
+  },
+  labelWithButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  keyboardButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.3)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.4)',
+  },
+  keyboardButtonText: {
+    fontSize: 11,
+    color: '#e0e7ff',
+    fontWeight: '600',
+  },
+  inputSection: {
+    marginBottom: 0,
+  },
+  inputSectionLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#cbd5e1',
+    marginBottom: 8,
   },
   input: {
     backgroundColor: 'rgba(15, 23, 42, 0.6)',

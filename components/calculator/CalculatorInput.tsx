@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import { Modal, SafeAreaView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { CalculatorColors } from '../../constants/CalculatorColors';
 import { CalculationType } from '../../types/calculator-enhanced';
+import NameAutocomplete from '../NameAutocomplete';
 import ArabicKeyboard from './ArabicKeyboard';
 import { DivineNamesPicker } from './DivineNamesPicker';
 import { SurahAyahSelector } from './SurahAyahSelector';
@@ -29,8 +30,8 @@ interface CalculatorInputProps {
   // Quran selection
   selectedSurah: number | null;
   onSurahChange: (number: number | null) => void;
-  selectedAyah: number | null;
-  onAyahChange: (number: number | null) => void;
+  selectedAyah: number | 'basmalah' | null;
+  onAyahChange: (number: number | 'basmalah' | null) => void;
   
   // Phrase options
   removeVowels: boolean;
@@ -75,6 +76,11 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
   const [showSurahSelector, setShowSurahSelector] = useState(false);
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [activeInput, setActiveInput] = useState<'arabic' | 'yourName' | 'motherName' | null>(null);
+  
+  // Latin autocomplete states
+  const [nameLatin, setNameLatin] = useState('');
+  const [yourNameLatin, setYourNameLatin] = useState('');
+  const [motherNameLatin, setMotherNameLatin] = useState('');
   
   // Refs for text inputs to track cursor position
   const arabicInputRef = useRef<TextInput>(null);
@@ -142,22 +148,46 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
           <View style={styles.inputCard}>
             <View style={styles.inputHeader}>
               <Text style={styles.inputLabel}>👤 Name</Text>
-              <TouchableOpacity 
-                style={styles.keyboardButton}
-                onPress={() => openKeyboard('arabic')}
-              >
-                <Text style={styles.keyboardButtonText}>⌨️ Arabic Keyboard</Text>
-              </TouchableOpacity>
             </View>
-            <TextInput
-              ref={arabicInputRef}
-              style={styles.arabicInput}
-              value={arabicInput}
-              onChangeText={onArabicInputChange}
-              onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
-              placeholder="محمد"
-              placeholderTextColor="#64748b"
-            />
+            
+            {/* Latin Name Autocomplete */}
+            <View style={styles.inputWrapper}>
+              <Text style={styles.label}>Latin Name (English/French)</Text>
+              <NameAutocomplete
+                value={nameLatin}
+                onChange={setNameLatin}
+                onArabicSelect={(arabic, latin) => {
+                  onArabicInputChange(arabic);
+                  setNameLatin(latin);
+                }}
+                placeholder="e.g., Ibrahima, Amadou, Ousmane"
+                showHelper={false}
+                language="en"
+              />
+            </View>
+            
+            {/* Arabic Name Input */}
+            <View style={styles.inputWrapper}>
+              <View style={styles.labelRow}>
+                <Text style={styles.label}>Arabic Name *</Text>
+                <TouchableOpacity 
+                  style={styles.keyboardButton}
+                  onPress={() => openKeyboard('arabic')}
+                >
+                  <Text style={styles.keyboardButtonText}>⌨️ Keyboard</Text>
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                ref={arabicInputRef}
+                style={styles.arabicInput}
+                value={arabicInput}
+                onChangeText={onArabicInputChange}
+                onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
+                placeholder="محمد"
+                placeholderTextColor="#64748b"
+                editable={!showKeyboard || activeInput !== 'arabic'}
+              />
+            </View>
           </View>
         );
 
@@ -167,43 +197,91 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
             <View style={styles.inputCard}>
               <View style={styles.inputHeader}>
                 <Text style={styles.inputLabel}>👤 Your Name</Text>
-                <TouchableOpacity 
-                  style={styles.keyboardButton}
-                  onPress={() => openKeyboard('yourName')}
-                >
-                  <Text style={styles.keyboardButtonText}>⌨️</Text>
-                </TouchableOpacity>
               </View>
-              <TextInput
-                ref={yourNameInputRef}
-                style={styles.arabicInput}
-                value={yourName}
-                onChangeText={onYourNameChange}
-                onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
-                placeholder="محمد"
-                placeholderTextColor="#64748b"
-              />
+              
+              {/* Latin Name Autocomplete */}
+              <View style={styles.inputWrapper}>
+                <Text style={styles.label}>Latin Name (English/French)</Text>
+                <NameAutocomplete
+                  value={yourNameLatin}
+                  onChange={setYourNameLatin}
+                  onArabicSelect={(arabic, latin) => {
+                    onYourNameChange(arabic);
+                    setYourNameLatin(latin);
+                  }}
+                  placeholder="e.g., Ibrahima, Amadou, Ousmane"
+                  showHelper={false}
+                  language="en"
+                />
+              </View>
+              
+              {/* Arabic Name Input */}
+              <View style={styles.inputWrapper}>
+                <View style={styles.labelRow}>
+                  <Text style={styles.label}>Arabic Name *</Text>
+                  <TouchableOpacity 
+                    style={styles.keyboardButton}
+                    onPress={() => openKeyboard('yourName')}
+                  >
+                    <Text style={styles.keyboardButtonText}>⌨️ Keyboard</Text>
+                  </TouchableOpacity>
+                </View>
+                <TextInput
+                  ref={yourNameInputRef}
+                  style={styles.arabicInput}
+                  value={yourName}
+                  onChangeText={onYourNameChange}
+                  onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
+                  placeholder="محمد"
+                  placeholderTextColor="#64748b"
+                  editable={!showKeyboard || activeInput !== 'yourName'}
+                />
+              </View>
             </View>
             
             <View style={styles.inputCard}>
               <View style={styles.inputHeader}>
                 <Text style={styles.inputLabel}>👩 Mother's Name</Text>
-                <TouchableOpacity 
-                  style={styles.keyboardButton}
-                  onPress={() => openKeyboard('motherName')}
-                >
-                  <Text style={styles.keyboardButtonText}>⌨️</Text>
-                </TouchableOpacity>
               </View>
-              <TextInput
-                ref={motherNameInputRef}
-                style={styles.arabicInput}
-                value={motherName}
-                onChangeText={onMotherNameChange}
-                onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
-                placeholder="فاطمة"
-                placeholderTextColor="#64748b"
-              />
+              
+              {/* Latin Name Autocomplete */}
+              <View style={styles.inputWrapper}>
+                <Text style={styles.label}>Latin Name (English/French)</Text>
+                <NameAutocomplete
+                  value={motherNameLatin}
+                  onChange={setMotherNameLatin}
+                  onArabicSelect={(arabic, latin) => {
+                    onMotherNameChange(arabic);
+                    setMotherNameLatin(latin);
+                  }}
+                  placeholder="e.g., Fatima, Khadija, Aisha"
+                  showHelper={false}
+                  language="en"
+                />
+              </View>
+              
+              {/* Arabic Name Input */}
+              <View style={styles.inputWrapper}>
+                <View style={styles.labelRow}>
+                  <Text style={styles.label}>Arabic Name *</Text>
+                  <TouchableOpacity 
+                    style={styles.keyboardButton}
+                    onPress={() => openKeyboard('motherName')}
+                  >
+                    <Text style={styles.keyboardButtonText}>⌨️ Keyboard</Text>
+                  </TouchableOpacity>
+                </View>
+                <TextInput
+                  ref={motherNameInputRef}
+                  style={styles.arabicInput}
+                  value={motherName}
+                  onChangeText={onMotherNameChange}
+                  onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
+                  placeholder="فاطمة"
+                  placeholderTextColor="#64748b"
+                  editable={!showKeyboard || activeInput !== 'motherName'}
+                />
+              </View>
             </View>
           </>
         );
@@ -274,7 +352,9 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
             >
               <Text style={styles.selectorButtonText}>
                 {selectedSurah && selectedAyah
-                  ? `📖 Surah ${selectedSurah}, Ayah ${selectedAyah}`
+                  ? selectedAyah === 'basmalah'
+                    ? `📿 Basmalah (بِسْمِ ٱللَّهِ)`
+                    : `📖 Surah ${selectedSurah}, Ayah ${selectedAyah}`
                   : '📖 Select Surah & Ayah'}
               </Text>
             </TouchableOpacity>
@@ -540,6 +620,21 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#334155',
     gap: 12,
+  },
+  inputWrapper: {
+    marginBottom: 8,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  label: {
+    color: '#cbd5e1',
+    fontSize: 14,
+    marginBottom: 8,
+    fontWeight: '500',
   },
   inputHeader: {
     flexDirection: 'row',

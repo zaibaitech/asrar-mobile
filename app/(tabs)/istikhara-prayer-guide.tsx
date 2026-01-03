@@ -19,6 +19,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type StepSection = 'introduction' | 'prerequisites' | 'prayer' | 'dua' | 'after';
 
@@ -32,6 +33,7 @@ interface Step {
 }
 
 export default function IstkharaPrayerGuideScreen() {
+  const insets = useSafeAreaInsets();
   const [activeSection, setActiveSection] = useState<StepSection>('introduction');
   const [expandedSteps, setExpandedSteps] = useState<Record<string, boolean>>({
     intro: true,
@@ -440,20 +442,20 @@ export default function IstkharaPrayerGuideScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={['#0f172a', '#1e1b4b', '#312e81']}
-      style={styles.container}
-    >
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Authentic Istikhara Guide</Text>
-        <View style={{ width: 40 }} />
-      </View>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={['#0f172a', '#1e1b4b', '#312e81']}
+        style={styles.gradientContainer}
+      >
+        {/* Back Button - Minimal */}
+        <View style={styles.backButtonContainer}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Progress Tabs */}
+        {/* Progress Tabs */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -495,12 +497,13 @@ export default function IstkharaPrayerGuideScreen() {
       {/* Content */}
       <ScrollView
         style={styles.content}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[styles.contentContainer, { paddingBottom: insets.bottom + 80 }]}
         showsVerticalScrollIndicator={false}
       >
         {renderContent()}
       </ScrollView>
-    </LinearGradient>
+      </LinearGradient>
+    </View>
   );
 }
 
@@ -567,25 +570,24 @@ function StepCard({ number, title, titleAr, icon, expanded, onToggle, children }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#0f172a',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  gradientContainer: {
+    flex: 1,
+  },
+  backButtonContainer: {
     paddingHorizontal: Spacing.lg,
-    paddingTop: 60,
-    paddingBottom: Spacing.md,
+    paddingVertical: Spacing.md,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 8,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: Typography.weightBold as any,
+  backButtonText: {
+    fontSize: 16,
     color: '#fff',
+    fontWeight: Typography.weightMedium as any,
   },
   tabsContainer: {
     flexGrow: 0,

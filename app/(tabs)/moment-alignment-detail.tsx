@@ -8,8 +8,11 @@
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { MomentAlignment, getMomentAlignment } from '@/services/MomentAlignmentService';
+import { getMomentAlignment, MomentAlignment } from '@/services/MomentAlignmentService';
+import { calculatePlanetaryHours, PlanetaryHourData } from '@/services/PlanetaryHoursService';
+import { fetchPrayerTimes } from '@/services/api/prayerTimes';
 import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -32,6 +35,9 @@ export default function MomentAlignmentDetailScreen() {
   const [alignment, setAlignment] = useState<MomentAlignment | null>(null);
   const [loading, setLoading] = useState(true);
   const [showTimeline, setShowTimeline] = useState(false);
+  const [planetaryData, setPlanetaryData] = useState<PlanetaryHourData | null>(null);
+  const [prayerTimesData, setPrayerTimesData] = useState<any>(null);
+  const [now, setNow] = useState(new Date());
   
   const loadAlignment = useCallback(async () => {
     setLoading(true);
@@ -40,9 +46,61 @@ export default function MomentAlignmentDetailScreen() {
     setLoading(false);
   }, [profile]);
   
+  const loadPrayerTimes = useCallback(async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      
+      if (status === 'granted') {
+        const location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+        
+        const { latitude, longitude } = location.coords;
+        const data = await fetchPrayerTimes(latitude, longitude);
+        setPrayerTimesData(data);
+      }
+    } catch (error) {
+      console.error('Error loading prayer times:', error);
+    }
+  }, []);
+  
   useEffect(() => {
     loadAlignment();
-  }, [loadAlignment]);
+    loadPrayerTimes();
+  }, [loadAlignment, loadPrayerTimes]);
+  
+  // Calculate planetary hours when prayer times are available
+  useEffect(() => {
+    if (!prayerTimesData) return;
+    
+    try {
+      const { timings } = prayerTimesData;
+      const parseTime = (timeStr: string) => {
+        const [hours, minutes] = timeStr.split(':');
+        const date = new Date();
+        date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        return date;
+      };
+      
+      const sunrise = parseTime(timings.Sunrise);
+      const sunset = parseTime(timings.Maghrib);
+      const nextDay = new Date(sunrise);
+      nextDay.setDate(nextDay.getDate() + 1);
+      
+      const planetary = calculatePlanetaryHours(sunrise, sunset, nextDay, now);
+      setPlanetaryData(planetary);
+    } catch (error) {
+      console.error('Error calculating planetary hours:', error);
+    }
+  }, [prayerTimesData, now]);
+  
+  // Update time every second for countdown
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
   
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -332,6 +390,121 @@ export default function MomentAlignmentDetailScreen() {
             </Text>
           </View>
         </View>
+        
+        {/* Planetary Hours Section */}
+        {planetaryData && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="planet-outline" size={20} color="#8B7355" />
+              <Text style={styles.sectionTitle}>{t('planetaryHours.title')}</Text>
+            </View>
+            
+            {/* Current Hour */}
+            <View style={styles.planetaryHourCard}>
+              <View style={styles.planetaryHourHeader}>
+                <Text style={styles.planetaryHourLabel}>{t('planetaryHours.currentHour')}</Text>
+                <View style={[styles.hourBadge, { backgroundColor: 'rgba(139, 115, 85, 0.15)' }]}>
+                  <Text style={[styles.hourBadgeText, { color: '#8B7355' }]}>
+                    Hour #{planetaryData.currentHour.hourNumber}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.planetaryHourContent}>
+                <Text style={styles.planetSymbol}>{planetaryData.currentHour.planetInfo.symbol}</Text>
+                <View style={styles.planetInfo}>
+                  <Text style={styles.planetName}>{planetaryData.currentHour.planet}</Text>
+                  <Text style={styles.planetArabic}>{planetaryData.currentHour.planetInfo.arabicName}</Text>
+                  <View style={[styles.elementBadge, { backgroundColor: `rgba(139, 115, 85, 0.1)` }]}>
+                    <Text style={[styles.elementBadgeText, { color: '#8B7355' }]}>
+                      {getElementIcon(planetaryData.currentHour.planetInfo.element)} {getElementLabel(planetaryData.currentHour.planetInfo.element)}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              <View style={styles.timeRange}>
+                <Ionicons name="time-outline" size={14} color={DarkTheme.textTertiary} />
+                <Text style={styles.timeRangeText}>
+                  {planetaryData.currentHour.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {planetaryData.currentHour.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </Text>
+                {planetaryData.countdownSeconds > 0 && (
+                  <Text style={styles.countdown}>
+                    ({(() => {
+                      const seconds = planetaryData.countdownSeconds;
+                      const hours = Math.floor(seconds / 3600);
+                      const minutes = Math.floor((seconds % 3600) / 60);
+                      const secs = seconds % 60;
+                      if (hours > 0) return `${hours}h ${minutes}m left`;
+                      if (minutes > 0) return `${minutes}m ${secs}s left`;
+                      return `${secs}s left`;
+                    })()})
+                  </Text>
+                )}
+              </View>
+            </View>
+            
+            {/* Next Hour */}
+            <View style={[styles.planetaryHourCard, { backgroundColor: 'rgba(255, 255, 255, 0.02)' }]}>
+              <View style={styles.planetaryHourHeader}>
+                <Text style={styles.planetaryHourLabel}>{t('home.nextPlanetHour')}</Text>
+                <View style={[styles.hourBadge, { backgroundColor: 'rgba(100, 181, 246, 0.15)' }]}>
+                  <Text style={[styles.hourBadgeText, { color: '#64B5F6' }]}>
+                    Hour #{planetaryData.nextHour.hourNumber}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.planetaryHourContent}>
+                <Text style={styles.planetSymbol}>{planetaryData.nextHour.planetInfo.symbol}</Text>
+                <View style={styles.planetInfo}>
+                  <Text style={styles.planetName}>{planetaryData.nextHour.planet}</Text>
+                  <Text style={styles.planetArabic}>{planetaryData.nextHour.planetInfo.arabicName}</Text>
+                  <View style={[styles.elementBadge, { backgroundColor: `rgba(100, 181, 246, 0.1)` }]}>
+                    <Text style={[styles.elementBadgeText, { color: '#64B5F6' }]}>
+                      {getElementIcon(planetaryData.nextHour.planetInfo.element)} {getElementLabel(planetaryData.nextHour.planetInfo.element)}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              <View style={styles.timeRange}>
+                <Ionicons name="time-outline" size={14} color={DarkTheme.textTertiary} />
+                <Text style={styles.timeRangeText}>
+                  {t('home.startsAt')} {planetaryData.nextHour.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </Text>
+              </View>
+            </View>
+            
+            {/* After Next Hour (if available) */}
+            {planetaryData.afterNextHour && (
+              <View style={[styles.planetaryHourCard, { backgroundColor: 'rgba(255, 255, 255, 0.015)' }]}>
+                <View style={styles.planetaryHourHeader}>
+                  <Text style={styles.planetaryHourLabel}>Hour After Next</Text>
+                  <View style={[styles.hourBadge, { backgroundColor: 'rgba(148, 163, 184, 0.15)' }]}>
+                    <Text style={[styles.hourBadgeText, { color: '#94a3b8' }]}>
+                      Hour #{planetaryData.afterNextHour.hourNumber}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.planetaryHourContent}>
+                  <Text style={styles.planetSymbol}>{planetaryData.afterNextHour.planetInfo.symbol}</Text>
+                  <View style={styles.planetInfo}>
+                    <Text style={styles.planetName}>{planetaryData.afterNextHour.planet}</Text>
+                    <Text style={styles.planetArabic}>{planetaryData.afterNextHour.planetInfo.arabicName}</Text>
+                    <View style={[styles.elementBadge, { backgroundColor: `rgba(148, 163, 184, 0.1)` }]}>
+                      <Text style={[styles.elementBadgeText, { color: '#94a3b8' }]}>
+                        {getElementIcon(planetaryData.afterNextHour.planetInfo.element)} {getElementLabel(planetaryData.afterNextHour.planetInfo.element)}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.timeRange}>
+                  <Ionicons name="time-outline" size={14} color={DarkTheme.textTertiary} />
+                  <Text style={styles.timeRangeText}>
+                    {t('home.startsAt')} {planetaryData.afterNextHour.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+        )}
         
         {/* Why This Status - Bullet Points */}
         <View style={styles.section}>
@@ -761,6 +934,89 @@ const styles = StyleSheet.create({
     color: DarkTheme.textTertiary,
     textAlign: 'center',
     paddingVertical: Spacing.md,
+    fontStyle: 'italic',
+  },
+  
+  // Planetary Hours
+  planetaryHourCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    padding: Spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  planetaryHourHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  planetaryHourLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: DarkTheme.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  hourBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  hourBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  planetaryHourContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  planetSymbol: {
+    fontSize: 48,
+  },
+  planetInfo: {
+    flex: 1,
+    gap: Spacing.xs,
+  },
+  planetName: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+  },
+  planetArabic: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+  },
+  elementBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  elementBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  timeRange: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingTop: Spacing.xs,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+    flexWrap: 'wrap',
+  },
+  timeRangeText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: '500',
+  },
+  countdown: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
     fontStyle: 'italic',
   },
 });
