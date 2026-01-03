@@ -251,7 +251,7 @@ export default function AuthScreen() {
                 onPress={() => setMode('signup')}
               >
                 <Text style={[styles.tabText, mode === 'signup' && styles.tabTextActive]}>
-                  {t.auth.signUp}
+                  {t('auth.signUp')}
                 </Text>
               </TouchableOpacity>
               
@@ -260,7 +260,7 @@ export default function AuthScreen() {
                 onPress={() => setMode('signin')}
               >
                 <Text style={[styles.tabText, mode === 'signin' && styles.tabTextActive]}>
-                  {t.auth.signIn}
+                  {t('auth.signIn')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -310,14 +310,14 @@ export default function AuthScreen() {
             {/* Form */}
             <View style={styles.form}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>{t.auth.email}</Text>
+                <Text style={styles.label}>{t('auth.email')}</Text>
                 <View style={styles.inputWrapper}>
                   <Ionicons name="mail" size={20} color={DarkTheme.textSecondary} />
                   <TextInput
                     style={styles.input}
                     value={email}
                     onChangeText={setEmail}
-                    placeholder={t.auth.emailPlaceholder}
+                    placeholder={t('auth.emailPlaceholder')}
                     placeholderTextColor={DarkTheme.textSecondary}
                     keyboardType="email-address"
                     autoCapitalize="none"
@@ -327,14 +327,14 @@ export default function AuthScreen() {
               </View>
               
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>{t.auth.password}</Text>
+                <Text style={styles.label}>{t('auth.password')}</Text>
                 <View style={styles.inputWrapper}>
                   <Ionicons name="lock-closed" size={20} color={DarkTheme.textSecondary} />
                   <TextInput
                     style={styles.input}
                     value={password}
                     onChangeText={setPassword}
-                    placeholder={t.auth.passwordPlaceholder}
+                    placeholder={t('auth.passwordPlaceholder')}
                     placeholderTextColor={DarkTheme.textSecondary}
                     secureTextEntry
                     autoComplete="password"
@@ -404,7 +404,7 @@ export default function AuthScreen() {
               {/* Forgot Password */}
               {mode === 'signin' && (
                 <TouchableOpacity style={styles.forgotButton}>
-                  <Text style={styles.forgotText}>{t.auth.forgotPassword}</Text>
+                  <Text style={styles.forgotText}>{t('auth.forgotPassword')}</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -422,7 +422,7 @@ export default function AuthScreen() {
               onPress={handleContinueAsGuest}
             >
               <Ionicons name="person-outline" size={20} color={DarkTheme.textSecondary} />
-              <Text style={styles.guestButtonText}>{t.auth.continueAsGuest}</Text>
+              <Text style={styles.guestButtonText}>{t('auth.continueAsGuest')}</Text>
             </TouchableOpacity>
             
             {/* Privacy Notice */}

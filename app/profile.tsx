@@ -210,12 +210,12 @@ export default function ProfileScreen() {
   
   const handleClearProfile = () => {
     Alert.alert(
-      t.profile.clearDataTitle,
-      t.profile.clearDataMessage,
+      t('profile.clearDataTitle'),
+      t('profile.clearDataMessage'),
       [
-        { text: t.common.cancel, style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: t.common.delete,
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             await resetProfile();
@@ -237,7 +237,7 @@ export default function ProfileScreen() {
       const jsonData = await exportProfile();
       
       if (!jsonData) {
-        Alert.alert(t.common.error, t.profile.exportError);
+        Alert.alert(t('common.error'), t('profile.exportError'));
         return;
       }
       
@@ -249,7 +249,7 @@ export default function ProfileScreen() {
       if (Platform.OS === 'web') {
         // @ts-ignore - clipboard API exists in web
         navigator.clipboard.writeText(jsonData);
-        Alert.alert(t.common.success, t.profile.exportSuccess);
+        Alert.alert(t('common.success'), t('profile.exportSuccess'));
         return;
       }
       
@@ -260,29 +260,29 @@ export default function ProfileScreen() {
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(fileUri, {
           mimeType: 'application/json',
-          dialogTitle: t.profile.exportMyData,
+          dialogTitle: t('profile.exportMyData'),
         });
       } else {
-        Alert.alert(t.common.success, t.profile.exportSuccess);
+        Alert.alert(t('common.success'), t('profile.exportSuccess'));
       }
       
     } catch (error) {
       console.error('Export error:', error);
-      Alert.alert(t.common.error, t.profile.exportError);
+      Alert.alert(t('common.error'), t('profile.exportError'));
     }
   };
   
   const handleSignOut = () => {
     Alert.alert(
-      t.profile.signOutTitle,
-      t.profile.signOutMessage,
+      t('profile.signOutTitle'),
+      t('profile.signOutMessage'),
       [
         {
-          text: t.common.cancel,
+          text: t('common.cancel'),
           style: 'cancel',
         },
         {
-          text: t.profile.signOut,
+          text: t('profile.signOut'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -292,11 +292,11 @@ export default function ProfileScreen() {
               // Reload profile - this will re-check session (now null) and switch to guest mode
               await reloadProfile();
               
-              Alert.alert(t.common.success, t.profile.signOutMessage);
+              Alert.alert(t('common.success'), t('profile.signOutMessage'));
               router.replace('/(tabs)');
             } catch (error) {
               console.error('Sign out error:', error);
-              Alert.alert(t.common.error, t.profile.deleteError);
+              Alert.alert(t('common.error'), t('profile.deleteError'));
             }
           },
         },
@@ -306,32 +306,32 @@ export default function ProfileScreen() {
   
   const handleDeleteAccount = () => {
     Alert.alert(
-      t.profile.deleteAccountTitle,
-      t.profile.deleteAccountMessage,
+      t('profile.deleteAccountTitle'),
+      t('profile.deleteAccountMessage'),
       [
         {
-          text: t.common.cancel,
+          text: t('common.cancel'),
           style: 'cancel',
         },
         {
-          text: t.profile.deleteAccount,
+          text: t('profile.deleteAccount'),
           style: 'destructive',
           onPress: () => {
             // Require password confirmation
             Alert.prompt(
-              t.profile.deleteAccountTitle,
-              t.profile.enterPassword,
+              t('profile.deleteAccountTitle'),
+              t('profile.enterPassword'),
               [
                 {
-                  text: t.common.cancel,
+                  text: t('common.cancel'),
                   style: 'cancel',
                 },
                 {
-                  text: t.common.delete,
+                  text: t('common.delete'),
                   style: 'destructive',
                   onPress: async (password?: string) => {
                     if (!password || password.trim() === '') {
-                      Alert.alert(t.common.error, t.auth.passwordRequired);
+                      Alert.alert(t('common.error'), t('auth.passwordRequired'));
                       return;
                     }
                     
@@ -342,7 +342,7 @@ export default function ProfileScreen() {
                       const result = await deleteAccount(password);
                       
                       if (result.error) {
-                        Alert.alert(t.common.error, result.error.message);
+                        Alert.alert(t('common.error'), result.error.message);
                         return;
                       }
                       
@@ -350,18 +350,18 @@ export default function ProfileScreen() {
                       await resetProfile();
                       
                       Alert.alert(
-                        t.profile.deleteSuccess,
-                        t.profile.deleteAccountMessage,
+                        t('profile.deleteSuccess'),
+                        t('profile.deleteAccountMessage'),
                         [
                           {
-                            text: t.common.close,
+                            text: t('common.close'),
                             onPress: () => router.replace('/auth'),
                           },
                         ]
                       );
                     } catch (error) {
                       console.error('Delete account error:', error);
-                      Alert.alert(t.common.error, t.profile.deleteError);
+                      Alert.alert(t('common.error'), t('profile.deleteError'));
                     } finally {
                       setLoadingLocation(false);
                     }
@@ -622,7 +622,7 @@ export default function ProfileScreen() {
         
         {/* Privacy & Data Section */}
         <View style={styles.privacySection}>
-          <Text style={styles.privacySectionTitle}>{t.profile.privacyDataTitle}</Text>
+          <Text style={styles.privacySectionTitle}>{t('profile.privacyDataTitle')}</Text>
           
           {/* Export Data Button */}
           <TouchableOpacity 
@@ -630,7 +630,7 @@ export default function ProfileScreen() {
             onPress={handleExportData}
           >
             <Ionicons name="download-outline" size={20} color="#10b981" />
-            <Text style={styles.exportButtonText}>{t.profile.exportMyData}</Text>
+            <Text style={styles.exportButtonText}>{t('profile.exportMyData')}</Text>
             <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
           </TouchableOpacity>
           
@@ -642,7 +642,7 @@ export default function ProfileScreen() {
                 onPress={handleSignOut}
               >
                 <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-                <Text style={styles.signOutButtonText}>{t.profile.signOut}</Text>
+                <Text style={styles.signOutButtonText}>{t('profile.signOut')}</Text>
                 <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
               </TouchableOpacity>
               
@@ -652,7 +652,7 @@ export default function ProfileScreen() {
                 onPress={handleDeleteAccount}
               >
                 <Ionicons name="trash-outline" size={20} color="#dc2626" />
-                <Text style={styles.deleteAccountButtonText}>{t.profile.deleteAccount}</Text>
+                <Text style={styles.deleteAccountButtonText}>{t('profile.deleteAccount')}</Text>
                 <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
               </TouchableOpacity>
             </>
@@ -662,7 +662,7 @@ export default function ProfileScreen() {
           <View style={styles.privacyNoticeCard}>
             <Ionicons name="shield-checkmark" size={16} color="#10b981" />
             <Text style={styles.privacyNoticeText}>
-              {t.profile.privacyNotice}
+              {t('profile.privacyNotice')}
             </Text>
           </View>
           
@@ -673,7 +673,7 @@ export default function ProfileScreen() {
               onPress={() => router.push('https://zaibaitech.github.io/asrar-mobile/privacy.html' as any)}
             >
               <Ionicons name="document-text-outline" size={18} color={DarkTheme.textSecondary} />
-              <Text style={styles.legalLinkText}>{t.profile.privacyPolicy}</Text>
+              <Text style={styles.legalLinkText}>{t('profile.privacyPolicy')}</Text>
               <Ionicons name="open-outline" size={16} color={DarkTheme.textSecondary} />
             </TouchableOpacity>
             
@@ -682,14 +682,14 @@ export default function ProfileScreen() {
               onPress={() => router.push('https://zaibaitech.github.io/asrar-mobile/terms.html' as any)}
             >
               <Ionicons name="document-text-outline" size={18} color={DarkTheme.textSecondary} />
-              <Text style={styles.legalLinkText}>{t.profile.termsOfService}</Text>
+              <Text style={styles.legalLinkText}>{t('profile.termsOfService')}</Text>
               <Ionicons name="open-outline" size={16} color={DarkTheme.textSecondary} />
             </TouchableOpacity>
           </View>
         </View>
         
         <TouchableOpacity style={styles.clearButton} onPress={handleClearProfile}>
-          <Text style={styles.clearButtonText}>{t.profile.deleteAllMyData}</Text>
+          <Text style={styles.clearButtonText}>{t('profile.deleteAllMyData')}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
