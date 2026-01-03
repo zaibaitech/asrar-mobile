@@ -425,6 +425,109 @@ export async function signOut(): Promise<void> {
   }
 }
 
+/**
+ * Delete user account permanently
+ * Requires password confirmation for security
+ * 
+ * IMPORTANT: Requires Supabase RLS policy:
+ * CREATE POLICY "Users can delete own account"
+ *   ON auth.users FOR DELETE USING (auth.uid() = id);
+ */
+export async function deleteAccount(password: string): Promise<{
+  success: boolean;
+  error: AuthError | null;
+}> {
+  try {
+    const session = await getSession();
+    
+    if (!session) {
+      return {
+        success: false,
+        error: {
+          code: 'NOT_AUTHENTICATED',
+          message: 'You must be signed in to delete your account',
+        },
+      };
+    }
+    
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      return {
+        success: false,
+        error: {
+          code: 'NOT_CONFIGURED',
+          message: 'Backend not configured',
+        },
+      };
+    }
+    
+    // Step 1: Verify password before deletion (security measure)
+    const verifyResponse = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({
+        email: session.email,
+        password: password,
+      }),
+    });
+    
+    if (!verifyResponse.ok) {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_PASSWORD',
+          message: 'Incorrect password. Please try again.',
+        },
+      };
+    }
+    
+    // Step 2: Delete user account via Supabase Management API
+    // Note: This requires the service_role key or user's own session token
+    const deleteResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${session.accessToken}`,
+        'apikey': SUPABASE_ANON_KEY,
+      },
+    });
+    
+    if (!deleteResponse.ok) {
+      const error = await deleteResponse.json();
+      return {
+        success: false,
+        error: {
+          code: 'DELETE_FAILED',
+          message: error.message || 'Failed to delete account. Please contact support.',
+        },
+      };
+    }
+    
+    // Step 3: Clear local session
+    await clearSession();
+    
+    if (__DEV__) {
+      console.log('[AuthService] Account deleted successfully');
+    }
+    
+    return { success: true, error: null };
+    
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[AuthService] Delete account error:', error);
+    }
+    
+    return {
+      success: false,
+      error: {
+        code: 'NETWORK_ERROR',
+        message: error instanceof Error ? error.message : 'Network error. Please try again.',
+      },
+    };
+  }
+}
+
 // ============================================================================
 // PROFILE SYNC
 // ============================================================================

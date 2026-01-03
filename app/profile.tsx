@@ -39,7 +39,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DarkTheme } from '@/constants/DarkTheme';
 import { useProfile } from '@/contexts/ProfileContext';
-import { signOut } from '@/services/AuthService';
+import { deleteAccount, signOut } from '@/services/AuthService';
 import {
     getCurrentLocation,
     requestLocationPermission,
@@ -296,6 +296,78 @@ export default function ProfileScreen() {
               console.error('Sign out error:', error);
               Alert.alert('Error', 'Failed to sign out. Please try again.');
             }
+          },
+        },
+      ]
+    );
+  };
+  
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      '⚠️ Delete Account',
+      'This will permanently delete your account and all cloud data. Local data will remain until you uninstall the app.\n\nThis action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete Account',
+          style: 'destructive',
+          onPress: () => {
+            // Require password confirmation
+            Alert.prompt(
+              'Confirm Deletion',
+              'Enter your password to confirm account deletion:',
+              [
+                {
+                  text: 'Cancel',
+                  style: 'cancel',
+                },
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: async (password?: string) => {
+                    if (!password || password.trim() === '') {
+                      Alert.alert('Error', 'Password is required to delete account');
+                      return;
+                    }
+                    
+                    try {
+                      setLoadingLocation(true); // Reuse existing loading state
+                      
+                      // Call delete service
+                      const result = await deleteAccount(password);
+                      
+                      if (result.error) {
+                        Alert.alert('Error', result.error.message);
+                        return;
+                      }
+                      
+                      // Clear local profile
+                      await resetProfile();
+                      
+                      Alert.alert(
+                        'Account Deleted',
+                        'Your account has been permanently deleted.',
+                        [
+                          {
+                            text: 'OK',
+                            onPress: () => router.replace('/auth'),
+                          },
+                        ]
+                      );
+                    } catch (error) {
+                      console.error('Delete account error:', error);
+                      Alert.alert('Error', 'Failed to delete account. Please try again.');
+                    } finally {
+                      setLoadingLocation(false);
+                    }
+                  },
+                },
+              ],
+              'secure-text'
+            );
           },
         },
       ]
@@ -562,14 +634,26 @@ export default function ProfileScreen() {
           
           {/* Sign Out Button (only show if in account mode) */}
           {profile.mode === 'account' && (
-            <TouchableOpacity 
-              style={styles.signOutButton} 
-              onPress={handleSignOut}
-            >
-              <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-              <Text style={styles.signOutButtonText}>Sign Out</Text>
-              <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity 
+                style={styles.signOutButton} 
+                onPress={handleSignOut}
+              >
+                <Ionicons name="log-out-outline" size={20} color="#ef4444" />
+                <Text style={styles.signOutButtonText}>Sign Out</Text>
+                <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
+              </TouchableOpacity>
+              
+              {/* Delete Account Button */}
+              <TouchableOpacity 
+                style={styles.deleteAccountButton} 
+                onPress={handleDeleteAccount}
+              >
+                <Ionicons name="trash-outline" size={20} color="#dc2626" />
+                <Text style={styles.deleteAccountButtonText}>Delete Account</Text>
+                <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
+              </TouchableOpacity>
+            </>
           )}
           
           {/* Privacy Notice */}
@@ -877,6 +961,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#ef4444',
+    marginLeft: 8,
+    flex: 1,
+  },
+  deleteAccountButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(220, 38, 38, 0.1)',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(220, 38, 38, 0.3)',
+  },
+  deleteAccountButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#dc2626',
     marginLeft: 8,
     flex: 1,
   },

@@ -14,6 +14,7 @@
 import { DarkTheme } from '@/constants/DarkTheme';
 import { useProfile } from '@/contexts/ProfileContext';
 import { signIn, signUp } from '@/services/AuthService';
+import { evaluatePasswordStrength, getPasswordStrengthLabel } from '@/utils/passwordStrength';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useRouter } from 'expo-router';
@@ -47,6 +48,9 @@ export default function AuthScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // Password strength indicator
+  const passwordStrength = evaluatePasswordStrength(password);
   
   // Helper function for user-friendly error messages
   const getErrorMessage = (errorCode: string): string => {
@@ -334,6 +338,15 @@ export default function AuthScreen() {
                     autoComplete="password"
                   />
                 </View>
+                {/* Password Strength Indicator (only for signup) */}
+                {mode === 'signup' && password.length > 0 && (
+                  <View style={styles.passwordStrength}>
+                    <View style={[styles.strengthBar, { width: `${passwordStrength.score}%`, backgroundColor: passwordStrength.color }]} />
+                    <Text style={[styles.strengthText, { color: passwordStrength.color }]}>
+                      {getPasswordStrengthLabel(passwordStrength.strength)}
+                    </Text>
+                  </View>
+                )}
               </View>
               
               {mode === 'signup' && (
@@ -597,6 +610,27 @@ const styles = StyleSheet.create({
   forgotText: {
     fontSize: 14,
     color: '#8B7355',
+  },
+  
+  // Password Strength
+  passwordStrength: {
+    marginTop: 8,
+    height: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 2,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  strengthBar: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  strengthText: {
+    position: 'absolute',
+    right: 0,
+    top: 6,
+    fontSize: 12,
+    fontWeight: '600',
   },
   
   // Divider
