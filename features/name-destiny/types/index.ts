@@ -44,6 +44,8 @@ export interface PlanetaryHour {
   fr: string;
   planet: string;
   color: string;
+  planetKey: string; // Translation key for planet name (e.g., 'planets.sun')
+  dayKey: string; // Translation key for day name (e.g., 'days.sunday')
   day?: {
     en: string;
     ar: string;

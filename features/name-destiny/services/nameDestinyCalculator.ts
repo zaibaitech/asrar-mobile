@@ -69,6 +69,8 @@ function getPlanetaryHour(saghir: number): PlanetaryHour {
       ar: 'الشمس',
       fr: 'Soleil',
       planet: 'Sun',
+      planetKey: 'planets.sun',
+      dayKey: 'days.sunday',
       color: '#FFD700',
       day: getPlanetaryDay('Sun')
     },
@@ -77,6 +79,8 @@ function getPlanetaryHour(saghir: number): PlanetaryHour {
       ar: 'القمر',
       fr: 'Lune',
       planet: 'Moon',
+      planetKey: 'planets.moon',
+      dayKey: 'days.monday',
       color: '#C0C0C0',
       day: getPlanetaryDay('Moon')
     },
@@ -85,6 +89,8 @@ function getPlanetaryHour(saghir: number): PlanetaryHour {
       ar: 'المريخ',
       fr: 'Mars',
       planet: 'Mars',
+      planetKey: 'planets.mars',
+      dayKey: 'days.tuesday',
       color: '#FF4500',
       day: getPlanetaryDay('Mars')
     },
@@ -93,6 +99,8 @@ function getPlanetaryHour(saghir: number): PlanetaryHour {
       ar: 'عطارد',
       fr: 'Mercure',
       planet: 'Mercury',
+      planetKey: 'planets.mercury',
+      dayKey: 'days.wednesday',
       color: '#FFA500',
       day: getPlanetaryDay('Mercury')
     },
@@ -101,6 +109,8 @@ function getPlanetaryHour(saghir: number): PlanetaryHour {
       ar: 'المشتري',
       fr: 'Jupiter',
       planet: 'Jupiter',
+      planetKey: 'planets.jupiter',
+      dayKey: 'days.thursday',
       color: '#4169E1',
       day: getPlanetaryDay('Jupiter')
     },
@@ -109,6 +119,8 @@ function getPlanetaryHour(saghir: number): PlanetaryHour {
       ar: 'الزهرة',
       fr: 'Vénus',
       planet: 'Venus',
+      planetKey: 'planets.venus',
+      dayKey: 'days.friday',
       color: '#00CED1',
       day: getPlanetaryDay('Venus')
     },
@@ -117,6 +129,8 @@ function getPlanetaryHour(saghir: number): PlanetaryHour {
       ar: 'زحل',
       fr: 'Saturne',
       planet: 'Saturn',
+      planetKey: 'planets.saturn',
+      dayKey: 'days.saturday',
       color: '#8B4513',
       day: getPlanetaryDay('Saturn')
     },
@@ -125,6 +139,8 @@ function getPlanetaryHour(saghir: number): PlanetaryHour {
       ar: 'الشمس',
       fr: 'Soleil',
       planet: 'Sun',
+      planetKey: 'planets.sun',
+      dayKey: 'days.sunday',
       color: '#FFD700',
       day: getPlanetaryDay('Sun')
     },
@@ -133,6 +149,8 @@ function getPlanetaryHour(saghir: number): PlanetaryHour {
       ar: 'القمر',
       fr: 'Lune',
       planet: 'Moon',
+      planetKey: 'planets.moon',
+      dayKey: 'days.monday',
       color: '#C0C0C0',
       day: getPlanetaryDay('Moon')
     }

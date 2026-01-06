@@ -124,12 +124,14 @@ function computeDominantAndWeakElements(composition: {
  * @param dominantElement - The dominant element type
  * @param powerDay - The power day from Burj ruler (e.g., "Sunday")
  * @param language - Display language
+ * @param t - Translation function
  * @returns Best time window string with day, time of day, and season
  */
 function getBestTimeWindow(
   dominantElement: 'Fire' | 'Air' | 'Water' | 'Earth',
   powerDay: string | undefined,
-  language: 'en' | 'fr' | 'ar'
+  language: 'en' | 'fr' | 'ar',
+  t: (key: string) => string
 ): string {
   // Get the base best time from element (contains day + time + season)
   const elementGuidance = getPracticalGuidance(dominantElement, language);
@@ -140,28 +142,13 @@ function getBestTimeWindow(
     return baseBestTime;
   }
 
-  // Replace the day in bestTime with powerDay
+  // Replace the day in bestTime with powerDay using translation system
   // Pattern: "DayName at/morning/evening/night • Season"
-  // We need to extract everything after the day
   
-  const dayMapping: Record<string, { en: string; fr: string; ar: string }> = {
-    Sunday: { en: 'Sunday', fr: 'Dimanche', ar: 'الأحد' },
-    Monday: { en: 'Monday', fr: 'Lundi', ar: 'الإثنين' },
-    Tuesday: { en: 'Tuesday', fr: 'Mardi', ar: 'الثلاثاء' },
-    Wednesday: { en: 'Wednesday', fr: 'Mercredi', ar: 'الأربعاء' },
-    Thursday: { en: 'Thursday', fr: 'Jeudi', ar: 'الخميس' },
-    Friday: { en: 'Friday', fr: 'Vendredi', ar: 'الجمعة' },
-    Saturday: { en: 'Saturday', fr: 'Samedi', ar: 'السبت' },
-  };
-
-  const translatedPowerDay = dayMapping[powerDay]?.[language] || powerDay;
+  // Get translated power day
+  const translatedPowerDay = t(`days.${powerDay.toLowerCase()}`);
 
   // Extract time of day and season from baseBestTime
-  // English pattern: "Day at time • season"
-  // French pattern: "Jour au/matin/soir • saison"
-  // Arabic pattern: "اليوم في/صباحًا/مساءً • الموسم"
-  
-  const parts = baseBestTime.split(/(?:at |au |في |morning|matin|صباحًا|evening|soir|مساءً|night|nuit|ليلاً)/);
   const timeAndSeasonPart = baseBestTime.substring(baseBestTime.indexOf(' '));
 
   return `${translatedPowerDay}${timeAndSeasonPart}`;
@@ -315,7 +302,8 @@ export default function ResultsScreen() {
   const bestTimeWindow = getBestTimeWindow(
     elementType,
     result.burjDay?.en,
-    lang
+    lang,
+    t
   );
 
   // Compute dominant and weak elements for composition summary
@@ -622,7 +610,9 @@ export default function ResultsScreen() {
                         <Text style={styles.infoLabel}>
                           {t('nameDestiny.results.rulingPlanet')}
                         </Text>
-                        <Text style={styles.infoValue}>{result.burj.planet}</Text>
+                        <Text style={styles.infoValue}>
+                          {t(`planets.${result.burj.planet.toLowerCase()}`)}
+                        </Text>
                       </View>
                     </View>
                   )}
@@ -638,8 +628,7 @@ export default function ResultsScreen() {
                           {t('nameDestiny.results.dayOfPower')}
                         </Text>
                         <Text style={styles.infoValue}>
-                          {result.burjDay.en}{' '}
-                          <Text style={styles.infoValueAr}>({result.burjDay.ar})</Text>
+                          {t(`days.${result.burjDay.en.toLowerCase()}`)}
                         </Text>
                       </View>
                     </View>
@@ -656,8 +645,7 @@ export default function ResultsScreen() {
                           {t('nameDestiny.results.activeHourPlanet')}
                         </Text>
                         <Text style={styles.infoValue}>
-                          {result.hour.name}{' '}
-                          <Text style={styles.infoValueAr}>({result.hour.ar})</Text>
+                          {t(result.hour.planetKey)}
                         </Text>
                       </View>
                     </View>

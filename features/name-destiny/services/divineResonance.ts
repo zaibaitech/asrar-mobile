@@ -16,6 +16,7 @@ export interface DivineName {
   nameTashkeel: string;
   transliteration: string;
   translation: string;
+  translationKey: string; // Key for i18n translation system
 }
 
 export interface DivineResonanceResult {
@@ -28,6 +29,7 @@ export interface DivineResonanceResult {
   divineNameTashkeel: string;
   transliteration: string;
   translation: string;
+  translationKey: string; // Key for i18n translation system
 }
 
 /**
@@ -40,196 +42,224 @@ const DIVINE_NAMES: Record<number, DivineName> = {
     name: 'الله', 
     nameTashkeel: 'اللهُ',
     transliteration: 'Allah',
-    translation: 'The God, The One True God'
+    translation: 'The God, The One True God',
+    translationKey: 'divineNames.allah.meaning'
   },
   2: { 
     letter: 'ب', 
     name: 'باقٍ', 
     nameTashkeel: 'بَاقٍ',
     transliteration: 'Al-Bāqī',
-    translation: 'The Everlasting, The Eternal'
+    translation: 'The Everlasting, The Eternal',
+    translationKey: 'divineNames.alBaqi.meaning'
   },
   3: { 
     letter: 'ج', 
     name: 'جامع', 
     nameTashkeel: 'جَامِعٌ',
     transliteration: 'Al-Jāmiʿ',
-    translation: 'The Gatherer, The Uniter'
+    translation: 'The Gatherer, The Uniter',
+    translationKey: 'divineNames.alJami.meaning'
   },
   4: { 
     letter: 'د', 
     name: 'دائم', 
     nameTashkeel: 'دَائِمٌ',
     transliteration: 'Ad-Dāʾim',
-    translation: 'The Eternal, The Everlasting'
+    translation: 'The Eternal, The Everlasting',
+    translationKey: 'divineNames.adDaim.meaning'
   },
   5: { 
     letter: 'ه', 
     name: 'هادي', 
     nameTashkeel: 'هَادِي',
     transliteration: 'Al-Hādī',
-    translation: 'The Guide, The One Who Guides'
+    translation: 'The Guide, The One Who Guides',
+    translationKey: 'divineNames.alHadi.meaning'
   },
   6: { 
     letter: 'و', 
     name: 'ودود', 
     nameTashkeel: 'وَدُودٌ',
     transliteration: 'Al-Wadūd',
-    translation: 'The Loving, The Most Affectionate'
+    translation: 'The Loving, The Most Affectionate',
+    translationKey: 'divineNames.alWadud.meaning'
   },
   7: { 
     letter: 'ز', 
     name: 'زكي', 
     nameTashkeel: 'زَكِيٌّ',
     transliteration: 'Az-Zakī',
-    translation: 'The Pure, The Immaculate'
+    translation: 'The Pure, The Immaculate',
+    translationKey: 'divineNames.azZaki.meaning'
   },
   8: { 
     letter: 'ح', 
     name: 'حكيم', 
     nameTashkeel: 'حَكِيمٌ',
     transliteration: 'Al-Ḥakīm',
-    translation: 'The Wise, The All-Wise'
+    translation: 'The Wise, The All-Wise',
+    translationKey: 'divineNames.alHakim.meaning'
   },
   9: { 
     letter: 'ط', 
     name: 'طاهر', 
     nameTashkeel: 'طَاهِرٌ',
     transliteration: 'Aṭ-Ṭāhir',
-    translation: 'The Purifier, The Pure One'
+    translation: 'The Purifier, The Pure One',
+    translationKey: 'divineNames.atTahir.meaning'
   },
   10: { 
     letter: 'ي', 
     name: 'يقين', 
     nameTashkeel: 'يَقِينٌ',
     transliteration: 'Al-Yaqīn',
-    translation: 'The Certain, The Certainty'
+    translation: 'The Certain, The Certainty',
+    translationKey: 'divineNames.alYaqin.meaning'
   },
   11: { 
     letter: 'ك', 
     name: 'كريم', 
     nameTashkeel: 'كَرِيمٌ',
     transliteration: 'Al-Karīm',
-    translation: 'The Generous, The Most Bountiful'
+    translation: 'The Generous, The Most Bountiful',
+    translationKey: 'divineNames.alKarim.meaning'
   },
   12: { 
     letter: 'ل', 
     name: 'لطيف', 
     nameTashkeel: 'لَطِيفٌ',
     transliteration: 'Al-Laṭīf',
-    translation: 'The Subtle, The Most Kind'
+    translation: 'The Subtle, The Most Kind',
+    translationKey: 'divineNames.alLatif.meaning'
   },
   13: { 
     letter: 'م', 
     name: 'مؤمن', 
     nameTashkeel: 'مُؤْمِنٌ',
     transliteration: 'Al-Muʾmin',
-    translation: 'The Believer, The Giver of Faith'
+    translation: 'The Believer, The Giver of Faith',
+    translationKey: 'divineNames.alMumin.meaning'
   },
   14: { 
     letter: 'ن', 
     name: 'نور', 
     nameTashkeel: 'نُورٌ',
     transliteration: 'An-Nūr',
-    translation: 'The Light, The Illuminator'
+    translation: 'The Light, The Illuminator',
+    translationKey: 'divineNames.anNur.meaning'
   },
   15: { 
     letter: 'س', 
     name: 'سلام', 
     nameTashkeel: 'سَلَامٌ',
     transliteration: 'As-Salām',
-    translation: 'The Peace, The Source of Peace'
+    translation: 'The Peace, The Source of Peace',
+    translationKey: 'divineNames.asSalam.meaning'
   },
   16: { 
     letter: 'ع', 
     name: 'عليم', 
     nameTashkeel: 'عَلِيمٌ',
     transliteration: 'Al-ʿAlīm',
-    translation: 'The All-Knowing, The Omniscient'
+    translation: 'The All-Knowing, The Omniscient',
+    translationKey: 'divineNames.alAlim.meaning'
   },
   17: { 
     letter: 'ف', 
     name: 'فرد', 
     nameTashkeel: 'فَرْدٌ',
     transliteration: 'Al-Fard',
-    translation: 'The Unique, The One and Only'
+    translation: 'The Unique, The One and Only',
+    translationKey: 'divineNames.alFard.meaning'
   },
   18: { 
     letter: 'ص', 
     name: 'صبور', 
     nameTashkeel: 'صَبُورٌ',
     transliteration: 'Aṣ-Ṣabūr',
-    translation: 'The Patient, The Most Forbearing'
+    translation: 'The Patient, The Most Forbearing',
+    translationKey: 'divineNames.asSabur.meaning'
   },
   19: { 
     letter: 'ق', 
     name: 'قادر', 
     nameTashkeel: 'قَادِرٌ',
     transliteration: 'Al-Qādir',
-    translation: 'The Able, The All-Powerful'
+    translation: 'The Able, The All-Powerful',
+    translationKey: 'divineNames.alQadir.meaning'
   },
   20: { 
     letter: 'ر', 
     name: 'رحمن', 
     nameTashkeel: 'رَحْمَنٌ',
     transliteration: 'Ar-Raḥmān',
-    translation: 'The Most Merciful, The Beneficent'
+    translation: 'The Most Merciful, The Beneficent',
+    translationKey: 'divineNames.arRahman.meaning'
   },
   21: { 
     letter: 'ش', 
     name: 'شكور', 
     nameTashkeel: 'شَكُورٌ',
     transliteration: 'Ash-Shakūr',
-    translation: 'The Grateful, The Appreciative'
+    translation: 'The Grateful, The Appreciative',
+    translationKey: 'divineNames.ashShakur.meaning'
   },
   22: { 
     letter: 'ت', 
     name: 'تواب', 
     nameTashkeel: 'تَوَّابٌ',
     transliteration: 'At-Tawwāb',
-    translation: 'The Acceptor of Repentance'
+    translation: 'The Acceptor of Repentance',
+    translationKey: 'divineNames.atTawwab.meaning'
   },
   23: { 
     letter: 'ث', 
     name: 'ثابت', 
     nameTashkeel: 'ثَابِتٌ',
     transliteration: 'Ath-Thābit',
-    translation: 'The Firm, The Steadfast'
+    translation: 'The Firm, The Steadfast',
+    translationKey: 'divineNames.athThabit.meaning'
   },
   24: { 
     letter: 'خ', 
     name: 'خبير', 
     nameTashkeel: 'خَبِيرٌ',
     transliteration: 'Al-Khabīr',
-    translation: 'The Aware, The All-Informed'
+    translation: 'The Aware, The All-Informed',
+    translationKey: 'divineNames.alKhabir.meaning'
   },
   25: { 
     letter: 'ذ', 
     name: 'ذو الجلال والإكرام', 
     nameTashkeel: 'ذُو الْجَلَالِ وَالْإِكْرَامِ',
     transliteration: 'Dhul-Jalāli wal-Ikrām',
-    translation: 'The Lord of Majesty and Bounty'
+    translation: 'The Lord of Majesty and Bounty',
+    translationKey: 'divineNames.dhulJalal.meaning'
   },
   26: { 
     letter: 'ض', 
     name: 'ضار', 
     nameTashkeel: 'ضَارٌّ',
     transliteration: 'Aḍ-Ḍārr',
-    translation: 'The Distresser, The Corrector'
+    translation: 'The Distresser, The Corrector',
+    translationKey: 'divineNames.adDarr.meaning'
   },
   27: { 
     letter: 'ظ', 
     name: 'ظاهر', 
     nameTashkeel: 'ظَاهِرٌ',
     transliteration: 'Aẓ-Ẓāhir',
-    translation: 'The Manifest, The Evident'
+    translation: 'The Manifest, The Evident',
+    translationKey: 'divineNames.azZahir.meaning'
   },
   28: { 
     letter: 'غ', 
     name: 'غني', 
     nameTashkeel: 'غَنِيٌّ',
     transliteration: 'Al-Ghanī',
-    translation: 'The Rich, The Self-Sufficient'
+    translation: 'The Rich, The Self-Sufficient',
+    translationKey: 'divineNames.alGhani.meaning'
   },
 };
 
@@ -324,6 +354,7 @@ export function computeDivineResonance(
     divineNameTashkeel: divineEntry.nameTashkeel,
     transliteration: divineEntry.transliteration,
     translation: divineEntry.translation,
+    translationKey: divineEntry.translationKey,
   };
 }
 

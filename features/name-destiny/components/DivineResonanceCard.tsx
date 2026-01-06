@@ -42,7 +42,7 @@ export function DivineResonanceCard({ resonance }: DivineResonanceCardProps) {
           <Text style={styles.divineNameArabicTashkeel}>{resonance.divineNameTashkeel}</Text>
           <Text style={styles.divineNameArabic}>{resonance.divineName}</Text>
           <Text style={styles.transliteration}>{resonance.transliteration}</Text>
-          <Text style={styles.translation}>{resonance.translation}</Text>
+          <Text style={styles.translation}>{t(resonance.translationKey)}</Text>
           <View style={styles.letterBadge}>
             <Text style={styles.letterText}>{resonance.letter}</Text>
           </View>
