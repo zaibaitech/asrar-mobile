@@ -622,13 +622,13 @@ export default function HomeScreen() {
           />
         </TouchableOpacity>
         
-        {!modulesExpanded && (
+        {modulesExpanded && (
           <View style={styles.modulesGrid}>
             {MODULES.map((module) => (
               <TouchableOpacity
-                key={module.title}
+                key={module.id}
                 style={styles.moduleGridItem}
-                onPress={() => handleModulePress(module.title)}
+                onPress={() => handleModulePress(module.id)}
                 activeOpacity={0.7}
               >
                 <View style={styles.moduleIcon}>

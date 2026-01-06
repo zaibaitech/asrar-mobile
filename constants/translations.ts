@@ -615,6 +615,8 @@ export const translations = {
       confirmClear: "Clear all history? This cannot be undone.",
       favorites: "Favorites",
       recent: "Recent",
+      saved: "saved",
+      total: "total",
     },
 
     // Comparison Modal
@@ -3231,6 +3233,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       title: "Istikharah al-Asmā'",
       titleArabic: "الاستخارة بالأسماء",
       subtitle: "Spiritual Guidance Through Names",
+      formInstruction: "Enter two names to receive spiritual guidance",
       description: "Seek divine guidance by examining the spiritual connection between two names using the sacred science of ʿIlm al-Ḥurūf.",
       
       // Collapsible sections
@@ -3242,6 +3245,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       privacyTitle: "Your Privacy",
       privacyText: "🔒 Your data is never stored or shared. All calculations happen instantly and are discarded after your session. We respect your privacy and spiritual journey.",
       arabicName: "Arabic Name",
+      helperText: "Names should be in Arabic script for accurate results",
       
       // Latin search
       latinSearch: {
@@ -4089,6 +4093,8 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       confirmClear: "Effacer tout l'historique ? Cette action est irréversible.",
       favorites: "Favoris",
       recent: "Récent",
+      saved: "sauvegardés",
+      total: "total",
     },
 
     comparison: {
@@ -6611,6 +6617,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       title: "Istikharah al-Asmā'",
       titleArabic: "الاستخارة بالأسماء",
       subtitle: "Guidance Spirituelle par les Noms",
+      formInstruction: "Entrez deux noms pour recevoir une guidance spirituelle",
       description: "Cherchez la guidance divine en examinant la connexion spirituelle entre deux noms en utilisant la science sacrée du ʿIlm al-Ḥurūf.",
       
       // Éducation & Introduction
@@ -6626,6 +6633,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       privacyText: "🔒 Vos données ne sont jamais stockées ni partagées. Tous les calculs se font localement sur votre appareil.",
       
       arabicName: "Nom Arabe",
+      helperText: "Les noms doivent être en écriture arabe pour des résultats précis",
       
       // Recherche par nom latin
       latinSearch: {

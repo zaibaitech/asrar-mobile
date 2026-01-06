@@ -159,7 +159,7 @@ export default function IstikharaCalculator() {
           <View style={styles.headerMinimal}>
             <Text style={styles.headerTitleMinimal}>{t('istikhara.title')}</Text>
             <Text style={styles.headerSubtitleMinimal}>
-              Enter two names to receive spiritual guidance
+              {t('istikhara.formInstruction')}
             </Text>
           </View>
 
@@ -242,7 +242,7 @@ export default function IstikharaCalculator() {
 
               {/* Mini helper text */}
               <Text style={styles.helperText}>
-                Names should be in Arabic script for accurate results
+                {t('istikhara.helperText')}
               </Text>
             </LinearGradient>
           </View>
@@ -261,7 +261,7 @@ export default function IstikharaCalculator() {
               <View style={styles.collapsibleHeaderContentCompact}>
                 <View style={styles.collapsibleTitleRow}>
                   <BookOpen size={16} color="rgba(96, 165, 250, 0.8)" />
-                  <Text style={styles.collapsibleTitleCompact}>What is Ilm al-Ḥurūf?</Text>
+                  <Text style={styles.collapsibleTitleCompact}>{t('istikhara.educationTitle')}</Text>
                 </View>
                 {educationExpanded ? (
                   <ChevronUp size={16} color="rgba(255, 255, 255, 0.5)" />
@@ -291,7 +291,7 @@ export default function IstikharaCalculator() {
             <View style={styles.collapsibleHeaderContentCompact}>
               <View style={styles.collapsibleTitleRow}>
                 <Lightbulb size={16} color="rgba(167, 139, 250, 0.8)" />
-                <Text style={styles.collapsibleTitleCompact}>What You'll Discover</Text>
+                <Text style={styles.collapsibleTitleCompact}>{t('istikhara.discoveryTitle')}</Text>
               </View>
               {discoveryExpanded ? (
                 <ChevronUp size={16} color="rgba(255, 255, 255, 0.5)" />
@@ -333,7 +333,7 @@ export default function IstikharaCalculator() {
             <View style={styles.collapsibleHeaderContentCompact}>
               <View style={styles.collapsibleTitleRow}>
                 <Users size={16} color="rgba(74, 222, 128, 0.8)" />
-                <Text style={styles.collapsibleTitleCompact}>Example Names</Text>
+                <Text style={styles.collapsibleTitleCompact}>{t('istikhara.examplesTitle')}</Text>
               </View>
               {examplesExpanded ? (
                 <ChevronUp size={16} color="rgba(255, 255, 255, 0.5)" />
@@ -363,7 +363,7 @@ export default function IstikharaCalculator() {
             <View style={styles.collapsibleHeaderContentCompact}>
               <View style={styles.collapsibleTitleRow}>
                 <Shield size={16} color="rgba(96, 165, 250, 0.8)" />
-                <Text style={styles.collapsibleTitleCompact}>Your Privacy</Text>
+                <Text style={styles.collapsibleTitleCompact}>{t('istikhara.privacyTitle')}</Text>
               </View>
               {privacyExpanded ? (
                 <ChevronUp size={16} color="rgba(255, 255, 255, 0.5)" />

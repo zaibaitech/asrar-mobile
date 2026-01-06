@@ -148,7 +148,11 @@ async function refreshSession(refreshToken: string): Promise<AuthSession | null>
     });
     
     if (!response.ok) {
-      throw new Error('Failed to refresh token');
+      const errorData = await response.text();
+      if (__DEV__) {
+        console.error('[AuthService] Refresh token failed:', response.status, errorData);
+      }
+      throw new Error(`Failed to refresh token: ${response.status}`);
     }
     
     const data = await response.json();
