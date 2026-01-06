@@ -30,7 +30,7 @@ const EXAMPLE_NAMES = ['محمد', 'علي', 'فاطمة', 'خديجة', 'حسن
 
 export default function NameDestinyForm() {
   const router = useRouter();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { abjadSystem } = useAbjad();
   const insets = useSafeAreaInsets();
 
@@ -103,7 +103,7 @@ export default function NameDestinyForm() {
   const handleCalculate = async () => {
     if (!isFormValid || loading) {
       if (!isFormValid) {
-        Alert.alert('Incomplete Form', 'Please enter both names to continue.');
+        Alert.alert(t('nameDestiny.form.incompleteForm'), t('nameDestiny.form.incompleteMessage'));
       }
       return;
     }
@@ -146,7 +146,7 @@ export default function NameDestinyForm() {
       });
     } catch (error) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert('Calculation Error', 'Something went wrong while generating the destiny insights.');
+      Alert.alert(t('nameDestiny.form.calculationError'), t('nameDestiny.form.calculationErrorMessage'));
       console.error('[name-destiny/form] calculation failure', error);
     } finally {
       setLoading(false);
@@ -157,7 +157,7 @@ export default function NameDestinyForm() {
     <SafeAreaView style={styles.root}>
       <LinearGradient colors={['#0f172a', '#1e1b4b', '#312e81']} style={styles.gradient}>
         <DestinyHeader
-          title="Name Destiny"
+          title={t('nameDestiny.form.title')}
           onBack={() => router.back()}
           language={language === 'ar' ? 'en' : language}
           onLanguageChange={setLanguage}
@@ -177,16 +177,16 @@ export default function NameDestinyForm() {
             {/* Hero Section */}
             <View style={styles.hero}>
               <Sparkles size={40} color="#a78bfa" />
-              <Text style={styles.heroTitle}>Name Destiny Calculator</Text>
+              <Text style={styles.heroTitle}>{t('nameDestiny.form.heroTitle')}</Text>
               <Text style={styles.heroSubtitle}>
-                Discover the spiritual blueprint encoded in your name through sacred Abjad numerology
+                {t('nameDestiny.form.heroSubtitle')}
               </Text>
             </View>
 
             {/* Input Section - MUST BE FIRST */}
             <View style={styles.inputSection}>
-              <Text style={styles.sectionTitle}>Enter Names</Text>
-              <Text style={styles.sectionSubtitle}>Both names must be in Arabic script</Text>
+              <Text style={styles.sectionTitle}>{t('nameDestiny.form.enterNames')}</Text>
+              <Text style={styles.sectionSubtitle}>{t('nameDestiny.form.bothArabic')}</Text>
 
               {/* Person Name Input */}
               <LinearGradient
@@ -196,7 +196,7 @@ export default function NameDestinyForm() {
                 <View style={styles.inputHeader}>
                   <View style={styles.inputTitleRow}>
                     <Text style={styles.inputEmoji}>👤</Text>
-                    <Text style={styles.inputTitle}>Your Name</Text>
+                    <Text style={styles.inputTitle}>{t('nameDestiny.form.yourName')}</Text>
                   </View>
                   {touched.person && isPersonValid && (
                     <CheckCircle size={20} color="#86efac" />
@@ -205,7 +205,7 @@ export default function NameDestinyForm() {
 
                 {/* Latin Name Autocomplete */}
                 <View style={styles.inputWrapper}>
-                  <Text style={styles.inputLabel}>Latin Name (English/French)</Text>
+                  <Text style={styles.inputLabel}>{t('nameDestiny.form.latinNameLabel')}</Text>
                   <NameAutocomplete
                     value={personLatin}
                     onChange={setPersonLatin}
@@ -214,7 +214,7 @@ export default function NameDestinyForm() {
                       setPersonLatin(latin);
                       if (!touched.person) setTouched((prev) => ({ ...prev, person: true }));
                     }}
-                    placeholder="e.g., Ibrahima, Amadou, Ousmane"
+                    placeholder={t('nameDestiny.form.latinPlaceholderPerson')}
                     showHelper={false}
                     language={language}
                   />
@@ -223,13 +223,13 @@ export default function NameDestinyForm() {
                 {/* Arabic Name Input */}
                 <View style={styles.inputWrapper}>
                   <View style={styles.labelWithButton}>
-                    <Text style={styles.inputLabel}>Arabic Name *</Text>
+                    <Text style={styles.inputLabel}>{t('nameDestiny.form.arabicNameLabel')}</Text>
                     <TouchableOpacity
                       style={styles.keyboardButton}
                       onPress={() => openKeyboard('person')}
                     >
                       <KeyboardIcon size={14} color="#e0e7ff" strokeWidth={2} />
-                      <Text style={styles.keyboardButtonText}>Keyboard</Text>
+                      <Text style={styles.keyboardButtonText}>{t('nameDestiny.form.keyboardButton')}</Text>
                     </TouchableOpacity>
                   </View>
                   <TextInput
@@ -239,7 +239,7 @@ export default function NameDestinyForm() {
                       touched.person && !isPersonValid && styles.inputError,
                       touched.person && isPersonValid && styles.inputSuccess,
                     ]}
-                    placeholder="محمد"
+                    placeholder={t('nameDestiny.form.arabicPlaceholderPerson')}
                     placeholderTextColor="rgba(255, 255, 255, 0.3)"
                     value={personName}
                     onChangeText={(text) => {
@@ -258,7 +258,7 @@ export default function NameDestinyForm() {
                   {touched.person && !isPersonValid && (
                     <View style={styles.errorRow}>
                       <AlertCircle size={14} color="#fca5a5" />
-                      <Text style={styles.errorText}>Please enter a valid Arabic name</Text>
+                      <Text style={styles.errorText}>{t('nameDestiny.form.validationError')}</Text>
                     </View>
                   )}
                 </View>
@@ -272,7 +272,7 @@ export default function NameDestinyForm() {
                   <View style={styles.inputHeader}>
                     <View style={styles.inputTitleRow}>
                       <Text style={styles.inputEmoji}>👩</Text>
-                      <Text style={styles.inputTitle}>Mother's Name</Text>
+                      <Text style={styles.inputTitle}>{t('nameDestiny.form.mothersName')}</Text>
                     </View>
                     {touched.mother && isMotherValid && (
                       <CheckCircle size={20} color="#86efac" />
@@ -281,7 +281,7 @@ export default function NameDestinyForm() {
 
                   {/* Latin Name Autocomplete */}
                   <View style={styles.inputWrapper}>
-                    <Text style={styles.inputLabel}>Latin Name (English/French)</Text>
+                    <Text style={styles.inputLabel}>{t('nameDestiny.form.latinNameLabel')}</Text>
                     <NameAutocomplete
                       value={motherLatin}
                       onChange={setMotherLatin}
@@ -290,7 +290,7 @@ export default function NameDestinyForm() {
                         setMotherLatin(latin);
                         if (!touched.mother) setTouched((prev) => ({ ...prev, mother: true }));
                       }}
-                      placeholder="e.g., Fatima, Khadija, Aisha"
+                      placeholder={t('nameDestiny.form.latinPlaceholderMother')}
                       showHelper={false}
                       language={language}
                     />
@@ -299,13 +299,13 @@ export default function NameDestinyForm() {
                   {/* Arabic Name Input */}
                   <View style={styles.inputWrapper}>
                     <View style={styles.labelWithButton}>
-                      <Text style={styles.inputLabel}>Arabic Name *</Text>
+                      <Text style={styles.inputLabel}>{t('nameDestiny.form.arabicNameLabel')}</Text>
                       <TouchableOpacity
                         style={styles.keyboardButton}
                         onPress={() => openKeyboard('mother')}
                       >
                         <KeyboardIcon size={14} color="#e0e7ff" strokeWidth={2} />
-                        <Text style={styles.keyboardButtonText}>Keyboard</Text>
+                        <Text style={styles.keyboardButtonText}>{t('nameDestiny.form.keyboardButton')}</Text>
                       </TouchableOpacity>
                     </View>
                     <TextInput
@@ -315,7 +315,7 @@ export default function NameDestinyForm() {
                         touched.mother && !isMotherValid && styles.inputError,
                         touched.mother && isMotherValid && styles.inputSuccess,
                       ]}
-                      placeholder="فاطمة"
+                      placeholder={t('nameDestiny.form.arabicPlaceholderMother')}
                       placeholderTextColor="rgba(255, 255, 255, 0.3)"
                       value={motherName}
                       onChangeText={(text) => {
@@ -337,7 +337,7 @@ export default function NameDestinyForm() {
                     {touched.mother && !isMotherValid && (
                       <View style={styles.errorRow}>
                         <AlertCircle size={14} color="#fca5a5" />
-                        <Text style={styles.errorText}>Please enter a valid Arabic name</Text>
+                        <Text style={styles.errorText}>{t('nameDestiny.form.validationError')}</Text>
                       </View>
                     )}
                   </View>
@@ -361,10 +361,10 @@ export default function NameDestinyForm() {
                   {loading ? (
                     <View style={styles.loadingRow}>
                       <ActivityIndicator size="small" color="#ffffff" />
-                      <Text style={styles.calculateText}>Calculating...</Text>
+                      <Text style={styles.calculateText}>{t('nameDestiny.form.calculating')}</Text>
                     </View>
                   ) : (
-                    <Text style={styles.calculateText}>✨ Calculate Destiny</Text>
+                    <Text style={styles.calculateText}>{t('nameDestiny.form.calculateButton')}</Text>
                   )}
                 </LinearGradient>
               </TouchableOpacity>
@@ -373,31 +373,29 @@ export default function NameDestinyForm() {
             {/* Info Sections - AFTER INPUTS */}
             <View style={styles.infoSection}>
               <CollapsibleSection
-                title="What is Name Destiny?"
+                title={t('nameDestiny.form.educationTitle')}
                 icon={BookOpen}
                 tintColor="#60a5fa"
                 open={educationOpen}
                 onToggle={() => setEducationOpen((prev) => !prev)}
               >
                 <Text style={styles.infoText}>
-                  Name Destiny (Qadr al-Asmāʾ) reveals the spiritual blueprint encoded within your name
-                  and your mother's name. Using Abjad numerology, we uncover the sacred numbers, elemental
-                  balance, and celestial influences guiding your life path.
+                  {t('nameDestiny.form.educationContent')}
                 </Text>
               </CollapsibleSection>
 
               <CollapsibleSection
-                title="What You'll Discover"
+                title={t('nameDestiny.form.discoveryTitle')}
                 icon={Lightbulb}
                 tintColor="#c084fc"
                 open={insightsOpen}
                 onToggle={() => setInsightsOpen((prev) => !prev)}
               >
                 {[
-                  { icon: '🔢', title: 'Sacred Numbers', desc: 'Kabir (grand total) and Saghir (essence)' },
-                  { icon: '💧', title: 'Element', desc: 'Your Tab element—Water, Fire, Earth, or Air' },
-                  { icon: '⭐', title: 'Zodiac', desc: 'Your Burj (constellation) and ruling planet' },
-                  { icon: '🌙', title: 'Guidance', desc: 'Spiritual insights for your journey' },
+                  { icon: '🔢', title: t('nameDestiny.form.discoveryItems.numbers.title'), desc: t('nameDestiny.form.discoveryItems.numbers.desc') },
+                  { icon: '💧', title: t('nameDestiny.form.discoveryItems.element.title'), desc: t('nameDestiny.form.discoveryItems.element.desc') },
+                  { icon: '⭐', title: t('nameDestiny.form.discoveryItems.zodiac.title'), desc: t('nameDestiny.form.discoveryItems.zodiac.desc') },
+                  { icon: '🌙', title: t('nameDestiny.form.discoveryItems.guidance.title'), desc: t('nameDestiny.form.discoveryItems.guidance.desc') },
                 ].map((item) => (
                   <View key={item.title} style={styles.discoveryRow}>
                     <Text style={styles.discoveryIcon}>{item.icon}</Text>
@@ -410,14 +408,14 @@ export default function NameDestinyForm() {
               </CollapsibleSection>
 
               <CollapsibleSection
-                title="Example Names"
+                title={t('nameDestiny.form.examplesTitle')}
                 icon={Users}
                 tintColor="#4ade80"
                 open={examplesOpen}
                 onToggle={() => setExamplesOpen((prev) => !prev)}
               >
                 <Text style={styles.infoText}>
-                  All entries should be in Arabic script for accurate calculation:
+                  {t('nameDestiny.form.examplesContent')}
                 </Text>
                 <View style={styles.chipRow}>
                   {EXAMPLE_NAMES.map((name) => (
@@ -429,22 +427,21 @@ export default function NameDestinyForm() {
               </CollapsibleSection>
 
               <CollapsibleSection
-                title="Your Privacy"
+                title={t('nameDestiny.form.privacyTitle')}
                 icon={Shield}
                 tintColor="#60a5fa"
                 open={privacyOpen}
                 onToggle={() => setPrivacyOpen((prev) => !prev)}
               >
                 <Text style={styles.infoText}>
-                  🔒 Calculations happen entirely on your device. Your names are never stored, synced, or
-                  shared—preserving the privacy of your sacred journey.
+                  {t('nameDestiny.form.privacyContent')}
                 </Text>
               </CollapsibleSection>
             </View>
 
             {/* Footer */}
             <View style={styles.footer}>
-              <Text style={styles.footerText}>For reflection only • Not divination or legal ruling</Text>
+              <Text style={styles.footerText}>{t('nameDestiny.form.footer')}</Text>
             </View>
 
             <View style={{ height: Math.max(insets.bottom, 24) }} />
