@@ -3,6 +3,7 @@
  * Displays the Divine Name Resonance calculation and results
  */
 
+import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
@@ -14,6 +15,7 @@ interface DivineResonanceCardProps {
 }
 
 export function DivineResonanceCard({ resonance }: DivineResonanceCardProps) {
+  const { t } = useLanguage();
   const [showDetails, setShowDetails] = useState(false);
 
   // Compute dhikr count from Divine Name's own Abjad value
@@ -32,7 +34,7 @@ export function DivineResonanceCard({ resonance }: DivineResonanceCardProps) {
           <View style={styles.iconContainer}>
             <Sparkles size={20} color="#c084fc" fill="#c084fc" />
           </View>
-          <Text style={styles.title}>Divine Name Resonance</Text>
+          <Text style={styles.title}>{t('nameDestiny.divineResonance.title')}</Text>
         </View>
 
         {/* Divine Name Display */}
@@ -47,7 +49,7 @@ export function DivineResonanceCard({ resonance }: DivineResonanceCardProps) {
           
           {/* Why explanation */}
           <Text style={styles.whyText}>
-            This Name resonates with your name through the 28-letter Abjad cycle.
+            {t('nameDestiny.divineResonance.abjadNote')}
           </Text>
         </View>
 
@@ -56,7 +58,7 @@ export function DivineResonanceCard({ resonance }: DivineResonanceCardProps) {
           style={styles.derivedHeader}
           onPress={() => setShowDetails(!showDetails)}
         >
-          <Text style={styles.derivedTitle}>How it was derived</Text>
+          <Text style={styles.derivedTitle}>{t('nameDestiny.divineResonance.howDerived')}</Text>
           {showDetails ? (
             <ChevronUp size={18} color="#9CA3AF" />
           ) : (
@@ -67,24 +69,24 @@ export function DivineResonanceCard({ resonance }: DivineResonanceCardProps) {
         {showDetails && (
           <View style={styles.detailsSection}>
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Abjad Total (your name)</Text>
+              <Text style={styles.detailLabel}>{t('nameDestiny.divineResonance.abjadTotalLabel')}</Text>
               <Text style={styles.detailValue}>{resonance.total}</Text>
             </View>
             
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Resonance Index (1–28)</Text>
+              <Text style={styles.detailLabel}>{t('nameDestiny.divineResonance.resonanceIndexLabel')}</Text>
               <Text style={styles.detailValue}>{resonance.index}</Text>
             </View>
             
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Resonant Letter</Text>
+              <Text style={styles.detailLabel}>{t('nameDestiny.divineResonance.resonantLetterLabel')}</Text>
               <Text style={styles.detailValueArabic}>{resonance.letter}</Text>
             </View>
 
             {/* Letter Breakdown */}
             {resonance.breakdown.length > 0 && (
               <View style={styles.breakdownSection}>
-                <Text style={styles.breakdownTitle}>Letter-by-letter breakdown</Text>
+                <Text style={styles.breakdownTitle}>{t('nameDestiny.divineResonance.letterBreakdownTitle')}</Text>
                 <View style={styles.breakdownGrid}>
                   {resonance.breakdown.map((item, index) => (
                     <View key={index} style={styles.breakdownItem}>
@@ -100,18 +102,18 @@ export function DivineResonanceCard({ resonance }: DivineResonanceCardProps) {
 
         {/* Dhikr Recommendation (Optional) */}
         <View style={styles.dhikrSection}>
-          <Text style={styles.dhikrTitle}>Dhikr (Optional)</Text>
+          <Text style={styles.dhikrTitle}>{t('nameDestiny.divineResonance.dhikrTitle')}</Text>
           
           {dhikrData.total > 0 && (
             <View style={styles.dhikrCountRow}>
-              <Text style={styles.dhikrLabel}>Suggested count:</Text>
+              <Text style={styles.dhikrLabel}>{t('nameDestiny.divineResonance.suggestedCount')}</Text>
               <Text style={styles.dhikrCount}>{dhikrData.total}</Text>
               <Text style={styles.dhikrNameSmall}>يا {resonance.divineName}</Text>
             </View>
           )}
 
           <Text style={styles.dhikrExplanation}>
-            This Divine Name may be used in dhikr (remembrance of Allah), seeking closeness, forgiveness, or help according to one's intention (niyyah).
+            {t('nameDestiny.divineResonance.dhikrDescription')}
           </Text>
           
           <Text style={styles.dhikrArabic}>

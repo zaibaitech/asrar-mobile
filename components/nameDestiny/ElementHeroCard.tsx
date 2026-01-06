@@ -2,6 +2,7 @@
  * ElementHeroCard - Large primary card displaying user's Tab element
  */
 
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { ElementType } from '@/utils/elementTheme';
 import { getElementTheme } from '@/utils/elementTheme';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -23,8 +24,16 @@ const ELEMENT_ICONS = {
 };
 
 export function ElementHeroCard({ element, elementAr, elementFr }: ElementHeroCardProps) {
+  const { t, language } = useLanguage();
   const theme = getElementTheme(element);
   const IconComponent = ELEMENT_ICONS[element];
+
+  // Get translated element name
+  const elementName = language === 'fr' && elementFr 
+    ? elementFr 
+    : language === 'ar'
+    ? (elementAr || element)
+    : element;
 
   return (
     <View
@@ -52,25 +61,20 @@ export function ElementHeroCard({ element, elementAr, elementFr }: ElementHeroCa
           </View>
         </View>
 
-        <Text style={styles.sectionLabel}>YOUR PERSONAL ELEMENT (TAB)</Text>
+        <Text style={styles.sectionLabel}>{t('nameDestiny.personalElement.title')}</Text>
 
         <View style={styles.nameContainer}>
-          <Text style={[styles.elementName, { color: theme.accentColor }]}>{element}</Text>
-          {elementAr && <Text style={styles.elementArabic}>{elementAr}</Text>}
+          <Text style={[styles.elementName, { color: theme.accentColor }]}>{elementName}</Text>
+          {elementAr && language !== 'ar' && <Text style={styles.elementArabic}>{elementAr}</Text>}
         </View>
 
-        <Text style={styles.subtitle}>{theme.subtitle}</Text>
+        <Text style={styles.subtitle}>
+          {t(`nameDestiny.personalElement.qualities.${element.toLowerCase()}`)}
+        </Text>
 
         <View style={styles.descriptionContainer}>
           <Text style={styles.description}>
-            {element === 'Fire' &&
-              'Passionate, dynamic energy. Transformative power that drives action and illuminates the path forward.'}
-            {element === 'Air' &&
-              'Intellectual, communicative essence. Free-flowing wisdom that connects ideas and facilitates understanding.'}
-            {element === 'Water' &&
-              'Emotional, intuitive wisdom. Adaptive nature that flows through challenges with grace and depth.'}
-            {element === 'Earth' &&
-              'Grounded, stable foundation. Nurturing strength that provides security and steady growth.'}
+            {t(`nameDestiny.personalElement.description.${element.toLowerCase()}`)}
           </Text>
         </View>
       </LinearGradient>

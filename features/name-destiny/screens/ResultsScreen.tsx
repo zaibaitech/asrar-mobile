@@ -170,7 +170,7 @@ function getBestTimeWindow(
 export default function ResultsScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { profile } = useProfile();
   const insets = useSafeAreaInsets();
 
@@ -267,9 +267,9 @@ export default function ResultsScreen() {
         <LinearGradient colors={['#0f172a', '#1e1b4b', '#312e81']} style={styles.gradient}>
           <View style={styles.errorContainer}>
             <AlertCircle size={48} color="#ef4444" />
-            <Text style={styles.errorText}>No results to display</Text>
+            <Text style={styles.errorText}>{t('nameDestiny.results.noResults')}</Text>
             <TouchableOpacity onPress={() => router.back()} style={styles.errorButton}>
-              <Text style={styles.errorButtonText}>Go Back</Text>
+              <Text style={styles.errorButtonText}>{t('nameDestiny.results.goBack')}</Text>
             </TouchableOpacity>
           </View>
         </LinearGradient>
@@ -341,7 +341,7 @@ export default function ResultsScreen() {
       <LinearGradient colors={['#0f172a', '#1e1b4b', '#312e81']} style={styles.gradient}>
         {/* 1) Header */}
         <DestinyHeader
-          title={language === 'ar' ? 'نتائجك' : language === 'fr' ? 'Vos Résultats' : 'Your Results'}
+          title={t('nameDestiny.results.yourResults')}
           onBack={() => router.back()}
           language={language === 'ar' ? 'en' : language}
           onLanguageChange={setLanguage}
@@ -362,11 +362,7 @@ export default function ResultsScreen() {
           >
             <Sparkles size={16} color="#a78bfa" strokeWidth={2.5} />
             <Text style={styles.newCalcText}>
-              {language === 'ar'
-                ? 'حساب جديد'
-                : language === 'fr'
-                ? 'Nouveau Calcul'
-                : 'New Calculation'}
+              {t('nameDestiny.results.newCalculation')}
             </Text>
           </TouchableOpacity>
 
@@ -391,60 +387,28 @@ export default function ResultsScreen() {
           {/* 3) Sacred Numbers */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
-              {language === 'ar'
-                ? 'الأرقام المقدسة'
-                : language === 'fr'
-                ? 'Nombres Sacrés'
-                : 'Sacred Numbers'}
+              {t('nameDestiny.results.sacredNumbers')}
             </Text>
             <View style={styles.numbersRow}>
               <SacredNumberCard
                 label={
-                  language === 'ar'
-                    ? showClassical
-                      ? 'كبير'
-                      : 'الإجمالي'
-                    : language === 'fr'
-                    ? showClassical
-                      ? 'Kabīr'
-                      : 'Total'
-                    : showClassical
-                    ? 'Kabīr'
-                    : 'Grand Total'
+                  showClassical
+                    ? t('nameDestiny.results.kabir')
+                    : t('nameDestiny.results.total')
                 }
                 value={formatNumber(result.totalKabir)}
-                description={
-                  language === 'ar'
-                    ? 'المجموع الكلي'
-                    : language === 'fr'
-                    ? 'Total global'
-                    : 'Complete sum'
-                }
+                description={t('nameDestiny.results.completSum')}
                 gradientColors={['rgba(168, 85, 247, 0.25)', 'rgba(139, 92, 246, 0.15)']}
                 accentColor="#a78bfa"
               />
               <SacredNumberCard
                 label={
-                  language === 'ar'
-                    ? showClassical
-                      ? 'صغير'
-                      : 'الجوهر'
-                    : language === 'fr'
-                    ? showClassical
-                      ? 'Ṣaghīr'
-                      : 'Essence'
-                    : showClassical
-                    ? 'Ṣaghīr'
-                    : 'Essence'
+                  showClassical
+                    ? t('nameDestiny.results.saghir')
+                    : t('nameDestiny.results.essence')
                 }
                 value={result.saghir.toString()}
-                description={
-                  language === 'ar'
-                    ? 'الجذر الرقمي'
-                    : language === 'fr'
-                    ? 'Racine numérique'
-                    : 'Digital root'
-                }
+                description={t('nameDestiny.results.digitalRoot')}
                 gradientColors={['rgba(236, 72, 153, 0.25)', 'rgba(219, 39, 119, 0.15)']}
                 accentColor="#ec4899"
               />
@@ -454,11 +418,7 @@ export default function ResultsScreen() {
           {/* 4) Your Personal Element (Ṭabʿ) */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
-              {language === 'ar'
-                ? 'عنصرك الشخصي (طبع)'
-                : language === 'fr'
-                ? 'Votre Élément Personnel (Ṭabʿ)'
-                : 'Your Personal Element (Ṭabʿ)'}
+              {t('nameDestiny.results.yourPersonalElement')}
             </Text>
             <ElementHeroCard
               element={elementType}
@@ -481,8 +441,8 @@ export default function ResultsScreen() {
                   <Sparkles size={18} color="#8B7355" />
                   <Text style={styles.aiEnhanceText}>
                     {aiLoading
-                      ? (language === 'ar' ? 'جاري التحسين...' : language === 'fr' ? 'Amélioration...' : 'Enhancing...')
-                      : (language === 'ar' ? '✨ تخصيص التفسير' : language === 'fr' ? '✨ Personnaliser' : '✨ Personalize Explanation')}
+                      ? t('nameDestiny.results.enhancing')
+                      : t('nameDestiny.results.personalizeExplanation')}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -494,7 +454,7 @@ export default function ResultsScreen() {
                 <View style={styles.aiEnhancedHeader}>
                   <Sparkles size={16} color="#8B7355" />
                   <Text style={styles.aiEnhancedTitle}>
-                    {language === 'ar' ? 'شرح محسّن' : language === 'fr' ? 'Explication Améliorée' : 'Enhanced Explanation'}
+                    {t('nameDestiny.results.enhancedExplanation')}
                   </Text>
                   <AIBadge size="small" />
                 </View>
@@ -503,7 +463,7 @@ export default function ResultsScreen() {
                 {aiPersonalizedInsight && (
                   <View style={styles.personalizedInsightCard}>
                     <Text style={styles.personalizedInsightLabel}>
-                      {language === 'ar' ? '💫 رؤية شخصية' : language === 'fr' ? '💫 Aperçu Personnel' : '💫 Personalized Insight'}
+                      {t('nameDestiny.results.personalizedInsight')}
                     </Text>
                     <Text style={styles.personalizedInsightText}>{aiPersonalizedInsight}</Text>
                   </View>
@@ -554,11 +514,7 @@ export default function ResultsScreen() {
             <View style={styles.dominanceSummary}>
               <Text style={styles.dominanceText}>
                 <Text style={styles.dominanceLabel}>
-                  {language === 'ar'
-                    ? 'التعبير المهيمن: '
-                    : language === 'fr'
-                    ? 'Expression Dominante : '
-                    : 'Dominant Expression: '}
+                  {t('nameDestiny.results.dominantExpression')}
                 </Text>
                 <Text style={[styles.dominanceValue, { color: getElementTheme(elementStats.dominant.element as any).accentColor }]}>
                   {elementStats.dominant.element} ({elementStats.dominant.percentage}%)
@@ -566,11 +522,7 @@ export default function ResultsScreen() {
               </Text>
               <Text style={styles.dominanceText}>
                 <Text style={styles.dominanceLabel}>
-                  {language === 'ar'
-                    ? 'العنصر الضعيف: '
-                    : language === 'fr'
-                    ? 'Élément Faible : '
-                    : 'Weak Element: '}
+                  {t('nameDestiny.results.weakElement')}
                 </Text>
                 <Text style={[styles.dominanceValue, { color: getElementTheme(elementStats.weak.element as any).accentColor }]}>
                   {elementStats.weak.element} ({elementStats.weak.percentage}%)
@@ -605,11 +557,7 @@ export default function ResultsScreen() {
           {/* 6) Balancing Actions */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
-              {language === 'ar'
-                ? 'إجراءات الموازنة'
-                : language === 'fr'
-                ? 'Actions d\'Équilibrage'
-                : 'Balancing Actions'}
+              {t('nameDestiny.results.balancingActions')}
             </Text>
             <Text style={styles.sectionExplainer}>
               {language === 'ar'
@@ -631,29 +579,17 @@ export default function ResultsScreen() {
           {/* 7) Zodiac Influence */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
-              {language === 'ar'
-                ? 'التأثير الفلكي'
-                : language === 'fr'
-                ? 'Influence Zodiacale'
-                : 'Zodiac Influence'}
+              {t('nameDestiny.results.zodiacInfluence')}
             </Text>
             <Text style={styles.sectionExplainer}>
-              {language === 'ar'
-                ? 'الكوكب الحاكم يعكس طبيعتك؛ كوكب الساعة النشطة يعكس التوقيت الحالي.'
-                : language === 'fr'
-                ? 'La planète maîtresse reflète votre nature ; la planète heure active reflète le timing actuel.'
-                : 'Ruling planet reflects your nature; active hour reflects current timing.'}
+              {t('nameDestiny.results.zodiacInfluenceSubtitle')}
             </Text>
             
             {/* Helper Caption */}
             <View style={styles.helperCaption}>
               <HelpCircle size={14} color="#94a3b8" strokeWidth={2} />
               <Text style={styles.helperCaptionText}>
-                {language === 'ar'
-                  ? 'يوم القوة من الكوكب الحاكم لبرجك. أفضل وقت هو نافذة ممارسة تعتمد على العنصر والموسم.'
-                  : language === 'fr'
-                  ? 'Le Jour de Puissance vient de la planète maîtresse de votre Burj. Le Meilleur Moment est une fenêtre de pratique basée sur l\'élément et la saison.'
-                  : 'Power Day comes from your Burj\'s ruling planet. Best Time is a practice window based on element + seasonal resonance.'}
+                {t('nameDestiny.results.zodiacInfluenceTooltip')}
               </Text>
             </View>
 
@@ -684,11 +620,7 @@ export default function ResultsScreen() {
                       </View>
                       <View style={styles.infoContent}>
                         <Text style={styles.infoLabel}>
-                          {language === 'ar'
-                            ? 'الكوكب الحاكم'
-                            : language === 'fr'
-                            ? 'Planète Maîtresse'
-                            : 'Ruling Planet'}
+                          {t('nameDestiny.results.rulingPlanet')}
                         </Text>
                         <Text style={styles.infoValue}>{result.burj.planet}</Text>
                       </View>
@@ -703,11 +635,7 @@ export default function ResultsScreen() {
                       </View>
                       <View style={styles.infoContent}>
                         <Text style={styles.infoLabel}>
-                          {language === 'ar'
-                            ? 'يوم القوة (حاكم البرج)'
-                            : language === 'fr'
-                            ? 'Jour de Puissance (Maître du Burj)'
-                            : 'Power Day (Burj Ruler)'}
+                          {t('nameDestiny.results.dayOfPower')}
                         </Text>
                         <Text style={styles.infoValue}>
                           {result.burjDay.en}{' '}
@@ -725,11 +653,7 @@ export default function ResultsScreen() {
                       </View>
                       <View style={styles.infoContent}>
                         <Text style={styles.infoLabel}>
-                          {language === 'ar'
-                            ? 'كوكب الساعة النشطة'
-                            : language === 'fr'
-                            ? 'Planète Heure Active'
-                            : 'Active Hour Planet'}
+                          {t('nameDestiny.results.activeHourPlanet')}
                         </Text>
                         <Text style={styles.infoValue}>
                           {result.hour.name}{' '}
@@ -748,7 +672,7 @@ export default function ResultsScreen() {
                 <View style={styles.aiEnhancedHeader}>
                   <Sparkles size={16} color="#fbbf24" />
                   <Text style={styles.aiEnhancedTitle}>
-                    {language === 'ar' ? 'شرح البرج' : language === 'fr' ? 'Explication du Burj' : 'Burj Insight'}
+                    {t('nameDestiny.results.burjInsight')}
                   </Text>
                   <AIBadge size="small" />
                 </View>
@@ -771,11 +695,7 @@ export default function ResultsScreen() {
               <View style={styles.reflectionPrompt}>
                 <HelpCircle size={16} color="#a78bfa" strokeWidth={2} />
                 <Text style={styles.reflectionText}>
-                  {language === 'ar'
-                    ? 'أي كلمة أو عبارة تبرز أكثر لموقفك الحالي؟'
-                    : language === 'fr'
-                    ? 'Quel mot ou phrase ressort le plus pour votre situation actuelle ?'
-                    : 'Which word or phrase stands out most for your current situation?'}
+                  {t('nameDestiny.results.reflectionPrompt')}
                 </Text>
               </View>
             )}
@@ -799,28 +719,12 @@ export default function ResultsScreen() {
           {showAdvanced && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>
-                {language === 'ar'
-                  ? 'المحتوى المتقدم'
-                  : language === 'fr'
-                  ? 'Contenu Avancé'
-                  : 'Advanced Content'}
+                {t('nameDestiny.results.advancedContent')}
               </Text>
 
               <AccordionSection
-                title={
-                  language === 'ar'
-                    ? 'التفاصيل الكلاسيكية'
-                    : language === 'fr'
-                    ? 'Détails Classiques'
-                    : 'Classical Details'
-                }
-                subtitle={
-                  language === 'ar'
-                    ? 'المصطلحات المغربية التقليدية'
-                    : language === 'fr'
-                    ? 'Terminologie maghribine traditionnelle'
-                    : 'Traditional Maghribi terminology'
-                }
+                title={t('nameDestiny.results.classicalDetails')}
+                subtitle={t('nameDestiny.results.classicalDetailsSubtitle')}
                 defaultOpen={showClassical}
                 accentColor="#a78bfa"
               >
@@ -838,45 +742,33 @@ export default function ResultsScreen() {
                     </Text>
                   </View>
                   <View style={styles.advancedRow}>
-                    <Text style={styles.advancedLabel}>Person Kabir:</Text>
+                    <Text style={styles.advancedLabel}>{t('nameDestiny.results.personKabir')}</Text>
                     <Text style={styles.advancedValue}>{formatNumber(result.personKabir)}</Text>
                   </View>
                   {result.motherKabir > 0 && (
                     <View style={styles.advancedRow}>
-                      <Text style={styles.advancedLabel}>Mother Kabir:</Text>
+                      <Text style={styles.advancedLabel}>{t('nameDestiny.results.motherKabir')}</Text>
                       <Text style={styles.advancedValue}>{formatNumber(result.motherKabir)}</Text>
                     </View>
                   )}
                   <View style={styles.advancedRow}>
-                    <Text style={styles.advancedLabel}>Divisibility by 4:</Text>
+                    <Text style={styles.advancedLabel}>{t('nameDestiny.results.divisibleBy4')}</Text>
                     <Text style={styles.advancedValue}>
-                      {result.totalKabir % 4 === 0 ? 'Yes ✓' : 'No'}
+                      {result.totalKabir % 4 === 0 ? t('nameDestiny.results.yes') : t('nameDestiny.results.no')}
                     </Text>
                   </View>
                   <View style={styles.advancedRow}>
-                    <Text style={styles.advancedLabel}>Divisibility by 12:</Text>
+                    <Text style={styles.advancedLabel}>{t('nameDestiny.results.divisibleBy12')}</Text>
                     <Text style={styles.advancedValue}>
-                      {result.totalKabir % 12 === 0 ? 'Yes ✓' : 'No'}
+                      {result.totalKabir % 12 === 0 ? t('nameDestiny.results.yes') : t('nameDestiny.results.no')}
                     </Text>
                   </View>
                 </View>
               </AccordionSection>
 
               <AccordionSection
-                title={
-                  language === 'ar'
-                    ? 'التفسير العميق'
-                    : language === 'fr'
-                    ? 'Interprétation Profonde'
-                    : 'Deep Interpretation'
-                }
-                subtitle={
-                  language === 'ar'
-                    ? 'السر، البسط، الكمال'
-                    : language === 'fr'
-                    ? 'Sirr, Basṭ, Kamāl'
-                    : 'Sirr, Basṭ, Kamāl'
-                }
+                title={t('nameDestiny.results.deepInterpretation')}
+                subtitle={t('nameDestiny.results.deepInterpretationSubtitle')}
                 defaultOpen={false}
                 accentColor="#ec4899"
               >
@@ -901,11 +793,7 @@ export default function ResultsScreen() {
           {/* Footer */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              {language === 'ar'
-                ? 'للتأمل فقط • ليس تنجيمًا أو حكمًا قانونيًا'
-                : language === 'fr'
-                ? 'Pour réflexion uniquement • Pas de divination ou de décision juridique'
-                : 'For reflection only • Not divination or legal ruling'}
+              {t('nameDestiny.results.disclaimer')}
             </Text>
           </View>
         </ScrollView>
