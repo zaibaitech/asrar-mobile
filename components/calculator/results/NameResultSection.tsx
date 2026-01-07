@@ -7,37 +7,40 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NameInsights } from '../../../types/calculator-enhanced';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NameResultSectionProps {
   insights: NameInsights;
 }
 
 export const NameResultSection: React.FC<NameResultSectionProps> = ({ insights }) => {
+  const { t } = useLanguage();
+  
   return (
     <View style={styles.container}>
       {/* Archetype Card */}
       <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.archetypeCard}>
         <Text style={styles.archetypeTitle}>{insights.archetypeTitle}</Text>
-        <Text style={styles.archetypeSubtitle}>Your Spiritual Archetype</Text>
+        <Text style={styles.archetypeSubtitle}>{t('calculator.results.nameInsights.yourSpiritualArchetype')}</Text>
       </LinearGradient>
       
       {/* Spiritual Guidance */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🌟 Spiritual Guidance</Text>
+        <Text style={styles.cardTitle}>🌟 {t('calculator.results.nameInsights.spiritualGuidance')}</Text>
         <Text style={styles.cardText}>{insights.spiritualGuidance}</Text>
       </View>
       
       {/* Divine Name Connections */}
       {insights.divineNameConnection.length > 0 && (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>🕋 Divine Name Resonance</Text>
+          <Text style={styles.cardTitle}>🕋 {t('calculator.results.nameInsights.divineNameResonance')}</Text>
           {insights.divineNameConnection.map((name, idx) => (
             <View key={idx} style={styles.divineNameRow}>
               <Text style={styles.divineNameArabic}>{name.arabic}</Text>
               <View style={styles.divineNameInfo}>
                 <Text style={styles.divineNameText}>{name.name}</Text>
                 <Text style={styles.divineNameMeta}>
-                  Value: {name.value} (Distance: {name.distance})
+                  {t('calculator.results.nameInsights.value')}: {name.value} ({t('calculator.results.nameInsights.distance')}: {name.distance})
                 </Text>
               </View>
             </View>
@@ -47,7 +50,7 @@ export const NameResultSection: React.FC<NameResultSectionProps> = ({ insights }
       
       {/* Recommended Dhikr Counts */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🤲 Recommended Dhikr Counts</Text>
+        <Text style={styles.cardTitle}>🤲 {t('calculator.results.nameInsights.recommendedDhikrCounts')}</Text>
         <View style={styles.countsRow}>
           {insights.recommendedDhikrCount.map((count, idx) => (
             <View key={idx} style={styles.countChip}>
@@ -59,19 +62,19 @@ export const NameResultSection: React.FC<NameResultSectionProps> = ({ insights }
       
       {/* Timing Recommendations */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>⏰ Best Practice Times</Text>
+        <Text style={styles.cardTitle}>⏰ {t('calculator.results.nameInsights.bestPracticeTimes')}</Text>
         <View style={styles.timingRow}>
           <View style={styles.timingItem}>
-            <Text style={styles.timingLabel}>Best Time Window</Text>
+            <Text style={styles.timingLabel}>{t('calculator.results.nameInsights.bestTimeWindow')}</Text>
             <Text style={styles.timingValue}>{insights.bestTimeWindow}</Text>
           </View>
           <View style={styles.timingItem}>
-            <Text style={styles.timingLabel}>Power Days</Text>
+            <Text style={styles.timingLabel}>{t('calculator.results.nameInsights.powerDays')}</Text>
             <Text style={styles.timingValue}>{insights.powerDay}</Text>
           </View>
         </View>
         <Text style={styles.timingNote}>
-          💡 Power Day = Burj planetary ruler. Best Time Window = Elemental resonance peak.
+          💡 {t('calculator.results.nameInsights.timingNote')}
         </Text>
       </View>
     </View>

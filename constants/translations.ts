@@ -924,6 +924,80 @@ export const translations = {
             spiritual: "Your being roots in divine stability and patient perseverance",
           },
         },
+        
+        // Elemental Composition Section
+        elementalComposition: {
+          title: "Elemental Composition",
+          balanceScore: "Elemental Balance Score",
+          balanceStatus: {
+            harmonious: "Harmonious",
+            moderate: "Moderate",
+            seeRecommendations: "See recommendations",
+          },
+          harmonizingRecommendation: "Harmonizing Recommendation",
+          letterCount: "{{count}} letter",
+          letterCount_plural: "{{count}} letters",
+          recommendations: {
+            harmonious: "Your elemental balance is harmonious. Maintain equilibrium through balanced practices.",
+            waterWeak: "Your Water element (0%) could use more attention. Try: Cultivate emotional depth, intuition, and flow. Practice dhikr near water or during wuḍū.",
+            fireWeak: "Your Fire element (0%) could use more attention. Try: Engage passionate spiritual practices. Dhikr at dawn or sunrise to kindle inner light.",
+            airWeak: "Your Air element (0%) could use more attention. Try: Focus on knowledge and communication. Practice dhikr with breath awareness (habs al-nafas).",
+            earthWeak: "Your Earth element (0%) could use more attention. Try: Ground yourself through patience and gratitude. Practice dhikr while in sujūd or standing on earth.",
+            balanceDominant: "Balance your {{element}} dominance by incorporating practices from other elements.",
+          },
+        },
+        
+        // Name Insights Section
+        nameInsights: {
+          yourSpiritualArchetype: "Your Spiritual Archetype",
+          spiritualGuidance: "Spiritual Guidance",
+          divineNameResonance: "Divine Name Resonance",
+          value: "Value",
+          distance: "Distance",
+          recommendedDhikrCounts: "Recommended Dhikr Counts",
+          bestPracticeTimes: "Best Practice Times",
+          bestTimeWindow: "Best Time Window",
+          powerDays: "Power Days",
+          timingNote: "Power Day = Burj planetary ruler. Best Time Window = Elemental resonance peak.",
+        },
+        
+        // Advanced Methods Section
+        advancedMethods: {
+          title: "Advanced Calculation Methods",
+          subtitle: "Traditional methods from classical ʿIlm al-Ḥurūf for deeper numerical analysis",
+          wusta: {
+            name: "Wusṭā (Mean)",
+            description: "Balance between large and small",
+          },
+          kamal: {
+            name: "Kamāl (Perfection)",
+            description: "Essence of numerical completion",
+          },
+          bast: {
+            name: "Basṭ (Expansion)",
+            description: "Expansive spiritual potential",
+          },
+          sirr: {
+            name: "Sirr (Hidden)",
+            description: "Secret reflection of the value",
+          },
+        },
+        
+        // Zodiac Symbols
+        zodiacSymbols: {
+          ram: "The Ram",
+          bull: "The Bull",
+          twins: "The Twins",
+          crab: "The Crab",
+          lion: "The Lion",
+          maiden: "The Maiden",
+          scales: "The Scales",
+          scorpion: "The Scorpion",
+          archer: "The Archer",
+          goat: "The Goat",
+          waterBearer: "The Water-Bearer",
+          fish: "The Fish",
+        },
       },
       
       // Abjad System Labels (deprecated, kept for backwards compatibility)
@@ -4781,6 +4855,80 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             quality: "Ancré, stable, nourrissant",
             spiritual: "Votre être s'enracine dans la stabilité divine et la persévérance patiente",
           },
+        },
+        
+        // Elemental Composition Section
+        elementalComposition: {
+          title: "Composition Élémentaire",
+          balanceScore: "Score d'Équilibre Élémentaire",
+          balanceStatus: {
+            harmonious: "Harmonieux",
+            moderate: "Modéré",
+            seeRecommendations: "Voir les recommandations",
+          },
+          harmonizingRecommendation: "Recommandation d'Harmonisation",
+          letterCount: "{{count}} lettre",
+          letterCount_plural: "{{count}} lettres",
+          recommendations: {
+            harmonious: "Votre équilibre élémentaire est harmonieux. Maintenez l'équilibre par des pratiques équilibrées.",
+            waterWeak: "Votre élément Eau (0%) pourrait nécessiter plus d'attention. Essayez : Cultivez la profondeur émotionnelle, l'intuition et le flux. Pratiquez le dhikr près de l'eau ou pendant le wuḍū.",
+            fireWeak: "Votre élément Feu (0%) pourrait nécessiter plus d'attention. Essayez : Engagez des pratiques spirituelles passionnées. Dhikr à l'aube ou au lever du soleil pour allumer la lumière intérieure.",
+            airWeak: "Votre élément Air (0%) pourrait nécessiter plus d'attention. Essayez : Concentrez-vous sur la connaissance et la communication. Pratiquez le dhikr avec la conscience du souffle (habs al-nafas).",
+            earthWeak: "Votre élément Terre (0%) pourrait nécessiter plus d'attention. Essayez : Ancrez-vous par la patience et la gratitude. Pratiquez le dhikr en sujūd ou debout sur la terre.",
+            balanceDominant: "Équilibrez votre dominance {{element}} en incorporant des pratiques d'autres éléments.",
+          },
+        },
+        
+        // Name Insights Section
+        nameInsights: {
+          yourSpiritualArchetype: "Votre Archétype Spirituel",
+          spiritualGuidance: "Guidance Spirituelle",
+          divineNameResonance: "Résonance du Nom Divin",
+          value: "Valeur",
+          distance: "Distance",
+          recommendedDhikrCounts: "Comptages de Dhikr Recommandés",
+          bestPracticeTimes: "Meilleurs Moments de Pratique",
+          bestTimeWindow: "Meilleure Fenêtre Temporelle",
+          powerDays: "Jours de Puissance",
+          timingNote: "Jour de Puissance = dirigeant planétaire du Burj. Meilleure Fenêtre = pic de résonance élémentaire.",
+        },
+        
+        // Advanced Methods Section
+        advancedMethods: {
+          title: "Méthodes de Calcul Avancées",
+          subtitle: "Méthodes traditionnelles de l'ʿIlm al-Ḥurūf classique pour une analyse numérique approfondie",
+          wusta: {
+            name: "Wusṭā (Moyenne)",
+            description: "Équilibre entre le grand et le petit",
+          },
+          kamal: {
+            name: "Kamāl (Perfection)",
+            description: "Essence de l'achèvement numérique",
+          },
+          bast: {
+            name: "Basṭ (Expansion)",
+            description: "Potentiel spirituel expansif",
+          },
+          sirr: {
+            name: "Sirr (Caché)",
+            description: "Réflexion secrète de la valeur",
+          },
+        },
+        
+        // Zodiac Symbols
+        zodiacSymbols: {
+          ram: "Le Bélier",
+          bull: "Le Taureau",
+          twins: "Les Gémeaux",
+          crab: "Le Crabe",
+          lion: "Le Lion",
+          maiden: "La Vierge",
+          scales: "La Balance",
+          scorpion: "Le Scorpion",
+          archer: "L'Archer",
+          goat: "Le Bouc",
+          waterBearer: "Le Verseau",
+          fish: "Les Poissons",
         },
       },
       

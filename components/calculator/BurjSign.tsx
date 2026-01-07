@@ -25,6 +25,15 @@ export const BurjSign: React.FC<BurjSignProps> = ({ kabir }) => {
   const spiritualQuality = language === 'fr' ? zodiacData.spiritualQualityFr : zodiacData.spiritualQuality;
   const classicalRef = language === 'fr' ? zodiacData.classicalReferenceFr : zodiacData.classicalReference;
   
+  // Get symbol emoji and translated name
+  const symbolMapping: Record<number, string> = {
+    1: 'ram', 2: 'bull', 3: 'twins', 4: 'crab', 5: 'lion', 6: 'maiden',
+    7: 'scales', 8: 'scorpion', 9: 'archer', 10: 'goat', 11: 'waterBearer', 12: 'fish',
+  };
+  const symbolEmoji = zodiacData.symbol.split(' ')[0]; // Extract emoji (e.g., "♈️")
+  const symbolKey = symbolMapping[burjCalc.burj];
+  const symbolText = t(`calculator.results.zodiacSymbols.${symbolKey}`);
+  
   // Get element display text
   const getElementDisplay = () => {
     if (zodiacData.temperament.includes('Hot & Dry')) {
@@ -51,7 +60,7 @@ export const BurjSign: React.FC<BurjSignProps> = ({ kabir }) => {
       
       {/* Main Card */}
       <View style={styles.mainCard}>
-        <Text style={styles.symbol}>{zodiacData.symbol}</Text>
+        <Text style={styles.symbol}>{symbolEmoji} {symbolText}</Text>
         <Text style={styles.nameEn}>{zodiacName}</Text>
         <Text style={styles.nameAr}>{zodiacData.nameAr}</Text>
         <Text style={styles.transliteration}>{zodiacData.transliteration}</Text>

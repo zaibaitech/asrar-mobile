@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface AdvancedMethodsProps {
   kabir: number;
@@ -13,6 +14,7 @@ type OperationResult = {
 };
 
 export const AdvancedMethods: React.FC<AdvancedMethodsProps> = ({ kabir, saghir }) => {
+  const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   
   // Traditional calculations from classical ʿIlm al-Ḥurūf
@@ -31,35 +33,35 @@ export const AdvancedMethods: React.FC<AdvancedMethodsProps> = ({ kabir, saghir 
   
   const methods = [
     {
-      name: 'Wusṭā (Mean)',
+      name: t('calculator.results.advancedMethods.wusta.name'),
       arabic: 'الوُسْطَى',
       formula: 'Kabīr + Ṣaghīr ÷ 2',
       value: wusta,
-      description: 'Balance between large and small',
+      description: t('calculator.results.advancedMethods.wusta.description'),
       color: '#f59e0b', // amber
     },
     {
-      name: 'Kamāl (Perfection)',
+      name: t('calculator.results.advancedMethods.kamal.name'),
       arabic: 'الكَمَال',
       formula: 'Kabīr + Ṣaghīr',
       value: kamal,
-      description: 'Essence of numerical completion',
+      description: t('calculator.results.advancedMethods.kamal.description'),
       color: '#10b981', // emerald
     },
     {
-      name: 'Basṭ (Expansion)',
+      name: t('calculator.results.advancedMethods.bast.name'),
       arabic: 'البَسْط',
       formula: 'Kabīr × Ṣaghīr',
       value: bast,
-      description: 'Expansive spiritual potential',
+      description: t('calculator.results.advancedMethods.bast.description'),
       color: '#06b6d4', // cyan
     },
     {
-      name: 'Sirr (Hidden)',
+      name: t('calculator.results.advancedMethods.sirr.name'),
       arabic: 'السِّر',
       formula: 'Kabīr − Ṣaghīr',
       value: sirr,
-      description: 'Secret reflection of the value',
+      description: t('calculator.results.advancedMethods.sirr.description'),
       color: '#8b5cf6', // purple
     },
   ];
@@ -73,13 +75,13 @@ export const AdvancedMethods: React.FC<AdvancedMethodsProps> = ({ kabir, saghir 
       >
         <View style={styles.headerLeft}>
           <Text style={styles.emoji}>⚗️</Text>
-          <Text style={styles.title}>Advanced Calculation Methods</Text>
+          <Text style={styles.title}>{t('calculator.results.advancedMethods.title')}</Text>
         </View>
         <Text style={styles.chevron}>{expanded ? '▼' : '▶'}</Text>
       </Pressable>
       
       <Text style={styles.subtitle}>
-        Traditional methods from classical ʿIlm al-Ḥurūf for deeper numerical analysis
+        {t('calculator.results.advancedMethods.subtitle')}
       </Text>
 
       {/* Method Cards */}

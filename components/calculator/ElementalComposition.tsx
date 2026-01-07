@@ -8,7 +8,7 @@ interface ElementalCompositionProps {
 }
 
 export const ElementalComposition: React.FC<ElementalCompositionProps> = ({ analytics }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const elementCounts: Record<'fire' | 'water' | 'air' | 'earth', number> = {
     fire: 0,
     water: 0,
@@ -24,26 +24,38 @@ export const ElementalComposition: React.FC<ElementalCompositionProps> = ({ anal
 
   const { elementPercents, dominantElement, weakElement, balanceScore } = analytics;
   
+  // Get pluralized letter count
+  const getLetterCount = (count: number): string => {
+    if (language === 'fr') {
+      return count === 0 || count === 1 
+        ? t('calculator.results.elementalComposition.letterCount', { count })
+        : t('calculator.results.elementalComposition.letterCount_plural', { count });
+    }
+    return `${count} letter${count !== 1 ? 's' : ''}`;
+  };
+  
   // Harmonizing recommendation
   const getHarmonizingAdvice = (): string => {
     if (balanceScore >= 75) {
-      return 'Your elemental balance is harmonious. Maintain equilibrium through balanced practices.';
+      return t('calculator.results.elementalComposition.recommendations.harmonious');
     }
 
     if (weakElement === 'water' && elementPercents.water === 0) {
-      return 'Your Water element (0%) could use more attention. Try: Cultivate emotional depth, intuition, and flow. Practice dhikr near water or during wuḍū.';
+      return t('calculator.results.elementalComposition.recommendations.waterWeak');
     }
     if (weakElement === 'fire' && elementPercents.fire === 0) {
-      return 'Your Fire element (0%) could use more attention. Try: Engage passionate spiritual practices. Dhikr at dawn or sunrise to kindle inner light.';
+      return t('calculator.results.elementalComposition.recommendations.fireWeak');
     }
     if (weakElement === 'air' && elementPercents.air === 0) {
-      return 'Your Air element (0%) could use more attention. Try: Focus on knowledge and communication. Practice dhikr with breath awareness (habs al-nafas).';
+      return t('calculator.results.elementalComposition.recommendations.airWeak');
     }
     if (weakElement === 'earth' && elementPercents.earth === 0) {
-      return 'Your Earth element (0%) could use more attention. Try: Ground yourself through patience and gratitude. Practice dhikr while in sujūd or standing on earth.';
+      return t('calculator.results.elementalComposition.recommendations.earthWeak');
     }
 
-    return `Balance your ${dominantElement} dominance by incorporating practices from other elements.`;
+    return t('calculator.results.elementalComposition.recommendations.balanceDominant', { 
+      element: t(`calculator.results.elements.${dominantElement}`) 
+    });
   };
 
   const elements = [
@@ -56,17 +68,22 @@ export const ElementalComposition: React.FC<ElementalCompositionProps> = ({ anal
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Text style={styles.title}>🔮 Elemental Composition</Text>
+      <Text style={styles.title}>🔮 {t('calculator.results.elementalComposition.title')}</Text>
       
       {/* Balance Score */}
       <View style={styles.balanceCard}>
-        <Text style={styles.balanceLabel}>Elemental Balance Score</Text>
+        <Text style={styles.balanceLabel}>{t('calculator.results.elementalComposition.balanceScore')}</Text>
         <View style={styles.balanceBar}>
           <View style={[styles.balanceFill, { width: `${balanceScore}%` }]} />
           <Text style={styles.balanceText}>{balanceScore}%</Text>
         </View>
         <Text style={styles.balanceSubtext}>
-          {balanceScore >= 75 ? 'Harmonious' : balanceScore >= 50 ? 'Moderate' : 'See recommendations'}
+          {balanceScore >= 75 
+            ? t('calculator.results.elementalComposition.balanceStatus.harmonious')
+            : balanceScore >= 50 
+            ? t('calculator.results.elementalComposition.balanceStatus.moderate')
+            : t('calculator.results.elementalComposition.balanceStatus.seeRecommendations')
+          }
         </Text>
       </View>
       
@@ -86,7 +103,7 @@ export const ElementalComposition: React.FC<ElementalCompositionProps> = ({ anal
               ]} 
             />
             <Text style={styles.percentageText}>
-              {element.count} letter{element.count !== 1 ? 's' : ''} ({element.percentage}%)
+              {getLetterCount(element.count)} ({element.percentage}%)
             </Text>
           </View>
         </View>
@@ -95,7 +112,7 @@ export const ElementalComposition: React.FC<ElementalCompositionProps> = ({ anal
       {/* Harmonizing Recommendation */}
       {balanceScore < 75 && (
         <View style={styles.recommendationCard}>
-          <Text style={styles.recommendationTitle}>💡 Harmonizing Recommendation</Text>
+          <Text style={styles.recommendationTitle}>💡 {t('calculator.results.elementalComposition.harmonizingRecommendation')}</Text>
           <Text style={styles.recommendationText}>{getHarmonizingAdvice()}</Text>
         </View>
       )}
