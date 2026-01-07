@@ -1011,6 +1011,90 @@ export const translations = {
         essenceGuidance: {
           template: "Your path combines the essence of {{archetype}} with the power of {{element}}.\n\nEmbrace your natural {{quality}} while balancing it with the {{elementQuality}} nature of your element. Seek harmony between inner contemplation and outward expression.",
         },
+        
+        // Lineage Result Section
+        lineage: {
+          // Section Title
+          lineageBreakdown: "Lineage Breakdown",
+          familyPattern: "Family Pattern",
+          keyTakeaways: "Key Takeaways",
+          practicePlan: "Practice Plan",
+          
+          // Breakdown Labels
+          labels: {
+            yourName: "Your Name",
+            motherName: "Mother's Name",
+            combined: "Combined",
+            plusSign: "+",
+            equalsSign: "=",
+          },
+          
+          // Harmony Badges & Descriptions
+          pattern: {
+            support: {
+              badge: "SUPPORT",
+              title: "Supportive Harmony",
+            },
+            neutral: {
+              badge: "NEUTRAL",
+              title: "Neutral Balance",
+            },
+            tension: {
+              badge: "TENSION",
+              title: "Dynamic Tension",
+            },
+          },
+          
+          // Element Interaction Descriptions
+          interactions: {
+            firefire: "Double fire creates powerful transformation energy",
+            fireair: "Fire and air amplify each other - inspiration flows",
+            firewater: "Fire and water create dynamic tension - balance needed",
+            fireearth: "Fire warms earth - grounded passion",
+            waterwater: "Double water deepens intuition and emotional wisdom",
+            waterair: "Water and air create mist - gentle flow",
+            waterearth: "Water nourishes earth - fertile growth",
+            airair: "Double air enhances communication and clarity",
+            airearth: "Air over earth - ideas meet reality",
+            earthearth: "Double earth provides strong foundation and stability",
+            balanced: "Balanced elemental interaction",
+          },
+          
+          // Key Takeaways Templates
+          takeaways: {
+            lineageNumber: "Your lineage number is {{kabir}}, rooted in {{element}} energy",
+            elementalRelationship: "Elemental relationship: {{interaction}}",
+            spiritualRoot: "Combined spiritual root (Ṣaghīr): {{saghir}}",
+          },
+          
+          // Practice Plan
+          practice: {
+            doTitle: "Do",
+            avoidTitle: "Avoid",
+            bestTimeTitle: "Best Time",
+            
+            // Do List Items
+            do: {
+              dhikr: "Practice dhikr {{saghir}} or 99 times",
+              reflection: "Reflect on family patterns during {{bestTime}}",
+              gratitude: "Honor maternal lineage through duʿā and gratitude",
+            },
+            
+            // Avoid List Items
+            avoid: {
+              neglect: "Neglecting family spiritual connection",
+              ignoreWisdom: "Ignoring ancestral wisdom",
+            },
+          },
+          
+          // Best Time Descriptions
+          bestTime: {
+            fire: "Dawn and sunrise (Fajr time) - when fire energy is strongest",
+            water: "Night and before sleep (Isha time) - when water energy flows",
+            air: "Morning and afternoon (Dhuhr to Asr) - when air circulates",
+            earth: "Maghrib and grounding moments - when earth stabilizes",
+          },
+        },
       },
       
       // Abjad System Labels (deprecated, kept for backwards compatibility)
@@ -4955,6 +5039,90 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         // Numerical Essence Guidance Template
         essenceGuidance: {
           template: "Votre chemin combine l'essence de {{archetype}} avec le pouvoir de {{element}}.\n\nEmbrassez votre {{quality}} naturel tout en l'équilibrant avec la nature {{elementQuality}} de votre élément. Recherchez l'harmonie entre contemplation intérieure et expression extérieure.",
+        },
+        
+        // Lineage Result Section
+        lineage: {
+          // Section Title
+          lineageBreakdown: "Répartition de Lignée",
+          familyPattern: "Modèle Familial",
+          keyTakeaways: "Points Clés",
+          practicePlan: "Plan de Pratique",
+          
+          // Breakdown Labels
+          labels: {
+            yourName: "Votre Nom",
+            motherName: "Nom de la Mère",
+            combined: "Combiné",
+            plusSign: "+",
+            equalsSign: "=",
+          },
+          
+          // Harmony Badges & Descriptions
+          pattern: {
+            support: {
+              badge: "SOUTIEN",
+              title: "Harmonie de Soutien",
+            },
+            neutral: {
+              badge: "NEUTRE",
+              title: "Équilibre Neutre",
+            },
+            tension: {
+              badge: "TENSION",
+              title: "Tension Dynamique",
+            },
+          },
+          
+          // Element Interaction Descriptions
+          interactions: {
+            firefire: "Le double feu crée une puissante énergie de transformation",
+            fireair: "Le feu et l'air s'amplifient mutuellement - l'inspiration coule",
+            firewater: "Le feu et l'eau créent une tension dynamique - équilibre nécessaire",
+            fireearth: "Le feu réchauffe la terre - passion ancrée",
+            waterwater: "L'eau double approfondit l'intuition et la sagesse émotionnelle",
+            waterair: "L'eau et l'air créent de la brume - flux doux",
+            waterearth: "L'eau nourrit la terre - croissance fertile",
+            airair: "Le double air améliore la communication et la clarté",
+            airearth: "L'air sur la terre - les idées rencontrent la réalité",
+            earthearth: "La terre double fournit une base solide et de la stabilité",
+            balanced: "Interaction élémentaire équilibrée",
+          },
+          
+          // Key Takeaways Templates
+          takeaways: {
+            lineageNumber: "Votre nombre de lignée est {{kabir}}, enraciné dans l'énergie {{element}}",
+            elementalRelationship: "Relation élémentaire : {{interaction}}",
+            spiritualRoot: "Racine spirituelle combinée (Ṣaghīr) : {{saghir}}",
+          },
+          
+          // Practice Plan
+          practice: {
+            doTitle: "À Faire",
+            avoidTitle: "À Éviter",
+            bestTimeTitle: "Meilleur Moment",
+            
+            // Do List Items
+            do: {
+              dhikr: "Pratiquez le dhikr {{saghir}} ou 99 fois",
+              reflection: "Réfléchissez aux modèles familiaux pendant {{bestTime}}",
+              gratitude: "Honorez la lignée maternelle par le duʿā et la gratitude",
+            },
+            
+            // Avoid List Items
+            avoid: {
+              neglect: "Négliger la connexion spirituelle familiale",
+              ignoreWisdom: "Ignorer la sagesse ancestrale",
+            },
+          },
+          
+          // Best Time Descriptions
+          bestTime: {
+            fire: "L'aube et le lever du soleil (heure de Fajr) - quand l'énergie du feu est la plus forte",
+            water: "La nuit et avant de dormir (heure d'Isha) - quand l'énergie de l'eau coule",
+            air: "Le matin et l'après-midi (Dhuhr à Asr) - quand l'air circule",
+            earth: "Maghrib et moments d'ancrage - quand la terre stabilise",
+          },
         },
       },
       

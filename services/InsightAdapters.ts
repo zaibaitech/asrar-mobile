@@ -43,11 +43,11 @@ const ELEMENT_GUIDANCE_KEYS: Record<ElementType, string> = {
   earth: 'calculator.results.elementGuidance.earth',
 };
 
-const ELEMENT_BEST_TIME: Record<ElementType, string> = {
-  fire: 'Dawn and sunrise (Fajr time) - when fire energy is strongest',
-  water: 'Night and before sleep (Isha time) - when water energy flows',
-  air: 'Morning and afternoon (Dhuhr to Asr) - when air circulates',
-  earth: 'Maghrib and grounding moments - when earth stabilizes',
+const ELEMENT_BEST_TIME_KEYS: Record<ElementType, string> = {
+  fire: 'calculator.results.lineage.bestTime.fire',
+  water: 'calculator.results.lineage.bestTime.water',
+  air: 'calculator.results.lineage.bestTime.air',
+  earth: 'calculator.results.lineage.bestTime.earth',
 };
 
 const ELEMENT_POWER_DAY: Record<ElementType, string> = {
@@ -102,26 +102,26 @@ export function computeNameInsights(
 function analyzeElementInteraction(
   element1: ElementType,
   element2: ElementType
-): { harmony: 'support' | 'neutral' | 'tension'; description: string } {
-  const INTERACTIONS: Record<string, { harmony: 'support' | 'neutral' | 'tension'; description: string }> = {
-    'fire-fire': { harmony: 'support', description: 'Double fire creates powerful transformation energy' },
-    'fire-air': { harmony: 'support', description: 'Fire and air amplify each other - inspiration flows' },
-    'fire-water': { harmony: 'tension', description: 'Fire and water create dynamic tension - balance needed' },
-    'fire-earth': { harmony: 'neutral', description: 'Fire warms earth - grounded passion' },
-    'water-water': { harmony: 'support', description: 'Double water deepens intuition and emotional wisdom' },
-    'water-air': { harmony: 'neutral', description: 'Water and air create mist - gentle flow' },
-    'water-earth': { harmony: 'support', description: 'Water nourishes earth - fertile growth' },
-    'air-air': { harmony: 'support', description: 'Double air enhances communication and clarity' },
-    'air-earth': { harmony: 'neutral', description: 'Air over earth - ideas meet reality' },
-    'earth-earth': { harmony: 'support', description: 'Double earth provides strong foundation and stability' },
+): { harmony: 'support' | 'neutral' | 'tension'; descriptionKey: string } {
+  const INTERACTION_KEYS: Record<string, { harmony: 'support' | 'neutral' | 'tension'; descriptionKey: string }> = {
+    'fire-fire': { harmony: 'support', descriptionKey: 'calculator.results.lineage.interactions.firefire' },
+    'fire-air': { harmony: 'support', descriptionKey: 'calculator.results.lineage.interactions.fireair' },
+    'fire-water': { harmony: 'tension', descriptionKey: 'calculator.results.lineage.interactions.firewater' },
+    'fire-earth': { harmony: 'neutral', descriptionKey: 'calculator.results.lineage.interactions.fireearth' },
+    'water-water': { harmony: 'support', descriptionKey: 'calculator.results.lineage.interactions.waterwater' },
+    'water-air': { harmony: 'neutral', descriptionKey: 'calculator.results.lineage.interactions.waterair' },
+    'water-earth': { harmony: 'support', descriptionKey: 'calculator.results.lineage.interactions.waterearth' },
+    'air-air': { harmony: 'support', descriptionKey: 'calculator.results.lineage.interactions.airair' },
+    'air-earth': { harmony: 'neutral', descriptionKey: 'calculator.results.lineage.interactions.airearth' },
+    'earth-earth': { harmony: 'support', descriptionKey: 'calculator.results.lineage.interactions.earthearth' },
   };
   
   const key1 = `${element1}-${element2}`;
   const key2 = `${element2}-${element1}`;
   
-  return INTERACTIONS[key1] || INTERACTIONS[key2] || {
+  return INTERACTION_KEYS[key1] || INTERACTION_KEYS[key2] || {
     harmony: 'neutral',
-    description: 'Balanced elemental interaction',
+    descriptionKey: 'calculator.results.lineage.interactions.balanced',
   };
 }
 
@@ -134,23 +134,25 @@ export function computeLineageInsights(
 ): LineageInsights {
   const interaction = analyzeElementInteraction(yourElement, motherElement);
   
-  const keyTakeaways = [
-    `Your lineage number is ${combinedCore.kabir}, rooted in ${combinedCore.element} energy`,
-    `Elemental relationship: ${interaction.description}`,
-    `Combined spiritual root (Ṣaghīr): ${combinedCore.saghir}`,
+  // Return translation keys instead of English strings
+  // Components will use t(key, {variables}) to translate with variable interpolation
+  const keyTakeawaysKeys = [
+    'calculator.results.lineage.takeaways.lineageNumber', // Variables: {{kabir}}, {{element}}
+    'calculator.results.lineage.takeaways.elementalRelationship', // Variable: {{interaction}}
+    'calculator.results.lineage.takeaways.spiritualRoot', // Variable: {{saghir}}
   ];
   
   const practicePlan = {
     doList: [
-      `Practice dhikr ${combinedCore.saghir} or 99 times`,
-      `Reflect on family patterns during ${ELEMENT_BEST_TIME[combinedCore.element]}`,
-      'Honor maternal lineage through duʿā and gratitude',
+      'calculator.results.lineage.practice.do.dhikr', // Variable: {{saghir}}
+      'calculator.results.lineage.practice.do.reflection', // Variable: {{bestTime}}
+      'calculator.results.lineage.practice.do.gratitude',
     ],
     avoidList: [
-      'Neglecting family spiritual connection',
-      'Ignoring ancestral wisdom',
+      'calculator.results.lineage.practice.avoid.neglect',
+      'calculator.results.lineage.practice.avoid.ignoreWisdom',
     ],
-    bestTime: ELEMENT_BEST_TIME[combinedCore.element],
+    bestTimeKey: ELEMENT_BEST_TIME_KEYS[combinedCore.element],
   };
   
   return {
@@ -159,10 +161,13 @@ export function computeLineageInsights(
     combinedTotal: combinedCore.kabir,
     familyPattern: {
       harmony: interaction.harmony,
-      elementInteraction: interaction.description,
+      elementInteractionKey: interaction.descriptionKey,
     },
-    keyTakeaways,
+    keyTakeawaysKeys,
     practicePlan,
+    // Store element and saghir for variable interpolation in component
+    combinedElement: combinedCore.element,
+    combinedSaghir: combinedCore.saghir,
   };
 }
 

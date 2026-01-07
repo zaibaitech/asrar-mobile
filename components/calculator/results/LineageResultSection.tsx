@@ -5,12 +5,15 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LineageInsights } from '../../../types/calculator-enhanced';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface LineageResultSectionProps {
   insights: LineageInsights;
 }
 
 export const LineageResultSection: React.FC<LineageResultSectionProps> = ({ insights }) => {
+  const { t } = useLanguage();
+  
   const getHarmonyColor = (harmony: string) => {
     switch (harmony) {
       case 'support': return '#10b981';
@@ -23,20 +26,20 @@ export const LineageResultSection: React.FC<LineageResultSectionProps> = ({ insi
     <View style={styles.container}>
       {/* Lineage Breakdown */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>📊 Lineage Breakdown</Text>
+        <Text style={styles.cardTitle}>📊 {t('calculator.results.lineage.lineageBreakdown')}</Text>
         <View style={styles.breakdownRow}>
           <View style={styles.breakdownItem}>
-            <Text style={styles.breakdownLabel}>Your Name</Text>
+            <Text style={styles.breakdownLabel}>{t('calculator.results.lineage.labels.yourName')}</Text>
             <Text style={styles.breakdownValue}>{insights.yourNameValue}</Text>
           </View>
-          <Text style={styles.plusSign}>+</Text>
+          <Text style={styles.plusSign}>{t('calculator.results.lineage.labels.plusSign')}</Text>
           <View style={styles.breakdownItem}>
-            <Text style={styles.breakdownLabel}>Mother's Name</Text>
+            <Text style={styles.breakdownLabel}>{t('calculator.results.lineage.labels.motherName')}</Text>
             <Text style={styles.breakdownValue}>{insights.motherNameValue}</Text>
           </View>
-          <Text style={styles.equalsSign}>=</Text>
+          <Text style={styles.equalsSign}>{t('calculator.results.lineage.labels.equalsSign')}</Text>
           <View style={styles.breakdownItem}>
-            <Text style={styles.breakdownLabel}>Combined</Text>
+            <Text style={styles.breakdownLabel}>{t('calculator.results.lineage.labels.combined')}</Text>
             <Text style={[styles.breakdownValue, styles.combinedValue]}>{insights.combinedTotal}</Text>
           </View>
         </View>
@@ -44,45 +47,76 @@ export const LineageResultSection: React.FC<LineageResultSectionProps> = ({ insi
       
       {/* Family Pattern */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🌳 Family Pattern</Text>
+        <Text style={styles.cardTitle}>🌳 {t('calculator.results.lineage.familyPattern')}</Text>
         <View style={[styles.harmonyBadge, { backgroundColor: getHarmonyColor(insights.familyPattern.harmony) }]}>
-          <Text style={styles.harmonyText}>{insights.familyPattern.harmony.toUpperCase()}</Text>
+          <Text style={styles.harmonyText}>
+            {t(`calculator.results.lineage.pattern.${insights.familyPattern.harmony}.badge`)}
+          </Text>
         </View>
-        <Text style={styles.cardText}>{insights.familyPattern.elementInteraction}</Text>
+        <Text style={styles.cardText}>{t(insights.familyPattern.elementInteractionKey)}</Text>
       </View>
       
       {/* Key Takeaways */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>💡 Key Takeaways</Text>
-        {insights.keyTakeaways.map((takeaway, idx) => (
-          <View key={idx} style={styles.takeawayRow}>
-            <Text style={styles.bullet}>•</Text>
-            <Text style={styles.takeawayText}>{takeaway}</Text>
-          </View>
-        ))}
+        <Text style={styles.cardTitle}>💡 {t('calculator.results.lineage.keyTakeaways')}</Text>
+        {insights.keyTakeawaysKeys.map((takeawayKey, idx) => {
+          // Prepare variables for interpolation
+          let variables = {};
+          if (takeawayKey.includes('lineageNumber')) {
+            variables = { 
+              kabir: insights.combinedTotal.toString(), 
+              element: t(`calculator.results.elements.${insights.combinedElement}`) 
+            };
+          } else if (takeawayKey.includes('elementalRelationship')) {
+            variables = { 
+              interaction: t(insights.familyPattern.elementInteractionKey) 
+            };
+          } else if (takeawayKey.includes('spiritualRoot')) {
+            variables = { 
+              saghir: insights.combinedSaghir.toString() 
+            };
+          }
+          
+          return (
+            <View key={idx} style={styles.takeawayRow}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.takeawayText}>{t(takeawayKey, variables)}</Text>
+            </View>
+          );
+        })}
       </View>
       
       {/* Practice Plan */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🎯 Practice Plan</Text>
+        <Text style={styles.cardTitle}>🎯 {t('calculator.results.lineage.practicePlan')}</Text>
         
         <View style={styles.practiceSection}>
-          <Text style={styles.practiceSubtitle}>✅ Do</Text>
-          {insights.practicePlan.doList.map((item, idx) => (
-            <Text key={idx} style={styles.practiceItem}>• {item}</Text>
+          <Text style={styles.practiceSubtitle}>✅ {t('calculator.results.lineage.practice.doTitle')}</Text>
+          {insights.practicePlan.doList.map((itemKey, idx) => {
+            // Prepare variables for interpolation
+            let variables = {};
+            if (itemKey.includes('dhikr')) {
+              variables = { saghir: insights.combinedSaghir.toString() };
+            } else if (itemKey.includes('reflection')) {
+              variables = { bestTime: t(insights.practicePlan.bestTimeKey) };
+            }
+            
+            return (
+              <Text key={idx} style={styles.practiceItem}>• {t(itemKey, variables)}</Text>
+            );
+          })}
+        </View>
+        
+        <View style={styles.practiceSection}>
+          <Text style={styles.practiceSubtitle}>❌ {t('calculator.results.lineage.practice.avoidTitle')}</Text>
+          {insights.practicePlan.avoidList.map((itemKey, idx) => (
+            <Text key={idx} style={styles.practiceItem}>• {t(itemKey)}</Text>
           ))}
         </View>
         
         <View style={styles.practiceSection}>
-          <Text style={styles.practiceSubtitle}>❌ Avoid</Text>
-          {insights.practicePlan.avoidList.map((item, idx) => (
-            <Text key={idx} style={styles.practiceItem}>• {item}</Text>
-          ))}
-        </View>
-        
-        <View style={styles.practiceSection}>
-          <Text style={styles.practiceSubtitle}>⏰ Best Time</Text>
-          <Text style={styles.practiceItem}>{insights.practicePlan.bestTime}</Text>
+          <Text style={styles.practiceSubtitle}>⏰ {t('calculator.results.lineage.practice.bestTimeTitle')}</Text>
+          <Text style={styles.practiceItem}>{t(insights.practicePlan.bestTimeKey)}</Text>
         </View>
       </View>
     </View>

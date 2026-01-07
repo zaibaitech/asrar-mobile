@@ -116,14 +116,17 @@ export interface LineageInsights {
   combinedTotal: number;
   familyPattern: {
     harmony: 'support' | 'neutral' | 'tension';
-    elementInteraction: string;
+    elementInteractionKey: string; // Translation key instead of English text
   };
-  keyTakeaways: string[];
+  keyTakeawaysKeys: string[]; // Translation keys instead of English texts
   practicePlan: {
-    doList: string[];
-    avoidList: string[];
-    bestTime: string;
+    doList: string[]; // Translation keys instead of English texts
+    avoidList: string[]; // Translation keys instead of English texts
+    bestTimeKey: string; // Translation key instead of English text
   };
+  // Store element and saghir for variable interpolation
+  combinedElement: ElementType;
+  combinedSaghir: number;
 }
 
 export interface PhraseInsights {
