@@ -66,7 +66,7 @@ export const NameResultSection: React.FC<NameResultSectionProps> = ({ insights }
         <View style={styles.timingRow}>
           <View style={styles.timingItem}>
             <Text style={styles.timingLabel}>{t('calculator.results.nameInsights.bestTimeWindow')}</Text>
-            <Text style={styles.timingValue}>{insights.bestTimeWindow}</Text>
+            <Text style={styles.timingValue}>{t(insights.bestTimeWindow)}</Text>
           </View>
           <View style={styles.timingItem}>
             <Text style={styles.timingLabel}>{t('calculator.results.nameInsights.powerDays')}</Text>

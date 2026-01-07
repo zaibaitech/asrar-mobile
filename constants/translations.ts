@@ -959,6 +959,13 @@ export const translations = {
           bestTimeWindow: "Best Time Window",
           powerDays: "Power Days",
           timingNote: "Power Day = Burj planetary ruler. Best Time Window = Elemental resonance peak.",
+          // Best Time Descriptions by Element
+          bestTime: {
+            fire: "Dawn and sunrise (Fajr time) - when fire energy is strongest",
+            water: "Night and before sleep (Isha time) - when water energy flows",
+            air: "Morning and afternoon (Dhuhr to Asr) - when air circulates",
+            earth: "Maghrib and grounding moments - when earth stabilizes",
+          },
         },
         
         // Advanced Methods Section
@@ -5145,6 +5152,13 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           bestTimeWindow: "Meilleure Fenêtre Temporelle",
           powerDays: "Jours de Puissance",
           timingNote: "Jour de Puissance = dirigeant planétaire du Burj. Meilleure Fenêtre = pic de résonance élémentaire.",
+          // Best Time Descriptions by Element
+          bestTime: {
+            fire: "Aube et lever du soleil (temps de Fajr) - quand l'énergie du feu est la plus forte",
+            water: "Nuit et avant de dormir (temps d'Isha) - quand l'énergie de l'eau coule",
+            air: "Matin et après-midi (Dhuhr à Asr) - quand l'air circule",
+            earth: "Maghrib et moments d'ancrage - quand la terre se stabilise",
+          },
         },
         
         // Advanced Methods Section

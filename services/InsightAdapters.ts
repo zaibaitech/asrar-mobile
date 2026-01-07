@@ -44,10 +44,10 @@ const ELEMENT_GUIDANCE_KEYS: Record<ElementType, string> = {
 };
 
 const ELEMENT_BEST_TIME_KEYS: Record<ElementType, string> = {
-  fire: 'calculator.results.lineage.bestTime.fire',
-  water: 'calculator.results.lineage.bestTime.water',
-  air: 'calculator.results.lineage.bestTime.air',
-  earth: 'calculator.results.lineage.bestTime.earth',
+  fire: 'calculator.results.nameInsights.bestTime.fire',
+  water: 'calculator.results.nameInsights.bestTime.water',
+  air: 'calculator.results.nameInsights.bestTime.air',
+  earth: 'calculator.results.nameInsights.bestTime.earth',
 };
 
 const ELEMENT_POWER_DAY: Record<ElementType, string> = {
@@ -67,7 +67,7 @@ export function computeNameInsights(
   // Components will translate this using t(spiritualGuidance)
   const guidanceKey = ELEMENT_GUIDANCE_KEYS[core.element];
   
-  const bestTime = ELEMENT_BEST_TIME[core.element];
+  const bestTime = ELEMENT_BEST_TIME_KEYS[core.element];
   const powerDay = ELEMENT_POWER_DAY[core.element];
   
   // Enhanced: Find divine names with matching or near values
