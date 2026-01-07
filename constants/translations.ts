@@ -30,6 +30,17 @@ export const translations = {
       guidedIstikhara: {
         title: "Guided Istikhārah",
         description: "Learn the authentic prayer method and track your spiritual decisions",
+        // Common navigation
+        common: {
+          back: "Back",
+        },
+        // Step labels
+        steps: {
+          intro: "Intro",
+          prepare: "Prepare",
+          prayer: "Prayer",
+          dua: "Dua",
+        },
         // Home/Landing Screen
         home: {
           title: "Ṣalāt al-Istikhārah",
@@ -76,6 +87,39 @@ export const translations = {
             text: "Istikhara is NOT fortune-telling. It is seeking Allah's guidance to make the decision easier and to place your trust in His wisdom, not to see dreams or receive mystical signs.",
           },
           cta: "Begin Preparation",
+        },
+        // Prepare Screen
+        prepare: {
+          title: "Before You Begin",
+          step1: {
+            title: "Make Wudu",
+            body: "Perform complete wudu (ablution) as you would for any obligatory prayer. You must be in a state of ritual purity.",
+            bullets: [
+              "Wash hands, rinse mouth, rinse nose",
+              "Wash face, arms to elbows",
+              "Wipe head, wash feet to ankles",
+            ],
+          },
+          step2: {
+            title: "Find a Clean, Quiet Place",
+            body: "Choose a clean area where you can pray without interruption. Face the Qibla (direction of the Kaaba in Makkah).",
+          },
+          step3: {
+            title: "Have a Clear Decision in Mind",
+            body: "Before praying, clearly define the matter you're seeking guidance about. Istikhara is for when you have two permissible options and need help choosing.",
+            note: "Istikhara is for halal matters only. Don't pray istikhara about something clearly forbidden.",
+          },
+          step4: {
+            title: "Choose the Right Time",
+            body: "Istikhara can be prayed at any time EXCEPT:",
+            avoid: [
+              "After Fajr until 15 minutes after sunrise",
+              "When sun is at its zenith (around Dhuhr time)",
+              "After Asr until sunset",
+            ],
+            best: "Best times: Last third of night, after any obligatory prayer, or between Maghrib and Isha.",
+          },
+          cta: "Continue to Prayer",
         },
       },
       compatibility: {
@@ -4277,6 +4321,17 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       guidedIstikhara: {
         title: "Istikharah Guidée",
         description: "Apprenez la méthode authentique de prière et suivez vos décisions spirituelles",
+        // Common navigation
+        common: {
+          back: "Retour",
+        },
+        // Step labels
+        steps: {
+          intro: "Intro",
+          prepare: "Préparation",
+          prayer: "Prière",
+          dua: "Doua",
+        },
         // Home/Landing Screen
         home: {
           title: "Ṣalāt al-Istikhārah",
@@ -4323,6 +4378,39 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             text: "L'istikhara n'est PAS de la divination. C'est une demande de guidance d'Allah pour faciliter la décision et placer sa confiance dans Sa sagesse, et non pour voir des rêves ou recevoir des signes mystiques.",
           },
           cta: "Commencer la préparation",
+        },
+        // Prepare Screen
+        prepare: {
+          title: "Avant de commencer",
+          step1: {
+            title: "Faire les ablutions",
+            body: "Faites des ablutions complètes (wuḍūʾ) comme pour toute prière obligatoire. Vous devez être en état de pureté rituelle.",
+            bullets: [
+              "Laver les mains, rincer la bouche, rincer le nez",
+              "Laver le visage, les bras jusqu'aux coudes",
+              "Passer les mains mouillées sur la tête, laver les pieds jusqu'aux chevilles",
+            ],
+          },
+          step2: {
+            title: "Trouver un endroit propre et calme",
+            body: "Choisissez un endroit propre où vous pouvez prier sans interruption. Orientez-vous vers la Qibla (direction de la Kaaba à La Mecque).",
+          },
+          step3: {
+            title: "Avoir une décision claire en tête",
+            body: "Avant de prier, définissez clairement la question pour laquelle vous demandez la guidance. L'istikhara est utile lorsque vous avez deux options permises et que vous avez besoin d'aide pour choisir.",
+            note: "L'istikhara concerne uniquement les choses licites. Ne faites pas l'istikhara pour une chose clairement interdite.",
+          },
+          step4: {
+            title: "Choisir le bon moment",
+            body: "L'istikhara peut être accomplie à tout moment SAUF :",
+            avoid: [
+              "Après Fajr jusqu'à 15 minutes après le lever du soleil",
+              "Lorsque le soleil est au zénith (autour de l'heure de Ẓuhr)",
+              "Après ʿAṣr jusqu'au coucher du soleil",
+            ],
+            best: "Meilleurs moments : dernier tiers de la nuit, après une prière obligatoire, ou entre Maghrib et ʿIshāʾ.",
+          },
+          cta: "Continuer vers la prière",
         },
       },
       compatibility: {

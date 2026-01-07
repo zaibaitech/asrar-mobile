@@ -82,76 +82,76 @@ export default function IstkharaPrayerGuideScreen() {
 
   const renderPrerequisites = () => (
     <View style={styles.sectionContainer}>
-      <Text style={styles.sectionTitle}>Before You Begin</Text>
+      <Text style={styles.sectionTitle}>{t('modules.guidedIstikhara.prepare.title')}</Text>
       
       <StepCard
         number={1}
-        title="Make Wudu"
+        title={t('modules.guidedIstikhara.prepare.step1.title')}
         titleAr="الوضوء"
         icon="💧"
         expanded={expandedSteps.wudu}
         onToggle={() => toggleStep('wudu')}
       >
         <Text style={styles.stepText}>
-          Perform complete wudu (ablution) as you would for any obligatory prayer. You must be in a state of ritual purity.
+          {t('modules.guidedIstikhara.prepare.step1.body')}
         </Text>
         <Text style={styles.stepSubText}>
-          • Wash hands, rinse mouth, rinse nose{'\n'}
-          • Wash face, arms to elbows{'\n'}
-          • Wipe head, wash feet to ankles
+          {t('modules.guidedIstikhara.prepare.step1.bullets.0')}{('\n')}
+          {t('modules.guidedIstikhara.prepare.step1.bullets.1')}{('\n')}
+          {t('modules.guidedIstikhara.prepare.step1.bullets.2')}
         </Text>
       </StepCard>
 
       <StepCard
         number={2}
-        title="Find a Clean, Quiet Place"
+        title={t('modules.guidedIstikhara.prepare.step2.title')}
         titleAr="مكان نظيف"
         icon="🕌"
         expanded={expandedSteps.place}
         onToggle={() => toggleStep('place')}
       >
         <Text style={styles.stepText}>
-          Choose a clean area where you can pray without interruption. Face the Qibla (direction of the Kaaba in Makkah).
+          {t('modules.guidedIstikhara.prepare.step2.body')}
         </Text>
       </StepCard>
 
       <StepCard
         number={3}
-        title="Have a Clear Decision in Mind"
+        title={t('modules.guidedIstikhara.prepare.step3.title')}
         titleAr="قرار واضح"
         icon="💭"
         expanded={expandedSteps.decision}
         onToggle={() => toggleStep('decision')}
       >
         <Text style={styles.stepText}>
-          Before praying, clearly define the matter you're seeking guidance about. Istikhara is for when you have two permissible options and need help choosing.
+          {t('modules.guidedIstikhara.prepare.step3.body')}
         </Text>
         <View style={styles.noteBox}>
           <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
           <Text style={styles.noteText}>
-            Istikhara is for halal matters only. Don't pray istikhara about something clearly forbidden.
+            {t('modules.guidedIstikhara.prepare.step3.note')}
           </Text>
         </View>
       </StepCard>
 
       <StepCard
         number={4}
-        title="Choose the Right Time"
+        title={t('modules.guidedIstikhara.prepare.step4.title')}
         titleAr="الوقت المناسب"
         icon="🕐"
         expanded={expandedSteps.timing}
         onToggle={() => toggleStep('timing')}
       >
         <Text style={styles.stepText}>
-          Istikhara can be prayed at any time EXCEPT:
+          {t('modules.guidedIstikhara.prepare.step4.body')}
         </Text>
         <Text style={styles.stepSubText}>
-          ❌ After Fajr until 15 minutes after sunrise{'\n'}
-          ❌ When sun is at its zenith (around Dhuhr time){'\n'}
-          ❌ After Asr until sunset
+          ❌ {t('modules.guidedIstikhara.prepare.step4.avoid.0')}{('\n')}
+          ❌ {t('modules.guidedIstikhara.prepare.step4.avoid.1')}{('\n')}
+          ❌ {t('modules.guidedIstikhara.prepare.step4.avoid.2')}
         </Text>
         <Text style={styles.stepText}>
-          ✅ Best times: Last third of night, after any obligatory prayer, or between Maghrib and Isha.
+          ✅ {t('modules.guidedIstikhara.prepare.step4.best')}
         </Text>
       </StepCard>
 
@@ -159,7 +159,7 @@ export default function IstkharaPrayerGuideScreen() {
         style={styles.nextButton}
         onPress={() => setActiveSection('prayer')}
       >
-        <Text style={styles.nextButtonText}>Continue to Prayer</Text>
+        <Text style={styles.nextButtonText}>{t('modules.guidedIstikhara.prepare.cta')}</Text>
         <Ionicons name="arrow-forward" size={20} color="#fff" />
       </TouchableOpacity>
     </View>
@@ -453,7 +453,7 @@ export default function IstkharaPrayerGuideScreen() {
         <View style={styles.backButtonContainer}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color="#fff" />
-            <Text style={styles.backButtonText}>{t('modules.guidedIstikhara.intro.back')}</Text>
+            <Text style={styles.backButtonText}>{t('modules.guidedIstikhara.common.back')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -465,25 +465,25 @@ export default function IstkharaPrayerGuideScreen() {
         contentContainerStyle={styles.tabsContent}
       >
         <TabButton
-          label={t('modules.guidedIstikhara.intro.steps.intro')}
+          label={t('modules.guidedIstikhara.steps.intro')}
           icon="information-circle"
           active={activeSection === 'introduction'}
           onPress={() => setActiveSection('introduction')}
         />
         <TabButton
-          label={t('modules.guidedIstikhara.intro.steps.prepare')}
+          label={t('modules.guidedIstikhara.steps.prepare')}
           icon="checkmark-circle"
           active={activeSection === 'prerequisites'}
           onPress={() => setActiveSection('prerequisites')}
         />
         <TabButton
-          label={t('modules.guidedIstikhara.intro.steps.prayer')}
+          label={t('modules.guidedIstikhara.steps.prayer')}
           icon="moon"
           active={activeSection === 'prayer'}
           onPress={() => setActiveSection('prayer')}
         />
         <TabButton
-          label={t('modules.guidedIstikhara.intro.steps.dua')}
+          label={t('modules.guidedIstikhara.steps.dua')}
           icon="book"
           active={activeSection === 'dua'}
           onPress={() => setActiveSection('dua')}
