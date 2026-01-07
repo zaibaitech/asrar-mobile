@@ -121,6 +121,50 @@ export const translations = {
           },
           cta: "Continue to Prayer",
         },
+        // Prayer Screen
+        prayer: {
+          title: "The Two Rakats Prayer",
+          prayerType: {
+            title: "Prayer Type",
+            body: "This is a voluntary (Nafl) prayer of 2 rakats, performed like any other voluntary prayer.",
+          },
+          step1: {
+            title: "Make Intention (Niyyah)",
+            body: "In your heart, intend: \"I am praying two rakats of Salat al-Istikhara seeking Allah's guidance.\"",
+            note: "Note: The intention is in the heart, not spoken aloud.",
+          },
+          step2: {
+            title: "First Rakat",
+            items: [
+              "Say Takbir (Allahu Akbar) and raise hands",
+              "Recite Surah Al-Fatihah",
+              "Recite a Surah (recommended: Surah Al-Kafirun)",
+              "Perform Ruku (bowing)",
+              "Stand up, then go to Sujud (prostration)",
+              "Sit briefly between the two prostrations",
+              "Perform second Sujud",
+              "Stand up for the second rakat",
+            ],
+          },
+          step3: {
+            title: "Second Rakat",
+            items: [
+              "Recite Surah Al-Fatihah",
+              "Recite a Surah (recommended: Surah Al-Ikhlas)",
+              "Perform Ruku",
+              "Perform the two Sujud",
+              "Sit for Tashahhud",
+              "Send blessings on the Prophet (Salawat)",
+              "Make Salam to conclude",
+            ],
+          },
+          tip: {
+            title: "Tip: Recommended Surahs",
+            firstRakat: "First Rakat: After Al-Fatihah, recite \"Qul ya ayyuhal-kafirun\" (Surah 109)",
+            secondRakat: "Second Rakat: After Al-Fatihah, recite \"Qul Huwa Allahu Ahad\" (Surah 112)",
+          },
+          cta: "Continue to Dua",
+        },
       },
       compatibility: {
         title: "Compatibility",
@@ -4411,6 +4455,50 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             best: "Meilleurs moments : dernier tiers de la nuit, après une prière obligatoire, ou entre Maghrib et ʿIshāʾ.",
           },
           cta: "Continuer vers la prière",
+        },
+        // Prayer Screen
+        prayer: {
+          title: "La prière de deux rak'ats",
+          prayerType: {
+            title: "Type de prière",
+            body: "Il s'agit d'une prière surérogatoire (nafl) de deux rak'ats, accomplie comme toute autre prière surérogatoire.",
+          },
+          step1: {
+            title: "Formuler l'intention (niyyah)",
+            body: "Dans votre cœur, ayez l'intention : « Je prie deux rak'ats de ṣalāt al-istikhāra pour demander la guidance d'Allah. »",
+            note: "Note : L'intention se fait dans le cœur, elle ne se prononce pas à voix haute.",
+          },
+          step2: {
+            title: "Première rak'a",
+            items: [
+              "Dire le takbīr (« Allāhu Akbar ») et lever les mains",
+              "Réciter la sourate Al-Fātiḥa",
+              "Réciter une sourate (recommandé : Al-Kāfirūn)",
+              "Faire le rukūʿ (inclinaison)",
+              "Se relever, puis faire le sujūd (prosternation)",
+              "S'asseoir brièvement entre les deux prosternations",
+              "Faire le deuxième sujūd",
+              "Se relever pour la deuxième rak'a",
+            ],
+          },
+          step3: {
+            title: "Deuxième rak'a",
+            items: [
+              "Réciter la sourate Al-Fātiḥa",
+              "Réciter une sourate (recommandé : Al-Ikhlāṣ)",
+              "Faire le rukūʿ",
+              "Faire les deux sujūd",
+              "S'asseoir pour le tashahhud",
+              "Envoyer les salutations sur le Prophète (ṣalawāt)",
+              "Faire le salām pour conclure",
+            ],
+          },
+          tip: {
+            title: "Astuce : Sourates recommandées",
+            firstRakat: "Première rak'a : Après Al-Fātiḥa, réciter « Qul yā ayyuhal-kāfirūn » (sourate 109)",
+            secondRakat: "Deuxième rak'a : Après Al-Fātiḥa, réciter « Qul huwa Allāhu aḥad » (sourate 112)",
+          },
+          cta: "Continuer vers la dou'a",
         },
       },
       compatibility: {

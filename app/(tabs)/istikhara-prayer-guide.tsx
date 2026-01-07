@@ -167,78 +167,78 @@ export default function IstkharaPrayerGuideScreen() {
 
   const renderPrayer = () => (
     <View style={styles.sectionContainer}>
-      <Text style={styles.sectionTitle}>The Two Rakats Prayer</Text>
+      <Text style={styles.sectionTitle}>{t('modules.guidedIstikhara.prayer.title')}</Text>
       
       <View style={styles.importantBox}>
         <Ionicons name="star" size={24} color="#FFD700" />
         <View style={{ flex: 1 }}>
-          <Text style={styles.importantTitle}>Prayer Type</Text>
+          <Text style={styles.importantTitle}>{t('modules.guidedIstikhara.prayer.prayerType.title')}</Text>
           <Text style={styles.importantText}>
-            This is a voluntary (Nafl) prayer of 2 rakats, performed like any other voluntary prayer.
+            {t('modules.guidedIstikhara.prayer.prayerType.body')}
           </Text>
         </View>
       </View>
 
       <StepCard
         number={1}
-        title="Make Intention (Niyyah)"
+        title={t('modules.guidedIstikhara.prayer.step1.title')}
         titleAr="النية"
         icon="🤲"
         expanded={expandedSteps.niyyah}
         onToggle={() => toggleStep('niyyah')}
       >
         <Text style={styles.stepText}>
-          In your heart, intend: "I am praying two rakats of Salat al-Istikhara seeking Allah's guidance."
+          {t('modules.guidedIstikhara.prayer.step1.body')}
         </Text>
         <Text style={styles.stepNote}>
-          Note: The intention is in the heart, not spoken aloud.
+          {t('modules.guidedIstikhara.prayer.step1.note')}
         </Text>
       </StepCard>
 
       <StepCard
         number={2}
-        title="First Rakat"
+        title={t('modules.guidedIstikhara.prayer.step2.title')}
         titleAr="الركعة الأولى"
         icon="1️⃣"
         expanded={expandedSteps.rakat1}
         onToggle={() => toggleStep('rakat1')}
       >
         <Text style={styles.stepText}>
-          1. Say Takbir (Allahu Akbar) and raise hands{'\n'}
-          2. Recite Surah Al-Fatihah{'\n'}
-          3. Recite a Surah (recommended: Surah Al-Kafirun){'\n'}
-          4. Perform Ruku (bowing){'\n'}
-          5. Stand up, then go to Sujud (prostration){'\n'}
-          6. Sit briefly between the two prostrations{'\n'}
-          7. Perform second Sujud{'\n'}
-          8. Stand up for the second rakat
+          {t('modules.guidedIstikhara.prayer.step2.items.0') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step2.items.1') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step2.items.2') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step2.items.3') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step2.items.4') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step2.items.5') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step2.items.6') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step2.items.7')}
         </Text>
       </StepCard>
 
       <StepCard
         number={3}
-        title="Second Rakat"
+        title={t('modules.guidedIstikhara.prayer.step3.title')}
         titleAr="الركعة الثانية"
         icon="2️⃣"
         expanded={expandedSteps.rakat2}
         onToggle={() => toggleStep('rakat2')}
       >
         <Text style={styles.stepText}>
-          1. Recite Surah Al-Fatihah{'\n'}
-          2. Recite a Surah (recommended: Surah Al-Ikhlas){'\n'}
-          3. Perform Ruku{'\n'}
-          4. Perform the two Sujud{'\n'}
-          5. Sit for Tashahhud{'\n'}
-          6. Send blessings on the Prophet (Salawat){'\n'}
-          7. Make Salam to conclude
+          {t('modules.guidedIstikhara.prayer.step3.items.0') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step3.items.1') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step3.items.2') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step3.items.3') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step3.items.4') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step3.items.5') + '\n'}
+          {t('modules.guidedIstikhara.prayer.step3.items.6')}
         </Text>
       </StepCard>
 
       <View style={styles.tipBox}>
-        <Text style={styles.tipTitle}>💡 Tip: Recommended Surahs</Text>
+        <Text style={styles.tipTitle}>💡 {t('modules.guidedIstikhara.prayer.tip.title')}</Text>
         <Text style={styles.tipText}>
-          First Rakat: After Al-Fatihah, recite "Qul ya ayyuhal-kafirun" (Surah 109){'\n'}
-          Second Rakat: After Al-Fatihah, recite "Qul Huwa Allahu Ahad" (Surah 112)
+          {t('modules.guidedIstikhara.prayer.tip.firstRakat') + '\n'}
+          {t('modules.guidedIstikhara.prayer.tip.secondRakat')}
         </Text>
       </View>
 
@@ -246,7 +246,7 @@ export default function IstkharaPrayerGuideScreen() {
         style={styles.nextButton}
         onPress={() => setActiveSection('dua')}
       >
-        <Text style={styles.nextButtonText}>Continue to Dua</Text>
+        <Text style={styles.nextButtonText}>{t('modules.guidedIstikhara.prayer.cta')}</Text>
         <Ionicons name="arrow-forward" size={20} color="#fff" />
       </TouchableOpacity>
     </View>
