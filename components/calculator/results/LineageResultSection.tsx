@@ -4,8 +4,8 @@
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { LineageInsights } from '../../../types/calculator-enhanced';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { LineageInsights } from '../../../types/calculator-enhanced';
 
 interface LineageResultSectionProps {
   insights: LineageInsights;
