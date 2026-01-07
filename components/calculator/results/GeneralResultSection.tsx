@@ -4,8 +4,8 @@
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { GeneralInsights } from '../../../types/calculator-enhanced';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { GeneralInsights } from '../../../types/calculator-enhanced';
 
 interface GeneralResultSectionProps {
   insights: GeneralInsights;
