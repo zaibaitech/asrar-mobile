@@ -138,9 +138,9 @@ export interface PhraseInsights {
   structureInsights: {
     topRepeatedLetters: { letter: string; count: number; element: ElementType }[];
     centerLetter: string;
-    centerSignificance: string;
+    centerSignificanceKey: string; // Translation key instead of English text
   };
-  reflectionPrompts: string[];
+  reflectionPromptsKeys: string[]; // Translation keys instead of English texts
 }
 
 export interface QuranInsights {

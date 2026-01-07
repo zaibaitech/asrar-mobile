@@ -1095,6 +1095,35 @@ export const translations = {
             earth: "Maghrib and grounding moments - when earth stabilizes",
           },
         },
+        
+        // Phrase Result Section
+        phrase: {
+          // Section Titles
+          themeDetection: "Theme Detection",
+          repeatedLetters: "Repeated Letters",
+          structureInsights: "Structure Insights",
+          reflectionPrompts: "Reflection Prompts",
+          
+          // Theme Detection Labels
+          theme: {
+            dominantElement: "Dominant Element:",
+            nearSacredNumber: "Near Sacred Number:",
+          },
+          
+          // Structure Labels
+          structure: {
+            topRepeated: "Top Repeated:",
+            elementLabel: "({{element}} element)",
+            centerSignificance: "The center represents the heart of the message",
+          },
+          
+          // Reflection Prompts
+          reflection: {
+            q1: "What feeling does this phrase evoke in your heart?",
+            q2: "How does this phrase connect to your current spiritual journey?",
+            q3: "What action or change does this phrase inspire in you?",
+          },
+        },
       },
       
       // Abjad System Labels (deprecated, kept for backwards compatibility)
@@ -5122,6 +5151,35 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             water: "La nuit et avant de dormir (heure d'Isha) - quand l'énergie de l'eau coule",
             air: "Le matin et l'après-midi (Dhuhr à Asr) - quand l'air circule",
             earth: "Maghrib et moments d'ancrage - quand la terre stabilise",
+          },
+        },
+        
+        // Phrase Result Section
+        phrase: {
+          // Section Titles
+          themeDetection: "Détection de Thème",
+          repeatedLetters: "Lettres Répétées",
+          structureInsights: "Aperçus de Structure",
+          reflectionPrompts: "Questions de Réflexion",
+          
+          // Theme Detection Labels
+          theme: {
+            dominantElement: "Élément Dominant :",
+            nearSacredNumber: "Nombre Sacré Proche :",
+          },
+          
+          // Structure Labels
+          structure: {
+            topRepeated: "Plus Répété :",
+            elementLabel: "(élément {{element}})",
+            centerSignificance: "Le centre représente le cœur du message",
+          },
+          
+          // Reflection Prompts
+          reflection: {
+            q1: "Quel sentiment cette phrase évoque-t-elle dans votre cœur ?",
+            q2: "Comment cette phrase se connecte-t-elle à votre parcours spirituel actuel ?",
+            q3: "Quelle action ou changement cette phrase vous inspire-t-elle ?",
           },
         },
       },

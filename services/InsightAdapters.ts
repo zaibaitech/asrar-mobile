@@ -201,12 +201,12 @@ export function computePhraseInsights(
     structureInsights: {
       topRepeatedLetters: topRepeated,
       centerLetter: '', // Calculate from normalized text
-      centerSignificance: 'The center represents the heart of the message',
+      centerSignificanceKey: 'calculator.results.phrase.structure.centerSignificance',
     },
-    reflectionPrompts: [
-      'What feeling does this phrase evoke in your heart?',
-      'How does this phrase connect to your current spiritual journey?',
-      'What action or change does this phrase inspire in you?',
+    reflectionPromptsKeys: [
+      'calculator.results.phrase.reflection.q1',
+      'calculator.results.phrase.reflection.q2',
+      'calculator.results.phrase.reflection.q3',
     ],
   };
 }

@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { PhraseInsights } from '../../../types/calculator-enhanced';
 
 interface PhraseResultSectionProps {
@@ -11,21 +12,25 @@ interface PhraseResultSectionProps {
 }
 
 export const PhraseResultSection: React.FC<PhraseResultSectionProps> = ({ insights }) => {
+  const { t } = useLanguage();
+  
   return (
     <View style={styles.container}>
       {/* Theme Detection */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🎭 Theme Detection</Text>
+        <Text style={styles.cardTitle}>🎭 {t('calculator.results.phrase.themeDetection')}</Text>
         <View style={styles.themeRow}>
-          <Text style={styles.themeLabel}>Dominant Element:</Text>
+          <Text style={styles.themeLabel}>{t('calculator.results.phrase.theme.dominantElement')}</Text>
           <View style={styles.elementBadge}>
-            <Text style={styles.elementText}>{insights.themeDetection.dominantElement}</Text>
+            <Text style={styles.elementText}>
+              {t(`calculator.results.elements.${insights.themeDetection.dominantElement}`)}
+            </Text>
           </View>
         </View>
         
         {insights.themeDetection.sacredNumberNear && (
           <View style={styles.themeRow}>
-            <Text style={styles.themeLabel}>Near Sacred Number:</Text>
+            <Text style={styles.themeLabel}>{t('calculator.results.phrase.theme.nearSacredNumber')}</Text>
             <Text style={styles.themeValue}>{insights.themeDetection.sacredNumberNear}</Text>
           </View>
         )}
@@ -34,7 +39,7 @@ export const PhraseResultSection: React.FC<PhraseResultSectionProps> = ({ insigh
       {/* Repeated Letters */}
       {insights.themeDetection.repeatedLetters.length > 0 && (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>🔄 Repeated Letters</Text>
+          <Text style={styles.cardTitle}>🔄 {t('calculator.results.phrase.repeatedLetters')}</Text>
           <View style={styles.lettersGrid}>
             {insights.themeDetection.repeatedLetters.map((letter, idx) => (
               <View key={idx} style={styles.letterChip}>
@@ -48,30 +53,32 @@ export const PhraseResultSection: React.FC<PhraseResultSectionProps> = ({ insigh
       
       {/* Structure Insights */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🏗️ Structure Insights</Text>
+        <Text style={styles.cardTitle}>🏗️ {t('calculator.results.phrase.structureInsights')}</Text>
         {insights.structureInsights.topRepeatedLetters.length > 0 && (
           <View style={styles.structureSection}>
-            <Text style={styles.structureLabel}>Top Repeated:</Text>
+            <Text style={styles.structureLabel}>{t('calculator.results.phrase.structure.topRepeated')}</Text>
             {insights.structureInsights.topRepeatedLetters.map((letter, idx) => (
               <View key={idx} style={styles.structureRow}>
                 <Text style={styles.structureArabic}>{letter.letter}</Text>
                 <Text style={styles.structureText}>
-                  {letter.count}× ({letter.element} element)
+                  {letter.count}× {t('calculator.results.phrase.structure.elementLabel', {
+                    element: t(`calculator.results.elements.${letter.element}`)
+                  })}
                 </Text>
               </View>
             ))}
           </View>
         )}
-        <Text style={styles.structureNote}>{insights.structureInsights.centerSignificance}</Text>
+        <Text style={styles.structureNote}>{t(insights.structureInsights.centerSignificanceKey)}</Text>
       </View>
       
       {/* Reflection Prompts */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🤔 Reflection Prompts</Text>
-        {insights.reflectionPrompts.map((prompt, idx) => (
+        <Text style={styles.cardTitle}>🤔 {t('calculator.results.phrase.reflectionPrompts')}</Text>
+        {insights.reflectionPromptsKeys.map((promptKey, idx) => (
           <View key={idx} style={styles.promptRow}>
             <Text style={styles.promptNumber}>{idx + 1}.</Text>
-            <Text style={styles.promptText}>{prompt}</Text>
+            <Text style={styles.promptText}>{t(promptKey)}</Text>
           </View>
         ))}
       </View>
