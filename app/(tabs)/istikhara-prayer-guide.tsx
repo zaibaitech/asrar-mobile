@@ -254,20 +254,20 @@ export default function IstkharaPrayerGuideScreen() {
 
   const renderDua = () => (
     <View style={styles.sectionContainer}>
-      <Text style={styles.sectionTitle}>The Istikhara Dua</Text>
+      <Text style={styles.sectionTitle}>{t('modules.guidedIstikhara.dua.title')}</Text>
       
       <View style={styles.importantBox}>
         <Ionicons name="book" size={24} color="#FFD700" />
         <View style={{ flex: 1 }}>
-          <Text style={styles.importantTitle}>When to Recite</Text>
+          <Text style={styles.importantTitle}>{t('modules.guidedIstikhara.dua.when.title')}</Text>
           <Text style={styles.importantText}>
-            After completing the 2 rakats and making Salam, praise Allah, send blessings upon the Prophet ﷺ, then recite this dua.
+            {t('modules.guidedIstikhara.dua.when.body')}
           </Text>
         </View>
       </View>
 
       <View style={styles.duaCard}>
-        <Text style={styles.duaLabel}>The Complete Dua in Arabic</Text>
+        <Text style={styles.duaLabel}>{t('modules.guidedIstikhara.dua.arabicTitle')}</Text>
         <View style={styles.arabicBox}>
           <Text style={styles.arabicText}>
             اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ، وَأَسْتَقْدِرُكَ بِقُدْرَتِكَ، وَأَسْأَلُكَ مِنْ فَضْلِكَ الْعَظِيمِ، فَإِنَّكَ تَقْدِرُ وَلَا أَقْدِرُ، وَتَعْلَمُ وَلَا أَعْلَمُ، وَأَنْتَ عَلَّامُ الْغُيُوبِ
@@ -282,7 +282,7 @@ export default function IstkharaPrayerGuideScreen() {
       </View>
 
       <View style={styles.duaCard}>
-        <Text style={styles.duaLabel}>Transliteration</Text>
+        <Text style={styles.duaLabel}>{t('modules.guidedIstikhara.dua.transliterationTitle')}</Text>
         <Text style={styles.translitText}>
           Allahumma inni astakhiruka bi'ilmika, wa astaqdiruka bi qudratika, wa as'aluka min fadlikal-'azim, fa innaka taqdiru wa la aqdir, wa ta'lamu wa la a'lam, wa anta 'allamul-ghuyub.
         </Text>
@@ -295,22 +295,22 @@ export default function IstkharaPrayerGuideScreen() {
       </View>
 
       <View style={styles.duaCard}>
-        <Text style={styles.duaLabel}>Translation</Text>
+        <Text style={styles.duaLabel}>{t('modules.guidedIstikhara.dua.translationTitle')}</Text>
         <Text style={styles.translationText}>
-          "O Allah, I seek Your guidance by virtue of Your knowledge, and I seek ability by virtue of Your power, and I ask You of Your great bounty. For You have power and I have none. And You know and I know not. You are the Knower of hidden things.
+          {t('modules.guidedIstikhara.dua.translation.p1')}
         </Text>
         <Text style={styles.translationText}>
-          O Allah, if You know that this matter [mention your specific matter here] is good for me in my religion, my livelihood, and the outcome of my affairs—both immediate and in the future—then ordain it for me, make it easy for me, and bless it for me.
+          {t('modules.guidedIstikhara.dua.translation.p2')}
         </Text>
         <Text style={styles.translationText}>
-          And if You know that this matter is bad for me in my religion, my livelihood, and the outcome of my affairs—both immediate and in the future—then turn it away from me and turn me away from it, and ordain for me what is good wherever it may be, and make me pleased with it."
+          {t('modules.guidedIstikhara.dua.translation.p3')}
         </Text>
       </View>
 
       <View style={styles.noteBox}>
         <Ionicons name="alert-circle" size={20} color="#FF9800" />
         <Text style={styles.noteText}>
-          When you reach "hadhal-amr" (this matter), specify your decision clearly. For example: "If marriage to [name] is good for me..." or "If accepting this job is good for me..."
+          {t('modules.guidedIstikhara.dua.note')}
         </Text>
       </View>
 
@@ -318,7 +318,7 @@ export default function IstkharaPrayerGuideScreen() {
         style={styles.nextButton}
         onPress={() => setActiveSection('after')}
       >
-        <Text style={styles.nextButtonText}>What Happens Next?</Text>
+        <Text style={styles.nextButtonText}>{t('modules.guidedIstikhara.dua.cta')}</Text>
         <Ionicons name="arrow-forward" size={20} color="#fff" />
       </TouchableOpacity>
     </View>
@@ -326,94 +326,94 @@ export default function IstkharaPrayerGuideScreen() {
 
   const renderAfter = () => (
     <View style={styles.sectionContainer}>
-      <Text style={styles.sectionTitle}>After the Prayer</Text>
+      <Text style={styles.sectionTitle}>{t('modules.guidedIstikhara.after.title')}</Text>
 
       <View style={styles.importantBox}>
         <Ionicons name="heart" size={24} color="#E91E63" />
         <View style={{ flex: 1 }}>
-          <Text style={styles.importantTitle}>Trust in Allah's Wisdom</Text>
+          <Text style={styles.importantTitle}>{t('modules.guidedIstikhara.after.trust.title')}</Text>
           <Text style={styles.importantText}>
-            The most important part of Istikhara is accepting Allah's decree with contentment, knowing He has chosen what is best for you.
+            {t('modules.guidedIstikhara.after.trust.body')}
           </Text>
         </View>
       </View>
 
       <StepCard
         number={1}
-        title="What to Expect"
+        title={t('modules.guidedIstikhara.after.expect.title')}
         titleAr="ما يتوقع"
         icon="✨"
         expanded={expandedSteps.expect}
         onToggle={() => toggleStep('expect')}
       >
         <Text style={styles.stepText}>
-          Many people mistakenly think Istikhara means you'll see a dream or receive a sign. This is NOT required.
+          {t('modules.guidedIstikhara.after.expect.body')}
         </Text>
         <Text style={styles.stepSubText}>
-          ✅ Look for ease and facilitation in one direction{'\n'}
-          ✅ Notice which option feels more peaceful{'\n'}
-          ✅ See which path opens up naturally{'\n'}
-          ❌ Don't wait for mystical signs or dreams{'\n'}
-          ❌ Don't keep repeating if you've already decided
+          ✅ {t('modules.guidedIstikhara.after.expect.do1')}{' \n'}
+          ✅ {t('modules.guidedIstikhara.after.expect.do2')}{' \n'}
+          ✅ {t('modules.guidedIstikhara.after.expect.do3')}{' \n'}
+          ❌ {t('modules.guidedIstikhara.after.expect.avoid1')}{' \n'}
+          ❌ {t('modules.guidedIstikhara.after.expect.avoid2')}
         </Text>
       </StepCard>
 
       <StepCard
         number={2}
-        title="Take Action"
+        title={t('modules.guidedIstikhara.after.action.title')}
         titleAr="اتخذ إجراء"
         icon="🚶"
         expanded={expandedSteps.action}
         onToggle={() => toggleStep('action')}
       >
         <Text style={styles.stepText}>
-          After praying Istikhara, proceed with what seems best. Trust that Allah will make the good easy and block the harmful.
+          {t('modules.guidedIstikhara.after.action.body')}
         </Text>
         <View style={styles.tipBox}>
           <Text style={styles.tipText}>
-            If things become easy and flow smoothly, that's a positive sign.{'\n'}
-            If unexpected obstacles arise, consider it Allah protecting you from harm.
+            {t('modules.guidedIstikhara.after.action.note1')}{' \n'}
+            {t('modules.guidedIstikhara.after.action.note2')}
           </Text>
         </View>
       </StepCard>
 
       <StepCard
         number={3}
-        title="How Many Times?"
+        title={t('modules.guidedIstikhara.after.repeat.title')}
         titleAr="كم مرة"
         icon="🔄"
         expanded={expandedSteps.repeat}
         onToggle={() => toggleStep('repeat')}
       >
         <Text style={styles.stepText}>
-          You can pray Istikhara once or repeat it up to 7 times if you're still uncertain. Some scholars say 3 times, others 7 times.
+          {t('modules.guidedIstikhara.after.repeat.body')}
         </Text>
         <Text style={styles.stepNote}>
-          But once you feel inclined toward a decision, trust that feeling and proceed. Don't become paralyzed by indecision.
+          {t('modules.guidedIstikhara.after.repeat.note')}
         </Text>
       </StepCard>
 
       <StepCard
         number={4}
-        title="Common Mistakes to Avoid"
+        title={t('modules.guidedIstikhara.after.mistakes.title')}
         titleAr="أخطاء شائعة"
         icon="⚠️"
         expanded={expandedSteps.mistakes}
         onToggle={() => toggleStep('mistakes')}
       >
         <Text style={styles.stepSubText}>
-          ❌ Praying Istikhara about something haram{'\n'}
-          ❌ Expecting dreams or supernatural signs{'\n'}
-          ❌ Repeating endlessly without taking action{'\n'}
-          ❌ Praying after already making a decision{'\n'}
-          ❌ Using it to avoid responsibility for your choice
+          ❌ {t('modules.guidedIstikhara.after.mistakes.1')}{' \n'}
+          ❌ {t('modules.guidedIstikhara.after.mistakes.2')}{' \n'}
+          ❌ {t('modules.guidedIstikhara.after.mistakes.3')}{' \n'}
+          ❌ {t('modules.guidedIstikhara.after.mistakes.4')}{' \n'}
+          ❌ {t('modules.guidedIstikhara.after.mistakes.5')}
         </Text>
       </StepCard>
 
       <View style={styles.finalBox}>
-        <Text style={styles.finalTitle}>🤲 Remember</Text>
+        <Text style={styles.finalTitle}>🤲 {t('modules.guidedIstikhara.after.remember.title')}</Text>
         <Text style={styles.finalText}>
-          "And whoever relies upon Allah - then He is sufficient for him. Indeed, Allah will accomplish His purpose."
+          {t('modules.guidedIstikhara.after.remember.text')}
         </Text>
         <Text style={styles.finalReference}>— Quran 65:3</Text>
       </View>
@@ -423,7 +423,7 @@ export default function IstkharaPrayerGuideScreen() {
         onPress={() => router.back()}
       >
         <Ionicons name="checkmark-circle" size={24} color="#fff" />
-        <Text style={styles.nextButtonText}>I Understand</Text>
+        <Text style={styles.nextButtonText}>{t('modules.guidedIstikhara.after.cta')}</Text>
       </TouchableOpacity>
     </View>
   );

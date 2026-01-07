@@ -165,6 +165,65 @@ export const translations = {
           },
           cta: "Continue to Dua",
         },
+        // Dua Screen
+        dua: {
+          title: "The Istikhara Dua",
+          when: {
+            title: "When to Recite",
+            body: "After completing the 2 rakats and making Salam, praise Allah, send blessings upon the Prophet ﷺ, then recite this dua.",
+          },
+          arabicTitle: "The Complete Dua in Arabic",
+          transliterationTitle: "Transliteration",
+          translationTitle: "Translation",
+          translation: {
+            p1: "O Allah, I seek Your guidance by virtue of Your knowledge, and I seek ability by virtue of Your power, and I ask You of Your great bounty. For You have power and I have none. And You know and I know not. You are the Knower of hidden things.",
+            p2: "O Allah, if You know that this matter [mention your specific matter here] is good for me in my religion, my livelihood, and the outcome of my affairs—both immediate and in the future—then ordain it for me, make it easy for me, and bless it for me.",
+            p3: "And if You know that this matter is bad for me in my religion, my livelihood, and the outcome of my affairs—both immediate and in the future—then turn it away from me and turn me away from it, and ordain for me what is good wherever it may be, and make me pleased with it.",
+          },
+          note: "When you reach \"hadhal-amr\" (this matter), specify your decision clearly. For example: \"If marriage to [name] is good for me...\" or \"If accepting this job is good for me...\"",
+          cta: "What Happens Next?",
+        },
+        // After Screen
+        after: {
+          title: "After the Prayer",
+          trust: {
+            title: "Trust in Allah's Wisdom",
+            body: "The most important part of Istikhara is accepting Allah's decree with contentment, knowing He has chosen what is best for you.",
+          },
+          expect: {
+            title: "What to Expect",
+            body: "Many people mistakenly think istikhara means you'll see a dream or receive a sign. This is NOT required.",
+            do1: "Look for ease and facilitation in one direction",
+            do2: "Notice which option feels more peaceful",
+            do3: "See which path opens up naturally",
+            avoid1: "Don't wait for mystical signs or dreams",
+            avoid2: "Don't keep repeating if you've already decided",
+          },
+          action: {
+            title: "Take Action",
+            body: "After praying istikhara, proceed with what seems best. Trust that Allah will make the good easy and block the harmful.",
+            note1: "If things become easy and flow smoothly, that's a positive sign.",
+            note2: "If unexpected obstacles arise, consider it Allah protecting you from harm.",
+          },
+          repeat: {
+            title: "How Many Times?",
+            body: "You can pray istikhara once or repeat it up to 7 times if you're still uncertain. Some scholars say 3 times, others 7 times.",
+            note: "But once you feel inclined toward a decision, trust that feeling and proceed. Don't become paralyzed by indecision.",
+          },
+          mistakes: {
+            title: "Common Mistakes to Avoid",
+            1: "Praying istikhara about something haram",
+            2: "Expecting dreams or supernatural signs",
+            3: "Repeating endlessly without taking action",
+            4: "Praying after already making a decision",
+            5: "Using it to avoid responsibility for your choice",
+          },
+          remember: {
+            title: "Remember",
+            text: "\"And whoever relies upon Allah – then He is sufficient for him. Indeed, Allah will accomplish His purpose.\"",
+          },
+          cta: "I Understand",
+        },
       },
       compatibility: {
         title: "Compatibility",
@@ -4499,6 +4558,65 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             secondRakat: "Deuxième rak'a : Après Al-Fātiḥa, réciter « Qul huwa Allāhu aḥad » (sourate 112)",
           },
           cta: "Continuer vers la dou'a",
+        },
+        // Dua Screen
+        dua: {
+          title: "L'invocation de l'istikhāra",
+          when: {
+            title: "Quand réciter",
+            body: "Après avoir accompli les deux rak'ats et fait le salām, louez Allah, envoyez les salutations sur le Prophète ﷺ, puis récitez cette invocation.",
+          },
+          arabicTitle: "L'invocation complète en arabe",
+          transliterationTitle: "Transcription phonétique",
+          translationTitle: "Traduction",
+          translation: {
+            p1: "Ô Allah, je Te demande la guidance par Ta science, et je Te demande la capacité par Ta puissance, et je Te demande de Ta grâce immense. Car Tu es Capable et je ne le suis pas. Tu sais et je ne sais pas, et Tu es le Connaisseur de l'invisible.",
+            p2: "Ô Allah, si Tu sais que cette chose [mentionne ici ton besoin précis] est un bien pour moi dans ma religion, dans ma subsistance et dans l'issue de mes affaires — immédiates et futures — alors décrète-la pour moi, facilite-la-moi et bénis-la pour moi.",
+            p3: "Et si Tu sais que cette chose est un mal pour moi dans ma religion, dans ma subsistance et dans l'issue de mes affaires — immédiates et futures — alors écarte-la de moi et écarte-moi d'elle, et décrète pour moi le bien où qu'il se trouve, puis rends-moi satisfait de cela.",
+          },
+          note: "Lorsque tu arrives à « hadhal-amr » (cette chose), précise clairement ton intention. Par exemple : « si mon mariage avec [nom] est un bien pour moi » ou « si accepter ce travail est un bien pour moi ».",
+          cta: "Que se passe-t-il ensuite ?",
+        },
+        // After Screen
+        after: {
+          title: "Après la prière",
+          trust: {
+            title: "Avoir confiance en la sagesse d'Allah",
+            body: "La partie la plus importante de l'istikhāra est d'accepter le décret d'Allah avec satisfaction, en sachant qu'Il a choisi ce qu'il y a de meilleur pour toi.",
+          },
+          expect: {
+            title: "À quoi s'attendre",
+            body: "Beaucoup de personnes pensent à tort que l'istikhāra signifie voir un rêve ou recevoir un signe. Ce n'est PAS nécessaire.",
+            do1: "Observer la facilité et l'ouverture dans une direction",
+            do2: "Remarquer quelle option apporte le plus de paix",
+            do3: "Voir quelle voie s'ouvre naturellement",
+            avoid1: "Ne pas attendre des signes mystiques ou des rêves",
+            avoid2: "Ne pas répéter si tu as déjà pris une décision",
+          },
+          action: {
+            title: "Passer à l'action",
+            body: "Après avoir prié l'istikhāra, avance avec ce qui te semble le meilleur. Aie confiance qu'Allah facilitera le bien et écartera ce qui est nuisible.",
+            note1: "Si les choses deviennent faciles et fluides, c'est un signe positif.",
+            note2: "Si des obstacles inattendus apparaissent, considère que c'est une protection d'Allah contre un mal.",
+          },
+          repeat: {
+            title: "Combien de fois ?",
+            body: "Tu peux prier l'istikhāra une fois ou la répéter jusqu'à 7 fois si tu hésites encore. Certains savants disent 3 fois, d'autres 7 fois.",
+            note: "Mais lorsque tu penches vers une décision, fais confiance à cela et avance. Ne reste pas bloqué dans l'hésitation.",
+          },
+          mistakes: {
+            title: "Erreurs courantes à éviter",
+            1: "Faire l'istikhāra pour quelque chose d'illicite",
+            2: "Attendre des rêves ou des signes surnaturels",
+            3: "Répéter sans fin sans passer à l'action",
+            4: "Prier après avoir déjà décidé",
+            5: "L'utiliser pour fuir la responsabilité de son choix",
+          },
+          remember: {
+            title: "Rappel",
+            text: "« Et quiconque place sa confiance en Allah, Il lui suffit. Allah accomplit parfaitement Son dessein. »",
+          },
+          cta: "J'ai compris",
         },
       },
       compatibility: {
