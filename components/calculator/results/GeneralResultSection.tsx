@@ -5,17 +5,20 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { GeneralInsights } from '../../../types/calculator-enhanced';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface GeneralResultSectionProps {
   insights: GeneralInsights;
 }
 
 export const GeneralResultSection: React.FC<GeneralResultSectionProps> = ({ insights }) => {
+  const { t } = useLanguage();
+  
   return (
     <View style={styles.container}>
       {/* Letter Frequency Chart */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>📊 Letter Frequency</Text>
+        <Text style={styles.cardTitle}>📊 {t('calculator.results.general.letterFrequency.title')}</Text>
         <View style={styles.frequencyList}>
           {insights.letterFrequencyChart.slice(0, 10).map((letter, idx) => (
             <View key={idx} style={styles.frequencyRow}>
@@ -28,7 +31,7 @@ export const GeneralResultSection: React.FC<GeneralResultSectionProps> = ({ insi
                     { width: `${(letter.count / insights.letterFrequencyChart[0].count) * 100}%` }
                   ]} 
                 />
-                <Text style={styles.frequencyCount}>{letter.count}× (value: {letter.value})</Text>
+                <Text style={styles.frequencyCount}>{letter.count}× ({t('calculator.results.general.letterFrequency.value')}: {letter.value})</Text>
               </View>
             </View>
           ))}
@@ -37,7 +40,7 @@ export const GeneralResultSection: React.FC<GeneralResultSectionProps> = ({ insi
       
       {/* Elemental Balance */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🔮 Elemental Balance</Text>
+        <Text style={styles.cardTitle}>🔮 {t('calculator.results.general.elementalBalance.title')}</Text>
         <View style={styles.compositionGrid}>
           {Object.entries(insights.elementalBalance.composition).map(([element, percent]) => (
             <View key={element} style={styles.elementCard}>
@@ -46,45 +49,45 @@ export const GeneralResultSection: React.FC<GeneralResultSectionProps> = ({ insi
             </View>
           ))}
         </View>
-        <Text style={styles.adviceText}>{insights.elementalBalance.advice}</Text>
+        <Text style={styles.adviceText}>{t(insights.elementalBalance.adviceKey)}</Text>
       </View>
       
       {/* Sacred Resonance */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>✨ Sacred Resonance</Text>
+        <Text style={styles.cardTitle}>✨ {t('calculator.results.general.sacredResonance.title')}</Text>
         <View style={styles.resonanceRow}>
           <View style={styles.resonanceItem}>
-            <Text style={styles.resonanceLabel}>Nearest Sacred</Text>
+            <Text style={styles.resonanceLabel}>{t('calculator.results.general.sacredResonance.nearestLabel')}</Text>
             <Text style={styles.resonanceValue}>{insights.sacredResonance.nearest}</Text>
           </View>
           <View style={styles.resonanceItem}>
-            <Text style={styles.resonanceLabel}>Distance</Text>
+            <Text style={styles.resonanceLabel}>{t('calculator.results.general.sacredResonance.distanceLabel')}</Text>
             <Text style={styles.resonanceValue}>{insights.sacredResonance.distance}</Text>
           </View>
         </View>
-        <Text style={styles.resonanceMeaning}>{insights.sacredResonance.meaning}</Text>
+        <Text style={styles.resonanceMeaning}>{t(insights.sacredResonance.meaningKey)}</Text>
       </View>
       
       {/* Advanced Methods */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🔬 Advanced Methods</Text>
+        <Text style={styles.cardTitle}>🔬 {t('calculator.results.general.advancedMethods.title')}</Text>
         
         <View style={styles.methodRow}>
-          <Text style={styles.methodName}>Wusṭā (Middle):</Text>
+          <Text style={styles.methodName}>{t('calculator.results.general.advancedMethods.wusta.label')}:</Text>
           <Text style={styles.methodValue}>
             {insights.advancedMethods.wusta.value} ({insights.advancedMethods.wusta.element})
           </Text>
         </View>
         
         <View style={styles.methodRow}>
-          <Text style={styles.methodName}>Kamāl (Perfection):</Text>
+          <Text style={styles.methodName}>{t('calculator.results.general.advancedMethods.kamal.label')}:</Text>
           <Text style={styles.methodValue}>
             {insights.advancedMethods.kamal.value} ({insights.advancedMethods.kamal.element})
           </Text>
         </View>
         
         <View style={styles.methodRow}>
-          <Text style={styles.methodName}>Basṭ (Expansion):</Text>
+          <Text style={styles.methodName}>{t('calculator.results.general.advancedMethods.bast.label')}:</Text>
           <Text style={styles.methodValue}>
             {insights.advancedMethods.bast.value} ({insights.advancedMethods.bast.element})
           </Text>

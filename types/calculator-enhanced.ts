@@ -192,11 +192,12 @@ export interface GeneralInsights {
   letterFrequencyChart: LetterFrequency[];
   elementalBalance: {
     composition: { [key in ElementType]: number };
-    advice: string;
+    adviceKey: string;           // Translation key instead of English text
+    dominantElement: ElementType; // Store for variable interpolation
   };
   sacredResonance: {
     nearest: number;
-    meaning: string;
+    meaningKey: string; // Translation key instead of English text
     distance: number;
   };
   advancedMethods: {

@@ -1223,6 +1223,35 @@ export const translations = {
             },
           },
         },
+        
+        // General Result Section
+        general: {
+          // Section Titles
+          letterFrequency: {
+            title: "Letter Frequency",
+            value: "value",
+          },
+          elementalBalance: {
+            title: "Elemental Balance",
+          },
+          sacredResonance: {
+            title: "Sacred Resonance",
+            nearestLabel: "Nearest Sacred",
+            distanceLabel: "Distance",
+          },
+          advancedMethods: {
+            title: "Advanced Methods",
+            wusta: {
+              label: "Wusṭā (Middle)",
+            },
+            kamal: {
+              label: "Kamāl (Perfection)",
+            },
+            bast: {
+              label: "Basṭ (Expansion)",
+            },
+          },
+        },
       },
       
       // Abjad System Labels (deprecated, kept for backwards compatibility)
@@ -5377,6 +5406,35 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
               presence: "Avec présence et humilité",
               counting: "Comptez sur les doigts ou le tasbīḥ",
               dua: "Terminez par le duʿā",
+            },
+          },
+        },
+        
+        // General Result Section
+        general: {
+          // Section Titles
+          letterFrequency: {
+            title: "Fréquence des Lettres",
+            value: "valeur",
+          },
+          elementalBalance: {
+            title: "Équilibre Élémentaire",
+          },
+          sacredResonance: {
+            title: "Résonance Sacrée",
+            nearestLabel: "Sacré le Plus Proche",
+            distanceLabel: "Distance",
+          },
+          advancedMethods: {
+            title: "Méthodes Avancées",
+            wusta: {
+              label: "Wusṭā (Milieu)",
+            },
+            kamal: {
+              label: "Kamāl (Perfection)",
+            },
+            bast: {
+              label: "Basṭ (Expansion)",
             },
           },
         },

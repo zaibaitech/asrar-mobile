@@ -332,17 +332,21 @@ export function computeGeneralInsights(
     sacredSet[0]
   );
   
-  const meaning = sacredSignificance[nearest] || 'Unique numeric signature';
+  // Return translation key for sacred meaning instead of English text
+  const meaningKey = sacredSignificance[nearest] 
+    ? `calculator.results.quran.sacredMeaning.${nearest}`
+    : 'calculator.results.quran.sacredMeaning.default';
   
   return {
     letterFrequencyChart: analytics.letterFreq,
     elementalBalance: {
       composition: analytics.elementPercents,
-      advice: `Your dominant element is ${analytics.dominantElement}. ${ELEMENT_GUIDANCE[analytics.dominantElement]}`,
+      adviceKey: ELEMENT_GUIDANCE_KEYS[analytics.dominantElement], // Translation key instead of English text
+      dominantElement: analytics.dominantElement, // Store for use in translation
     },
     sacredResonance: {
       nearest,
-      meaning,
+      meaningKey, // Translation key instead of English text
       distance: Math.abs(nearest - core.kabir),
     },
     advancedMethods: {
