@@ -7,6 +7,7 @@
  */
 
 import { ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -34,6 +35,7 @@ interface Step {
 
 export default function IstkharaPrayerGuideScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useLanguage();
   const [activeSection, setActiveSection] = useState<StepSection>('introduction');
   const [expandedSteps, setExpandedSteps] = useState<Record<string, boolean>>({
     intro: true,
@@ -45,25 +47,25 @@ export default function IstkharaPrayerGuideScreen() {
 
   const renderIntroduction = () => (
     <View style={styles.sectionContainer}>
-      <Text style={styles.sectionTitle}>What is Salat al-Istikhara?</Text>
+      <Text style={styles.sectionTitle}>{t('modules.guidedIstikhara.intro.title')}</Text>
       <Text style={styles.bodyText}>
-        Ṣalāt al-Istikhārah (Prayer of Seeking Guidance) is a blessed Sunnah prayer taught by Prophet Muhammad ﷺ to seek Allah's guidance when making important decisions.
+        {t('modules.guidedIstikhara.intro.description')}
       </Text>
       
       <View style={styles.hadithBox}>
-        <Text style={styles.hadithLabel}>📖 Authentic Hadith</Text>
+        <Text style={styles.hadithLabel}>📖 {t('modules.guidedIstikhara.intro.hadith.title')}</Text>
         <Text style={styles.hadithText}>
-          Jabir ibn Abdullah (RA) narrated: "The Prophet ﷺ used to teach us to seek Allah's counsel in all matters, just as he used to teach us a chapter from the Quran."
+          {t('modules.guidedIstikhara.intro.hadith.text')}
         </Text>
-        <Text style={styles.hadithReference}>— Sahih al-Bukhari 1162</Text>
+        <Text style={styles.hadithReference}>{t('modules.guidedIstikhara.intro.hadith.source')}</Text>
       </View>
 
       <View style={styles.importantBox}>
         <Ionicons name="information-circle" size={24} color="#FFD700" />
         <View style={{ flex: 1 }}>
-          <Text style={styles.importantTitle}>Important Understanding</Text>
+          <Text style={styles.importantTitle}>{t('modules.guidedIstikhara.intro.understanding.title')}</Text>
           <Text style={styles.importantText}>
-            Istikhara is NOT fortune-telling. It is seeking Allah's guidance to make the decision easier and to place your trust in His wisdom, not to see dreams or receive mystical signs.
+            {t('modules.guidedIstikhara.intro.understanding.text')}
           </Text>
         </View>
       </View>
@@ -72,7 +74,7 @@ export default function IstkharaPrayerGuideScreen() {
         style={styles.nextButton}
         onPress={() => setActiveSection('prerequisites')}
       >
-        <Text style={styles.nextButtonText}>Begin Preparation</Text>
+        <Text style={styles.nextButtonText}>{t('modules.guidedIstikhara.intro.cta')}</Text>
         <Ionicons name="arrow-forward" size={20} color="#fff" />
       </TouchableOpacity>
     </View>
@@ -451,7 +453,7 @@ export default function IstkharaPrayerGuideScreen() {
         <View style={styles.backButtonContainer}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color="#fff" />
-            <Text style={styles.backButtonText}>Back</Text>
+            <Text style={styles.backButtonText}>{t('modules.guidedIstikhara.intro.back')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -463,25 +465,25 @@ export default function IstkharaPrayerGuideScreen() {
         contentContainerStyle={styles.tabsContent}
       >
         <TabButton
-          label="Intro"
+          label={t('modules.guidedIstikhara.intro.steps.intro')}
           icon="information-circle"
           active={activeSection === 'introduction'}
           onPress={() => setActiveSection('introduction')}
         />
         <TabButton
-          label="Prepare"
+          label={t('modules.guidedIstikhara.intro.steps.prepare')}
           icon="checkmark-circle"
           active={activeSection === 'prerequisites'}
           onPress={() => setActiveSection('prerequisites')}
         />
         <TabButton
-          label="Prayer"
+          label={t('modules.guidedIstikhara.intro.steps.prayer')}
           icon="moon"
           active={activeSection === 'prayer'}
           onPress={() => setActiveSection('prayer')}
         />
         <TabButton
-          label="Dua"
+          label={t('modules.guidedIstikhara.intro.steps.dua')}
           icon="book"
           active={activeSection === 'dua'}
           onPress={() => setActiveSection('dua')}

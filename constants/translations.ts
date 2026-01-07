@@ -30,6 +30,53 @@ export const translations = {
       guidedIstikhara: {
         title: "Guided Istikhārah",
         description: "Learn the authentic prayer method and track your spiritual decisions",
+        // Home/Landing Screen
+        home: {
+          title: "Ṣalāt al-Istikhārah",
+          subtitle: "The Prayer of Seeking Guidance - a Sunnah practice to seek Allah's guidance when making important decisions",
+          hadith: {
+            text: "\"When one of you is concerned about a matter, let him pray two rak'ahs...\"",
+            source: "— Sahih al-Bukhari 1162",
+          },
+          learnTitle: "📖 LEARN THE AUTHENTIC METHOD",
+          guide: {
+            title: "Complete Prayer Guide",
+            subtitle: "Step-by-step instructions • Authentic duʿā • Prerequisites • Post-prayer guidance",
+          },
+          infoCard: "Istikhārah is performed when facing an important decision. The prayer consists of 2 rak'ahs followed by a specific supplication taught by the Prophet Muhammad ﷺ.",
+          when: {
+            title: "When to Perform Istikhārah",
+            items: {
+              marriage: "Marriage or important relationships",
+              career: "Career decisions or job changes",
+              purchases: "Major purchases or investments",
+              travel: "Travel or relocation decisions",
+              anyMatter: "Any permissible matter requiring guidance",
+            },
+          },
+        },
+        // Intro/Guide Screen
+        intro: {
+          back: "Back",
+          steps: {
+            intro: "Intro",
+            prepare: "Prepare",
+            prayer: "Prayer",
+            dua: "Dua",
+          },
+          title: "What is Salat al-Istikhara?",
+          description: "Ṣalāt al-Istikhārah (Prayer of Seeking Guidance) is a blessed Sunnah prayer taught by Prophet Muhammad ﷺ to seek Allah's guidance when making important decisions.",
+          hadith: {
+            title: "Authentic Hadith",
+            text: "Jabir ibn Abdullah (RA) narrated: \"The Prophet ﷺ used to teach us to seek Allah's counsel in all matters, just as he used to teach us a chapter from the Quran.\"",
+            source: "Sahih al-Bukhari 1162",
+          },
+          understanding: {
+            title: "Important Understanding",
+            text: "Istikhara is NOT fortune-telling. It is seeking Allah's guidance to make the decision easier and to place your trust in His wisdom, not to see dreams or receive mystical signs.",
+          },
+          cta: "Begin Preparation",
+        },
       },
       compatibility: {
         title: "Compatibility",
@@ -4230,6 +4277,53 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       guidedIstikhara: {
         title: "Istikharah Guidée",
         description: "Apprenez la méthode authentique de prière et suivez vos décisions spirituelles",
+        // Home/Landing Screen
+        home: {
+          title: "Ṣalāt al-Istikhārah",
+          subtitle: "La Prière de Demande de Guidance - une pratique Sunnah pour solliciter la guidance d'Allah lors de décisions importantes",
+          hadith: {
+            text: "\"Lorsque l'un d'entre vous s'inquiète d'une affaire, qu'il prie deux rak'ahs...\"",
+            source: "— Sahih al-Bukhari 1162",
+          },
+          learnTitle: "📖 APPRENDRE LA MÉTHODE AUTHENTIQUE",
+          guide: {
+            title: "Guide Complet de Prière",
+            subtitle: "Instructions étape par étape • Duʿā authentique • Prérequis • Guidance post-prière",
+          },
+          infoCard: "L'Istikhārah est effectuée face à une décision importante. La prière se compose de 2 rak'ahs suivies d'une supplication spécifique enseignée par le Prophète Muhammad ﷺ.",
+          when: {
+            title: "Quand Effectuer l'Istikhārah",
+            items: {
+              marriage: "Mariage ou relations importantes",
+              career: "Décisions de carrière ou changements d'emploi",
+              purchases: "Achats majeurs ou investissements",
+              travel: "Décisions de voyage ou de relocalisation",
+              anyMatter: "Toute question licite nécessitant une guidance",
+            },
+          },
+        },
+        // Intro/Guide Screen
+        intro: {
+          back: "Retour",
+          steps: {
+            intro: "Intro",
+            prepare: "Préparation",
+            prayer: "Prière",
+            dua: "Doua",
+          },
+          title: "Qu'est-ce que la Salat al-Istikhara ?",
+          description: "Ṣalāt al-Istikhārah (prière de demande de guidance) est une prière de la Sunnah enseignée par le Prophète Muhammad ﷺ pour rechercher la guidance d'Allah lors de décisions importantes.",
+          hadith: {
+            title: "Hadith authentique",
+            text: "Jabir ibn Abdullah (RA) a rapporté : « Le Prophète ﷺ nous enseignait de rechercher le conseil d'Allah en toute chose, comme il nous enseignait une sourate du Coran. »",
+            source: "Sahih al-Bukhari 1162",
+          },
+          understanding: {
+            title: "Point important",
+            text: "L'istikhara n'est PAS de la divination. C'est une demande de guidance d'Allah pour faciliter la décision et placer sa confiance dans Sa sagesse, et non pour voir des rêves ou recevoir des signes mystiques.",
+          },
+          cta: "Commencer la préparation",
+        },
       },
       compatibility: {
         title: "Compatibilité",

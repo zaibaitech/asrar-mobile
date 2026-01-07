@@ -10,7 +10,7 @@ import Colors from '@/constants/Colors';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import {
     SafeAreaView,
     ScrollView,
