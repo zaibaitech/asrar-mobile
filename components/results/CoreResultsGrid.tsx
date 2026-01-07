@@ -30,7 +30,7 @@ const defaultLabels = {
 };
 
 export const CoreResultsGrid: React.FC<CoreResultsGridProps> = ({ results, t, style }) => {
-  const translate = (key: keyof typeof defaultLabels) => (t ? t(`core.${key}`) : defaultLabels[key]);
+  const translate = (key: keyof typeof defaultLabels) => (t ? t(`calculator.results.core.${key}`) : defaultLabels[key]);
 
   const safeNumber = (value?: number) => {
     if (value === null || value === undefined) {

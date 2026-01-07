@@ -4,6 +4,7 @@
  */
 
 import { useProfile } from '@/contexts/ProfileContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { enhanceCalculatorWithAI, isAIAvailable, loadAISettings } from '@/services/AIReflectionService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -32,6 +33,7 @@ interface EnhancedResultsDisplayProps {
 }
 
 export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ result }) => {
+  const { t } = useLanguage();
   const scrollViewRef = useRef<ScrollView>(null);
   const [sectionOffsets, setSectionOffsets] = useState<{ [key: string]: number }>({});
   
@@ -122,16 +124,16 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
       <View style={styles.jumpNav}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.jumpNavContent}>
           <TouchableOpacity style={styles.jumpButton} onPress={() => scrollToSection('core')}>
-            <Text style={styles.jumpText}>Core</Text>
+            <Text style={styles.jumpText}>{t('calculator.results.tabs.core')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.jumpButton} onPress={() => scrollToSection('insights')}>
-            <Text style={styles.jumpText}>Insights</Text>
+            <Text style={styles.jumpText}>{t('calculator.results.tabs.insights')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.jumpButton} onPress={() => scrollToSection('elements')}>
-            <Text style={styles.jumpText}>Elements</Text>
+            <Text style={styles.jumpText}>{t('calculator.results.tabs.elements')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.jumpButton} onPress={() => scrollToSection('advanced')}>
-            <Text style={styles.jumpText}>Advanced</Text>
+            <Text style={styles.jumpText}>{t('calculator.results.tabs.advanced')}</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -146,7 +148,7 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
             <Text style={styles.inputText}>{result.input.raw}</Text>
             {(result.input.calculatedFrom !== undefined || result.input.calculationNote || result.input.warning) && (
               <View style={styles.calculationMeta}>
-                <Text style={styles.metaLabel}>Calculated from</Text>
+                <Text style={styles.metaLabel}>{t('calculator.results.labels.calculatedFrom')}</Text>
                 <Text style={styles.metaValue}>
                   {result.input.calculatedFrom && result.input.calculatedFrom.length > 0
                     ? result.input.calculatedFrom
@@ -162,10 +164,10 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
             )}
             <View style={styles.badges}>
               <View style={styles.badge}>
-                <Text style={styles.badgeText}>{result.system === 'maghribi' ? '🌙 Maghribi' : '☀️ Mashriqi'}</Text>
+                <Text style={styles.badgeText}>{result.system === 'maghribi' ? `🌙 ${t('calculator.results.badges.maghribi')}` : `☀️ ${t('calculator.results.badges.mashriqi')}`}</Text>
               </View>
               <View style={[styles.badge, styles.typeBadge]}>
-                <Text style={styles.badgeText}>{getTypeLabel(result.type)}</Text>
+                <Text style={styles.badgeText}>{getTypeLabel(result.type, t)}</Text>
               </View>
             </View>
           </LinearGradient>
@@ -173,8 +175,9 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
         
         {/* Core Results Section */}
         <View onLayout={(e) => handleSectionLayout('core', e.nativeEvent.layout.y)}>
-          <Text style={styles.sectionTitle}>📊 Core Results</Text>
+          <Text style={styles.sectionTitle}>📊 {t('calculator.results.sections.coreResults')}</Text>
           <CoreResultsGrid
+            t={t}
             style={styles.coreGrid}
             results={{
               kabirTotal: result.core?.kabir,
@@ -270,19 +273,19 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
         
         {/* Type-Specific Insights Section */}
         <View onLayout={(e) => handleSectionLayout('insights', e.nativeEvent.layout.y)}>
-          <Text style={styles.sectionTitle}>✨ {getInsightsTitle(result.type)}</Text>
+          <Text style={styles.sectionTitle}>✨ {getInsightsTitle(result.type, t)}</Text>
           {renderTypeSpecificInsights(result)}
         </View>
         
         {/* Elemental Composition Section */}
         <View onLayout={(e) => handleSectionLayout('elements', e.nativeEvent.layout.y)}>
-          <Text style={styles.sectionTitle}>🔮 Elemental Analysis</Text>
+          <Text style={styles.sectionTitle}>🔮 {t('calculator.results.sections.elementalAnalysis')}</Text>
           <ElementalComposition analytics={result.analytics} />
         </View>
         
         {/* Advanced Methods Section */}
         <View onLayout={(e) => handleSectionLayout('advanced', e.nativeEvent.layout.y)}>
-          <Text style={styles.sectionTitle}>🔬 Advanced Methods</Text>
+          <Text style={styles.sectionTitle}>🔬 {t('calculator.results.sections.advancedMethods')}</Text>
           <AdvancedMethods 
             kabir={result.core.kabir}
             saghir={result.core.saghir}
@@ -292,7 +295,7 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
         {/* Disclaimer */}
         <View style={styles.disclaimer}>
           <Text style={styles.disclaimerText}>
-            ℹ️ These insights are for spiritual reflection only. Not a substitute for qualified religious guidance.
+            ℹ️ {t('calculator.results.disclaimer')}
           </Text>
         </View>
       </ScrollView>
@@ -300,28 +303,31 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
   );
 };
 
-function getTypeLabel(type: string): string {
-  const labels: { [key: string]: string } = {
-    name: '👤 Name',
-    lineage: '🌳 Lineage',
-    phrase: '📝 Phrase',
-    quran: '📖 Qur\'an',
-    dhikr: '🤲 Dhikr',
-    general: '🔤 General',
+function getTypeLabel(type: string, t: (key: string) => string): string {
+  const icons: { [key: string]: string } = {
+    name: '👤',
+    lineage: '🌳',
+    phrase: '📝',
+    quran: '📖',
+    dhikr: '🤲',
+    general: '🔤',
   };
-  return labels[type] || type;
+  const icon = icons[type] || '';
+  const label = t(`calculator.results.types.${type}`);
+  return icon ? `${icon} ${label}` : label;
 }
 
-function getInsightsTitle(type: string): string {
-  const titles: { [key: string]: string } = {
-    name: 'Name Insights',
-    lineage: 'Lineage Insights',
-    phrase: 'Phrase Analysis',
-    quran: 'Qur\'an Resonance',
-    dhikr: 'Dhikr Practice',
-    general: 'General Insights',
+function getInsightsTitle(type: string, t: (key: string) => string): string {
+  const sectionKeys: { [key: string]: string } = {
+    name: 'nameInsights',
+    lineage: 'lineageInsights',
+    phrase: 'phraseAnalysis',
+    quran: 'quranResonance',
+    dhikr: 'dhikrPractice',
+    general: 'generalInsights',
   };
-  return titles[type] || 'Insights';
+  const key = sectionKeys[type] || 'nameInsights';
+  return t(`calculator.results.sections.${key}`);
 }
 
 function renderTypeSpecificInsights(result: EnhancedCalculationResult) {

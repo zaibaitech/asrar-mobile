@@ -755,6 +755,72 @@ export const translations = {
         close: "Close",
       },
       
+      // Results Screen - Phase 1: Tabs, Sections, Core Labels
+      results: {
+        // Tab Navigation
+        tabs: {
+          core: "Core",
+          insights: "Insights",
+          elements: "Elements",
+          advanced: "Advanced",
+        },
+        
+        // Section Headers
+        sections: {
+          coreResults: "Core Results",
+          nameInsights: "Name Insights",
+          lineageInsights: "Lineage Insights",
+          phraseAnalysis: "Phrase Analysis",
+          quranResonance: "Qur'an Resonance",
+          dhikrPractice: "Dhikr Practice",
+          generalInsights: "General Insights",
+          elementalAnalysis: "Elemental Analysis",
+          advancedMethods: "Advanced Methods",
+        },
+        
+        // Core Result Labels
+        core: {
+          kabir: "Kabir",
+          saghir: "Saghir",
+          hadad: "Hadad",
+          burj: "Burj",
+          grandTotal: "Grand Total",
+          digitalRoot: "Digital Root",
+          mod4: "Mod 4",
+          zodiac: "Zodiac",
+        },
+        
+        // Common Labels
+        labels: {
+          calculatedFrom: "Calculated from",
+          calculation: "Calculation",
+          intermediate: "Intermediate",
+          value: "Value",
+          distance: "Distance",
+          letter: "letter",
+          letters: "letters",
+        },
+        
+        // Badges
+        badges: {
+          maghribi: "Maghribi",
+          mashriqi: "Mashriqi",
+        },
+        
+        // Type Labels
+        types: {
+          name: "Name",
+          lineage: "Lineage",
+          phrase: "Phrase",
+          quran: "Qur'an",
+          dhikr: "Dhikr",
+          general: "General",
+        },
+        
+        // Disclaimer
+        disclaimer: "These insights are for spiritual reflection only. Not a substitute for qualified religious guidance.",
+      },
+      
       // Abjad System Labels (deprecated, kept for backwards compatibility)
       maghribi: "Maghribi",
       mashriqi: "Mashriqi",
@@ -4440,6 +4506,72 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         calculate: "Calculer",
         calculating: "Calcul en cours...",
         close: "Fermer",
+      },
+      
+      // Results Screen - Phase 1: Tabs, Sections, Core Labels
+      results: {
+        // Tab Navigation
+        tabs: {
+          core: "Base",
+          insights: "Aperçus",
+          elements: "Éléments",
+          advanced: "Avancé",
+        },
+        
+        // Section Headers
+        sections: {
+          coreResults: "Résultats de Base",
+          nameInsights: "Aperçus du Nom",
+          lineageInsights: "Aperçus de Lignée",
+          phraseAnalysis: "Analyse de Phrase",
+          quranResonance: "Résonance Coranique",
+          dhikrPractice: "Pratique du Dhikr",
+          generalInsights: "Aperçus Généraux",
+          elementalAnalysis: "Analyse Élémentaire",
+          advancedMethods: "Méthodes Avancées",
+        },
+        
+        // Core Result Labels
+        core: {
+          kabir: "Kabir",
+          saghir: "Saghir",
+          hadad: "Hadad",
+          burj: "Burj",
+          grandTotal: "Total Grand",
+          digitalRoot: "Racine Numérique",
+          mod4: "Mod 4",
+          zodiac: "Zodiaque",
+        },
+        
+        // Common Labels
+        labels: {
+          calculatedFrom: "Calculé à partir de",
+          calculation: "Calcul",
+          intermediate: "Intermédiaire",
+          value: "Valeur",
+          distance: "Distance",
+          letter: "lettre",
+          letters: "lettres",
+        },
+        
+        // Badges
+        badges: {
+          maghribi: "Maghribi",
+          mashriqi: "Mashriqi",
+        },
+        
+        // Type Labels
+        types: {
+          name: "Nom",
+          lineage: "Lignée",
+          phrase: "Phrase",
+          quran: "Coran",
+          dhikr: "Dhikr",
+          general: "Général",
+        },
+        
+        // Disclaimer
+        disclaimer: "Ces aperçus sont destinés à la réflexion spirituelle uniquement. Pas un substitut à des conseils religieux qualifiés.",
       },
       
       // Abjad System Labels (deprecated, kept for backwards compatibility)
