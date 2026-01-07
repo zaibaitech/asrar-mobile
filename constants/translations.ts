@@ -998,6 +998,19 @@ export const translations = {
           waterBearer: "The Water-Bearer",
           fish: "The Fish",
         },
+        
+        // Spiritual Guidance (Element-based)
+        elementGuidance: {
+          fire: "Your fiery nature brings passion and transformation. Channel this energy through focused spiritual practice and righteous action.",
+          water: "Your flowing nature brings depth and intuition. Embrace emotional wisdom and let your heart guide you to divine connection.",
+          air: "Your airy nature brings clarity and communication. Seek knowledge and share wisdom with gentle words and pure intention.",
+          earth: "Your grounded nature brings stability and patience. Build your spiritual foundation through consistent practice and gratitude.",
+        },
+        
+        // Numerical Essence Guidance Template
+        essenceGuidance: {
+          template: "Your path combines the essence of {{archetype}} with the power of {{element}}.\n\nEmbrace your natural {{quality}} while balancing it with the {{elementQuality}} nature of your element. Seek harmony between inner contemplation and outward expression.",
+        },
       },
       
       // Abjad System Labels (deprecated, kept for backwards compatibility)
@@ -4929,6 +4942,19 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           goat: "Le Bouc",
           waterBearer: "Le Verseau",
           fish: "Les Poissons",
+        },
+        
+        // Spiritual Guidance (Element-based)
+        elementGuidance: {
+          fire: "Votre nature ardente apporte passion et transformation. Canalisez cette énergie par une pratique spirituelle concentrée et une action juste.",
+          water: "Votre nature fluide apporte profondeur et intuition. Embrassez la sagesse émotionnelle et laissez votre cœur vous guider vers la connexion divine.",
+          air: "Votre nature aérienne apporte clarté et communication. Recherchez la connaissance et partagez la sagesse avec des mots doux et une intention pure.",
+          earth: "Votre nature ancrée apporte stabilité et patience. Construisez votre fondation spirituelle par une pratique constante et la gratitude.",
+        },
+        
+        // Numerical Essence Guidance Template
+        essenceGuidance: {
+          template: "Votre chemin combine l'essence de {{archetype}} avec le pouvoir de {{element}}.\n\nEmbrassez votre {{quality}} naturel tout en l'équilibrant avec la nature {{elementQuality}} de votre élément. Recherchez l'harmonie entre contemplation intérieure et expression extérieure.",
         },
       },
       

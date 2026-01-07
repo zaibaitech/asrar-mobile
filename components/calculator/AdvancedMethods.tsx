@@ -1,6 +1,6 @@
+import { useLanguage } from '@/contexts/LanguageContext';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 interface AdvancedMethodsProps {
   kabir: number;

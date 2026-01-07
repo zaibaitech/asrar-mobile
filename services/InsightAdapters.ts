@@ -35,11 +35,12 @@ const NAME_ARCHETYPES: Record<number, string> = {
   9: 'The Sage',
 };
 
-const ELEMENT_GUIDANCE: Record<ElementType, string> = {
-  fire: 'Your fiery nature brings passion and transformation. Channel this energy through focused spiritual practice and righteous action.',
-  water: 'Your flowing nature brings depth and intuition. Embrace emotional wisdom and let your heart guide you to divine connection.',
-  air: 'Your airy nature brings clarity and communication. Seek knowledge and share wisdom with gentle words and pure intention.',
-  earth: 'Your grounded nature brings stability and patience. Build your spiritual foundation through consistent practice and gratitude.',
+// Element guidance keys (to be translated via t())
+const ELEMENT_GUIDANCE_KEYS: Record<ElementType, string> = {
+  fire: 'calculator.results.elementGuidance.fire',
+  water: 'calculator.results.elementGuidance.water',
+  air: 'calculator.results.elementGuidance.air',
+  earth: 'calculator.results.elementGuidance.earth',
 };
 
 const ELEMENT_BEST_TIME: Record<ElementType, string> = {
@@ -61,7 +62,11 @@ export function computeNameInsights(
   analytics: ElementalAnalytics
 ): NameInsights {
   const archetype = NAME_ARCHETYPES[core.saghir] || 'The Traveler';
-  const guidance = ELEMENT_GUIDANCE[core.element];
+  
+  // Store the translation key instead of translated text
+  // Components will translate this using t(spiritualGuidance)
+  const guidanceKey = ELEMENT_GUIDANCE_KEYS[core.element];
+  
   const bestTime = ELEMENT_BEST_TIME[core.element];
   const powerDay = ELEMENT_POWER_DAY[core.element];
   
@@ -82,7 +87,7 @@ export function computeNameInsights(
   
   return {
     archetypeTitle: archetype,
-    spiritualGuidance: guidance,
+    spiritualGuidance: guidanceKey, // Now a translation key, not English text
     divineNameConnection: matchingNames,
     recommendedDhikrCount: counts,
     bestTimeWindow: bestTime,

@@ -50,6 +50,14 @@ export const NumericalEssence: React.FC<NumericalEssenceProps> = ({ saghir, elem
     quality: t(`calculator.results.elementQualities.${element}.quality`),
     spiritual: t(`calculator.results.elementQualities.${element}.spiritual`),
   };
+  
+  // Build guidance text from template with dynamic values
+  const guidanceText = t('calculator.results.essenceGuidance.template', {
+    archetype: meaning.title,
+    element: t(`calculator.results.elements.${element}`),
+    quality: meaning.qualities[0].toLowerCase(),
+    elementQuality: elementData.quality.split(',')[0].toLowerCase(),
+  });
 
   return (
     <View style={[styles.container, { borderColor: elementData.color }]}>
@@ -96,12 +104,7 @@ export const NumericalEssence: React.FC<NumericalEssenceProps> = ({ saghir, elem
       {/* Guidance */}
       <View style={styles.guidanceCard}>
         <Text style={styles.guidanceTitle}>✨ {t('calculator.results.essence.spiritualGuidance')}</Text>
-        <Text style={styles.guidanceText}>
-          Your path combines the essence of <Text style={styles.highlight}>{meaning.title}</Text> with the power of <Text style={styles.highlight}>{t(`calculator.results.elements.${element}`)}</Text>. 
-          {'\n\n'}
-          Embrace your natural {meaning.qualities[0].toLowerCase()} while balancing it with the {elementData.quality.split(',')[0]} nature of your element. 
-          Seek harmony between inner contemplation and outward expression.
-        </Text>
+        <Text style={styles.guidanceText}>{guidanceText}</Text>
       </View>
     </View>
   );

@@ -3,11 +3,11 @@
  * Displays name-specific insights
  */
 
+import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NameInsights } from '../../../types/calculator-enhanced';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NameResultSectionProps {
   insights: NameInsights;
@@ -27,7 +27,7 @@ export const NameResultSection: React.FC<NameResultSectionProps> = ({ insights }
       {/* Spiritual Guidance */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>🌟 {t('calculator.results.nameInsights.spiritualGuidance')}</Text>
-        <Text style={styles.cardText}>{insights.spiritualGuidance}</Text>
+        <Text style={styles.cardText}>{t(insights.spiritualGuidance)}</Text>
       </View>
       
       {/* Divine Name Connections */}
