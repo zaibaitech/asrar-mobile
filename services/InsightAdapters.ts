@@ -298,11 +298,23 @@ export function computeDhikrInsights(
     } : undefined,
     suggestedCounts,
     timing: {
-      afterSalah: ['After Fajr', 'After Maghrib', 'Before sleep'],
+      afterSalahKeys: [
+        'calculator.results.dhikr.timing.afterFajr',
+        'calculator.results.dhikr.timing.afterMaghrib',
+        'calculator.results.dhikr.timing.beforeSleep',
+      ],
     },
     practiceGuidance: {
-      preparation: ['Make wuḍū', 'Face qibla', 'Begin with ṣalawāt on the Prophet ﷺ'],
-      adab: ['With presence and humility', 'Count on fingers or tasbīḥ', 'End with duʿā'],
+      preparationKeys: [
+        'calculator.results.dhikr.guidance.prep.wudu',
+        'calculator.results.dhikr.guidance.prep.qibla',
+        'calculator.results.dhikr.guidance.prep.salawat',
+      ],
+      adabKeys: [
+        'calculator.results.dhikr.guidance.etiquette.presence',
+        'calculator.results.dhikr.guidance.etiquette.counting',
+        'calculator.results.dhikr.guidance.etiquette.dua',
+      ],
     },
   };
 }

@@ -1169,6 +1169,60 @@ export const translations = {
           // Disclaimer
           disclaimer: "This is numerical analysis only. For tafsīr and religious rulings, consult qualified scholars.",
         },
+        
+        // Dhikr Result Section
+        dhikr: {
+          // Calculated From Messages
+          calculatedWithoutPrefixes: "Calculated without ال/يا prefixes",
+          
+          // Section Titles
+          divineName: "Divine Name",
+          suggestedCounts: "Suggested Dhikr Counts",
+          bestTimes: "Best Times to Practice",
+          practiceGuidance: "Practice Guidance",
+          
+          // Match Strength Templates
+          match: {
+            exact: "Match: exact (Value: {{value}})",
+            near: "Match: near (Value: {{value}})",
+            distant: "Match: distant (Value: {{value}})",
+          },
+          
+          // Count Labels
+          counts: {
+            valueBased: "Value-Based:",
+            traditionalCounts: "Traditional Counts:",
+          },
+          
+          // Timing Labels
+          timing: {
+            planetaryDay: "Planetary Day:",
+            afterSalah: "After Salah:",
+            afterFajr: "After Fajr",
+            afterMaghrib: "After Maghrib",
+            beforeSleep: "Before sleep",
+          },
+          
+          // Practice Guidance
+          guidance: {
+            preparation: "Preparation:",
+            adab: "Adab (Etiquette):",
+            
+            // Preparation Steps
+            prep: {
+              wudu: "Make wuḍū",
+              qibla: "Face qibla",
+              salawat: "Begin with ṣalawāt on the Prophet ﷺ",
+            },
+            
+            // Adab Steps
+            etiquette: {
+              presence: "With presence and humility",
+              counting: "Count on fingers or tasbīḥ",
+              dua: "End with duʿā",
+            },
+          },
+        },
       },
       
       // Abjad System Labels (deprecated, kept for backwards compatibility)
@@ -5271,6 +5325,60 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           
           // Disclaimer
           disclaimer: "Ceci est une analyse numérique uniquement. Pour le tafsīr et les décisions religieuses, consultez des érudits qualifiés.",
+        },
+        
+        // Dhikr Result Section
+        dhikr: {
+          // Calculated From Messages
+          calculatedWithoutPrefixes: "Calculé sans les préfixes ال/يا",
+          
+          // Section Titles
+          divineName: "Nom Divin",
+          suggestedCounts: "Comptages de Dhikr Suggérés",
+          bestTimes: "Meilleurs Moments pour Pratiquer",
+          practiceGuidance: "Guide de Pratique",
+          
+          // Match Strength Templates
+          match: {
+            exact: "Correspondance : exacte (Valeur : {{value}})",
+            near: "Correspondance : proche (Valeur : {{value}})",
+            distant: "Correspondance : distante (Valeur : {{value}})",
+          },
+          
+          // Count Labels
+          counts: {
+            valueBased: "Basé sur la Valeur :",
+            traditionalCounts: "Comptages Traditionnels :",
+          },
+          
+          // Timing Labels
+          timing: {
+            planetaryDay: "Jour Planétaire :",
+            afterSalah: "Après la Salah :",
+            afterFajr: "Après Fajr",
+            afterMaghrib: "Après Maghrib",
+            beforeSleep: "Avant de dormir",
+          },
+          
+          // Practice Guidance
+          guidance: {
+            preparation: "Préparation :",
+            adab: "Adab (Étiquette) :",
+            
+            // Preparation Steps
+            prep: {
+              wudu: "Faites le wuḍū",
+              qibla: "Faites face à la qibla",
+              salawat: "Commencez par les ṣalawāt sur le Prophète ﷺ",
+            },
+            
+            // Adab Steps
+            etiquette: {
+              presence: "Avec présence et humilité",
+              counting: "Comptez sur les doigts ou le tasbīḥ",
+              dua: "Terminez par le duʿā",
+            },
+          },
         },
       },
       

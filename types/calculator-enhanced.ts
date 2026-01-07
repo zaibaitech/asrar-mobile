@@ -180,11 +180,11 @@ export interface DhikrInsights {
   };
   timing: {
     planetDay?: string;
-    afterSalah: string[];
+    afterSalahKeys: string[]; // Translation keys instead of English texts
   };
   practiceGuidance: {
-    preparation: string[];
-    adab: string[];
+    preparationKeys: string[]; // Translation keys instead of English texts
+    adabKeys: string[];        // Translation keys instead of English texts
   };
 }
 

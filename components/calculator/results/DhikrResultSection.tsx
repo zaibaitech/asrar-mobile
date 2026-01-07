@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { DhikrInsights } from '../../../types/calculator-enhanced';
 
 interface DhikrResultSectionProps {
@@ -11,17 +12,21 @@ interface DhikrResultSectionProps {
 }
 
 export const DhikrResultSection: React.FC<DhikrResultSectionProps> = ({ insights }) => {
+  const { t } = useLanguage();
+  
   return (
     <View style={styles.container}>
       {/* Selected Divine Name */}
       {insights.selectedDivineName && (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>🕋 Divine Name</Text>
+          <Text style={styles.cardTitle}>🕋 {t('calculator.results.dhikr.divineName')}</Text>
           <Text style={styles.divineNameArabic}>{insights.selectedDivineName.arabic}</Text>
           <Text style={styles.divineNameTranslit}>{insights.selectedDivineName.transliteration}</Text>
           <View style={styles.matchBadge}>
             <Text style={styles.matchText}>
-              Match: {insights.selectedDivineName.matchStrength} (Value: {insights.selectedDivineName.abjadValue})
+              {t(`calculator.results.dhikr.match.${insights.selectedDivineName.matchStrength}`, {
+                value: insights.selectedDivineName.abjadValue.toString()
+              })}
             </Text>
           </View>
         </View>
@@ -29,11 +34,11 @@ export const DhikrResultSection: React.FC<DhikrResultSectionProps> = ({ insights
       
       {/* Suggested Counts */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🔢 Suggested Dhikr Counts</Text>
+        <Text style={styles.cardTitle}>🔢 {t('calculator.results.dhikr.suggestedCounts')}</Text>
         
         {insights.suggestedCounts.valueBased && (
           <View style={styles.countSection}>
-            <Text style={styles.countLabel}>Value-Based:</Text>
+            <Text style={styles.countLabel}>{t('calculator.results.dhikr.counts.valueBased')}</Text>
             <View style={styles.countChip}>
               <Text style={styles.countText}>{insights.suggestedCounts.valueBased}×</Text>
             </View>
@@ -41,7 +46,7 @@ export const DhikrResultSection: React.FC<DhikrResultSectionProps> = ({ insights
         )}
         
         <View style={styles.countSection}>
-          <Text style={styles.countLabel}>Traditional Counts:</Text>
+          <Text style={styles.countLabel}>{t('calculator.results.dhikr.counts.traditionalCounts')}</Text>
           <View style={styles.countsRow}>
             {insights.suggestedCounts.traditional.map((count, idx) => (
               <View key={idx} style={styles.countChip}>
@@ -55,20 +60,20 @@ export const DhikrResultSection: React.FC<DhikrResultSectionProps> = ({ insights
       {/* Timing */}
       {insights.timing && (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>⏰ Best Times to Practice</Text>
+          <Text style={styles.cardTitle}>⏰ {t('calculator.results.dhikr.bestTimes')}</Text>
           
           {insights.timing.planetDay && (
             <View style={styles.timingSection}>
-              <Text style={styles.timingLabel}>🪐 Planetary Day:</Text>
+              <Text style={styles.timingLabel}>🪐 {t('calculator.results.dhikr.timing.planetaryDay')}</Text>
               <Text style={styles.timingValue}>{insights.timing.planetDay}</Text>
             </View>
           )}
           
-          {insights.timing.afterSalah && insights.timing.afterSalah.length > 0 && (
+          {insights.timing.afterSalahKeys && insights.timing.afterSalahKeys.length > 0 && (
             <View style={styles.timingSection}>
-              <Text style={styles.timingLabel}>🕌 After Salah:</Text>
-              {insights.timing.afterSalah.map((time, idx) => (
-                <Text key={idx} style={styles.timingItem}>• {time}</Text>
+              <Text style={styles.timingLabel}>🕌 {t('calculator.results.dhikr.timing.afterSalah')}</Text>
+              {insights.timing.afterSalahKeys.map((timeKey, idx) => (
+                <Text key={idx} style={styles.timingItem}>• {t(timeKey)}</Text>
               ))}
             </View>
           )}
@@ -77,19 +82,19 @@ export const DhikrResultSection: React.FC<DhikrResultSectionProps> = ({ insights
       
       {/* Practice Guidance */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>📿 Practice Guidance</Text>
+        <Text style={styles.cardTitle}>📿 {t('calculator.results.dhikr.practiceGuidance')}</Text>
         
         <View style={styles.guidanceSection}>
-          <Text style={styles.guidanceSubtitle}>Preparation:</Text>
-          {insights.practiceGuidance.preparation.map((step, idx) => (
-            <Text key={idx} style={styles.guidanceItem}>✓ {step}</Text>
+          <Text style={styles.guidanceSubtitle}>{t('calculator.results.dhikr.guidance.preparation')}</Text>
+          {insights.practiceGuidance.preparationKeys.map((stepKey, idx) => (
+            <Text key={idx} style={styles.guidanceItem}>✓ {t(stepKey)}</Text>
           ))}
         </View>
         
         <View style={styles.guidanceSection}>
-          <Text style={styles.guidanceSubtitle}>Adab (Etiquette):</Text>
-          {insights.practiceGuidance.adab.map((rule, idx) => (
-            <Text key={idx} style={styles.guidanceItem}>• {rule}</Text>
+          <Text style={styles.guidanceSubtitle}>{t('calculator.results.dhikr.guidance.adab')}</Text>
+          {insights.practiceGuidance.adabKeys.map((ruleKey, idx) => (
+            <Text key={idx} style={styles.guidanceItem}>• {t(ruleKey)}</Text>
           ))}
         </View>
       </View>
