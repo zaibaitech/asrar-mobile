@@ -675,7 +675,87 @@ export const translations = {
       hideKeyboard: "Hide Keyboard",
       examples: "Examples",
       
+      // Tabs
+      tabs: {
+        input: "Input",
+        results: "Results",
+      },
+      
+      // Form Section Headers
+      form: {
+        calculationType: "Calculation Type",
+        calculationTypeHelper: "What would you like to calculate?",
+        abjadSystem: "Abjad System",
+        name: "Name",
+        yourName: "Your Name",
+        motherName: "Mother's Name",
+        phraseOrSentence: "Phrase or Sentence",
+        anyText: "Any Text",
+        pasteArabicText: "Paste Arabic Text",
+      },
+      
+      // Calculation Types
+      types: {
+        name: {
+          title: "Name",
+          subtitle: "Single name analysis",
+        },
+        lineage: {
+          title: "Lineage",
+          subtitle: "Name + Mother",
+        },
+        phrase: {
+          title: "Phrase",
+          subtitle: "Sentence or text",
+        },
+        quran: {
+          title: "Qur'an",
+          subtitle: "Surah + Ayah",
+        },
+        dhikr: {
+          title: "Dhikr",
+          subtitle: "Divine Names",
+        },
+        general: {
+          title: "General",
+          subtitle: "Raw letters",
+        },
+      },
+      
       // Abjad System Labels
+      abjad: {
+        maghribi: "Maghribi",
+        mashriqi: "Mashriqi",
+      },
+      
+      // Input Fields
+      inputs: {
+        latinName: "Latin Name (English/French)",
+        latinNamePlaceholder: "e.g., Ibrahima, Amadou, Ousmane",
+        motherLatinPlaceholder: "e.g., Fatima, Khadija, Aisha",
+        arabicName: "Arabic Name",
+        arabicNameRequired: "Arabic Name *",
+        keyboard: "Keyboard",
+        selectSurahAyah: "Select Surah & Ayah",
+        selectDivineName: "Select Divine Name",
+        orDivider: "— OR —",
+      },
+      
+      // Phrase Options
+      options: {
+        removeVowels: "Remove vowels/harakat",
+        ignorePunctuation: "Ignore punctuation",
+        ignoreSpaces: "Ignore spaces",
+      },
+      
+      // Actions
+      actions: {
+        calculate: "Calculate",
+        calculating: "Calculating...",
+        close: "Close",
+      },
+      
+      // Abjad System Labels (deprecated, kept for backwards compatibility)
       maghribi: "Maghribi",
       mashriqi: "Mashriqi",
       
@@ -4282,7 +4362,87 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       hideKeyboard: "Masquer le Clavier",
       examples: "Exemples",
       
+      // Tabs
+      tabs: {
+        input: "Saisie",
+        results: "Résultats",
+      },
+      
+      // Form Section Headers
+      form: {
+        calculationType: "Type de Calcul",
+        calculationTypeHelper: "Que souhaitez-vous calculer ?",
+        abjadSystem: "Système Abjad",
+        name: "Nom",
+        yourName: "Votre Nom",
+        motherName: "Nom de la Mère",
+        phraseOrSentence: "Phrase ou Sentence",
+        anyText: "Texte Quelconque",
+        pasteArabicText: "Coller le Texte Arabe",
+      },
+      
+      // Calculation Types
+      types: {
+        name: {
+          title: "Nom",
+          subtitle: "Analyse d'un seul nom",
+        },
+        lineage: {
+          title: "Lignée",
+          subtitle: "Nom + Mère",
+        },
+        phrase: {
+          title: "Phrase",
+          subtitle: "Sentence ou texte",
+        },
+        quran: {
+          title: "Coran",
+          subtitle: "Sourate + Ayah",
+        },
+        dhikr: {
+          title: "Dhikr",
+          subtitle: "Noms Divins",
+        },
+        general: {
+          title: "Général",
+          subtitle: "Lettres brutes",
+        },
+      },
+      
       // Abjad System Labels
+      abjad: {
+        maghribi: "Maghribi",
+        mashriqi: "Mashriqi",
+      },
+      
+      // Input Fields
+      inputs: {
+        latinName: "Nom Latin (Anglais/Français)",
+        latinNamePlaceholder: "ex., Ibrahima, Amadou, Ousmane",
+        motherLatinPlaceholder: "ex., Fatima, Khadija, Aisha",
+        arabicName: "Nom Arabe",
+        arabicNameRequired: "Nom Arabe *",
+        keyboard: "Clavier",
+        selectSurahAyah: "Sélectionner Sourate & Ayah",
+        selectDivineName: "Sélectionner un Nom Divin",
+        orDivider: "— OU —",
+      },
+      
+      // Phrase Options
+      options: {
+        removeVowels: "Supprimer les voyelles/harakat",
+        ignorePunctuation: "Ignorer la ponctuation",
+        ignoreSpaces: "Ignorer les espaces",
+      },
+      
+      // Actions
+      actions: {
+        calculate: "Calculer",
+        calculating: "Calcul en cours...",
+        close: "Fermer",
+      },
+      
+      // Abjad System Labels (deprecated, kept for backwards compatibility)
       maghribi: "Maghribi",
       mashriqi: "Mashriqi",
       

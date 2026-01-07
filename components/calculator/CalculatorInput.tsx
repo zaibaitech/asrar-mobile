@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState } from 'react';
 import { Modal, SafeAreaView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { CalculatorColors } from '../../constants/CalculatorColors';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { CalculationType } from '../../types/calculator-enhanced';
 import NameAutocomplete from '../NameAutocomplete';
 import ArabicKeyboard from './ArabicKeyboard';
@@ -72,6 +73,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
   isLoading,
 }) => {
   const colors = CalculatorColors;
+  const { t } = useLanguage();
   const [showDivineNamesPicker, setShowDivineNamesPicker] = useState(false);
   const [showSurahSelector, setShowSurahSelector] = useState(false);
   const [showKeyboard, setShowKeyboard] = useState(false);
@@ -147,12 +149,12 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
         return (
           <View style={styles.inputCard}>
             <View style={styles.inputHeader}>
-              <Text style={styles.inputLabel}>👤 Name</Text>
+              <Text style={styles.inputLabel}>👤 {t('calculator.form.name')}</Text>
             </View>
             
             {/* Latin Name Autocomplete */}
             <View style={styles.inputWrapper}>
-              <Text style={styles.label}>Latin Name (English/French)</Text>
+              <Text style={styles.label}>{t('calculator.inputs.latinName')}</Text>
               <NameAutocomplete
                 value={nameLatin}
                 onChange={setNameLatin}
@@ -160,7 +162,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
                   onArabicInputChange(arabic);
                   setNameLatin(latin);
                 }}
-                placeholder="e.g., Ibrahima, Amadou, Ousmane"
+                placeholder={t('calculator.inputs.latinNamePlaceholder')}
                 showHelper={false}
                 language="en"
               />
@@ -169,12 +171,12 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
             {/* Arabic Name Input */}
             <View style={styles.inputWrapper}>
               <View style={styles.labelRow}>
-                <Text style={styles.label}>Arabic Name *</Text>
+                <Text style={styles.label}>{t('calculator.inputs.arabicNameRequired')}</Text>
                 <TouchableOpacity 
                   style={styles.keyboardButton}
                   onPress={() => openKeyboard('arabic')}
                 >
-                  <Text style={styles.keyboardButtonText}>⌨️ Keyboard</Text>
+                  <Text style={styles.keyboardButtonText}>⌨️ {t('calculator.inputs.keyboard')}</Text>
                 </TouchableOpacity>
               </View>
               <TextInput
@@ -196,12 +198,12 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
           <>
             <View style={styles.inputCard}>
               <View style={styles.inputHeader}>
-                <Text style={styles.inputLabel}>👤 Your Name</Text>
+                <Text style={styles.inputLabel}>👤 {t('calculator.form.yourName')}</Text>
               </View>
               
               {/* Latin Name Autocomplete */}
               <View style={styles.inputWrapper}>
-                <Text style={styles.label}>Latin Name (English/French)</Text>
+                <Text style={styles.label}>{t('calculator.inputs.latinName')}</Text>
                 <NameAutocomplete
                   value={yourNameLatin}
                   onChange={setYourNameLatin}
@@ -209,7 +211,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
                     onYourNameChange(arabic);
                     setYourNameLatin(latin);
                   }}
-                  placeholder="e.g., Ibrahima, Amadou, Ousmane"
+                  placeholder={t('calculator.inputs.latinNamePlaceholder')}
                   showHelper={false}
                   language="en"
                 />
@@ -218,12 +220,12 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
               {/* Arabic Name Input */}
               <View style={styles.inputWrapper}>
                 <View style={styles.labelRow}>
-                  <Text style={styles.label}>Arabic Name *</Text>
+                  <Text style={styles.label}>{t('calculator.inputs.arabicNameRequired')}</Text>
                   <TouchableOpacity 
                     style={styles.keyboardButton}
                     onPress={() => openKeyboard('yourName')}
                   >
-                    <Text style={styles.keyboardButtonText}>⌨️ Keyboard</Text>
+                    <Text style={styles.keyboardButtonText}>⌨️ {t('calculator.inputs.keyboard')}</Text>
                   </TouchableOpacity>
                 </View>
                 <TextInput
@@ -241,12 +243,12 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
             
             <View style={styles.inputCard}>
               <View style={styles.inputHeader}>
-                <Text style={styles.inputLabel}>👩 Mother's Name</Text>
+                <Text style={styles.inputLabel}>👩 {t('calculator.form.motherName')}</Text>
               </View>
               
               {/* Latin Name Autocomplete */}
               <View style={styles.inputWrapper}>
-                <Text style={styles.label}>Latin Name (English/French)</Text>
+                <Text style={styles.label}>{t('calculator.inputs.latinName')}</Text>
                 <NameAutocomplete
                   value={motherNameLatin}
                   onChange={setMotherNameLatin}
@@ -254,7 +256,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
                     onMotherNameChange(arabic);
                     setMotherNameLatin(latin);
                   }}
-                  placeholder="e.g., Fatima, Khadija, Aisha"
+                  placeholder={t('calculator.inputs.motherLatinPlaceholder')}
                   showHelper={false}
                   language="en"
                 />
@@ -263,12 +265,12 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
               {/* Arabic Name Input */}
               <View style={styles.inputWrapper}>
                 <View style={styles.labelRow}>
-                  <Text style={styles.label}>Arabic Name *</Text>
+                  <Text style={styles.label}>{t('calculator.inputs.arabicNameRequired')}</Text>
                   <TouchableOpacity 
                     style={styles.keyboardButton}
                     onPress={() => openKeyboard('motherName')}
                   >
-                    <Text style={styles.keyboardButtonText}>⌨️ Keyboard</Text>
+                    <Text style={styles.keyboardButtonText}>⌨️ {t('calculator.inputs.keyboard')}</Text>
                   </TouchableOpacity>
                 </View>
                 <TextInput
@@ -291,7 +293,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
           <>
             <View style={styles.inputCard}>
               <View style={styles.inputHeader}>
-                <Text style={styles.inputLabel}>📝 Phrase or Sentence</Text>
+                <Text style={styles.inputLabel}>📝 {t('calculator.form.phraseOrSentence')}</Text>
                 <TouchableOpacity 
                   style={styles.keyboardButton}
                   onPress={() => openKeyboard('arabic')}
@@ -313,7 +315,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
             
             <View style={styles.optionCard}>
               <View style={styles.optionRow}>
-                <Text style={styles.optionLabel}>Remove vowels/harakat</Text>
+                <Text style={styles.optionLabel}>{t('calculator.options.removeVowels')}</Text>
                 <Switch
                   value={removeVowels}
                   onValueChange={onRemoveVowelsChange}
@@ -322,7 +324,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
                 />
               </View>
               <View style={styles.optionRow}>
-                <Text style={styles.optionLabel}>Ignore punctuation</Text>
+                <Text style={styles.optionLabel}>{t('calculator.options.ignorePunctuation')}</Text>
                 <Switch
                   value={ignorePunctuation}
                   onValueChange={onIgnorePunctuationChange}
@@ -331,7 +333,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
                 />
               </View>
               <View style={styles.optionRow}>
-                <Text style={styles.optionLabel}>Ignore spaces</Text>
+                <Text style={styles.optionLabel}>{t('calculator.options.ignoreSpaces')}</Text>
                 <Switch
                   value={ignoreSpaces}
                   onValueChange={onIgnoreSpacesChange}
@@ -355,15 +357,15 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
                   ? selectedAyah === 'basmalah'
                     ? `📿 Basmalah (بِسْمِ ٱللَّهِ)`
                     : `📖 Surah ${selectedSurah}, Ayah ${selectedAyah}`
-                  : '📖 Select Surah & Ayah'}
+                  : `📖 ${t('calculator.inputs.selectSurahAyah')}`}
               </Text>
             </TouchableOpacity>
 
-            <Text style={styles.orText}>— OR —</Text>
+            <Text style={styles.orText}>{t('calculator.inputs.orDivider')}</Text>
 
             <View style={styles.inputCard}>
               <View style={styles.inputHeader}>
-                <Text style={styles.inputLabel}>Paste Arabic Text</Text>
+                <Text style={styles.inputLabel}>{t('calculator.form.pasteArabicText')}</Text>
               </View>
               <TextInput
                 style={[styles.arabicInput, { minHeight: 100 }]}
@@ -387,7 +389,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
                       onPress={() => setShowSurahSelector(false)}
                       style={styles.modalCloseButton}
                     >
-                      <Text style={styles.modalCloseText}>✕ Close</Text>
+                      <Text style={styles.modalCloseText}>✕ {t('calculator.actions.close')}</Text>
                     </TouchableOpacity>
                   </View>
                   <SurahAyahSelector
@@ -415,7 +417,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
               <Text style={styles.selectorButtonText}>
                 {selectedDivineName
                   ? `🤲 Name #${selectedDivineName}`
-                  : '🤲 Select Divine Name'}
+                  : `🤲 ${t('calculator.inputs.selectDivineName')}`}
               </Text>
             </TouchableOpacity>
 
@@ -435,7 +437,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
         return (
           <View style={styles.inputCard}>
             <View style={styles.inputHeader}>
-              <Text style={styles.inputLabel}>🔤 Any Text</Text>
+              <Text style={styles.inputLabel}>🔤 {t('calculator.form.anyText')}</Text>
               <TouchableOpacity 
                 style={styles.keyboardButton}
                 onPress={() => openKeyboard('arabic')}
@@ -482,7 +484,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
     <View style={styles.container}>
       {/* System Selector */}
       <View style={styles.selectorContainer}>
-        <Text style={styles.selectorLabel}>🎯 Abjad System</Text>
+        <Text style={styles.selectorLabel}>🎯 {t('calculator.form.abjadSystem')}</Text>
         <View style={styles.systemSelector}>
           <TouchableOpacity
             style={styles.systemButtonWrapper}
@@ -495,11 +497,11 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                <Text style={styles.systemTextActive}>🌙 Maghribi</Text>
+                <Text style={styles.systemTextActive}>🌙 {t('calculator.abjad.maghribi')}</Text>
               </LinearGradient>
             ) : (
               <View style={[styles.systemButton, styles.systemButtonInactive]}>
-                <Text style={styles.systemTextInactive}>Maghribi</Text>
+                <Text style={styles.systemTextInactive}>{t('calculator.abjad.maghribi')}</Text>
               </View>
             )}
           </TouchableOpacity>
@@ -515,11 +517,11 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                <Text style={styles.systemTextActive}>☀️ Mashriqi</Text>
+                <Text style={styles.systemTextActive}>☀️ {t('calculator.abjad.mashriqi')}</Text>
               </LinearGradient>
             ) : (
               <View style={[styles.systemButton, styles.systemButtonInactive]}>
-                <Text style={styles.systemTextInactive}>Mashriqi</Text>
+                <Text style={styles.systemTextInactive}>{t('calculator.abjad.mashriqi')}</Text>
               </View>
             )}
           </TouchableOpacity>
@@ -543,7 +545,7 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
           end={{ x: 1, y: 0 }}
         >
           <Text style={styles.calculateText}>
-            {isLoading ? '⌛ Calculating...' : '✨ Calculate'}
+            {isLoading ? `⌛ ${t('calculator.actions.calculating')}` : `✨ ${t('calculator.actions.calculate')}`}
           </Text>
         </LinearGradient>
       </TouchableOpacity>

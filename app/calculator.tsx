@@ -6,11 +6,13 @@ import { CalculationTypeSelector } from '../components/calculator/CalculationTyp
 import { CalculatorInput } from '../components/calculator/CalculatorInput';
 import { EnhancedResultsDisplay } from '../components/calculator/EnhancedResultsDisplay';
 import { CalculatorColors } from '../constants/CalculatorColors';
+import { useLanguage } from '../contexts/LanguageContext';
 import { EnhancedCalculatorEngine } from '../services/EnhancedCalculatorEngine';
 import { CalculationType, EnhancedCalculationResult } from '../types/calculator-enhanced';
 
 export default function CalculatorScreen() {
   const colors = CalculatorColors;
+  const { t } = useLanguage();
 
   // Enhanced Calculator State
   const [calculationType, setCalculationType] = useState<CalculationType>('name');
@@ -201,7 +203,7 @@ export default function CalculatorScreen() {
                 end={{ x: 1, y: 0 }}
               />
             )}
-            <Text style={[styles.tabText, { color: activeTab === 'input' ? '#fff' : '#94a3b8' }]}>✍️ Input</Text>
+            <Text style={[styles.tabText, { color: activeTab === 'input' ? '#fff' : '#94a3b8' }]}>✍️ {t('calculator.tabs.input')}</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'results' && styles.tabActive]} 
@@ -216,7 +218,7 @@ export default function CalculatorScreen() {
                 end={{ x: 1, y: 0 }}
               />
             )}
-            <Text style={[styles.tabText, { color: activeTab === 'results' ? '#fff' : '#94a3b8', opacity: currentResult ? 1 : 0.4 }]}>✨ Results</Text>
+            <Text style={[styles.tabText, { color: activeTab === 'results' ? '#fff' : '#94a3b8', opacity: currentResult ? 1 : 0.4 }]}>✨ {t('calculator.tabs.results')}</Text>
           </TouchableOpacity>
         </LinearGradient>
 

@@ -6,6 +6,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { CalculationType } from '../../types/calculator-enhanced';
 
 interface CalculationTypeSelectorProps {
@@ -16,8 +17,6 @@ interface CalculationTypeSelectorProps {
 interface TypeOption {
   type: CalculationType;
   icon: string;
-  title: string;
-  subtitle: string;
   color: string;
 }
 
@@ -25,43 +24,31 @@ const TYPE_OPTIONS: TypeOption[] = [
   {
     type: 'name',
     icon: '👤',
-    title: 'Name',
-    subtitle: 'Single name analysis',
     color: '#6366f1',
   },
   {
     type: 'lineage',
     icon: '🌳',
-    title: 'Lineage',
-    subtitle: 'Name + Mother',
     color: '#8b5cf6',
   },
   {
     type: 'phrase',
     icon: '📝',
-    title: 'Phrase',
-    subtitle: 'Sentence or text',
     color: '#ec4899',
   },
   {
     type: 'quran',
     icon: '📖',
-    title: 'Qur\'an',
-    subtitle: 'Surah + Ayah',
     color: '#10b981',
   },
   {
     type: 'dhikr',
     icon: '🤲',
-    title: 'Dhikr',
-    subtitle: 'Divine Names',
     color: '#f59e0b',
   },
   {
     type: 'general',
     icon: '🔤',
-    title: 'General',
-    subtitle: 'Raw letters',
     color: '#06b6d4',
   },
 ];
@@ -70,10 +57,12 @@ export const CalculationTypeSelector: React.FC<CalculationTypeSelectorProps> = (
   selectedType,
   onTypeChange,
 }) => {
+  const { t } = useLanguage();
+  
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>🎯 Calculation Type</Text>
-      <Text style={styles.subtitle}>What would you like to calculate?</Text>
+      <Text style={styles.label}>🎯 {t('calculator.form.calculationType')}</Text>
+      <Text style={styles.subtitle}>{t('calculator.form.calculationTypeHelper')}</Text>
       
       <ScrollView 
         horizontal 
@@ -82,6 +71,8 @@ export const CalculationTypeSelector: React.FC<CalculationTypeSelectorProps> = (
       >
         {TYPE_OPTIONS.map((option) => {
           const isSelected = selectedType === option.type;
+          const title = t(`calculator.types.${option.type}.title`);
+          const subtitle = t(`calculator.types.${option.type}.subtitle`);
           
           return (
             <TouchableOpacity
@@ -98,14 +89,14 @@ export const CalculationTypeSelector: React.FC<CalculationTypeSelectorProps> = (
                   end={{ x: 1, y: 1 }}
                 >
                   <Text style={styles.iconSelected}>{option.icon}</Text>
-                  <Text style={styles.titleSelected}>{option.title}</Text>
-                  <Text style={styles.subtitleSelected}>{option.subtitle}</Text>
+                  <Text style={styles.titleSelected}>{title}</Text>
+                  <Text style={styles.subtitleSelected}>{subtitle}</Text>
                 </LinearGradient>
               ) : (
                 <View style={[styles.option, styles.optionInactive]}>
                   <Text style={styles.iconInactive}>{option.icon}</Text>
-                  <Text style={styles.titleInactive}>{option.title}</Text>
-                  <Text style={styles.subtitleInactive}>{option.subtitle}</Text>
+                  <Text style={styles.titleInactive}>{title}</Text>
+                  <Text style={styles.subtitleInactive}>{subtitle}</Text>
                 </View>
               )}
             </TouchableOpacity>
