@@ -367,6 +367,7 @@ export const translations = {
       sections: {
         spiritualModules: "Spiritual Modules",
       },
+      showAll: "Show All",
       nextPrayer: "Next Prayer",
       nextPlanetHour: "Next Planet Hour",
       startsAt: "Starts at",
@@ -4760,6 +4761,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       sections: {
         spiritualModules: "Modules spirituels",
       },
+      showAll: "Voir tout",
       nextPrayer: "Prochaine Prière",
       nextPlanetHour: "Prochaine Heure Planétaire",
       startsAt: "Commence à",

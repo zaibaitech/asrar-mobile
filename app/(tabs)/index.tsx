@@ -622,6 +622,47 @@ export default function HomeScreen() {
           />
         </TouchableOpacity>
         
+        {/* Compact Preview: Show first 4 modules when collapsed */}
+        {!modulesExpanded && (
+          <View style={styles.modulesCompactPreview}>
+            {MODULES.slice(0, 4).map((module) => (
+              <TouchableOpacity
+                key={module.id}
+                style={styles.moduleCompactItem}
+                onPress={() => handleModulePress(module.id)}
+                activeOpacity={0.7}
+              >
+                <View style={[
+                  styles.moduleCompactIcon,
+                  { borderColor: module.element === 'fire' ? ElementAccents.fire :
+                                 module.element === 'water' ? ElementAccents.water :
+                                 module.element === 'earth' ? ElementAccents.earth :
+                                 ElementAccents.air }
+                ]}>
+                  <Text style={styles.moduleCompactEmoji}>{module.icon}</Text>
+                </View>
+                <Text style={styles.moduleCompactLabel} numberOfLines={1}>
+                  {module.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
+            {/* "Show All" indicator */}
+            <TouchableOpacity
+              style={styles.moduleCompactItem}
+              onPress={() => setModulesExpanded(true)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.moduleCompactIconShowMore}>
+                <Ionicons name="apps" size={24} color={DarkTheme.textSecondary} />
+              </View>
+              <Text style={styles.moduleCompactLabel} numberOfLines={1}>
+                {t('home.showAll') || 'Show All'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        
+        {/* Full Grid: Show all modules when expanded */}
         {modulesExpanded && (
           <View style={styles.modulesGrid}>
             {MODULES.map((module) => (
@@ -631,7 +672,13 @@ export default function HomeScreen() {
                 onPress={() => handleModulePress(module.id)}
                 activeOpacity={0.7}
               >
-                <View style={styles.moduleIcon}>
+                <View style={[
+                  styles.moduleIcon,
+                  { borderColor: module.element === 'fire' ? ElementAccents.fire :
+                                 module.element === 'water' ? ElementAccents.water :
+                                 module.element === 'earth' ? ElementAccents.earth :
+                                 ElementAccents.air }
+                ]}>
                   <Text style={styles.moduleIconEmoji}>{module.icon}</Text>
                 </View>
                 <Text style={styles.moduleIconLabel} numberOfLines={1}>
@@ -855,6 +902,54 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weightSemibold,
     color: DarkTheme.textPrimary,
   },
+  
+  // Compact Preview (Collapsed State)
+  modulesCompactPreview: {
+    flexDirection: 'row',
+    paddingHorizontal: Spacing.screenPadding,
+    paddingVertical: Spacing.md,
+    gap: Spacing.sm,
+    justifyContent: 'space-between',
+  },
+  moduleCompactItem: {
+    alignItems: 'center',
+    flex: 1,
+    maxWidth: 70,
+  },
+  moduleCompactIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  moduleCompactIconShowMore: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  moduleCompactEmoji: {
+    fontSize: 22,
+  },
+  moduleCompactLabel: {
+    fontSize: 9,
+    fontWeight: Typography.weightMedium,
+    color: DarkTheme.textSecondary,
+    textAlign: 'center',
+  },
+  
+  // Full Grid (Expanded State)
   modulesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
