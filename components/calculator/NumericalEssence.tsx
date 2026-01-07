@@ -1,7 +1,7 @@
+import { useLanguage } from '@/contexts/LanguageContext';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ElementType } from '../../utils/types';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NumericalEssenceProps {
   saghir: number;
@@ -10,104 +10,46 @@ interface NumericalEssenceProps {
 
 export const NumericalEssence: React.FC<NumericalEssenceProps> = ({ saghir, element }) => {
   const { t } = useLanguage();
-  // Core number meanings (1-9) from numerology and Islamic tradition
-  const numberMeanings: Record<number, {
-    title: string;
-    arabic: string;
-    description: string;
-    qualities: string[];
-  }> = {
-    1: {
-      title: 'The Leader',
-      arabic: 'الواحد',
-      description: 'Leadership, independence, pioneering spirit. The number of divine unity (Tawḥīd).',
-      qualities: ['Initiative', 'Confidence', 'Innovation', 'Self-reliance'],
-    },
-    2: {
-      title: 'The Harmonizer',
-      arabic: 'الاثنين',
-      description: 'Balance, partnership, diplomacy. Represents duality seeking unity.',
-      qualities: ['Cooperation', 'Sensitivity', 'Patience', 'Mediation'],
-    },
-    3: {
-      title: 'The Creator',
-      arabic: 'الثلاثة',
-      description: 'Creativity, expression, joy. Sacred trinity of body, mind, and spirit.',
-      qualities: ['Creativity', 'Communication', 'Optimism', 'Self-expression'],
-    },
-    4: {
-      title: 'The Builder',
-      arabic: 'الأربعة',
-      description: 'Stability, foundation, discipline. Four elements, four sacred months.',
-      qualities: ['Organization', 'Practicality', 'Determination', 'Trustworthiness'],
-    },
-    5: {
-      title: 'The Adventurer',
-      arabic: 'الخمسة',
-      description: 'Freedom, change, versatility. Five pillars of Islam, five daily prayers.',
-      qualities: ['Adaptability', 'Curiosity', 'Freedom', 'Resourcefulness'],
-    },
-    6: {
-      title: 'The Nurturer',
-      arabic: 'الستة',
-      description: 'Love, responsibility, harmony. Six days of creation.',
-      qualities: ['Compassion', 'Service', 'Responsibility', 'Balance'],
-    },
-    7: {
-      title: 'The Seeker',
-      arabic: 'السبعة',
-      description: 'Wisdom, spirituality, introspection. Seven heavens, seven earths.',
-      qualities: ['Spiritual depth', 'Analysis', 'Contemplation', 'Mysticism'],
-    },
-    8: {
-      title: 'The Achiever',
-      arabic: 'الثمانية',
-      description: 'Power, abundance, manifestation. Eight angels carrying the Throne.',
-      qualities: ['Ambition', 'Authority', 'Material success', 'Karma'],
-    },
-    9: {
-      title: 'The Humanitarian',
-      arabic: 'التسعة',
-      description: 'Completion, universal love, enlightenment. The number of completion and perfection.',
-      qualities: ['Compassion', 'Service to others', 'Wisdom', 'Completion'],
-    },
+  
+  // Arabic numbers for display
+  const arabicNumbers: Record<number, string> = {
+    1: 'الواحد',
+    2: 'الاثنين',
+    3: 'الثلاثة',
+    4: 'الأربعة',
+    5: 'الخمسة',
+    6: 'الستة',
+    7: 'السبعة',
+    8: 'الثمانية',
+    9: 'التسعة',
   };
   
-  // Element descriptions and qualities
-  const elementQualities: Record<ElementType, {
-    emoji: string;
-    color: string;
-    quality: string;
-    spiritual: string;
-  }> = {
-    fire: {
-      emoji: '🔥',
-      color: '#ef4444',
-      quality: 'Passionate, energetic, transformative',
-      spiritual: 'Your soul carries the divine spark of transformation and purification',
-    },
-    water: {
-      emoji: '💧',
-      color: '#3b82f6',
-      quality: 'Flowing, adaptive, healing',
-      spiritual: 'Your essence flows with divine mercy and emotional depth',
-    },
-    air: {
-      emoji: '🌬️',
-      color: '#06b6d4',
-      quality: 'Intellectual, communicative, swift',
-      spiritual: 'Your spirit moves with divine inspiration and clarity of thought',
-    },
-    earth: {
-      emoji: '🌳',
-      color: '#84cc16',
-      quality: 'Grounding, stable, nurturing',
-      spiritual: 'Your being roots in divine stability and patient perseverance',
-    },
+  // Get archetype data from translations
+  const meaning = {
+    title: t(`calculator.results.archetypes.${saghir}.title`),
+    arabic: arabicNumbers[saghir] || arabicNumbers[9],
+    description: t(`calculator.results.archetypes.${saghir}.description`),
+    qualities: [
+      t(`calculator.results.archetypes.${saghir}.qualities.0`),
+      t(`calculator.results.archetypes.${saghir}.qualities.1`),
+      t(`calculator.results.archetypes.${saghir}.qualities.2`),
+      t(`calculator.results.archetypes.${saghir}.qualities.3`),
+    ],
   };
   
-  const meaning = numberMeanings[saghir] || numberMeanings[9];
-  const elementData = elementQualities[element];
+  // Element data with colors and emojis
+  const elementColors: Record<ElementType, { emoji: string; color: string }> = {
+    fire: { emoji: '🔥', color: '#ef4444' },
+    water: { emoji: '💧', color: '#3b82f6' },
+    air: { emoji: '🌬️', color: '#06b6d4' },
+    earth: { emoji: '🌳', color: '#84cc16' },
+  };
+  
+  const elementData = {
+    ...elementColors[element],
+    quality: t(`calculator.results.elementQualities.${element}.quality`),
+    spiritual: t(`calculator.results.elementQualities.${element}.spiritual`),
+  };
 
   return (
     <View style={[styles.container, { borderColor: elementData.color }]}>

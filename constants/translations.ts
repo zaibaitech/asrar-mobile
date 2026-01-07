@@ -855,6 +855,75 @@ export const translations = {
           dominantElement: "Dominant Element",
           spiritualGuidance: "Spiritual Guidance",
         },
+        
+        // Number Archetypes (1-9)
+        archetypes: {
+          1: {
+            title: "The Leader",
+            description: "Leadership, independence, pioneering spirit. The number of divine unity (Tawḥīd).",
+            qualities: ["Initiative", "Confidence", "Innovation", "Self-reliance"],
+          },
+          2: {
+            title: "The Harmonizer",
+            description: "Balance, partnership, diplomacy. Represents duality seeking unity.",
+            qualities: ["Cooperation", "Sensitivity", "Patience", "Mediation"],
+          },
+          3: {
+            title: "The Creator",
+            description: "Creativity, expression, joy. Sacred trinity of body, mind, and spirit.",
+            qualities: ["Creativity", "Communication", "Optimism", "Self-expression"],
+          },
+          4: {
+            title: "The Builder",
+            description: "Stability, foundation, discipline. Four elements, four sacred months.",
+            qualities: ["Organization", "Practicality", "Determination", "Trustworthiness"],
+          },
+          5: {
+            title: "The Adventurer",
+            description: "Freedom, change, versatility. Five pillars of Islam, five daily prayers.",
+            qualities: ["Adaptability", "Curiosity", "Freedom", "Resourcefulness"],
+          },
+          6: {
+            title: "The Nurturer",
+            description: "Love, responsibility, harmony. Six days of creation.",
+            qualities: ["Compassion", "Service", "Responsibility", "Balance"],
+          },
+          7: {
+            title: "The Seeker",
+            description: "Wisdom, spirituality, introspection. Seven heavens, seven earths.",
+            qualities: ["Spiritual depth", "Analysis", "Contemplation", "Mysticism"],
+          },
+          8: {
+            title: "The Achiever",
+            description: "Power, abundance, manifestation. Eight angels carrying the Throne.",
+            qualities: ["Ambition", "Authority", "Material success", "Karma"],
+          },
+          9: {
+            title: "The Humanitarian",
+            description: "Completion, universal love, enlightenment. The number of completion and perfection.",
+            qualities: ["Compassion", "Service to others", "Wisdom", "Completion"],
+          },
+        },
+        
+        // Element Qualities
+        elementQualities: {
+          fire: {
+            quality: "Passionate, energetic, transformative",
+            spiritual: "Your soul carries the divine spark of transformation and purification",
+          },
+          water: {
+            quality: "Flowing, adaptive, healing",
+            spiritual: "Your essence flows with divine mercy and emotional depth",
+          },
+          air: {
+            quality: "Intellectual, communicative, swift",
+            spiritual: "Your spirit moves with divine inspiration and clarity of thought",
+          },
+          earth: {
+            quality: "Grounding, stable, nurturing",
+            spiritual: "Your being roots in divine stability and patient perseverance",
+          },
+        },
       },
       
       // Abjad System Labels (deprecated, kept for backwards compatibility)
@@ -4643,6 +4712,75 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           coreNumberMeaning: "Signification du Nombre de Base",
           dominantElement: "Élément Dominant",
           spiritualGuidance: "Guidance Spirituelle",
+        },
+        
+        // Number Archetypes (1-9)
+        archetypes: {
+          1: {
+            title: "Le Leader",
+            description: "Leadership, indépendance, esprit pionnier. Le nombre de l'unité divine (Tawḥīd).",
+            qualities: ["Initiative", "Confiance", "Innovation", "Autonomie"],
+          },
+          2: {
+            title: "L'Harmonisateur",
+            description: "Équilibre, partenariat, diplomatie. Représente la dualité cherchant l'unité.",
+            qualities: ["Coopération", "Sensibilité", "Patience", "Médiation"],
+          },
+          3: {
+            title: "Le Créateur",
+            description: "Créativité, expression, joie. Trinité sacrée du corps, de l'esprit et de l'âme.",
+            qualities: ["Créativité", "Communication", "Optimisme", "Expression de soi"],
+          },
+          4: {
+            title: "Le Bâtisseur",
+            description: "Stabilité, fondation, discipline. Quatre éléments, quatre mois sacrés.",
+            qualities: ["Organisation", "Praticité", "Détermination", "Fiabilité"],
+          },
+          5: {
+            title: "L'Aventurier",
+            description: "Liberté, changement, versatilité. Cinq piliers de l'Islam, cinq prières quotidiennes.",
+            qualities: ["Adaptabilité", "Curiosité", "Liberté", "Débrouillardise"],
+          },
+          6: {
+            title: "Le Nourricier",
+            description: "Amour, responsabilité, harmonie. Six jours de création.",
+            qualities: ["Compassion", "Service", "Responsabilité", "Équilibre"],
+          },
+          7: {
+            title: "Le Chercheur",
+            description: "Sagesse, spiritualité, introspection. Sept cieux, sept terres.",
+            qualities: ["Profondeur spirituelle", "Analyse", "Contemplation", "Mysticisme"],
+          },
+          8: {
+            title: "L'Accomplisseur",
+            description: "Pouvoir, abondance, manifestation. Huit anges portant le Trône.",
+            qualities: ["Ambition", "Autorité", "Succès matériel", "Karma"],
+          },
+          9: {
+            title: "L'Humanitaire",
+            description: "Achèvement, amour universel, illumination. Le nombre de l'achèvement et de la perfection.",
+            qualities: ["Compassion", "Service aux autres", "Sagesse", "Achèvement"],
+          },
+        },
+        
+        // Element Qualities
+        elementQualities: {
+          fire: {
+            quality: "Passionné, énergique, transformateur",
+            spiritual: "Votre âme porte l'étincelle divine de transformation et de purification",
+          },
+          water: {
+            quality: "Fluide, adaptable, guérisseur",
+            spiritual: "Votre essence coule avec la miséricorde divine et la profondeur émotionnelle",
+          },
+          air: {
+            quality: "Intellectuel, communicatif, rapide",
+            spiritual: "Votre esprit se déplace avec l'inspiration divine et la clarté de pensée",
+          },
+          earth: {
+            quality: "Ancré, stable, nourrissant",
+            spiritual: "Votre être s'enracine dans la stabilité divine et la persévérance patiente",
+          },
         },
       },
       

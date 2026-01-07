@@ -1,7 +1,7 @@
+import { useLanguage } from '@/contexts/LanguageContext';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ElementalAnalytics } from '../../types/calculator-enhanced';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ElementalCompositionProps {
   analytics: ElementalAnalytics;

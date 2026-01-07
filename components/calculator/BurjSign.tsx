@@ -1,8 +1,8 @@
+import { useLanguage } from '@/contexts/LanguageContext';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { calculateBurj } from '../../constants/buruj';
 import { ZODIAC_SIGNS } from '../../constants/zodiacData';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 interface BurjSignProps {
   kabir: number;
