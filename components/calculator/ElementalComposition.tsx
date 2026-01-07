@@ -1,12 +1,14 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ElementalAnalytics } from '../../types/calculator-enhanced';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ElementalCompositionProps {
   analytics: ElementalAnalytics;
 }
 
 export const ElementalComposition: React.FC<ElementalCompositionProps> = ({ analytics }) => {
+  const { t } = useLanguage();
   const elementCounts: Record<'fire' | 'water' | 'air' | 'earth', number> = {
     fire: 0,
     water: 0,
@@ -45,10 +47,10 @@ export const ElementalComposition: React.FC<ElementalCompositionProps> = ({ anal
   };
 
   const elements = [
-    { name: 'Fire', key: 'fire', color: '#ef4444', emoji: '🔥', percentage: elementPercents.fire, count: elementCounts.fire },
-    { name: 'Water', key: 'water', color: '#3b82f6', emoji: '💧', percentage: elementPercents.water, count: elementCounts.water },
-    { name: 'Air', key: 'air', color: '#06b6d4', emoji: '🌬️', percentage: elementPercents.air, count: elementCounts.air },
-    { name: 'Earth', key: 'earth', color: '#84cc16', emoji: '🌳', percentage: elementPercents.earth, count: elementCounts.earth },
+    { name: t('calculator.results.elements.fire'), key: 'fire', color: '#ef4444', emoji: '🔥', percentage: elementPercents.fire, count: elementCounts.fire },
+    { name: t('calculator.results.elements.water'), key: 'water', color: '#3b82f6', emoji: '💧', percentage: elementPercents.water, count: elementCounts.water },
+    { name: t('calculator.results.elements.air'), key: 'air', color: '#06b6d4', emoji: '🌬️', percentage: elementPercents.air, count: elementCounts.air },
+    { name: t('calculator.results.elements.earth'), key: 'earth', color: '#84cc16', emoji: '🌳', percentage: elementPercents.earth, count: elementCounts.earth },
   ];
 
   return (

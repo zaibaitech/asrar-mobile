@@ -819,6 +819,42 @@ export const translations = {
         
         // Disclaimer
         disclaimer: "These insights are for spiritual reflection only. Not a substitute for qualified religious guidance.",
+        
+        // Elements (Ṭabāʾiʿ)
+        elements: {
+          fire: "Fire",
+          water: "Water",
+          air: "Air",
+          earth: "Earth",
+        },
+        
+        // Modalities
+        modalities: {
+          cardinal: "Cardinal",
+          fixed: "Fixed",
+          mutable: "Mutable",
+        },
+        
+        // Zodiac Section Labels
+        zodiac: {
+          element: "Element",
+          modality: "Modality",
+          planetaryRuler: "Planetary Ruler",
+          temperament: "Temperament",
+          spiritualQuality: "Spiritual Quality",
+          classicalReference: "Classical Reference",
+          calculation: "Calculation",
+          burjSign: "Burj (Zodiac Sign)",
+          intermediate: "Intermediate",
+        },
+        
+        // Numerical Essence Section Labels
+        essence: {
+          yourNumericalEssence: "Your Numerical Essence",
+          coreNumberMeaning: "Core Number Meaning",
+          dominantElement: "Dominant Element",
+          spiritualGuidance: "Spiritual Guidance",
+        },
       },
       
       // Abjad System Labels (deprecated, kept for backwards compatibility)
@@ -4572,6 +4608,42 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         
         // Disclaimer
         disclaimer: "Ces aperçus sont destinés à la réflexion spirituelle uniquement. Pas un substitut à des conseils religieux qualifiés.",
+        
+        // Elements (Ṭabāʾiʿ)
+        elements: {
+          fire: "Feu",
+          water: "Eau",
+          air: "Air",
+          earth: "Terre",
+        },
+        
+        // Modalities
+        modalities: {
+          cardinal: "Cardinal",
+          fixed: "Fixe",
+          mutable: "Mutable",
+        },
+        
+        // Zodiac Section Labels
+        zodiac: {
+          element: "Élément",
+          modality: "Modalité",
+          planetaryRuler: "Dirigeant Planétaire",
+          temperament: "Tempérament",
+          spiritualQuality: "Qualité Spirituelle",
+          classicalReference: "Référence Classique",
+          calculation: "Calcul",
+          burjSign: "Burj (Signe du Zodiaque)",
+          intermediate: "Intermédiaire",
+        },
+        
+        // Numerical Essence Section Labels
+        essence: {
+          yourNumericalEssence: "Votre Essence Numérique",
+          coreNumberMeaning: "Signification du Nombre de Base",
+          dominantElement: "Élément Dominant",
+          spiritualGuidance: "Guidance Spirituelle",
+        },
       },
       
       // Abjad System Labels (deprecated, kept for backwards compatibility)

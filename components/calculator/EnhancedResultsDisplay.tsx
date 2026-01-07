@@ -3,8 +3,8 @@
  * Reorganized with jump navigation
  */
 
-import { useProfile } from '@/contexts/ProfileContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useProfile } from '@/contexts/ProfileContext';
 import { enhanceCalculatorWithAI, isAIAvailable, loadAISettings } from '@/services/AIReflectionService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';

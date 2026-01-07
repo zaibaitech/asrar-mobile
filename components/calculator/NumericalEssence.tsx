@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ElementType } from '../../utils/types';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NumericalEssenceProps {
   saghir: number;
@@ -8,6 +9,7 @@ interface NumericalEssenceProps {
 }
 
 export const NumericalEssence: React.FC<NumericalEssenceProps> = ({ saghir, element }) => {
+  const { t } = useLanguage();
   // Core number meanings (1-9) from numerology and Islamic tradition
   const numberMeanings: Record<number, {
     title: string;
@@ -112,12 +114,12 @@ export const NumericalEssence: React.FC<NumericalEssenceProps> = ({ saghir, elem
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerEmoji}>💫</Text>
-        <Text style={styles.headerTitle}>Your Numerical Essence</Text>
+        <Text style={styles.headerTitle}>{t('calculator.results.essence.yourNumericalEssence')}</Text>
       </View>
       
       {/* Core Number */}
       <View style={styles.numberSection}>
-        <Text style={styles.label}>Core Number Meaning</Text>
+        <Text style={styles.label}>{t('calculator.results.essence.coreNumberMeaning')}</Text>
         <View style={styles.numberCard}>
           <Text style={styles.numberValue}>{saghir}</Text>
           <View style={styles.numberInfo}>
@@ -141,7 +143,9 @@ export const NumericalEssence: React.FC<NumericalEssenceProps> = ({ saghir, elem
       <View style={[styles.elementSection, { backgroundColor: elementData.color + '15' }]}>
         <View style={styles.elementHeader}>
           <Text style={styles.elementEmoji}>{elementData.emoji}</Text>
-          <Text style={styles.elementTitle}>Dominant Element: {element.toUpperCase()}</Text>
+          <Text style={styles.elementTitle}>
+            {t('calculator.results.essence.dominantElement')}: {t(`calculator.results.elements.${element}`).toUpperCase()}
+          </Text>
         </View>
         <Text style={styles.elementQuality}>{elementData.quality}</Text>
         <Text style={styles.elementSpiritual}>{elementData.spiritual}</Text>
@@ -149,9 +153,9 @@ export const NumericalEssence: React.FC<NumericalEssenceProps> = ({ saghir, elem
       
       {/* Guidance */}
       <View style={styles.guidanceCard}>
-        <Text style={styles.guidanceTitle}>✨ Spiritual Guidance</Text>
+        <Text style={styles.guidanceTitle}>✨ {t('calculator.results.essence.spiritualGuidance')}</Text>
         <Text style={styles.guidanceText}>
-          Your path combines the essence of <Text style={styles.highlight}>{meaning.title}</Text> with the power of <Text style={styles.highlight}>{element}</Text>. 
+          Your path combines the essence of <Text style={styles.highlight}>{meaning.title}</Text> with the power of <Text style={styles.highlight}>{t(`calculator.results.elements.${element}`)}</Text>. 
           {'\n\n'}
           Embrace your natural {meaning.qualities[0].toLowerCase()} while balancing it with the {elementData.quality.split(',')[0]} nature of your element. 
           Seek harmony between inner contemplation and outward expression.

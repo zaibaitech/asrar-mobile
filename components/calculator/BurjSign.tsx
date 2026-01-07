@@ -2,12 +2,14 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { calculateBurj } from '../../constants/buruj';
 import { ZODIAC_SIGNS } from '../../constants/zodiacData';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface BurjSignProps {
   kabir: number;
 }
 
 export const BurjSign: React.FC<BurjSignProps> = ({ kabir }) => {
+  const { t, language } = useLanguage();
   const burjCalc = calculateBurj(kabir);
   const zodiacData = ZODIAC_SIGNS[burjCalc.burj];
   
@@ -15,27 +17,48 @@ export const BurjSign: React.FC<BurjSignProps> = ({ kabir }) => {
     return null;
   }
 
+  // Get language-aware zodiac name
+  const zodiacName = language === 'fr' ? zodiacData.nameFr : zodiacData.nameEn;
+  const modality = language === 'fr' ? zodiacData.modalityFr : zodiacData.modality;
+  const planetName = language === 'fr' ? zodiacData.planetaryRuler.fr : zodiacData.planetaryRuler.en;
+  const temperament = language === 'fr' ? zodiacData.temperamentFr : zodiacData.temperament;
+  const spiritualQuality = language === 'fr' ? zodiacData.spiritualQualityFr : zodiacData.spiritualQuality;
+  const classicalRef = language === 'fr' ? zodiacData.classicalReferenceFr : zodiacData.classicalReference;
+  
+  // Get element display text
+  const getElementDisplay = () => {
+    if (zodiacData.temperament.includes('Hot & Dry')) {
+      return `🔥 ${t('calculator.results.elements.fire')}`;
+    } else if (zodiacData.temperament.includes('Cold & Wet')) {
+      return `💧 ${t('calculator.results.elements.water')}`;
+    } else if (zodiacData.temperament.includes('Hot & Wet')) {
+      return `🌬️ ${t('calculator.results.elements.air')}`;
+    } else {
+      return `🌳 ${t('calculator.results.elements.earth')}`;
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerEmoji}>🌙</Text>
-        <Text style={styles.title}>Burj (Zodiac Sign)</Text>
+        <Text style={styles.title}>{t('calculator.results.zodiac.burjSign')}</Text>
         <View style={styles.levelBadge}>
-          <Text style={styles.levelText}>Intermediate</Text>
+          <Text style={styles.levelText}>{t('calculator.results.zodiac.intermediate')}</Text>
         </View>
       </View>
       
       {/* Main Card */}
       <View style={styles.mainCard}>
         <Text style={styles.symbol}>{zodiacData.symbol}</Text>
-        <Text style={styles.nameEn}>{zodiacData.nameEn}</Text>
+        <Text style={styles.nameEn}>{zodiacName}</Text>
         <Text style={styles.nameAr}>{zodiacData.nameAr}</Text>
         <Text style={styles.transliteration}>{zodiacData.transliteration}</Text>
         
         <View style={styles.calculation}>
           <Text style={styles.calculationText}>
-            Calculation: {kabir} ÷ 12 = {burjCalc.burj}
+            {t('calculator.results.zodiac.calculation')}: {kabir} ÷ 12 = {burjCalc.burj}
           </Text>
         </View>
       </View>
@@ -44,45 +67,41 @@ export const BurjSign: React.FC<BurjSignProps> = ({ kabir }) => {
       <View style={styles.detailsGrid}>
         {/* Element */}
         <View style={styles.detailCard}>
-          <Text style={styles.detailLabel}>Element</Text>
-          <Text style={styles.detailValue}>
-            {zodiacData.temperament.includes('Hot & Dry') ? '🔥 Fire' :
-             zodiacData.temperament.includes('Cold & Wet') ? '💧 Water' :
-             zodiacData.temperament.includes('Hot & Wet') ? '🌬️ Air' : '🌳 Earth'}
-          </Text>
+          <Text style={styles.detailLabel}>{t('calculator.results.zodiac.element')}</Text>
+          <Text style={styles.detailValue}>{getElementDisplay()}</Text>
         </View>
         
         {/* Modality */}
         <View style={styles.detailCard}>
-          <Text style={styles.detailLabel}>Modality</Text>
-          <Text style={styles.detailValue}>{zodiacData.modality}</Text>
+          <Text style={styles.detailLabel}>{t('calculator.results.zodiac.modality')}</Text>
+          <Text style={styles.detailValue}>{modality}</Text>
         </View>
       </View>
       
       {/* Planetary Ruler */}
       <View style={styles.planetCard}>
-        <Text style={styles.planetLabel}>⭐ Planetary Ruler</Text>
-        <Text style={styles.planetEn}>{zodiacData.planetaryRuler.en}</Text>
+        <Text style={styles.planetLabel}>⭐ {t('calculator.results.zodiac.planetaryRuler')}</Text>
+        <Text style={styles.planetEn}>{planetName}</Text>
         <Text style={styles.planetAr}>{zodiacData.planetaryRuler.ar}</Text>
         <Text style={styles.planetTranslit}>{zodiacData.planetaryRuler.transliteration}</Text>
       </View>
       
       {/* Temperament */}
       <View style={styles.infoCard}>
-        <Text style={styles.infoLabel}>🌡️ Temperament</Text>
-        <Text style={styles.infoText}>{zodiacData.temperament}</Text>
+        <Text style={styles.infoLabel}>🌡️ {t('calculator.results.zodiac.temperament')}</Text>
+        <Text style={styles.infoText}>{temperament}</Text>
       </View>
       
       {/* Spiritual Quality */}
       <View style={styles.infoCard}>
-        <Text style={styles.infoLabel}>✨ Spiritual Quality</Text>
-        <Text style={styles.infoText}>{zodiacData.spiritualQuality}</Text>
+        <Text style={styles.infoLabel}>✨ {t('calculator.results.zodiac.spiritualQuality')}</Text>
+        <Text style={styles.infoText}>{spiritualQuality}</Text>
       </View>
       
       {/* Classical Reference */}
       <View style={styles.referenceCard}>
-        <Text style={styles.referenceLabel}>📖 Classical Reference</Text>
-        <Text style={styles.referenceText}>{zodiacData.classicalReference}</Text>
+        <Text style={styles.referenceLabel}>📖 {t('calculator.results.zodiac.classicalReference')}</Text>
+        <Text style={styles.referenceText}>{classicalRef}</Text>
       </View>
     </View>
   );
