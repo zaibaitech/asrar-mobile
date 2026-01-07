@@ -1124,6 +1124,51 @@ export const translations = {
             q3: "What action or change does this phrase inspire in you?",
           },
         },
+        
+        // Qur'an Result Section
+        quran: {
+          // Section Titles
+          resonanceTitle: "Quranic Resonance",
+          resonanceLink: "Resonance Link",
+          reflection: "Reflection",
+          ayah: "Ayah",
+          
+          // Resonance Subtitles
+          calculatedFrom: "Calculated from verse Abjad value",
+          suggestedAssociation: "Suggested association",
+          
+          // Resonance Labels
+          element: "Element",
+          sacredNumber: "Sacred Number",
+          verseKabir: "Verse Kabīr",
+          
+          // Sacred Number Meanings
+          sacredMeaning: {
+            7: "Seven heavens, seven days of creation",
+            12: "Twelve Imams, twelve months",
+            19: "Numerical miracle of the Quran",
+            70: "Surah Yā-Sīn (يس)",
+            99: "Asmā' al-Ḥusnā (Beautiful Names)",
+            114: "Surahs in the Quran",
+            313: "Companions at Badr",
+            786: "Bismillah value (short form)",
+            default: "Resonates with divine pattern",
+          },
+          
+          // Calculated Description Templates
+          calculatedDistance: "Calculated: Verse Kabīr is {{kabir}}, nearest sacred number is {{nearest}} (distance: {{distance}})",
+          perfectMatch: "Perfect match: This verse's Kabīr ({{kabir}}) is a sacred number!",
+          
+          // Reflection Section
+          reflectionPrompt: "Read this ayah slowly, with presence. What word or phrase stands out to you? Write 1-2 words that resonate.",
+          reflectionPlaceholder: "Write your reflections here (saved locally)...",
+          
+          // Actions
+          readOnQuranCom: "Read on Quran.com",
+          
+          // Disclaimer
+          disclaimer: "This is numerical analysis only. For tafsīr and religious rulings, consult qualified scholars.",
+        },
       },
       
       // Abjad System Labels (deprecated, kept for backwards compatibility)
@@ -5181,6 +5226,51 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             q2: "Comment cette phrase se connecte-t-elle à votre parcours spirituel actuel ?",
             q3: "Quelle action ou changement cette phrase vous inspire-t-elle ?",
           },
+        },
+        
+        // Qur'an Result Section
+        quran: {
+          // Section Titles
+          resonanceTitle: "Résonance Coranique",
+          resonanceLink: "Lien de Résonance",
+          reflection: "Réflexion",
+          ayah: "Ayah",
+          
+          // Resonance Subtitles
+          calculatedFrom: "Calculé à partir de la valeur Abjad du verset",
+          suggestedAssociation: "Association suggérée",
+          
+          // Resonance Labels
+          element: "Élément",
+          sacredNumber: "Nombre Sacré",
+          verseKabir: "Kabīr du Verset",
+          
+          // Sacred Number Meanings
+          sacredMeaning: {
+            7: "Sept cieux, sept jours de création",
+            12: "Douze Imams, douze mois",
+            19: "Miracle numérique du Coran",
+            70: "Sourate Yā-Sīn (يس)",
+            99: "Asmā' al-Ḥusnā (Les Beaux Noms)",
+            114: "Sourates dans le Coran",
+            313: "Compagnons à Badr",
+            786: "Valeur de Bismillah (forme courte)",
+            default: "Résonne avec un modèle divin",
+          },
+          
+          // Calculated Description Templates
+          calculatedDistance: "Calculé : Le Kabīr du verset est {{kabir}}, le nombre sacré le plus proche est {{nearest}} (distance : {{distance}})",
+          perfectMatch: "Correspondance parfaite : Le Kabīr de ce verset ({{kabir}}) est un nombre sacré !",
+          
+          // Reflection Section
+          reflectionPrompt: "Lisez cette ayah lentement, avec présence. Quel mot ou phrase vous interpelle ? Écrivez 1-2 mots qui résonnent.",
+          reflectionPlaceholder: "Écrivez vos réflexions ici (sauvegardées localement)...",
+          
+          // Actions
+          readOnQuranCom: "Lire sur Quran.com",
+          
+          // Disclaimer
+          disclaimer: "Ceci est une analyse numérique uniquement. Pour le tafsīr et les décisions religieuses, consultez des érudits qualifiés.",
         },
       },
       

@@ -239,7 +239,11 @@ export function computeQuranInsights(
   );
   
   const distance = Math.abs(nearest - core.kabir);
-  const meaning = sacredSignificance[nearest] || 'Resonates with divine pattern';
+  
+  // Return translation key for sacred meaning instead of English text
+  const meaningKey = sacredSignificance[nearest] 
+    ? `calculator.results.quran.sacredMeaning.${nearest}`
+    : 'calculator.results.quran.sacredMeaning.default';
   
   // Enhanced: Get surah metadata if provided
   const surah = surahNumber ? getSurahByNumber(surahNumber) : undefined;
@@ -247,13 +251,10 @@ export function computeQuranInsights(
     ? generateQuranLink(surahNumber, ayahNumber)
     : undefined;
   
-  // Build resonance description with transparency
-  let resonanceDescription = meaning;
-  if (distance > 0) {
-    resonanceDescription = `${meaning}\n\n📊 Calculated: Verse Kabīr is ${core.kabir}, nearest sacred number is ${nearest} (distance: ${distance})`;
-  } else {
-    resonanceDescription = `${meaning}\n\n✨ Perfect match: This verse's Kabīr (${core.kabir}) is a sacred number!`;
-  }
+  // Return translation keys for description instead of English text
+  const descriptionKey = distance > 0
+    ? 'calculator.results.quran.calculatedDistance'
+    : 'calculator.results.quran.perfectMatch';
   
   return {
     surahName: surah?.name.transliteration,
@@ -262,13 +263,14 @@ export function computeQuranInsights(
     resonanceLink: {
       dominantElement: core.element,
       sacredNumber: nearest,
-      meaning: resonanceDescription,
-      isCalculated: true, // Flag to indicate this is derived from Kabīr, not suggested
-      kabir: core.kabir,  // Include the actual Kabīr value for transparency
-      distance,           // Distance from nearest sacred number
+      meaningKey,           // Translation key for sacred meaning
+      descriptionKey,       // Translation key for description template
+      isCalculated: true,
+      kabir: core.kabir,
+      distance,
     },
     reflectionBlock: {
-      prompt: 'Read this ayah slowly, with presence. What word or phrase stands out to you? Write 1-2 words that resonate.',
+      promptKey: 'calculator.results.quran.reflectionPrompt',
     },
     quranComLink: quranLink,
   };

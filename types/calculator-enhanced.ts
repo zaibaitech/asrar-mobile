@@ -151,7 +151,8 @@ export interface QuranInsights {
   resonanceLink: {
     dominantElement: ElementType;
     sacredNumber: number;
-    meaning: string;
+    meaningKey: string;      // Translation key for sacred meaning
+    descriptionKey: string;  // Translation key for description template
     /** Flag indicating this is calculated from Kabīr, not suggested */
     isCalculated?: boolean;
     /** The actual Kabīr value of the verse */
@@ -160,7 +161,7 @@ export interface QuranInsights {
     distance?: number;
   };
   reflectionBlock: {
-    prompt: string;
+    promptKey: string;  // Translation key for reflection prompt
     userNotes?: string; // Store locally
   };
   quranComLink?: string;

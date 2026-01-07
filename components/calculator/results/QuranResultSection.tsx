@@ -5,6 +5,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Linking, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { QuranInsights } from '../../../types/calculator-enhanced';
 
 interface QuranResultSectionProps {
@@ -12,6 +13,7 @@ interface QuranResultSectionProps {
 }
 
 export const QuranResultSection: React.FC<QuranResultSectionProps> = ({ insights }) => {
+  const { t } = useLanguage();
   const [reflectionNotes, setReflectionNotes] = useState('');
   
   const handleOpenQuranCom = () => {
@@ -27,7 +29,9 @@ export const QuranResultSection: React.FC<QuranResultSectionProps> = ({ insights
         <LinearGradient colors={['#10b981', '#059669']} style={styles.surahCard}>
           <Text style={styles.surahName}>{insights.surahName}</Text>
           {insights.ayahNumber && (
-            <Text style={styles.ayahNumber}>Ayah {insights.ayahNumber}</Text>
+            <Text style={styles.ayahNumber}>
+              {t('calculator.results.quran.ayah')} {insights.ayahNumber}
+            </Text>
           )}
         </LinearGradient>
       )}
@@ -41,40 +45,55 @@ export const QuranResultSection: React.FC<QuranResultSectionProps> = ({ insights
       
       {/* Resonance Link */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🌟 Resonance Link</Text>
+        <Text style={styles.cardTitle}>🌟 {t('calculator.results.quran.resonanceLink')}</Text>
         <Text style={styles.resonanceSubtitle}>
           {insights.resonanceLink.isCalculated 
-            ? '📊 Calculated from verse Abjad value' 
-            : '💭 Suggested association'}
+            ? `📊 ${t('calculator.results.quran.calculatedFrom')}` 
+            : `💭 ${t('calculator.results.quran.suggestedAssociation')}`}
         </Text>
         <View style={styles.resonanceRow}>
           <View style={styles.resonanceItem}>
-            <Text style={styles.resonanceLabel}>Element</Text>
-            <Text style={styles.resonanceValue}>{insights.resonanceLink.dominantElement}</Text>
+            <Text style={styles.resonanceLabel}>{t('calculator.results.quran.element')}</Text>
+            <Text style={styles.resonanceValue}>
+              {t(`calculator.results.elements.${insights.resonanceLink.dominantElement}`)}
+            </Text>
           </View>
           <View style={styles.resonanceItem}>
-            <Text style={styles.resonanceLabel}>Sacred Number</Text>
+            <Text style={styles.resonanceLabel}>{t('calculator.results.quran.sacredNumber')}</Text>
             <Text style={styles.resonanceValue}>{insights.resonanceLink.sacredNumber}</Text>
           </View>
           {insights.resonanceLink.kabir && (
             <View style={styles.resonanceItem}>
-              <Text style={styles.resonanceLabel}>Verse Kabīr</Text>
+              <Text style={styles.resonanceLabel}>{t('calculator.results.quran.verseKabir')}</Text>
               <Text style={styles.resonanceValue}>{insights.resonanceLink.kabir}</Text>
             </View>
           )}
         </View>
-        <Text style={styles.resonanceMeaning}>{insights.resonanceLink.meaning}</Text>
+        <Text style={styles.resonanceMeaning}>
+          {t(insights.resonanceLink.meaningKey)}
+          {'\n\n'}
+          {insights.resonanceLink.distance !== undefined && (
+            <>
+              {insights.resonanceLink.distance > 0 ? '📊 ' : '✨ '}
+              {t(insights.resonanceLink.descriptionKey, {
+                kabir: insights.resonanceLink.kabir?.toString() || '',
+                nearest: insights.resonanceLink.sacredNumber.toString(),
+                distance: insights.resonanceLink.distance.toString(),
+              })}
+            </>
+          )}
+        </Text>
       </View>
       
       {/* Reflection Block */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🤲 Reflection</Text>
-        <Text style={styles.reflectionPrompt}>{insights.reflectionBlock.prompt}</Text>
+        <Text style={styles.cardTitle}>🤲 {t('calculator.results.quran.reflection')}</Text>
+        <Text style={styles.reflectionPrompt}>{t(insights.reflectionBlock.promptKey)}</Text>
         <TextInput
           style={styles.notesInput}
           value={reflectionNotes}
           onChangeText={setReflectionNotes}
-          placeholder="Write your reflections here (saved locally)..."
+          placeholder={t('calculator.results.quran.reflectionPlaceholder')}
           placeholderTextColor="#64748b"
           multiline
           numberOfLines={4}
@@ -85,7 +104,7 @@ export const QuranResultSection: React.FC<QuranResultSectionProps> = ({ insights
       {insights.quranComLink && (
         <TouchableOpacity onPress={handleOpenQuranCom} activeOpacity={0.8}>
           <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.linkButton}>
-            <Text style={styles.linkText}>📖 Read on Quran.com</Text>
+            <Text style={styles.linkText}>📖 {t('calculator.results.quran.readOnQuranCom')}</Text>
           </LinearGradient>
         </TouchableOpacity>
       )}
@@ -93,7 +112,7 @@ export const QuranResultSection: React.FC<QuranResultSectionProps> = ({ insights
       {/* Disclaimer */}
       <View style={styles.disclaimer}>
         <Text style={styles.disclaimerText}>
-          ⚠️ This is numerical analysis only. For tafsīr and religious rulings, consult qualified scholars.
+          ⚠️ {t('calculator.results.quran.disclaimer')}
         </Text>
       </View>
     </View>
