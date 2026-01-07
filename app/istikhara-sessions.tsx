@@ -7,6 +7,7 @@
 import ResponsiveAppHeader from '@/components/AppHeader';
 import BottomTabBar from '@/components/BottomTabBar';
 import Colors from '@/constants/Colors';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack } from 'expo-router';
 import React, { useState } from 'react';
@@ -23,7 +24,7 @@ import {
 export default function IstikharaSessionsScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
-  const [language, setLanguage] = useState<'en' | 'fr'>('en');
+  const { language, setLanguage, t } = useLanguage();
   
   return (
     <>
@@ -51,26 +52,26 @@ export default function IstikharaSessionsScreen() {
             <Ionicons name="moon" size={32} color="#a78bfa" />
           </View>
           <Text style={[styles.heroTitle, { color: colors.text }]}>
-            Ṣalāt al-Istikhārah
+            {t('modules.guidedIstikhara.home.title')}
           </Text>
           <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
-            The Prayer of Seeking Guidance - a Sunnah practice to seek Allah's guidance when making important decisions
+            {t('modules.guidedIstikhara.home.subtitle')}
           </Text>
           <View style={styles.heroHadith}>
             <Ionicons name="bookmarks" size={16} color="#fbbf24" />
             <Text style={[styles.heroHadithText, { color: colors.textSecondary }]}>
-              "When one of you is concerned about a matter, let him pray two rak'ahs..."
+              {t('modules.guidedIstikhara.home.hadith.text')}
             </Text>
           </View>
           <Text style={[styles.heroReference, { color: colors.textTertiary }]}>
-            — Sahih al-Bukhari 1162
+            {t('modules.guidedIstikhara.home.hadith.source')}
           </Text>
         </View>
 
         {/* Primary Action - Prayer Guide */}
         <View style={styles.primarySection}>
           <Text style={[styles.sectionLabel, { color: colors.text }]}>
-            📖 LEARN THE AUTHENTIC METHOD
+            {t('modules.guidedIstikhara.home.learnTitle')}
           </Text>
           <TouchableOpacity
             style={[styles.prayerGuideButton, { backgroundColor: '#dcfce7', borderColor: '#16a34a' }]}
@@ -82,10 +83,10 @@ export default function IstikharaSessionsScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.prayerGuideTitle, { color: '#15803d' }]}>
-                  Complete Prayer Guide
+                  {t('modules.guidedIstikhara.home.guide.title')}
                 </Text>
                 <Text style={[styles.prayerGuideSubtitle, { color: '#166534' }]}>
-                  Step-by-step instructions • Authentic dua • Prerequisites • Post-prayer guidance
+                  {t('modules.guidedIstikhara.home.guide.subtitle')}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={24} color="#16a34a" />
@@ -97,44 +98,44 @@ export default function IstikharaSessionsScreen() {
         <View style={[styles.infoCard, { backgroundColor: '#fef3c7', borderColor: '#f59e0b' }]}>
           <Ionicons name="bulb" size={18} color="#b45309" />
           <Text style={[styles.infoText, { color: '#78350f' }]}>
-            Istikhārah is performed when facing an important decision. The prayer consists of 2 rak'ahs followed by a specific supplication taught by the Prophet Muhammad ﷺ.
+            {t('modules.guidedIstikhara.home.infoCard')}
           </Text>
         </View>
 
         {/* When to Perform */}
         <View style={styles.whenCard}>
           <Text style={[styles.whenTitle, { color: colors.text }]}>
-            When to Perform Istikhārah
+            {t('modules.guidedIstikhara.home.when.title')}
           </Text>
           <View style={styles.whenList}>
             <View style={styles.whenItem}>
               <Ionicons name="checkmark-circle" size={20} color="#10b981" />
               <Text style={[styles.whenItemText, { color: colors.textSecondary }]}>
-                Marriage or important relationships
+                {t('modules.guidedIstikhara.home.when.items.marriage')}
               </Text>
             </View>
             <View style={styles.whenItem}>
               <Ionicons name="checkmark-circle" size={20} color="#10b981" />
               <Text style={[styles.whenItemText, { color: colors.textSecondary }]}>
-                Career decisions or job changes
+                {t('modules.guidedIstikhara.home.when.items.career')}
               </Text>
             </View>
             <View style={styles.whenItem}>
               <Ionicons name="checkmark-circle" size={20} color="#10b981" />
               <Text style={[styles.whenItemText, { color: colors.textSecondary }]}>
-                Major purchases or investments
+                {t('modules.guidedIstikhara.home.when.items.purchases')}
               </Text>
             </View>
             <View style={styles.whenItem}>
               <Ionicons name="checkmark-circle" size={20} color="#10b981" />
               <Text style={[styles.whenItemText, { color: colors.textSecondary }]}>
-                Travel or relocation decisions
+                {t('modules.guidedIstikhara.home.when.items.travel')}
               </Text>
             </View>
             <View style={styles.whenItem}>
               <Ionicons name="checkmark-circle" size={20} color="#10b981" />
               <Text style={[styles.whenItemText, { color: colors.textSecondary }]}>
-                Any permissible matter requiring guidance
+                {t('modules.guidedIstikhara.home.when.items.anyMatter')}
               </Text>
             </View>
           </View>
