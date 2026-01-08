@@ -9,10 +9,10 @@ import React, { useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useLanguage } from '../../contexts/LanguageContext';
 import type {
-    DivineNameIntentionCompatibility,
-    PersonDivineNameCompatibility,
-    PersonPersonCompatibility,
-    UniversalCompatibilityResult
+  DivineNameIntentionCompatibility,
+  PersonDivineNameCompatibility,
+  PersonPersonCompatibility,
+  UniversalCompatibilityResult
 } from '../../services/compatibility/types';
 import { CompatibilityGauge } from './CompatibilityGauge';
 
@@ -1241,6 +1241,22 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
 // ============================================================================
 
 function DivineIntentionResultView({ result, language }: { result: DivineNameIntentionCompatibility; language: 'en' | 'fr' | 'ar' }) {
+  const { t } = useLanguage();
+  
+  // Safe translation helper - never shows raw keys
+  const tr = (key: string, params?: any) => {
+    try {
+      const translated = t(key, params);
+      // If translation returns the key itself (meaning it's missing), return fallback
+      if (translated === key || !translated) {
+        return t('common.unknown') || '';
+      }
+      return translated;
+    } catch {
+      return t('common.unknown') || '';
+    }
+  };
+  
   const { divineName, intention, alignment, guidance, alternativeSuggestions } = result;
   const [activeTab, setActiveTab] = useState<'alignment' | 'alternatives' | 'guidance'>('alignment');
 
@@ -1251,11 +1267,11 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
   };
 
   const tabs = [
-    { id: 'alignment' as const, label: language === 'en' ? 'Alignment' : 'التوافق', icon: 'checkmark-circle' },
+    { id: 'alignment' as const, label: tr('compatibility.form.divineNameIntention.results.tabs.alignment'), icon: 'checkmark-circle' },
     ...(alternativeSuggestions && alternativeSuggestions.length > 0 
-      ? [{ id: 'alternatives' as const, label: language === 'en' ? 'Alternatives' : 'البدائل', icon: 'options' }] 
+      ? [{ id: 'alternatives' as const, label: tr('compatibility.form.divineNameIntention.results.tabs.alternatives'), icon: 'options' }] 
       : []),
-    { id: 'guidance' as const, label: language === 'en' ? 'Guidance' : 'الإرشاد', icon: 'compass' },
+    { id: 'guidance' as const, label: tr('compatibility.form.divineNameIntention.results.tabs.guidance'), icon: 'compass' },
   ];
 
   const getAlignmentColor = (align: string) => {
@@ -1289,19 +1305,7 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
   };
 
   const getIntentionLabel = (intent: string) => {
-    const labels: Record<string, { en: string; ar: string }> = {
-      clarity: { en: 'Clarity', ar: 'الوضوح' },
-      patience: { en: 'Patience', ar: 'الصبر' },
-      provision: { en: 'Provision', ar: 'الرزق' },
-      healing: { en: 'Healing', ar: 'الشفاء' },
-      protection: { en: 'Protection', ar: 'الحماية' },
-      guidance: { en: 'Guidance', ar: 'الهداية' },
-      strength: { en: 'Strength', ar: 'القوة' },
-      peace: { en: 'Peace', ar: 'السلام' },
-      knowledge: { en: 'Knowledge', ar: 'العلم' },
-      forgiveness: { en: 'Forgiveness', ar: 'المغفرة' }
-    };
-    return language === 'en' ? labels[intent]?.en || intent : labels[intent]?.ar || intent;
+    return tr(`compatibility.form.divineNameIntention.results.intentions.${intent}`);
   };
 
   return (
@@ -1340,7 +1344,7 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
         </View>
         
         <Text style={styles.headerSubtitle}>
-          {language === 'en' ? 'Divine Name for Your Intention' : 'الاسم الإلهي لنيتك'}
+          {tr('compatibility.form.divineNameIntention.results.title')}
         </Text>
       </LinearGradient>
 
@@ -1392,24 +1396,10 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                 color={getAlignmentColor(alignment)} 
               />
               <Text style={[styles.alignmentText, { color: getAlignmentColor(alignment) }]}>
-                {alignment.toUpperCase()}
+                {tr(`compatibility.form.divineNameIntention.results.alignment.${alignment === 'not-recommended' ? 'notRecommended' : alignment}`)}
               </Text>
               <Text style={styles.alignmentSubtext}>
-                {language === 'en' 
-                  ? alignment === 'optimal' 
-                    ? 'Perfect Match for Your Intention'
-                    : alignment === 'suitable' 
-                      ? 'Good Choice for Your Intention'
-                      : alignment === 'neutral'
-                        ? 'May Work, But Consider Alternatives'
-                        : 'Not Recommended for This Intention'
-                  : alignment === 'optimal'
-                    ? 'توافق مثالي لنيتك'
-                    : alignment === 'suitable'
-                      ? 'خيار جيد لنيتك'
-                      : alignment === 'neutral'
-                        ? 'قد يعمل، لكن فكر في البدائل'
-                        : 'غير موصى به لهذه النية'}
+                {tr(`compatibility.form.divineNameIntention.results.alignmentSubtext.${alignment === 'not-recommended' ? 'notRecommended' : alignment}`)}
               </Text>
             </LinearGradient>
 
@@ -1424,7 +1414,7 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.detailTitle}>
-                    {language === 'en' ? 'About This Divine Name' : 'عن هذا الاسم الإلهي'}
+                    {tr('compatibility.form.divineNameIntention.results.sections.aboutName')}
                   </Text>
                   <Text style={styles.detailSubtitle}>
                     {divineName.transliteration}
@@ -1437,7 +1427,7 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
               {/* Classical Functions */}
               <View style={styles.explanationBox}>
                 <Text style={styles.explanationTitle}>
-                  {language === 'en' ? '📖 Traditional Uses' : '📖 الاستخدامات التقليدية'}
+                  {tr('compatibility.form.divineNameIntention.results.sections.traditionalUses')}
                 </Text>
                 <View style={styles.functionList}>
                   {divineName.classicalFunction.map((func, index) => (
@@ -1446,7 +1436,7 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                         <Text style={styles.functionBulletText}>✓</Text>
                       </View>
                       <Text style={styles.functionText}>
-                        {func.charAt(0).toUpperCase() + func.slice(1)}
+                        {tr(`compatibility.form.divineNameIntention.results.intentions.${func}`)}
                       </Text>
                     </View>
                   ))}
@@ -1457,7 +1447,7 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
               <View style={styles.harmonyGrid}>
                 <View style={styles.harmonyCard}>
                   <Text style={styles.harmonyLabel}>
-                    {language === 'en' ? 'Element' : 'العنصر'}
+                    {tr('compatibility.divineNameResults.resonance.profile.element')}
                   </Text>
                   <Text style={styles.harmonyEmoji}>
                     {divineName.element === 'fire' ? '🔥' : 
@@ -1465,20 +1455,20 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                      divineName.element === 'air' ? '💨' : '🌱'}
                   </Text>
                   <Text style={styles.harmonyValue}>
-                    {divineName.element.toUpperCase()}
+                    {tr(`compatibility.divineNameResults.elements.${divineName.element}`)}
                   </Text>
                 </View>
 
                 <View style={styles.harmonyCard}>
                   <Text style={styles.harmonyLabel}>
-                    {language === 'en' ? 'Action' : 'الفعل'}
+                    {tr('compatibility.form.divineNameIntention.results.expectation.title')}
                   </Text>
                   <Text style={styles.harmonyEmoji}>
                     {divineName.modeOfAction === 'fast' ? '⚡' : 
                      divineName.modeOfAction === 'gradual' ? '🌱' : '💧'}
                   </Text>
                   <Text style={styles.harmonyValue}>
-                    {divineName.modeOfAction.toUpperCase()}
+                    {tr(`compatibility.form.divineNameIntention.results.speed.${divineName.modeOfAction}`)}
                   </Text>
                 </View>
               </View>
@@ -1487,7 +1477,7 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
             {/* Spiritual Influence */}
             <View style={styles.influenceCard}>
               <Text style={styles.influenceTitle}>
-                {language === 'en' ? '🌟 Spiritual Influence' : '🌟 التأثير الروحاني'}
+                {tr('compatibility.form.divineNameIntention.results.sections.spiritualInfluence')}
               </Text>
               <Text style={styles.influenceText}>
                 {language === 'en' 
@@ -1503,14 +1493,12 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
             <View style={styles.alternativesHeader}>
               <Ionicons name="bulb" size={28} color="#f59e0b" />
               <Text style={styles.alternativesTitle}>
-                {language === 'en' ? 'Traditionally More Aligned Names' : 'أسماء أكثر توافقاً تقليدياً'}
+                {tr('compatibility.form.divineNameIntention.results.sections.alternatives')}
               </Text>
             </View>
 
             <Text style={styles.alternativesSubtext}>
-              {language === 'en' 
-                ? 'According to classical teachings, these Names open doors traditionally more aligned with your intention:'
-                : 'وفقاً للتعاليم الكلاسيكية، هذه الأسماء تفتح أبواباً أكثر توافقاً تقليدياً مع نيتك:'}
+              {tr('compatibility.form.divineNameIntention.results.sections.alternativesDesc')}
             </Text>
 
             {alternativeSuggestions.map((name, index) => (
@@ -1527,7 +1515,7 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                   <View style={styles.recommendedBadge}>
                     <Ionicons name="star" size={16} color="#22c55e" />
                     <Text style={styles.recommendedText}>
-                      {language === 'en' ? 'Recommended' : 'موصى به'}
+                      {tr('compatibility.form.divineNameIntention.results.sections.recommended')}
                     </Text>
                   </View>
                 </View>
@@ -1566,14 +1554,14 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
               <View style={styles.guidanceHeader}>
                 <Ionicons name="compass" size={28} color="#3b82f6" />
                 <Text style={styles.guidanceTitle}>
-                  {language === 'en' ? 'Spiritual Guidance' : 'الإرشاد الروحاني'}
+                  {tr('compatibility.form.divineNameIntention.results.guidance.title')}
                 </Text>
               </View>
 
               <View style={styles.divider} />
 
               <Text style={styles.guidanceMainText}>
-                {language === 'en' ? guidance.en : guidance.ar}
+                {language === 'en' ? guidance.en : language === 'fr' ? guidance.en : guidance.ar}
               </Text>
             </LinearGradient>
 
@@ -1638,9 +1626,7 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
             <View style={styles.disclaimer}>
               <Ionicons name="information-circle-outline" size={20} color="#fbbf24" />
               <Text style={styles.disclaimerText}>
-                {language === 'en' 
-                  ? 'This is spiritual guidance only. The Divine Names belong to Allah alone. Results depend on sincerity, patience, and Allah\'s wisdom.'
-                  : 'هذا إرشاد روحي فقط. الأسماء الحسنى لله وحده. النتائج تعتمد على الإخلاص والصبر وحكمة الله.'}
+                {tr('compatibility.form.divineNameIntention.results.guidance.disclaimer')}
               </Text>
             </View>
           </View>

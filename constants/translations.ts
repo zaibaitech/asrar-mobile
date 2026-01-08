@@ -327,6 +327,7 @@ export const translations = {
       loading: "Loading...",
       error: "Error",
       success: "Success",
+      unknown: "—",
       name: "Name",
       date: "Date",
       location: "Location",
@@ -1972,6 +1973,76 @@ export const translations = {
           },
           cta: "Evaluate Compatibility",
           whyMatters: "Traditional sources guide which Names align with specific intentions.",
+          results: {
+            title: "Divine Name for Your Intention",
+            tabs: {
+              alignment: "Alignment",
+              alternatives: "Alternatives",
+              guidance: "Guidance",
+            },
+            alignment: {
+              optimal: "OPTIMAL",
+              suitable: "SUITABLE",
+              neutral: "NEUTRAL",
+              notRecommended: "NOT RECOMMENDED",
+            },
+            alignmentSubtext: {
+              optimal: "Perfect Match for Your Intention",
+              suitable: "Good Choice for Your Intention",
+              neutral: "May Work, But Consider Alternatives",
+              notRecommended: "Not Recommended for This Intention",
+            },
+            sections: {
+              aboutName: "About This Divine Name",
+              traditionalUses: "📖 Traditional Uses",
+              spiritualInfluence: "🌟 Spiritual Influence",
+              alternatives: "✨ Alternative Divine Names",
+              alternativesDesc: "These Names may better support your intention:",
+              recommended: "Recommended",
+            },
+            intentions: {
+              clarity: "Clarity",
+              patience: "Patience",
+              provision: "Provision",
+              healing: "Healing",
+              protection: "Protection",
+              guidance: "Guidance",
+              strength: "Strength",
+              peace: "Peace",
+              knowledge: "Knowledge",
+              forgiveness: "Forgiveness",
+            },
+            speed: {
+              fast: "FAST",
+              gradual: "GRADUAL",
+              subtle: "SUBTLE",
+              hidden: "HIDDEN",
+            },
+            expectation: {
+              title: "What to Expect",
+            },
+            guidance: {
+              title: "🧭 Spiritual Guidance",
+              howToUse: {
+                title: "🙏 How to Engage with This Name",
+              },
+              steps: {
+                step1: {
+                  title: "Purify Your Intention",
+                  desc: "Begin with sincere intention (niyyah) seeking only Allah's pleasure.",
+                },
+                step2: {
+                  title: "Reflect on the Meaning",
+                  desc: "Contemplate how this Name manifests in your life and creation.",
+                },
+                step3: {
+                  title: "Invoke with Reverence",
+                  desc: "Call upon Allah using this Name with humility and trust.",
+                },
+              },
+              disclaimer: "This is spiritual guidance only. The Divine Names belong to Allah alone. Results depend on sincerity, patience, and Allah's wisdom.",
+            },
+          },
         },
       },
 
@@ -5422,6 +5493,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       loading: "Chargement...",
       error: "Erreur",
       success: "Succès",
+      unknown: "—",
       name: "Nom",
       date: "Date",
       location: "Lieu",
@@ -7266,6 +7338,76 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           },
           cta: "Évaluer la Compatibilité",
           whyMatters: "Les sources traditionnelles guident quels Noms s'alignent avec des intentions spécifiques.",
+          results: {
+            title: "Nom Divin pour Votre Intention",
+            tabs: {
+              alignment: "Alignement",
+              alternatives: "Alternatives",
+              guidance: "Conseils",
+            },
+            alignment: {
+              optimal: "OPTIMAL",
+              suitable: "ADAPTÉ",
+              neutral: "NEUTRE",
+              notRecommended: "NON RECOMMANDÉ",
+            },
+            alignmentSubtext: {
+              optimal: "Correspondance Parfaite pour Votre Intention",
+              suitable: "Bon Choix pour Votre Intention",
+              neutral: "Peut Fonctionner, Mais Considérez les Alternatives",
+              notRecommended: "Non Recommandé pour Cette Intention",
+            },
+            sections: {
+              aboutName: "À Propos de Ce Nom Divin",
+              traditionalUses: "📖 Usages Traditionnels",
+              spiritualInfluence: "🌟 Influence Spirituelle",
+              alternatives: "✨ Noms Divins Alternatifs",
+              alternativesDesc: "Ces Noms peuvent mieux soutenir votre intention :",
+              recommended: "Recommandé",
+            },
+            intentions: {
+              clarity: "Clarté",
+              patience: "Patience",
+              provision: "Subsistance",
+              healing: "Guérison",
+              protection: "Protection",
+              guidance: "Guidance",
+              strength: "Force",
+              peace: "Paix",
+              knowledge: "Connaissance",
+              forgiveness: "Pardon",
+            },
+            speed: {
+              fast: "RAPIDE",
+              gradual: "PROGRESSIF",
+              subtle: "SUBTIL",
+              hidden: "CACHÉ",
+            },
+            expectation: {
+              title: "À Quoi S'Attendre",
+            },
+            guidance: {
+              title: "🧭 Guidance Spirituelle",
+              howToUse: {
+                title: "🙏 Comment Invoquer Ce Nom",
+              },
+              steps: {
+                step1: {
+                  title: "Purifiez Votre Intention",
+                  desc: "Commencez avec une intention sincère (niyyah) ne recherchant que la satisfaction d'Allah.",
+                },
+                step2: {
+                  title: "Réfléchissez sur le Sens",
+                  desc: "Contemplez comment ce Nom se manifeste dans votre vie et dans la création.",
+                },
+                step3: {
+                  title: "Invoquez avec Révérence",
+                  desc: "Invoquez Allah en utilisant ce Nom avec humilité et confiance.",
+                },
+              },
+              disclaimer: "Ceci est une guidance spirituelle uniquement. Les Noms Divins appartiennent à Allah seul. Les résultats dépendent de la sincérité, de la patience et de la sagesse d'Allah.",
+            },
+          },
         },
       },
 
