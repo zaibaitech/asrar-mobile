@@ -10,7 +10,9 @@
  * - Describes human reception and spiritual resonance, not Divine action constraints
  */
 
+import { calculateSpiritualDestiny } from '../../utils/relationshipCompatibility';
 import { NameDestinyResult } from '../ilm-huruf/core';
+import { getNormalizedAbjadValue } from './divineNamesData';
 import {
     buildCompatibilityEvaluation,
     extractSpiritualDestiny
@@ -21,8 +23,6 @@ import {
     IntentionCategory,
     PersonDivineNameCompatibility
 } from './types';
-import { calculateSpiritualDestiny } from '../../utils/relationshipCompatibility';
-import { getNormalizedAbjadValue } from './divineNamesData';
 
 // ============================================================================
 // PERSON ↔ DIVINE NAME COMPATIBILITY
@@ -99,59 +99,43 @@ function analyzeNameAction(
   modeOfAction: 'fast' | 'gradual' | 'hidden'
 ): {
   effect: 'strengthens' | 'stabilizes' | 'tempers' | 'challenges';
-  explanation: { en: string; ar: string };
+  personElement: 'fire' | 'water' | 'air' | 'earth';
+  nameElement: 'fire' | 'water' | 'air' | 'earth';
 } {
+  
+  let effect: 'strengthens' | 'stabilizes' | 'tempers' | 'challenges';
   
   // Same element = Taqwiyah (Strengthening)
   if (personElement === nameElement) {
-    return {
-      effect: 'strengthens',
-      explanation: {
-        en: `Taqwiyah (تقوية) — This Name reinforces your innate ${personElement} temperament, amplifying its natural expression.`,
-        ar: `تقوية — هذا الاسم يُعزّز طبيعتك ${getElementArabic(personElement)} الفطرية، مُقوّياً تعبيرها الطبيعي.`
-      }
-    };
+    effect = 'strengthens';
   }
-  
   // Supportive pairs = Muʿāwanah (Supportive Carrying)
-  if (
+  else if (
     (personElement === 'fire' && nameElement === 'air') ||
     (personElement === 'air' && nameElement === 'fire') ||
     (personElement === 'water' && nameElement === 'earth') ||
     (personElement === 'earth' && nameElement === 'water')
   ) {
-    return {
-      effect: 'stabilizes',
-      explanation: {
-        en: `Muʿāwanah (معاونة) — This Name carries and stabilizes your ${personElement} nature, providing harmonious support.`,
-        ar: `معاونة — هذا الاسم يحمل ويُثبّت طبيعتك ${getElementArabic(personElement)}، مُقدّماً دعماً متناغماً.`
-      }
-    };
+    effect = 'stabilizes';
   }
-  
   // Opposing pairs = Tadbīr bi-l-Ḍidd (Governance by Opposition)
-  if (
+  else if (
     (personElement === 'fire' && nameElement === 'water') ||
     (personElement === 'water' && nameElement === 'fire') ||
     (personElement === 'air' && nameElement === 'earth') ||
     (personElement === 'earth' && nameElement === 'air')
   ) {
-    return {
-      effect: 'tempers',
-      explanation: {
-        en: `Tadbīr bi-l-Ḍidd (تدبير بالضدّ) — This Name governs your ${personElement} nature through opposition, restraining excess and establishing regulation.`,
-        ar: `تدبير بالضدّ — هذا الاسم يُدبّر طبيعتك ${getElementArabic(personElement)} بالمعارضة، كابحاً الزيادة ومُقرّراً التنظيم.`
-      }
-    };
+    effect = 'tempers';
+  }
+  // Transformative pairs = Taṣrīf / Taḥwīl (Transformation & Refinement)
+  else {
+    effect = 'challenges';
   }
   
-  // Transformative pairs = Taṣrīf / Taḥwīl (Transformation & Refinement)
   return {
-    effect: 'challenges',
-    explanation: {
-      en: `Taṣrīf wa-Taḥwīl (تصريف وتحويل) — This Name transforms your ${personElement} disposition, refining it through internal change rather than comfort.`,
-      ar: `تصريف وتحويل — هذا الاسم يُحوّل طبيعتك ${getElementArabic(personElement)}، مُنقّياً إياها من خلال التغيير الباطني لا الراحة.`
-    }
+    effect,
+    personElement,
+    nameElement
   };
 }
 
@@ -161,69 +145,34 @@ function analyzeManifestationGuidance(
   nameElement: 'fire' | 'water' | 'air' | 'earth'
 ): {
   speed: 'fast' | 'delayed' | 'subtle';
-  reason: { en: string; ar: string };
+  personElement: 'fire' | 'water' | 'air' | 'earth';
+  modeOfAction: 'fast' | 'gradual' | 'hidden';
 } {
+  
+  let speed: 'fast' | 'delayed' | 'subtle';
   
   // Sarīʿ al-Athar (Apparent Effect)
   if (modeOfAction === 'fast') {
     if (personElement === 'fire' || personElement === 'air') {
-      return {
-        speed: 'fast',
-        reason: {
-          en: 'Sarīʿ al-Athar (سريع الأثر) — Your temperament allows quicker reception of this Name\'s apparent effect. Reflection may reveal changes sooner.',
-          ar: 'سريع الأثر — طبيعتك تسمح باستقبال أسرع لأثر هذا الاسم الظاهر. قد يكشف التأمل عن تغييرات أسرع.'
-        }
-      };
+      speed = 'fast';
     } else {
-      return {
-        speed: 'delayed',
-        reason: {
-          en: 'Sarīʿ al-Athar (سريع الأثر) — Your grounded nature receives this Name\'s effect more gradually, stabilizing it deeply over time.',
-          ar: 'سريع الأثر — طبيعتك المتجذرة تستقبل أثر هذا الاسم تدريجياً، مُثبّتةً إياه عميقاً مع الوقت.'
-        }
-      };
+      speed = 'delayed';
     }
   }
-  
   // Mutawassiṭ (Gradual Unfolding)
-  if (modeOfAction === 'gradual') {
-    if (personElement === 'earth') {
-      return {
-        speed: 'delayed',
-        reason: {
-          en: 'Mutawassiṭ (متوسط) — Your earthy reception mirrors the Name\'s gradual unfolding, building lasting foundations through patient reception.',
-          ar: 'متوسط — استقبالك الترابي يُحاكي تكشّف الاسم التدريجي، بانياً أساسات دائمة بالاستقبال الصابر.'
-        }
-      };
-    } else {
-      return {
-        speed: 'delayed',
-        reason: {
-          en: 'Mutawassiṭ (متوسط) — This Name unfolds gradually; your reception deepens through steady spiritual practice over time.',
-          ar: 'متوسط — هذا الاسم يتكشّف تدريجياً؛ استقبالك يعمق بالممارسة الروحية الثابتة مع الوقت.'
-        }
-      };
-    }
+  else if (modeOfAction === 'gradual') {
+    speed = 'delayed';
+  }
+  // Khafī (Inward/Subtle Effect)
+  else {
+    speed = 'subtle';
   }
   
-  // Khafī (Inward/Subtle Effect)
   return {
-    speed: 'subtle',
-    reason: {
-      en: 'Khafī (خفيّ) — This Name works inwardly. Its effect is subtle, revealed through inner transformation rather than outward signs.',
-      ar: 'خفيّ — هذا الاسم يعمل باطنياً. أثره خفيّ، يُكشف من خلال التحول الداخلي لا بالعلامات الظاهرة.'
-    }
+    speed,
+    personElement,
+    modeOfAction
   };
-}
-
-function getElementArabic(element: 'fire' | 'water' | 'air' | 'earth'): string {
-  const map = {
-    fire: 'النار',
-    water: 'الماء',
-    air: 'الهواء',
-    earth: 'التراب'
-  };
-  return map[element];
 }
 
 // ============================================================================

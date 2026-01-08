@@ -16,6 +16,7 @@ import {
     View
 } from 'react-native';
 import { ABJAD_MAGHRIBI } from '../../constants/abjad-maps';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { calculatePersonDivineNameCompatibility } from '../../services/compatibility/divineNameCompatibility';
 import {
     getAllCompatibilityDivineNames
@@ -29,15 +30,11 @@ import ArabicKeyboard from '../istikhara/ArabicKeyboard';
 import NameAutocomplete from '../NameAutocomplete';
 
 interface PersonDivineNameFormProps {
-  language: 'en' | 'fr' | 'ar';
-  onCalculate: (result: PersonDivineNameCompatibility) => void;
-}
-interface PersonDivineNameFormProps {
-  language: 'en' | 'ar';
   onCalculate: (result: PersonDivineNameCompatibility) => void;
 }
 
-export function PersonDivineNameForm({ language, onCalculate }: PersonDivineNameFormProps) {
+export function PersonDivineNameForm({ onCalculate }: PersonDivineNameFormProps) {
+  const { language, t } = useLanguage();
   const [personName, setPersonName] = useState('');
   const [personArabic, setPersonArabic] = useState('');
   const [personLatin, setPersonLatin] = useState('');
@@ -80,12 +77,12 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
     setError('');
     
     if (!personArabic.trim()) {
-      setError(language === 'en' ? 'Arabic name is required' : 'الاسم العربي مطلوب');
+      setError(t('compatibility.form.errors.arabicNameRequired'));
       return;
     }
 
     if (!selectedDivineName) {
-      setError(language === 'en' ? 'Please select a Divine Name' : 'يرجى اختيار اسم إلهي');
+      setError(t('compatibility.form.errors.divineNameRequired'));
       return;
     }
 
@@ -104,9 +101,7 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
       onCalculate(result);
     } catch (err) {
       console.error('Compatibility calculation error:', err);
-      setError(language === 'en' 
-        ? 'Calculation failed. Please check your inputs.'
-        : 'فشل الحساب. يرجى التحقق من المدخلات.');
+      setError(t('compatibility.form.errors.calculationFailed'));
     } finally {
       setIsCalculating(false);
     }
@@ -124,7 +119,7 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
             <View style={styles.inputTitleRow}>
               <Text style={styles.inputEmoji}>👤</Text>
               <Text style={styles.inputTitle}>
-                {language === 'en' ? 'Your Information' : 'معلوماتك'}
+                {t('compatibility.form.personInfo.title')}
               </Text>
             </View>
           </View>
@@ -132,13 +127,13 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
           {/* Display Name */}
           <View style={styles.inputWrapper}>
             <Text style={styles.label}>
-              {language === 'en' ? 'Display Name (Optional)' : 'الاسم للعرض (اختياري)'}
+              {t('compatibility.form.personInfo.displayName.label')}
             </Text>
             <TextInput
               style={styles.input}
               value={personName}
               onChangeText={setPersonName}
-              placeholder={language === 'en' ? 'e.g., Ahmed' : 'مثال: أحمد'}
+              placeholder={t('compatibility.form.personInfo.displayName.placeholder')}
               placeholderTextColor="#64748b"
             />
           </View>
@@ -146,7 +141,7 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
           {/* Latin Name Autocomplete */}
           <View style={styles.inputWrapper}>
             <Text style={styles.label}>
-              {language === 'en' ? 'Latin Name (English/French)' : 'الاسم اللاتيني (إنجليزي/فرنسي)'}
+              {t('compatibility.form.personInfo.latinName.label')}
             </Text>
             <NameAutocomplete
               value={personLatin}
@@ -155,7 +150,7 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
                 setPersonArabic(arabic);
                 setPersonLatin(latin);
               }}
-              placeholder="e.g., Fatima, Ibrahima, Amadou"
+              placeholder={t('compatibility.form.personInfo.latinName.placeholder')}
               showHelper={false}
               language={language}
             />
@@ -165,7 +160,7 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
           <View style={styles.inputWrapper}>
             <View style={styles.labelRow}>
               <Text style={styles.label}>
-                {language === 'en' ? 'Arabic Name *' : 'الاسم العربي *'}
+                {t('compatibility.form.personInfo.arabicName.label')}
               </Text>
               <TouchableOpacity
                 style={styles.keyboardButton}
@@ -173,7 +168,7 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
               >
                 <Keyboard size={14} color="#a78bfa" strokeWidth={2} />
                 <Text style={styles.keyboardButtonText}>
-                  {language === 'en' ? 'Keyboard' : 'لوحة'}
+                  {t('compatibility.form.personInfo.keyboard')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -186,7 +181,7 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
                 setCursorPosition(text.length);
               }}
               onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
-              placeholder="أحمد"
+              placeholder={t('compatibility.form.personInfo.arabicName.placeholder')}
               placeholderTextColor="#64748b"
               editable={!showKeyboard}
             />
@@ -196,7 +191,7 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
 
       {/* Divine Name Selection */}
       <Text style={styles.sectionTitle}>
-        {language === 'en' ? 'Select Divine Name' : 'اختر الاسم الإلهي'}
+        {t('compatibility.form.divineName.title')}
       </Text>
 
       <TouchableOpacity
@@ -206,7 +201,7 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
         <Text style={styles.namePickerButtonText}>
           {selectedDivineName 
             ? `${selectedDivineName.arabic} (${selectedDivineName.transliteration})`
-            : (language === 'en' ? 'Choose a Divine Name' : 'اختر اسماً إلهياً')}
+            : t('compatibility.form.divineName.placeholder')}
         </Text>
         <Text style={styles.chevron}>›</Text>
       </TouchableOpacity>
@@ -214,9 +209,9 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
       {selectedDivineName && (
         <View style={styles.namePreview}>
           <Text style={styles.namePreviewMeaning}>
-            {language === 'en' 
-              ? selectedDivineName.meaning.en 
-              : selectedDivineName.meaning.ar}
+            {language === 'ar' 
+              ? selectedDivineName.meaning.ar 
+              : selectedDivineName.meaning.en}
           </Text>
         </View>
       )}
@@ -232,7 +227,7 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {language === 'en' ? 'Select Divine Name' : 'اختر الاسم الإلهي'}
+                {t('compatibility.form.divineName.title')}
               </Text>
               <TouchableOpacity onPress={() => setShowNamePicker(false)}>
                 <Text style={styles.modalClose}>✕</Text>
@@ -281,7 +276,7 @@ export function PersonDivineNameForm({ language, onCalculate }: PersonDivineName
           <ActivityIndicator color="#ffffff" />
         ) : (
           <Text style={styles.calculateButtonText}>
-            {language === 'en' ? 'Calculate Resonance' : 'حساب الرنين'}
+            {t('compatibility.form.cta2.calculateResonance')}
           </Text>
         )}
       </TouchableOpacity>

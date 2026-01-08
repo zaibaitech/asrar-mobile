@@ -883,6 +883,7 @@ function getModeOfUnion(elementalElement: string, planetaryRelationship: string,
 // ============================================================================
 
 function PersonDivineNameResultView({ result, language }: { result: PersonDivineNameCompatibility; language: 'en' | 'fr' | 'ar' }) {
+  const { t } = useLanguage();
   const { person, divineName, evaluation, spiritualDestiny, nameAction, manifestationGuidance } = result;
   const [activeTab, setActiveTab] = useState<'resonance' | 'guidance' | 'practice'>('resonance');
 
@@ -893,9 +894,9 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
   };
 
   const tabs = [
-    { id: 'resonance' as const, label: language === 'en' ? 'Resonance' : 'الرنين', icon: 'pulse' },
-    { id: 'guidance' as const, label: language === 'en' ? 'Guidance' : 'الإرشاد', icon: 'compass' },
-    { id: 'practice' as const, label: language === 'en' ? 'Practice' : 'الممارسة', icon: 'book' },
+    { id: 'resonance' as const, label: t('compatibility.divineNameResults.tabs.resonance'), icon: 'pulse' },
+    { id: 'guidance' as const, label: t('compatibility.divineNameResults.tabs.guidance'), icon: 'compass' },
+    { id: 'practice' as const, label: t('compatibility.divineNameResults.tabs.practice'), icon: 'book' },
   ];
 
   const getEffectColor = (effect: string) => {
@@ -944,13 +945,13 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
             <Text style={styles.divineNameArabic}>{divineName.arabic}</Text>
             <Text style={styles.divineNameTranslit}>{divineName.transliteration}</Text>
             <Text style={styles.divineNameMeaning}>
-              {language === 'en' ? divineName.meaning.en : divineName.meaning.ar}
+              {language === 'ar' ? divineName.meaning.ar : divineName.meaning.en}
             </Text>
           </View>
         </View>
         
         <Text style={styles.headerSubtitle}>
-          {language === 'en' ? 'Divine Name Resonance Analysis' : 'تحليل رنين الاسم الإلهي'}
+          {t('compatibility.divineNameResults.subtitle')}
         </Text>
       </LinearGradient>
 
@@ -997,7 +998,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
               style={styles.resonanceCard}
             >
               <Text style={styles.resonanceTitle}>
-                {language === 'en' ? 'Spiritual Resonance' : 'الرنين الروحاني'}
+                {t('compatibility.divineNameResults.resonance.title')}
               </Text>
               <CompatibilityGauge
                 score={evaluation.resonanceScore}
@@ -1006,9 +1007,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                 size={130}
               />
               <Text style={styles.resonanceSubtext}>
-                {language === 'en' 
-                  ? `${person.name}'s energy aligns with ${divineName.transliteration}` 
-                  : `طاقة ${person.name} تتوافق مع ${divineName.arabic}`}
+                {t('compatibility.divineNameResults.resonance.subtitle', { person: person.name, name: divineName.transliteration })}
               </Text>
             </LinearGradient>
 
@@ -1022,7 +1021,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                   <Ionicons name="sparkles" size={28} color="#8b5cf6" />
                 </View>
                 <Text style={styles.detailTitle}>
-                  {language === 'en' ? 'Spiritual Destiny (Primary)' : 'القدر الروحاني (أساسي)'}
+                  {t('compatibility.divineNameResults.resonance.spiritualDestiny.title')}
                 </Text>
               </View>
 
@@ -1034,13 +1033,11 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                   {spiritualDestiny.score}%
                 </Text>
                 <Text style={[styles.spiritualQuality, { color: getScoreColor(spiritualDestiny.score) }]}>
-                  {language === 'en' 
-                    ? spiritualDestiny.quality.toUpperCase().replace('-', ' ')
-                    : spiritualDestiny.qualityArabic}
+                  {t(`compatibility.divineNameResults.qualityLabels.${spiritualDestiny.quality}`)}
                 </Text>
                 <View style={styles.remainderBadge}>
                   <Text style={styles.remainderText}>
-                    {language === 'en' ? 'Mod-9 Remainder:' : 'الباقي:'} {spiritualDestiny.remainder}
+                    {t('compatibility.divineNameResults.modLabel', { value: spiritualDestiny.remainder })}
                   </Text>
                 </View>
               </View>
@@ -1048,7 +1045,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
               {/* Description */}
               <View style={styles.explanationBox}>
                 <Text style={styles.explanationTitle}>
-                  {language === 'en' ? '✨ Spiritual Meaning' : '✨ المعنى الروحاني'}
+                  {t('compatibility.divineNameResults.explanations.spiritualMeaning')}
                 </Text>
                 <Text style={styles.explanationText}>
                   {language === 'en' 
@@ -1069,10 +1066,10 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.detailTitle}>
-                    {language === 'en' ? 'How This Name Acts Upon You' : 'كيف يؤثر هذا الاسم عليك'}
+                    {t('compatibility.divineNameResults.resonance.nameAction.title')}
                   </Text>
                   <Text style={[styles.effectBadge, { color: getEffectColor(nameAction.effect) }]}>
-                    {nameAction.effect.toUpperCase()}
+                    {t(`compatibility.divineNameResults.effects.${nameAction.effect}`)}
                   </Text>
                 </View>
               </View>
@@ -1081,10 +1078,10 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
 
               <View style={styles.explanationBox}>
                 <Text style={styles.explanationTitle}>
-                  {language === 'en' ? '💫 Divine Influence' : '💫 التأثير الإلهي'}
+                  {t('compatibility.divineNameResults.resonance.nameAction.divineInfluence')}
                 </Text>
                 <Text style={styles.explanationText}>
-                  {language === 'en' ? nameAction.explanation.en : nameAction.explanation.ar}
+                  {t(`compatibility.divineNameResults.nameActions.${nameAction.effect}.description`, { element: t(`compatibility.divineNameResults.elementLabels.${nameAction.personElement}`) })}
                 </Text>
               </View>
             </LinearGradient>
@@ -1093,7 +1090,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
             <View style={styles.harmonyGrid}>
               <View style={styles.harmonyCard}>
                 <Text style={styles.harmonyLabel}>
-                  {language === 'en' ? 'Element' : 'العنصر'}
+                  {t('compatibility.divineNameResults.resonance.profile.element')}
                 </Text>
                 <Text style={styles.harmonyEmoji}>
                   {divineName.element === 'fire' ? '🔥' : 
@@ -1101,17 +1098,17 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                    divineName.element === 'air' ? '💨' : '🌱'}
                 </Text>
                 <Text style={styles.harmonyValue}>
-                  {divineName.element.toUpperCase()}
+                  {t(`compatibility.divineNameResults.elements.${divineName.element}`)}
                 </Text>
               </View>
 
               <View style={styles.harmonyCard}>
                 <Text style={styles.harmonyLabel}>
-                  {language === 'en' ? 'Planet' : 'الكوكب'}
+                  {t('compatibility.divineNameResults.resonance.profile.planet')}
                 </Text>
                 <Text style={styles.harmonyEmoji}>🌙</Text>
                 <Text style={styles.harmonyValue}>
-                  {divineName.planet}
+                  {t(`compatibility.divineNameResults.planets.${divineName.planet}`)}
                 </Text>
               </View>
             </View>
@@ -1131,10 +1128,10 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.detailTitle}>
-                    {language === 'en' ? 'Manifestation Timeline' : 'جدول التجلي'}
+                    {t('compatibility.divineNameResults.guidance.manifestation.title')}
                   </Text>
                   <Text style={[styles.effectBadge, { color: getSpeedColor(manifestationGuidance.speed) }]}>
-                    {manifestationGuidance.speed.toUpperCase()}
+                    {t(`compatibility.divineNameResults.speed.${manifestationGuidance.speed}`)}
                   </Text>
                 </View>
               </View>
@@ -1143,12 +1140,17 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
 
               <View style={styles.explanationBox}>
                 <Text style={styles.explanationTitle}>
-                  {language === 'en' ? '⏳ What to Expect' : '⏳ ما يمكن توقعه'}
+                  {t('compatibility.divineNameResults.guidance.manifestation.whatToExpect')}
                 </Text>
                 <Text style={styles.explanationText}>
-                  {language === 'en' 
-                    ? manifestationGuidance.reason.en 
-                    : manifestationGuidance.reason.ar}
+                  {manifestationGuidance.speed === 'fast' 
+                    ? t(`compatibility.divineNameResults.manifestationSpeed.fast.${manifestationGuidance.personElement}`)
+                    : manifestationGuidance.speed === 'delayed' 
+                      ? manifestationGuidance.personElement === 'earth'
+                        ? t('compatibility.divineNameResults.manifestationSpeed.gradual.earth')
+                        : t('compatibility.divineNameResults.manifestationSpeed.gradual.default')
+                      : t('compatibility.divineNameResults.manifestationSpeed.subtle.default')
+                  }
                 </Text>
               </View>
             </LinearGradient>
@@ -1161,14 +1163,14 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
               <View style={styles.adviceHeader}>
                 <Ionicons name="bulb" size={28} color="#8b5cf6" />
                 <Text style={styles.adviceTitle}>
-                  {language === 'en' ? 'Spiritual Wisdom' : 'الحكمة الروحانية'}
+                  {t('compatibility.divineNameResults.guidance.spiritualWisdom.title')}
                 </Text>
               </View>
 
               <View style={styles.divider} />
 
               <Text style={styles.guidanceText}>
-                {language === 'en' ? evaluation.guidance.whatFlowsEasily.en : evaluation.guidance.whatFlowsEasily.ar}
+                {t('compatibility.divineNameResults.spiritualWisdomText')}
               </Text>
             </LinearGradient>
           </View>
@@ -1186,7 +1188,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                   <Ionicons name="book" size={28} color="#3b82f6" />
                 </View>
                 <Text style={styles.detailTitle}>
-                  {language === 'en' ? 'Traditional Uses' : 'الاستخدامات التقليدية'}
+                  {t('compatibility.divineNameResults.practice.traditionalUses.title')}
                 </Text>
               </View>
 
@@ -1199,7 +1201,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                       <Text style={styles.functionBulletText}>✓</Text>
                     </View>
                     <Text style={styles.functionText}>
-                      {func.charAt(0).toUpperCase() + func.slice(1)}
+                      {t(`compatibility.divineNameResults.intentions.${func}`)}
                     </Text>
                   </View>
                 ))}
@@ -1209,12 +1211,12 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
             {/* Spiritual Influence */}
             <View style={styles.influenceCard}>
               <Text style={styles.influenceTitle}>
-                {language === 'en' ? '🌟 Spiritual Influence' : '🌟 التأثير الروحاني'}
+                {t('compatibility.divineNameResults.practice.spiritualInfluence.title')}
               </Text>
               <Text style={styles.influenceText}>
-                {language === 'en' 
-                  ? divineName.spiritualInfluence.en 
-                  : divineName.spiritualInfluence.ar}
+                {language === 'ar' 
+                  ? divineName.spiritualInfluence.ar 
+                  : divineName.spiritualInfluence.en}
               </Text>
             </View>
 
@@ -1222,9 +1224,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
             <View style={styles.disclaimer}>
               <Ionicons name="information-circle-outline" size={20} color="#fbbf24" />
               <Text style={styles.disclaimerText}>
-                {language === 'en' 
-                  ? 'This resonance analysis is for spiritual reflection. The Divine Names belong to Allah alone. Use with reverence and pure intention.'
-                  : 'هذا التحليل للتأمل الروحي. الأسماء الحسنى لله وحده. استخدمها بإجلال ونية خالصة.'}
+                {t('compatibility.divineNameResults.practice.disclaimer')}
               </Text>
             </View>
           </View>

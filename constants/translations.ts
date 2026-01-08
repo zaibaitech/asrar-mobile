@@ -1918,6 +1918,173 @@ export const translations = {
         newCalculation: "New Calculation",
         reflectionOnly: "⚖️ Reflection Only",
         disclaimer: "This analysis is for spiritual reflection within the traditional sciences of ʿIlm al-Asrār. It does not constitute religious rulings, future predictions, or guarantees of outcomes.",
+        personInfo: {
+          title: "Your Information",
+          displayName: {
+            label: "Display Name (Optional)",
+            placeholder: "e.g., Ahmed",
+          },
+          latinName: {
+            label: "Latin Name (English/French)",
+            placeholder: "e.g., Fatima, Ibrahima, Amadou",
+          },
+          arabicName: {
+            label: "Arabic Name *",
+            placeholder: "أحمد",
+          },
+          keyboard: "Keyboard",
+        },
+        divineName: {
+          title: "Select Divine Name",
+          placeholder: "Choose a Divine Name",
+        },
+        cta2: {
+          calculateResonance: "Calculate Resonance",
+          calculateCompatibility: "Calculate Compatibility",
+        },
+        disclaimer2: {
+          title: "⚖️ Reflection Only",
+          body: "This analysis is for spiritual reflection within the traditional sciences of ʿIlm al-Asrār. It does not constitute religious rulings, future predictions, or guarantees of outcomes.",
+        },
+        errors: {
+          arabicNameRequired: "Arabic name is required",
+          divineNameRequired: "Please select a Divine Name",
+          calculationFailed: "Calculation failed. Please check your inputs.",
+        },
+      },
+
+      // Person ↔ Divine Name Results
+      divineNameResults: {
+        title: "Divine Name Resonance",
+        subtitle: "Divine Name Resonance Analysis",
+        tabs: {
+          resonance: "Resonance",
+          guidance: "Guidance",
+          practice: "Practice",
+        },
+        resonance: {
+          title: "Spiritual Resonance",
+          subtitle: "{{person}}'s energy aligns with {{name}}",
+          spiritualDestiny: {
+            title: "Main Spiritual Tendency",
+            modNine: "Mod-9 Remainder:",
+          },
+          nameAction: {
+            title: "How This Name Acts Upon You",
+            divineInfluence: "💫 Divine Influence",
+          },
+          profile: {
+            element: "Element",
+            planet: "Planet",
+          },
+        },
+        guidance: {
+          manifestation: {
+            title: "Manifestation Timeline",
+            whatToExpect: "⏳ What to Expect",
+          },
+          spiritualWisdom: {
+            title: "Spiritual Wisdom",
+          },
+        },
+        practice: {
+          traditionalUses: {
+            title: "Traditional Uses",
+          },
+          spiritualInfluence: {
+            title: "🌟 Spiritual Influence",
+          },
+          disclaimer: "This resonance analysis is for spiritual reflection. The Divine Names belong to Allah alone. Use with reverence and pure intention.",
+        },
+        effects: {
+          strengthens: "STRENGTHENS",
+          stabilizes: "STABILIZES",
+          tempers: "TEMPERS",
+          challenges: "CHALLENGES",
+        },
+        speed: {
+          fast: "FAST",
+          delayed: "GRADUAL",
+          subtle: "SUBTLE",
+        },
+        intentions: {
+          clarity: "Clarity",
+          patience: "Patience",
+          provision: "Provision",
+          healing: "Healing",
+          protection: "Protection",
+          guidance: "Guidance",
+          strength: "Strength",
+          peace: "Peace",
+          knowledge: "Knowledge",
+          forgiveness: "Forgiveness",
+        },
+        elements: {
+          fire: "FIRE",
+          water: "WATER",
+          air: "AIR",
+          earth: "EARTH",
+        },
+        planets: {
+          Sun: "Sun",
+          Moon: "Moon",
+          Mercury: "Mercury",
+          Venus: "Venus",
+          Mars: "Mars",
+          Jupiter: "Jupiter",
+          Saturn: "Saturn",
+        },
+        explanations: {
+          spiritualMeaning: "✨ Spiritual Meaning",
+        },
+        nameActions: {
+          strengthens: {
+            title: "Taqwiyah (Strengthening)",
+            description: "This Name reinforces your innate {{element}} temperament, amplifying its natural expression.",
+          },
+          stabilizes: {
+            title: "Muʿāwanah (Supportive)",
+            description: "This Name carries and stabilizes your {{element}} nature, providing harmonious support.",
+          },
+          tempers: {
+            title: "Tadbīr bi-l-Ḍidd (Tempering)",
+            description: "This Name governs your {{element}} nature through opposition, restraining excess and establishing regulation.",
+          },
+          challenges: {
+            title: "Taṣrīf wa-Taḥwīl (Transformative)",
+            description: "This Name transforms your {{element}} disposition, refining it through internal change rather than comfort.",
+          },
+        },
+        manifestationSpeed: {
+          fast: {
+            fire: "Your temperament allows quicker reception of this Name's apparent effect. Reflection may reveal changes sooner.",
+            air: "Your temperament allows quicker reception of this Name's apparent effect. Reflection may reveal changes sooner.",
+            water: "Your grounded nature receives this Name's effect more gradually, stabilizing it deeply over time.",
+            earth: "Your grounded nature receives this Name's effect more gradually, stabilizing it deeply over time.",
+          },
+          gradual: {
+            earth: "Your earthy reception mirrors the Name's gradual unfolding, building lasting foundations through patient reception.",
+            default: "This Name unfolds gradually; your reception deepens through steady spiritual practice over time.",
+          },
+          subtle: {
+            default: "This Name works inwardly. Its effect is subtle, revealed through inner transformation rather than outward signs.",
+          },
+        },
+        elementLabels: {
+          fire: "fire",
+          water: "water",
+          air: "air",
+          earth: "earth",
+        },
+        spiritualWisdomText: "This alignment supports steady progress and smooth cooperation.",
+        qualityLabels: {
+          excellent: "Excellent",
+          "very-good": "Very Good",
+          good: "Good",
+          moderate: "Moderate",
+          challenging: "End of cycle",
+        },
+        modLabel: "Sacred number: {{value}}",
       },
 
       // Person-to-Person Results
@@ -7019,6 +7186,173 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         newCalculation: "Nouveau calcul",
         reflectionOnly: "⚖️ Pour réflexion seulement",
         disclaimer: "Cette analyse est destinée à la réflexion spirituelle dans le cadre des sciences traditionnelles de ʿIlm al-Asrār. Elle ne constitue pas de règles religieuses, de prédictions futures ou de garanties de résultats.",
+        personInfo: {
+          title: "Vos informations",
+          displayName: {
+            label: "Nom d'affichage (optionnel)",
+            placeholder: "ex. Ahmed",
+          },
+          latinName: {
+            label: "Nom en latin (anglais/français)",
+            placeholder: "ex. Fatima, Ibrahima, Amadou",
+          },
+          arabicName: {
+            label: "Nom en arabe *",
+            placeholder: "أحمد",
+          },
+          keyboard: "Clavier",
+        },
+        divineName: {
+          title: "Choisir un Nom divin",
+          placeholder: "Sélectionner un Nom divin",
+        },
+        cta2: {
+          calculateResonance: "Calculer la résonance",
+          calculateCompatibility: "Calculer la compatibilité",
+        },
+        disclaimer2: {
+          title: "⚖️ Pour réflexion seulement",
+          body: "Cette analyse est destinée à la réflexion spirituelle dans le cadre des sciences traditionnelles de ʿIlm al-Asrār. Elle ne constitue pas de règles religieuses, de prédictions futures ou de garanties de résultats.",
+        },
+        errors: {
+          arabicNameRequired: "Le nom arabe est requis",
+          divineNameRequired: "Veuillez sélectionner un Nom divin",
+          calculationFailed: "Le calcul a échoué. Veuillez vérifier vos entrées.",
+        },
+      },
+
+      // Person ↔ Divine Name Results
+      divineNameResults: {
+        title: "Résonance du Nom Divin",
+        subtitle: "Analyse de Résonance du Nom Divin",
+        tabs: {
+          resonance: "Résonance",
+          guidance: "Conseils",
+          practice: "Pratique",
+        },
+        resonance: {
+          title: "Résonance Spirituelle",
+          subtitle: "L'énergie de {{person}} s'aligne avec {{name}}",
+          spiritualDestiny: {
+            title: "Tendance spirituelle principale",
+            modNine: "Reste Mod-9:",
+          },
+          nameAction: {
+            title: "Comment ce Nom agit sur vous",
+            divineInfluence: "💫 Influence Divine",
+          },
+          profile: {
+            element: "Élément",
+            planet: "Planète",
+          },
+        },
+        guidance: {
+          manifestation: {
+            title: "Chronologie de Manifestation",
+            whatToExpect: "⏳ À quoi s'attendre",
+          },
+          spiritualWisdom: {
+            title: "Sagesse Spirituelle",
+          },
+        },
+        practice: {
+          traditionalUses: {
+            title: "Usages Traditionnels",
+          },
+          spiritualInfluence: {
+            title: "🌟 Influence Spirituelle",
+          },
+          disclaimer: "Cette analyse de résonance est destinée à la réflexion spirituelle. Les Noms Divins appartiennent à Allah seul. Utilisez-les avec révérence et intention pure.",
+        },
+        effects: {
+          strengthens: "RENFORCE",
+          stabilizes: "STABILISE",
+          tempers: "TEMPÈRE",
+          challenges: "TRANSFORME",
+        },
+        speed: {
+          fast: "RAPIDE",
+          delayed: "PROGRESSIF",
+          subtle: "SUBTIL",
+        },
+        intentions: {
+          clarity: "Clarté",
+          patience: "Patience",
+          provision: "Subsistance",
+          healing: "Guérison",
+          protection: "Protection",
+          guidance: "Guidance",
+          strength: "Force",
+          peace: "Paix",
+          knowledge: "Connaissance",
+          forgiveness: "Pardon",
+        },
+        elements: {
+          fire: "FEU",
+          water: "EAU",
+          air: "AIR",
+          earth: "TERRE",
+        },
+        planets: {
+          Sun: "Soleil",
+          Moon: "Lune",
+          Mercury: "Mercure",
+          Venus: "Vénus",
+          Mars: "Mars",
+          Jupiter: "Jupiter",
+          Saturn: "Saturne",
+        },
+        explanations: {
+          spiritualMeaning: "✨ Signification Spirituelle",
+        },
+        nameActions: {
+          strengthens: {
+            title: "Taqwiyah (Renforcement)",
+            description: "Ce Nom renforce votre tempérament {{element}} inné, amplifiant son expression naturelle.",
+          },
+          stabilizes: {
+            title: "Muʿāwanah (Soutien)",
+            description: "Ce Nom porte et stabilise votre nature {{element}}, fournissant un soutien harmonieux.",
+          },
+          tempers: {
+            title: "Tadbīr bi-l-Ḍidd (Tempérance)",
+            description: "Ce Nom gouverne votre nature {{element}} par l'opposition, refrénant l'excès et établissant la régulation.",
+          },
+          challenges: {
+            title: "Taṣrīf wa-Taḥwīl (Transformation)",
+            description: "Ce Nom transforme votre disposition {{element}}, la raffinant par le changement intérieur plutôt que par le confort.",
+          },
+        },
+        manifestationSpeed: {
+          fast: {
+            fire: "Votre tempérament permet une réception plus rapide de l'effet apparent de ce Nom. La réflexion peut révéler des changements plus tôt.",
+            air: "Votre tempérament permet une réception plus rapide de l'effet apparent de ce Nom. La réflexion peut révéler des changements plus tôt.",
+            water: "Votre nature ancrée reçoit l'effet de ce Nom plus graduellement, le stabilisant profondément avec le temps.",
+            earth: "Votre nature ancrée reçoit l'effet de ce Nom plus graduellement, le stabilisant profondément avec le temps.",
+          },
+          gradual: {
+            earth: "Votre réception terrestre reflète le déploiement graduel du Nom, construisant des fondations durables par une réception patiente.",
+            default: "Ce Nom se déploie graduellement; votre réception s'approfondit par une pratique spirituelle constante au fil du temps.",
+          },
+          subtle: {
+            default: "Ce Nom agit intérieurement. Son effet est subtil, révélé par la transformation intérieure plutôt que par des signes extérieurs.",
+          },
+        },
+        elementLabels: {
+          fire: "feu",
+          water: "eau",
+          air: "air",
+          earth: "terre",
+        },
+        spiritualWisdomText: "Cet alignement favorise une progression régulière et une coopération harmonieuse.",
+        qualityLabels: {
+          excellent: "Excellent",
+          "very-good": "Très Bon",
+          good: "Bon",
+          moderate: "Modéré",
+          challenging: "Fin de cycle",
+        },
+        modLabel: "Nombre sacré : {{value}}",
       },
 
       // Person-to-Person Results

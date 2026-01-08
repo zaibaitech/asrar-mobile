@@ -201,19 +201,15 @@ export interface PersonDivineNameCompatibility {
   // How the Name acts upon the person
   nameAction: {
     effect: 'strengthens' | 'stabilizes' | 'tempers' | 'challenges';
-    explanation: {
-      en: string;
-      ar: string;
-    };
+    personElement: 'fire' | 'water' | 'air' | 'earth';
+    nameElement: 'fire' | 'water' | 'air' | 'earth';
   };
   
   // Why results may vary
   manifestationGuidance: {
     speed: 'fast' | 'delayed' | 'subtle';
-    reason: {
-      en: string;
-      ar: string;
-    };
+    personElement: 'fire' | 'water' | 'air' | 'earth';
+    modeOfAction: 'fast' | 'gradual' | 'hidden';
   };
 }
 

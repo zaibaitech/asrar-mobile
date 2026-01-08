@@ -103,7 +103,6 @@ export default function UniversalCompatibilityScreen() {
 
               {selectedType === 'person-divine-name' && (
                 <PersonDivineNameForm
-                  language={language}
                   onCalculate={handleCalculate}
                 />
               )}
