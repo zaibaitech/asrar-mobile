@@ -19,7 +19,7 @@ const { width } = Dimensions.get('window');
 
 interface CompatibilityResultViewProps {
   result: UniversalCompatibilityResult;
-  language: 'en' | 'ar';
+  language: 'en' | 'fr' | 'ar';
 }
 
 // Dynamic color themes based on relationship context
@@ -77,7 +77,7 @@ export function CompatibilityResultView({ result, language }: CompatibilityResul
 // PERSON ↔ PERSON RESULT VIEW (ENHANCED)
 // ============================================================================
 
-function PersonPersonResultView({ result, language }: { result: PersonPersonCompatibility; language: 'en' | 'ar' }) {
+function PersonPersonResultView({ result, language }: { result: PersonPersonCompatibility; language: 'en' | 'fr' | 'ar' }) {
   const { person1, person2, relationshipCompatibility, relationshipContext } = result;
   const rc = relationshipCompatibility;
   const methods = rc.methods;
@@ -763,7 +763,7 @@ function AdviceTab({ rc, theme, language }: any) {
 }
 
 // Traditional Note Component
-function TraditionalNote({ language }: { language: 'en' | 'ar' }) {
+function TraditionalNote({ language }: { language: 'en' | 'fr' | 'ar' }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -883,7 +883,7 @@ function getModeOfUnion(elementalElement: string, planetaryRelationship: string,
 // PERSON ↔ DIVINE NAME RESULT VIEW
 // ============================================================================
 
-function PersonDivineNameResultView({ result, language }: { result: PersonDivineNameCompatibility; language: 'en' | 'ar' }) {
+function PersonDivineNameResultView({ result, language }: { result: PersonDivineNameCompatibility; language: 'en' | 'fr' | 'ar' }) {
   const { person, divineName, evaluation, spiritualDestiny, nameAction, manifestationGuidance } = result;
   const [activeTab, setActiveTab] = useState<'resonance' | 'guidance' | 'practice'>('resonance');
 
@@ -1239,7 +1239,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
 // DIVINE NAME ↔ INTENTION RESULT VIEW
 // ============================================================================
 
-function DivineIntentionResultView({ result, language }: { result: DivineNameIntentionCompatibility; language: 'en' | 'ar' }) {
+function DivineIntentionResultView({ result, language }: { result: DivineNameIntentionCompatibility; language: 'en' | 'fr' | 'ar' }) {
   const { divineName, intention, alignment, guidance, alternativeSuggestions } = result;
   const [activeTab, setActiveTab] = useState<'alignment' | 'alternatives' | 'guidance'>('alignment');
 

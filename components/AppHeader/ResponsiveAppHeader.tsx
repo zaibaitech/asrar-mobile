@@ -5,8 +5,8 @@ import AppHeaderTablet from './AppHeaderTablet';
 
 interface ResponsiveAppHeaderProps {
   logoSource?: ImageSourcePropType;
-  currentLanguage: 'EN' | 'FR';
-  onLanguageChange: (lang: 'EN' | 'FR') => void;
+  currentLanguage: 'EN' | 'FR' | 'AR';
+  onLanguageChange: (lang: 'EN' | 'FR' | 'AR') => void;
   onProfilePress: () => void;
   onMenuPress: () => void;
   onHistoryPress?: () => void;

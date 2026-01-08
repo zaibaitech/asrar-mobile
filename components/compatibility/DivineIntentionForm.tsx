@@ -23,7 +23,7 @@ import {
 } from '../../services/compatibility/types';
 
 interface DivineIntentionFormProps {
-  language: 'en' | 'ar';
+  language: 'en' | 'fr' | 'ar';
   onCalculate: (result: DivineNameIntentionCompatibility) => void;
 }
 

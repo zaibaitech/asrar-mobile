@@ -15,6 +15,7 @@ import {
     View
 } from 'react-native';
 import { ABJAD_MAGHRIBI } from '../../constants/abjad-maps';
+import { useLanguage } from '../../contexts/LanguageContext';
 import {
     calculatePersonPersonCompatibility
 } from '../../services/compatibility/engine';
@@ -24,11 +25,12 @@ import ArabicKeyboard from '../istikhara/ArabicKeyboard';
 import NameAutocomplete from '../NameAutocomplete';
 
 interface PersonPersonFormProps {
-  language: 'en' | 'ar';
+  language: 'en' | 'fr' | 'ar';
   onCalculate: (result: PersonPersonCompatibility) => void;
 }
 
 export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProps) {
+  const { t } = useLanguage();
   const [person1Name, setPerson1Name] = useState('');
   const [person1Arabic, setPerson1Arabic] = useState('');
   const [person1Latin, setPerson1Latin] = useState('');
@@ -47,11 +49,11 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
   const person2InputRef = useRef<TextInput>(null);
 
   const relationshipTypes = [
-    { value: 'universal', labelEn: 'Universal', labelAr: 'شامل' },
-    { value: 'marriage', labelEn: 'Marriage', labelAr: 'زواج' },
-    { value: 'friendship', labelEn: 'Friendship', labelAr: 'صداقة' },
-    { value: 'family', labelEn: 'Family', labelAr: 'عائلة' },
-    { value: 'work', labelEn: 'Work', labelAr: 'عمل' }
+    { value: 'universal' },
+    { value: 'marriage' },
+    { value: 'friendship' },
+    { value: 'family' },
+    { value: 'work' }
   ] as const;
 
   // Keyboard handlers
@@ -138,7 +140,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>
-        {language === 'en' ? 'Relationship Context' : 'سياق العلاقة'}
+        {t('compatibility.form.context.title')}
       </Text>
       
       {/* Relationship Type Selector */}
@@ -156,7 +158,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
               styles.relationshipChipText,
               relationshipType === type.value && styles.relationshipChipTextActive
             ]}>
-              {language === 'en' ? type.labelEn : type.labelAr}
+              {t(`compatibility.form.context.${type.value}`)}
             </Text>
           </TouchableOpacity>
         ))}
@@ -172,7 +174,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
             <View style={styles.inputTitleRow}>
               <Text style={styles.inputEmoji}>👤</Text>
               <Text style={styles.inputTitle}>
-                {language === 'en' ? 'Person 1' : 'الشخص الأول'}
+                {t('compatibility.form.person1')}
               </Text>
             </View>
           </View>
@@ -180,13 +182,13 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
           {/* Display Name */}
           <View style={styles.inputWrapper}>
             <Text style={styles.label}>
-              {language === 'en' ? 'Display Name (Optional)' : 'الاسم للعرض (اختياري)'}
+              {t('compatibility.form.displayNameOptional')}
             </Text>
             <TextInput
               style={styles.input}
               value={person1Name}
               onChangeText={setPerson1Name}
-              placeholder={language === 'en' ? 'e.g., Ahmed' : 'مثال: أحمد'}
+              placeholder={t('compatibility.form.exampleAhmed')}
               placeholderTextColor="#64748b"
             />
           </View>
@@ -194,7 +196,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
           {/* Latin Name Autocomplete */}
           <View style={styles.inputWrapper}>
             <Text style={styles.label}>
-              {language === 'en' ? 'Latin Name (English/French)' : 'الاسم اللاتيني (إنجليزي/فرنسي)'}
+              {t('compatibility.form.latinName')}
             </Text>
             <NameAutocomplete
               value={person1Latin}
@@ -203,7 +205,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
                 setPerson1Arabic(arabic);
                 setPerson1Latin(latin);
               }}
-              placeholder="e.g., Fatima, Ibrahima, Amadou"
+              placeholder={t('compatibility.form.exampleFatima')}
               showHelper={false}
               language={language}
             />
@@ -213,7 +215,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
           <View style={styles.inputWrapper}>
             <View style={styles.labelRow}>
               <Text style={styles.label}>
-                {language === 'en' ? 'Arabic Name *' : 'الاسم العربي *'}
+                {t('compatibility.form.arabicName')} *
               </Text>
               <TouchableOpacity
                 style={styles.keyboardButton}
@@ -221,7 +223,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
               >
                 <Keyboard size={14} color="#a78bfa" strokeWidth={2} />
                 <Text style={styles.keyboardButtonText}>
-                  {language === 'en' ? 'Keyboard' : 'لوحة'}
+                  {t('compatibility.form.keyboard')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -252,7 +254,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
             <View style={styles.inputTitleRow}>
               <Text style={styles.inputEmoji}>👥</Text>
               <Text style={styles.inputTitle}>
-                {language === 'en' ? 'Person 2' : 'الشخص الثاني'}
+                {t('compatibility.form.person2')}
               </Text>
             </View>
           </View>
@@ -260,13 +262,13 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
           {/* Display Name */}
           <View style={styles.inputWrapper}>
             <Text style={styles.label}>
-              {language === 'en' ? 'Display Name (Optional)' : 'الاسم للعرض (اختياري)'}
+              {t('compatibility.form.displayNameOptional')}
             </Text>
             <TextInput
               style={styles.input}
               value={person2Name}
               onChangeText={setPerson2Name}
-              placeholder={language === 'en' ? 'e.g., Fatima' : 'مثال: فاطمة'}
+              placeholder={t('compatibility.form.exampleAhmed')}
               placeholderTextColor="#64748b"
             />
           </View>
@@ -274,7 +276,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
           {/* Latin Name Autocomplete */}
           <View style={styles.inputWrapper}>
             <Text style={styles.label}>
-              {language === 'en' ? 'Latin Name (English/French)' : 'الاسم اللاتيني (إنجليزي/فرنسي)'}
+              {t('compatibility.form.latinName')}
             </Text>
             <NameAutocomplete
               value={person2Latin}
@@ -283,7 +285,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
                 setPerson2Arabic(arabic);
                 setPerson2Latin(latin);
               }}
-              placeholder="e.g., Fatima, Khadija, Aisha"
+              placeholder={t('compatibility.form.exampleKhadija')}
               showHelper={false}
               language={language}
             />
@@ -293,7 +295,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
           <View style={styles.inputWrapper}>
             <View style={styles.labelRow}>
               <Text style={styles.label}>
-                {language === 'en' ? 'Arabic Name *' : 'الاسم العربي *'}
+                {t('compatibility.form.arabicName')} *
               </Text>
               <TouchableOpacity
                 style={styles.keyboardButton}
@@ -301,7 +303,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
               >
                 <Keyboard size={14} color="#a78bfa" strokeWidth={2} />
                 <Text style={styles.keyboardButtonText}>
-                  {language === 'en' ? 'Keyboard' : 'لوحة'}
+                  {t('compatibility.form.keyboard')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -339,7 +341,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
           <ActivityIndicator color="#ffffff" />
         ) : (
           <Text style={styles.calculateButtonText}>
-            {language === 'en' ? 'Calculate Resonance' : 'حساب الرنين'}
+            {t('compatibility.form.cta')}
           </Text>
         )}
       </TouchableOpacity>

@@ -29,6 +29,10 @@ import ArabicKeyboard from '../istikhara/ArabicKeyboard';
 import NameAutocomplete from '../NameAutocomplete';
 
 interface PersonDivineNameFormProps {
+  language: 'en' | 'fr' | 'ar';
+  onCalculate: (result: PersonDivineNameCompatibility) => void;
+}
+interface PersonDivineNameFormProps {
   language: 'en' | 'ar';
   onCalculate: (result: PersonDivineNameCompatibility) => void;
 }

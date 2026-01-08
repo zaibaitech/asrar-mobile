@@ -1882,6 +1882,44 @@ export const translations = {
         challenging: "Challenging",
       },
 
+      // New Universal Compatibility UI translations
+      tabs: {
+        calculate: "Calculate",
+        results: "Results",
+      },
+      form: {
+        chooseType: "Select Compatibility Type",
+        type: {
+          personPerson: "Person ↔ Person",
+          personPersonDesc: "Universal compatibility for any relationship",
+          personDivineName: "Person ↔ Divine Name",
+          personDivineNameDesc: "How a Divine Name resonates with you",
+          divineIntention: "Divine Name ↔ Intention",
+          divineIntentionDesc: "Match Names to your spiritual goals",
+        },
+        context: {
+          title: "Relationship Context",
+          universal: "Universal",
+          marriage: "Marriage",
+          friendship: "Friendship",
+          family: "Family",
+          work: "Work",
+        },
+        person1: "Person 1",
+        person2: "Person 2",
+        displayNameOptional: "Display name (optional)",
+        latinName: "Latin name (English/French)",
+        arabicName: "Arabic name",
+        keyboard: "Keyboard",
+        exampleAhmed: "Example: Ahmed",
+        exampleFatima: "e.g., Fatima, Ibrahima, Amadou",
+        exampleKhadija: "e.g., Fatima, Khadija, Aisha",
+        cta: "Calculate Compatibility",
+        newCalculation: "New Calculation",
+        reflectionOnly: "⚖️ Reflection Only",
+        disclaimer: "This analysis is for spiritual reflection within the traditional sciences of ʿIlm al-Asrār. It does not constitute religious rulings, future predictions, or guarantees of outcomes.",
+      },
+
       // Universal Compatibility System (ʿIlm al-Asrār)
       universal: {
         title: "Universal Compatibility",
@@ -6810,6 +6848,44 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         good: "Bon",
         moderate: "Modéré",
         challenging: "Difficile",
+      },
+
+      // New Universal Compatibility UI translations
+      tabs: {
+        calculate: "Calcul",
+        results: "Résultats",
+      },
+      form: {
+        chooseType: "Choisissez le type de compatibilité",
+        type: {
+          personPerson: "Personne ↔ Personne",
+          personPersonDesc: "Compatibilité pour toute relation",
+          personDivineName: "Personne ↔ Nom divin",
+          personDivineNameDesc: "Comment le Nom divin te soutient",
+          divineIntention: "Nom divin ↔ Intention",
+          divineIntentionDesc: "Association des Noms pour un objectif spirituel",
+        },
+        context: {
+          title: "Contexte de la relation",
+          universal: "Général",
+          marriage: "Mariage",
+          friendship: "Amitié",
+          family: "Famille",
+          work: "Travail",
+        },
+        person1: "Première personne",
+        person2: "Deuxième personne",
+        displayNameOptional: "Nom d'affichage (optionnel)",
+        latinName: "Nom en latin (anglais/français)",
+        arabicName: "Nom en arabe",
+        keyboard: "Clavier",
+        exampleAhmed: "Exemple : Ahmed",
+        exampleFatima: "ex. Fatima, Ibrahima, Amadou",
+        exampleKhadija: "ex. Fatima, Khadija, Aisha",
+        cta: "Calculer la compatibilité",
+        newCalculation: "Nouveau calcul",
+        reflectionOnly: "⚖️ Pour réflexion seulement",
+        disclaimer: "Cette analyse est destinée à la réflexion spirituelle dans le cadre des sciences traditionnelles de ʿIlm al-Asrār. Elle ne constitue pas de règles religieuses, de prédictions futures ou de garanties de résultats.",
       },
     },
 

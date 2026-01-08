@@ -13,8 +13,8 @@ import AsrarLogo from '../AsrarLogo';
 
 interface AppHeaderTabletProps {
   logoSource?: ImageSourcePropType;
-  currentLanguage: 'EN' | 'FR';
-  onLanguageChange: (lang: 'EN' | 'FR') => void;
+  currentLanguage: 'EN' | 'FR' | 'AR';
+  onLanguageChange: (lang: 'EN' | 'FR' | 'AR') => void;
   onProfilePress: () => void;
   onClockPress: () => void;
   onMenuPress: () => void;

@@ -22,11 +22,12 @@ import { DivineIntentionForm } from '../components/compatibility/DivineIntention
 import { PersonDivineNameForm } from '../components/compatibility/PersonDivineNameForm';
 import { PersonPersonForm } from '../components/compatibility/PersonPersonForm';
 import { DarkTheme } from '../constants/DarkTheme';
+import { useLanguage } from '../contexts/LanguageContext';
 import type { UniversalCompatibilityResult } from '../services/compatibility/types';
 import { CompatibilityType } from '../services/compatibility/types';
 
 export default function UniversalCompatibilityScreen() {
-  const [language, setLanguage] = useState<'en' | 'ar'>('en');
+  const { language, t } = useLanguage();
   const [selectedType, setSelectedType] = useState<CompatibilityType>('person-person');
   const [result, setResult] = useState<UniversalCompatibilityResult | null>(null);
   const [activeTab, setActiveTab] = useState<'input' | 'results'>('input');
@@ -47,8 +48,8 @@ export default function UniversalCompatibilityScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       <SafeAreaView style={styles.container}>
         <ResponsiveAppHeader
-          currentLanguage={language === 'en' ? 'EN' : 'FR'}
-          onLanguageChange={(lang) => setLanguage(lang.toLowerCase() as 'en' | 'ar')}
+          currentLanguage={language.toUpperCase() as 'EN' | 'FR' | 'AR'}
+          onLanguageChange={() => {}} // Language is controlled by global context
           onProfilePress={() => router.push('/profile')}
           onMenuPress={() => console.log('Menu pressed')}
         />
@@ -63,7 +64,7 @@ export default function UniversalCompatibilityScreen() {
             onPress={() => setActiveTab('input')}
           >
             <Text style={[styles.tabText, activeTab === 'input' && styles.tabTextActive]}>
-              {language === 'en' ? 'Calculate' : 'حساب'}
+              {t('compatibility.tabs.calculate')}
             </Text>
           </TouchableOpacity>
           
@@ -77,7 +78,7 @@ export default function UniversalCompatibilityScreen() {
               activeTab === 'results' && styles.tabTextActive,
               !result && styles.tabTextDisabled
             ]}>
-              {language === 'en' ? 'Results' : 'النتائج'}
+              {t('compatibility.tabs.results')}
             </Text>
           </TouchableOpacity>
         </LinearGradient>
@@ -117,12 +118,10 @@ export default function UniversalCompatibilityScreen() {
               {/* Authentic Disclaimer */}
               <View style={styles.disclaimerCard}>
                 <Text style={styles.disclaimerTitle}>
-                  {language === 'en' ? '⚖️ Reflection Only' : '⚖️ للتأمل فقط'}
+                  {t('compatibility.form.reflectionOnly')}
                 </Text>
                 <Text style={styles.disclaimerText}>
-                  {language === 'en'
-                    ? 'This analysis is for spiritual reflection within the traditional sciences of ʿIlm al-Asrār. It does not constitute religious rulings, future predictions, or guarantees of outcomes.'
-                    : 'هذا التحليل للتأمل الروحي ضمن علوم أسرار الحروف التقليدية. لا يُشكّل أحكاماً دينية، تنبؤات مستقبلية، أو ضمانات للنتائج.'}
+                  {t('compatibility.form.disclaimer')}
                 </Text>
               </View>
             </>
@@ -139,7 +138,7 @@ export default function UniversalCompatibilityScreen() {
                   onPress={handleReset}
                 >
                   <Text style={styles.resetButtonText}>
-                    {language === 'en' ? 'New Calculation' : 'حساب جديد'}
+                    {t('compatibility.form.newCalculation')}
                   </Text>
                 </TouchableOpacity>
               </>

@@ -17,8 +17,8 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface AppHeaderProps {
   logoSource?: ImageSourcePropType;
-  currentLanguage: 'EN' | 'FR';
-  onLanguageChange: (lang: 'EN' | 'FR') => void;
+  currentLanguage: 'EN' | 'FR' | 'AR';
+  onLanguageChange: (lang: 'EN' | 'FR' | 'AR') => void;
   onProfilePress: () => void;
   onMenuPress: () => void;
   onHistoryPress?: () => void;

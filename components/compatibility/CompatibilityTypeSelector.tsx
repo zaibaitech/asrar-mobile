@@ -5,12 +5,13 @@
 
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { CompatibilityType } from '../../services/compatibility/types';
 
 interface CompatibilityTypeSelectorProps {
   selectedType: CompatibilityType;
   onSelectType: (type: CompatibilityType) => void;
-  language: 'en' | 'ar';
+  language: 'en' | 'fr' | 'ar';
 }
 
 export function CompatibilityTypeSelector({
@@ -18,45 +19,37 @@ export function CompatibilityTypeSelector({
   onSelectType,
   language
 }: CompatibilityTypeSelectorProps) {
+  const { t } = useLanguage();
+  
+  // Map type IDs to translation key suffixes (camelCase)
+  const typeKeyMap: Record<CompatibilityType, string> = {
+    'person-person': 'personPerson',
+    'person-divine-name': 'personDivineName',
+    'divine-intention': 'divineIntention',
+  };
   
   const types: Array<{
     type: CompatibilityType;
     icon: string;
-    titleEn: string;
-    titleAr: string;
-    descEn: string;
-    descAr: string;
   }> = [
     {
       type: 'person-person',
       icon: '👥',
-      titleEn: 'Person ↔ Person',
-      titleAr: 'شخص ↔ شخص',
-      descEn: 'Universal compatibility for any relationship',
-      descAr: 'التوافق الشامل لأي علاقة'
     },
     {
       type: 'person-divine-name',
       icon: '🤲',
-      titleEn: 'Person ↔ Divine Name',
-      titleAr: 'شخص ↔ اسم إلهي',
-      descEn: 'How a Divine Name resonates with you',
-      descAr: 'كيف يتناغم الاسم الإلهي معك'
     },
     {
       type: 'divine-intention',
       icon: '🎯',
-      titleEn: 'Divine Name ↔ Intention',
-      titleAr: 'اسم إلهي ↔ نية',
-      descEn: 'Match Names to your spiritual goals',
-      descAr: 'مطابقة الأسماء لأهدافك الروحية'
     }
   ];
 
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>
-        {language === 'en' ? 'Select Compatibility Type' : 'اختر نوع التوافق'}
+        {t('compatibility.form.chooseType')}
       </Text>
       
       {types.map((item) => (
@@ -75,11 +68,11 @@ export function CompatibilityTypeSelector({
               styles.typeTitle,
               selectedType === item.type && styles.typeTitleActive
             ]}>
-              {language === 'en' ? item.titleEn : item.titleAr}
+              {t(`compatibility.form.type.${typeKeyMap[item.type]}` as any)}
             </Text>
             
             <Text style={styles.typeDesc}>
-              {language === 'en' ? item.descEn : item.descAr}
+              {t(`compatibility.form.type.${typeKeyMap[item.type]}Desc` as any)}
             </Text>
           </View>
           
