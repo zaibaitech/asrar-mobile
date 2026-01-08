@@ -109,7 +109,6 @@ export default function UniversalCompatibilityScreen() {
 
               {selectedType === 'divine-intention' && (
                 <DivineIntentionForm
-                  language={language}
                   onCalculate={handleCalculate}
                 />
               )}

@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { calculateDivineNameIntentionCompatibility } from '../../services/compatibility/divineNameCompatibility';
 import {
     getAllCompatibilityDivineNames
@@ -23,11 +24,11 @@ import {
 } from '../../services/compatibility/types';
 
 interface DivineIntentionFormProps {
-  language: 'en' | 'fr' | 'ar';
   onCalculate: (result: DivineNameIntentionCompatibility) => void;
 }
 
-export function DivineIntentionForm({ language, onCalculate }: DivineIntentionFormProps) {
+export function DivineIntentionForm({ onCalculate }: DivineIntentionFormProps) {
+  const { language, t } = useLanguage();
   const [selectedIntention, setSelectedIntention] = useState<IntentionCategory | null>(null);
   const [selectedDivineName, setSelectedDivineName] = useState<DivineNameMetadata | null>(null);
   const [showNamePicker, setShowNamePicker] = useState(false);
@@ -37,29 +38,29 @@ export function DivineIntentionForm({ language, onCalculate }: DivineIntentionFo
 
   const divineNames = getAllCompatibilityDivineNames();
   
-  const intentions: Array<{ value: IntentionCategory; labelEn: string; labelAr: string; icon: string }> = [
-    { value: 'clarity', labelEn: 'Clarity', labelAr: 'الوضوح', icon: '💡' },
-    { value: 'patience', labelEn: 'Patience', labelAr: 'الصبر', icon: '🕊️' },
-    { value: 'provision', labelEn: 'Provision', labelAr: 'الرزق', icon: '🌾' },
-    { value: 'healing', labelEn: 'Healing', labelAr: 'الشفاء', icon: '💚' },
-    { value: 'protection', labelEn: 'Protection', labelAr: 'الحماية', icon: '🛡️' },
-    { value: 'guidance', labelEn: 'Guidance', labelAr: 'الهداية', icon: '🧭' },
-    { value: 'strength', labelEn: 'Strength', labelAr: 'القوة', icon: '💪' },
-    { value: 'peace', labelEn: 'Peace', labelAr: 'السلام', icon: '☮️' },
-    { value: 'knowledge', labelEn: 'Knowledge', labelAr: 'المعرفة', icon: '📚' },
-    { value: 'forgiveness', labelEn: 'Forgiveness', labelAr: 'المغفرة', icon: '🤲' }
+  const intentions: Array<{ value: IntentionCategory; icon: string }> = [
+    { value: 'clarity', icon: '💡' },
+    { value: 'patience', icon: '🕊️' },
+    { value: 'provision', icon: '🌾' },
+    { value: 'healing', icon: '💚' },
+    { value: 'protection', icon: '🛡️' },
+    { value: 'guidance', icon: '🧭' },
+    { value: 'strength', icon: '💪' },
+    { value: 'peace', icon: '☮️' },
+    { value: 'knowledge', icon: '📚' },
+    { value: 'forgiveness', icon: '🤲' }
   ];
 
   const handleCalculate = async () => {
     setError('');
     
     if (!selectedIntention) {
-      setError(language === 'en' ? 'Please select an intention' : 'يرجى اختيار نية');
+      setError(t('compatibility.form.errors.intentionRequired'));
       return;
     }
 
     if (!selectedDivineName) {
-      setError(language === 'en' ? 'Please select a Divine Name' : 'يرجى اختيار اسم إلهي');
+      setError(t('compatibility.form.errors.divineNameRequired'));
       return;
     }
 
@@ -75,51 +76,67 @@ export function DivineIntentionForm({ language, onCalculate }: DivineIntentionFo
       onCalculate(result);
     } catch (err) {
       console.error('Compatibility calculation error:', err);
-      setError(language === 'en' 
-        ? 'Calculation failed.'
-        : 'فشل الحساب.');
+      setError(t('compatibility.form.errors.calculationFailed'));
     } finally {
       setIsCalculating(false);
     }
   };
 
   const selectedIntentionData = intentions.find(i => i.value === selectedIntention);
+  const getIntentionLabel = (intention: IntentionCategory) => t(`compatibility.divineNameResults.intentions.${intention}`);
+  const isRTL = language === 'ar';
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, !isRTL && styles.ltrContainer]}>
+      {/* Helper Text */}
+      <Text style={[styles.helperText, !isRTL && styles.ltrText]}>
+        {t('compatibility.form.divineNameIntention.helper')}
+      </Text>
+
       {/* Intention Selection */}
-      <Text style={styles.sectionTitle}>
-        {language === 'en' ? 'Your Spiritual Intention' : 'نيتك الروحية'}
+      <Text style={[styles.sectionTitle, !isRTL && styles.ltrText]}>
+        {t('compatibility.form.divineNameIntention.intentionSection.title')}
+      </Text>
+      <Text style={[styles.sectionDescription, !isRTL && styles.ltrText]}>
+        {t('compatibility.form.divineNameIntention.intentionSection.description')}
       </Text>
 
       <TouchableOpacity
         style={styles.pickerButton}
         onPress={() => setShowIntentionPicker(true)}
       >
-        <Text style={styles.pickerButtonText}>
+        <Text style={[styles.pickerButtonText, !isRTL && styles.ltrText]}>
           {selectedIntentionData 
-            ? `${selectedIntentionData.icon} ${language === 'en' ? selectedIntentionData.labelEn : selectedIntentionData.labelAr}`
-            : (language === 'en' ? 'Choose Your Intention' : 'اختر نيتك')}
+            ? `${selectedIntentionData.icon} ${getIntentionLabel(selectedIntentionData.value)}`
+            : t('compatibility.form.divineNameIntention.intentionSection.placeholder')}
         </Text>
         <Text style={styles.chevron}>›</Text>
       </TouchableOpacity>
 
       {/* Divine Name Selection */}
-      <Text style={styles.sectionTitle}>
-        {language === 'en' ? 'Divine Name to Evaluate' : 'الاسم الإلهي للتقييم'}
+      <Text style={[styles.sectionTitle, !isRTL && styles.ltrText]}>
+        {t('compatibility.form.divineNameIntention.divineNameSection.title')}
+      </Text>
+      <Text style={[styles.sectionDescription, !isRTL && styles.ltrText]}>
+        {t('compatibility.form.divineNameIntention.divineNameSection.hint')}
       </Text>
 
       <TouchableOpacity
         style={styles.pickerButton}
         onPress={() => setShowNamePicker(true)}
       >
-        <Text style={styles.pickerButtonText}>
+        <Text style={[styles.pickerButtonText, !isRTL && styles.ltrText]}>
           {selectedDivineName 
             ? `${selectedDivineName.arabic} (${selectedDivineName.transliteration})`
-            : (language === 'en' ? 'Choose a Divine Name' : 'اختر اسماً إلهياً')}
+            : t('compatibility.form.divineNameIntention.divineNameSection.placeholder')}
         </Text>
         <Text style={styles.chevron}>›</Text>
       </TouchableOpacity>
+
+      {/* Why This Matters Hint */}
+      <Text style={[styles.hintText, !isRTL && styles.ltrText]}>
+        💡 {t('compatibility.form.divineNameIntention.whyMatters')}
+      </Text>
 
       {/* Intention Picker Modal */}
       <Modal
@@ -131,8 +148,8 @@ export function DivineIntentionForm({ language, onCalculate }: DivineIntentionFo
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {language === 'en' ? 'Select Intention' : 'اختر النية'}
+              <Text style={[styles.modalTitle, !isRTL && styles.ltrText]}>
+                {t('compatibility.form.divineNameIntention.intentionPicker.title')}
               </Text>
               <TouchableOpacity onPress={() => setShowIntentionPicker(false)}>
                 <Text style={styles.modalClose}>✕</Text>
@@ -153,8 +170,8 @@ export function DivineIntentionForm({ language, onCalculate }: DivineIntentionFo
                   }}
                 >
                   <Text style={styles.itemIcon}>{intention.icon}</Text>
-                  <Text style={styles.itemText}>
-                    {language === 'en' ? intention.labelEn : intention.labelAr}
+                  <Text style={[styles.itemText, !isRTL && styles.ltrText]}>
+                    {getIntentionLabel(intention.value)}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -173,8 +190,8 @@ export function DivineIntentionForm({ language, onCalculate }: DivineIntentionFo
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {language === 'en' ? 'Select Divine Name' : 'اختر الاسم الإلهي'}
+              <Text style={[styles.modalTitle, !isRTL && styles.ltrText]}>
+                {t('compatibility.form.divineNameIntention.divineNamePicker.title')}
               </Text>
               <TouchableOpacity onPress={() => setShowNamePicker(false)}>
                 <Text style={styles.modalClose}>✕</Text>
@@ -222,8 +239,8 @@ export function DivineIntentionForm({ language, onCalculate }: DivineIntentionFo
         {isCalculating ? (
           <ActivityIndicator color="#ffffff" />
         ) : (
-          <Text style={styles.calculateButtonText}>
-            {language === 'en' ? 'Evaluate Alignment' : 'تقييم التوافق'}
+          <Text style={[styles.calculateButtonText, !isRTL && styles.ltrText]}>
+            {t('compatibility.form.divineNameIntention.cta')}
           </Text>
         )}
       </TouchableOpacity>
@@ -235,12 +252,39 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 24,
   },
+  ltrContainer: {
+    // Ensure LTR layout for EN/FR
+  },
+  ltrText: {
+    writingDirection: 'ltr',
+    textAlign: 'left',
+  },
+  helperText: {
+    color: '#94a3b8',
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 20,
+    paddingHorizontal: 4,
+  },
   sectionTitle: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '700',
-    marginBottom: 12,
+    marginBottom: 6,
     marginTop: 16,
+  },
+  sectionDescription: {
+    color: '#94a3b8',
+    fontSize: 13,
+    marginBottom: 10,
+    paddingHorizontal: 4,
+  },
+  hintText: {
+    color: '#8b5cf6',
+    fontSize: 12,
+    marginTop: 8,
+    paddingHorizontal: 4,
+    fontStyle: 'italic',
   },
   pickerButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',

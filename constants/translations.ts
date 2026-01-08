@@ -1950,6 +1950,28 @@ export const translations = {
           arabicNameRequired: "Arabic name is required",
           divineNameRequired: "Please select a Divine Name",
           calculationFailed: "Calculation failed. Please check your inputs.",
+          intentionRequired: "Please select an intention",
+        },
+        divineNameIntention: {
+          helper: "Match a Divine Name to your spiritual intention to receive traditional guidance.",
+          intentionSection: {
+            title: "Your Spiritual Intention",
+            placeholder: "Choose Your Intention",
+            description: "What spiritual goal are you focusing on?",
+          },
+          divineNameSection: {
+            title: "Divine Name to Evaluate",
+            placeholder: "Choose a Divine Name",
+            hint: "Select which Divine Name you'd like to align with this intention.",
+          },
+          intentionPicker: {
+            title: "Select Intention",
+          },
+          divineNamePicker: {
+            title: "Select Divine Name",
+          },
+          cta: "Evaluate Compatibility",
+          whyMatters: "Traditional sources guide which Names align with specific intentions.",
         },
       },
 
@@ -7222,6 +7244,28 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           arabicNameRequired: "Le nom arabe est requis",
           divineNameRequired: "Veuillez sélectionner un Nom divin",
           calculationFailed: "Le calcul a échoué. Veuillez vérifier vos entrées.",
+          intentionRequired: "Veuillez sélectionner une intention",
+        },
+        divineNameIntention: {
+          helper: "Associez un Nom divin à votre intention spirituelle pour recevoir des conseils traditionnels.",
+          intentionSection: {
+            title: "Votre Intention Spirituelle",
+            placeholder: "Choisir Votre Intention",
+            description: "Quel objectif spirituel visez-vous ?",
+          },
+          divineNameSection: {
+            title: "Nom Divin à Évaluer",
+            placeholder: "Choisir un Nom Divin",
+            hint: "Sélectionnez le Nom divin que vous souhaitez aligner avec cette intention.",
+          },
+          intentionPicker: {
+            title: "Sélectionner l'Intention",
+          },
+          divineNamePicker: {
+            title: "Sélectionner le Nom Divin",
+          },
+          cta: "Évaluer la Compatibilité",
+          whyMatters: "Les sources traditionnelles guident quels Noms s'alignent avec des intentions spécifiques.",
         },
       },
 
