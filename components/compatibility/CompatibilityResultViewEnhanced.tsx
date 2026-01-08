@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useLanguage } from '../../contexts/LanguageContext';
 import type {
     DivineNameIntentionCompatibility,
     PersonDivineNameCompatibility,
@@ -78,6 +79,7 @@ export function CompatibilityResultView({ result, language }: CompatibilityResul
 // ============================================================================
 
 function PersonPersonResultView({ result, language }: { result: PersonPersonCompatibility; language: 'en' | 'fr' | 'ar' }) {
+  const { t } = useLanguage();
   const { person1, person2, relationshipCompatibility, relationshipContext } = result;
   const rc = relationshipCompatibility;
   const methods = rc.methods;
@@ -86,12 +88,12 @@ function PersonPersonResultView({ result, language }: { result: PersonPersonComp
   const [activeTab, setActiveTab] = useState<'overview' | 'spiritual' | 'elemental' | 'planetary' | 'daily' | 'advice'>('overview');
 
   const tabs = [
-    { id: 'overview' as const, label: language === 'en' ? 'Overview' : 'نظرة عامة', icon: 'eye' },
-    { id: 'spiritual' as const, label: language === 'en' ? 'Spiritual' : 'روحاني', icon: 'sparkles' },
-    { id: 'elemental' as const, label: language === 'en' ? 'Elemental' : 'عنصري', icon: 'leaf' },
-    { id: 'planetary' as const, label: language === 'en' ? 'Planetary' : 'كوكبي', icon: 'planet' },
-    { id: 'daily' as const, label: language === 'en' ? 'Daily' : 'يومي', icon: 'calendar' },
-    { id: 'advice' as const, label: language === 'en' ? 'Advice' : 'نصائح', icon: 'bulb' },
+    { id: 'overview' as const, label: t('compatibility.results.tabs.overview'), icon: 'eye' },
+    { id: 'spiritual' as const, label: t('compatibility.results.tabs.spiritual'), icon: 'sparkles' },
+    { id: 'elemental' as const, label: t('compatibility.results.tabs.elemental'), icon: 'leaf' },
+    { id: 'planetary' as const, label: t('compatibility.results.tabs.planetary'), icon: 'planet' },
+    { id: 'daily' as const, label: t('compatibility.results.tabs.daily'), icon: 'calendar' },
+    { id: 'advice' as const, label: t('compatibility.results.tabs.advice'), icon: 'bulb' },
   ];
 
   const getQualityGradient = (score: number): readonly [string, string] => {
@@ -137,7 +139,9 @@ function PersonPersonResultView({ result, language }: { result: PersonPersonComp
         </View>
         
         <Text style={styles.headerSubtitle}>
-          {language === 'en' ? `${relationshipContext.charAt(0).toUpperCase() + relationshipContext.slice(1)} Compatibility` : 'تحليل التوافق'}
+          {t('compatibility.results.header.compatibilityAnalysis', { 
+            context: relationshipContext.charAt(0).toUpperCase() + relationshipContext.slice(1) 
+          })}
         </Text>
       </LinearGradient>
 
@@ -232,10 +236,25 @@ function PersonPersonResultView({ result, language }: { result: PersonPersonComp
 }
 
 // ============================================================================
+// HELPER: Get field value based on language
+// ============================================================================
+
+function getLocalizedField(obj: any, baseField: string, language: 'en' | 'fr' | 'ar'): any {
+  if (language === 'ar') {
+    return obj[`${baseField}Arabic`] || obj[`${baseField}Ar`] || obj[baseField];
+  }
+  if (language === 'fr') {
+    return obj[`${baseField}French`] || obj[`${baseField}Fr`] || obj[baseField];
+  }
+  return obj[baseField]; // Default to English
+}
+
+// ============================================================================
 // TAB COMPONENTS
 // ============================================================================
 
 function OverviewTab({ rc, theme, language, getQualityGradient }: any) {
+  const { t } = useLanguage();
   const modeOfUnion = getModeOfUnion(
     rc.methods.elementalTemperament.sharedElement,
     rc.methods.planetaryCosmic.relationship,
@@ -250,7 +269,7 @@ function OverviewTab({ rc, theme, language, getQualityGradient }: any) {
         style={styles.overallCard}
       >
         <Text style={styles.overallLabel}>
-          {language === 'en' ? 'Overall Compatibility' : 'التوافق الشامل'}
+          {t('compatibility.results.overview.overallCompatibility')}
         </Text>
         <CompatibilityGauge
           score={rc.overallScore}
@@ -259,19 +278,21 @@ function OverviewTab({ rc, theme, language, getQualityGradient }: any) {
           size={130}
         />
         <Text style={styles.qualityText}>
-          {language === 'en' ? rc.overallQuality.toUpperCase() : rc.overallQualityArabic}
+          {t(`compatibility.results.enums.quality.${rc.overallQuality}`)?.toUpperCase() || rc.overallQuality.toUpperCase()}
         </Text>
         <Text style={styles.scoreMicroLabel}>
-          {language === 'en' ? 'Tendency, not certainty' : 'الميل، وليس اليقين'}
+          {t('compatibility.results.overview.tendencyNotCertainty')}
         </Text>
       </LinearGradient>
 
       {/* Mode of Union Card */}
       <View style={styles.modeOfUnionCard}>
         <Text style={styles.modeOfUnionLabel}>
-          {language === 'en' ? '🜂 MODE OF UNION' : '🜂 نمط الاتحاد'}
+          {t('compatibility.results.overview.unionMode.label')}
         </Text>
-        <Text style={styles.modeOfUnionText}>{modeOfUnion}</Text>
+        <Text style={styles.modeOfUnionText}>
+          {t(`compatibility.results.overview.unionMode.${modeOfUnion}`)}
+        </Text>
       </View>
 
       {/* Summary */}
@@ -279,36 +300,36 @@ function OverviewTab({ rc, theme, language, getQualityGradient }: any) {
         <View style={styles.summaryHeader}>
           <Ionicons name="information-circle" size={24} color={theme.primary[0]} />
           <Text style={styles.summaryTitle}>
-            {language === 'en' ? 'Summary' : 'الملخص'}
+            {t('compatibility.results.overview.summary')}
           </Text>
         </View>
         <Text style={styles.summaryText}>
-          {language === 'en' ? rc.summary : rc.summaryArabic}
+          {getLocalizedField(rc, 'summary', language)}
         </Text>
       </View>
 
       {/* Quick Stats */}
       <View style={styles.statsGrid}>
         <StatCard
-          title={language === 'en' ? 'Spiritual' : 'روحاني'}
+          titleKey="compatibility.results.overview.spiritual"
           score={rc.methods.spiritualDestiny.score}
           color={METHOD_THEMES.spiritual.color}
           emoji={METHOD_THEMES.spiritual.emoji}
         />
         <StatCard
-          title={language === 'en' ? 'Elemental' : 'عنصري'}
+          titleKey="compatibility.results.overview.elemental"
           score={rc.methods.elementalTemperament.score}
           color={METHOD_THEMES.elemental.color}
           emoji={METHOD_THEMES.elemental.emoji}
         />
         <StatCard
-          title={language === 'en' ? 'Planetary' : 'كوكبي'}
+          titleKey="compatibility.results.overview.planetary"
           score={rc.methods.planetaryCosmic.score}
           color={METHOD_THEMES.planetary.color}
           emoji={METHOD_THEMES.planetary.emoji}
         />
         <StatCard
-          title={language === 'en' ? 'Daily' : 'يومي'}
+          titleKey="compatibility.results.overview.daily"
           score={rc.methods.dailyInteraction.score}
           color={METHOD_THEMES.daily.color}
           emoji={METHOD_THEMES.daily.emoji}
@@ -319,6 +340,7 @@ function OverviewTab({ rc, theme, language, getQualityGradient }: any) {
 }
 
 function SpiritualTab({ method, person1Name, person2Name, language }: any) {
+  const { t } = useLanguage();
   const theme = METHOD_THEMES.spiritual;
   
   return (
@@ -333,10 +355,10 @@ function SpiritualTab({ method, person1Name, person2Name, language }: any) {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.detailTitle}>
-              {language === 'en' ? 'Spiritual Destiny' : 'القدر الروحاني'}
+              {t('compatibility.results.spiritual.title')}
             </Text>
             <Text style={styles.detailSubtitle}>
-              {language === 'en' ? 'Spiritual consonance (taʾāluf rūḥānī)' : 'التآلف الروحاني'}
+              {t('compatibility.results.spiritual.subtitle')}
             </Text>
           </View>
           <CompatibilityGauge
@@ -353,34 +375,28 @@ function SpiritualTab({ method, person1Name, person2Name, language }: any) {
         <View style={styles.classicalStructure}>
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '🌿 Meaning' : '🌿 المعنى'}
+              {t('compatibility.results.spiritual.meaning')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? `${person1Name} and ${person2Name}'s spiritual paths ${method.quality === 'harmonious' || method.score >= 70 ? 'align naturally' : method.score >= 40 ? 'can align through cultivation' : 'diverge, calling for patience'}. ${getSimplifiedSpiritual(method.remainder, language)}`
-                : method.descriptionArabic}
+              {getLocalizedField(method, 'description', language)}
             </Text>
           </View>
 
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '⚡ Test' : '⚡ الاختبار'}
+              {t('compatibility.results.spiritual.watchOut')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? method.score >= 70 ? 'Harmony may feel effortless — avoid complacency; intention preserves alignment.' : method.score >= 40 ? 'Differences surface when expectations rush or patience wanes — gentleness restores balance.' : 'Fundamental tensions arise frequently — this path requires continuous conscious effort.'
-                : 'الاختلافات تظهر عندما تتسرع التوقعات أو يقل الصبر.'}
+              {t(method.score >= 70 ? 'compatibility.results.spiritual.watchOut_high' : method.score >= 40 ? 'compatibility.results.spiritual.watchOut_medium' : 'compatibility.results.spiritual.watchOut_low')}
             </Text>
           </View>
 
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '🔑 Key to Success' : '🔑 مفتاح النجاح'}
+              {t('compatibility.results.spiritual.keyToSuccess')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? method.score >= 70 ? 'Continue shared spiritual practice with gratitude and humility.' : method.score >= 40 ? 'Consistency, gentleness, and honoring each other\'s rhythm strengthen this bond.' : 'If pursuing this connection, prioritize independent spiritual cultivation first.'
-                : 'الاتساق والرفق والإيقاع المشترك يقوي هذه الرابطة.'}
+              {t(method.score >= 70 ? 'compatibility.results.spiritual.success_high' : method.score >= 40 ? 'compatibility.results.spiritual.success_medium' : 'compatibility.results.spiritual.success_low')}
             </Text>
           </View>
         </View>
@@ -389,15 +405,15 @@ function SpiritualTab({ method, person1Name, person2Name, language }: any) {
         <View style={styles.metadataRow}>
           <View style={styles.metadataItem}>
             <Text style={styles.metadataLabel}>
-              {language === 'en' ? 'Quality' : 'الجودة'}
+              {t('compatibility.results.overview.quality')}
             </Text>
             <Text style={[styles.metadataValue, { color: theme.color }]}>
-              {language === 'en' ? method.quality.toUpperCase() : method.qualityArabic}
+              {t(`compatibility.results.enums.quality.${method.quality}`)?.toUpperCase() || method.quality.toUpperCase()}
             </Text>
           </View>
           <View style={styles.metadataItem}>
             <Text style={styles.metadataLabel}>
-              {language === 'en' ? 'Sacred Number' : 'الرقم المقدس'}
+              {t('compatibility.results.overview.sacredNumber')}
             </Text>
             <Text style={[styles.metadataValue, { color: theme.color }]}>
               {method.remainder}
@@ -410,6 +426,7 @@ function SpiritualTab({ method, person1Name, person2Name, language }: any) {
 }
 
 function ElementalTab({ method, language }: any) {
+  const { t } = useLanguage();
   const theme = METHOD_THEMES.elemental;
   const elementEmoji = {
     fire: '🔥',
@@ -430,10 +447,10 @@ function ElementalTab({ method, language }: any) {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.detailTitle}>
-              {language === 'en' ? 'Elemental Temperament' : 'المزاج العنصري'}
+              {t('compatibility.results.elemental.title')}
             </Text>
             <Text style={styles.detailSubtitle}>
-              {language === 'en' ? 'Natural energy balance' : 'توازن الطاقة الطبيعية'}
+              {t('compatibility.results.elemental.subtitle')}
             </Text>
           </View>
           <CompatibilityGauge
@@ -449,12 +466,10 @@ function ElementalTab({ method, language }: any) {
         {/* Asrār-Authentic Insight */}
         <View style={styles.insightCard}>
           <Text style={styles.insightLabel}>
-            {language === 'en' ? 'Balance Type' : 'نوع التوازن'}
+            {t('compatibility.results.elemental.balanceType')}
           </Text>
           <Text style={styles.insightValue}>
-            {language === 'en' 
-              ? method.score >= 80 ? 'Reinforcing' : method.score >= 60 ? 'Complementary' : 'Tempering'
-              : method.score >= 80 ? 'معزز' : method.score >= 60 ? 'متكامل' : 'معتدل'}
+            {t(method.score >= 80 ? 'compatibility.results.elemental.balanceType_high' : method.score >= 60 ? 'compatibility.results.elemental.balanceType_medium' : 'compatibility.results.elemental.balanceType_low')}
           </Text>
         </View>
 
@@ -465,7 +480,7 @@ function ElementalTab({ method, language }: any) {
               {elementEmoji[method.sharedElement as keyof typeof elementEmoji]}
             </Text>
             <Text style={styles.elementText}>
-              {method.sharedElement.toUpperCase()}
+              {t(`compatibility.results.enums.element.${method.sharedElement}`).toUpperCase()}
             </Text>
           </View>
         </View>
@@ -474,34 +489,28 @@ function ElementalTab({ method, language }: any) {
         <View style={styles.classicalStructure}>
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '🌿 Meaning' : '🌿 المعنى'}
+              {t('compatibility.results.spiritual.meaning')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? getSimplifiedElemental(method.sharedElement, language)
-                : method.descriptionArabic}
+              {getLocalizedField(method, 'description', language)}
             </Text>
           </View>
 
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '⚡ Test' : '⚡ الاختبار'}
+              {t('compatibility.results.spiritual.watchOut')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? method.sharedElement === 'fire' ? 'Intensity may overwhelm — channel heat toward shared purpose, not conflict.' : method.sharedElement === 'water' ? 'Emotions may flood — honor boundaries while maintaining empathy.' : method.sharedElement === 'air' ? 'Mental stimulation may scatter — ground ideas in action.' : 'Routines may rigidify — preserve stability while allowing gentle adaptation.'
-                : 'الاختبارات تظهر عندما تضطرب الروتين'}
+              {t(`compatibility.results.elemental.watchOut_${method.sharedElement}`)}
             </Text>
           </View>
 
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '🔑 Key to Success' : '🔑 مفتاح النجاح'}
+              {t('compatibility.results.spiritual.keyToSuccess')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? method.sharedElement === 'fire' ? 'Direct shared passion toward constructive goals; celebrate victories together.' : method.sharedElement === 'water' ? 'Create space for emotional expression; listen without fixing.' : method.sharedElement === 'air' ? 'Balance dialogue with silence; let ideas settle before acting.' : 'Build rhythms together; let consistency become your foundation.'
-                : 'بناء الإيقاعات معًا'}
+              {t(`compatibility.results.elemental.success_${method.sharedElement}`)}
             </Text>
           </View>
         </View>
@@ -509,7 +518,7 @@ function ElementalTab({ method, language }: any) {
         {/* Quality Badge */}
         <View style={styles.qualityBadge}>
           <Text style={[styles.qualityBadgeText, { color: theme.color }]}>
-            {language === 'en' ? method.quality.toUpperCase() : method.qualityArabic}
+            {t(`compatibility.results.enums.elementalQuality.${method.quality}`)?.toUpperCase() || method.quality.toUpperCase()}
           </Text>
         </View>
       </LinearGradient>
@@ -518,6 +527,7 @@ function ElementalTab({ method, language }: any) {
 }
 
 function PlanetaryTab({ method, person1Name, person2Name, language }: any) {
+  const { t } = useLanguage();
   const theme = METHOD_THEMES.planetary;
 
   return (
@@ -532,10 +542,10 @@ function PlanetaryTab({ method, person1Name, person2Name, language }: any) {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.detailTitle}>
-              {language === 'en' ? 'Cosmic Harmony' : 'الانسجام الكوني'}
+              {t('compatibility.results.planetary.title')}
             </Text>
             <Text style={styles.detailSubtitle}>
-              {language === 'en' ? 'Planetary influences' : 'التأثيرات الكوكبية'}
+              {t('compatibility.results.planetary.subtitle')}
             </Text>
           </View>
           <CompatibilityGauge
@@ -551,12 +561,10 @@ function PlanetaryTab({ method, person1Name, person2Name, language }: any) {
         {/* Asrār-Authentic Insight */}
         <View style={styles.insightCard}>
           <Text style={styles.insightLabel}>
-            {language === 'en' ? 'Dominant Influence' : 'التأثير المهيمن'}
+            {t('compatibility.results.planetary.dominantInfluence')}
           </Text>
           <Text style={styles.insightValue}>
-            {language === 'en' 
-              ? method.relationship === 'friendly' ? `${method.person1Planet.name} & ${method.person2Planet.name} support` : method.relationship === 'neutral' ? 'Balanced influences' : `Tension requires patience`
-              : method.relationship === 'friendly' ? 'تأثيرات داعمة' : 'تأثيرات متوازنة'}
+            {t(`compatibility.results.planetary.dominantInfluence_${method.relationship}`)}
           </Text>
         </View>
 
@@ -603,34 +611,28 @@ function PlanetaryTab({ method, person1Name, person2Name, language }: any) {
         <View style={styles.classicalStructure}>
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '🌿 Meaning' : '🌿 المعنى'}
+              {t('compatibility.results.spiritual.meaning')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? getSimplifiedPlanetary(method.relationship, method.person1Planet.name, method.person2Planet.name, language)
-                : method.descriptionArabic}
+              {getLocalizedField(method, 'description', language)}
             </Text>
           </View>
 
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '⚡ Test' : '⚡ الاختبار'}
+              {t('compatibility.results.spiritual.watchOut')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? method.relationship === 'friendly' ? 'Natural ease may breed assumption — maintain gratitude and intention.' : method.relationship === 'neutral' ? 'Subtle imbalances emerge when one influence dominates — honor both energies equally.' : 'Conflicting impulses arise frequently — recognize which influence serves the moment.'
-                : 'الاختبارات تظهر'}
+              {t(`compatibility.results.planetary.watchOut_${method.relationship}`)}
             </Text>
           </View>
 
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '🔑 Key to Success' : '🔑 مفتاح النجاح'}
+              {t('compatibility.results.spiritual.keyToSuccess')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? method.relationship === 'friendly' ? 'Flow with supportive influences while remaining grounded in shared values.' : method.relationship === 'neutral' ? 'Acknowledge differences without judgment; find complementary rhythms.' : 'When tension rises, pause; let patience reveal the wiser path forward.'
-                : 'الصبر يكشف الطريق'}
+              {t(`compatibility.results.planetary.success_${method.relationship}`)}
             </Text>
           </View>
         </View>
@@ -640,6 +642,7 @@ function PlanetaryTab({ method, person1Name, person2Name, language }: any) {
 }
 
 function DailyTab({ method, person1Name, person2Name, language }: any) {
+  const { t } = useLanguage();
   const theme = METHOD_THEMES.daily;
 
   return (
@@ -654,10 +657,10 @@ function DailyTab({ method, person1Name, person2Name, language }: any) {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.detailTitle}>
-              {language === 'en' ? 'Daily Interaction' : 'التفاعل اليومي'}
+              {t('compatibility.results.daily.title')}
             </Text>
             <Text style={styles.detailSubtitle}>
-              {language === 'en' ? 'Day-to-day dynamics' : 'الديناميكيات اليومية'}
+              {t('compatibility.results.daily.subtitle')}
             </Text>
           </View>
           <CompatibilityGauge
@@ -673,12 +676,10 @@ function DailyTab({ method, person1Name, person2Name, language }: any) {
         {/* Asrār-Authentic Insight */}
         <View style={styles.insightCard}>
           <Text style={styles.insightLabel}>
-            {language === 'en' ? 'Best Rhythm' : 'أفضل إيقاع'}
+            {t('compatibility.results.daily.bestRhythm')}
           </Text>
           <Text style={styles.insightValue}>
-            {language === 'en' 
-              ? 'Calm days benefit this pairing more than rushed cycles'
-              : 'الأيام الهادئة تنفع هذه العلاقة'}
+            {t('compatibility.results.daily.bestRhythm_value')}
           </Text>
         </View>
 
@@ -686,34 +687,28 @@ function DailyTab({ method, person1Name, person2Name, language }: any) {
         <View style={styles.classicalStructure}>
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '🌿 Meaning' : '🌿 المعنى'}
+              {t('compatibility.results.spiritual.meaning')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? `In daily life, ${person1Name} and ${person2Name} experience ${method.quality} rhythms. ${method.description}`
-                : method.descriptionArabic}
+              {getLocalizedField(method, 'description', language)}
             </Text>
           </View>
 
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '⚡ Test' : '⚡ الاختبار'}
+              {t('compatibility.results.spiritual.watchOut')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? method.score >= 70 ? 'Routines may become mechanical — infuse intention into ordinary moments.' : 'Rushed days amplify friction — slow down when imbalance appears.'
-                : 'الأيام المتسرعة تزيد التوتر'}
+              {t(method.score >= 70 ? 'compatibility.results.daily.watchOut_high' : 'compatibility.results.daily.watchOut_low')}
             </Text>
           </View>
 
           <View style={styles.classicalSection}>
             <Text style={styles.classicalLabel}>
-              {language === 'en' ? '🔑 Key to Success' : '🔑 مفتاح النجاح'}
+              {t('compatibility.results.spiritual.keyToSuccess')}
             </Text>
             <Text style={styles.classicalText}>
-              {language === 'en' 
-                ? 'Calm days benefit this pairing more than hurried cycles — protect shared stillness.'
-                : 'الأيام الهادئة تنفع هـذه العلاقة'}
+              {t(method.score >= 70 ? 'compatibility.results.daily.success_high' : 'compatibility.results.daily.success_low')}
             </Text>
           </View>
         </View>
@@ -721,7 +716,7 @@ function DailyTab({ method, person1Name, person2Name, language }: any) {
         {/* Interaction Type */}
         <View style={styles.qualityBadge}>
           <Text style={[styles.qualityBadgeText, { color: theme.color }]}>
-            {language === 'en' ? method.interactionType.toUpperCase() : method.interactionTypeArabic}
+            {t(`compatibility.results.enums.interactionType.${method.interactionType}`).toUpperCase()}
           </Text>
         </View>
       </LinearGradient>
@@ -730,6 +725,7 @@ function DailyTab({ method, person1Name, person2Name, language }: any) {
 }
 
 function AdviceTab({ rc, theme, language }: any) {
+  const { t } = useLanguage();
   return (
     <View style={styles.section}>
       {/* Recommendations */}
@@ -740,13 +736,13 @@ function AdviceTab({ rc, theme, language }: any) {
         <View style={styles.adviceHeader}>
           <Ionicons name="bulb" size={28} color="#22c55e" />
           <Text style={styles.adviceTitle}>
-            {language === 'en' ? 'Spiritual Guidance' : 'الإرشاد الروحي'}
+            {t('compatibility.results.advice.title')}
           </Text>
         </View>
 
         <View style={styles.divider} />
 
-        {(language === 'en' ? rc.recommendations : rc.recommendationsArabic).map((rec: string, index: number) => (
+        {getLocalizedField(rc, 'recommendations', language).map((rec: string, index: number) => (
           <View key={index} style={styles.recommendationItem}>
             <View style={styles.recommendationBullet}>
               <Text style={styles.recommendationBulletText}>✓</Text>
@@ -764,6 +760,7 @@ function AdviceTab({ rc, theme, language }: any) {
 
 // Traditional Note Component
 function TraditionalNote({ language }: { language: 'en' | 'fr' | 'ar' }) {
+  const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -775,7 +772,7 @@ function TraditionalNote({ language }: { language: 'en' | 'fr' | 'ar' }) {
       >
         <Ionicons name="book-outline" size={20} color="#d97706" />
         <Text style={styles.traditionalNoteTitle}>
-          {language === 'en' ? '📜 Traditional Note' : '📜 ملاحظة تقليدية'}
+          {t('compatibility.results.advice.traditionalNote')}
         </Text>
         <Ionicons 
           name={expanded ? 'chevron-up' : 'chevron-down'} 
@@ -787,9 +784,7 @@ function TraditionalNote({ language }: { language: 'en' | 'fr' | 'ar' }) {
       {expanded && (
         <View style={styles.traditionalNoteContent}>
           <Text style={styles.traditionalNoteText}>
-            {language === 'en' 
-              ? 'Compatibility reflects tendencies of harmony, not certainty. Preservation depends on intention (niyyah), character (khuluṱ), and timing (waqt). This analysis offers reflection within ʿIlm al-Asrār — not fortune-telling, not guarantees.'
-              : 'التوافق يعكس الميول المتناغمة، وليس اليقين. الحفظ يعتمد على النية والخلق والتوقيت.'}
+            {t('compatibility.results.disclaimer.body')}
           </Text>
         </View>
       )}
@@ -798,21 +793,25 @@ function TraditionalNote({ language }: { language: 'en' | 'fr' | 'ar' }) {
 }
 
 // Helper Components
-function StatCard({ title, score, color, emoji }: any) {
-  const getMicroLabel = (title: string): string => {
-    if (title.includes('Spiritual') || title.includes('روحاني')) return 'Alignment, not completion';
-    if (title.includes('Elemental') || title.includes('عنصري')) return 'Natural ease';
-    if (title.includes('Planetary') || title.includes('كوكبي')) return 'Supportive influences';
-    if (title.includes('Daily') || title.includes('يومي')) return 'Day-to-day flow';
+function StatCard({ titleKey, score, color, emoji }: any) {
+  const { t } = useLanguage();
+  
+  const getMicroLabelKey = (key: string): string => {
+    if (key.includes('spiritual')) return 'compatibility.results.microLabels.spiritual';
+    if (key.includes('elemental')) return 'compatibility.results.microLabels.elemental';
+    if (key.includes('planetary')) return 'compatibility.results.microLabels.planetary';
+    if (key.includes('daily')) return 'compatibility.results.microLabels.daily';
     return '';
   };
+
+  const microLabelKey = getMicroLabelKey(titleKey);
 
   return (
     <View style={[styles.statCard, { borderColor: color + '40' }]}>
       <Text style={styles.statEmoji}>{emoji}</Text>
       <Text style={[styles.statScore, { color }]}>{score}%</Text>
-      <Text style={styles.statTitle}>{title}</Text>
-      <Text style={styles.scoreMicroLabel}>{getMicroLabel(title)}</Text>
+      <Text style={styles.statTitle}>{t(titleKey)}</Text>
+      {microLabelKey && <Text style={styles.scoreMicroLabel}>{t(microLabelKey)}</Text>}
     </View>
   );
 }
@@ -856,27 +855,27 @@ function getSimplifiedPlanetary(relationship: string, planet1: string, planet2: 
 function getModeOfUnion(elementalElement: string, planetaryRelationship: string, language: string): string {
   const modes: Record<string, Record<string, string>> = {
     fire: {
-      friendly: 'Union through shared purpose',
-      neutral: 'Union through directed motion',
-      challenging: 'Union through constructive tension'
+      friendly: 'dynamic',
+      neutral: 'dynamic',
+      challenging: 'complementary'
     },
     water: {
-      friendly: 'Union through emotional depth',
-      neutral: 'Union through patient flow',
-      challenging: 'Union through gentle persistence'
+      friendly: 'balance',
+      neutral: 'balance',
+      challenging: 'balance'
     },
     air: {
-      friendly: 'Union through dialogue',
-      neutral: 'Union through mutual understanding',
-      challenging: 'Union through thoughtful exchange'
+      friendly: 'complementary',
+      neutral: 'complementary',
+      challenging: 'complementary'
     },
     earth: {
-      friendly: 'Union through stability',
-      neutral: 'Union through consistent rhythm',
-      challenging: 'Union through gradual cultivation'
+      friendly: 'balance',
+      neutral: 'balance',
+      challenging: 'balance'
     }
   };
-  return language === 'en' ? (modes[elementalElement]?.[planetaryRelationship] || 'Union through balance') : 'الاتحاد من خلال التوازن';
+  return modes[elementalElement]?.[planetaryRelationship] || 'balance';
 }
 
 // ============================================================================
