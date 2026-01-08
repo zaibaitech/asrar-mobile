@@ -2035,8 +2035,12 @@ export const translations = {
           Saturn: "Saturn",
         },
         explanations: {
-          spiritualMeaning: "✨ Spiritual Meaning",
+          spiritualMeaning: {
+            title: "Spiritual Meaning",
+            description: "Dynamic change and strong adaptability. This energy thrives on variety and movement.",
+          },
         },
+        sacredNumber: "Sacred number: {{value}}",
         nameActions: {
           strengthens: {
             title: "Taqwiyah (Strengthening)",
@@ -7303,8 +7307,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           Saturn: "Saturne",
         },
         explanations: {
-          spiritualMeaning: "✨ Signification Spirituelle",
+          spiritualMeaning: {
+            title: "Signification Spirituelle",
+            description: "Changement dynamique et grande capacité d'adaptation. Cette énergie s'épanouit dans la variété et le mouvement.",
+          },
         },
+        sacredNumber: "Nombre sacré : {{value}}",
         nameActions: {
           strengthens: {
             title: "Taqwiyah (Renforcement)",

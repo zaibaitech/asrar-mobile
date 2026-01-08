@@ -1020,7 +1020,11 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                 <View style={styles.detailIconContainer}>
                   <Ionicons name="sparkles" size={28} color="#8b5cf6" />
                 </View>
-                <Text style={styles.detailTitle}>
+                <Text 
+                  style={styles.detailTitle}
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                >
                   {t('compatibility.divineNameResults.resonance.spiritualDestiny.title')}
                 </Text>
               </View>
@@ -1037,7 +1041,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                 </Text>
                 <View style={styles.remainderBadge}>
                   <Text style={styles.remainderText}>
-                    {t('compatibility.divineNameResults.modLabel', { value: spiritualDestiny.remainder })}
+                    {t('compatibility.divineNameResults.sacredNumber', { value: spiritualDestiny.remainder })}
                   </Text>
                 </View>
               </View>
@@ -1045,12 +1049,10 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
               {/* Description */}
               <View style={styles.explanationBox}>
                 <Text style={styles.explanationTitle}>
-                  {t('compatibility.divineNameResults.explanations.spiritualMeaning')}
+                  ✨ {t('compatibility.divineNameResults.explanations.spiritualMeaning.title')}
                 </Text>
                 <Text style={styles.explanationText}>
-                  {language === 'en' 
-                    ? spiritualDestiny.description 
-                    : spiritualDestiny.descriptionArabic}
+                  {t('compatibility.divineNameResults.explanations.spiritualMeaning.description')}
                 </Text>
               </View>
             </LinearGradient>
@@ -1819,6 +1821,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
+    gap: 12,
   },
   detailIconContainer: {
     width: 48,
@@ -1827,13 +1830,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    flexShrink: 0,
   },
   detailTitle: {
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
     color: '#ffffff',
     fontSize: 18,
     fontWeight: '700',
-    marginBottom: 4,
+    lineHeight: 24,
   },
   detailSubtitle: {
     color: '#94a3b8',
@@ -1848,7 +1854,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    marginTop: 4,
   },
   explanationTitle: {
     color: '#ffffff',
@@ -1857,9 +1863,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   explanationText: {
-    color: '#cbd5e1',
-    fontSize: 15,
-    lineHeight: 24,
+    color: '#e2e8f0',
+    fontSize: 14,
+    lineHeight: 21,
   },
   classicalStructure: {
     marginTop: 8,
@@ -2423,23 +2429,25 @@ const styles = StyleSheet.create({
   },
   spiritualDestinyBox: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 12,
+    paddingBottom: 16,
   },
   spiritualScore: {
     fontSize: 48,
     fontWeight: '700',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   spiritualQuality: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   remainderBadge: {
     backgroundColor: 'rgba(139, 92, 246, 0.2)',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
+    alignSelf: 'center',
   },
   remainderText: {
     color: '#a78bfa',
