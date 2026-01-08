@@ -5,6 +5,7 @@
  */
 
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { IntentionTimingAnalysis } from '@/services/AdvancedDivineTimingService';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
@@ -15,6 +16,7 @@ interface AdvancedAnalysisCardProps {
 }
 
 export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
+  const { t, language } = useLanguage();
   const [expandedSections, setExpandedSections] = useState({
     current: true,
     timeline: false,
@@ -46,13 +48,13 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
     }
   };
 
-  const getRecommendationText = () => {
+  const getRecommendationKey = () => {
     switch (analysis.recommendation) {
-      case 'highly_favorable': return 'Highly Favorable Time';
-      case 'act_now': return 'Good Time to Act';
-      case 'proceed_with_caution': return 'Proceed with Caution';
-      case 'wait_for_better_time': return 'Consider Waiting';
-      default: return 'Neutral';
+      case 'highly_favorable': return 'highlyFavorable';
+      case 'act_now': return 'actNow';
+      case 'proceed_with_caution': return 'proceedWithCaution';
+      case 'wait_for_better_time': return 'waitForBetterTime';
+      default: return 'neutral';
     }
   };
 
@@ -62,7 +64,7 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
       <View style={styles.harmonyHeader}>
         <View style={styles.scoreCircle}>
           <Text style={styles.scoreNumber}>{analysis.harmonyScore}</Text>
-          <Text style={styles.scoreLabel}>Harmony</Text>
+          <Text style={styles.scoreLabel}>{t('divineTiming.results.labels.harmony')}</Text>
         </View>
         <View style={styles.recommendationBox}>
           <Ionicons 
@@ -71,7 +73,7 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
             color={getRecommendationColor()} 
           />
           <Text style={[styles.recommendationText, { color: getRecommendationColor() }]}>
-            {getRecommendationText()}
+            {t(`divineTiming.results.alerts.${getRecommendationKey()}`)}
           </Text>
         </View>
       </View>
@@ -82,7 +84,7 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
         onPress={() => toggleSection('current')}
       >
         <Ionicons name="time" size={20} color="#8B7355" />
-        <Text style={styles.sectionTitle}>Current Moment Analysis</Text>
+        <Text style={styles.sectionTitle}>{t('divineTiming.results.section.currentMomentAnalysis')}</Text>
         <Ionicons 
           name={expandedSections.current ? "chevron-up" : "chevron-down"} 
           size={20} 
@@ -94,7 +96,7 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
         <View style={styles.sectionContent}>
           <View style={styles.infoRow}>
             <View style={styles.infoBox}>
-              <Text style={styles.infoLabel}>Hourly Status</Text>
+              <Text style={styles.infoLabel}>{t('divineTiming.results.labels.hourlyStatus')}</Text>
               <Text style={[
                 styles.infoValue,
                 { color: analysis.currentMoment.hourlyAlignment.status === 'ACT' ? '#10b981' : '#8B7355' }
@@ -103,7 +105,7 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
               </Text>
             </View>
             <View style={styles.infoBox}>
-              <Text style={styles.infoLabel}>Planetary Hour</Text>
+              <Text style={styles.infoLabel}>{t('divineTiming.results.labels.planetaryHour')}</Text>
               <Text style={styles.infoValue}>
                 {analysis.currentMoment.planetaryHour.planet}
               </Text>
@@ -112,15 +114,15 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
 
           <View style={styles.infoRow}>
             <View style={styles.infoBox}>
-              <Text style={styles.infoLabel}>Daily Quality</Text>
+              <Text style={styles.infoLabel}>{t('divineTiming.results.labels.dailyQuality')}</Text>
               <Text style={styles.infoValue}>
-                {analysis.currentMoment.dailyGuidance.timingQuality}
+                {t(`divineTiming.results.qualities.${analysis.currentMoment.dailyGuidance.timingQuality}`)}
               </Text>
             </View>
             <View style={styles.infoBox}>
-              <Text style={styles.infoLabel}>Day Element</Text>
+              <Text style={styles.infoLabel}>{t('divineTiming.results.labels.elementalTone')}</Text>
               <Text style={styles.infoValue}>
-                {analysis.currentMoment.dailyGuidance.dayElement}
+                {t(`common.elements.${analysis.currentMoment.dailyGuidance.dayElement}`)}
               </Text>
             </View>
           </View>
@@ -133,7 +135,7 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
         onPress={() => toggleSection('steps')}
       >
         <Ionicons name="list" size={20} color="#8B7355" />
-        <Text style={styles.sectionTitle}>Practical Steps</Text>
+        <Text style={styles.sectionTitle}>{t('divineTiming.results.section.practicalSteps')}</Text>
         <Ionicons 
           name={expandedSections.steps ? "chevron-up" : "chevron-down"} 
           size={20} 
@@ -143,12 +145,19 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
 
       {expandedSections.steps && (
         <View style={styles.sectionContent}>
-          {analysis.practicalSteps.map((step, idx) => (
-            <View key={idx} style={styles.stepRow}>
-              <Text style={styles.stepNumber}>{idx + 1}</Text>
-              <Text style={styles.stepText}>{step}</Text>
-            </View>
-          ))}
+          {analysis.stepKeys
+            ? analysis.stepKeys.map((stepKey, idx) => (
+                <View key={idx} style={styles.stepRow}>
+                  <Text style={styles.stepNumber}>{idx + 1}</Text>
+                  <Text style={styles.stepText}>{t(`divineTiming.results.steps.${stepKey}`)}</Text>
+                </View>
+              ))
+            : analysis.practicalSteps.map((step, idx) => (
+                <View key={idx} style={styles.stepRow}>
+                  <Text style={styles.stepNumber}>{idx + 1}</Text>
+                  <Text style={styles.stepText}>{step}</Text>
+                </View>
+              ))}
         </View>
       )}
 
@@ -160,7 +169,7 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
             onPress={() => toggleSection('timeline')}
           >
             <Ionicons name="calendar" size={20} color="#8B7355" />
-            <Text style={styles.sectionTitle}>Best Time in Next 24 Hours</Text>
+            <Text style={styles.sectionTitle}>{t('divineTiming.results.section.bestTimeNext24h')}</Text>
             <Ionicons 
               name={expandedSections.timeline ? "chevron-up" : "chevron-down"} 
               size={20} 
@@ -174,14 +183,14 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
                 <View style={styles.timeRow}>
                   <Ionicons name="time-outline" size={16} color="#10b981" />
                   <Text style={styles.timeText}>
-                    {analysis.bestTimingInNext24Hours.startTime.toLocaleTimeString([], { 
+                    {analysis.bestTimingInNext24Hours.startTime.toLocaleTimeString(language === 'fr' ? 'fr-FR' : 'en-US', { 
                       hour: '2-digit', 
                       minute: '2-digit' 
                     })}
                   </Text>
                 </View>
                 <Text style={styles.planetText}>
-                  {analysis.bestTimingInNext24Hours.planet} Hour ({analysis.bestTimingInNext24Hours.element})
+                  {analysis.bestTimingInNext24Hours.planet} Hour ({t(`common.elements.${analysis.bestTimingInNext24Hours.element}`)})
                 </Text>
                 <Text style={styles.reasonText}>
                   {analysis.bestTimingInNext24Hours.reason}
@@ -198,7 +207,7 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
         onPress={() => toggleSection('optimal')}
       >
         <Ionicons name="trending-up" size={20} color="#8B7355" />
-        <Text style={styles.sectionTitle}>7-Day Outlook</Text>
+        <Text style={styles.sectionTitle}>{t('divineTiming.results.section.sevenDayOutlook')}</Text>
         <Ionicons 
           name={expandedSections.optimal ? "chevron-up" : "chevron-down"} 
           size={20} 
@@ -208,12 +217,25 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
 
       {expandedSections.optimal && (
         <View style={styles.sectionContent}>
-          {analysis.next7DaysOutlook.map((day, idx) => (
+          {analysis.next7DaysOutlook.map((day, idx) => {
+            // Map English day names to translation keys
+            const dayKeyMap: Record<string, string> = {
+              'Sunday': 'sunday',
+              'Monday': 'monday',
+              'Tuesday': 'tuesday',
+              'Wednesday': 'wednesday',
+              'Thursday': 'thursday',
+              'Friday': 'friday',
+              'Saturday': 'saturday',
+            };
+            const dayKey = dayKeyMap[day.dayOfWeek] || 'sunday';
+            
+            return (
             <View key={idx} style={styles.dayRow}>
               <View style={styles.dayInfo}>
-                <Text style={styles.dayName}>{day.dayOfWeek}</Text>
+                <Text style={styles.dayName}>{t(`divineTiming.home.weekdaysLong.${dayKey}`)}</Text>
                 <Text style={styles.dayDate}>
-                  {day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {day.date.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}
                 </Text>
               </View>
               <View style={styles.dayScore}>
@@ -226,7 +248,7 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
                 {day.overallScore}
               </Text>
             </View>
-          ))}
+          )})}
         </View>
       )}
     </View>

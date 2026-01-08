@@ -118,6 +118,14 @@ export interface DivineTimingResult {
   /** Short reflective message (neutral, non-authoritative) */
   shortMessage: string;
   
+  /** Translation keys for localized messages */
+  messageKeys?: {
+    /** Base quality message key (e.g., "supportive_reflection") */
+    qualityKey: string;
+    /** Cycle addition key (e.g., "ongoing_efforts") */
+    cycleKey: string;
+  };
+  
   /** Input context (for debugging/display) */
   context?: {
     hadad: number;

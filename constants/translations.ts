@@ -295,6 +295,13 @@ export const translations = {
       export: "Export",
       showKeyboard: "Show Keyboard",
       tapForDetails: "Tap for details",
+      // Elements - shared across features
+      elements: {
+        air: "Air",
+        fire: "Fire",
+        water: "Water",
+        earth: "Earth",
+      },
     },
     
     // Home Screen
@@ -3868,6 +3875,277 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
 
     // DIVINE TIMING SPIRITUAL COMPONENTS
     divineTiming: {
+      // Screen 1: Advanced Timing Analysis - Home/Intro
+      home: {
+        title: "Advanced Timing Analysis",
+        subtitle: "Receive comprehensive guidance by integrating all timing systems: Moment Alignment, Daily Guidance, and Planetary Hours.",
+        cards: {
+          currentHour: {
+            label: "Current Hour",
+          },
+          dailyEnergy: {
+            label: "Daily Energy",
+          },
+        },
+        features: {
+          harmonyScore: "Harmony Score (0-100)",
+          timeline: "7-Day Optimal Timeline",
+          actionSteps: "Practical Action Steps",
+        },
+        intentions: {
+          question: "What is your intention today?",
+          newBeginning: "New Beginning",
+          journey: "Journey",
+          communication: "Communication",
+          connection: "Connection",
+          learning: "Learning",
+          restRecovery: "Rest & Recovery",
+          generalReflection: "General Reflection",
+        },
+        weekdays: {
+          sun: "Sun",
+          mon: "Mon",
+          tue: "Tue",
+          wed: "Wed",
+          thu: "Thu",
+          fri: "Fri",
+          sat: "Sat",
+        },
+        weekdaysLong: {
+          sunday: "Sunday",
+          monday: "Monday",
+          tuesday: "Tuesday",
+          wednesday: "Wednesday",
+          thursday: "Thursday",
+          friday: "Friday",
+          saturday: "Saturday",
+        },
+        cta: "Get Advanced Analysis",
+      },
+      // Ask Divine Timing (AI Guidance Input)
+      askDivineTiming: {
+        title: "Ask Divine Timing",
+        subtitle: "Receive spiritual reflection for your question",
+        questionLabel: "Your Question",
+        questionPlaceholder: "e.g., Is it a good time to start my exam preparation?",
+        category: "Category *",
+        timeFrame: "Time Frame",
+        urgency: "Urgency",
+        charCount: "{count}/200",
+        categories: {
+          study_exam: "Study / Exam",
+          work_career: "Work / Career",
+          money_business: "Money / Business",
+          travel: "Travel",
+          relationships_family: "Relationships / Family",
+          health_wellbeing: "Health / Wellbeing",
+          spiritual_practice: "Spiritual Practice",
+          decisions_general: "Decisions / General",
+        },
+        timeFrameOptions: {
+          today: "Today",
+          this_week: "This Week",
+          this_month: "This Month",
+        },
+        urgencyOptions: {
+          low: "Low",
+          medium: "Medium",
+          high: "High",
+        },
+        actions: {
+          getGuidance: "Get Guidance",
+          reflectDifferent: "Reflect on Different Intention",
+        },
+        errors: {
+          enterQuestion: "Please enter your question",
+          selectCategory: "Please select a category",
+          tooLong: "Question must be 200 characters or less",
+        },
+      },
+      // Results Screens - All tabs and data translations
+      results: {
+        // Header
+        header: {
+          intentToday: "Your intention today:",
+        },
+        // Section titles
+        section: {
+          divineTiming: "Divine Timing",
+          currentMomentAnalysis: "Current Moment Analysis",
+          practicalSteps: "Practical Steps",
+          bestTimeNext24h: "Best Time in Next 24 Hours",
+          sevenDayOutlook: "7-Day Outlook",
+        },
+        // Field labels
+        labels: {
+          timingQuality: "Timing Quality",
+          cycleState: "Cycle State",
+          elementalTone: "Elemental Tone",
+          reflectiveGuidance: "Reflective Guidance",
+          harmony: "Harmony",
+          hourlyStatus: "Hourly Status",
+          planetaryHour: "Planetary Hour",
+          dailyQuality: "Daily Quality",
+        },
+        // Timing quality values
+        qualities: {
+          favorable: "Favorable",
+          neutral: "Neutral",
+          delicate: "Delicate",
+          mixed: "Mixed",
+          challenging: "Challenging",
+        },
+        // Cycle states
+        states: {
+          completion_closure: "Completion / Closure",
+          initiation: "Initiation",
+          growth_expansion: "Growth / Expansion",
+          review_restraint: "Review / Restraint",
+        },
+        // Guidance levels
+        guidanceLevels: {
+          act: "→ Engage mindfully",
+          slow: "⊙ Proceed deliberately",
+          observe: "◐ Reflect before acting",
+        },
+        // Alert/Recommendation levels
+        alerts: {
+          proceedWithCaution: "Proceed with Caution",
+          proceedConfidently: "Proceed Confidently",
+          highlyFavorable: "Highly Favorable Time",
+          actNow: "Good Time to Act",
+          waitForBetterTime: "Consider Waiting",
+        },
+        // Guidance messages (from DivineTimingService)
+        guidance: {
+          // Quality-based messages
+          supportive_reflection: "Conditions appear supportive for reflection and considered action.",
+          energy_flows_align: "The energy flows align well for mindful engagement.",
+          mindful_participation: "A good moment for mindful participation with what's before you.",
+          conditions_neutral: "Conditions are neutral—good for routine activities.",
+          steady_as_you_go: "Steady-as-you-go energy—neither pushing nor resisting.",
+          balanced_window: "A balanced window for everyday tasks.",
+          timing_feels_delicate: "Timing feels delicate—proceed gently if you must.",
+          consider_pausing: "This may be a time to pause and observe.",
+          quiet_reflection: "Better suited for quiet reflection than decisive action.",
+        },
+        // Cycle state descriptions
+        cycles: {
+          ongoing_efforts: "Ongoing efforts may be nurtured.",
+          current_projects: "Current projects can progress steadily.",
+          gentle_continuation: "A time for gentle continuation.",
+          new_beginnings: "New beginnings may take root.",
+          fresh_initiatives: "Fresh initiatives can be explored.",
+          planting_seeds: "Consider this a time for planting seeds.",
+          winding_down: "Things may be winding down naturally.",
+          completion_near: "Completion or closure may be near.",
+          finishing_touches: "A time for finishing touches, not new starts.",
+          watchful_waiting: "Watchful waiting is advised.",
+          careful_review: "Careful review before moving forward.",
+          patience_serves: "Patience serves you now.",
+        },
+        // Practical Steps (from AdvancedDivineTimingService)
+        steps: {
+          // Highly favorable
+          exceptionally_aligned: "✨ Conditions are exceptionally aligned - this is an optimal time to act",
+          act_within_2_hours: "Make your decision/move within the next 2 hours while alignment is strong",
+          combine_prayer_trust: "Combine with prayer (duʿāʾ) and trust in divine wisdom",
+          // Act now
+          timing_favorable: "✓ Current timing is favorable for your intention",
+          proceed_confident_mindful: "Proceed with confidence but remain mindful",
+          track_unfold: "Keep track of how things unfold for future reference",
+          // Proceed with caution
+          mixed_proceed_care: "⚠ Timing is mixed - proceed if necessary but with extra care",
+          wait_if_not_urgent: "Consider waiting for a better window if not urgent",
+          increase_prayers_istikharah: "Increase prayers and istikhārah for guidance",
+          // Wait for better time
+          consider_delaying: "⏸ Consider delaying if possible",
+          review_timeline: "Review the timeline for upcoming optimal windows",
+          planning_preparation: "Use this time for planning and preparation",
+          // Intention-specific
+          document_decision_process: "Document your decision-making process for future reflection",
+          double_check_arrangements: "Double-check all arrangements and have backup plans",
+          prepare_words_carefully: "Prepare your words carefully and choose the right medium",
+          approach_empathy_patience: "Approach with empathy and patience",
+          structured_study_schedule: "Create a structured study schedule and quiet environment",
+          handle_obligations_first: "Ensure all obligations are handled before taking time off",
+          reflect_seek_counsel: "Reflect on your specific situation and seek qualified counsel",
+        },
+        // Quran Reflection
+        quranReflection: {
+          title: "Quran Reflection",
+          mode: {
+            auto: "Auto",
+            manual: "Manual",
+          },
+          prompt: "Read this verse slowly. What word resonates with you today?",
+          readOnQuran: "Read on Quran.com",
+          forContemplation: "For contemplation only",
+          hideTranslation: "Hide Translation",
+          disclaimer: "This verse is presented for reflection only. For strict interpretations and religious guidance, consult qualified scholars.",
+        },
+        // Reflection Prompts (from QuranReflectionService)
+        reflectionPrompts: {
+          // Favorable prompts
+          read_verse_slowly_resonate: "Read this verse slowly. What word resonates with you today?",
+          clarity_mindful_action: "Reflect on how this verse speaks to clarity and mindful action.",
+          wisdom_current_path: "Consider what wisdom this verse offers for your current path.",
+          // Neutral prompts
+          invite_consider_today: "What does this verse invite you to consider today?",
+          balance_patience_observation: "Reflect on balance, patience, and attentive observation.",
+          notice_draws_attention: "Notice which part of this verse draws your attention.",
+          // Delicate prompts
+          read_patience_comfort: "Read this verse with patience. What comfort does it offer?",
+          trust_stillness_contemplation: "Reflect on trust, stillness, and careful contemplation.",
+          wisdom_in_waiting: "Consider how this verse speaks to wisdom in waiting.",
+        },
+        // AI Guidance
+        aiGuidance: {
+          title: "AI-Powered Spiritual Guidance",
+          badge: "AI",
+          description: "Get personalized guidance based on your Abjad profile and current timing",
+          cta: "Ask AI Guidance",
+          changeIntention: "Change intention",
+        },
+        aiGuidanceCard: {
+          header: "AI-Powered Guidance",
+          verdict: {
+            highlyFavorable: "HIGHLY FAVORABLE",
+            favorable: "FAVORABLE",
+            mixed: "MIXED CONDITIONS",
+            unfavorable: "PROCEED WITH CAUTION",
+          },
+          sections: {
+            summary: "Summary",
+            contextualInsight: "Contextual Insight",
+            spiritualAlignment: "Spiritual Alignment",
+            personalizedSteps: "Recommended Steps",
+            optimalTiming: "Optimal Timing",
+            abjadWisdom: "Abjad Wisdom",
+          },
+          fields: {
+            harmonyScore: "Harmony Score",
+            zahir: "Ẓāhir (Outward)",
+            batin: "Bāṭin (Inward)",
+            bestTime: "Best Time",
+            nextOptimal: "Next Optimal",
+            avoid: "Consider Avoiding",
+            today: "Today",
+            thisWeek: "This Week",
+            thisMonth: "This Month",
+          },
+          actions: {
+            askAnother: "Ask Another Question",
+            seeMore: "See More",
+          },
+        },
+        // CTA buttons
+        cta: {
+          reflectDifferentIntention: "Reflect on Different Intention",
+        },
+        // Disclaimer
+        disclaimer: "This guidance is for spiritual reflection only and does not replace prayer, istikhārah, or qualified religious advice.",
+      },
       spiritualDepth: {
         divineName: "Divine Name",
         quranicVerse: "Quranic Verse",
@@ -4689,6 +4967,13 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       export: "Exporter",
       showKeyboard: "Afficher le Clavier",
       tapForDetails: "Appuyez pour détails",
+      // Elements - shared across features
+      elements: {
+        air: "Air",
+        fire: "Feu",
+        water: "Eau",
+        earth: "Terre",
+      },
     },
     
     // Home Screen
@@ -8166,6 +8451,277 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
 
     // DIVINE TIMING SPIRITUAL COMPONENTS
     divineTiming: {
+      // Screen 1: Advanced Timing Analysis - Home/Intro
+      home: {
+        title: "Analyse avancée des timings",
+        subtitle: "Recevez une guidance complète en intégrant tous les systèmes de timing : Alignement du moment, Guidance du jour et Heures planétaires.",
+        cards: {
+          currentHour: {
+            label: "Heure actuelle",
+          },
+          dailyEnergy: {
+            label: "Énergie du jour",
+          },
+        },
+        features: {
+          harmonyScore: "Score d'harmonie (0-100)",
+          timeline: "Chronologie optimale sur 7 jours",
+          actionSteps: "Étapes d'action pratiques",
+        },
+        intentions: {
+          question: "Quelle est votre intention aujourd'hui ?",
+          newBeginning: "Nouveau départ",
+          journey: "Voyage",
+          communication: "Communication",
+          connection: "Connexion",
+          learning: "Apprentissage",
+          restRecovery: "Repos & récupération",
+          generalReflection: "Réflexion générale",
+        },
+        weekdays: {
+          sun: "Dim",
+          mon: "Lun",
+          tue: "Mar",
+          wed: "Mer",
+          thu: "Jeu",
+          fri: "Ven",
+          sat: "Sam",
+        },
+        weekdaysLong: {
+          sunday: "Dimanche",
+          monday: "Lundi",
+          tuesday: "Mardi",
+          wednesday: "Mercredi",
+          thursday: "Jeudi",
+          friday: "Vendredi",
+          saturday: "Samedi",
+        },
+        cta: "Obtenir l'analyse avancée",
+      },
+      // Ask Divine Timing (AI Guidance Input)
+      askDivineTiming: {
+        title: "Demander le Timing Divin",
+        subtitle: "Recevez une guidance spirituelle pour votre question",
+        questionLabel: "Votre question",
+        questionPlaceholder: "ex. Est-ce un bon moment pour commencer mes révisions ?",
+        category: "Catégorie *",
+        timeFrame: "Période",
+        urgency: "Urgence",
+        charCount: "{count}/200",
+        categories: {
+          study_exam: "Études",
+          work_career: "Travail",
+          money_business: "Finances",
+          travel: "Voyage",
+          relationships_family: "Relations",
+          health_wellbeing: "Santé",
+          spiritual_practice: "Spiritualité",
+          decisions_general: "Décision",
+        },
+        timeFrameOptions: {
+          today: "Aujourd'hui",
+          this_week: "Cette semaine",
+          this_month: "Ce mois-ci",
+        },
+        urgencyOptions: {
+          low: "Faible",
+          medium: "Moyenne",
+          high: "Élevée",
+        },
+        actions: {
+          getGuidance: "Obtenir une guidance",
+          reflectDifferent: "Réfléchir sur une autre intention",
+        },
+        errors: {
+          enterQuestion: "Veuillez entrer votre question",
+          selectCategory: "Veuillez sélectionner une catégorie",
+          tooLong: "La question doit contenir 200 caractères ou moins",
+        },
+      },
+      // Results Screens - All tabs and data translations
+      results: {
+        // Header
+        header: {
+          intentToday: "Votre intention aujourd'hui :",
+        },
+        // Section titles
+        section: {
+          divineTiming: "Divine Timing",
+          currentMomentAnalysis: "Analyse du moment actuel",
+          practicalSteps: "Étapes pratiques",
+          bestTimeNext24h: "Meilleur moment dans les 24 heures",
+          sevenDayOutlook: "Perspective sur 7 jours",
+        },
+        // Field labels
+        labels: {
+          timingQuality: "Qualité du timing",
+          cycleState: "État du cycle",
+          elementalTone: "Ton élémental",
+          reflectiveGuidance: "Guidance réflexive",
+          harmony: "Harmonie",
+          hourlyStatus: "État horaire",
+          planetaryHour: "Heure planétaire",
+          dailyQuality: "Qualité du jour",
+        },
+        // Timing quality values
+        qualities: {
+          favorable: "Favorable",
+          neutral: "Neutre",
+          delicate: "Délicat",
+          mixed: "Mixte",
+          challenging: "Difficile",
+        },
+        // Cycle states
+        states: {
+          completion_closure: "Achèvement / Clôture",
+          initiation: "Initiation",
+          growth_expansion: "Croissance / Expansion",
+          review_restraint: "Révision / Retenue",
+        },
+        // Guidance levels
+        guidanceLevels: {
+          act: "→ Engagez-vous consciemment",
+          slow: "⊙ Procédez délibérément",
+          observe: "◐ Réfléchissez avant d'agir",
+        },
+        // Alert/Recommendation levels
+        alerts: {
+          proceedWithCaution: "Procéder avec prudence",
+          proceedConfidently: "Procéder en toute confiance",
+          highlyFavorable: "Moment très favorable",
+          actNow: "Bon moment pour agir",
+          waitForBetterTime: "Envisager d'attendre",
+        },
+        // Guidance messages (from DivineTimingService)
+        guidance: {
+          // Quality-based messages
+          supportive_reflection: "Les conditions semblent favorables à la réflexion et à l'action considérée.",
+          energy_flows_align: "Les flux d'énergie s'alignent bien pour un engagement attentif.",
+          mindful_participation: "Un bon moment pour une participation consciente avec ce qui se présente à vous.",
+          conditions_neutral: "Les conditions sont neutres — bonnes pour les activités routinières.",
+          steady_as_you_go: "Énergie régulière — ni en poussant ni en résistant.",
+          balanced_window: "Une fenêtre équilibrée pour les tâches quotidiennes.",
+          timing_feels_delicate: "Le timing semble délicat — procédez doucement si nécessaire.",
+          consider_pausing: "Cela peut être un moment pour faire une pause et observer.",
+          quiet_reflection: "Mieux adapté à une réflexion tranquille qu'à une action décisive.",
+        },
+        // Cycle state descriptions
+        cycles: {
+          ongoing_efforts: "Les efforts en cours peuvent être nourris.",
+          current_projects: "Les projets en cours peuvent progresser régulièrement.",
+          gentle_continuation: "Un temps pour une continuation douce.",
+          new_beginnings: "De nouveaux départs peuvent prendre racine.",
+          fresh_initiatives: "De nouvelles initiatives peuvent être explorées.",
+          planting_seeds: "Considérez ceci comme un temps pour planter des graines.",
+          winding_down: "Les choses peuvent naturellement se terminer.",
+          completion_near: "L'achèvement ou la clôture peut être proche.",
+          finishing_touches: "Un temps pour les touches finales, pas pour de nouveaux départs.",
+          watchful_waiting: "L'attente vigilante est conseillée.",
+          careful_review: "Révision attentive avant d'avancer.",
+          patience_serves: "La patience vous sert maintenant.",
+        },
+        // Practical Steps (from AdvancedDivineTimingService)
+        steps: {
+          // Highly favorable
+          exceptionally_aligned: "✨ Les conditions sont exceptionnellement alignées - c'est un moment optimal pour agir",
+          act_within_2_hours: "Prenez votre décision/mouvement dans les 2 prochaines heures pendant que l'alignement est fort",
+          combine_prayer_trust: "Combinez avec la prière (duʿāʾ) et la confiance en la sagesse divine",
+          // Act now
+          timing_favorable: "✓ Le timing actuel est favorable pour votre intention",
+          proceed_confident_mindful: "Procédez avec confiance mais restez attentif",
+          track_unfold: "Suivez comment les choses se déroulent pour référence future",
+          // Proceed with caution
+          mixed_proceed_care: "⚠ Le timing est mixte - procédez si nécessaire mais avec un soin supplémentaire",
+          wait_if_not_urgent: "Envisagez d'attendre une meilleure fenêtre si ce n'est pas urgent",
+          increase_prayers_istikharah: "Augmentez les prières et l'istikhārah pour obtenir des conseils",
+          // Wait for better time
+          consider_delaying: "⏸ Envisagez de reporter si possible",
+          review_timeline: "Examinez la chronologie pour les fenêtres optimales à venir",
+          planning_preparation: "Utilisez ce temps pour la planification et la préparation",
+          // Intention-specific
+          document_decision_process: "Documentez votre processus de décision pour réflexion future",
+          double_check_arrangements: "Vérifiez tous les arrangements et ayez des plans de secours",
+          prepare_words_carefully: "Préparez vos mots soigneusement et choisissez le bon médium",
+          approach_empathy_patience: "Approchez avec empathie et patience",
+          structured_study_schedule: "Créez un horaire d'étude structuré et un environnement calme",
+          handle_obligations_first: "Assurez-vous que toutes les obligations sont gérées avant de prendre du temps libre",
+          reflect_seek_counsel: "Réfléchissez à votre situation spécifique et cherchez des conseils qualifiés",
+        },
+        // Quran Reflection
+        quranReflection: {
+          title: "Réflexion coranique",
+          mode: {
+            auto: "Auto",
+            manual: "Manuel",
+          },
+          prompt: "Lisez ce verset lentement. Quel mot résonne avec vous aujourd'hui ?",
+          readOnQuran: "Lire sur Quran.com",
+          forContemplation: "Pour la contemplation uniquement",
+          hideTranslation: "Masquer la traduction",
+          disclaimer: "Ce verset est présenté pour la réflexion uniquement. Pour des interprétations strictes et des conseils religieux, consultez des savants qualifiés.",
+        },
+        // Reflection Prompts (from QuranReflectionService)
+        reflectionPrompts: {
+          // Favorable prompts
+          read_verse_slowly_resonate: "Lisez ce verset lentement. Quel mot résonne avec vous aujourd'hui ?",
+          clarity_mindful_action: "Réfléchissez à la façon dont ce verset parle de clarté et d'action consciente.",
+          wisdom_current_path: "Considérez quelle sagesse ce verset offre pour votre chemin actuel.",
+          // Neutral prompts
+          invite_consider_today: "Qu'est-ce que ce verset vous invite à considérer aujourd'hui ?",
+          balance_patience_observation: "Réfléchissez à l'équilibre, la patience et l'observation attentive.",
+          notice_draws_attention: "Remarquez quelle partie de ce verset attire votre attention.",
+          // Delicate prompts
+          read_patience_comfort: "Lisez ce verset avec patience. Quel réconfort offre-t-il ?",
+          trust_stillness_contemplation: "Réfléchissez à la confiance, au calme et à la contemplation attentive.",
+          wisdom_in_waiting: "Considérez comment ce verset parle de la sagesse dans l'attente.",
+        },
+        // AI Guidance
+        aiGuidance: {
+          title: "Guidance spirituelle assistée par IA",
+          badge: "IA",
+          description: "Obtenez des conseils personnalisés basés sur votre profil Abjad et le timing actuel",
+          cta: "Demander la guidance IA",
+          changeIntention: "Changer d'intention",
+        },
+        aiGuidanceCard: {
+          header: "Guidance assistée par l'IA",
+          verdict: {
+            highlyFavorable: "TRÈS FAVORABLE",
+            favorable: "FAVORABLE",
+            mixed: "CONDITIONS MIXTES",
+            unfavorable: "PROCÉDER AVEC PRUDENCE",
+          },
+          sections: {
+            summary: "Résumé",
+            contextualInsight: "Perspective contextuelle",
+            spiritualAlignment: "Alignement spirituel",
+            personalizedSteps: "Étapes recommandées",
+            optimalTiming: "Timing optimal",
+            abjadWisdom: "Sagesse Abjad",
+          },
+          fields: {
+            harmonyScore: "Score d'harmonie",
+            zahir: "Ẓāhir (extérieur)",
+            batin: "Bāṭin (intérieur)",
+            bestTime: "Meilleur moment",
+            nextOptimal: "Prochaine fenêtre",
+            avoid: "À éviter",
+            today: "Aujourd'hui",
+            thisWeek: "Cette semaine",
+            thisMonth: "Ce mois-ci",
+          },
+          actions: {
+            askAnother: "Poser une autre question",
+            seeMore: "Voir plus",
+          },
+        },
+        // CTA buttons
+        cta: {
+          reflectDifferentIntention: "Réfléchir sur une intention différente",
+        },
+        // Disclaimer
+        disclaimer: "Cette guidance est pour la réflexion spirituelle uniquement et ne remplace pas la prière, l'istikhārah ou les conseils religieux qualifiés.",
+      },
       spiritualDepth: {
         divineName: "Nom Divin",
         quranicVerse: "Verset Coranique",

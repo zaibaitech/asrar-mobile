@@ -11,6 +11,7 @@
  */
 
 import { DarkTheme, ElementAccents } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { enhancePeakWindowsWithAI, isAIAvailable, loadAISettings } from '@/services/AIReflectionService';
 import { loadCheckIns, loadUserTimingProfile } from '@/services/CheckInStorage';
@@ -57,6 +58,7 @@ export function PeakWindowsCard({
 }: PeakWindowsCardProps) {
   const router = useRouter();
   const { profile: userProfile } = useProfile();
+  const { language } = useLanguage();
   const [windows, setWindows] = useState<PeakWindow[]>([]);
   const [loading, setLoading] = useState(true);
   const [dataQuality, setDataQuality] = useState<'full' | 'partial' | 'minimal'>('minimal');
@@ -104,7 +106,7 @@ export function PeakWindowsCard({
         userBurj: userProfile?.derived?.burj,
         userLocationCity: userProfile?.location?.label,
         tone: settings.tone,
-        language: 'en',
+        language: language, // Use app's current language
       });
       
       if (response.aiAssisted) {

@@ -244,6 +244,8 @@ function getGuidanceLevel(
  * - Never predict outcomes
  * - Never use certainty language about the future
  * - Keep language reflective and optional
+ * 
+ * Returns both the English message (for backwards compatibility) and translation keys
  */
 function generateMessage(
   timingQuality: TimingQuality,
@@ -252,7 +254,7 @@ function generateMessage(
   intentionCategory: IntentionCategory,
   dominantElement: ElementalTone,
   dayElement: ElementalTone
-): string {
+): { message: string; qualityKey: string; cycleKey: string } {
   // Base messages by timing quality
   const qualityMessages: Record<TimingQuality, string[]> = {
     favorable: [
@@ -272,6 +274,25 @@ function generateMessage(
     ],
   };
   
+  // Translation keys for quality messages
+  const qualityKeys: Record<TimingQuality, string[]> = {
+    favorable: [
+      'supportive_reflection',
+      'energy_flows_align',
+      'mindful_participation',
+    ],
+    neutral: [
+      'balanced_measured',
+      'awareness_flexibility',
+      'deliberate_thought',
+    ],
+    delicate: [
+      'favor_reflection',
+      'observe_patterns',
+      'patience_awareness',
+    ],
+  };
+  
   // Cycle-specific additions
   const cycleAdditions: Record<CycleState, string> = {
     'initiation': 'New beginnings may be contemplated.',
@@ -280,16 +301,33 @@ function generateMessage(
     'completion / closure': 'Endings and transitions invite attention.',
   };
   
+  // Cycle translation keys
+  const cycleKeys: Record<CycleState, string> = {
+    'initiation': 'new_beginnings',
+    'growth / expansion': 'ongoing_efforts',
+    'review / restraint': 'reflection_assessment',
+    'completion / closure': 'endings_transitions',
+  };
+  
   // Select base message (deterministic based on intention)
   const baseOptions = qualityMessages[timingQuality];
   const baseIndex = intentionCategory.length % baseOptions.length;
   const baseMessage = baseOptions[baseIndex];
   
+  // Select translation key
+  const keyOptions = qualityKeys[timingQuality];
+  const qualityKey = keyOptions[baseIndex];
+  
   // Add cycle context
   const cycleNote = cycleAdditions[cycleState];
+  const cycleKey = cycleKeys[cycleState];
   
   // Combine
-  return `${baseMessage} ${cycleNote}`;
+  return {
+    message: `${baseMessage} ${cycleNote}`,
+    qualityKey,
+    cycleKey,
+  };
 }
 
 // ============================================================================
@@ -335,7 +373,7 @@ export function computeDivineTiming(input: DivineTimingInput): DivineTimingResul
   const guidanceLevel = getGuidanceLevel(timingQuality, cycleState);
   
   // Step 6: Generate reflective message
-  const shortMessage = generateMessage(
+  const messageData = generateMessage(
     timingQuality,
     cycleState,
     guidanceLevel,
@@ -350,7 +388,11 @@ export function computeDivineTiming(input: DivineTimingInput): DivineTimingResul
     cycleState,
     elementalTone,
     guidanceLevel,
-    shortMessage,
+    shortMessage: messageData.message,
+    messageKeys: {
+      qualityKey: messageData.qualityKey,
+      cycleKey: messageData.cycleKey,
+    },
     context: {
       hadad: userAbjadResult.hadad,
       dominantElement: userAbjadResult.dominantElement,

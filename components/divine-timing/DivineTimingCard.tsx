@@ -5,12 +5,12 @@
  */
 
 import Colors from '@/constants/Colors';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
-    DIVINE_TIMING_DISCLAIMER,
     getElementColor,
     getElementIcon,
     getTimingQualityColor,
-    getTimingQualityIcon,
+    getTimingQualityIcon
 } from '@/services/DivineTimingService';
 import { DivineTimingResult } from '@/types/divine-timing';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +25,7 @@ interface DivineTimingCardProps {
 export function DivineTimingCard({ result, colorScheme = 'light' }: DivineTimingCardProps) {
   const isDark = colorScheme === 'dark';
   const colors = Colors[colorScheme];
+  const { t } = useLanguage();
   
   const qualityIcon = getTimingQualityIcon(result.timingQuality);
   const qualityColor = getTimingQualityColor(result.timingQuality);
@@ -38,7 +39,7 @@ export function DivineTimingCard({ result, colorScheme = 'light' }: DivineTiming
         <View style={styles.titleRow}>
           <Ionicons name="time-outline" size={24} color={colors.primary} />
           <Text style={[styles.title, { color: colors.text }]}>
-            Divine Timing
+            {t('divineTiming.results.section.divineTiming')}
           </Text>
         </View>
       </View>
@@ -49,10 +50,10 @@ export function DivineTimingCard({ result, colorScheme = 'light' }: DivineTiming
           <Text style={styles.qualityIcon}>{qualityIcon}</Text>
           <View style={styles.qualityTextContainer}>
             <Text style={[styles.qualityLabel, { color: colors.textSecondary }]}>
-              Timing Quality
+              {t('divineTiming.results.labels.timingQuality')}
             </Text>
             <Text style={[styles.qualityValue, { color: qualityColor }]}>
-              {result.timingQuality.charAt(0).toUpperCase() + result.timingQuality.slice(1)}
+              {t(`divineTiming.results.qualities.${result.timingQuality}`)}
             </Text>
           </View>
         </View>
@@ -63,22 +64,22 @@ export function DivineTimingCard({ result, colorScheme = 'light' }: DivineTiming
         {/* Cycle State */}
         <View style={[styles.infoCard, { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }]}>
           <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>
-            Cycle State
+            {t('divineTiming.results.labels.cycleState')}
           </Text>
           <Text style={[styles.infoValue, { color: colors.text }]}>
-            {result.cycleState}
+            {t(`divineTiming.results.states.${result.cycleState.replace(/\s*\/\s*/g, '_').replace(/\s+/g, '_').toLowerCase()}`)}
           </Text>
         </View>
         
         {/* Elemental Tone */}
         <View style={[styles.infoCard, { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }]}>
           <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>
-            Elemental Tone
+            {t('divineTiming.results.labels.elementalTone')}
           </Text>
           <View style={styles.elementRow}>
             <Text style={styles.elementIcon}>{elementIcon}</Text>
             <Text style={[styles.infoValue, { color: elementColor }]}>
-              {result.elementalTone.charAt(0).toUpperCase() + result.elementalTone.slice(1)}
+              {t(`common.elements.${result.elementalTone}`)}
             </Text>
           </View>
         </View>
@@ -89,19 +90,19 @@ export function DivineTimingCard({ result, colorScheme = 'light' }: DivineTiming
         <View style={styles.messageHeader}>
           <Ionicons name="bulb-outline" size={20} color={colors.primary} />
           <Text style={[styles.messageLabel, { color: colors.textSecondary }]}>
-            Reflective Guidance
+            {t('divineTiming.results.labels.reflectiveGuidance')}
           </Text>
         </View>
         <Text style={[styles.messageText, { color: colors.text }]}>
-          {result.shortMessage}
+          {result.messageKeys
+            ? `${t(`divineTiming.results.guidance.${result.messageKeys.qualityKey}`)} ${t(`divineTiming.results.cycles.${result.messageKeys.cycleKey}`)}`
+            : result.shortMessage}
         </Text>
         
         {/* Guidance Level Badge */}
         <View style={styles.guidanceBadge}>
           <Text style={[styles.guidanceBadgeText, { color: colors.primary }]}>
-            {result.guidanceLevel === 'act' && '→ Engage mindfully'}
-            {result.guidanceLevel === 'slow' && '⊙ Proceed deliberately'}
-            {result.guidanceLevel === 'observe' && '◐ Reflect before acting'}
+            {t(`divineTiming.results.guidanceLevels.${result.guidanceLevel}`)}
           </Text>
         </View>
       </View>
@@ -110,7 +111,7 @@ export function DivineTimingCard({ result, colorScheme = 'light' }: DivineTiming
       <View style={styles.disclaimerContainer}>
         <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
         <Text style={[styles.disclaimerText, { color: colors.textSecondary }]}>
-          {DIVINE_TIMING_DISCLAIMER}
+          {t('divineTiming.results.disclaimer')}
         </Text>
       </View>
     </View>

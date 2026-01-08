@@ -6,6 +6,7 @@
  */
 
 import Colors from '@/constants/Colors';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { loadAISettings, rewriteGuidanceWithAI } from '@/services/AIReflectionService';
 import { GUIDANCE_DISCLAIMER } from '@/services/DivineTimingGuidanceService';
 import { AIRewriteResponse } from '@/types/ai-settings';
@@ -41,6 +42,7 @@ export function DivineTimingGuidanceCard({
 }: DivineTimingGuidanceCardProps) {
   const isDark = colorScheme === 'dark';
   const colors = Colors[colorScheme];
+  const { language } = useLanguage();
   
   const [displayResponse, setDisplayResponse] = useState(response);
   const [aiEnhancing, setAiEnhancing] = useState(false);
@@ -75,7 +77,7 @@ export function DivineTimingGuidanceCard({
         },
         quranContext,
         tone: settings.tone,
-        language: 'en',
+        language: language, // Use app's current language
       });
       
       // Convert AI response back to GuidanceResponse format

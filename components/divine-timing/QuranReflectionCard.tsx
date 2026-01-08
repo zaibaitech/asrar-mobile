@@ -7,7 +7,8 @@
  */
 
 import Colors from '@/constants/Colors';
-import { QURAN_REFLECTION_DISCLAIMER, QuranReflection } from '@/services/QuranReflectionService';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { QuranReflection } from '@/services/QuranReflectionService';
 import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import React, { useState } from 'react';
@@ -33,6 +34,7 @@ export function QuranReflectionCard({
 }: QuranReflectionCardProps) {
   const isDark = colorScheme === 'dark';
   const colors = Colors[colorScheme];
+  const { t, language } = useLanguage();
   
   const [translationVisible, setTranslationVisible] = useState(showTranslation);
   
@@ -53,11 +55,11 @@ export function QuranReflectionCard({
         <View style={styles.titleRow}>
           <Ionicons name="book-outline" size={24} color={colors.primary} />
           <Text style={[styles.title, { color: colors.text }]}>
-            Qur'an Reflection
+            {t('divineTiming.results.quranReflection.title')}
           </Text>
         </View>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          For contemplation only
+          {t('divineTiming.results.quranReflection.forContemplation')}
         </Text>
       </View>
       
@@ -94,7 +96,7 @@ export function QuranReflectionCard({
           color={colors.primary}
         />
         <Text style={[styles.translationToggleText, { color: colors.primary }]}>
-          {translationVisible ? 'Hide' : 'Show'} Translation
+          {t('divineTiming.results.quranReflection.hideTranslation')}
         </Text>
       </TouchableOpacity>
       
@@ -102,7 +104,7 @@ export function QuranReflectionCard({
       {translationVisible && (
         <View style={[styles.translationCard, { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }]}>
           <Text style={[styles.translationText, { color: colors.text }]}>
-            {reflection.verse.translationEn}
+            {language === 'fr' ? reflection.verse.translationFr : reflection.verse.translationEn}
           </Text>
         </View>
       )}
@@ -116,7 +118,9 @@ export function QuranReflectionCard({
           </Text>
         </View>
         <Text style={[styles.promptText, { color: colors.text }]}>
-          {reflection.prompt.text}
+          {reflection.prompt.promptKey
+            ? t(`divineTiming.results.reflectionPrompts.${reflection.prompt.promptKey}`)
+            : reflection.prompt.text}
         </Text>
       </View>
       
@@ -128,7 +132,7 @@ export function QuranReflectionCard({
         >
           <Ionicons name="globe-outline" size={18} color="#fff" />
           <Text style={styles.actionButtonText}>
-            Read on Quran.com
+            {t('divineTiming.results.quranReflection.readOnQuran')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -137,7 +141,7 @@ export function QuranReflectionCard({
       <View style={styles.disclaimerContainer}>
         <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
         <Text style={[styles.disclaimerText, { color: colors.textSecondary }]}>
-          {QURAN_REFLECTION_DISCLAIMER}
+          {t('divineTiming.results.quranReflection.disclaimer')}
         </Text>
       </View>
     </View>

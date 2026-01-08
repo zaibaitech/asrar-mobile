@@ -16,6 +16,7 @@ import { DivineTimingQuestionCard } from '@/components/divine-timing/DivineTimin
 import { ManualVerseSelector } from '@/components/divine-timing/ManualVerseSelector';
 import { QuranReflectionCard } from '@/components/divine-timing/QuranReflectionCard';
 import Colors from '@/constants/Colors';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import {
     getAdvancedDivineTimingAnalysis,
@@ -27,7 +28,6 @@ import {
 } from '@/services/DivineTimingGuidanceService';
 import {
     computeDivineTiming,
-    getIntentionDisplayName,
 } from '@/services/DivineTimingService';
 import {
     getManualReflection,
@@ -109,6 +109,21 @@ export default function DivineTimingScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const { profile } = useProfile();
+  const { language, t } = useLanguage();
+  
+  // Helper function to get localized intention name
+  const getLocalizedIntentionName = (category: IntentionCategory): string => {
+    const intentionKeyMap: Record<IntentionCategory, string> = {
+      start: 'divineTiming.home.intentions.newBeginning',
+      travel: 'divineTiming.home.intentions.journey',
+      communication: 'divineTiming.home.intentions.communication',
+      relationship: 'divineTiming.home.intentions.connection',
+      study: 'divineTiming.home.intentions.learning',
+      rest: 'divineTiming.home.intentions.restRecovery',
+      custom: 'divineTiming.home.intentions.generalReflection',
+    };
+    return t(intentionKeyMap[category]);
+  };
   
   // Phase 1 & 2 state
   const [selectedIntention, setSelectedIntention] = useState<IntentionCategory | null>(null);
@@ -291,6 +306,16 @@ export default function DivineTimingScreen() {
   ) => {
     if (!result || !selectedIntention || !profile.derived) return;
     
+    if (__DEV__) {
+      console.log('[DivineTiming][AskAI] Submit request', {
+        locale: language,
+        question,
+        category,
+        timeHorizon,
+        urgency,
+      });
+    }
+
     setLoading(true);
     
     try {
@@ -306,10 +331,14 @@ export default function DivineTimingScreen() {
         userAbjad: PLACEHOLDER_USER_ABJAD,
         intention: selectedIntention,
         advancedAnalysis: advancedAnalysis || undefined,
+        locale: language,
       });
       
       setAdvancedGuidanceResponse(advancedGuidance);
       setGuidanceResponse(advancedGuidance); // Also set base response for compatibility
+      if (__DEV__) {
+        console.log('[DivineTiming][AskAI] Rendering AdvancedDivineTimingGuidanceCard');
+      }
       
       // Save to history
       const historyItem: GuidanceHistoryItem = {
@@ -368,6 +397,9 @@ export default function DivineTimingScreen() {
         } : undefined,
       });
       setGuidanceResponse(basicGuidance);
+      if (__DEV__) {
+        console.log('[DivineTiming][AskAI] Fallback rendering DivineTimingGuidanceCard');
+      }
       setShowGuidanceInput(false);
     } finally {
       setLoading(false);
@@ -411,19 +443,18 @@ export default function DivineTimingScreen() {
             <View style={styles.introHeader}>
               <Ionicons name="compass" size={32} color={colors.primary} />
               <Text style={[styles.introTitle, { color: colors.text }]}>
-                Advanced Timing Analysis
+                {t('divineTiming.home.title')}
               </Text>
             </View>
             <Text style={[styles.introText, { color: colors.textSecondary }]}>
-              Receive comprehensive guidance by integrating all timing systems:
-              Moment Alignment, Daily Guidance, and Planetary Hours.
+              {t('divineTiming.home.subtitle')}
             </Text>
             
             {/* Live Preview Stats */}
             <View style={styles.introStatsContainer}>
               <View style={[styles.introStatCard, { backgroundColor: colors.background }]}>
                 <Ionicons name="time" size={16} color={colors.primary} />
-                <Text style={[styles.introStatLabel, { color: colors.textSecondary }]}>Current Hour</Text>
+                <Text style={[styles.introStatLabel, { color: colors.textSecondary }]}>{t('divineTiming.home.cards.currentHour.label')}</Text>
                 <Text style={[styles.introStatValue, { color: colors.text }]}>
                   {(() => {
                     const ph = getCurrentPlanetaryHour();
@@ -433,9 +464,9 @@ export default function DivineTimingScreen() {
               </View>
               <View style={[styles.introStatCard, { backgroundColor: colors.background }]}>
                 <Ionicons name="sunny" size={16} color={colors.primary} />
-                <Text style={[styles.introStatLabel, { color: colors.textSecondary }]}>Daily Energy</Text>
+                <Text style={[styles.introStatLabel, { color: colors.textSecondary }]}>{t('divineTiming.home.cards.dailyEnergy.label')}</Text>
                 <Text style={[styles.introStatValue, { color: colors.text }]}>
-                  {new Date().toLocaleDateString('en-US', { weekday: 'short' })}
+                  {new Date().toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'short' })}
                 </Text>
               </View>
             </View>
@@ -445,19 +476,19 @@ export default function DivineTimingScreen() {
               <View style={styles.introFeature}>
                 <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
                 <Text style={[styles.introFeatureText, { color: colors.textSecondary }]}>
-                  Harmony Score (0-100)
+                  {t('divineTiming.home.features.harmonyScore')}
                 </Text>
               </View>
               <View style={styles.introFeature}>
                 <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
                 <Text style={[styles.introFeatureText, { color: colors.textSecondary }]}>
-                  7-Day Optimal Timeline
+                  {t('divineTiming.home.features.timeline')}
                 </Text>
               </View>
               <View style={styles.introFeature}>
                 <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
                 <Text style={[styles.introFeatureText, { color: colors.textSecondary }]}>
-                  Practical Action Steps
+                  {t('divineTiming.home.features.actionSteps')}
                 </Text>
               </View>
             </View>
@@ -468,7 +499,7 @@ export default function DivineTimingScreen() {
         {!result && (
           <View style={styles.intentionSection}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              What is your intention today?
+              {t('divineTiming.home.intentions.question')}
             </Text>
             
             <View style={styles.intentionGrid}>
@@ -514,7 +545,7 @@ export default function DivineTimingScreen() {
                         { color: isSelected ? '#fff' : colors.text },
                       ]}
                     >
-                      {getIntentionDisplayName(category)}
+                      {getLocalizedIntentionName(category)}
                     </Text>
                     {isSelected && (
                       <View style={styles.selectedIndicator}>
@@ -549,7 +580,7 @@ export default function DivineTimingScreen() {
                 <>
                   <Ionicons name="sparkles" size={20} color="#fff" />
                   <Text style={styles.calculateButtonText}>
-                    Get Advanced Analysis
+                    {t('divineTiming.home.cta')}
                   </Text>
                 </>
               )}
@@ -563,7 +594,7 @@ export default function DivineTimingScreen() {
             {/* Selected Intention Display */}
             <View style={[styles.selectedIntentionCard, { backgroundColor: colors.card }]}>
               <Text style={[styles.selectedLabel, { color: colors.textSecondary }]}>
-                Your intention today:
+                {t('divineTiming.results.header.intentToday')}
               </Text>
               <View style={styles.selectedIntentionRow}>
                 <Ionicons
@@ -572,7 +603,7 @@ export default function DivineTimingScreen() {
                   color={colors.primary}
                 />
                 <Text style={[styles.selectedIntentionText, { color: colors.text }]}>
-                  {getIntentionDisplayName(selectedIntention!)}
+                  {getLocalizedIntentionName(selectedIntention!)}
                 </Text>
               </View>
             </View>
@@ -589,7 +620,7 @@ export default function DivineTimingScreen() {
             <View style={[styles.reflectionControls, { backgroundColor: colors.card }]}>
               <View style={styles.reflectionHeader}>
                 <Text style={[styles.reflectionTitle, { color: colors.text }]}>
-                  Qur'an Reflection
+                  {t('divineTiming.results.quranReflection.title')}
                 </Text>
                 <View style={styles.modeToggle}>
                   <TouchableOpacity
@@ -606,7 +637,7 @@ export default function DivineTimingScreen() {
                         { color: verseMode === 'auto' ? '#fff' : colors.textSecondary },
                       ]}
                     >
-                      Auto
+                      {t('divineTiming.results.quranReflection.mode.auto')}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -623,7 +654,7 @@ export default function DivineTimingScreen() {
                         { color: verseMode === 'manual' ? '#fff' : colors.textSecondary },
                       ]}
                     >
-                      Manual
+                      {t('divineTiming.results.quranReflection.mode.manual')}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -659,15 +690,15 @@ export default function DivineTimingScreen() {
                 <View style={{ flex: 1 }}>
                   <View style={styles.guidanceTitleRow}>
                     <Text style={[styles.guidanceSectionTitle, { color: colors.text }]}>
-                      AI-Powered Spiritual Guidance
+                      {t('divineTiming.results.aiGuidance.title')}
                     </Text>
                     <View style={styles.aiBadge}>
                       <Ionicons name="sparkles" size={10} color="#000" />
-                      <Text style={styles.aiBadgeText}>AI</Text>
+                      <Text style={styles.aiBadgeText}>{t('divineTiming.results.aiGuidance.badge')}</Text>
                     </View>
                   </View>
                   <Text style={[styles.guidanceSectionDesc, { color: colors.textSecondary }]}>
-                    Get personalized guidance based on your Abjad profile and current timing
+                    {t('divineTiming.results.aiGuidance.description')}
                   </Text>
                 </View>
               </View>
@@ -679,7 +710,7 @@ export default function DivineTimingScreen() {
                 >
                   <Ionicons name="chatbubble-ellipses" size={20} color="#fff" />
                   <Text style={styles.showGuidanceButtonText}>
-                    Ask AI Guidance
+                    {t('divineTiming.results.aiGuidance.cta')}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -719,14 +750,14 @@ export default function DivineTimingScreen() {
               />
             ) : null}
             
-            {/* Reset Button */}
+            {/* Reset Button - Secondary Style */}
             <TouchableOpacity
-              style={[styles.resetButton, { borderColor: colors.textSecondary }]}
+              style={styles.secondaryResetButton}
               onPress={handleReset}
             >
-              <Ionicons name="refresh" size={20} color={colors.text} />
-              <Text style={[styles.resetButtonText, { color: colors.text }]}>
-                Reflect on Different Intention
+              <Ionicons name="refresh" size={18} color={colors.textSecondary} />
+              <Text style={[styles.secondaryResetButtonText, { color: colors.textSecondary }]}>
+                {t('divineTiming.results.aiGuidance.changeIntention')}
               </Text>
             </TouchableOpacity>
           </>
@@ -889,6 +920,18 @@ const styles = StyleSheet.create({
   },
   resetButtonText: {
     fontSize: 14,
+    fontWeight: '500',
+  },
+  secondaryResetButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    padding: 12,
+    marginTop: 12,
+  },
+  secondaryResetButtonText: {
+    fontSize: 13,
     fontWeight: '500',
   },
   reflectionControls: {

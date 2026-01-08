@@ -64,6 +64,8 @@ export interface IntentionTimingAnalysis {
   next7DaysOutlook: DayAnalysis[];
   optimalDaysInNext30: Date[];
   practicalSteps: string[];
+  /** Translation keys for practical steps */
+  stepKeys?: string[];
 }
 
 // ============================================================================
@@ -217,31 +219,45 @@ function findOptimalDaysInNext30(
 
 /**
  * Generate actionable steps based on analysis
+ * Returns both English text (backwards compat) and translation keys
  */
 function generatePracticalSteps(
   recommendation: string,
   intention: IntentionCategory,
   harmonyScore: number,
   momentStatus: string
-): string[] {
+): { steps: string[]; stepKeys: string[] } {
   const steps: string[] = [];
+  const stepKeys: string[] = [];
   
   if (recommendation === 'highly_favorable') {
     steps.push('✨ Conditions are exceptionally aligned - this is an optimal time to act');
+    stepKeys.push('exceptionally_aligned');
     steps.push(`Make your ${intention === 'start' ? 'decision' : 'move'} within the next 2 hours while alignment is strong`);
+    stepKeys.push('act_within_2_hours');
     steps.push('Combine with prayer (duʿāʾ) and trust in divine wisdom');
+    stepKeys.push('combine_prayer_trust');
   } else if (recommendation === 'act_now') {
     steps.push('✓ Current timing is favorable for your intention');
+    stepKeys.push('timing_favorable');
     steps.push('Proceed with confidence but remain mindful');
+    stepKeys.push('proceed_confident_mindful');
     steps.push('Keep track of how things unfold for future reference');
+    stepKeys.push('track_unfold');
   } else if (recommendation === 'proceed_with_caution') {
     steps.push('⚠ Timing is mixed - proceed if necessary but with extra care');
+    stepKeys.push('mixed_proceed_care');
     steps.push('Consider waiting for a better window if not urgent');
+    stepKeys.push('wait_if_not_urgent');
     steps.push('Increase prayers and istikhārah for guidance');
+    stepKeys.push('increase_prayers_istikharah');
   } else {
     steps.push('⏸ Consider delaying if possible');
+    stepKeys.push('consider_delaying');
     steps.push('Review the timeline for upcoming optimal windows');
+    stepKeys.push('review_timeline');
     steps.push('Use this time for planning and preparation');
+    stepKeys.push('planning_preparation');
   }
   
   // Intention-specific advice
@@ -255,9 +271,20 @@ function generatePracticalSteps(
     custom: 'Reflect on your specific situation and seek qualified counsel',
   };
   
-  steps.push(intentionSteps[intention]);
+  const intentionStepKeys: Record<IntentionCategory, string> = {
+    start: 'document_decision_process',
+    travel: 'double_check_arrangements',
+    communication: 'prepare_words_carefully',
+    relationship: 'approach_empathy_patience',
+    study: 'structured_study_schedule',
+    rest: 'handle_obligations_first',
+    custom: 'reflect_seek_counsel',
+  };
   
-  return steps;
+  steps.push(intentionSteps[intention]);
+  stepKeys.push(intentionStepKeys[intention]);
+  
+  return { steps, stepKeys };
 }
 
 // ============================================================================
@@ -314,7 +341,7 @@ export async function getAdvancedDivineTimingAnalysis(
   const optimalDaysInNext30 = findOptimalDaysInNext30(next7DaysOutlook);
   
   // Generate practical steps
-  const practicalSteps = generatePracticalSteps(
+  const { steps: practicalSteps, stepKeys } = generatePracticalSteps(
     recommendation,
     intention,
     harmonyScore,
@@ -351,5 +378,6 @@ export async function getAdvancedDivineTimingAnalysis(
     next7DaysOutlook,
     optimalDaysInNext30,
     practicalSteps,
+    stepKeys,
   };
 }

@@ -41,6 +41,9 @@ export interface ReflectionPrompt {
   /** Short reflective question or instruction */
   text: string;
   
+  /** Translation key for the prompt text */
+  promptKey?: string;
+  
   /** Category of prompt */
   type: 'question' | 'instruction' | 'contemplation';
 }
@@ -164,42 +167,51 @@ function generateReflectionPrompt(
     favorable: [
       {
         text: 'Read this verse slowly. What word resonates with you today?',
+        promptKey: 'read_verse_slowly_resonate',
         type: 'question',
       },
       {
         text: 'Reflect on how this verse speaks to clarity and mindful action.',
+        promptKey: 'clarity_mindful_action',
         type: 'instruction',
       },
       {
         text: 'Consider what wisdom this verse offers for your current path.',
+        promptKey: 'wisdom_current_path',
         type: 'contemplation',
       },
     ],
     neutral: [
       {
         text: 'What does this verse invite you to consider today?',
+        promptKey: 'invite_consider_today',
         type: 'question',
       },
       {
         text: 'Reflect on balance, patience, and attentive observation.',
+        promptKey: 'balance_patience_observation',
         type: 'instruction',
       },
       {
         text: 'Notice which part of this verse draws your attention.',
+        promptKey: 'notice_draws_attention',
         type: 'contemplation',
       },
     ],
     delicate: [
       {
         text: 'Read this verse with patience. What comfort does it offer?',
+        promptKey: 'read_patience_comfort',
         type: 'question',
       },
       {
         text: 'Reflect on trust, stillness, and careful contemplation.',
+        promptKey: 'trust_stillness_contemplation',
         type: 'instruction',
       },
       {
         text: 'Consider how this verse speaks to wisdom in waiting.',
+        promptKey: 'wisdom_in_waiting',
         type: 'contemplation',
       },
     ],

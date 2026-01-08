@@ -22,22 +22,20 @@
 import {
     AIRewriteRequest,
     AIRewriteResponse,
-    AISettings,
     AITone,
     CalculatorAIRequest,
     CalculatorAIResponse,
     CompatibilityAIRequest,
     CompatibilityAIResponse,
-    DEFAULT_AI_SETTINGS,
     IstikharaAIRewriteRequest,
     IstikharaAIRewriteResponse,
     NameDestinyAIRequest,
     NameDestinyAIResponse,
     PeakWindowsAIRequest,
-    PeakWindowsAIResponse,
+    PeakWindowsAIResponse
 } from '@/types/ai-settings';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
+import { AI_PROVIDER_NAME, GROQ_API_KEY, GROQ_API_URL, GROQ_MODEL, containsEnglish, containsFrench, extractJSON } from './AIClientConfig';
 
 // ============================================================================
 // CONFIGURATION
@@ -58,9 +56,7 @@ const AI_SETTINGS_KEY = '@divine_timing_ai_settings';
  * 
  * Current setup is for DEVELOPMENT ONLY.
  */
-const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY;
-const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const DEFAULT_MODEL = GROQ_MODEL || 'llama-3.3-70b-versatile';
 
 /**
  * Feature flag: Build-time AI capability
@@ -104,128 +100,35 @@ const IstikharaAIRewriteResponseSchema = z.object({
 });
 
 // ============================================================================
-// JSON EXTRACTION HELPERS
-// ============================================================================
-
-/**
- * Extract JSON from AI response
- * Handles markdown code fences, extra text, and various edge cases
- * 
- * Examples handled:
- * - "```json\n{...}\n```"
- * - "Here's the result:\n{...}"
- * - "{...}\n\nLet me know if..."
- * - Plain "{...}"
- */
-function extractJSON(text: string): string | null {
-  if (!text || typeof text !== 'string') {
-    return null;
-  }
-  
-  // Try 1: Extract from markdown code fences (```json ... ``` or ``` ... ```)
-  const codeBlockMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
-  if (codeBlockMatch) {
-    return codeBlockMatch[1].trim();
-  }
-  
-  // Try 2: Find JSON object by braces (first { to last })
-  const firstBrace = text.indexOf('{');
-  const lastBrace = text.lastIndexOf('}');
-  
-  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-    const extracted = text.substring(firstBrace, lastBrace + 1);
-    
-    // Verify it looks like valid JSON structure
-    try {
-      JSON.parse(extracted);
-      return extracted;
-    } catch {
-      // Not valid JSON, continue
-    }
-  }
-  
-  // Try 3: Maybe it's already pure JSON
-  try {
-    JSON.parse(text.trim());
-    return text.trim();
-  } catch {
-    // Not pure JSON
-  }
-  
-  return null;
-}
-
-// ============================================================================
-// SETTINGS PERSISTENCE
-// ============================================================================
-
-/**
- * Load AI settings from AsyncStorage
- */
-export async function loadAISettings(): Promise<AISettings> {
-  try {
-    const stored = await AsyncStorage.getItem(AI_SETTINGS_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
-    return DEFAULT_AI_SETTINGS;
-  } catch (error) {
-    if (__DEV__) {
-      console.warn('[AI] Failed to load settings:', error);
-    }
-    return DEFAULT_AI_SETTINGS;
-  }
-}
-
-/**
- * Save AI settings to AsyncStorage
- */
-export async function saveAISettings(settings: AISettings): Promise<void> {
-  try {
-    await AsyncStorage.setItem(AI_SETTINGS_KEY, JSON.stringify(settings));
-  } catch (error) {
-    if (__DEV__) {
-      console.error('[AI] Failed to save settings:', error);
-    }
-    throw error;
-  }
-}
-
-/**
- * Check if AI is available
- * Requires:
- * 1. Build-time capability flag (ENABLE_AI_CAPABILITY)
- * 2. API key present
- * 
- * Note: Does NOT check settings.enabled - that's a user preference
- * This only checks if AI CAN be used, not if it IS enabled
- */
-export async function isAIAvailable(): Promise<boolean> {
-  // Build-time capability check
-  if (!ENABLE_AI_CAPABILITY) {
-    return false;
-  }
-  
-  // API key check (will be server endpoint in production)
-  if (!GROQ_API_KEY) {
-    if (__DEV__) {
-      console.warn('[AI] Groq API key not found. Set EXPO_PUBLIC_GROQ_API_KEY in .env');
-    }
-    return false;
-  }
-  
-  return true;
-}
-
-// ============================================================================
 // AI SYSTEM PROMPT
 // ============================================================================
 
 /**
- * Build strict system prompt with safety rules
+ * Build strict system prompt with safety rules and language enforcement
+ * @param locale - The app's current language locale ('en', 'fr', or 'ar')
  */
-function buildSystemPrompt(): string {
-  return `You are a spiritual guidance editor for a Muslim reflection app.
+function buildSystemPrompt(locale: 'en' | 'fr' | 'ar' = 'en'): string {
+  // OUTPUT LANGUAGE CONTRACT - Short and strict (models obey short rules better)
+  const languageContract = locale === 'fr'
+    ? `OUTPUT LANGUAGE CONTRACT:
+The app locale is "fr" (French).
+- You MUST reply ONLY in French. No English words or sentences.
+- Even if the user writes in English or Arabic, respond in French.
+- If you cannot comply, return: "[LANGUAGE_ERROR]"`
+    : locale === 'ar'
+    ? `OUTPUT LANGUAGE CONTRACT:
+The app locale is "ar" (Arabic).
+- You MUST reply ONLY in Arabic. No English or French words.
+- Even if the user writes in English or French, respond in Arabic.
+- If you cannot comply, return: "[LANGUAGE_ERROR]"`
+    : `OUTPUT LANGUAGE CONTRACT:
+The app locale is "en" (English).
+- You MUST reply ONLY in English. No French or Arabic words.
+- If you cannot comply, return: "[LANGUAGE_ERROR]"`;
+
+  return `${languageContract}
+
+You are Asrār's Divine Timing assistant, a spiritual guidance editor for a Muslim reflection app.
 
 STRICT RULES - MUST FOLLOW:
 1. NEVER predict outcomes or future events
@@ -237,10 +140,18 @@ STRICT RULES - MUST FOLLOW:
 7. DO NOT add or remove sections
 8. KEEP the disclaimer VERBATIM (word-for-word)
 9. If Qur'an context provided, use for tone ONLY - NEVER interpret the verse
+10. Do not mix languages in the same sentence
+
+STYLE:
+- Spiritual, reflective, grounded, respectful
+- Use short paragraphs and bullet points when helpful
+- Reference the provided context (Abjad, element, planetary hour, timing quality, harmony score) naturally
+- End with 1 practical next step
 
 Your role: Polish wording only, nothing else.
 
-Return ONLY valid JSON. No markdown, no extra text.`;
+OUTPUT:
+Return ONLY valid JSON. No markdown, no extra text, no language notes.`;
 }
 
 /**
@@ -316,11 +227,22 @@ export async function rewriteGuidanceWithAI(
   request: AIRewriteRequest
 ): Promise<AIRewriteResponse> {
   try {
-    const systemPrompt = buildSystemPrompt();
+    // Get locale from request, default to 'en'
+    const locale = request.language || 'en';
+    const systemPrompt = buildSystemPrompt(locale);
     const toneInstructions = getToneInstructions(request.tone);
     
+    // DEV LOGGING: Confirm locale and system prompt
+    if (__DEV__) {
+      console.log('[AI] 🌍 Locale:', locale);
+      console.log('[AI] 🤝 Provider/Model:', AI_PROVIDER_NAME, DEFAULT_MODEL);
+      console.log('[AI] 📝 System prompt (first 200 chars):', systemPrompt.substring(0, 200));
+    }
+    
     // ⚠️ Warning: Qur'an context provided for warmth ONLY, never for interpretation
+    const languageName = locale === 'fr' ? 'French' : locale === 'ar' ? 'Arabic' : 'English';
     const userPrompt = `
+  User locale: ${locale}. Respond in ${languageName} only.
 Tone: ${toneInstructions}
 
 Original Guidance:
@@ -346,6 +268,9 @@ RETURN ONLY VALID JSON matching this structure:
   "aiAssisted": true
 }
 `;
+    if (__DEV__) {
+      console.log('[AI] 📤 User prompt (first 400 chars):', userPrompt.substring(0, 400));
+    }
     
     const response = await fetch(GROQ_API_URL, {
       method: 'POST',
@@ -372,7 +297,81 @@ RETURN ONLY VALID JSON matching this structure:
     }
     
     const data = await response.json();
-    const content = data.choices[0].message.content;
+    let content = data.choices[0].message.content;
+    
+    // DEV LOGGING: First 120 chars of AI response
+    if (__DEV__) {
+      console.log('[AI] 🤖 AI response (first 300 chars):', content.substring(0, 300));
+    }
+    
+    // POST-CHECK: Validate language compliance
+    if (locale === 'fr' && containsEnglish(content)) {
+      if (__DEV__) {
+        console.warn('[AI] ⚠️ LANGUAGE VIOLATION: English detected in FR mode. Re-calling AI...');
+      }
+      
+      // Re-call AI with correction message
+      const correctionResponse = await fetch(GROQ_API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: GROQ_MODEL,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+            { role: 'assistant', content: content },
+            { role: 'user', content: 'Your last response contained English. Rewrite the exact same answer in French ONLY. No English words.' },
+          ],
+          temperature: 0.7,
+          max_tokens: 1500,
+        }),
+      });
+      
+      if (correctionResponse.ok) {
+        const correctionData = await correctionResponse.json();
+        content = correctionData.choices[0].message.content;
+        
+        if (__DEV__) {
+          console.log('[AI] ✅ Correction applied. New response (first 300 chars):', content.substring(0, 300));
+        }
+      }
+    } else if (locale === 'en' && containsFrench(content)) {
+      if (__DEV__) {
+        console.warn('[AI] ⚠️ LANGUAGE VIOLATION: French detected in EN mode. Re-calling AI...');
+      }
+      
+      // Re-call AI with correction message
+      const correctionResponse = await fetch(GROQ_API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: GROQ_MODEL,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+            { role: 'assistant', content: content },
+            { role: 'user', content: 'Your last response contained French. Rewrite the SAME answer in English ONLY. Keep the meaning, but remove all French words.' },
+          ],
+          temperature: 0.7,
+          max_tokens: 1500,
+        }),
+      });
+      
+      if (correctionResponse.ok) {
+        const correctionData = await correctionResponse.json();
+        content = correctionData.choices[0].message.content;
+        
+        if (__DEV__) {
+          console.log('[AI] ✅ Correction applied. New response (first 120 chars):', content.substring(0, 120));
+        }
+      }
+    }
     
     // Extract JSON from response (handles markdown code fences, extra text)
     const extractedJSON = extractJSON(content);
@@ -436,6 +435,8 @@ export async function rewriteIstikharaSummaryWithAI(
   request: IstikharaAIRewriteRequest
 ): Promise<IstikharaAIRewriteResponse> {
   try {
+    // Get locale from request, default to 'en'
+    const locale = request.language || 'en';
     const systemPrompt = `You are a spiritual guidance editor.
 
 STRICT RULES:
@@ -445,6 +446,8 @@ STRICT RULES:
 4. Keep it observational and reflective
 5. DO NOT add interpretations beyond what the data shows
 6. Maintain humility and neutrality
+
+${locale === 'fr' ? "Vous DEVEZ écrire l'ENTIÈRE réponse en français uniquement." : locale === 'ar' ? 'يجب عليك كتابة الرد بالكامل بالعربية فقط.' : 'You MUST write the ENTIRE response in English only.'}
 
 Your role: Polish observational summaries only.`;
     
@@ -563,6 +566,8 @@ export async function enhanceNameDestinyWithAI(
       };
     }
 
+    // Get locale from request, default to 'en'
+    const locale = request.language || 'en';
     const systemPrompt = `You are a spiritual guidance educator specializing in Islamic numerology.
 
 STRICT RULES:
@@ -573,6 +578,8 @@ STRICT RULES:
 5. If user profile provided, connect their birth chart to name calculation
 6. Use 2-3 sentences per explanation
 7. Maintain humility and avoid certainty
+
+${locale === 'fr' ? "Vous DEVEZ écrire l'ENTIÈRE réponse en français uniquement." : locale === 'ar' ? 'يجب عليك كتابة الرد بالكامل بالعربية فقط.' : 'You MUST write the ENTIRE response in English only.'}
 
 Your role: Educate and contextualize, not predict.`;
 
@@ -700,6 +707,8 @@ export async function enhanceCompatibilityWithAI(
       };
     }
 
+    // Get locale from request, default to 'en'
+    const locale = request.language || 'en';
     // System prompt with strict rules
     const systemPrompt = `You are a spiritual guidance educator specializing in Islamic numerology and relationship compatibility analysis.
 
@@ -712,6 +721,8 @@ STRICT RULES:
 6. Use 2-3 sentences per explanation
 7. Maintain humility and avoid certainty
 8. Respect cultural sensitivity around relationships
+
+${locale === 'fr' ? "Vous DEVEZ écrire l'ENTIÈRE réponse en français uniquement." : locale === 'ar' ? 'يجب عليك كتابة الرد بالكامل بالعربية فقط.' : 'You MUST write the ENTIRE response in English only.'}
 
 Your role: Educate about compatibility patterns, not predict or advise.`;
 
@@ -852,6 +863,8 @@ export async function enhanceCalculatorWithAI(
       };
     }
 
+    // Get locale from request, default to 'en'
+    const locale = request.language || 'en';
     // System prompt with strict rules
     const systemPrompt = `You are a spiritual guidance educator specializing in Islamic numerology (ʿIlm al-Ḥurūf).
 
@@ -864,6 +877,8 @@ STRICT RULES:
 6. Use 2-3 sentences per explanation
 7. Maintain humility and avoid certainty
 8. Type-specific context: ${request.calculationType}
+
+${locale === 'fr' ? "Vous DEVEZ écrire l'ENTIÈRE réponse en français uniquement." : locale === 'ar' ? 'يجب عليك كتابة الرد بالكامل بالعربية فقط.' : 'You MUST write the ENTIRE response in English only.'}
 
 Your role: Educate about numerical meanings, not predict or prescribe.`;
 
@@ -1010,6 +1025,8 @@ export async function enhancePeakWindowsWithAI(
       };
     }
 
+    // Get locale from request, default to 'en'
+    const locale = request.language || 'en';
     // System prompt with strict rules
     const systemPrompt = `You are a spiritual guidance educator specializing in Islamic sacred timing wisdom.
 
@@ -1022,6 +1039,8 @@ STRICT RULES:
 6. Use 2-3 sentences per explanation
 7. Maintain humility and avoid certainty
 8. Focus on reflection and intention, not prediction
+
+${locale === 'fr' ? "Vous DEVEZ écrire l'ENTIÈRE réponse en français uniquement." : locale === 'ar' ? 'يجب عليك كتابة الرد بالكامل بالعربية فقط.' : 'You MUST write the ENTIRE response in English only.'}
 
 Your role: Educate about time patterns, not prescribe or predict.`;
 

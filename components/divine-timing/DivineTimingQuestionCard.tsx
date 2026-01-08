@@ -5,11 +5,7 @@
  */
 
 import Colors from '@/constants/Colors';
-import {
-    getGuidanceCategoryName,
-    getTimeHorizonName,
-    getUrgencyName,
-} from '@/services/DivineTimingGuidanceService';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
     GuidanceCategory,
     TimeHorizon,
@@ -71,6 +67,7 @@ export function DivineTimingQuestionCard({
   initialUrgency = 'medium',
 }: DivineTimingQuestionCardProps) {
   const colors = Colors[colorScheme];
+  const { t } = useLanguage();
   
   const [question, setQuestion] = useState('');
   const [category, setCategory] = useState<GuidanceCategory | null>(
@@ -83,17 +80,17 @@ export function DivineTimingQuestionCard({
   const handleSubmit = () => {
     // Validation
     if (!question.trim()) {
-      setError('Please enter your question');
+      setError(t('divineTiming.askDivineTiming.errors.enterQuestion'));
       return;
     }
     
     if (!category) {
-      setError('Please select a category');
+      setError(t('divineTiming.askDivineTiming.errors.selectCategory'));
       return;
     }
     
     if (question.length > 200) {
-      setError('Question must be 200 characters or less');
+      setError(t('divineTiming.askDivineTiming.errors.tooLong'));
       return;
     }
     
@@ -107,17 +104,17 @@ export function DivineTimingQuestionCard({
       <View style={styles.header}>
         <Ionicons name="chatbubble-ellipses-outline" size={24} color={colors.primary} />
         <Text style={[styles.title, { color: colors.text }]}>
-          Ask Divine Timing
+          {t('divineTiming.askDivineTiming.title')}
         </Text>
       </View>
       
       <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-        Receive spiritual reflection for your question
+        {t('divineTiming.askDivineTiming.subtitle')}
       </Text>
       
       {/* Question Input */}
       <View style={styles.section}>
-        <Text style={[styles.label, { color: colors.text }]}>Your Question</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('divineTiming.askDivineTiming.questionLabel')}</Text>
         <TextInput
           style={[
             styles.input,
@@ -127,7 +124,7 @@ export function DivineTimingQuestionCard({
               borderColor: error ? '#ef4444' : 'transparent',
             },
           ]}
-          placeholder="e.g., Is it a good time to start my exam preparation?"
+          placeholder={t('divineTiming.askDivineTiming.questionPlaceholder')}
           placeholderTextColor={colors.textSecondary}
           value={question}
           onChangeText={(text) => {
@@ -139,13 +136,13 @@ export function DivineTimingQuestionCard({
           numberOfLines={3}
         />
         <Text style={[styles.charCount, { color: colors.textSecondary }]}>
-          {question.length}/200
+          {t('divineTiming.askDivineTiming.charCount').replace('{count}', question.length.toString())}
         </Text>
       </View>
       
       {/* Category Selection */}
       <View style={styles.section}>
-        <Text style={[styles.label, { color: colors.text }]}>Category *</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('divineTiming.askDivineTiming.category')}</Text>
         <View style={styles.categoryGrid}>
           {CATEGORIES.map((cat) => {
             const isSelected = category === cat;
@@ -176,7 +173,7 @@ export function DivineTimingQuestionCard({
                   ]}
                   numberOfLines={1}
                 >
-                  {getGuidanceCategoryName(cat)}
+                  {t(`divineTiming.askDivineTiming.categories.${cat}`)}
                 </Text>
               </TouchableOpacity>
             );
@@ -186,7 +183,7 @@ export function DivineTimingQuestionCard({
       
       {/* Time Horizon */}
       <View style={styles.section}>
-        <Text style={[styles.label, { color: colors.text }]}>Time Frame</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('divineTiming.askDivineTiming.timeFrame')}</Text>
         <View style={styles.toggleRow}>
           {TIME_HORIZONS.map((horizon) => {
             const isSelected = timeHorizon === horizon;
@@ -208,7 +205,7 @@ export function DivineTimingQuestionCard({
                     { color: isSelected ? '#fff' : colors.primary },
                   ]}
                 >
-                  {getTimeHorizonName(horizon)}
+                  {t(`divineTiming.askDivineTiming.timeFrameOptions.${horizon}`)}
                 </Text>
               </TouchableOpacity>
             );
@@ -218,7 +215,7 @@ export function DivineTimingQuestionCard({
       
       {/* Urgency */}
       <View style={styles.section}>
-        <Text style={[styles.label, { color: colors.text }]}>Urgency</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('divineTiming.askDivineTiming.urgency')}</Text>
         <View style={styles.toggleRow}>
           {URGENCY_LEVELS.map((level) => {
             const isSelected = urgency === level;
@@ -240,7 +237,7 @@ export function DivineTimingQuestionCard({
                     { color: isSelected ? '#fff' : colors.primary },
                   ]}
                 >
-                  {getUrgencyName(level)}
+                  {t(`divineTiming.askDivineTiming.urgencyOptions.${level}`)}
                 </Text>
               </TouchableOpacity>
             );
@@ -269,7 +266,7 @@ export function DivineTimingQuestionCard({
         disabled={!question.trim() || !category}
       >
         <Ionicons name="sparkles" size={20} color="#fff" />
-        <Text style={styles.submitButtonText}>Get Guidance</Text>
+        <Text style={styles.submitButtonText}>{t('divineTiming.askDivineTiming.actions.getGuidance')}</Text>
       </TouchableOpacity>
     </View>
   );

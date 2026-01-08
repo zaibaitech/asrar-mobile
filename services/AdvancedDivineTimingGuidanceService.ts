@@ -19,7 +19,11 @@ import {
     UrgencyLevel
 } from '@/types/divine-timing-guidance';
 import type { UserProfile } from '@/types/user-profile';
+import { z } from 'zod';
 import { getAdvancedDivineTimingAnalysis, IntentionTimingAnalysis } from './AdvancedDivineTimingService';
+import { AI_PROVIDER_NAME, containsEnglish, extractJSON, GROQ_API_KEY, GROQ_API_URL, GROQ_MODEL } from './AIClientConfig';
+
+type SupportedLocale = 'en' | 'fr' | 'ar';
 
 /**
  * Enhanced guidance input with timing context
@@ -34,6 +38,7 @@ export interface AdvancedGuidanceInput {
   userAbjad: UserAbjadResult;
   intention: IntentionCategory;
   advancedAnalysis?: IntentionTimingAnalysis;
+  locale?: SupportedLocale;
 }
 
 /**
@@ -325,18 +330,571 @@ function generateAbjadWisdom(
   return `${displayName}, ${baseWisdom} ${elementMessage}`.trim();
 }
 
+const AdvancedGuidanceSchema = z.object({
+  summaryTitle: z.string(),
+  timingSignal: z.string(),
+  recommendedApproach: z.array(z.string()),
+  watchOuts: z.array(z.string()),
+  nextStep: z.string(),
+  reflection: z.object({
+    surahNameEn: z.string(),
+    surahNumber: z.number(),
+    ayahNumber: z.number(),
+    prompt: z.string(),
+  }).optional(),
+  contextualInsight: z.string(),
+  spiritualAlignment: z.object({
+    zahirAlignment: z.string(),
+    batinAlignment: z.string(),
+    harmonyScore: z.number(),
+    recommendation: z.string(),
+  }),
+  personalizedSteps: z.array(z.object({
+    step: z.string(),
+    timing: z.string(),
+    reasoning: z.string(),
+  })),
+  timingWindow: z.object({
+    bestTime: z.string(),
+    nextOptimal: z.string(),
+    avoid: z.string(),
+  }),
+  abjadWisdom: z.string(),
+  generatedAt: z.string().optional(),
+});
+
+type ChatMessage = {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+};
+
+const LOCALE_LABELS: Record<SupportedLocale, string> = {
+  en: 'English',
+  fr: 'French',
+  ar: 'Arabic',
+};
+
+function buildLocalizationSystemPrompt(locale: SupportedLocale): string {
+  if (locale === 'fr') {
+    return `OUTPUT LANGUAGE CONTRACT:\nLocale = fr. Reply ONLY in French. No English words.\n\nYou are Asrār's Divine Timing localization assistant.\n- Keep the JSON structure identical (same keys, arrays, order).\n- Preserve all numbers, punctuation, and ISO timestamps.\n- Do NOT add or remove fields.\n- Return ONLY valid JSON.`;
+  }
+  if (locale === 'ar') {
+    return `OUTPUT LANGUAGE CONTRACT:\nLocale = ar. Reply ONLY in Arabic. No English or French words.\n\nYou are Asrār's Divine Timing localization assistant.\n- Keep the JSON structure identical (same keys, arrays, order).\n- Preserve all numbers, punctuation, and ISO timestamps.\n- Do NOT add or remove fields.\n- Return ONLY valid JSON.`;
+  }
+  return `OUTPUT LANGUAGE CONTRACT:\nLocale = en. Reply ONLY in English.\n\nYou are Asrār's Divine Timing localization assistant.\n- Keep the JSON structure identical (same keys, arrays, order).\n- Preserve all numbers, punctuation, and ISO timestamps.\n- Do NOT add or remove fields.\n- Return ONLY valid JSON.`;
+}
+
+function buildLocalizationUserPrompt(
+  locale: SupportedLocale,
+  response: AdvancedGuidanceResponse,
+  input: AdvancedGuidanceInput
+): string {
+  const localeName = LOCALE_LABELS[locale];
+  const base = JSON.stringify(response, null, 2);
+  return `User locale: ${locale}. Respond in ${localeName} only.\nQuestion: ${input.questionText}\nCategory: ${getCategoryDisplayName(input.category)}\nTime horizon: ${input.timeHorizon}\nUrgency: ${input.urgency}\n\nRewrite the following JSON so every user-facing sentence is expressed in ${localeName}.\n- Do NOT change keys.\n- Keep bullet counts the same.\n- Preserve all numeric scores exactly.\n- Return ONLY JSON.\n\n${base}`;
+}
+
+async function callChatCompletion(
+  messages: ChatMessage[],
+  contextLabel: string,
+  temperature = 0.4,
+  maxTokens = 1500
+): Promise<string | null> {
+  if (!GROQ_API_KEY) {
+    return null;
+  }
+
+  if (__DEV__) {
+    const userMsg = messages.find((m) => m.role === 'user')?.content ?? '';
+    console.log(`[DivineTiming][AI] ${contextLabel} → Provider: ${AI_PROVIDER_NAME}, Model: ${GROQ_MODEL}`);
+    console.log('[DivineTiming][AI] System prompt (first 200 chars):', messages[0].content.substring(0, 200));
+    console.log('[DivineTiming][AI] User prompt (first 400 chars):', userMsg.substring(0, 400));
+  }
+
+  const response = await fetch(GROQ_API_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  if (!response.ok) {
+    if (__DEV__) {
+      console.warn('[DivineTiming][AI] Chat completion failed:', response.status, await response.text());
+    }
+    return null;
+  }
+
+  const data = await response.json();
+  const content: string | undefined = data?.choices?.[0]?.message?.content;
+
+  if (__DEV__ && content) {
+    console.log('[DivineTiming][AI] Raw model response (first 300 chars):', content.substring(0, 300));
+  }
+
+  return content ?? null;
+}
+
+function parseGuidanceJSON(content: string | null, context: string): AdvancedGuidanceResponse | null {
+  if (!content) {
+    return null;
+  }
+  const extracted = extractJSON(content);
+  if (!extracted) {
+    if (__DEV__) {
+      console.warn(`[DivineTiming][AI] Failed to extract JSON (${context})`);
+    }
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(extracted);
+    const validated = AdvancedGuidanceSchema.parse(parsed);
+    return {
+      ...validated,
+      generatedAt: validated.generatedAt ?? new Date().toISOString(),
+    } as AdvancedGuidanceResponse;
+  } catch (error) {
+    if (__DEV__) {
+      console.warn(`[DivineTiming][AI] JSON validation failed (${context}):`, error);
+    }
+    return null;
+  }
+}
+
+/**
+ * Simple fallback translation for when AI is unavailable
+ * Uses cleaner, more natural French phrasing
+ */
+function simpleTranslateFallback(text: string, locale: SupportedLocale): string {
+  if (locale !== 'fr') return text;
+  
+  const translations: Record<string, string> = {
+    // Planetary hours - natural French
+    'Venus hour': 'heure de Vénus',
+    'Mars hour': 'heure de Mars',
+    'Jupiter hour': 'heure de Jupiter',
+    'Saturn hour': 'heure de Saturne',
+    'Sun hour': 'heure du Soleil',
+    'Moon hour': 'heure de la Lune',
+    'Mercury hour': 'heure de Mercure',
+    
+    // Days
+    'Sunday': 'dimanche',
+    'Monday': 'lundi',
+    'Tuesday': 'mardi',
+    'Wednesday': 'mercredi',
+    'Thursday': 'jeudi',
+    'Friday': 'vendredi',
+    'Saturday': 'samedi',
+    
+    // Phrases - improved natural French
+    "Thursday's Air energy brings clarity and communication": "L'énergie de l'Air de jeudi apporte clarté et communication",
+    "A day for learning and intellectual pursuits": "Journée propice à l'apprentissage et à la réflexion",
+    "Balanced energies today": "Énergies équilibrées aujourd'hui",
+    "steady ground for mindful action": "une énergie stable pour avancer avec lucidité",
+    "Conditions are supportive": "Les conditions sont favorables à une action réfléchie",
+    "Conditions are exceptionally aligned": "Les conditions sont exceptionnellement alignées",
+    "highly favorable": "très favorable",
+    
+    // Categories
+    'work & career': 'travail et carrière',
+    'Work & Career': 'Travail et carrière',
+    
+    // States
+    'HOLD': 'PAUSE',
+    'ACT': 'AGIR',
+    'MAINTAIN': 'MAINTENIR',
+    'HIGHLY FAVORABLE': 'TRÈS FAVORABLE',
+    'FAVORABLE': 'FAVORABLE',
+    'MIXED CONDITIONS': 'CONDITIONS MIXTES',
+    'PROCEED WITH CAUTION': 'PROCÉDER AVEC PRUDENCE',
+    
+    // Elements & qualities
+    'favorable': 'favorable',
+    'neutral': 'neutre',
+    'delicate': 'délicat',
+    'initiation': 'initiation',
+    'start': 'démarrage',
+    'fire': 'feu',
+    'water': 'eau',
+    'air': 'air',
+    'earth': 'terre',
+    'Fire': 'Feu',
+    'Water': 'Eau',
+    'Air': 'Air',
+    'Earth': 'Terre',
+    
+    // Recommendations - natural phrasing
+    'proceed with caution': 'procéder avec prudence',
+    'move forward confidently': 'avancer avec confiance',
+    'wait and observe': 'attendre et observer',
+    'Make your move': 'Passez à l\'action',
+    'Combine with prayer': 'Combinez avec la prière',
+    'Double-check all arrangements': 'Vérifiez tous les arrangements',
+    
+    // Alignment descriptions - natural French
+    'Your outward expression': 'Votre expression extérieure',
+    'faces resistance from the current hour': 'rencontre une résistance durant cette heure',
+    'Focus on internal work and preparation rather than external action': 'Privilégiez le travail intérieur et la préparation',
+    'Your inner essence': 'Votre essence intérieure',
+    'experiences balanced energy today': 'bénéficie d\'une énergie équilibrée aujourd\'hui',
+    'Maintain equilibrium between your inner knowing and outer actions': 'Maintenez l\'équilibre entre votre intuition et vos actions',
+    'Your eau essence gifts you': 'Votre essence Eau vous donne',
+    
+    // Timing windows - natural phrasing
+    'Later this week when conditions improve': 'Plus tard cette semaine, quand les conditions s\'amélioreront',
+    'Monitor daily guidance for emerging opportunities': 'Restez attentif aux guidances quotidiennes',
+    'Avoid forcing outcomes during HOLD periods': 'Évitez de forcer les choses pendant les périodes de pause',
+    'No critical timing conflicts detected': 'Aucun conflit majeur détecté',
+    'when conditions are more favorable': 'lorsque les conditions seront plus favorables',
+    
+    // Steps - natural French
+    'Within the next 2 hours': 'Dans les 2 prochaines heures',
+    'Make your move': 'Passez à l\'action',
+    'current planetary hour is favorable': 'l\'heure planétaire actuelle est propice',
+    'Today, when you feel centered and ready': 'Aujourd\'hui, quand vous vous sentirez prêt',
+    'Begin with this foundation step while honoring your current energy state': 'Commencez par cette étape fondamentale en respectant votre état actuel',
+    'Build momentum gradually, allowing each step to inform the next': 'Construisez votre élan progressivement',
+    'Progress at a sustainable pace that honors both urgency and quality': 'Avancez à un rythme qui honore urgence et qualité',
+    
+    // Harmony scores - more natural
+    'Your harmony score of': 'Votre score d\'harmonie de',
+    'shows exceptional alignment': 'révèle un alignement exceptionnel',
+    'This window strongly favors committed action': 'Cette période favorise fortement l\'action engagée',
+    'the energies are supportive': 'les énergies vous soutiennent',
+    'Move forward with attentive awareness': 'Avancez avec conscience et attention',
+    'suggests notable friction': 'suggère des frictions notables',
+    'Patience or deeper preparation may serve you well': 'La patience et la préparation vous serviront mieux',
+    'the Divine Timing quality is': 'le Timing Divin indique',
+    'and the wisdom suggests you': 'et la sagesse suggère de',
+    
+    // Common phrases - improved and expanded
+    'We are within the': 'Nous sommes dans l\'',
+    'and your Ẓāhir alignment is': 'et votre alignement Ẓāhir est',
+    'Expect': 'Attendez-vous à',
+    "Today's flow is": 'Le flux d\'aujourd\'hui est',
+    'highlighting': 'mettant en lumière',
+    'Regarding your question about': 'Concernant votre question sur',
+    
+    // Additional deterministic phrases that need translation
+    'is perfectly aligned with the planetary hour': 'est parfaitement aligné avec l\'heure planétaire',
+    'This is your moment to manifest and take visible action': 'C\'est le moment d\'agir de manière visible',
+    'is aligned with the': 'est aligné avec l\'',
+    'creating optimal conditions for immediate action': 'créant des conditions optimales pour agir immédiatement',
+    'Tomorrow or within': 'Demain ou dans',
+    'Within this week': 'Cette semaine',
+    'Within': 'Dans',
+    'Your': 'Votre',
+    'Perfect alignment for': 'Alignement parfait pour',
+    'flows harmoniously with the current hour': 'est en harmonie avec l\'heure actuelle',
+    'Maintain steady progress and consistent effort': 'Maintenez un progrès constant',
+    'is in transition': 'est en transition',
+    'Consider both inner reflection and gentle external steps': 'Considérez à la fois la réflexion intérieure et les actions douces',
+    'is supported by today\'s energies': 'est soutenue par les énergies d\'aujourd\'hui',
+    'Trust your intuition and inner guidance throughout this day': 'Faites confiance à votre intuition',
+    'requires careful attention today': 'nécessite une attention particulière aujourd\'hui',
+    'Honor your need for rest, reflection, and gentle self-care': 'Honorez votre besoin de repos et de réflexion',
+    'is undergoing transformation today': 'traverse une transformation aujourd\'hui',
+    'Embrace the changes while staying grounded in your core values': 'Accueillez les changements en restant ancré dans vos valeurs',
+    
+    // Steps - more complete translations
+    'Make your decision': 'Prenez votre décision',
+    'while alignment is strong': 'pendant que l\'alignement est fort',
+    'Give yourself time to integrate the first step before advancing': 'Prenez le temps d\'intégrer la première étape',
+    'and trust in divine wisdom': 'et faites confiance à la sagesse divine',
+    'Document your decision-making process for future reflection': 'Documentez votre processus de décision',
+    'this is an optimal time to': 'c\'est un moment optimal pour',
+    
+    // Common phrases - from original + additions
+    'a direct invitation to take aligned action': 'une invitation directe à agir',
+    'support for steady, mindful progress': 'un soutien pour progresser consciemment',
+    'a pause that favors preparation over bold moves': 'une pause qui privilégie la préparation',
+    'Your Abjad resonance carries a total value of': 'Votre résonance Abjad porte une valeur de',
+    'Your essence expresses through the': 'Votre essence s\'exprime à travers l\'élément',
+    'your Abjad vibrates with creativity and expression': 'votre Abjad vibre de créativité',
+    'with joyful innovation and authentic communication': 'avec innovation joyeuse et communication authentique',
+    'Approach': 'Abordez',
+    'element': 'élément',
+  };
+  
+  let translated = text;
+  // Sort by length descending to replace longer phrases first
+  const entries = Object.entries(translations).sort((a, b) => b[0].length - a[0].length);
+  for (const [en, fr] of entries) {
+    // Escape special regex characters and use word boundaries for single words
+    const escaped = en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (en.split(' ').length === 1 && !en.includes('\'')) {
+      translated = translated.replace(new RegExp(`\\b${escaped}\\b`, 'gi'), fr);
+    } else {
+      translated = translated.replace(new RegExp(escaped, 'gi'), fr);
+    }
+  }
+  return translated;
+}
+
+async function localizeAdvancedGuidanceResponse(
+  response: AdvancedGuidanceResponse,
+  locale: SupportedLocale | undefined,
+  input: AdvancedGuidanceInput
+): Promise<AdvancedGuidanceResponse> {
+  const targetLocale = locale || 'en';
+  if (targetLocale === 'en') {
+    return response;
+  }
+  
+  // Try AI-powered localization if API key available
+  if (GROQ_API_KEY) {
+    const systemPrompt = buildLocalizationSystemPrompt(targetLocale);
+    const userPrompt = buildLocalizationUserPrompt(targetLocale, response, input);
+    const messages: ChatMessage[] = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ];
+
+    const firstPass = await callChatCompletion(messages, `[localize:${targetLocale}][primary]`);
+    let localized = parseGuidanceJSON(firstPass, 'localize-primary');
+    if (!localized) {
+      if (__DEV__) {
+        console.warn('[DivineTiming][AI] AI localization failed, using simple fallback');
+      }
+    } else {
+      if (targetLocale === 'fr' && containsEnglish(JSON.stringify(localized))) {
+        if (__DEV__) {
+          console.warn('[DivineTiming][AI] English detected after localization. Running guard rewrite.');
+        }
+        const correctionMessages: ChatMessage[] = [
+          ...messages,
+          { role: 'assistant', content: firstPass ?? '' },
+          {
+            role: 'user',
+            content: 'Your last response still contained English words. Rewrite the exact same answer in French ONLY. No English words.',
+          },
+        ];
+        const correction = await callChatCompletion(correctionMessages, `[localize:${targetLocale}][guard]`);
+        const corrected = parseGuidanceJSON(correction, 'localize-guard');
+        if (corrected && !containsEnglish(JSON.stringify(corrected))) {
+          localized = corrected;
+        }
+      }
+      return localized;
+    }
+  }
+  
+  // Fallback: Simple dictionary-based translation
+  if (__DEV__) {
+    console.log('[DivineTiming][Localization] Using simple dictionary fallback for', targetLocale);
+  }
+  
+  return {
+    ...response,
+    contextualInsight: simpleTranslateFallback(response.contextualInsight, targetLocale),
+    spiritualAlignment: {
+      ...response.spiritualAlignment,
+      zahirAlignment: simpleTranslateFallback(response.spiritualAlignment.zahirAlignment, targetLocale),
+      batinAlignment: simpleTranslateFallback(response.spiritualAlignment.batinAlignment, targetLocale),
+      recommendation: simpleTranslateFallback(response.spiritualAlignment.recommendation, targetLocale),
+    },
+    personalizedSteps: response.personalizedSteps?.map(step => ({
+      step: simpleTranslateFallback(step.step, targetLocale),
+      timing: simpleTranslateFallback(step.timing, targetLocale),
+      reasoning: simpleTranslateFallback(step.reasoning, targetLocale),
+    })) ?? [],
+    timingWindow: {
+      bestTime: simpleTranslateFallback(response.timingWindow?.bestTime ?? '', targetLocale),
+      nextOptimal: simpleTranslateFallback(response.timingWindow?.nextOptimal ?? '', targetLocale),
+      avoid: simpleTranslateFallback(response.timingWindow?.avoid ?? '', targetLocale),
+    },
+    abjadWisdom: simpleTranslateFallback(response.abjadWisdom, targetLocale),
+  };
+}
+
+function buildAISystemPrompt(locale: SupportedLocale): string {
+  const contract = locale === 'fr'
+    ? 'OUTPUT LANGUAGE CONTRACT: Locale = fr. Respond ONLY in French. No English words.'
+    : locale === 'ar'
+      ? 'OUTPUT LANGUAGE CONTRACT: Locale = ar. Respond ONLY in Arabic. No English or French words.'
+      : 'OUTPUT LANGUAGE CONTRACT: Locale = en. Respond ONLY in English.';
+
+  return `${contract}
+
+You are Asrār's Divine Timing AI guide. Craft reflective yet grounded guidance rooted in Islamic spiritual etiquette.
+
+STRICT RULES:
+1. NEVER predict guaranteed outcomes or issue religious rulings.
+2. Base every statement on the provided timing analysis.
+3. Keep tone humble, devotional, and practical.
+4. Use short paragraphs and bullet points when helpful.
+5. Return ONLY JSON matching this schema (no markdown, no commentary):
+{
+  "summaryTitle": string,
+  "timingSignal": string,
+  "recommendedApproach": string[],
+  "watchOuts": string[],
+  "nextStep": string,
+  "contextualInsight": string,
+  "spiritualAlignment": {
+    "zahirAlignment": string,
+    "batinAlignment": string,
+    "harmonyScore": number,
+    "recommendation": string
+  },
+  "personalizedSteps": [
+    { "step": string, "timing": string, "reasoning": string }
+  ],
+  "timingWindow": {
+    "bestTime": string,
+    "nextOptimal": string,
+    "avoid": string
+  },
+  "abjadWisdom": string,
+  "generatedAt": string (ISO 8601)
+}`;
+}
+
+function buildAIUserPrompt(
+  input: AdvancedGuidanceInput,
+  analysis: IntentionTimingAnalysis,
+  locale: SupportedLocale,
+): string {
+  const { questionText, category, timeHorizon, urgency, divineTimingResult, userAbjad, userProfile, intention } = input;
+  const displayName = userProfile?.nameAr || userProfile?.nameLatin || 'Beloved seeker';
+  const moment = analysis.currentMoment;
+  const steps = analysis.practicalSteps.map((step, index) => `${index + 1}. ${step}`).join('\n');
+  const outlook = (analysis.next7DaysOutlook || [])
+    .slice(0, 5)
+    .map((day) => {
+      const recommendation = day.recommendation ? day.recommendation.replace(/_/g, ' ') : 'balanced';
+      return `${day.dayOfWeek}: score ${day.overallScore} (${recommendation})`;
+    })
+    .join('\n') || 'No extended outlook available';
+
+  return `User locale: ${locale}
+Question: ${questionText}
+Category: ${getCategoryDisplayName(category)}
+Time horizon: ${timeHorizon}
+Urgency: ${urgency}
+
+Divine Timing Snapshot:
+- Timing quality: ${divineTimingResult.timingQuality}
+- Cycle state: ${divineTimingResult.cycleState}
+- Elemental tone: ${divineTimingResult.elementalTone}
+- Recommendation keyword: ${analysis.recommendation}
+- Harmony score: ${analysis.harmonyScore}
+
+Moment Alignment:
+- Planetary hour: ${moment.planetaryHour?.planet ?? 'unknown'}
+- Hour status: ${moment.hourlyAlignment?.status ?? 'unknown'}
+- Daily guidance quality: ${moment.dailyGuidance.timingQuality}
+- Daily guidance message: ${moment.dailyGuidance.message}
+
+User & Abjad Profile:
+- Name reference: ${displayName}
+- Abjad total (kabir): ${userAbjad.kabir}
+- Inner tone (saghir): ${userAbjad.saghir}
+- Dominant element: ${userAbjad.dominantElement}
+- Profile element: ${userProfile?.derived?.element ?? 'unknown'}
+- Intention: ${intention}
+
+Practical Steps Seed (use as inspiration, do NOT copy verbatim):
+${steps}
+
+7-Day Outlook Seed:
+${outlook}
+
+TASK: Write reflective guidance that weaves these data points into spiritual insight, alignment analysis, actionable steps, timing window, and Abjad wisdom. Keep bullet counts between 2 and 4 items. Emphasize mindful caution if harmonyScore < 60.`;
+}
+
+async function generateAIAdvancedGuidance(
+  input: AdvancedGuidanceInput,
+  analysis: IntentionTimingAnalysis,
+  locale: SupportedLocale
+): Promise<AdvancedGuidanceResponse | null> {
+  if (!GROQ_API_KEY) {
+    return null;
+  }
+
+  const systemPrompt = buildAISystemPrompt(locale);
+  const userPrompt = buildAIUserPrompt(input, analysis, locale);
+  const messages: ChatMessage[] = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt },
+  ];
+
+  const primaryContent = await callChatCompletion(messages, `[adv-guidance:${locale}][primary]`, 0.35, 2000);
+  let parsed = parseGuidanceJSON(primaryContent, 'ai-primary');
+  if (!parsed) {
+    return null;
+  }
+
+  if (locale === 'fr' && containsEnglish(JSON.stringify(parsed))) {
+    if (__DEV__) {
+      console.warn('[DivineTiming][AI] English detected in AI guidance. Running correction.');
+    }
+    const correctionMessages: ChatMessage[] = [
+      ...messages,
+      { role: 'assistant', content: primaryContent ?? '' },
+      {
+        role: 'user',
+        content: 'Your previous JSON still included English words. Rewrite the same content ONLY in French. Do not change structure or numbers.',
+      },
+    ];
+    const correctionContent = await callChatCompletion(correctionMessages, `[adv-guidance:${locale}][guard]`, 0.3, 2000);
+    const corrected = parseGuidanceJSON(correctionContent, 'ai-guard');
+    if (corrected && !containsEnglish(JSON.stringify(corrected))) {
+      parsed = corrected;
+    }
+  }
+
+  return parsed;
+}
+
 /**
  * Main function: Generate advanced AI-powered guidance
  */
 export async function generateAdvancedDivineTimingGuidance(
   input: AdvancedGuidanceInput
 ): Promise<AdvancedGuidanceResponse> {
-  const { userProfile, intention, userAbjad } = input;
+  const { userProfile, intention, userAbjad, locale = 'en' } = input;
+  if (__DEV__) {
+    console.log('[DivineTiming][AskAI] Generating advanced guidance', {
+      locale,
+      question: input.questionText,
+      category: input.category,
+      timeHorizon: input.timeHorizon,
+      urgency: input.urgency,
+    });
+  }
   const displayName = userProfile?.nameAr || userProfile?.nameLatin || 'Beloved seeker';
   
   // Get advanced timing analysis
   const advancedAnalysis = input.advancedAnalysis || 
     await getAdvancedDivineTimingAnalysis(userProfile, intention, userAbjad);
+
+  // Primary path: AI-generated response with enforced locale
+  let aiResponse: AdvancedGuidanceResponse | null = null;
+  try {
+    aiResponse = await generateAIAdvancedGuidance(input, advancedAnalysis, locale);
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('[DivineTiming][AI] Failed to generate AI guidance, will fall back to deterministic text:', error);
+    }
+  }
+  if (aiResponse) {
+    if (__DEV__) {
+      console.log('[DivineTiming][AskAI] AI guidance generated successfully', { locale });
+    }
+    return aiResponse;
+  }
+  if (__DEV__) {
+    console.warn('[DivineTiming][AskAI] AI generation unavailable, using deterministic fallback.');
+  }
   
   // Generate all components (all async now)
   const [contextualInsight, spiritualAlignment, personalizedSteps, timingWindow] = await Promise.all([
@@ -389,8 +947,17 @@ export async function generateAdvancedDivineTimingGuidance(
     abjadWisdom,
     generatedAt: new Date().toISOString(),
   };
-  
-  return enhancedResponse;
+
+  const localizedResponse = await localizeAdvancedGuidanceResponse(enhancedResponse, locale, input);
+
+  if (__DEV__) {
+    console.log('[DivineTiming][AskAI] Advanced guidance ready (fallback path)', {
+      locale,
+      localized: locale !== 'en',
+    });
+  }
+
+  return localizedResponse;
 }
 
 /**
