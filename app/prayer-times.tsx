@@ -49,7 +49,7 @@ interface PrayerInfo {
 
 export default function PrayerTimesScreen() {
   const router = useRouter();
-  const { language } = useLanguage();
+  const { t } = useLanguage();
   const [state, setState] = useState<LoadingState>('idle');
   const [timings, setTimings] = useState<PrayerTimings | null>(null);
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -226,7 +226,7 @@ export default function PrayerTimesScreen() {
   if (state === 'loading') {
     return (
       <>
-        <Stack.Screen options={{ title: 'Prayer Times' }} />
+        <Stack.Screen options={{ title: t('prayerTimes.title') }} />
         <View style={styles.container}>
           <View style={styles.centerContent}>
             <ActivityIndicator size="large" color="#64B5F6" />
@@ -240,7 +240,7 @@ export default function PrayerTimesScreen() {
   if (state === 'permission-denied') {
     return (
       <>
-        <Stack.Screen options={{ title: 'Prayer Times' }} />
+        <Stack.Screen options={{ title: t('prayerTimes.title') }} />
         <View style={styles.container}>
           <View style={styles.centerContent}>
             <Text style={styles.errorIcon}>📍</Text>
@@ -260,7 +260,7 @@ export default function PrayerTimesScreen() {
   if (state === 'error') {
     return (
       <>
-        <Stack.Screen options={{ title: 'Prayer Times' }} />
+        <Stack.Screen options={{ title: t('prayerTimes.title') }} />
         <View style={styles.container}>
           <View style={styles.centerContent}>
             <Text style={styles.errorIcon}>⚠️</Text>
@@ -283,7 +283,7 @@ export default function PrayerTimesScreen() {
     <>
       <Stack.Screen 
         options={{
-          title: 'Prayer Times',
+          title: t('prayerTimes.title'),
           headerRight: () => (
             <TouchableOpacity 
               onPress={() => router.push('/adhan-settings')} 
@@ -356,16 +356,16 @@ export default function PrayerTimesScreen() {
                   </Text>
                   {prayer.isNext && timeUntil && (
                     <Text style={styles.countdown}>
-                      in {timeUntil.hours}h {timeUntil.minutes}m
+                      {t('prayerTimes.inTime', { time: `${timeUntil.hours}h ${timeUntil.minutes}m` })}
                     </Text>
                   )}
                   {prayer.isNext && (
                     <View style={styles.nextBadge}>
-                      <Text style={styles.nextBadgeText}>NEXT</Text>
+                      <Text style={styles.nextBadgeText}>{t('prayerTimes.next')}</Text>
                     </View>
                   )}
                   {isSunrise && (
-                    <Text style={styles.sunriseNote}>No prayer</Text>
+                    <Text style={styles.sunriseNote}>{t('prayerTimes.noPrayer')}</Text>
                   )}
                 </View>
               </View>
@@ -377,11 +377,11 @@ export default function PrayerTimesScreen() {
         <View style={styles.infoCard}>
           <View style={styles.infoRow}>
             <Ionicons name="information-circle-outline" size={20} color="#64B5F6" />
-            <Text style={styles.infoTitle}>Calculation Method</Text>
+            <Text style={styles.infoTitle}>{t('prayerTimes.calculationMethod')}</Text>
           </View>
-          <Text style={styles.infoText}>Muslim World League</Text>
+          <Text style={styles.infoText}>{t('prayerTimes.method.mwl')}</Text>
           <Text style={styles.infoSubtext}>
-            Times are calculated based on your current location and timezone.
+            {t('prayerTimes.timesBasedOnLocation')}
           </Text>
         </View>
 
@@ -392,7 +392,7 @@ export default function PrayerTimesScreen() {
         >
           <View style={styles.settingsLeft}>
             <Ionicons name="notifications-outline" size={24} color="#64B5F6" />
-            <Text style={styles.settingsText}>Configure Adhan Notifications</Text>
+            <Text style={styles.settingsText}>{t('prayerTimes.configureAdhan')}</Text>
           </View>
           <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
         </TouchableOpacity>

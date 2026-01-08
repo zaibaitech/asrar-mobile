@@ -96,17 +96,17 @@ export default function AdhanSettingsScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>🕌 Adhan Settings</Text>
-          <Text style={styles.headerSubtitle}>Configure prayer time notifications</Text>
+          <Text style={styles.headerTitle}>🕌 {t('adhanSettings.title')}</Text>
+          <Text style={styles.headerSubtitle}>{t('adhanSettings.subtitle')}</Text>
         </View>
 
         {/* Master Toggle */}
         <View style={styles.card}>
           <View style={styles.settingRow}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingTitle}>Enable Adhan Notifications</Text>
+              <Text style={styles.settingTitle}>{t('adhanSettings.enable.title')}</Text>
               <Text style={styles.settingDescription}>
-                Receive notifications at prayer times
+                {t('adhanSettings.enable.desc')}
               </Text>
             </View>
             <Switch
@@ -121,7 +121,7 @@ export default function AdhanSettingsScreen() {
         {/* Prayer Selection */}
         {settings.enabled && (
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Prayers to Notify</Text>
+            <Text style={styles.sectionTitle}>{t('adhanSettings.prayersToNotify.title')}</Text>
             
             {[
               { key: 'notifyFajr' as const, name: 'Fajr', arabic: 'الفجر', icon: '🌅' },
@@ -150,12 +150,12 @@ export default function AdhanSettingsScreen() {
         {/* Sound Settings */}
         {settings.enabled && (
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Sound Settings</Text>
+            <Text style={styles.sectionTitle}>{t('adhanSettings.sound.title')}</Text>
 
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Play Sound</Text>
-                <Text style={styles.settingDescription}>Play adhan audio</Text>
+                <Text style={styles.settingTitle}>{t('adhanSettings.sound.playSound')}</Text>
+                <Text style={styles.settingDescription}>{t('adhanSettings.sound.playSoundDesc')}</Text>
               </View>
               <Switch
                 value={settings.playSound}
@@ -166,8 +166,8 @@ export default function AdhanSettingsScreen() {
 
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>Vibrate</Text>
-                <Text style={styles.settingDescription}>Vibration pattern</Text>
+                <Text style={styles.settingTitle}>{t('adhanSettings.sound.vibrate')}</Text>
+                <Text style={styles.settingDescription}>{t('adhanSettings.sound.vibrateDesc')}</Text>
               </View>
               <Switch
                 value={settings.vibrate}
@@ -179,7 +179,7 @@ export default function AdhanSettingsScreen() {
             {settings.playSound && (
               <View style={styles.sliderContainer}>
                 <Text style={styles.settingTitle}>
-                  Volume: {Math.round(settings.volume * 100)}%
+                  {t('adhanSettings.sound.volume', { value: Math.round(settings.volume * 100) })}
                 </Text>
                 <SimpleSlider
                   style={styles.slider}
@@ -199,10 +199,10 @@ export default function AdhanSettingsScreen() {
         {/* Adhan Selection */}
         {settings.enabled && settings.playSound && (
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Adhan Selection</Text>
+            <Text style={styles.sectionTitle}>{t('adhanSettings.selection.title')}</Text>
 
             <View style={styles.settingInfo}>
-              <Text style={styles.settingTitle}>Fajr Adhan</Text>
+              <Text style={styles.settingTitle}>{t('adhanSettings.selection.fajr')}</Text>
               <View style={styles.pickerContainer}>
                 {['default', 'mishary', 'mecca', 'medina'].map((option) => (
                   <Pressable
@@ -219,7 +219,7 @@ export default function AdhanSettingsScreen() {
                         settings.fajrAdhan === option && styles.pickerOptionTextSelected,
                       ]}
                     >
-                      {option.charAt(0).toUpperCase() + option.slice(1)}
+                      {t(`adhanSettings.adhanOption.${option}`)}
                     </Text>
                   </Pressable>
                 ))}
@@ -227,7 +227,7 @@ export default function AdhanSettingsScreen() {
             </View>
 
             <View style={[styles.settingInfo, { marginTop: Spacing.lg }]}>
-              <Text style={styles.settingTitle}>Other Prayers Adhan</Text>
+              <Text style={styles.settingTitle}>{t('adhanSettings.selection.otherPrayers')}</Text>
               <View style={styles.pickerContainer}>
                 {['default', 'mishary', 'mecca', 'medina'].map((option) => (
                   <Pressable
@@ -244,7 +244,7 @@ export default function AdhanSettingsScreen() {
                         settings.otherAdhan === option && styles.pickerOptionTextSelected,
                       ]}
                     >
-                      {option.charAt(0).toUpperCase() + option.slice(1)}
+                      {t(`adhanSettings.adhanOption.${option}`)}
                     </Text>
                   </Pressable>
                 ))}
@@ -256,12 +256,12 @@ export default function AdhanSettingsScreen() {
         {/* Reminder */}
         {settings.enabled && (
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Reminder</Text>
+            <Text style={styles.sectionTitle}>{t('adhanSettings.reminder.title')}</Text>
             <View style={styles.settingInfo}>
               <Text style={styles.settingTitle}>
-                Remind before prayer: {settings.reminderMinutes} min
+                {t('adhanSettings.reminder.value', { minutes: settings.reminderMinutes })}
               </Text>
-              <Text style={styles.settingDescription}>0 = No reminder</Text>
+              <Text style={styles.settingDescription}>{t('adhanSettings.reminder.zeroHint')}</Text>
               <SimpleSlider
                 style={styles.slider}
                 minimumValue={0}
@@ -283,7 +283,7 @@ export default function AdhanSettingsScreen() {
         {/* Test Button */}
         {settings.enabled && (
           <Pressable style={styles.testButton} onPress={handleTestNotification}>
-            <Text style={styles.testButtonText}>🔔 Send Test Notification</Text>
+            <Text style={styles.testButtonText}>🔔 {t('adhanSettings.sendTest')}</Text>
           </Pressable>
         )}
 

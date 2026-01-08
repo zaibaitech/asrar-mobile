@@ -251,6 +251,65 @@ export const translations = {
       },
     },
 
+    // Prayer Times Screen
+    prayerTimes: {
+      title: "Prayer Times",
+      next: "NEXT",
+      inTime: "in {{time}}",
+      noPrayer: "No prayer",
+      calculationMethod: "Calculation Method",
+      method: {
+        mwl: "Muslim World League",
+      },
+      timesBasedOnLocation: "Times are calculated based on your current location and timezone.",
+      configureAdhan: "Configure Adhan Notifications",
+    },
+
+    // Adhan Settings Screen
+    adhanSettings: {
+      title: "Adhan Settings",
+      subtitle: "Configure prayer time notifications",
+
+      enable: {
+        title: "Enable Adhan Notifications",
+        desc: "Receive notifications at prayer times",
+      },
+
+      prayersToNotify: {
+        title: "Prayers to Notify",
+      },
+
+      sound: {
+        title: "Sound Settings",
+        playSound: "Play Sound",
+        playSoundDesc: "Play adhan audio",
+        vibrate: "Vibrate",
+        vibrateDesc: "Vibration pattern",
+        volume: "Volume: {{value}}%",
+      },
+
+      selection: {
+        title: "Adhan Selection",
+        fajr: "Fajr Adhan",
+        otherPrayers: "Other Prayers Adhan",
+      },
+
+      adhanOption: {
+        default: "Default",
+        mishary: "Mishary",
+        mecca: "Mecca",
+        medina: "Medina",
+      },
+
+      reminder: {
+        title: "Reminder",
+        value: "Remind before prayer: {{minutes}} min",
+        zeroHint: "0 = No reminder",
+      },
+
+      sendTest: "Send Test Notification",
+    },
+
     // Welcome Section
     welcome: {
       title: "Welcome to Asrār Everyday",
@@ -4922,6 +4981,65 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         title: "Compteur de Dhikr",
         description: "Tasbih numérique pour compter le dhikr et le souvenir",
       },
+    },
+
+    // Prayer Times Screen
+    prayerTimes: {
+      title: "Horaires de prière",
+      next: "SUIVANT",
+      inTime: "dans {{time}}",
+      noPrayer: "Pas de prière",
+      calculationMethod: "Méthode de calcul",
+      method: {
+        mwl: "Ligue musulmane mondiale",
+      },
+      timesBasedOnLocation: "Les horaires sont calculés selon votre position et votre fuseau horaire.",
+      configureAdhan: "Configurer les notifications d'adhan",
+    },
+
+    // Adhan Settings Screen
+    adhanSettings: {
+      title: "Paramètres de l'adhan",
+      subtitle: "Configurer les notifications des horaires de prière",
+
+      enable: {
+        title: "Activer les notifications d'adhan",
+        desc: "Recevoir des notifications aux heures de prière",
+      },
+
+      prayersToNotify: {
+        title: "Prières à notifier",
+      },
+
+      sound: {
+        title: "Paramètres du son",
+        playSound: "Activer le son",
+        playSoundDesc: "Lire l'audio de l'adhan",
+        vibrate: "Vibration",
+        vibrateDesc: "Schéma de vibration",
+        volume: "Volume : {{value}} %",
+      },
+
+      selection: {
+        title: "Choix de l'adhan",
+        fajr: "Adhan du Fajr",
+        otherPrayers: "Adhan des autres prières",
+      },
+
+      adhanOption: {
+        default: "Par défaut",
+        mishary: "Mishary",
+        mecca: "La Mecque",
+        medina: "Médine",
+      },
+
+      reminder: {
+        title: "Rappel",
+        value: "Rappel avant la prière : {{minutes}} min",
+        zeroHint: "0 = Aucun rappel",
+      },
+
+      sendTest: "Envoyer une notification test",
     },
 
     // Welcome Section
