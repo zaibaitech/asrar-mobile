@@ -1307,6 +1307,33 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
   const getIntentionLabel = (intent: string) => {
     return tr(`compatibility.form.divineNameIntention.results.intentions.${intent}`);
   };
+  
+  // Helper to convert divine name to translation key format
+  const getDivineNameKey = (arabicName: string) => {
+    const nameMap: Record<string, string> = {
+      'الرحمن': 'arRahman',
+      'الرحيم': 'arRaheem',
+      'الرزاق': 'arRazzaaq',
+      'العزيز': 'alAzeez',
+      'الفتاح': 'alFattaah',
+      'الخالق': 'alKhaliq',
+      'الشافي': 'asShafi',
+      'الحكيم': 'alHakim',
+      'العليم': 'alAleem',
+      'الشكور': 'asShakur',
+      'الحفيظ': 'alHafiz',
+      'المقيت': 'alMuqeet',
+      'الوهاب': 'alWahhaab',
+      'الهادي': 'alHaadi',
+      'السبوح': 'asSubbooh',
+      'الصبور': 'asSabur',
+      'المجيب': 'alMujeeb',
+      'الودود': 'alWadud',
+      'الغفار': 'alGhaffar',
+      'الحافظ': 'alHaafiz',
+    };
+    return nameMap[arabicName] || 'arRahman';
+  };
 
   return (
     <View style={styles.container}>
@@ -1493,12 +1520,12 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
             <View style={styles.alternativesHeader}>
               <Ionicons name="bulb" size={28} color="#f59e0b" />
               <Text style={styles.alternativesTitle}>
-                {tr('compatibility.form.divineNameIntention.results.sections.alternatives')}
+                {tr('compatibility.form.divineNameIntention.results.alternatives.title')}
               </Text>
             </View>
 
             <Text style={styles.alternativesSubtext}>
-              {tr('compatibility.form.divineNameIntention.results.sections.alternativesDesc')}
+              {tr('compatibility.form.divineNameIntention.results.alternatives.subtitle')}
             </Text>
 
             {alternativeSuggestions.map((name, index) => (
@@ -1515,31 +1542,42 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                   <View style={styles.recommendedBadge}>
                     <Ionicons name="star" size={16} color="#22c55e" />
                     <Text style={styles.recommendedText}>
-                      {tr('compatibility.form.divineNameIntention.results.sections.recommended')}
+                      {tr('compatibility.form.divineNameIntention.results.alternatives.recommended')}
                     </Text>
                   </View>
                 </View>
 
                 <Text style={styles.alternativeMeaning}>
-                  {language === 'en' ? name.meaning.en : name.meaning.ar}
+                  {tr(`divineNames.${getDivineNameKey(name.transliteration)}.meaning`)}
                 </Text>
 
                 <View style={styles.divider} />
 
-                <Text style={styles.alternativeInfluence}>
-                  {language === 'en' ? name.spiritualInfluence.en : name.spiritualInfluence.ar}
-                </Text>
+                {(() => {
+                  const influenceKey = `divineNames.${getDivineNameKey(name.transliteration)}.shortInfluence`;
+                  const influence = tr(influenceKey);
+                  return influence && influence !== '—' ? (
+                    <Text style={styles.alternativeInfluence}>
+                      {influence}
+                    </Text>
+                  ) : null;
+                })()}
 
                 {/* Functions */}
+                {name.classicalFunction && name.classicalFunction.length > 0 && (
                 <View style={styles.alternativeFunctions}>
-                  {name.classicalFunction.map((func, idx) => (
-                    <View key={idx} style={styles.alternativeFunctionTag}>
-                      <Text style={styles.alternativeFunctionText}>
-                        {func.charAt(0).toUpperCase() + func.slice(1)}
-                      </Text>
-                    </View>
-                  ))}
+                  {name.classicalFunction.map((func, idx) => {
+                    const tagLabel = tr(`compatibility.form.divineNameIntention.results.intentions.${func}`);
+                    return tagLabel && tagLabel !== '—' ? (
+                      <View key={idx} style={styles.alternativeFunctionTag}>
+                        <Text style={styles.alternativeFunctionText}>
+                          {tagLabel}
+                        </Text>
+                      </View>
+                    ) : null;
+                  })}
                 </View>
+                )}
               </LinearGradient>
             ))}
           </View>
@@ -1561,14 +1599,16 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
               <View style={styles.divider} />
 
               <Text style={styles.guidanceMainText}>
-                {language === 'en' ? guidance.en : language === 'fr' ? guidance.en : guidance.ar}
+                {alignment === 'not-recommended' || alignment === 'neutral' 
+                  ? tr('compatibility.form.divineNameIntention.results.misaligned.guidance')
+                  : (language === 'en' ? guidance.en : language === 'fr' ? guidance.en : guidance.ar)}
               </Text>
             </LinearGradient>
 
             {/* How to Use */}
             <View style={styles.howToUseCard}>
               <Text style={styles.howToUseTitle}>
-                {language === 'en' ? '🙏 How to Engage with This Name' : '🙏 كيف تتفاعل مع هذا الاسم'}
+                {tr('compatibility.form.divineNameIntention.results.practice.title')}
               </Text>
               
               <View style={styles.stepsList}>
@@ -1578,12 +1618,10 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                   </View>
                   <View style={styles.stepContent}>
                     <Text style={styles.stepTitle}>
-                      {language === 'en' ? 'Purify Your Intention' : 'صفِّ نيتك'}
+                      {tr('compatibility.form.divineNameIntention.results.practice.step1.title')}
                     </Text>
                     <Text style={styles.stepText}>
-                      {language === 'en' 
-                        ? 'Begin with sincere intention (niyyah) seeking only Allah\'s pleasure.'
-                        : 'ابدأ بنية صادقة تبتغي مرضاة الله فقط.'}
+                      {tr('compatibility.form.divineNameIntention.results.practice.step1.desc')}
                     </Text>
                   </View>
                 </View>
@@ -1594,12 +1632,10 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                   </View>
                   <View style={styles.stepContent}>
                     <Text style={styles.stepTitle}>
-                      {language === 'en' ? 'Reflect on the Meaning' : 'تأمل في المعنى'}
+                      {tr('compatibility.form.divineNameIntention.results.practice.step2.title')}
                     </Text>
                     <Text style={styles.stepText}>
-                      {language === 'en' 
-                        ? 'Contemplate how this Name manifests in your life and creation.'
-                        : 'تأمل كيف يتجلى هذا الاسم في حياتك وفي الخلق.'}
+                      {tr('compatibility.form.divineNameIntention.results.practice.step2.desc')}
                     </Text>
                   </View>
                 </View>
@@ -1610,12 +1646,10 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                   </View>
                   <View style={styles.stepContent}>
                     <Text style={styles.stepTitle}>
-                      {language === 'en' ? 'Invoke with Reverence' : 'ادعُ بإجلال'}
+                      {tr('compatibility.form.divineNameIntention.results.practice.step3.title')}
                     </Text>
                     <Text style={styles.stepText}>
-                      {language === 'en' 
-                        ? 'Call upon Allah using this Name with humility and trust.'
-                        : 'ادع الله بهذا الاسم بتواضع وثقة.'}
+                      {tr('compatibility.form.divineNameIntention.results.practice.step3.desc')}
                     </Text>
                   </View>
                 </View>
@@ -1626,7 +1660,7 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
             <View style={styles.disclaimer}>
               <Ionicons name="information-circle-outline" size={20} color="#fbbf24" />
               <Text style={styles.disclaimerText}>
-                {tr('compatibility.form.divineNameIntention.results.guidance.disclaimer')}
+                {tr('compatibility.form.divineNameIntention.results.practice.disclaimer')}
               </Text>
             </View>
           </View>

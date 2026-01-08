@@ -2042,7 +2042,129 @@ export const translations = {
               },
               disclaimer: "This is spiritual guidance only. The Divine Names belong to Allah alone. Results depend on sincerity, patience, and Allah's wisdom.",
             },
+            misaligned: {
+              guidance: "According to classical attributions, this Divine Name is not traditionally associated with this intention. Consider the suggested Names, which are classically more aligned for this intention.",
+            },
+            alternatives: {
+              title: "💡 Alternative Divine Names",
+              subtitle: "These Names may better support your intention:",
+              recommended: "Recommended",
+            },
+            practice: {
+              title: "🙏 How to Engage with This Name",
+              step1: {
+                title: "Purify Your Intention",
+                desc: "Begin with sincere intention (niyyah) seeking only Allah's pleasure.",
+              },
+              step2: {
+                title: "Reflect on the Meaning",
+                desc: "Contemplate how this Name manifests in your life and creation.",
+              },
+              step3: {
+                title: "Invoke with Reverence",
+                desc: "Call upon Allah using this Name with humility and trust.",
+              },
+              disclaimer: "This is spiritual guidance only. The Divine Names belong to Allah alone. Results depend on sincerity, patience, and Allah's wisdom.",
+            },
           },
+        },
+      },
+
+      // Tags (for alternative cards)
+      tags: {
+        strength: "Strength",
+        protection: "Protection",
+        provision: "Provision",
+        guidance: "Guidance",
+        clarity: "Clarity",
+        patience: "Patience",
+        peace: "Peace",
+        healing: "Healing",
+        knowledge: "Knowledge",
+        forgiveness: "Forgiveness",
+      },
+
+      // Divine Names (short influence for cards)
+      divineNames: {
+        arRahman: {
+          meaning: "The Most Merciful",
+          shortInfluence: "Deepens connection to the divine quality of The Most Merciful",
+        },
+        arRaheem: {
+          meaning: "The Merciful",
+          shortInfluence: "Deepens connection to the divine quality of The Merciful",
+        },
+        arRazzaaq: {
+          meaning: "The Sustainer",
+          shortInfluence: "Deepens connection to the divine quality of The Sustainer",
+        },
+        alAzeez: {
+          meaning: "The Precious / The Most Mighty",
+          shortInfluence: "Deepens connection to the divine quality of The Precious / The Most Mighty",
+        },
+        alFattaah: {
+          meaning: "The Opener",
+          shortInfluence: "Deepens connection to the divine quality of The Opener",
+        },
+        alKhaliq: {
+          meaning: "The Creator",
+          shortInfluence: "Deepens connection to the divine quality of The Creator",
+        },
+        asShafi: {
+          meaning: "The Healer",
+          shortInfluence: "Deepens connection to the divine quality of The Healer",
+        },
+        alHakim: {
+          meaning: "The Wise",
+          shortInfluence: "Deepens connection to the divine quality of The Wise",
+        },
+        alAleem: {
+          meaning: "The All-Knowing",
+          shortInfluence: "Deepens connection to the divine quality of The All-Knowing",
+        },
+        asShakur: {
+          meaning: "The Appreciative",
+          shortInfluence: "Deepens connection to the divine quality of The Appreciative",
+        },
+        alHafiz: {
+          meaning: "The Preserver",
+          shortInfluence: "Deepens connection to the divine quality of The Preserver",
+        },
+        alMuqeet: {
+          meaning: "The Sustainer",
+          shortInfluence: "Deepens connection to the divine quality of The Sustainer",
+        },
+        alWahhaab: {
+          meaning: "The Bestower",
+          shortInfluence: "Deepens connection to the divine quality of The Bestower",
+        },
+        alHaadi: {
+          meaning: "The Guide",
+          shortInfluence: "Deepens connection to the divine quality of The Guide",
+        },
+        asSubbooh: {
+          meaning: "The Pure",
+          shortInfluence: "Deepens connection to the divine quality of The Pure",
+        },
+        asSabur: {
+          meaning: "The Patient",
+          shortInfluence: "Deepens connection to the divine quality of The Patient",
+        },
+        alMujeeb: {
+          meaning: "The Responsive",
+          shortInfluence: "Deepens connection to the divine quality of The Responsive",
+        },
+        alWadud: {
+          meaning: "The Loving",
+          shortInfluence: "Deepens connection to the divine quality of The Loving",
+        },
+        alGhaffar: {
+          meaning: "The Forgiving",
+          shortInfluence: "Deepens connection to the divine quality of The Forgiving",
+        },
+        alHaafiz: {
+          meaning: "The Guardian",
+          shortInfluence: "Deepens connection to the divine quality of The Guardian",
         },
       },
 
@@ -7407,7 +7529,129 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
               },
               disclaimer: "Ceci est une guidance spirituelle uniquement. Les Noms Divins appartiennent à Allah seul. Les résultats dépendent de la sincérité, de la patience et de la sagesse d'Allah.",
             },
+            misaligned: {
+              guidance: "Selon les attributions classiques, ce Nom Divin n'est pas traditionnellement associé à cette intention. Considérez les Noms suggérés, qui sont classiquement plus alignés pour cette intention.",
+            },
+            alternatives: {
+              title: "💡 Noms Divins Alternatifs",
+              subtitle: "Ces Noms peuvent mieux soutenir votre intention :",
+              recommended: "Recommandé",
+            },
+            practice: {
+              title: "🙏 Comment Invoquer Ce Nom",
+              step1: {
+                title: "Purifiez Votre Intention",
+                desc: "Commencez avec une intention sincère (niyyah) ne recherchant que la satisfaction d'Allah.",
+              },
+              step2: {
+                title: "Réfléchissez sur le Sens",
+                desc: "Contemplez comment ce Nom se manifeste dans votre vie et dans la création.",
+              },
+              step3: {
+                title: "Invoquez avec Révérence",
+                desc: "Invoquez Allah en utilisant ce Nom avec humilité et confiance.",
+              },
+              disclaimer: "Ceci est une guidance spirituelle uniquement. Les Noms Divins appartiennent à Allah seul. Les résultats dépendent de la sincérité, de la patience et de la sagesse d'Allah.",
+            },
           },
+        },
+      },
+
+      // Tags (pour les cartes alternatives)
+      tags: {
+        strength: "Force",
+        protection: "Protection",
+        provision: "Subsistance",
+        guidance: "Guidance",
+        clarity: "Clarté",
+        patience: "Patience",
+        peace: "Paix",
+        healing: "Guérison",
+        knowledge: "Connaissance",
+        forgiveness: "Pardon",
+      },
+
+      // Noms Divins (influence courte pour les cartes)
+      divineNames: {
+        arRahman: {
+          meaning: "Le Tout Miséricordieux",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Tout Miséricordieux",
+        },
+        arRaheem: {
+          meaning: "Le Miséricordieux",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Miséricordieux",
+        },
+        arRazzaaq: {
+          meaning: "Le Pourvoyeur",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Pourvoyeur",
+        },
+        alAzeez: {
+          meaning: "Le Précieux / Le Tout-Puissant",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Précieux / Le Tout-Puissant",
+        },
+        alFattaah: {
+          meaning: "L'Ouvreur",
+          shortInfluence: "Approfondit la connexion à la qualité divine de l'Ouvreur",
+        },
+        alKhaliq: {
+          meaning: "Le Créateur",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Créateur",
+        },
+        asShafi: {
+          meaning: "Le Guérisseur",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Guérisseur",
+        },
+        alHakim: {
+          meaning: "Le Sage",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Sage",
+        },
+        alAleem: {
+          meaning: "L'Omniscient",
+          shortInfluence: "Approfondit la connexion à la qualité divine de l'Omniscient",
+        },
+        asShakur: {
+          meaning: "Le Reconnaissant",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Reconnaissant",
+        },
+        alHafiz: {
+          meaning: "Le Protecteur",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Protecteur",
+        },
+        alMuqeet: {
+          meaning: "Le Pourvoyeur",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Pourvoyeur",
+        },
+        alWahhaab: {
+          meaning: "Le Donateur",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Donateur",
+        },
+        alHaadi: {
+          meaning: "Le Guide",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Guide",
+        },
+        asSubbooh: {
+          meaning: "Le Pur",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Pur",
+        },
+        asSabur: {
+          meaning: "Le Patient",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Patient",
+        },
+        alMujeeb: {
+          meaning: "Le Répondant",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Répondant",
+        },
+        alWadud: {
+          meaning: "L'Aimant",
+          shortInfluence: "Approfondit la connexion à la qualité divine de l'Aimant",
+        },
+        alGhaffar: {
+          meaning: "Le Pardonneur",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Pardonneur",
+        },
+        alHaafiz: {
+          meaning: "Le Gardien",
+          shortInfluence: "Approfondit la connexion à la qualité divine du Gardien",
         },
       },
 
