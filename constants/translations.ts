@@ -13,6 +13,32 @@ export const translations = {
       menu: "Menu",
     },
     
+    // Drawer Menu
+    drawer: {
+      profileSettings: "PROFILE & SETTINGS",
+      myProfile: "My Profile",
+      aiSettings: "AI Settings",
+      tools: "TOOLS",
+      abjadCalculator: "Abjad Calculator",
+      nameDestiny: "Name Destiny",
+      compatibility: "Compatibility",
+      istikhara: "Istikharah",
+      divineTiming: "Divine Timing",
+      app: "APP",
+      about: "About Asrār",
+      helpTutorial: "Help & Tutorial",
+      language: "LANGUAGE",
+      langEnglish: "English",
+      langFrench: "Français",
+      langArabic: "العربية",
+      guestMode: "Guest Mode",
+      guestUser: "Guest User",
+      levelGuest: "GUEST",
+      levelBasic: "BASIC",
+      levelEnhanced: "ENHANCED",
+      levelFull: "FULL",
+    },
+    
     // Home Screen Modules
     modules: {
       calculator: {
@@ -5314,6 +5340,31 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       guidance: "Guide de Vie",
       advanced: "Istikharah",
       menu: "Menu",
+    },
+
+    drawer: {
+      profileSettings: "PROFIL & PARAMÈTRES",
+      myProfile: "Mon Profil",
+      aiSettings: "Paramètres IA",
+      tools: "OUTILS",
+      abjadCalculator: "Calculatrice Abjad",
+      nameDestiny: "Destinée des Noms",
+      compatibility: "Compatibilité",
+      istikhara: "Istikharah",
+      divineTiming: "Moment Divin",
+      app: "APPLICATION",
+      about: "À Propos d'Asrār",
+      helpTutorial: "Aide & Tutoriel",
+      language: "LANGUE",
+      langEnglish: "English",
+      langFrench: "Français",
+      langArabic: "العربية",
+      guestMode: "Mode Invité",
+      guestUser: "Utilisateur Invité",
+      levelGuest: "INVITÉ",
+      levelBasic: "BASIQUE",
+      levelEnhanced: "AMÉLIORÉ",
+      levelFull: "COMPLET",
     },
     
     // Modules de la Page d'Accueil

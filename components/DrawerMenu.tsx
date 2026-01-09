@@ -49,7 +49,7 @@ interface MenuItem {
 export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
   const router = useRouter();
   const { profile, completionStatus, personalizationLevel } = useProfile();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   
   const slideAnim = React.useRef(new Animated.Value(-300)).current;
   
@@ -77,18 +77,18 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
   
   const menuSections: { title: string; items: MenuItem[] }[] = [
     {
-      title: 'Profile & Settings',
+      title: t('drawer.profileSettings'),
       items: [
         {
           id: 'profile',
-          label: 'My Profile',
+          label: t('drawer.myProfile'),
           icon: 'person',
           route: '/profile',
           badge: `${completionStatus.completionPercent}%`,
         },
         {
           id: 'ai-settings',
-          label: 'AI Settings',
+          label: t('drawer.aiSettings'),
           icon: 'sparkles',
           route: '/ai-settings',
           color: '#6366f1',
@@ -96,46 +96,46 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
       ],
     },
     {
-      title: 'Tools',
+      title: t('drawer.tools'),
       items: [
         {
           id: 'calculator',
-          label: 'Abjad Calculator',
+          label: t('drawer.abjadCalculator'),
           icon: 'calculator',
           route: '/calculator',
         },
         {
           id: 'name-destiny',
-          label: 'Name Destiny',
+          label: t('drawer.nameDestiny'),
           icon: 'book',
           route: '/(tabs)/name-destiny',
         },
         {
           id: 'compatibility',
-          label: 'Compatibility',
+          label: t('drawer.compatibility'),
           icon: 'heart',
           route: '/compatibility',
         },
         {
           id: 'istikhara',
-          label: 'Istikhārah',
+          label: t('drawer.istikhara'),
           icon: 'moon',
           route: '/(tabs)/istikhara',
         },
         {
           id: 'divine-timing',
-          label: 'Divine Timing',
+          label: t('drawer.divineTiming'),
           icon: 'time',
           route: '/divine-timing',
         },
       ],
     },
     {
-      title: 'App',
+      title: t('drawer.app'),
       items: [
         {
           id: 'about',
-          label: 'About Asrār',
+          label: t('drawer.about'),
           icon: 'information-circle',
           action: () => {
             onClose();
@@ -144,7 +144,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
         },
         {
           id: 'help',
-          label: 'Help & Tutorial',
+          label: t('drawer.helpTutorial'),
           icon: 'help-circle',
           action: () => {
             onClose();
@@ -170,6 +170,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
       >
         {/* Drawer */}
         <Animated.View
+          key={language}
           style={[
             styles.drawer,
             {
@@ -212,15 +213,15 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                   </View>
                   <View style={styles.profileInfo}>
                     <Text style={styles.profileName}>
-                      {profile.nameAr || profile.nameLatin || 'Guest User'}
+                      {profile.nameAr || profile.nameLatin || t('drawer.guestUser')}
                     </Text>
                     <View style={styles.profileMeta}>
                       <View style={styles.levelBadge}>
                         <Text style={styles.levelText}>
-                          {personalizationLevel === 0 && 'Guest'}
-                          {personalizationLevel === 1 && 'Basic'}
-                          {personalizationLevel === 2 && 'Enhanced'}
-                          {personalizationLevel === 3 && 'Full'}
+                          {personalizationLevel === 0 && t('drawer.levelGuest')}
+                          {personalizationLevel === 1 && t('drawer.levelBasic')}
+                          {personalizationLevel === 2 && t('drawer.levelEnhanced')}
+                          {personalizationLevel === 3 && t('drawer.levelFull')}
                         </Text>
                       </View>
                       {profile.derived?.element && (
@@ -279,7 +280,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                 
                 {/* Language Selector */}
                 <View style={styles.menuSection}>
-                  <Text style={styles.sectionTitle}>Language</Text>
+                  <Text style={styles.sectionTitle}>{t('drawer.language')}</Text>
                   <View style={styles.languageSelector}>
                     {['en', 'fr', 'ar'].map((lang) => (
                       <TouchableOpacity
@@ -296,9 +297,9 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                             language === lang && styles.languageButtonTextActive,
                           ]}
                         >
-                          {lang === 'en' && 'English'}
-                          {lang === 'fr' && 'Français'}
-                          {lang === 'ar' && 'العربية'}
+                          {lang === 'en' && t('drawer.langEnglish')}
+                          {lang === 'fr' && t('drawer.langFrench')}
+                          {lang === 'ar' && t('drawer.langArabic')}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -308,7 +309,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                 {/* App Version */}
                 <View style={styles.footer}>
                   <Text style={styles.footerText}>Asrār v1.0.0</Text>
-                  <Text style={styles.footerText}>Guest Mode</Text>
+                  <Text style={styles.footerText}>{t('drawer.guestMode')}</Text>
                 </View>
               </ScrollView>
             </SafeAreaView>
