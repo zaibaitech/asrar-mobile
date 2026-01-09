@@ -5594,6 +5594,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       // Validation
       validation: {
         missingNames: "Please enter both names to continue",
+        nameRequired: "Name is required",
       },
       
       // Form section
@@ -5603,10 +5604,14 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         personNamePlaceholder: "e.g., Muhammad, Fatima, Ibrahim",
         motherName: "Mother's Name",
         motherNamePlaceholder: "e.g., Khadija, Aisha, Maryam",
+        latinName: "Latin Name",
+        latinNamePlaceholder: "e.g., Muhammad, Fatima, Aisha",
+        latinNameHint: "Type your name in Latin letters — we'll show the Arabic equivalent",
         calculateButton: "Seek Guidance",
         clearButton: "Clear",
         validationError: "Please enter both names to continue",
         bothNamesRequired: "Both names are required for accurate guidance",
+        arabicRequiredNote: "Names should be in Arabic script for accurate results",
       },
       
       // Results section
@@ -11294,6 +11299,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       // Validation
       validation: {
         missingNames: "Veuillez entrer les deux noms pour continuer",
+        nameRequired: "Le nom est requis",
       },
       
       // Section formulaire
@@ -11303,10 +11309,14 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         personNamePlaceholder: "p.ex., Muhammad, Fatima, Ibrahim",
         motherName: "Nom de la Mère",
         motherNamePlaceholder: "p.ex., Khadija, Aisha, Maryam",
+        latinName: "Nom en lettres latines",
+        latinNamePlaceholder: "ex : Muhammad, Fatima, Aisha",
+        latinNameHint: "Écrivez votre nom en lettres latines — l'équivalent arabe sera affiché",
         calculateButton: "Chercher la Guidance",
         clearButton: "Effacer",
         validationError: "Veuillez entrer les deux noms pour continuer",
         bothNamesRequired: "Les deux noms sont requis pour une guidance précise",
+        arabicRequiredNote: "Les noms doivent être en écriture arabe pour des résultats précis",
       },
       
       // Section résultats

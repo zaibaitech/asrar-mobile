@@ -25,11 +25,11 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import NameAutocomplete from '../../components/NameAutocomplete';
 import NameInputSection from '../../components/istikhara/NameInputSection';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useProfile } from '../../contexts/ProfileContext';
 import { useIstikhara } from '../../hooks/useIstikhara';
-import { useNameSuggestions } from '../../hooks/useNameSuggestions';
 import { HistoryService } from '../../services/HistoryService';
 
 export default function IstikharaCalculator() {
@@ -64,10 +64,6 @@ export default function IstikharaCalculator() {
   
   // Validation states
   const [touched, setTouched] = useState({ person: false, mother: false });
-  
-  // Name suggestions
-  const personSuggestions = useNameSuggestions(personLatin);
-  const motherSuggestions = useNameSuggestions(motherLatin);
 
   const validateName = (name: string) => {
     return name.trim().length > 0;
@@ -170,44 +166,66 @@ export default function IstikharaCalculator() {
               style={styles.formGradient}
             >
               {/* Person's Name Input */}
-              <NameInputSection
-                title={t('istikhara.form.personName')}
-                icon="👤"
-                latinValue={personLatin}
-                arabicValue={personName}
-                onLatinChange={(text) => {
-                  setPersonLatin(text);
-                  if (!touched.person) setTouched({ ...touched, person: true });
-                }}
-                onArabicChange={(text) => {
-                  setPersonName(text);
-                  if (!touched.person) setTouched({ ...touched, person: true });
-                }}
-                suggestions={personSuggestions.suggestions}
-                borderColor="#10B981"
-                isValid={personValid}
-                touched={touched.person}
-              />
+              <View style={styles.nameSection}>
+                <View style={styles.nameSectionHeader}>
+                  <Text style={styles.nameSectionIcon}>👤</Text>
+                  <Text style={styles.nameSectionTitle}>{t('istikhara.form.personName')}</Text>
+                </View>
+                <Text style={styles.nameLabel}>{t('istikhara.form.latinName')}</Text>
+                <NameAutocomplete
+                  value={personLatin}
+                  onChange={(text) => {
+                    setPersonLatin(text);
+                    if (!touched.person) setTouched({ ...touched, person: true });
+                  }}
+                  onArabicSelect={(arabic, latin) => {
+                    setPersonName(arabic);
+                    setPersonLatin(latin);
+                    if (!touched.person) setTouched({ ...touched, person: true });
+                  }}
+                  placeholder={t('istikhara.form.personNamePlaceholder') || 'e.g., Ahmed, Rahim'}
+                  showHelper={true}
+                  language="en"
+                />
+                <Text style={styles.nameLabel}>{t('istikhara.arabicName')} *</Text>
+                <View style={styles.arabicInputWrapper}>
+                  <Text style={styles.arabicInput}>{personName || 'أدخل الاسم بالعربية'}</Text>
+                </View>
+                {!personValid && touched.person && (
+                  <Text style={styles.errorText}>{t('istikhara.validation.nameRequired')}</Text>
+                )}
+              </View>
 
               {/* Mother's Name Input */}
-              <NameInputSection
-                title={t('istikhara.form.motherName')}
-                icon="👩"
-                latinValue={motherLatin}
-                arabicValue={motherName}
-                onLatinChange={(text) => {
-                  setMotherLatin(text);
-                  if (!touched.mother) setTouched({ ...touched, mother: true });
-                }}
-                onArabicChange={(text) => {
-                  setMotherName(text);
-                  if (!touched.mother) setTouched({ ...touched, mother: true });
-                }}
-                suggestions={motherSuggestions.suggestions}
-                borderColor="#3B82F6"
-                isValid={motherValid}
-                touched={touched.mother}
-              />
+              <View style={styles.nameSection}>
+                <View style={styles.nameSectionHeader}>
+                  <Text style={styles.nameSectionIcon}>👩</Text>
+                  <Text style={styles.nameSectionTitle}>{t('istikhara.form.motherName')}</Text>
+                </View>
+                <Text style={styles.nameLabel}>{t('istikhara.form.latinName')}</Text>
+                <NameAutocomplete
+                  value={motherLatin}
+                  onChange={(text) => {
+                    setMotherLatin(text);
+                    if (!touched.mother) setTouched({ ...touched, mother: true });
+                  }}
+                  onArabicSelect={(arabic, latin) => {
+                    setMotherName(arabic);
+                    setMotherLatin(latin);
+                    if (!touched.mother) setTouched({ ...touched, mother: true });
+                  }}
+                  placeholder={t('istikhara.form.motherNamePlaceholder') || 'e.g., Fatima, Aisha'}
+                  showHelper={true}
+                  language="en"
+                />
+                <Text style={styles.nameLabel}>{t('istikhara.arabicName')} *</Text>
+                <View style={styles.arabicInputWrapper}>
+                  <Text style={styles.arabicInput}>{motherName || 'أدخل الاسم بالعربية'}</Text>
+                </View>
+                {!motherValid && touched.mother && (
+                  <Text style={styles.errorText}>{t('istikhara.validation.nameRequired')}</Text>
+                )}
+              </View>
 
               {/* Calculate Button */}
               <TouchableOpacity
@@ -548,5 +566,51 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: '#ffffff',
     fontWeight: 'bold',
+  },
+  
+  // Name section styles
+  nameSection: {
+    marginBottom: 20,
+  },
+  nameSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  nameSectionIcon: {
+    fontSize: 22,
+  },
+  nameSectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  nameLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  arabicInputWrapper: {
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+    borderWidth: 2,
+    borderColor: 'rgba(148, 163, 184, 0.25)',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    minHeight: 50,
+  },
+  arabicInput: {
+    color: '#ffffff',
+    fontSize: 16,
+    textAlign: 'right',
+    fontWeight: '500',
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#ef4444',
+    marginTop: 6,
   },
 });
