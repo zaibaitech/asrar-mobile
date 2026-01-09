@@ -15,6 +15,7 @@ import type {
   UniversalCompatibilityResult
 } from '../../services/compatibility/types';
 import { CompatibilityGauge } from './CompatibilityGauge';
+import { SoulConnectionRing } from './SoulConnectionRing';
 
 const { width } = Dimensions.get('window');
 
@@ -85,14 +86,12 @@ function PersonPersonResultView({ result, language }: { result: PersonPersonComp
   const methods = rc.methods;
   const theme = RELATIONSHIP_THEMES[relationshipContext];
   
-  const [activeTab, setActiveTab] = useState<'overview' | 'spiritual' | 'elemental' | 'planetary' | 'daily' | 'advice'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'soulConnection' | 'harmony' | 'advice'>('overview');
 
   const tabs = [
     { id: 'overview' as const, label: t('compatibility.results.tabs.overview'), icon: 'eye' },
-    { id: 'spiritual' as const, label: t('compatibility.results.tabs.spiritual'), icon: 'sparkles' },
-    { id: 'elemental' as const, label: t('compatibility.results.tabs.elemental'), icon: 'leaf' },
-    { id: 'planetary' as const, label: t('compatibility.results.tabs.planetary'), icon: 'planet' },
-    { id: 'daily' as const, label: t('compatibility.results.tabs.daily'), icon: 'calendar' },
+    { id: 'soulConnection' as const, label: t('compatibility.results.tabs.soulConnection'), icon: 'sparkles' },
+    { id: 'harmony' as const, label: t('compatibility.results.tabs.harmony'), icon: 'analytics' },
     { id: 'advice' as const, label: t('compatibility.results.tabs.advice'), icon: 'bulb' },
   ];
 
@@ -186,39 +185,26 @@ function PersonPersonResultView({ result, language }: { result: PersonPersonComp
             theme={theme} 
             language={language}
             getQualityGradient={getQualityGradient}
+            relationshipContext={relationshipContext}
           />
         )}
         
-        {activeTab === 'spiritual' && (
-          <SpiritualTab 
+        {activeTab === 'soulConnection' && (
+          <SoulConnectionTab 
             method={methods.spiritualDestiny} 
             person1Name={person1.name}
             person2Name={person2.name}
+            person1Kabir={person1.destiny.kabir}
+            person2Kabir={person2.destiny.kabir}
+            relationshipContext={relationshipContext}
             language={language} 
           />
         )}
         
-        {activeTab === 'elemental' && (
-          <ElementalTab 
-            method={methods.elementalTemperament} 
-            language={language} 
-          />
-        )}
-        
-        {activeTab === 'planetary' && (
-          <PlanetaryTab 
-            method={methods.planetaryCosmic}
-            person1Name={person1.name}
-            person2Name={person2.name}
-            language={language} 
-          />
-        )}
-        
-        {activeTab === 'daily' && (
-          <DailyTab 
-            method={methods.dailyInteraction}
-            person1Name={person1.name}
-            person2Name={person2.name}
+        {activeTab === 'harmony' && (
+          <HarmonyTab 
+            rc={rc}
+            theme={theme}
             language={language} 
           />
         )}
@@ -253,52 +239,77 @@ function getLocalizedField(obj: any, baseField: string, language: 'en' | 'fr' | 
 // TAB COMPONENTS
 // ============================================================================
 
-function OverviewTab({ rc, theme, language, getQualityGradient }: any) {
+function OverviewTab({ rc, theme, language, getQualityGradient, relationshipContext }: any) {
   const { t } = useLanguage();
-  const modeOfUnion = getModeOfUnion(
-    rc.methods.elementalTemperament.sharedElement,
-    rc.methods.planetaryCosmic.relationship,
-    language
-  );
 
   return (
     <View style={styles.section}>
-      {/* Overall Score */}
-      <LinearGradient
-        colors={getQualityGradient(rc.overallScore)}
-        style={styles.overallCard}
-      >
-        <Text style={styles.overallLabel}>
-          {t('compatibility.results.overview.overallCompatibility')}
-        </Text>
-        <CompatibilityGauge
-          score={rc.overallScore}
-          label=""
-          color="#fff"
-          size={130}
-        />
-        <Text style={styles.qualityText}>
-          {t(`compatibility.results.enums.quality.${rc.overallQuality}`)?.toUpperCase() || rc.overallQuality.toUpperCase()}
-        </Text>
-        <Text style={styles.scoreMicroLabel}>
-          {t('compatibility.results.overview.tendencyNotCertainty')}
-        </Text>
-      </LinearGradient>
+      {/* Two KPIs Side by Side */}
+      <View style={styles.twoKpiContainer}>
+        {/* LEFT KPI: Harmony Index */}
+        <View style={styles.kpiCard}>
+          <LinearGradient
+            colors={getQualityGradient(rc.overallScore)}
+            style={styles.kpiGradient}
+          >
+            <Text style={styles.kpiLabel}>
+              {t('compatibility.results.overview.overallCompatibility')}
+            </Text>
+            <CompatibilityGauge
+              score={rc.overallScore}
+              label=""
+              color="#fff"
+              size={100}
+            />
+            <Text style={styles.kpiQuality}>
+              {t(`compatibility.results.enums.quality.${rc.overallQuality}`)?.toUpperCase() || rc.overallQuality.toUpperCase()}
+            </Text>
+            <Text style={styles.kpiMicroLabel}>
+              {t('compatibility.results.overview.harmonyDesc')}
+            </Text>
+          </LinearGradient>
+        </View>
 
-      {/* Mode of Union Card */}
-      <View style={styles.modeOfUnionCard}>
-        <Text style={styles.modeOfUnionLabel}>
-          {t('compatibility.results.overview.unionMode.label')}
-        </Text>
-        <Text style={styles.modeOfUnionText}>
-          {t(`compatibility.results.overview.unionMode.${modeOfUnion}`)}
-        </Text>
+        {/* RIGHT KPI: Soul Connection */}
+        <View style={styles.kpiCard}>
+          <View style={styles.soulConnectionKpi}>
+            <Text style={styles.kpiLabel}>
+              {t('compatibility.results.overview.soulConnectionTitle')}
+            </Text>
+            <SoulConnectionRing 
+              value={rc.methods.spiritualDestiny.remainder}
+              size={100}
+              activeColor={METHOD_THEMES.spiritual.color}
+            />
+            <Text style={[styles.soulConnectionNumber, { color: METHOD_THEMES.spiritual.color }]}>
+              {rc.methods.spiritualDestiny.remainder}/9
+            </Text>
+            <Text style={[styles.kpiQuality, { color: METHOD_THEMES.spiritual.color }]}>
+              {t(`compatibility.results.enums.quality.${rc.methods.spiritualDestiny.quality}`)?.toUpperCase() || rc.methods.spiritualDestiny.quality.toUpperCase()}
+            </Text>
+            <View style={styles.independentBadge}>
+              <Text style={styles.independentBadgeText}>
+                {t('compatibility.independentMetric')}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* Explanation Card */}
+      <View style={styles.explanationCard}>
+        <Ionicons name="information-circle" size={20} color={theme.primary[0]} />
+        <View style={{ flex: 1, marginLeft: 10 }}>
+          <Text style={styles.explanationCardText}>
+            {t('compatibility.results.overview.twoMetricsExplanation')}
+          </Text>
+        </View>
       </View>
 
       {/* Summary */}
       <View style={styles.summaryCard}>
         <View style={styles.summaryHeader}>
-          <Ionicons name="information-circle" size={24} color={theme.primary[0]} />
+          <Ionicons name="document-text" size={24} color={theme.primary[0]} />
           <Text style={styles.summaryTitle}>
             {t('compatibility.results.overview.summary')}
           </Text>
@@ -308,14 +319,9 @@ function OverviewTab({ rc, theme, language, getQualityGradient }: any) {
         </Text>
       </View>
 
-      {/* Quick Stats */}
+      {/* Quick Stats Grid - showing Harmony components only */}
+      <Text style={styles.sectionTitle}>{t('compatibility.results.overview.harmony')}</Text>
       <View style={styles.statsGrid}>
-        <StatCard
-          titleKey="compatibility.results.overview.spiritual"
-          score={rc.methods.spiritualDestiny.score}
-          color={METHOD_THEMES.spiritual.color}
-          emoji={METHOD_THEMES.spiritual.emoji}
-        />
         <StatCard
           titleKey="compatibility.results.overview.elemental"
           score={rc.methods.elementalTemperament.score}
@@ -335,6 +341,165 @@ function OverviewTab({ rc, theme, language, getQualityGradient }: any) {
           emoji={METHOD_THEMES.daily.emoji}
         />
       </View>
+    </View>
+  );
+}
+
+function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, person2Kabir, relationshipContext, language }: any) {
+  const { t } = useLanguage();
+  const theme = METHOD_THEMES.spiritual;
+  const [showFormula, setShowFormula] = useState(false);
+  
+  // Context-specific message
+  const contextMessages: Record<string, string> = {
+    marriage: t('compatibility.results.spiritual.contextMarriage'),
+    friendship: t('compatibility.results.spiritual.contextFriendship'),
+    work: t('compatibility.results.spiritual.contextWork'),
+    family: t('compatibility.results.spiritual.contextFamily'),
+    universal: ''
+  };
+  
+  return (
+    <View style={styles.section}>
+      <View style={styles.soulConnectionCard}>
+        {/* Header */}
+        <View style={styles.soulConnectionHeader}>
+          <View style={styles.iconBadgeContainer}>
+            <Ionicons name="sparkles" size={24} color={theme.color} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.soulConnectionTitle}>
+              {t('compatibility.results.spiritual.title')}
+            </Text>
+            <Text style={styles.soulConnectionSubtitle}>
+              {t('compatibility.results.spiritual.subtitle')}
+            </Text>
+            <View style={styles.badgeRow}>
+              <View style={[styles.badge, { backgroundColor: `${theme.color}20` }]}>
+                <Text style={[styles.badgeText, { color: theme.color }]}>
+                  {t('compatibility.results.spiritual.badge')}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* The Result */}
+        <View style={styles.resultSection}>
+          <SoulConnectionRing 
+            value={method.remainder}
+            size={140}
+            activeColor={theme.color}
+          />
+          <Text style={[styles.soulConnectionBigNumber, { color: theme.color }]}>
+            {method.remainder}
+          </Text>
+          <Text style={[styles.soulConnectionQuality, { color: theme.color }]}>
+            {t(`compatibility.results.enums.quality.${method.quality}`)?.toUpperCase() || method.quality.toUpperCase()}
+          </Text>
+          <Text style={styles.oneLineInterpretation}>
+            {getLocalizedField(method, 'description', language)}
+          </Text>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* 3-Part Classical Structure */}
+        <View style={styles.classicalStructure}>
+          <View style={styles.classicalSection}>
+            <Text style={styles.classicalLabel}>
+              {t('compatibility.results.spiritual.meaning')}
+            </Text>
+            <Text style={styles.classicalText}>
+              {getLocalizedField(method, 'description', language)}
+            </Text>
+          </View>
+
+          <View style={styles.classicalSection}>
+            <Text style={styles.classicalLabel}>
+              {t('compatibility.results.spiritual.watchOut')}
+            </Text>
+            <Text style={styles.classicalText}>
+              {t(method.score >= 70 ? 'compatibility.results.spiritual.watchOut_high' : method.score >= 40 ? 'compatibility.results.spiritual.watchOut_medium' : 'compatibility.results.spiritual.watchOut_low')}
+            </Text>
+          </View>
+
+          <View style={styles.classicalSection}>
+            <Text style={styles.classicalLabel}>
+              {t('compatibility.results.spiritual.keyToSuccess')}
+            </Text>
+            <Text style={styles.classicalText}>
+              {t(method.score >= 70 ? 'compatibility.results.spiritual.success_high' : method.score >= 40 ? 'compatibility.results.spiritual.success_medium' : 'compatibility.results.spiritual.success_low')}
+            </Text>
+          </View>
+        </View>
+
+        {/* Relationship Context Note */}
+        {contextMessages[relationshipContext] && (
+          <View style={styles.contextNote}>
+            <Ionicons name="heart-circle" size={18} color={theme.color} />
+            <Text style={styles.contextNoteText}>
+              {t('compatibility.results.spiritual.contextNote', { 
+                context: relationshipContext 
+              })}: {contextMessages[relationshipContext]}
+            </Text>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
+function HarmonyTab({ rc, theme, language }: any) {
+  const { t } = useLanguage();
+  const methods = rc.methods;
+  
+  return (
+    <View style={styles.section}>
+      {/* Harmony Score Card */}
+      <View style={styles.harmonyScoreCard}>
+        <Text style={styles.harmonyTitle}>
+          {t('compatibility.results.harmony.title')}
+        </Text>
+        <Text style={styles.harmonySubtitle}>
+          {t('compatibility.results.harmony.subtitle')}
+        </Text>
+        <CompatibilityGauge
+          score={rc.overallScore}
+          label=""
+          color={theme.primary[0]}
+          size={120}
+        />
+        <Text style={styles.harmonyDescription}>
+          {t('compatibility.results.harmony.description')}
+        </Text>
+      </View>
+
+      {/* Components */}
+      <Text style={styles.componentsTitle}>
+        {t('compatibility.results.harmony.components')}
+      </Text>
+
+      {/* Elemental Component */}
+      <ElementalTab method={methods.elementalTemperament} language={language} />
+      
+      {/* Planetary Component */}
+      <PlanetaryTab 
+        method={methods.planetaryCosmic}
+        person1Name={rc.person1.name}
+        person2Name={rc.person2.name}
+        language={language} 
+      />
+      
+      {/* Daily Component */}
+      <DailyTab 
+        method={methods.dailyInteraction}
+        person1Name={rc.person1.name}
+        person2Name={rc.person2.name}
+        language={language} 
+      />
     </View>
   );
 }
@@ -2483,4 +2648,246 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-});
+  // Two-KPI Layout Styles
+  twoKpiContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 20,
+  },
+  kpiCard: {
+    flex: 1,
+  },
+  kpiGradient: {
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+  },
+  kpiLabel: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  kpiQuality: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 8,
+  },
+  kpiMicroLabel: {
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 11,
+    textAlign: 'center',
+    marginTop: 6,
+  },
+  soulConnectionKpi: {
+    backgroundColor: 'rgba(217, 119, 6, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(217, 119, 6, 0.3)',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+  },
+  soulConnectionNumber: {
+    fontSize: 28,
+    fontWeight: '700',
+    marginTop: 8,
+  },
+  independentBadge: {
+    backgroundColor: 'rgba(217, 119, 6, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  independentBadgeText: {
+    color: '#d97706',
+    fontSize: 10,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  explanationCard: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  explanationCardText: {
+    color: '#cbd5e1',
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  sectionTitle: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  // Soul Connection Tab Styles
+  soulConnectionCard: {
+    backgroundColor: 'rgba(217, 119, 6, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(217, 119, 6, 0.2)',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+  },
+  soulConnectionHeader: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  iconBadgeContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(217, 119, 6, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  soulConnectionTitle: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  soulConnectionSubtitle: {
+    color: '#94a3b8',
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  resultSection: {
+    alignItems: 'center',
+    paddingVertical: 24,
+  },
+  soulConnectionBigNumber: {
+    fontSize: 48,
+    fontWeight: '700',
+    marginTop: -50,
+    marginBottom: 8,
+  },
+  soulConnectionQuality: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  oneLineInterpretation: {
+    color: '#cbd5e1',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  expandableHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    marginTop: 16,
+  },
+  expandableTitle: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  formulaSection: {
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 12,
+  },
+  formulaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  formulaLabel: {
+    color: '#94a3b8',
+    fontSize: 14,
+  },
+  formulaValue: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  formulaText: {
+    color: '#d97706',
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginTop: 12,
+  },
+  formulaNote: {
+    color: '#94a3b8',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
+  },
+  contextNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(217, 119, 6, 0.1)',
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 16,
+  },
+  contextNoteText: {
+    flex: 1,
+    color: '#cbd5e1',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  // Harmony Tab Styles
+  harmonyScoreCard: {
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  harmonyTitle: {
+    color: '#ffffff',
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  harmonySubtitle: {
+    color: '#94a3b8',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  harmonyDescription: {
+    color: '#cbd5e1',
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginTop: 16,
+  },
+  componentsTitle: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 16,
+  },});
