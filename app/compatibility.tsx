@@ -7,13 +7,14 @@ import BottomTabBar from '../components/BottomTabBar';
 import { RelationshipCompatibilityView, RelationshipInputForm } from '../components/compatibility';
 import { DarkTheme } from '../constants/DarkTheme';
 import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI } from '../constants/abjad-maps';
+import { useLanguage } from '../contexts/LanguageContext';
 import { RelationshipCompatibility } from '../types/compatibility';
 import { calculateAbjadTotal } from '../utils/abjad-calculations';
 import { analyzeRelationshipCompatibility, getElementFromAbjadTotal } from '../utils/relationshipCompatibility';
 
 export default function CompatibilityScreen() {
+  const { language, setLanguage } = useLanguage();
   const [result, setResult] = useState<RelationshipCompatibility | null>(null);
-  const [language, setLanguage] = useState<'en' | 'fr'>('en');
   const [system, setSystem] = useState<'maghribi' | 'mashriqi'>('maghribi');
   const [activeTab, setActiveTab] = useState<'input' | 'results'>('input');
   const [isLoading, setIsLoading] = useState(false);
@@ -73,6 +74,10 @@ export default function CompatibilityScreen() {
     setActiveTab('input');
   };
   
+  const handleLanguageChange = (lang: 'EN' | 'FR' | 'AR') => {
+    setLanguage(lang.toLowerCase() as 'en' | 'fr' | 'ar');
+  };
+  
   return (
     <>
       <Stack.Screen 
@@ -82,8 +87,8 @@ export default function CompatibilityScreen() {
       />
       <SafeAreaView style={styles.outerContainer}>
         <ResponsiveAppHeader
-          currentLanguage={language === 'en' ? 'EN' : 'FR'}
-          onLanguageChange={(lang) => setLanguage(lang.toLowerCase() as 'en' | 'fr')}
+          currentLanguage={language.toUpperCase() as 'EN' | 'FR' | 'AR'}
+          onLanguageChange={handleLanguageChange}
           onProfilePress={() => router.push('/profile')}
           onMenuPress={() => console.log('Menu pressed')}
         />
@@ -162,7 +167,7 @@ export default function CompatibilityScreen() {
           </View>
         )}
         
-        <BottomTabBar />
+        <BottomTabBar activeTab="guidance" />
       </SafeAreaView>
     </>
   );

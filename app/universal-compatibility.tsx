@@ -27,7 +27,7 @@ import type { UniversalCompatibilityResult } from '../services/compatibility/typ
 import { CompatibilityType } from '../services/compatibility/types';
 
 export default function UniversalCompatibilityScreen() {
-  const { language, t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const [selectedType, setSelectedType] = useState<CompatibilityType>('person-person');
   const [result, setResult] = useState<UniversalCompatibilityResult | null>(null);
   const [activeTab, setActiveTab] = useState<'input' | 'results'>('input');
@@ -43,13 +43,17 @@ export default function UniversalCompatibilityScreen() {
     setActiveTab('input');
   };
 
+  const handleLanguageChange = (lang: 'EN' | 'FR' | 'AR') => {
+    setLanguage(lang.toLowerCase() as 'en' | 'fr' | 'ar');
+  };
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <SafeAreaView style={styles.container}>
         <ResponsiveAppHeader
           currentLanguage={language.toUpperCase() as 'EN' | 'FR' | 'AR'}
-          onLanguageChange={() => {}} // Language is controlled by global context
+          onLanguageChange={handleLanguageChange}
           onProfilePress={() => router.push('/profile')}
           onMenuPress={() => console.log('Menu pressed')}
         />
@@ -144,7 +148,7 @@ export default function UniversalCompatibilityScreen() {
           )}
         </ScrollView>
 
-        <BottomTabBar activeTab="compatibility" />
+        <BottomTabBar activeTab="guidance" />
       </SafeAreaView>
     </>
   );
