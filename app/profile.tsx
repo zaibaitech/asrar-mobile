@@ -385,7 +385,7 @@ export default function ProfileScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
-          headerTitle: 'Your Profile',
+          headerTitle: t('profile.title'),
           headerStyle: {
             backgroundColor: DarkTheme.screenBackground,
           },
@@ -413,7 +413,7 @@ export default function ProfileScreen() {
               color="#8B7355"
             />
             <Text style={styles.completionTitle}>
-              Profile {completionStatus.completionPercent}% Complete
+              {t('profile.complete')}
             </Text>
           </View>
           
@@ -434,13 +434,13 @@ export default function ProfileScreen() {
           
           {/* Personalization Level */}
           <View style={styles.levelRow}>
-            <Text style={styles.levelLabel}>Personalization Level:</Text>
+            <Text style={styles.levelLabel}>{t('profile.personalizationLevel')}:</Text>
             <View style={styles.levelBadge}>
               <Text style={styles.levelText}>
-                {personalizationLevel === 0 && 'None'}
-                {personalizationLevel === 1 && 'Basic'}
-                {personalizationLevel === 2 && 'Enhanced'}
-                {personalizationLevel === 3 && 'Full'}
+                {personalizationLevel === 0 && t('profile.levels.none')}
+                {personalizationLevel === 1 && t('profile.levels.basic')}
+                {personalizationLevel === 2 && t('profile.levels.enhanced')}
+                {personalizationLevel === 3 && t('profile.levels.full')}
               </Text>
             </View>
           </View>
@@ -448,9 +448,9 @@ export default function ProfileScreen() {
         
         {/* Date of Birth Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Date of Birth</Text>
+          <Text style={styles.sectionTitle}>{t('profile.dob.title')}</Text>
           <Text style={styles.sectionDescription}>
-            Required for Divine Timing personalization
+            {t('profile.dob.subtitle')}
           </Text>
           
           <TouchableOpacity
@@ -459,7 +459,7 @@ export default function ProfileScreen() {
           >
             <Ionicons name="calendar" size={20} color={DarkTheme.textSecondary} />
             <Text style={styles.dateButtonText}>
-              {dobISO || 'Select your date of birth'}
+              {dobISO || t('profile.dob.selectPlaceholder')}
             </Text>
           </TouchableOpacity>
           
@@ -490,16 +490,16 @@ export default function ProfileScreen() {
             colors={['rgba(139, 115, 85, 0.15)', 'rgba(139, 115, 85, 0.05)']}
             style={styles.derivedCard}
           >
-            <Text style={styles.derivedTitle}>Your Astrological Profile</Text>
+            <Text style={styles.derivedTitle}>{t('profile.astro.title')}</Text>
             
             <View style={styles.derivedRow}>
               <View style={styles.derivedItem}>
-                <Text style={styles.derivedLabel}>Burj (Sign)</Text>
+                <Text style={styles.derivedLabel}>{t('profile.astro.sign')}</Text>
                 <Text style={styles.derivedValue}>{burjPreview}</Text>
               </View>
               
               <View style={styles.derivedItem}>
-                <Text style={styles.derivedLabel}>Element</Text>
+                <Text style={styles.derivedLabel}>{t('profile.astro.element')}</Text>
                 <Text style={styles.derivedValue}>{elementPreview}</Text>
               </View>
             </View>
@@ -508,29 +508,29 @@ export default function ProfileScreen() {
         
         {/* Name Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your Name</Text>
+          <Text style={styles.sectionTitle}>{t('profile.name.title')}</Text>
           <Text style={styles.sectionDescription}>
-            Required for Name Destiny and Compatibility
+            {t('profile.name.subtitle')}
           </Text>
           
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Arabic Name</Text>
+            <Text style={styles.inputLabel}>{t('profile.name.arabic')}</Text>
             <TextInput
               style={styles.input}
               value={nameAr}
               onChangeText={setNameAr}
-              placeholder="أدخل اسمك بالعربية"
+              placeholder={t('profile.name.arabicPlaceholder')}
               placeholderTextColor={DarkTheme.textSecondary}
             />
           </View>
           
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Latin Name (Optional)</Text>
+            <Text style={styles.inputLabel}>{t('profile.name.latin')}</Text>
             <TextInput
               style={styles.input}
               value={nameLatin}
               onChangeText={setNameLatin}
-              placeholder="Enter your name in Latin"
+              placeholder={t('profile.name.latinPlaceholder')}
               placeholderTextColor={DarkTheme.textSecondary}
             />
           </View>
@@ -538,18 +538,18 @@ export default function ProfileScreen() {
         
         {/* Mother's Name Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Mother's Name (Optional)</Text>
+          <Text style={styles.sectionTitle}>{t('profile.mother.title')}</Text>
           <Text style={styles.sectionDescription}>
-            Used for enhanced calculations in some features
+            {t('profile.mother.subtitle')}
           </Text>
           
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Mother's Arabic Name</Text>
+            <Text style={styles.inputLabel}>{t('profile.mother.arabic')}</Text>
             <TextInput
               style={styles.input}
               value={motherName}
               onChangeText={setMotherName}
-              placeholder="أدخل اسم والدتك بالعربية"
+              placeholder={t('profile.mother.arabicPlaceholder')}
               placeholderTextColor={DarkTheme.textSecondary}
             />
           </View>
@@ -557,19 +557,19 @@ export default function ProfileScreen() {
         
         {/* Location Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Location (Optional)</Text>
+          <Text style={styles.sectionTitle}>{t('profile.location.title')}</Text>
           <Text style={styles.sectionDescription}>
-            For accurate prayer times and advanced astrological calculations
+            {t('profile.location.subtitle')}
           </Text>
           
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Location</Text>
+            <Text style={styles.inputLabel}>{t('profile.location.label')}</Text>
             <View style={styles.locationRow}>
               <TextInput
                 style={[styles.input, styles.locationInput]}
                 value={locationLabel}
                 onChangeText={setLocationLabel}
-                placeholder="Enter location or use auto-detect"
+                placeholder={t('profile.location.placeholder')}
                 placeholderTextColor={DarkTheme.textSecondary}
                 editable={false}
               />
@@ -586,7 +586,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
             <Text style={styles.inputHint}>
-              Tap the location icon to auto-detect
+              {t('profile.location.autoDetect')}
             </Text>
           </View>
         </View>
@@ -595,7 +595,7 @@ export default function ProfileScreen() {
         <View style={styles.privacyNotice}>
           <Ionicons name="lock-closed" size={16} color={DarkTheme.textSecondary} />
           <Text style={styles.privacyText}>
-            All data is stored locally on your device. Nothing is sent to external servers in guest mode.
+            {t('profile.localOnly')}
           </Text>
         </View>
         
@@ -606,7 +606,7 @@ export default function ProfileScreen() {
             style={styles.saveGradient}
           >
             <Ionicons name="save" size={20} color="#fff" />
-            <Text style={styles.saveButtonText}>Save Profile</Text>
+            <Text style={styles.saveButtonText}>{t('profile.save')}</Text>
           </LinearGradient>
         </TouchableOpacity>
         
@@ -616,7 +616,7 @@ export default function ProfileScreen() {
           onPress={() => router.push('/ai-settings')}
         >
           <Ionicons name="sparkles" size={20} color="#6366f1" />
-          <Text style={styles.aiSettingsButtonText}>AI Settings</Text>
+          <Text style={styles.aiSettingsButtonText}>{t('profile.aiSettings')}</Text>
           <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
         </TouchableOpacity>
         

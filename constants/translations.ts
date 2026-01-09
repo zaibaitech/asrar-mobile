@@ -1139,13 +1139,72 @@ export const translations = {
 
     // User Profile
     profile: {
-      title: "My Profile",
+      title: "Your Profile",
+      complete: "Profile 100% Complete",
+      personalizationLevel: "Personalization Level",
+      full: "Full",
       setup: "Profile Setup",
       edit: "Edit Profile",
       view: "View Profile",
       completion: "Profile Completion",
       completeYourProfile: "Complete Your Profile",
       profileIncomplete: "Your profile is incomplete. Complete it to personalize your experience.",
+      
+      // Personalization levels
+      levels: {
+        none: "None",
+        basic: "Basic",
+        enhanced: "Enhanced",
+        full: "Full",
+      },
+      
+      // Date of Birth
+      dob: {
+        title: "Date of Birth",
+        subtitle: "Required for Divine Timing personalization",
+        selectPlaceholder: "Select your date of birth",
+      },
+      
+      // Astrological Profile
+      astro: {
+        title: "Your Astrological Profile",
+        sign: "Burj (Sign)",
+        element: "Element",
+      },
+      
+      // Name Section
+      name: {
+        title: "Your Name",
+        subtitle: "Required for Name Destiny and Compatibility",
+        arabic: "Arabic Name",
+        arabicPlaceholder: "أدخل اسمك بالعربية",
+        latin: "Latin Name (Optional)",
+        latinPlaceholder: "Enter your name in Latin",
+      },
+      
+      // Mother's Name
+      mother: {
+        title: "Mother's Name (Optional)",
+        subtitle: "Used for enhanced calculations in some features",
+        arabic: "Mother's Arabic Name",
+        arabicPlaceholder: "أدخل اسم والدتك بالعربية",
+      },
+      
+      // Location
+      location: {
+        title: "Location (Optional)",
+        subtitle: "For accurate prayer times and advanced astrological calculations",
+        label: "Location",
+        placeholder: "Enter location or use auto-detect",
+        autoDetect: "Tap the location icon to auto-detect",
+      },
+      
+      // Data Privacy
+      localOnly: "All data is stored locally on your device. Nothing is sent to external servers in guest mode.",
+      
+      // Action Buttons
+      save: "Save Profile",
+      aiSettings: "AI Settings",
       
       // Setup Steps
       steps: {
@@ -6871,13 +6930,72 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
 
     // Profil Utilisateur
     profile: {
-      title: "Mon Profil",
+      title: "Votre profil",
+      complete: "Profil complété à 100 %",
+      personalizationLevel: "Niveau de personnalisation",
+      full: "Complet",
       setup: "Configuration du Profil",
       edit: "Modifier le Profil",
       view: "Voir le Profil",
       completion: "Complétion du Profil",
       completeYourProfile: "Complétez Votre Profil",
       profileIncomplete: "Votre profil est incomplet. Complétez-le pour personnaliser votre expérience.",
+      
+      // Niveaux de personnalisation
+      levels: {
+        none: "Aucun",
+        basic: "Basique",
+        enhanced: "Amélioré",
+        full: "Complet",
+      },
+      
+      // Date de naissance
+      dob: {
+        title: "Date de naissance",
+        subtitle: "Requis pour la personnalisation du Timing Divin",
+        selectPlaceholder: "Sélectionnez votre date de naissance",
+      },
+      
+      // Profil astrologique
+      astro: {
+        title: "Votre profil astrologique",
+        sign: "Burj (signe)",
+        element: "Élément",
+      },
+      
+      // Section nom
+      name: {
+        title: "Votre nom",
+        subtitle: "Requis pour le Destin du Nom et la Compatibilité",
+        arabic: "Nom en arabe",
+        arabicPlaceholder: "أدخل اسمك بالعربية",
+        latin: "Nom en latin (optionnel)",
+        latinPlaceholder: "Entrez votre nom en lettres latines",
+      },
+      
+      // Nom de la mère
+      mother: {
+        title: "Nom de la mère (optionnel)",
+        subtitle: "Utilisé pour des calculs avancés dans certaines fonctionnalités",
+        arabic: "Nom arabe de la mère",
+        arabicPlaceholder: "أدخل اسم والدتك بالعربية",
+      },
+      
+      // Localisation
+      location: {
+        title: "Localisation (optionnel)",
+        subtitle: "Pour des heures de prière précises et des calculs astrologiques avancés",
+        label: "Localisation",
+        placeholder: "Entrez la localisation ou utilisez la détection automatique",
+        autoDetect: "Touchez l'icône pour détecter automatiquement",
+      },
+      
+      // Confidentialité des données
+      localOnly: "Toutes les données sont stockées localement sur votre appareil. Aucune information n'est envoyée vers des serveurs externes en mode invité.",
+      
+      // Boutons d'action
+      save: "Enregistrer le profil",
+      aiSettings: "Paramètres IA",
       
       // Étapes de configuration
       steps: {
