@@ -162,8 +162,8 @@ export function RealTimeDailyGuidance({
               {showDayLabel && dayLabel && (
                 <Text style={[styles.dayBadge, compact && styles.dayBadgeCompact]}>{dayLabel}</Text>
               )}
-              <Text style={[styles.title, compact && styles.titleCompact]}>{t('home.cards.dailyGuidance.title')}</Text>
-              <Text style={[styles.subtitle, { color: statusColor }, compact && styles.subtitleCompact]}>
+              <Text style={[styles.title, compact && styles.titleCompact]} numberOfLines={1} ellipsizeMode="tail">{t('home.cards.dailyGuidance.title')}</Text>
+              <Text style={[styles.subtitle, { color: statusColor }, compact && styles.subtitleCompact]} numberOfLines={1} ellipsizeMode="tail">
                 {statusLabel}
               </Text>
             </View>
@@ -223,14 +223,14 @@ export function RealTimeDailyGuidance({
         {showDetailsHint && (
           <View style={styles.detailsRow}>
             <Ionicons name="arrow-forward" size={12} color={DarkTheme.textTertiary} />
-            <Text style={styles.detailsText}>{t('home.cards.dailyGuidance.tapForDetails')}</Text>
+            <Text style={styles.detailsText} numberOfLines={1} ellipsizeMode="tail">{t('home.cards.dailyGuidance.tapForDetails')}</Text>
           </View>
         )}
 
         {/* Footer */}
         <View style={[styles.footer, compact && styles.footerCompact]}>
           <Ionicons name="information-circle-outline" size={12} color={DarkTheme.textTertiary} />
-          <Text style={compact ? styles.footerTextCompact : styles.footerText}>
+          <Text style={compact ? styles.footerTextCompact : styles.footerText} numberOfLines={2} ellipsizeMode="tail">
             {t('home.cards.dailyGuidance.disclaimer')}
           </Text>
         </View>
@@ -286,6 +286,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flex: 1,
+    minWidth: 0,
   },
   dayBadge: {
     fontSize: 10,
@@ -367,6 +368,7 @@ const styles = StyleSheet.create({
   // Elements
   elementsRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
     marginBottom: 4,
   },
@@ -385,6 +387,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
+    maxWidth: '100%',
   },
   elementBadgeCompact: {
     paddingHorizontal: Spacing.md,
@@ -402,6 +405,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     color: DarkTheme.textSecondary,
+    flexShrink: 1,
   },
   elementLabelCompact: {
     fontSize: Typography.caption,
@@ -481,9 +485,11 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
   detailsText: {
-    fontSize: Typography.caption,
+    fontSize: 11,
     color: DarkTheme.textTertiary,
     fontWeight: Typography.weightMedium,
+    flex: 1,
+    minWidth: 0,
   },
   
   // Footer
@@ -497,13 +503,19 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xs,
   },
   footerText: {
-    fontSize: 11,
-    color: DarkTheme.textTertiary,
-  },
-  footerTextCompact: {
     fontSize: 10,
     color: DarkTheme.textTertiary,
+    flex: 1,
+    minWidth: 0,
+    lineHeight: 14,
+  },
+  footerTextCompact: {
+    fontSize: 9,
+    color: DarkTheme.textTertiary,
     opacity: 0.8,
+    flex: 1,
+    minWidth: 0,
+    lineHeight: 13,
   },
   
   // Loading

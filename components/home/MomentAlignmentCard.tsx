@@ -230,12 +230,12 @@ export function MomentAlignmentCard({
               <View style={[styles.headerIcon, { backgroundColor: theme.pillBackground }]}> 
                 <Ionicons name="sparkles-outline" size={18} color={theme.accent} />
               </View>
-              <Text style={styles.headerTitle} numberOfLines={1}>
+              <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
                 {t('home.cards.momentAlignment.title')}
               </Text>
             </View>
             <View style={styles.headerAction}>
-              <Text style={styles.headerActionText}>{t('home.cards.momentAlignment.details')}</Text>
+              <Text style={styles.headerActionText} numberOfLines={1} ellipsizeMode="tail">{t('home.cards.momentAlignment.details')}</Text>
               <Ionicons name="chevron-forward" size={14} color={DarkTheme.textTertiary} />
             </View>
           </View>
@@ -243,7 +243,7 @@ export function MomentAlignmentCard({
           {statusLabel && (
             <View style={[styles.statusPill, { borderColor: theme.accent, backgroundColor: theme.pillBackground }]}> 
               <View style={[styles.statusDot, { backgroundColor: theme.accent }]} />
-              <Text style={[styles.statusLabel, { color: theme.accent }]}>{statusLabel}</Text>
+              <Text style={[styles.statusLabel, { color: theme.accent }]} numberOfLines={1} ellipsizeMode="tail">{statusLabel}</Text>
             </View>
           )}
 
@@ -261,7 +261,7 @@ export function MomentAlignmentCard({
 
           {/* Cause-based hint text */}
           {causeText && (
-            <Text style={styles.signalText} numberOfLines={2}>
+            <Text style={styles.signalText} numberOfLines={3} ellipsizeMode="tail">
               {causeText}
             </Text>
           )}
@@ -274,7 +274,7 @@ export function MomentAlignmentCard({
 
         <View style={styles.footerRow}>
           <Ionicons name="arrow-forward" size={12} color={DarkTheme.textTertiary} />
-          <Text style={styles.footerText}>{t('home.cards.momentAlignment.tapForDetails')}</Text>
+          <Text style={styles.footerText} numberOfLines={1} ellipsizeMode="tail">{t('home.cards.momentAlignment.tapForDetails')}</Text>
         </View>
       </LinearGradient>
     </Pressable>
@@ -320,7 +320,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    flexShrink: 1,
+    flex: 1,
+    minWidth: 0,
   },
   headerIcon: {
     width: 26,
@@ -343,11 +344,12 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
   headerActionText: {
-    fontSize: Typography.caption,
+    fontSize: 10,
     color: DarkTheme.textTertiary,
     fontWeight: Typography.weightMedium,
     textTransform: 'uppercase',
-    letterSpacing: 0.6,
+    letterSpacing: 0.5,
+    flexShrink: 1,
   },
   statusPill: {
     flexDirection: 'row',
@@ -413,6 +415,7 @@ const styles = StyleSheet.create({
   elementColumn: {
     gap: Spacing.xs,
     marginTop: Spacing.xs,
+    flexWrap: 'wrap',
   },
   elementChip: {
     flexDirection: 'row',
@@ -424,6 +427,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
+    maxWidth: '100%',
   },
   elementIconBadge: {
     width: 26,
@@ -437,6 +441,7 @@ const styles = StyleSheet.create({
   },
   elementTextColumn: {
     flex: 1,
+    minWidth: 0,
   },
   elementChipLabel: {
     fontSize: Typography.caption,
@@ -448,6 +453,7 @@ const styles = StyleSheet.create({
     fontSize: Typography.label,
     fontWeight: Typography.weightSemibold,
     color: DarkTheme.textSecondary,
+    flexShrink: 1,
   },
   footerRow: {
     flexDirection: 'row',
@@ -456,9 +462,11 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
   },
   footerText: {
-    fontSize: Typography.caption,
+    fontSize: 10,
     color: DarkTheme.textTertiary,
     fontWeight: Typography.weightMedium,
+    flex: 1,
+    minWidth: 0,
   },
   footerSeparator: {
     fontSize: Typography.caption,
