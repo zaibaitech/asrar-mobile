@@ -97,7 +97,7 @@ const getModules = (t: any): (Omit<ModuleCardProps, 'onPress'> & { id: string })
     title: t('modules.compatibility.title'),
     titleArabic: 'التوافق',
     description: t('modules.compatibility.description'),
-    icon: '💞',
+    icon: '⚖️',
     element: 'air',
     comingSoon: false,
   },
