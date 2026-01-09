@@ -13,7 +13,6 @@ export type MomentState = 'HOLD' | 'FLOW' | 'ACT' | 'REST';
 
 export interface ElementalHarmony {
   level: HarmonyLevel;
-  explanation: string;
   explanationKey: string; // i18n key
 }
 
@@ -39,8 +38,7 @@ export function calculateElementalHarmony(
   if (userElement === contextElement) {
     return {
       level: 'Harmonious',
-      explanation: `Your ${userElement} nature perfectly aligns with today's ${contextElement} energy — move with confidence and clarity.`,
-      explanationKey: 'harmony.harmonious',
+      explanationKey: 'dailyGuidance.elemental.harmonious.description',
     };
   }
   
@@ -54,8 +52,7 @@ export function calculateElementalHarmony(
   if (complementary) {
     return {
       level: 'Supportive',
-      explanation: `Your ${userElement} nature is supported by today's ${contextElement} energy — favorable conditions for growth and action.`,
-      explanationKey: 'harmony.supportive',
+      explanationKey: 'dailyGuidance.elemental.supportive.description',
     };
   }
   
@@ -69,15 +66,13 @@ export function calculateElementalHarmony(
   if (opposing) {
     return {
       level: 'Challenging',
-      explanation: `Your ${userElement} nature contrasts with today's ${contextElement} energy — practice patience and gentle adaptation.`,
-      explanationKey: 'harmony.challenging',
+      explanationKey: 'dailyGuidance.elemental.challenging.description',
     };
   }
   
   return {
     level: 'Neutral',
-    explanation: `Your ${userElement} nature and today's ${contextElement} energy flow neutrally — balanced conditions for steady progress.`,
-    explanationKey: 'harmony.neutral',
+    explanationKey: 'dailyGuidance.elemental.neutral.description',
   };
 }
 

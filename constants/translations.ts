@@ -440,6 +440,360 @@ export const translations = {
         momentAlignment: {
           title: "Moment Alignment",
           details: "DETAILS",
+          now: "Now",
+          tapForDetails: "Tap for details",
+        },
+        nextPlanetaryHour: {
+          title: "Next Planetary Hour",
+          inTime: "in {duration}",
+        },
+        tomorrow: {
+          title: "Tomorrow",
+        },
+      },
+      
+      // Daily Guidance Details Screen
+      dailyGuidanceDetails: {
+        title: "Daily Guidance",
+        sections: {
+          dayRuler: "Day Ruler",
+          dailyWindow: "Daily Window",
+          elementalHarmony: "Elemental Harmony",
+          bestFor: "Best For",
+          whyThis: "Why This?",
+        },
+        days: {
+          Sunday: "Sunday",
+          Monday: "Monday",
+          Tuesday: "Tuesday",
+          Wednesday: "Wednesday",
+          Thursday: "Thursday",
+          Friday: "Friday",
+          Saturday: "Saturday",
+        },
+        elements: {
+          fire: "Fire",
+          water: "Water",
+          air: "Air",
+          earth: "Earth",
+        },
+        window: {
+          favorable: "Favorable Window",
+          neutral: "Neutral Window",
+          transformative: "Transformative Window",
+          delicate: "Delicate Window",
+        },
+        windowDescription: {
+          favorable: "Today presents favorable conditions for action and growth. The energies align to support your intentions.",
+          neutral: "Today offers balanced energies. A steady day for routine activities and gradual progress.",
+          transformative: "Today brings transformative potential through contrast. Opportunities arise from adapting to changing energies.",
+          delicate: "Today requires gentle navigation. Practice patience and mindful awareness in your actions.",
+        },
+        dayRulerText: "Today is ruled by {planet}, bringing {element} energy to all activities and intentions.",
+        elementText: "{element} Element",
+        harmonyYour: "Your {element}",
+        harmonyDay: "Day's {element}",
+        harmonyLevels: {
+          Harmonious: "Harmonious",
+          Supportive: "Supportive",
+          Challenging: "Challenging",
+        },
+        whyThisContent: {
+          line1: "Today's guidance is calculated from {day}'s planetary ruler ({planet})",
+          line2: "The {element} element of {planet} shapes the day's overall energy",
+          line3: "Your personal {userElement} element (derived from your name) interacts with the day's energy",
+          line4: "This is a reflection tool, not a predictive system — use it to align intentions with natural rhythms",
+        },
+        disclaimer: "For reflection only • Not a ruling",
+      },
+      
+      // Daily Guidance Messages & Content
+      dailyGuidanceContent: {
+        generic: {
+          fire: {
+            message: "{day}'s Fire energy brings vitality and action. A day for initiative and creative expression.",
+            bestFor: {
+              0: "New beginnings",
+              1: "Creative projects",
+              2: "Leadership",
+              3: "Physical activity",
+            },
+            avoid: {
+              0: "Impulsive decisions",
+              1: "Conflict",
+              2: "Overexertion",
+            },
+          },
+          water: {
+            message: "{day}'s Water energy brings flow and intuition. A day for emotional connection and reflection.",
+            bestFor: {
+              0: "Emotional healing",
+              1: "Intuitive work",
+              2: "Relationships",
+              3: "Spiritual practices",
+            },
+            avoid: {
+              0: "Major decisions",
+              1: "Rigid planning",
+              2: "Overanalysis",
+            },
+          },
+          air: {
+            message: "{day}'s Air energy brings clarity and communication. A day for learning and intellectual pursuits.",
+            bestFor: {
+              0: "Study",
+              1: "Communication",
+              2: "Planning",
+              3: "Social connection",
+            },
+            avoid: {
+              0: "Heavy emotions",
+              1: "Isolation",
+              2: "Rushed decisions",
+            },
+          },
+          earth: {
+            message: "{day}'s Earth energy brings grounding and stability. A day for practical work and building foundations.",
+            bestFor: {
+              0: "Practical tasks",
+              1: "Financial planning",
+              2: "Health routines",
+              3: "Building",
+            },
+            avoid: {
+              0: "Major changes",
+              1: "Risk-taking",
+              2: "Neglecting basics",
+            },
+          },
+        },
+        harmonious: {
+          fire: {
+            message: "Powerful alignment! Your Fire nature resonates perfectly with {day}'s solar energy. Channel this intensity with clear intention.",
+            bestFor: {
+              0: "Bold action",
+              1: "Leadership",
+              2: "Breakthrough",
+              3: "Transformation",
+            },
+            avoid: {
+              0: "Burnout",
+              1: "Aggression",
+              2: "Impatience",
+            },
+            peakHours: "Morning to Midday",
+          },
+          water: {
+            message: "Deep harmony! Your Water element flows with {day}'s lunar energy. Trust your intuition and emotional wisdom.",
+            bestFor: {
+              0: "Healing",
+              1: "Intuitive work",
+              2: "Deep connection",
+              3: "Spiritual reflection",
+            },
+            avoid: {
+              0: "Overthinking",
+              1: "Isolation",
+              2: "Emotional overwhelm",
+            },
+            peakHours: "Evening to Night",
+          },
+          air: {
+            message: "Clear alignment! Your Air nature dances with {day}'s mercurial energy. Perfect for mental clarity and communication.",
+            bestFor: {
+              0: "Learning",
+              1: "Teaching",
+              2: "Writing",
+              3: "Strategy",
+            },
+            avoid: {
+              0: "Scattered focus",
+              1: "Overcommitment",
+              2: "Superficiality",
+            },
+            peakHours: "Morning to Afternoon",
+          },
+          earth: {
+            message: "Solid foundation! Your Earth element grounds {day}'s stable energy. Build with patience and practical wisdom.",
+            bestFor: {
+              0: "Building",
+              1: "Health routines",
+              2: "Financial planning",
+              3: "Consistency",
+            },
+            avoid: {
+              0: "Stubbornness",
+              1: "Resistance to change",
+              2: "Overwork",
+            },
+            peakHours: "Afternoon to Evening",
+          },
+        },
+        complementary: {
+          fireAir: {
+            message: "Air fans your Fire! {day}'s energy amplifies your natural vitality. Channel this synergy wisely.",
+            bestFor: {
+              0: "Creative expression",
+              1: "Communication",
+              2: "Innovation",
+              3: "Social leadership",
+            },
+            avoid: {
+              0: "Scattered energy",
+              1: "Overcommitment",
+              2: "Impulsiveness",
+            },
+          },
+          airFire: {
+            message: "Fire energizes your Air! {day} brings passion to your ideas. Clarity meets action.",
+            bestFor: {
+              0: "Strategic action",
+              1: "Public speaking",
+              2: "Problem-solving",
+              3: "Teaching",
+            },
+            avoid: {
+              0: "Analysis paralysis",
+              1: "Overexcitement",
+              2: "Hasty decisions",
+            },
+          },
+          waterEarth: {
+            message: "Earth contains your Water! {day} provides structure for your flow. Intuition meets form.",
+            bestFor: {
+              0: "Grounded healing",
+              1: "Practical spirituality",
+              2: "Building routines",
+              3: "Nurturing",
+            },
+            avoid: {
+              0: "Stagnation",
+              1: "Over-caution",
+              2: "Suppressing emotions",
+            },
+          },
+          earthWater: {
+            message: "Water nourishes your Earth! {day}'s emotional energy softens your grounding. Stability meets flow.",
+            bestFor: {
+              0: "Gentle progress",
+              1: "Emotional work",
+              2: "Creativity",
+              3: "Compassion",
+            },
+            avoid: {
+              0: "Rigidity",
+              1: "Over-planning",
+              2: "Neglecting intuition",
+            },
+          },
+          default: {
+            message: "Supportive energies today. {day} complements your natural element.",
+            bestFor: {
+              0: "Balanced action",
+              1: "Integration",
+              2: "Steady progress",
+            },
+            avoid: {
+              0: "Extremes",
+              1: "Forcing outcomes",
+            },
+          },
+        },
+        transformative: {
+          fireWater: {
+            message: "Transformative tension. Your Fire meets {day}'s Water energy. This opposition creates steam - powerful transformation potential.",
+            bestFor: {
+              0: "Breakthrough",
+              1: "Letting go",
+              2: "Spiritual cleansing",
+              3: "Deep healing",
+            },
+            avoid: {
+              0: "Impulsive reactions",
+              1: "Emotional decisions",
+              2: "Forcing outcomes",
+            },
+            peakHours: "Evening (21:00-04:00)",
+          },
+          waterFire: {
+            message: "Dynamic opposition. Your Water meets {day}'s Fire energy. Navigate with awareness - transformation awaits.",
+            bestFor: {
+              0: "Emotional alchemy",
+              1: "Creative breakthrough",
+              2: "Shadow work",
+              3: "Purification",
+            },
+            avoid: {
+              0: "Reactivity",
+              1: "Overwhelm",
+              2: "Hasty action",
+            },
+            peakHours: "Pre-Dawn (04:00-06:00) & Night (21:00-04:00)",
+          },
+          airEarth: {
+            message: "Grounding challenge. Your Air meets {day}'s Earth energy. Slow down and anchor your insights.",
+            bestFor: {
+              0: "Bringing ideas to form",
+              1: "Practical application",
+              2: "Discipline",
+              3: "Patience",
+            },
+            avoid: {
+              0: "Mental resistance",
+              1: "Rushing",
+              2: "Avoiding embodiment",
+            },
+            peakHours: "Afternoon (14:00-18:00)",
+          },
+          earthAir: {
+            message: "Elevating tension. Your Earth meets {day}'s Air energy. Let yourself be lifted into new perspectives.",
+            bestFor: {
+              0: "New viewpoints",
+              1: "Learning",
+              2: "Flexibility",
+              3: "Mental expansion",
+            },
+            avoid: {
+              0: "Stubbornness",
+              1: "Over-attachment",
+              2: "Resistance to change",
+            },
+            peakHours: "Morning (06:00-10:00)",
+          },
+          default: {
+            message: "Transformative day. Navigate opposing energies with awareness and intention.",
+            bestFor: {
+              0: "Transformation",
+              1: "Growth",
+              2: "Breakthrough",
+            },
+            avoid: {
+              0: "Reactivity",
+              1: "Resistance",
+              2: "Forcing",
+            },
+          },
+        },
+        neutral: {
+          message: "Balanced energies today. {day} offers steady ground for mindful action.",
+          bestFor: {
+            0: "Routine tasks",
+            1: "Consistent effort",
+            2: "Observation",
+            3: "Balance",
+          },
+          avoid: {
+            0: "Extremes",
+            1: "Major changes",
+            2: "Overexertion",
+          },
+        },
+      },
+      
+      sections: {
+        momentAlignment: {
+          title: "Moment Alignment",
+          details: "DETAILS",
           you: "You",
           now: "Now",
           tapForDetails: "Tap for details",
@@ -452,13 +806,11 @@ export const translations = {
         tomorrow: {
           title: "Tomorrow",
         },
+        spiritualModules: "Spiritual Modules",
       },
       actions: {
         checkInNow: "Check In Now",
         viewInsights: "View Insights",
-      },
-      sections: {
-        spiritualModules: "Spiritual Modules",
       },
       showAll: "Show All",
       nextPrayer: "Next Prayer",
@@ -4445,6 +4797,20 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         transformative: "Transformative Dynamic — Opposing energies invite growth",
         neutral: "Balanced State — Neutral energy flow",
       },
+      elemental: {
+        harmonious: {
+          description: "Your {userElement} nature perfectly aligns with today's {dayElement} energy — move with confidence and clarity.",
+        },
+        supportive: {
+          description: "Your {userElement} nature is supported by today's {dayElement} energy — favorable conditions for growth and action.",
+        },
+        challenging: {
+          description: "Your {userElement} nature contrasts with today's {dayElement} energy — practice patience and gentle adaptation.",
+        },
+        neutral: {
+          description: "Your {userElement} nature and today's {dayElement} energy flow neutrally — balanced conditions for steady progress.",
+        },
+      },
       elements: {
         fire: {
           description: "Dynamic, initiating, outward expression",
@@ -5767,6 +6133,360 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         momentAlignment: {
           title: "Alignement du moment",
           details: "DÉTAILS",
+          now: "Maintenant",
+          tapForDetails: "Appuyez pour détails",
+        },
+        nextPlanetaryHour: {
+          title: "Prochaine heure planétaire",
+          inTime: "dans {duration}",
+        },
+        tomorrow: {
+          title: "Demain",
+        },
+      },
+      
+      // Daily Guidance Details Screen  
+      dailyGuidanceDetails: {
+        title: "Guidance du jour",
+        sections: {
+          dayRuler: "Planète du jour",
+          dailyWindow: "Fenêtre quotidienne",
+          elementalHarmony: "Harmonie élémentaire",
+          bestFor: "Idéal pour",
+          whyThis: "Pourquoi?",
+        },
+        days: {
+          Sunday: "Dimanche",
+          Monday: "Lundi",
+          Tuesday: "Mardi",
+          Wednesday: "Mercredi",
+          Thursday: "Jeudi",
+          Friday: "Vendredi",
+          Saturday: "Samedi",
+        },
+        elements: {
+          fire: "Feu",
+          water: "Eau",
+          air: "Air",
+          earth: "Terre",
+        },
+        window: {
+          favorable: "Fenêtre favorable",
+          neutral: "Fenêtre neutre",
+          transformative: "Fenêtre transformative",
+          delicate: "Fenêtre délicate",
+        },
+        windowDescription: {
+          favorable: "Aujourd'hui présente des conditions favorables pour l'action et la croissance. Les énergies s'alignent pour soutenir vos intentions.",
+          neutral: "Aujourd'hui offre des énergies équilibrées. Une journée stable pour les activités routinières et le progrès graduel.",
+          transformative: "Aujourd'hui apporte un potentiel transformatif par le contraste. Les opportunités naissent de l'adaptation aux énergies changeantes.",
+          delicate: "Aujourd'hui nécessite une navigation délicate. Pratiquez la patience et la conscience dans vos actions.",
+        },
+        dayRulerText: "Aujourd'hui est gouverné par {planet}, apportant l'énergie {element} à toutes les activités et intentions.",
+        elementText: "Élément {element}",
+        harmonyYour: "Votre {element}",
+        harmonyDay: "{element} du jour",
+        harmonyLevels: {
+          Harmonious: "Harmonieux",
+          Supportive: "Favorable",
+          Challenging: "Difficile",
+        },
+        whyThisContent: {
+          line1: "La guidance d'aujourd'hui est calculée à partir de la planète gouvernante de {day} ({planet})",
+          line2: "L'élément {element} de {planet} façonne l'énergie générale du jour",
+          line3: "Votre élément personnel {userElement} (dérivé de votre nom) interagit avec l'énergie du jour",
+          line4: "Ceci est un outil de réflexion, pas un système prédictif — utilisez-le pour aligner vos intentions avec les rythmes naturels",
+        },
+        disclaimer: "Pour réflexion • Pas un avis religieux",
+      },
+      
+      // Daily Guidance Messages & Content
+      dailyGuidanceContent: {
+        generic: {
+          fire: {
+            message: "L'énergie Feu de {day} apporte vitalité et action. Un jour pour l'initiative et l'expression créative.",
+            bestFor: {
+              0: "Nouveaux débuts",
+              1: "Projets créatifs",
+              2: "Leadership",
+              3: "Activité physique",
+            },
+            avoid: {
+              0: "Décisions impulsives",
+              1: "Conflit",
+              2: "Surmenage",
+            },
+          },
+          water: {
+            message: "L'énergie Eau de {day} apporte fluidité et intuition. Un jour pour la connexion émotionnelle et la réflexion.",
+            bestFor: {
+              0: "Guérison émotionnelle",
+              1: "Travail intuitif",
+              2: "Relations",
+              3: "Pratiques spirituelles",
+            },
+            avoid: {
+              0: "Décisions majeures",
+              1: "Planification rigide",
+              2: "Suranalyse",
+            },
+          },
+          air: {
+            message: "L'énergie Air de {day} apporte clarté et communication. Un jour pour l'apprentissage et les poursuites intellectuelles.",
+            bestFor: {
+              0: "Étude",
+              1: "Communication",
+              2: "Planification",
+              3: "Connexion sociale",
+            },
+            avoid: {
+              0: "Émotions lourdes",
+              1: "Isolement",
+              2: "Décisions précipitées",
+            },
+          },
+          earth: {
+            message: "L'énergie Terre de {day} apporte ancrage et stabilité. Un jour pour le travail pratique et bâtir des fondations.",
+            bestFor: {
+              0: "Tâches pratiques",
+              1: "Planification financière",
+              2: "Routines de santé",
+              3: "Construction",
+            },
+            avoid: {
+              0: "Changements majeurs",
+              1: "Prise de risques",
+              2: "Négliger les bases",
+            },
+          },
+        },
+        harmonious: {
+          fire: {
+            message: "Alignement puissant ! Votre nature Feu résonne parfaitement avec l'énergie solaire de {day}. Canalisez cette intensité avec une intention claire.",
+            bestFor: {
+              0: "Action audacieuse",
+              1: "Leadership",
+              2: "Percée",
+              3: "Transformation",
+            },
+            avoid: {
+              0: "Épuisement",
+              1: "Agressivité",
+              2: "Impatience",
+            },
+            peakHours: "Matin au Midi",
+          },
+          water: {
+            message: "Harmonie profonde ! Votre élément Eau coule avec l'énergie lunaire de {day}. Faites confiance à votre intuition et sagesse émotionnelle.",
+            bestFor: {
+              0: "Guérison",
+              1: "Travail intuitif",
+              2: "Connexion profonde",
+              3: "Réflexion spirituelle",
+            },
+            avoid: {
+              0: "Surpensée",
+              1: "Isolement",
+              2: "Submersion émotionnelle",
+            },
+            peakHours: "Soir à la Nuit",
+          },
+          air: {
+            message: "Alignement clair ! Votre nature Air danse avec l'énergie mercurielle de {day}. Parfait pour la clarté mentale et la communication.",
+            bestFor: {
+              0: "Apprentissage",
+              1: "Enseignement",
+              2: "Écriture",
+              3: "Stratégie",
+            },
+            avoid: {
+              0: "Focus dispersé",
+              1: "Sur-engagement",
+              2: "Superficialité",
+            },
+            peakHours: "Matin à l'Après-midi",
+          },
+          earth: {
+            message: "Fondation solide ! Votre élément Terre ancre l'énergie stable de {day}. Construisez avec patience et sagesse pratique.",
+            bestFor: {
+              0: "Construction",
+              1: "Routines de santé",
+              2: "Planification financière",
+              3: "Constance",
+            },
+            avoid: {
+              0: "Entêtement",
+              1: "Résistance au changement",
+              2: "Surmenage",
+            },
+            peakHours: "Après-midi au Soir",
+          },
+        },
+        complementary: {
+          fireAir: {
+            message: "L'Air attise votre Feu ! L'énergie de {day} amplifie votre vitalité naturelle. Canalisez cette synergie avec sagesse.",
+            bestFor: {
+              0: "Expression créative",
+              1: "Communication",
+              2: "Innovation",
+              3: "Leadership social",
+            },
+            avoid: {
+              0: "Énergie dispersée",
+              1: "Sur-engagement",
+              2: "Impulsivité",
+            },
+          },
+          airFire: {
+            message: "Le Feu énergise votre Air ! {day} apporte passion à vos idées. La clarté rencontre l'action.",
+            bestFor: {
+              0: "Action stratégique",
+              1: "Prise de parole en public",
+              2: "Résolution de problèmes",
+              3: "Enseignement",
+            },
+            avoid: {
+              0: "Paralysie d'analyse",
+              1: "Surexcitation",
+              2: "Décisions hâtives",
+            },
+          },
+          waterEarth: {
+            message: "La Terre contient votre Eau ! {day} fournit structure à votre flux. L'intuition rencontre la forme.",
+            bestFor: {
+              0: "Guérison ancrée",
+              1: "Spiritualité pratique",
+              2: "Construire des routines",
+              3: "Nourrir",
+            },
+            avoid: {
+              0: "Stagnation",
+              1: "Excès de prudence",
+              2: "Supprimer les émotions",
+            },
+          },
+          earthWater: {
+            message: "L'Eau nourrit votre Terre ! L'énergie émotionnelle de {day} adoucit votre ancrage. La stabilité rencontre le flux.",
+            bestFor: {
+              0: "Progrès doux",
+              1: "Travail émotionnel",
+              2: "Créativité",
+              3: "Compassion",
+            },
+            avoid: {
+              0: "Rigidité",
+              1: "Sur-planification",
+              2: "Négliger l'intuition",
+            },
+          },
+          default: {
+            message: "Énergies favorables aujourd'hui. {day} complète votre élément naturel.",
+            bestFor: {
+              0: "Action équilibrée",
+              1: "Intégration",
+              2: "Progrès constant",
+            },
+            avoid: {
+              0: "Extrêmes",
+              1: "Forcer les résultats",
+            },
+          },
+        },
+        transformative: {
+          fireWater: {
+            message: "Tension transformative. Votre Feu rencontre l'énergie Eau de {day}. Cette opposition crée de la vapeur - potentiel de transformation puissant.",
+            bestFor: {
+              0: "Percée",
+              1: "Lâcher prise",
+              2: "Nettoyage spirituel",
+              3: "Guérison profonde",
+            },
+            avoid: {
+              0: "Réactions impulsives",
+              1: "Décisions émotionnelles",
+              2: "Forcer les résultats",
+            },
+            peakHours: "Soir (21h00-04h00)",
+          },
+          waterFire: {
+            message: "Opposition dynamique. Votre Eau rencontre l'énergie Feu de {day}. Naviguez avec conscience - la transformation vous attend.",
+            bestFor: {
+              0: "Alchimie émotionnelle",
+              1: "Percée créative",
+              2: "Travail de l'ombre",
+              3: "Purification",
+            },
+            avoid: {
+              0: "Réactivité",
+              1: "Submersion",
+              2: "Action hâtive",
+            },
+            peakHours: "Pré-aube (04h00-06h00) & Nuit (21h00-04h00)",
+          },
+          airEarth: {
+            message: "Défi d'ancrage. Votre Air rencontre l'énergie Terre de {day}. Ralentissez et ancrez vos idées.",
+            bestFor: {
+              0: "Donner forme aux idées",
+              1: "Application pratique",
+              2: "Discipline",
+              3: "Patience",
+            },
+            avoid: {
+              0: "Résistance mentale",
+              1: "Précipitation",
+              2: "Éviter l'incarnation",
+            },
+            peakHours: "Après-midi (14h00-18h00)",
+          },
+          earthAir: {
+            message: "Tension élévatrice. Votre Terre rencontre l'énergie Air de {day}. Laissez-vous élever vers de nouvelles perspectives.",
+            bestFor: {
+              0: "Nouveaux points de vue",
+              1: "Apprentissage",
+              2: "Flexibilité",
+              3: "Expansion mentale",
+            },
+            avoid: {
+              0: "Entêtement",
+              1: "Sur-attachement",
+              2: "Résistance au changement",
+            },
+            peakHours: "Matin (06h00-10h00)",
+          },
+          default: {
+            message: "Journée transformative. Naviguez les énergies opposées avec conscience et intention.",
+            bestFor: {
+              0: "Transformation",
+              1: "Croissance",
+              2: "Percée",
+            },
+            avoid: {
+              0: "Réactivité",
+              1: "Résistance",
+              2: "Forcer",
+            },
+          },
+        },
+        neutral: {
+          message: "Énergies équilibrées aujourd'hui. {day} offre un terrain stable pour une action consciente.",
+          bestFor: {
+            0: "Tâches routinières",
+            1: "Effort constant",
+            2: "Observation",
+            3: "Équilibre",
+          },
+          avoid: {
+            0: "Extrêmes",
+            1: "Changements majeurs",
+            2: "Surmenage",
+          },
+        },
+      },
+      
+      sections: {
+        momentAlignment: {
+          title: "Alignement du moment",
+          details: "DÉTAILS",
           you: "Vous",
           now: "Maintenant",
           tapForDetails: "Appuyez pour détails",
@@ -5779,13 +6499,11 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         tomorrow: {
           title: "Demain",
         },
+        spiritualModules: "Modules spirituels",
       },
       actions: {
         checkInNow: "Check-in",
         viewInsights: "Voir analyses",
-      },
-      sections: {
-        spiritualModules: "Modules spirituels",
       },
       showAll: "Voir tout",
       nextPrayer: "Prochaine Prière",
@@ -9675,6 +10393,20 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         complementary: "Flux Favorable — Votre élément complète l'énergie d'aujourd'hui",
         transformative: "Dynamique Transformative — Les énergies opposées invitent à la croissance",
         neutral: "État Équilibré — Flux d'énergie neutre",
+      },
+      elemental: {
+        harmonious: {
+          description: "Votre nature {userElement} s'aligne parfaitement avec l'énergie {dayElement} du jour — avancez avec confiance et clarté.",
+        },
+        supportive: {
+          description: "Votre nature {userElement} est soutenue par l'énergie {dayElement} du jour — des conditions favorables à l'évolution et à l'action.",
+        },
+        challenging: {
+          description: "Votre nature {userElement} contraste avec l'énergie {dayElement} du jour — pratiquez la patience et une adaptation en douceur.",
+        },
+        neutral: {
+          description: "Votre nature {userElement} et l'énergie {dayElement} du jour restent neutres — des conditions équilibrées pour un progrès stable.",
+        },
       },
       elements: {
         fire: {

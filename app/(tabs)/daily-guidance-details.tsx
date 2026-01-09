@@ -33,13 +33,17 @@ export default function DailyGuidanceDetailsScreen() {
   const dayElement = (params.dayElement as Element) || 'earth';
   const userElement = (params.userElement as Element) || undefined;
   const relationship = (params.relationship as string) || 'neutral';
-  const message = (params.message as string) || '';
-  const bestFor = params.bestFor ? JSON.parse(params.bestFor as string) : [];
-  const avoid = params.avoid ? JSON.parse(params.avoid as string) : [];
-  const peakHours = (params.peakHours as string) || '';
+  const messageKey = (params.messageKey as string) || '';
+  const messageParams = params.messageParams ? JSON.parse(params.messageParams as string) : {};
+  const bestForKeys = params.bestForKeys ? JSON.parse(params.bestForKeys as string) : [];
+  const avoidKeys = params.avoidKeys ? JSON.parse(params.avoidKeys as string) : [];
+  const peakHoursKey = (params.peakHoursKey as string) || '';
   
   const now = new Date();
-  const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
+  const dayOfWeek = now.getDay();
+  const dayKeys = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dayKey = dayKeys[dayOfWeek];
+  const dayName = t(`home.dailyGuidanceDetails.days.${dayKey}`);
   const date = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   
   // Get day ruler
@@ -48,8 +52,14 @@ export default function DailyGuidanceDetailsScreen() {
   
   // Calculate harmony
   const harmony = userElement ? calculateElementalHarmony(userElement, dayElement) : null;
+  const harmonyDescription = harmony && userElement
+    ? t(harmony.explanationKey, {
+        userElement: getElementLabel(userElement).toLowerCase(),
+        dayElement: getElementLabel(dayElement).toLowerCase(),
+      })
+    : '';
   
-  const getStatusColor = () => {
+  function getStatusColor() {
     switch (timingQuality) {
       case 'favorable':
         return '#10b981';
@@ -60,22 +70,13 @@ export default function DailyGuidanceDetailsScreen() {
       default:
         return '#64B5F6';
     }
-  };
+  }
   
-  const getStatusLabel = () => {
-    switch (timingQuality) {
-      case 'favorable':
-        return 'Favorable Window';
-      case 'transformative':
-        return 'Transformative Window';
-      case 'delicate':
-        return 'Delicate Window';
-      default:
-        return 'Neutral Window';
-    }
-  };
+  function getStatusLabel() {
+    return t(`home.dailyGuidanceDetails.window.${timingQuality}`);
+  }
   
-  const getElementIcon = (element: Element) => {
+  function getElementIcon(element: Element) {
     const icons = {
       fire: '🔥',
       water: '💧',
@@ -83,11 +84,11 @@ export default function DailyGuidanceDetailsScreen() {
       earth: '🌱',
     };
     return icons[element];
-  };
+  }
   
-  const getElementLabel = (element: Element) => {
-    return element.charAt(0).toUpperCase() + element.slice(1);
-  };
+  function getElementLabel(element: Element) {
+    return t(`home.dailyGuidanceDetails.elements.${element}`);
+  }
   
   const statusColor = getStatusColor();
   
@@ -99,7 +100,7 @@ export default function DailyGuidanceDetailsScreen() {
           <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.headerTitle}>Daily Guidance</Text>
+          <Text style={styles.headerTitle}>{t('home.dailyGuidanceDetails.title')}</Text>
           <Text style={styles.headerSubtitle}>{dayName}, {date}</Text>
         </View>
         <View style={styles.placeholder} />
@@ -122,77 +123,84 @@ export default function DailyGuidanceDetailsScreen() {
           
           {/* Day Ruler Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Day Ruler</Text>
+            <Text style={styles.sectionTitle}>{t('home.dailyGuidanceDetails.sections.dayRuler')}</Text>
             <View style={styles.planetCard}>
               <Text style={styles.planetSymbol}>{dayRulerInfo.symbol}</Text>
               <View style={styles.planetInfo}>
                 <Text style={styles.planetName}>{dayRuler}</Text>
                 <Text style={styles.planetArabic}>{dayRulerInfo.arabicName}</Text>
                 <Text style={styles.planetElement}>
-                  {getElementIcon(dayRulerInfo.element)} {getElementLabel(dayRulerInfo.element)} Element
+                  {getElementIcon(dayRulerInfo.element)} {t('home.dailyGuidanceDetails.elementText', { element: getElementLabel(dayRulerInfo.element) })}
                 </Text>
               </View>
             </View>
             <Text style={styles.explainerText}>
-              Today is ruled by {dayRuler}, bringing {getElementLabel(dayRulerInfo.element).toLowerCase()} energy to all activities and intentions.
+              {t('home.dailyGuidanceDetails.dayRulerText', { 
+                planet: dayRuler, 
+                element: getElementLabel(dayRulerInfo.element).toLowerCase() 
+              })}
             </Text>
           </View>
           
           {/* Daily Window Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Daily Window</Text>
+            <Text style={styles.sectionTitle}>{t('home.dailyGuidanceDetails.sections.dailyWindow')}</Text>
             <View style={styles.card}>
               <View style={styles.cardHeader}>
                 <Ionicons name="compass-outline" size={24} color={statusColor} />
                 <Text style={[styles.cardTitle, { color: statusColor }]}>{getStatusLabel()}</Text>
               </View>
               <Text style={styles.cardText}>
-                {timingQuality === 'favorable' && 
-                  'Today presents favorable conditions for action and growth. The energies align to support your intentions.'}
-                {timingQuality === 'neutral' &&
-                  'Today offers balanced energies. A steady day for routine activities and gradual progress.'}
-                {timingQuality === 'transformative' &&
-                  'Today brings transformative potential through contrast. Opportunities arise from adapting to changing energies.'}
-                {timingQuality === 'delicate' &&
-                  'Today requires gentle navigation. Practice patience and mindful awareness in your actions.'}
+                {t(`home.dailyGuidanceDetails.windowDescription.${timingQuality}`)}
               </Text>
+              {messageKey && (
+                <Text style={styles.cardText}>
+                  {t(messageKey, messageParams)}
+                </Text>
+              )}
             </View>
           </View>
           
           {/* Elemental Harmony Section */}
           {harmony && userElement && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Elemental Harmony</Text>
+              <Text style={styles.sectionTitle}>{t('home.dailyGuidanceDetails.sections.elementalHarmony')}</Text>
               <View style={styles.harmonyCard}>
                 <View style={styles.harmonyHeader}>
                   <View style={styles.harmonyElementBox}>
                     <Text style={styles.harmonyElementIcon}>{getElementIcon(userElement)}</Text>
-                    <Text style={styles.harmonyElementLabel}>Your {getElementLabel(userElement)}</Text>
+                    <Text style={styles.harmonyElementLabel}>
+                      {t('home.dailyGuidanceDetails.harmonyYour', { element: getElementLabel(userElement) })}
+                    </Text>
                   </View>
                   <Text style={styles.harmonySymbol}>◐</Text>
                   <View style={styles.harmonyElementBox}>
                     <Text style={styles.harmonyElementIcon}>{getElementIcon(dayElement)}</Text>
-                    <Text style={styles.harmonyElementLabel}>Day's {getElementLabel(dayElement)}</Text>
+                    <Text style={styles.harmonyElementLabel}>
+                      {t('home.dailyGuidanceDetails.harmonyDay', { element: getElementLabel(dayElement) })}
+                    </Text>
                   </View>
                 </View>
                 <View style={[styles.harmonyBadge, { backgroundColor: getHarmonyColor(harmony.level) + '20' }]}>
                   <Text style={[styles.harmonyLevel, { color: getHarmonyColor(harmony.level) }]}>
-                    {harmony.level}
+                    {t(`home.dailyGuidanceDetails.harmonyLevels.${harmony.level}`)}
                   </Text>
                 </View>
-                <Text style={styles.harmonyExplanation}>{harmony.explanation}</Text>
+                {harmonyDescription && (
+                  <Text style={styles.harmonyExplanation}>{harmonyDescription}</Text>
+                )}
               </View>
             </View>
           )}
           
           {/* Best For Section */}
-          {bestFor.length > 0 && (
+          {bestForKeys.length > 0 && (
             <View style={styles.section}>
               <TouchableOpacity 
                 style={styles.expandableHeader}
                 onPress={() => setBestForExpanded(!bestForExpanded)}
               >
-                <Text style={styles.sectionTitle}>✅ Best For</Text>
+                <Text style={styles.sectionTitle}>✅ {t('home.dailyGuidanceDetails.sections.bestFor')}</Text>
                 <Ionicons 
                   name={bestForExpanded ? 'chevron-up' : 'chevron-down'} 
                   size={20} 
@@ -201,10 +209,10 @@ export default function DailyGuidanceDetailsScreen() {
               </TouchableOpacity>
               {bestForExpanded && (
                 <View style={styles.listCard}>
-                  {bestFor.map((item: string, index: number) => (
+                  {bestForKeys.map((key: string, index: number) => (
                     <View key={index} style={styles.listItem}>
                       <View style={[styles.listDot, { backgroundColor: '#10b981' }]} />
-                      <Text style={styles.listText}>{item}</Text>
+                      <Text style={styles.listText}>{t(key)}</Text>
                     </View>
                   ))}
                 </View>
@@ -218,7 +226,7 @@ export default function DailyGuidanceDetailsScreen() {
               style={styles.expandableHeader}
               onPress={() => setWhyThisExpanded(!whyThisExpanded)}
             >
-              <Text style={styles.sectionTitle}>💡 Why This?</Text>
+              <Text style={styles.sectionTitle}>💡 {t('home.dailyGuidanceDetails.sections.whyThis')}</Text>
               <Ionicons 
                 name={whyThisExpanded ? 'chevron-up' : 'chevron-down'} 
                 size={20} 
@@ -228,10 +236,10 @@ export default function DailyGuidanceDetailsScreen() {
             {whyThisExpanded && (
               <View style={styles.card}>
                 <Text style={styles.cardText}>
-                  • Today's guidance is calculated from {dayName}'s planetary ruler ({dayRuler}){'\n\n'}
-                  • The {getElementLabel(dayElement).toLowerCase()} element of {dayRuler} shapes the day's overall energy{'\n\n'}
-                  {userElement && `• Your personal ${getElementLabel(userElement).toLowerCase()} element (derived from your name) interacts with the day's energy\n\n`}
-                  • This is a reflection tool, not a predictive system — use it to align intentions with natural rhythms
+                  • {t('home.dailyGuidanceDetails.whyThisContent.line1', { day: dayName, planet: dayRuler })}{'\n\n'}
+                  • {t('home.dailyGuidanceDetails.whyThisContent.line2', { element: getElementLabel(dayElement).toLowerCase(), planet: dayRuler })}{'\n\n'}
+                  {userElement && `• ${t('home.dailyGuidanceDetails.whyThisContent.line3', { userElement: getElementLabel(userElement).toLowerCase() })}\n\n`}
+                  • {t('home.dailyGuidanceDetails.whyThisContent.line4')}
                 </Text>
               </View>
             )}
@@ -241,7 +249,7 @@ export default function DailyGuidanceDetailsScreen() {
           <View style={styles.disclaimer}>
             <Ionicons name="information-circle-outline" size={16} color={DarkTheme.textTertiary} />
             <Text style={styles.disclaimerText}>
-              For reflection only • Not a ruling
+              {t('home.dailyGuidanceDetails.disclaimer')}
             </Text>
           </View>
         </ScrollView>

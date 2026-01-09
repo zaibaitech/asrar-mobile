@@ -53,10 +53,11 @@ export function RealTimeDailyGuidance({
           dayElement: guidance.dayElement,
           userElement: guidance.userElement || '',
           relationship: guidance.relationship,
-          message: guidance.message,
-          bestFor: JSON.stringify(guidance.bestFor || []),
-          avoid: JSON.stringify(guidance.avoid || []),
-          peakHours: guidance.peakHours || '',
+          messageKey: guidance.messageKey,
+          messageParams: JSON.stringify(guidance.messageParams || {}),
+          bestForKeys: JSON.stringify(guidance.bestForKeys || []),
+          avoidKeys: JSON.stringify(guidance.avoidKeys || []),
+          peakHoursKey: guidance.peakHoursKey || '',
         },
       });
     }
@@ -127,9 +128,11 @@ export function RealTimeDailyGuidance({
   
   const statusColor = getStatusColor(guidance.timingQuality);
   const statusLabel = getStatusLabel(guidance.timingQuality);
-  const summaryText = t('home.daily.summary');
-  const bestForText = t('home.daily.bestFor');
-  const hasBestFor = Array.isArray(guidance.bestFor) && guidance.bestFor.length > 0;
+  
+  // Get first bestFor item if available
+  const firstBestForKey = guidance.bestForKeys && guidance.bestForKeys.length > 0 ? guidance.bestForKeys[0] : null;
+  const bestForText = firstBestForKey ? t(firstBestForKey) : '';
+  const hasBestFor = firstBestForKey !== null;
   
   // Get day ruler
   const now = new Date();

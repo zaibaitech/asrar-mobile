@@ -22,11 +22,13 @@
 import {
     AIRewriteRequest,
     AIRewriteResponse,
+    AISettings,
     AITone,
     CalculatorAIRequest,
     CalculatorAIResponse,
     CompatibilityAIRequest,
     CompatibilityAIResponse,
+    DEFAULT_AI_SETTINGS,
     IstikharaAIRewriteRequest,
     IstikharaAIRewriteResponse,
     NameDestinyAIRequest,
@@ -34,6 +36,7 @@ import {
     PeakWindowsAIRequest,
     PeakWindowsAIResponse
 } from '@/types/ai-settings';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
 import { AI_PROVIDER_NAME, GROQ_API_KEY, GROQ_API_URL, GROQ_MODEL, containsEnglish, containsFrench, extractJSON } from './AIClientConfig';
 
@@ -71,6 +74,42 @@ const DEFAULT_MODEL = GROQ_MODEL || 'llama-3.3-70b-versatile';
  * For development: Can disable here to prevent all AI calls.
  */
 const ENABLE_AI_CAPABILITY = true; // Build-time capability flag
+
+// ============================================================================
+// SETTINGS STORAGE HELPERS
+// ============================================================================
+
+export async function loadAISettings(): Promise<AISettings> {
+  try {
+    const stored = await AsyncStorage.getItem(AI_SETTINGS_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('[AI] Failed to load settings:', error);
+    }
+  }
+  return { ...DEFAULT_AI_SETTINGS };
+}
+
+export async function saveAISettings(settings: AISettings): Promise<void> {
+  try {
+    await AsyncStorage.setItem(
+      AI_SETTINGS_KEY,
+      JSON.stringify({ ...settings, updatedAt: Date.now() })
+    );
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('[AI] Failed to save settings:', error);
+    }
+    throw error;
+  }
+}
+
+export function isAIAvailable(): boolean {
+  return ENABLE_AI_CAPABILITY && Boolean(GROQ_API_KEY);
+}
 
 // ============================================================================
 // VALIDATION SCHEMAS

@@ -22,17 +22,20 @@ export interface DailyGuidance {
   /** Element relationship */
   relationship: 'harmonious' | 'complementary' | 'neutral' | 'transformative';
   
-  /** Short guidance message */
-  message: string;
+  /** Translation key for the message */
+  messageKey: string;
   
-  /** Best activities for today */
-  bestFor: string[];
+  /** Translation params for the message */
+  messageParams?: Record<string, string>;
   
-  /** Activities to avoid */
-  avoid: string[];
+  /** Translation keys for best activities */
+  bestForKeys: string[];
   
-  /** Recommended hours */
-  peakHours?: string;
+  /** Translation keys for activities to avoid */
+  avoidKeys: string[];
+  
+  /** Recommended hours (translation key or actual text) */
+  peakHoursKey?: string;
   
   /** Cycle state */
   cycleState?: string;
@@ -88,10 +91,11 @@ export async function getDailyGuidance(profile?: UserProfile): Promise<DailyGuid
     dayElement,
     userElement,
     relationship,
-    message: guidance.message || 'Balanced energies today',
-    bestFor: Array.isArray(guidance.bestFor) ? guidance.bestFor : [],
-    avoid: Array.isArray(guidance.avoid) ? guidance.avoid : [],
-    peakHours: guidance.peakHours,
+    messageKey: guidance.messageKey,
+    messageParams: guidance.messageParams,
+    bestForKeys: guidance.bestForKeys,
+    avoidKeys: guidance.avoidKeys,
+    peakHoursKey: guidance.peakHoursKey,
   };
 }
 
@@ -146,231 +150,149 @@ function generateGuidanceMessage(
   relationship?: 'harmonious' | 'complementary' | 'neutral' | 'transformative',
   timingQuality?: 'favorable' | 'neutral' | 'delicate' | 'transformative'
 ): {
-  message: string;
-  bestFor: string[];
-  avoid: string[];
-  peakHours?: string;
+  messageKey: string;
+  messageParams?: Record<string, string>;
+  bestForKeys: string[];
+  avoidKeys: string[];
+  peakHoursKey?: string;
 } {
-  const dayNames: Record<number, string> = {
-    0: 'Sunday',
-    1: 'Monday',
-    2: 'Tuesday',
-    3: 'Wednesday',
-    4: 'Thursday',
-    5: 'Friday',
-    6: 'Saturday',
-  };
-  
   const dayOfWeek = new Date().getDay();
-  const dayName = dayNames[dayOfWeek];
+  const dayKeys = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dayKey = dayKeys[dayOfWeek];
   
   // No user element - generic guidance
   if (!userElement) {
-    return getGenericDayGuidance(dayElement, dayName);
+    return getGenericDayGuidance(dayElement, dayKey);
   }
   
   // Harmonious (same element)
   if (relationship === 'harmonious') {
-    return getHarmoniousGuidance(dayElement, dayName);
+    return getHarmoniousGuidance(dayElement, dayKey);
   }
   
   // Complementary
   if (relationship === 'complementary') {
-    return getComplementaryGuidance(userElement, dayElement, dayName);
+    return getComplementaryGuidance(userElement, dayElement, dayKey);
   }
   
   // Transformative (opposing)
   if (relationship === 'transformative') {
-    return getTransformativeGuidance(userElement, dayElement, dayName);
+    return getTransformativeGuidance(userElement, dayElement, dayKey);
   }
   
   // Neutral
-  return getNeutralGuidance(dayElement, dayName);
+  return getNeutralGuidance(dayElement, dayKey);
 }
 
 /**
  * Generic day guidance (no user element)
  */
-function getGenericDayGuidance(dayElement: string, dayName: string): {
-  message: string;
-  bestFor: string[];
-  avoid: string[];
+function getGenericDayGuidance(dayElement: string, dayKey: string): {
+  messageKey: string;
+  messageParams: Record<string, string>;
+  bestForKeys: string[];
+  avoidKeys: string[];
 } {
-  const elementGuidance: Record<string, any> = {
-    fire: {
-      message: `${dayName}'s Fire energy brings vitality and action. A day for initiative and creative expression.`,
-      bestFor: ['New beginnings', 'Creative projects', 'Leadership', 'Physical activity'],
-      avoid: ['Impulsive decisions', 'Conflict', 'Overexertion'],
-    },
-    water: {
-      message: `${dayName}'s Water energy brings flow and intuition. A day for emotional connection and reflection.`,
-      bestFor: ['Emotional healing', 'Intuitive work', 'Relationships', 'Spiritual practices'],
-      avoid: ['Major decisions', 'Rigid planning', 'Overanalysis'],
-    },
-    air: {
-      message: `${dayName}'s Air energy brings clarity and communication. A day for learning and intellectual pursuits.`,
-      bestFor: ['Study', 'Communication', 'Planning', 'Social connection'],
-      avoid: ['Heavy emotions', 'Isolation', 'Rushed decisions'],
-    },
-    earth: {
-      message: `${dayName}'s Earth energy brings grounding and stability. A day for practical work and building foundations.`,
-      bestFor: ['Practical tasks', 'Financial planning', 'Health routines', 'Building'],
-      avoid: ['Major changes', 'Risk-taking', 'Neglecting basics'],
-    },
+  return {
+    messageKey: `home.dailyGuidanceContent.generic.${dayElement}.message`,
+    messageParams: { day: `home.dailyGuidanceDetails.days.${dayKey}` },
+    bestForKeys: [0, 1, 2, 3].map(i => `home.dailyGuidanceContent.generic.${dayElement}.bestFor.${i}`),
+    avoidKeys: [0, 1, 2].map(i => `home.dailyGuidanceContent.generic.${dayElement}.avoid.${i}`),
   };
-  
-  return elementGuidance[dayElement];
 }
 
 /**
  * Harmonious guidance (same element)
  */
-function getHarmoniousGuidance(element: string, dayName: string): {
-  message: string;
-  bestFor: string[];
-  avoid: string[];
-  peakHours?: string;
+function getHarmoniousGuidance(element: string, dayKey: string): {
+  messageKey: string;
+  messageParams: Record<string, string>;
+  bestForKeys: string[];
+  avoidKeys: string[];
+  peakHoursKey: string;
 } {
-  const harmonious: Record<string, any> = {
-    fire: {
-      message: `Powerful alignment! Your Fire nature resonates perfectly with ${dayName}'s solar energy. Channel this intensity with clear intention.`,
-      bestFor: ['Bold action', 'Leadership', 'Breakthrough', 'Transformation'],
-      avoid: ['Burnout', 'Aggression', 'Impatience'],
-      peakHours: 'Morning to Midday',
-    },
-    water: {
-      message: `Deep harmony! Your Water element flows with ${dayName}'s lunar energy. Trust your intuition and emotional wisdom.`,
-      bestFor: ['Healing', 'Intuitive work', 'Deep connection', 'Spiritual reflection'],
-      avoid: ['Overthinking', 'Isolation', 'Emotional overwhelm'],
-      peakHours: 'Evening to Night',
-    },
-    air: {
-      message: `Clear alignment! Your Air nature dances with ${dayName}'s mercurial energy. Perfect for mental clarity and communication.`,
-      bestFor: ['Learning', 'Teaching', 'Writing', 'Strategy'],
-      avoid: ['Scattered focus', 'Overcommitment', 'Superficiality'],
-      peakHours: 'Morning to Afternoon',
-    },
-    earth: {
-      message: `Solid foundation! Your Earth element grounds ${dayName}'s stable energy. Build with patience and practical wisdom.`,
-      bestFor: ['Building', 'Health routines', 'Financial planning', 'Consistency'],
-      avoid: ['Stubbornness', 'Resistance to change', 'Overwork'],
-      peakHours: 'Afternoon to Evening',
-    },
+  return {
+    messageKey: `home.dailyGuidanceContent.harmonious.${element}.message`,
+    messageParams: { day: `home.dailyGuidanceDetails.days.${dayKey}` },
+    bestForKeys: [0, 1, 2, 3].map(i => `home.dailyGuidanceContent.harmonious.${element}.bestFor.${i}`),
+    avoidKeys: [0, 1, 2].map(i => `home.dailyGuidanceContent.harmonious.${element}.avoid.${i}`),
+    peakHoursKey: `home.dailyGuidanceContent.harmonious.${element}.peakHours`,
   };
-  
-  return harmonious[element];
 }
 
 /**
  * Complementary guidance (supportive elements)
  */
-function getComplementaryGuidance(userElement: string, dayElement: string, dayName: string): {
-  message: string;
-  bestFor: string[];
-  avoid: string[];
+function getComplementaryGuidance(userElement: string, dayElement: string, dayKey: string): {
+  messageKey: string;
+  messageParams: Record<string, string>;
+  bestForKeys: string[];
+  avoidKeys: string[];
 } {
+  let typeKey = 'default';
+  
   if (userElement === 'fire' && dayElement === 'air') {
-    return {
-      message: `Air fans your Fire! ${dayName}'s energy amplifies your natural vitality. Channel this synergy wisely.`,
-      bestFor: ['Creative expression', 'Communication', 'Innovation', 'Social leadership'],
-      avoid: ['Scattered energy', 'Overcommitment', 'Impulsiveness'],
-    };
-  }
-  
-  if (userElement === 'air' && dayElement === 'fire') {
-    return {
-      message: `Fire energizes your Air! ${dayName} brings passion to your ideas. Clarity meets action.`,
-      bestFor: ['Strategic action', 'Public speaking', 'Problem-solving', 'Teaching'],
-      avoid: ['Analysis paralysis', 'Overexcitement', 'Hasty decisions'],
-    };
-  }
-  
-  if (userElement === 'water' && dayElement === 'earth') {
-    return {
-      message: `Earth contains your Water! ${dayName} provides structure for your flow. Intuition meets form.`,
-      bestFor: ['Grounded healing', 'Practical spirituality', 'Building routines', 'Nurturing'],
-      avoid: ['Stagnation', 'Over-caution', 'Suppressing emotions'],
-    };
-  }
-  
-  if (userElement === 'earth' && dayElement === 'water') {
-    return {
-      message: `Water nourishes your Earth! ${dayName}'s emotional energy softens your grounding. Stability meets flow.`,
-      bestFor: ['Gentle progress', 'Emotional work', 'Creativity', 'Compassion'],
-      avoid: ['Rigidity', 'Over-planning', 'Neglecting intuition'],
-    };
+    typeKey = 'fireAir';
+  } else if (userElement === 'air' && dayElement === 'fire') {
+    typeKey = 'airFire';
+  } else if (userElement === 'water' && dayElement === 'earth') {
+    typeKey = 'waterEarth';
+  } else if (userElement === 'earth' && dayElement === 'water') {
+    typeKey = 'earthWater';
   }
   
   return {
-    message: `Supportive energies today. ${dayName} complements your natural element.`,
-    bestFor: ['Balanced action', 'Integration', 'Steady progress'],
-    avoid: ['Extremes', 'Forcing outcomes'],
+    messageKey: `home.dailyGuidanceContent.complementary.${typeKey}.message`,
+    messageParams: { day: `home.dailyGuidanceDetails.days.${dayKey}` },
+    bestForKeys: [0, 1, 2, 3].map(i => `home.dailyGuidanceContent.complementary.${typeKey}.bestFor.${i}`),
+    avoidKeys: [0, 1, 2].map(i => `home.dailyGuidanceContent.complementary.${typeKey}.avoid.${i}`),
   };
 }
 
 /**
  * Transformative guidance (opposing elements)
  */
-function getTransformativeGuidance(userElement: string, dayElement: string, dayName: string): {
-  message: string;
-  bestFor: string[];
-  avoid: string[];
-  peakHours?: string;
+function getTransformativeGuidance(userElement: string, dayElement: string, dayKey: string): {
+  messageKey: string;
+  messageParams: Record<string, string>;
+  bestForKeys: string[];
+  avoidKeys: string[];
+  peakHoursKey: string;
 } {
+  let typeKey = 'default';
+  
   if (userElement === 'fire' && dayElement === 'water') {
-    return {
-      message: `Transformative tension. Your Fire meets ${dayName}'s Water energy. This opposition creates steam - powerful transformation potential.`,
-      bestFor: ['Breakthrough', 'Letting go', 'Spiritual cleansing', 'Deep healing'],
-      avoid: ['Impulsive reactions', 'Emotional decisions', 'Forcing outcomes'],
-      peakHours: 'Evening (21:00-04:00)',
-    };
-  }
-  
-  if (userElement === 'water' && dayElement === 'fire') {
-    return {
-      message: `Dynamic opposition. Your Water meets ${dayName}'s Fire energy. Navigate with awareness - transformation awaits.`,
-      bestFor: ['Emotional alchemy', 'Creative breakthrough', 'Shadow work', 'Purification'],
-      avoid: ['Reactivity', 'Overwhelm', 'Hasty action'],
-      peakHours: 'Pre-Dawn (04:00-06:00) & Night (21:00-04:00)',
-    };
-  }
-  
-  if (userElement === 'air' && dayElement === 'earth') {
-    return {
-      message: `Grounding challenge. Your Air meets ${dayName}'s Earth energy. Slow down and anchor your insights.`,
-      bestFor: ['Bringing ideas to form', 'Practical application', 'Discipline', 'Patience'],
-      avoid: ['Mental resistance', 'Rushing', 'Avoiding embodiment'],
-      peakHours: 'Afternoon (14:00-18:00)',
-    };
-  }
-  
-  if (userElement === 'earth' && dayElement === 'air') {
-    return {
-      message: `Elevating tension. Your Earth meets ${dayName}'s Air energy. Let yourself be lifted into new perspectives.`,
-      bestFor: ['New viewpoints', 'Learning', 'Flexibility', 'Mental expansion'],
-      avoid: ['Stubbornness', 'Over-attachment', 'Resistance to change'],
-      peakHours: 'Morning (06:00-10:00)',
-    };
+    typeKey = 'fireWater';
+  } else if (userElement === 'water' && dayElement === 'fire') {
+    typeKey = 'waterFire';
+  } else if (userElement === 'air' && dayElement === 'earth') {
+    typeKey = 'airEarth';
+  } else if (userElement === 'earth' && dayElement === 'air') {
+    typeKey = 'earthAir';
   }
   
   return {
-    message: `Transformative day. Navigate opposing energies with awareness and intention.`,
-    bestFor: ['Transformation', 'Growth', 'Breakthrough'],
-    avoid: ['Reactivity', 'Resistance', 'Forcing'],
+    messageKey: `home.dailyGuidanceContent.transformative.${typeKey}.message`,
+    messageParams: { day: `home.dailyGuidanceDetails.days.${dayKey}` },
+    bestForKeys: [0, 1, 2, 3].map(i => `home.dailyGuidanceContent.transformative.${typeKey}.bestFor.${i}`),
+    avoidKeys: [0, 1, 2].map(i => `home.dailyGuidanceContent.transformative.${typeKey}.avoid.${i}`),
+    peakHoursKey: `home.dailyGuidanceContent.transformative.${typeKey}.peakHours`,
   };
 }
 
 /**
  * Neutral guidance
  */
-function getNeutralGuidance(dayElement: string, dayName: string): {
-  message: string;
-  bestFor: string[];
-  avoid: string[];
+function getNeutralGuidance(dayElement: string, dayKey: string): {
+  messageKey: string;
+  messageParams: Record<string, string>;
+  bestForKeys: string[];
+  avoidKeys: string[];
 } {
   return {
-    message: `Balanced energies today. ${dayName} offers steady ground for mindful action.`,
-    bestFor: ['Routine tasks', 'Consistent effort', 'Observation', 'Balance'],
-    avoid: ['Extremes', 'Major changes', 'Overexertion'],
+    messageKey: 'home.dailyGuidanceContent.neutral.message',
+    messageParams: { day: `home.dailyGuidanceDetails.days.${dayKey}` },
+    bestForKeys: [0, 1, 2, 3].map(i => `home.dailyGuidanceContent.neutral.bestFor.${i}`),
+    avoidKeys: [0, 1, 2].map(i => `home.dailyGuidanceContent.neutral.avoid.${i}`),
   };
 }
