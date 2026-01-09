@@ -968,6 +968,46 @@ export const translations = {
         subtitle: "Attune to today's flow",
       },
       disclaimer: "For reflection only • Not a ruling",
+      
+      // Ritual Flow (V2)
+      ritual: {
+        subtitle: "Take a breath",
+        breathPrompt: "and observe your state",
+        step1: {
+          title: "Daily Alignment",
+          subtitle: "Observe",
+        },
+        step2: {
+          title: "Inner State",
+          subtitle: "How are you arriving today?",
+        },
+        step3: {
+          title: "Intention Setting",
+          subtitle: "What do you wish to align with?",
+        },
+        mood: {
+          label: "How are you feeling?",
+          hint: "There is no right answer",
+        },
+        energy: {
+          label: "Energy level",
+        },
+        note: {
+          label: "Brief reflection (optional)",
+          placeholder: "A short note about your day...",
+        },
+        intention: {
+          label: "Today's direction",
+          selected: "Today's intention",
+        },
+        complete: {
+          button: "Complete Check-In",
+          buttonAction: "Seal My Check-In",
+          saving: "Saving...",
+          success: "Check-In Saved ✓",
+          footer: "For reflection only • Not a ruling",
+        },
+      },
       notice: {
         alreadyCheckedIn: "You've already checked in today. You can update your reflection below.",
       },
@@ -6660,6 +6700,46 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         subtitle: "Accordez-vous au flux du jour",
       },
       disclaimer: "Pour la réflexion seulement • Pas une règle",
+      
+      // Ritual Flow (V2)
+      ritual: {
+        subtitle: "Prenez une respiration",
+        breathPrompt: "profonde et observez votre état",
+        step1: {
+          title: "Alignement quotidien",
+          subtitle: "Observer",
+        },
+        step2: {
+          title: "État intérieur",
+          subtitle: "Comment vous sentez-vous aujourd'hui ?",
+        },
+        step3: {
+          title: "Définir l'intention",
+          subtitle: "Avec quoi souhaitez-vous vous aligner ?",
+        },
+        mood: {
+          label: "Comment vous sentez-vous ?",
+          hint: "Il n'y a pas de bonne réponse",
+        },
+        energy: {
+          label: "Niveau d'énergie",
+        },
+        note: {
+          label: "Brève réflexion (optionnel)",
+          placeholder: "Une courte note sur votre journée...",
+        },
+        intention: {
+          label: "Direction du jour",
+          selected: "Intention du jour",
+        },
+        complete: {
+          button: "Terminer le bilan",
+          buttonAction: "Sceller mon bilan",
+          saving: "Enregistrement...",
+          success: "Bilan enregistré ✓",
+          footer: "Pour la réflexion seulement • Pas une règle",
+        },
+      },
       notice: {
         alreadyCheckedIn: "Vous avez déjà fait votre bilan aujourd'hui. Vous pouvez mettre à jour votre réflexion ci-dessous.",
       },

@@ -200,6 +200,13 @@ export default function TabLayout() {
           title: 'Istikhara Guide',
         }}
       />
+      <Tabs.Screen
+        name="daily-checkin"
+        options={{
+          href: null, // Hide from tab bar - accessed via navigation only
+          title: 'Daily Check-In',
+        }}
+      />
     </Tabs>
   );
 }
