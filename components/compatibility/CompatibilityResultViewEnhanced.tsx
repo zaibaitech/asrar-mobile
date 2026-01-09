@@ -18,6 +18,13 @@ import { CompatibilityGauge } from './CompatibilityGauge';
 import { SoulConnectionRing } from './SoulConnectionRing';
 
 const { width } = Dimensions.get('window');
+const isTablet = width >= 768;
+
+// Safe translation helper - never renders raw keys
+const safeT = (tFunc: (key: string, options?: any) => string, key: string, fallback: string, options?: any): string => {
+  const value = tFunc(key, options);
+  return value === key ? fallback : value;
+};
 
 interface CompatibilityResultViewProps {
   result: UniversalCompatibilityResult;
@@ -282,14 +289,14 @@ function OverviewTab({ rc, theme, language, getQualityGradient, relationshipCont
               activeColor={METHOD_THEMES.spiritual.color}
             />
             <Text style={[styles.soulConnectionNumber, { color: METHOD_THEMES.spiritual.color }]}>
-              {rc.methods.spiritualDestiny.remainder}/9
+              {rc.methods.spiritualDestiny.remainder}
             </Text>
-            <Text style={[styles.kpiQuality, { color: METHOD_THEMES.spiritual.color }]}>
-              {t(`compatibility.results.enums.quality.${rc.methods.spiritualDestiny.quality}`)?.toUpperCase() || rc.methods.spiritualDestiny.quality.toUpperCase()}
+            <Text style={[styles.soulConnectionMeaning, { color: '#cbd5e1' }]}>
+              {rc.methods.spiritualDestiny.remainder} — deep spiritual resonance.
             </Text>
             <View style={styles.independentBadge}>
               <Text style={styles.independentBadgeText}>
-                {t('compatibility.independentMetric')}
+                Soul metric
               </Text>
             </View>
           </View>
@@ -455,51 +462,284 @@ function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, per
 function HarmonyTab({ rc, theme, language }: any) {
   const { t } = useLanguage();
   const methods = rc.methods;
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
   
   return (
     <View style={styles.section}>
-      {/* Harmony Score Card */}
-      <View style={styles.harmonyScoreCard}>
-        <Text style={styles.harmonyTitle}>
+      {/* Page Title */}
+      <View style={styles.harmonyHeader}>
+        <Text style={styles.harmonyPageTitle}>
           {t('compatibility.results.harmony.title')}
         </Text>
-        <Text style={styles.harmonySubtitle}>
+        <Text style={styles.harmonyPageSubtitle}>
           {t('compatibility.results.harmony.subtitle')}
-        </Text>
-        <CompatibilityGauge
-          score={rc.overallScore}
-          label=""
-          color={theme.primary[0]}
-          size={120}
-        />
-        <Text style={styles.harmonyDescription}>
-          {t('compatibility.results.harmony.description')}
         </Text>
       </View>
 
-      {/* Components */}
-      <Text style={styles.componentsTitle}>
-        {t('compatibility.results.harmony.components')}
-      </Text>
+      {/* Compact Harmony Cards - Web-Inspired Layout */}
+      <View style={styles.harmonyCardsContainer}>
+        
+        {/* Elemental Harmony Card */}
+        <CompactHarmonyCard
+          title={safeT(t, 'compatibility.results.elemental.title', 'Elemental Harmony')}
+          subtitle={safeT(t, 'compatibility.results.elemental.shortDesc', 'Natural energetic balance')}
+          score={methods.elementalTemperament.score}
+          emoji="🌿"
+          description={getLocalizedField(methods.elementalTemperament, 'description', language)}
+          gradient={['rgba(34, 197, 94, 0.15)', 'rgba(22, 163, 74, 0.08)']}
+          accentColor="#22c55e"
+          isExpanded={expandedCard === 'elemental'}
+          onToggle={() => setExpandedCard(expandedCard === 'elemental' ? null : 'elemental')}
+          chips={[
+            `🔥 ${safeT(t, `compatibility.results.enums.element.${methods.elementalTemperament.sharedElement}`, methods.elementalTemperament.sharedElement)}`,
+            safeT(t, `compatibility.results.enums.elementalQuality.${methods.elementalTemperament.quality}`, methods.elementalTemperament.quality)
+          ]}
+          detailContent={
+            <ElementalDetailContent method={methods.elementalTemperament} language={language} />
+          }
+        />
 
-      {/* Elemental Component */}
-      <ElementalTab method={methods.elementalTemperament} language={language} />
-      
-      {/* Planetary Component */}
-      <PlanetaryTab 
-        method={methods.planetaryCosmic}
-        person1Name={rc.person1.name}
-        person2Name={rc.person2.name}
-        language={language} 
+        {/* Cosmic Harmony Card */}
+        <CompactHarmonyCard
+          title={safeT(t, 'compatibility.results.planetary.title', 'Cosmic Harmony')}
+          subtitle={safeT(t, 'compatibility.results.planetary.shortDesc', 'Planetary influences')}
+          score={methods.planetaryCosmic.score}
+          emoji="🌙"
+          description={getLocalizedField(methods.planetaryCosmic, 'description', language)}
+          gradient={['rgba(139, 92, 246, 0.15)', 'rgba(124, 58, 237, 0.08)']}
+          accentColor="#8b5cf6"
+          isExpanded={expandedCard === 'planetary'}
+          onToggle={() => setExpandedCard(expandedCard === 'planetary' ? null : 'planetary')}
+          chips={[
+            `${methods.planetaryCosmic.person1Planet.name} × ${methods.planetaryCosmic.person2Planet.name}`,
+            safeT(t, `compatibility.results.enums.planetaryRelationship.${methods.planetaryCosmic.relationship}`, methods.planetaryCosmic.relationship)
+          ]}
+          detailContent={
+            <PlanetaryDetailContent 
+              method={methods.planetaryCosmic} 
+              person1Name={rc.person1.name}
+              person2Name={rc.person2.name}
+              language={language} 
+            />
+          }
+        />
+
+        {/* Daily Life Harmony Card */}
+        <CompactHarmonyCard
+          title={safeT(t, 'compatibility.results.daily.title', 'Daily Life Together')}
+          subtitle={safeT(t, 'compatibility.results.daily.shortDesc', 'Day-to-day rhythm')}
+          score={methods.dailyInteraction.score}
+          emoji="📆"
+          description={getLocalizedField(methods.dailyInteraction, 'description', language)}
+          gradient={['rgba(59, 130, 246, 0.15)', 'rgba(37, 99, 235, 0.08)']}
+          accentColor="#3b82f6"
+          isExpanded={expandedCard === 'daily'}
+          onToggle={() => setExpandedCard(expandedCard === 'daily' ? null : 'daily')}
+          chips={[
+            safeT(t, `compatibility.results.enums.interactionType.${methods.dailyInteraction.interactionType}`, methods.dailyInteraction.interactionType),
+            methods.dailyInteraction.score >= 70 ? safeT(t, 'compatibility.tags.active', 'Active') : safeT(t, 'compatibility.tags.growing', 'Growing')
+          ]}
+          detailContent={
+            <DailyDetailContent 
+              method={methods.dailyInteraction} 
+              language={language} 
+            />
+          }
+        />
+      </View>
+    </View>
+  );
+}
+
+// ============================================================================
+// COMPACT HARMONY CARD COMPONENT (Web-Inspired Premium Mobile UI)
+// ============================================================================
+
+interface CompactHarmonyCardProps {
+  title: string;
+  subtitle: string;
+  score: number;
+  emoji: string;
+  description: string;
+  gradient: [string, string];
+  accentColor: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+  chips: string[];
+  detailContent: React.ReactNode;
+}
+
+function CompactHarmonyCard({
+  title,
+  subtitle,
+  score,
+  emoji,
+  description,
+  gradient,
+  accentColor,
+  isExpanded,
+  onToggle,
+  chips,
+  detailContent
+}: CompactHarmonyCardProps) {
+  return (
+    <View style={styles.compactCardWrapper}>
+      {/* Inner constrained container - THE KEY FIX */}
+      <View style={styles.compactCardInner}>
+        <LinearGradient
+          colors={gradient}
+          style={styles.compactCard}
+        >
+          {/* TOP ROW: Horizontal Layout (Icon + Title) | (Ring %) */}
+          <View style={styles.compactCardTop}>
+            {/* LEFT: Icon + Title */}
+            <View style={styles.compactCardLeft}>
+              <Text style={styles.compactCardEmoji}>{emoji}</Text>
+              <View style={styles.compactCardTitleContainer}>
+                <Text style={styles.compactCardTitle}>{title}</Text>
+                <Text style={styles.compactCardSubtitle}>{subtitle}</Text>
+              </View>
+            </View>
+
+            {/* RIGHT: Percentage Ring */}
+            <View style={styles.compactCardRight}>
+              <CompatibilityGauge
+                score={score}
+                label=""
+                color={accentColor}
+                size={70}
+              />
+            </View>
+          </View>
+
+          {/* ONE-SENTENCE INTERPRETATION */}
+          <Text style={styles.compactCardDescription} numberOfLines={isExpanded ? undefined : 2}>
+            {description}
+          </Text>
+
+          {/* CHIPS ROW */}
+          <View style={styles.compactCardChips}>
+            {chips.map((chip, index) => (
+              <View key={index} style={[styles.compactChip, { borderColor: accentColor + '60' }]}>
+                <Text style={[styles.compactChipText, { color: accentColor }]}>
+                  {chip}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          {/* EXPAND BUTTON */}
+          <TouchableOpacity 
+            style={styles.compactCardExpandButton}
+            onPress={onToggle}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.compactCardExpandText, { color: accentColor }]}>
+              {isExpanded ? '△ Hide details' : '▽ View details'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* EXPANDED DETAIL CONTENT */}
+          {isExpanded && (
+            <View style={styles.compactCardExpanded}>
+              <View style={styles.expandedDivider} />
+              {detailContent}
+            </View>
+          )}
+        </LinearGradient>
+      </View>
+    </View>
+  );
+}
+
+// ============================================================================
+// DETAIL CONTENT COMPONENTS
+// ============================================================================
+
+function ElementalDetailContent({ method, language }: any) {
+  const { t } = useLanguage();
+  return (
+    <View style={styles.detailContentContainer}>
+      <DetailSection
+        label={t('compatibility.results.spiritual.meaning')}
+        text={getLocalizedField(method, 'description', language)}
       />
-      
-      {/* Daily Component */}
-      <DailyTab 
-        method={methods.dailyInteraction}
-        person1Name={rc.person1.name}
-        person2Name={rc.person2.name}
-        language={language} 
+      <DetailSection
+        label={t('compatibility.results.spiritual.watchOut')}
+        text={t(`compatibility.results.elemental.watchOut_${method.sharedElement}`)}
       />
+      <DetailSection
+        label={t('compatibility.results.spiritual.keyToSuccess')}
+        text={t(`compatibility.results.elemental.success_${method.sharedElement}`)}
+      />
+    </View>
+  );
+}
+
+function PlanetaryDetailContent({ method, person1Name, person2Name, language }: any) {
+  const { t } = useLanguage();
+  return (
+    <View style={styles.detailContentContainer}>
+      <View style={styles.planetaryDetailRow}>
+        <View style={styles.planetDetailCard}>
+          <Text style={styles.planetDetailLabel}>{person1Name}</Text>
+          <Text style={styles.planetDetailName}>{method.person1Planet.name}</Text>
+          <Text style={styles.planetDetailArabic}>{method.person1Planet.nameArabic}</Text>
+        </View>
+        <View style={styles.planetDetailIndicator}>
+          <Ionicons 
+            name={method.relationship === 'friendly' ? 'heart' : method.relationship === 'neutral' ? 'remove-circle' : 'alert-circle'} 
+            size={20} 
+            color={method.relationship === 'friendly' ? '#22c55e' : method.relationship === 'neutral' ? '#f59e0b' : '#ef4444'}
+          />
+        </View>
+        <View style={styles.planetDetailCard}>
+          <Text style={styles.planetDetailLabel}>{person2Name}</Text>
+          <Text style={styles.planetDetailName}>{method.person2Planet.name}</Text>
+          <Text style={styles.planetDetailArabic}>{method.person2Planet.nameArabic}</Text>
+        </View>
+      </View>
+      <DetailSection
+        label={t('compatibility.results.spiritual.meaning')}
+        text={getLocalizedField(method, 'description', language)}
+      />
+      <DetailSection
+        label={t('compatibility.results.spiritual.watchOut')}
+        text={t(`compatibility.results.planetary.watchOut_${method.relationship}`)}
+      />
+      <DetailSection
+        label={t('compatibility.results.spiritual.keyToSuccess')}
+        text={t(`compatibility.results.planetary.success_${method.relationship}`)}
+      />
+    </View>
+  );
+}
+
+function DailyDetailContent({ method, language }: any) {
+  const { t } = useLanguage();
+  return (
+    <View style={styles.detailContentContainer}>
+      <DetailSection
+        label={t('compatibility.results.spiritual.meaning')}
+        text={getLocalizedField(method, 'description', language)}
+      />
+      <DetailSection
+        label={t('compatibility.results.spiritual.watchOut')}
+        text={t(method.score >= 70 ? 'compatibility.results.daily.watchOut_high' : 'compatibility.results.daily.watchOut_low')}
+      />
+      <DetailSection
+        label={t('compatibility.results.spiritual.keyToSuccess')}
+        text={t(method.score >= 70 ? 'compatibility.results.daily.success_high' : 'compatibility.results.daily.success_low')}
+      />
+    </View>
+  );
+}
+
+function DetailSection({ label, text }: { label: string; text: string }) {
+  return (
+    <View style={styles.detailSectionContainer}>
+      <Text style={styles.detailSectionLabel}>{label}</Text>
+      <Text style={styles.detailSectionText}>{text}</Text>
     </View>
   );
 }
@@ -1854,7 +2094,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0f172a',
   },
   headerCard: {
-    padding: 20,
+    padding: 16,
     marginBottom: 12,
   },
   namesRow: {
@@ -1935,7 +2175,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   section: {
-    padding: 16,
+    paddingHorizontal: 14,
+    paddingTop: 8,
+    paddingBottom: 20,
   },
   overallCard: {
     padding: 24,
@@ -2009,18 +2251,18 @@ const styles = StyleSheet.create({
   },
   detailCard: {
     borderRadius: 16,
-    padding: 20,
+    padding: 16,
   },
   detailHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-    gap: 12,
+    marginBottom: 14,
+    gap: 10,
   },
   detailIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -2042,12 +2284,12 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    marginVertical: 16,
+    marginVertical: 14,
   },
   explanationBox: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 12,
-    padding: 16,
+    padding: 14,
     marginTop: 4,
   },
   explanationTitle: {
@@ -2281,8 +2523,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(251, 191, 36, 0.3)',
     borderRadius: 12,
-    padding: 16,
-    gap: 12,
+    padding: 14,
+    gap: 10,
   },
   disclaimerText: {
     flex: 1,
@@ -2318,7 +2560,7 @@ const styles = StyleSheet.create({
   },
   divineNameArabic: {
     color: '#ffffff',
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700',
     marginBottom: 4,
   },
@@ -2358,7 +2600,7 @@ const styles = StyleSheet.create({
   },
   harmonyGrid: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
   },
   harmonyCard: {
     flex: 1,
@@ -2366,7 +2608,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
-    padding: 16,
+    padding: 12,
     alignItems: 'center',
   },
   harmonyLabel: {
@@ -2389,7 +2631,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   functionList: {
-    gap: 12,
+    gap: 10,
   },
   functionItem: {
     flexDirection: 'row',
@@ -2419,7 +2661,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
-    padding: 16,
+    padding: 14,
     marginBottom: 16,
   },
   influenceTitle: {
@@ -2442,31 +2684,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 24,
-    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    gap: 10,
     marginBottom: 12,
   },
   intentionEmoji: {
-    fontSize: 28,
+    fontSize: 24,
   },
   intentionLabel: {
     color: '#ffffff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
   },
   alignmentCard: {
-    padding: 32,
+    padding: 24,
     borderRadius: 16,
     alignItems: 'center',
     marginBottom: 16,
   },
   alignmentText: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700',
     marginTop: 16,
     marginBottom: 8,
+    textAlign: 'center',
   },
   alignmentSubtext: {
     color: '#cbd5e1',
@@ -2492,7 +2735,7 @@ const styles = StyleSheet.create({
   },
   alternativeCard: {
     borderRadius: 12,
-    padding: 16,
+    padding: 14,
     marginBottom: 12,
   },
   alternativeHeader: {
@@ -2500,26 +2743,28 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 8,
+    gap: 8,
   },
   alternativeArabic: {
     color: '#ffffff',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     marginBottom: 4,
   },
   alternativeTranslit: {
     color: '#22c55e',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
   },
   recommendedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(34, 197, 94, 0.2)',
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 10,
     gap: 4,
+    flexShrink: 1,
   },
   recommendedText: {
     color: '#22c55e',
@@ -2540,13 +2785,13 @@ const styles = StyleSheet.create({
   alternativeFunctions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 6,
   },
   alternativeFunctionTag: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 10,
   },
   alternativeFunctionText: {
     color: '#cbd5e1',
@@ -2555,7 +2800,7 @@ const styles = StyleSheet.create({
   },
   guidanceCard: {
     borderRadius: 16,
-    padding: 20,
+    padding: 16,
     marginBottom: 16,
   },
   guidanceHeader: {
@@ -2565,7 +2810,7 @@ const styles = StyleSheet.create({
   },
   guidanceTitle: {
     color: '#ffffff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
   },
   guidanceMainText: {
@@ -2578,17 +2823,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
-    padding: 20,
+    padding: 16,
     marginBottom: 16,
   },
   howToUseTitle: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   stepsList: {
-    gap: 16,
+    gap: 14,
   },
   stepItem: {
     flexDirection: 'row',
@@ -2612,7 +2857,7 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     color: '#ffffff',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
     marginBottom: 4,
   },
@@ -2662,6 +2907,198 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
   },
+  
+  // ============================================================================
+  // COMPACT HARMONY CARD STYLES (Premium Mobile UI - Web-Inspired)
+  // ============================================================================
+  
+  harmonyHeader: {
+    marginBottom: 20,
+  },
+  harmonyPageTitle: {
+    color: '#ffffff',
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  harmonyPageSubtitle: {
+    color: '#94a3b8',
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  harmonyCardsContainer: {
+    gap: 16,
+  },
+  
+  // Card wrapper (full-width background)
+  compactCardWrapper: {
+    width: '100%',
+  },
+  
+  // Inner container - constrained only on tablets for readability
+  compactCardInner: {
+    width: '100%',
+    maxWidth: isTablet ? 520 : undefined,
+    alignSelf: isTablet ? 'center' : 'stretch',
+  },
+  
+  compactCard: {
+    borderRadius: 20,
+    padding: 20,
+    gap: 16,
+  },
+  
+  // TOP ROW: Horizontal layout (Left: icon+title | Right: ring)
+  compactCardTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  
+  compactCardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 12,
+  },
+  
+  compactCardEmoji: {
+    fontSize: 32,
+  },
+  
+  compactCardTitleContainer: {
+    flex: 1,
+  },
+  
+  compactCardTitle: {
+    color: '#ffffff',
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  
+  compactCardSubtitle: {
+    color: '#94a3b8',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  
+  compactCardRight: {
+    flexShrink: 0,
+  },
+  
+  // One-sentence interpretation
+  compactCardDescription: {
+    color: '#e2e8f0',
+    fontSize: 14,
+    lineHeight: 21,
+  },
+  
+  // Chips row
+  compactCardChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  
+  compactChip: {
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  
+  compactChipText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  
+  // Expand button
+  compactCardExpandButton: {
+    alignSelf: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  
+  compactCardExpandText: {
+    fontSize: 13,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  
+  // Expanded detail area
+  compactCardExpanded: {
+    gap: 12,
+  },
+  
+  expandedDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginVertical: 8,
+  },
+  
+  // Detail content styles
+  detailContentContainer: {
+    gap: 16,
+  },
+  
+  detailSectionContainer: {
+    gap: 6,
+  },
+  
+  detailSectionLabel: {
+    color: '#d97706',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  
+  detailSectionText: {
+    color: '#e2e8f0',
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  
+  // Planetary detail row
+  planetaryDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+  },
+  
+  planetDetailCard: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  
+  planetDetailLabel: {
+    color: '#94a3b8',
+    fontSize: 11,
+    marginBottom: 4,
+  },
+  
+  planetDetailName: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  
+  planetDetailArabic: {
+    color: '#cbd5e1',
+    fontSize: 12,
+  },
+  
+  planetDetailIndicator: {
+    paddingHorizontal: 12,
+  },
   kpiLabel: {
     color: '#ffffff',
     fontSize: 14,
@@ -2693,6 +3130,14 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     marginTop: 8,
+  },
+  soulConnectionMeaning: {
+    fontSize: 13,
+    lineHeight: 18,
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 4,
+    paddingHorizontal: 8,
   },
   independentBadge: {
     backgroundColor: 'rgba(217, 119, 6, 0.2)',
@@ -2856,7 +3301,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
   },
-  // Harmony Tab Styles
+  // Harmony Tab Styles (Legacy - keeping for other tabs)
   harmonyScoreCard: {
     backgroundColor: 'rgba(59, 130, 246, 0.1)',
     borderWidth: 1,
@@ -2890,4 +3335,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 16,
-  },});
+  },
+});
