@@ -2042,8 +2042,22 @@ export const translations = {
               },
               disclaimer: "This is spiritual guidance only. The Divine Names belong to Allah alone. Results depend on sincerity, patience, and Allah's wisdom.",
             },
+            spiritualInfluence: {
+              body: "Deepens connection to the divine quality of {{name}}.",
+            },
             misaligned: {
-              guidance: "According to classical attributions, this Divine Name is not traditionally associated with this intention. Consider the suggested Names, which are classically more aligned for this intention.",
+              guidance: "According to classical attributions, {{name}} is not traditionally associated with {{intention}}. Consider the suggested Names, which are classically more aligned for this intention.",
+            },
+            aligned: {
+              optimal: "{{name}} is traditionally more aligned for {{intention}} according to classical teachings. This Name resonates well with your intention.",
+              suitable: "{{name}} opens adjacent spiritual doors related to {{intention}}. This is a suitable choice for reflection.",
+              neutral: "{{name}} has neutral alignment with {{intention}} in classical sources. All Divine Names may be invoked with sincere intention and proper adab.",
+            },
+            alignmentLevel: {
+              optimal: "OPTIMAL",
+              suitable: "SUITABLE",
+              neutral: "NEUTRAL",
+              notRecommended: "NOT RECOMMENDED",
             },
             alternatives: {
               title: "💡 Alternative Divine Names",
@@ -7529,8 +7543,22 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
               },
               disclaimer: "Ceci est une guidance spirituelle uniquement. Les Noms Divins appartiennent à Allah seul. Les résultats dépendent de la sincérité, de la patience et de la sagesse d'Allah.",
             },
+            spiritualInfluence: {
+              body: "Approfondit la connexion à la qualité divine de {{name}}.",
+            },
             misaligned: {
-              guidance: "Selon les attributions classiques, ce Nom Divin n'est pas traditionnellement associé à cette intention. Considérez les Noms suggérés, qui sont classiquement plus alignés pour cette intention.",
+              guidance: "Selon les attributions classiques, {{name}} n'est pas traditionnellement associé à {{intention}}. Considérez les Noms suggérés, qui sont classiquement plus alignés pour cette intention.",
+            },
+            aligned: {
+              optimal: "{{name}} est traditionnellement plus aligné pour {{intention}} selon les enseignements classiques. Ce Nom résonne bien avec votre intention.",
+              suitable: "{{name}} ouvre des portes spirituelles adjacentes liées à {{intention}}. C'est un choix adapté pour la réflexion.",
+              neutral: "{{name}} a un alignement neutre avec {{intention}} dans les sources classiques. Tous les Noms Divins peuvent être invoqués avec une intention sincère et le respect approprié (adab).",
+            },
+            alignmentLevel: {
+              optimal: "OPTIMAL",
+              suitable: "ADAPTÉ",
+              neutral: "NEUTRE",
+              notRecommended: "NON RECOMMANDÉ",
             },
             alternatives: {
               title: "💡 Noms Divins Alternatifs",

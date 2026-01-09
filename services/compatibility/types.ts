@@ -230,6 +230,8 @@ export interface DivineNameIntentionCompatibility {
     ar: string;
   };
   
+  guidanceKey: string; // Translation key for guidance text
+  
   alternativeSuggestions?: DivineNameMetadata[]; // If not optimal
 }
 

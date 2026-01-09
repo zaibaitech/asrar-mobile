@@ -191,16 +191,20 @@ export function calculateDivineNameIntentionCompatibility(
   
   let alignment: 'optimal' | 'suitable' | 'neutral' | 'not-recommended';
   let guidance = { en: '', ar: '' };
+  let guidanceKey = '';
   let alternativeSuggestions: DivineNameMetadata[] | undefined;
   
   if (isOptimal) {
     alignment = 'optimal';
+    guidanceKey = 'compatibility.form.divineNameIntention.results.aligned.optimal';
+    // Keep legacy strings for backward compatibility (not displayed in new UI)
     guidance = {
       en: `${divineName.transliteration} is traditionally more aligned for ${intention} according to classical teachings. This Name resonates well with your intention.`,
       ar: `${divineName.arabic} تقليدياً أكثر توافقاً لـ ${getIntentionArabic(intention)} وفق التعاليم الكلاسيكية. هذا الاسم يتناغم مع نيتك.`
     };
   } else if (isSuitable) {
     alignment = 'suitable';
+    guidanceKey = 'compatibility.form.divineNameIntention.results.aligned.suitable';
     guidance = {
       en: `${divineName.transliteration} opens adjacent spiritual doors related to ${intention}. This is a suitable choice for reflection.`,
       ar: `${divineName.arabic} يفتح أبواباً روحية مجاورة لـ ${getIntentionArabic(intention)}. هذا خيار مناسب للتأمل.`
@@ -213,12 +217,14 @@ export function calculateDivineNameIntentionCompatibility(
     
     if (alternativeSuggestions.length > 0) {
       alignment = 'not-recommended';
+      guidanceKey = 'compatibility.form.divineNameIntention.results.misaligned.guidance';
       guidance = {
         en: `According to classical attributions, ${divineName.transliteration} is not traditionally associated with ${intention}. Consider the suggested Names, which are classically more aligned for this intention.`,
         ar: `وفقاً للإسناد الكلاسيكية، ${divineName.arabic} ليس مرتبطاً تقليدياً بـ ${getIntentionArabic(intention)}. فكر في الأسماء المقترحة، والتي تتوافق كلاسيكياً أكثر لهذه النية.`
       };
     } else {
       alignment = 'neutral';
+      guidanceKey = 'compatibility.form.divineNameIntention.results.aligned.neutral';
       guidance = {
         en: `${divineName.transliteration} has neutral alignment with ${intention} in classical sources. All Divine Names may be invoked with sincere intention and proper adab.`,
         ar: `${divineName.arabic} له توافق محايد مع ${getIntentionArabic(intention)} في المصادر الكلاسيكية. جميع الأسماء الإلهية يمكن الدعاء بها بنية صادقة وأدب صحيح.`
@@ -232,6 +238,7 @@ export function calculateDivineNameIntentionCompatibility(
     intention,
     alignment,
     guidance,
+    guidanceKey,
     alternativeSuggestions
   };
 }

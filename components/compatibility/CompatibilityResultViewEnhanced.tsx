@@ -1243,17 +1243,17 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
 function DivineIntentionResultView({ result, language }: { result: DivineNameIntentionCompatibility; language: 'en' | 'fr' | 'ar' }) {
   const { t } = useLanguage();
   
-  // Safe translation helper - never shows raw keys
+  // Safe translation helper - returns empty string if missing (allows hiding sections)
   const tr = (key: string, params?: any) => {
     try {
       const translated = t(key, params);
-      // If translation returns the key itself (meaning it's missing), return fallback
+      // If translation returns the key itself (meaning it's missing), return empty string
       if (translated === key || !translated) {
-        return t('common.unknown') || '';
+        return '';
       }
       return translated;
     } catch {
-      return t('common.unknown') || '';
+      return '';
     }
   };
   
@@ -1309,30 +1309,31 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
   };
   
   // Helper to convert divine name to translation key format
-  const getDivineNameKey = (arabicName: string) => {
+  const getDivineNameKey = (transliteration: string) => {
+    // Convert transliteration to camelCase key format
     const nameMap: Record<string, string> = {
-      'الرحمن': 'arRahman',
-      'الرحيم': 'arRaheem',
-      'الرزاق': 'arRazzaaq',
-      'العزيز': 'alAzeez',
-      'الفتاح': 'alFattaah',
-      'الخالق': 'alKhaliq',
-      'الشافي': 'asShafi',
-      'الحكيم': 'alHakim',
-      'العليم': 'alAleem',
-      'الشكور': 'asShakur',
-      'الحفيظ': 'alHafiz',
-      'المقيت': 'alMuqeet',
-      'الوهاب': 'alWahhaab',
-      'الهادي': 'alHaadi',
-      'السبوح': 'asSubbooh',
-      'الصبور': 'asSabur',
-      'المجيب': 'alMujeeb',
-      'الودود': 'alWadud',
-      'الغفار': 'alGhaffar',
-      'الحافظ': 'alHaafiz',
+      'Ar-Rahman': 'arRahman',
+      'Ar-Raheem': 'arRaheem',
+      'Ar-Razzaaq': 'arRazzaaq',
+      'Al-Azeez': 'alAzeez',
+      'Al-Fattaah': 'alFattaah',
+      'Al-Khaliq': 'alKhaliq',
+      'Ash-Shafi': 'asShafi',
+      'Al-Hakim': 'alHakim',
+      'Al-Aleem': 'alAleem',
+      'Ash-Shakur': 'asShakur',
+      'Al-Hafiz': 'alHafiz',
+      'Al-Muqeet': 'alMuqeet',
+      'Al-Wahhaab': 'alWahhaab',
+      'Al-Haadi': 'alHaadi',
+      'As-Subbooh': 'asSubbooh',
+      'As-Sabur': 'asSabur',
+      'Al-Mujeeb': 'alMujeeb',
+      'Al-Wadud': 'alWadud',
+      'Al-Ghaffar': 'alGhaffar',
+      'Al-Haafiz': 'alHaafiz',
     };
-    return nameMap[arabicName] || 'arRahman';
+    return nameMap[transliteration] || 'arRahman';
   };
 
   return (
@@ -1364,9 +1365,12 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
           <View style={styles.divineNameSection}>
             <Text style={styles.divineNameArabic}>{divineName.arabic}</Text>
             <Text style={styles.divineNameTranslit}>{divineName.transliteration}</Text>
-            <Text style={styles.divineNameMeaning}>
-              {language === 'en' ? divineName.meaning.en : divineName.meaning.ar}
-            </Text>
+            {(() => {
+              const meaning = tr(`compatibility.divineNames.${getDivineNameKey(divineName.transliteration)}.meaning`);
+              return meaning ? (
+                <Text style={styles.divineNameMeaning}>{meaning}</Text>
+              ) : null;
+            })()}
           </View>
         </View>
         
@@ -1502,16 +1506,20 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
             </LinearGradient>
 
             {/* Spiritual Influence */}
-            <View style={styles.influenceCard}>
-              <Text style={styles.influenceTitle}>
-                {tr('compatibility.form.divineNameIntention.results.sections.spiritualInfluence')}
-              </Text>
-              <Text style={styles.influenceText}>
-                {language === 'en' 
-                  ? divineName.spiritualInfluence.en 
-                  : divineName.spiritualInfluence.ar}
-              </Text>
-            </View>
+            {(() => {
+              const nameKey = `compatibility.form.divineNames.${getDivineNameKey(divineName.transliteration)}.meaning`;
+              const nameMeaning = tr(nameKey);
+              const influenceText = nameMeaning ? t('compatibility.form.divineNameIntention.results.spiritualInfluence.body', { name: nameMeaning }) : '';
+              
+              return influenceText && influenceText !== 'compatibility.form.divineNameIntention.results.spiritualInfluence.body' ? (
+                <View style={styles.influenceCard}>
+                  <Text style={styles.influenceTitle}>
+                    {tr('compatibility.form.divineNameIntention.results.sections.spiritualInfluence')}
+                  </Text>
+                  <Text style={styles.influenceText}>{influenceText}</Text>
+                </View>
+              ) : null;
+            })()}
           </View>
         )}
 
@@ -1548,15 +1556,15 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                 </View>
 
                 <Text style={styles.alternativeMeaning}>
-                  {tr(`divineNames.${getDivineNameKey(name.transliteration)}.meaning`)}
+                  {tr(`compatibility.form.divineNames.${getDivineNameKey(name.transliteration)}.meaning`)}
                 </Text>
 
                 <View style={styles.divider} />
 
                 {(() => {
-                  const influenceKey = `divineNames.${getDivineNameKey(name.transliteration)}.shortInfluence`;
+                  const influenceKey = `compatibility.form.divineNames.${getDivineNameKey(name.transliteration)}.shortInfluence`;
                   const influence = tr(influenceKey);
-                  return influence && influence !== '—' ? (
+                  return influence ? (
                     <Text style={styles.alternativeInfluence}>
                       {influence}
                     </Text>
@@ -1568,7 +1576,7 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                 <View style={styles.alternativeFunctions}>
                   {name.classicalFunction.map((func, idx) => {
                     const tagLabel = tr(`compatibility.form.divineNameIntention.results.intentions.${func}`);
-                    return tagLabel && tagLabel !== '—' ? (
+                    return tagLabel ? (
                       <View key={idx} style={styles.alternativeFunctionTag}>
                         <Text style={styles.alternativeFunctionText}>
                           {tagLabel}
@@ -1599,9 +1607,10 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
               <View style={styles.divider} />
 
               <Text style={styles.guidanceMainText}>
-                {alignment === 'not-recommended' || alignment === 'neutral' 
-                  ? tr('compatibility.form.divineNameIntention.results.misaligned.guidance')
-                  : (language === 'en' ? guidance.en : language === 'fr' ? guidance.en : guidance.ar)}
+                {t(result.guidanceKey, { 
+                  name: divineName.transliteration,
+                  intention: tr(`compatibility.form.divineNameIntention.results.intentions.${intention}`)
+                })}
               </Text>
             </LinearGradient>
 
