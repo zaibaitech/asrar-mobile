@@ -463,3 +463,27 @@ export function hasContextMeaning(
 ): boolean {
   return !!getSoulMeaning(soulNumber, context);
 }
+
+/**
+ * Get glimpse translation key for Overview card
+ * Returns context-specific glimpse for universal/friendship/family/work
+ * Returns marriage archetype oneLine for marriage context
+ * 
+ * @param soulNumber - Soul connection number (1-9)
+ * @param context - Relationship context
+ * @returns Translation key for the glimpse text
+ */
+export function getSoulGlimpseKey(
+  soulNumber: SoulNumber,
+  context: RelationshipContext
+): string {
+  // For marriage, use existing archetype oneLine key
+  if (context === 'marriage') {
+    return SOUL_CONNECTION_MEANINGS[soulNumber]?.archetypeTitleKey 
+      ? `compatibility.soul.archetypes.${soulNumber}.oneLine`
+      : 'compatibility.soul.glimpse.fallback';
+  }
+  
+  // For other contexts, use new glimpse keys
+  return `compatibility.soul.glimpse.${context}.${soulNumber}`;
+}

@@ -3112,6 +3112,55 @@ export const translations = {
           reflection: "Reflection",
         },
         
+        // Soul Connection Glimpse (for Overview Card)
+        glimpse: {
+          fallback: "Spiritual connection pattern",
+          universal: {
+            1: "Easy start; growth can slow",
+            2: "Generally smooth and supportive",
+            3: "Friction likely; needs patience",
+            4: "Heavy feel; requires care",
+            5: "Blessed flow; harmony grows",
+            6: "Quarrels possible; set boundaries",
+            7: "Best long-term; tested first",
+            8: "Deep bond; clarity with time",
+            9: "Unstable match; avoid rushing",
+          },
+          friendship: {
+            1: "Starts well; may become distant",
+            2: "Good friendship; mutual support",
+            3: "Ego clashes; keep it light",
+            4: "Can feel heavy; be gentle",
+            5: "Warm bond; grows over time",
+            6: "Arguments possible; respect limits",
+            7: "Loyal bond after early tests",
+            8: "Strong link; avoid assumptions",
+            9: "On-off dynamic; protect peace",
+          },
+          family: {
+            1: "Closeness early; effort needed",
+            2: "Supportive ties; good harmony",
+            3: "Sensitive triggers; speak gently",
+            4: "Burdened feel; patience required",
+            5: "Mercy and ease; bond strengthens",
+            6: "Tension cycles; keep respect",
+            7: "Respect grows through duty",
+            8: "Close bond; heal misunderstandings",
+            9: "Distance cycles; keep boundaries",
+          },
+          work: {
+            1: "Good start; progress may stall",
+            2: "Works well; reliable teamwork",
+            3: "Conflict risk; clarify roles",
+            4: "Slow and heavy; needs structure",
+            5: "Productive flow; shared wins",
+            6: "Disputes possible; set process",
+            7: "Strong team once roles clear",
+            8: "High potential; align expectations",
+            9: "Volatile pairing; firm rules",
+          },
+        },
+        
         // Soul Connection Meanings by Relationship Context
         meanings: {
           // Universal Context (all relationship types)
@@ -9524,6 +9573,55 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           guidance: "Conseil",
           protection: "Protection",
           reflection: "Réflexion",
+        },
+        
+        // Aperçu de Connexion d'Âme (pour la Carte Aperçu)
+        glimpse: {
+          fallback: "Motif de connexion spirituelle",
+          universal: {
+            1: "Début facile ; croissance peut ralentir",
+            2: "Généralement fluide et soutenant",
+            3: "Friction probable ; patience requise",
+            4: "Sensation lourde ; soins nécessaires",
+            5: "Flux béni ; harmonie grandit",
+            6: "Querelles possibles ; limites claires",
+            7: "Meilleur long terme ; testé d'abord",
+            8: "Lien profond ; clarté avec le temps",
+            9: "Correspondance instable ; éviter précipitation",
+          },
+          friendship: {
+            1: "Commence bien ; peut devenir distant",
+            2: "Bonne amitié ; soutien mutuel",
+            3: "Clash d'ego ; garder léger",
+            4: "Peut sembler lourd ; être doux",
+            5: "Lien chaleureux ; grandit avec temps",
+            6: "Arguments possibles ; respecter limites",
+            7: "Lien loyal après tests précoces",
+            8: "Lien fort ; éviter suppositions",
+            9: "Dynamique on-off ; protéger paix",
+          },
+          family: {
+            1: "Proximité précoce ; effort nécessaire",
+            2: "Liens soutenants ; bonne harmonie",
+            3: "Déclencheurs sensibles ; parler doucement",
+            4: "Sensation de fardeau ; patience requise",
+            5: "Miséricorde et facilité ; lien renforce",
+            6: "Cycles de tension ; garder respect",
+            7: "Respect grandit par devoir",
+            8: "Lien proche ; guérir malentendus",
+            9: "Cycles de distance ; garder limites",
+          },
+          work: {
+            1: "Bon départ ; progrès peut stagner",
+            2: "Fonctionne bien ; travail d'équipe fiable",
+            3: "Risque de conflit ; clarifier rôles",
+            4: "Lent et lourd ; structure nécessaire",
+            5: "Flux productif ; victoires partagées",
+            6: "Disputes possibles ; définir processus",
+            7: "Équipe forte une fois rôles clairs",
+            8: "Haut potentiel ; aligner attentes",
+            9: "Appariement volatile ; règles fermes",
+          },
         },
         
         // Significations de la Connexion d'Âme par Contexte de Relation

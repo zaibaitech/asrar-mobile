@@ -13,6 +13,7 @@ import {
   getSoulMeaning, 
   getIntensityColor, 
   getArchetypeTitle,
+  getSoulGlimpseKey,
   type RelationshipContext,
   type SoulNumber 
 } from '../../services/compatibility/soulConnectionMeanings';
@@ -265,8 +266,13 @@ function OverviewTab({ rc, theme, language, getQualityGradient, relationshipCont
   const { t } = useLanguage();
   
   // Get soul archetype
-  const soulArchetype = getSoulArchetype(rc.methods.spiritualDestiny.remainder);
+  const soulNumber = rc.methods.spiritualDestiny.remainder as SoulNumber;
+  const soulArchetype = getSoulArchetype(soulNumber);
   const severityColor = getSeverityColor(soulArchetype.severity);
+  
+  // Get context-aware glimpse key
+  const glimpseKey = getSoulGlimpseKey(soulNumber, relationshipContext as RelationshipContext);
+  const glimpseText = safeT(t, glimpseKey, 'Spiritual connection pattern');
 
   return (
     <View style={styles.section}>
@@ -279,7 +285,7 @@ function OverviewTab({ rc, theme, language, getQualityGradient, relationshipCont
             style={styles.kpiGradient}
           >
             <Text style={styles.kpiLabel}>
-              {t('compatibility.results.overview.overallCompatibility')}
+              {safeT(t, 'compatibility.results.overview.overallCompatibility', 'Overall Compatibility')}
             </Text>
             <CompatibilityGauge
               score={rc.overallScore}
@@ -288,10 +294,10 @@ function OverviewTab({ rc, theme, language, getQualityGradient, relationshipCont
               size={100}
             />
             <Text style={styles.kpiQuality}>
-              {t(`compatibility.results.enums.quality.${rc.overallQuality}`)?.toUpperCase() || rc.overallQuality.toUpperCase()}
+              {safeT(t, `compatibility.results.enums.quality.${rc.overallQuality}`, rc.overallQuality).toUpperCase()}
             </Text>
             <Text style={styles.kpiMicroLabel}>
-              {t('compatibility.results.overview.harmonyDesc')}
+              {safeT(t, 'compatibility.results.overview.harmonyDesc', 'Harmony Index')}
             </Text>
           </LinearGradient>
         </View>
@@ -300,22 +306,22 @@ function OverviewTab({ rc, theme, language, getQualityGradient, relationshipCont
         <View style={styles.kpiCard}>
           <View style={styles.soulConnectionKpi}>
             <Text style={styles.kpiLabel}>
-              {t('compatibility.soul.title')}
+              {safeT(t, 'compatibility.soul.title', 'Soul Connection')}
             </Text>
             <SoulConnectionRing 
-              value={rc.methods.spiritualDestiny.remainder}
+              value={soulNumber}
               size={100}
               activeColor={severityColor}
             />
             <Text style={[styles.soulConnectionNumber, { color: severityColor }]}>
-              {rc.methods.spiritualDestiny.remainder}
+              {soulNumber}
             </Text>
-            <Text style={[styles.soulConnectionMeaning, { color: '#cbd5e1' }]}>
-              {t(soulArchetype.oneLineKey)}
+            <Text style={[styles.soulConnectionMeaning, { color: '#cbd5e1' }]} numberOfLines={2}>
+              {glimpseText}
             </Text>
             <View style={styles.independentBadge}>
               <Text style={styles.independentBadgeText}>
-                {t('compatibility.soul.independentChip')}
+                {safeT(t, 'compatibility.soul.independentChip', 'Independent metric')}
               </Text>
             </View>
           </View>
@@ -327,7 +333,7 @@ function OverviewTab({ rc, theme, language, getQualityGradient, relationshipCont
         <Ionicons name="information-circle" size={20} color={theme.primary[0]} />
         <View style={{ flex: 1, marginLeft: 10 }}>
           <Text style={styles.explanationCardText}>
-            {t('compatibility.results.overview.twoMetricsExplanation')}
+            {safeT(t, 'compatibility.results.overview.twoMetricsExplanation', 'Two independent compatibility metrics')}
           </Text>
         </View>
       </View>
@@ -337,7 +343,7 @@ function OverviewTab({ rc, theme, language, getQualityGradient, relationshipCont
         <View style={styles.summaryHeader}>
           <Ionicons name="document-text" size={24} color={theme.primary[0]} />
           <Text style={styles.summaryTitle}>
-            {t('compatibility.results.overview.summary')}
+            {safeT(t, 'compatibility.results.overview.summary', 'Summary')}
           </Text>
         </View>
         <Text style={styles.summaryText}>
@@ -346,7 +352,7 @@ function OverviewTab({ rc, theme, language, getQualityGradient, relationshipCont
       </View>
 
       {/* Quick Stats Grid - showing Harmony components only */}
-      <Text style={styles.sectionTitle}>{t('compatibility.results.overview.harmony')}</Text>
+      <Text style={styles.sectionTitle}>{safeT(t, 'compatibility.results.overview.harmony', 'Harmony Components')}</Text>
       <View style={styles.statsGrid}>
         <StatCard
           titleKey="compatibility.results.overview.elemental"
