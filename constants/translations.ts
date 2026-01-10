@@ -439,9 +439,12 @@ export const translations = {
         },
         momentAlignment: {
           title: "Moment Alignment",
-          details: "DETAILS",
-          now: "Now",
+          nowLabel: "Now",
+          cta: "See details →",
           tapForDetails: "Tap for details",
+          summaryTemplate: "{a} and {b} align — {tone}",
+          youLabel: "You",
+          momentLabel: "Moment",
         },
         nextPlanetaryHour: {
           title: "Next Planetary Hour",
@@ -6703,9 +6706,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         },
         momentAlignment: {
           title: "Alignement du moment",
-          details: "DÉTAILS",
-          now: "Maintenant",
+          nowLabel: "Maintenant",
+          cta: "Voir les détails →",
           tapForDetails: "Appuyez pour détails",
+          summaryTemplate: "{a} et {b} — {tone}",
+          youLabel: "Vous",
+          momentLabel: "Moment",
         },
         nextPlanetaryHour: {
           title: "Prochaine heure planétaire",
@@ -7057,10 +7063,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       sections: {
         momentAlignment: {
           title: "Alignement du moment",
-          details: "DÉTAILS",
-          you: "Vous",
-          now: "Maintenant",
-          tapForDetails: "Appuyez pour détails",
+          nowLabel: "Maintenant",
+          cta: "Voir les détails →",
+          tapForDetails: "Touchez pour les détails",
+          summaryTemplate: "{a} et {b} — {tone}",
+          youLabel: "Vous",
+          momentLabel: "Moment",
         },
         nextPlanetaryHour: {
           title: "Prochaine heure planétaire",

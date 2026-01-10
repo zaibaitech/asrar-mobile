@@ -9,13 +9,13 @@ import React, { useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { getSeverityColor, getSoulArchetype } from '../../services/compatibility/soulArchetypes';
-import { 
-  getSoulMeaning, 
-  getIntensityColor, 
-  getArchetypeTitle,
-  getSoulGlimpseKey,
-  type RelationshipContext,
-  type SoulNumber 
+import {
+    getArchetypeTitle,
+    getIntensityColor,
+    getSoulGlimpseKey,
+    getSoulMeaning,
+    type RelationshipContext,
+    type SoulNumber
 } from '../../services/compatibility/soulConnectionMeanings';
 import type {
     DivineNameIntentionCompatibility,

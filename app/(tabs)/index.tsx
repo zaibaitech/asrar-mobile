@@ -27,12 +27,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RealTimeDailyGuidance } from '../../components/divine-timing/RealTimeDailyGuidance';
 import { ModuleCard } from '../../components/home';
-import { MomentAlignmentCard } from '../../components/home/MomentAlignmentCard';
-import { RotatingCardContent } from '../../components/home/RotatingCardContent';
+import { MomentAlignmentStrip } from '../../components/home/MomentAlignmentStrip';
+import { RightStackWidgets } from '../../components/home/RightStackWidgets';
 import { ModuleCardProps } from '../../components/home/types';
 import { DarkTheme, ElementAccents, Spacing, Typography } from '../../constants/DarkTheme';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -45,7 +45,6 @@ import {
 } from '../../services/api/prayerTimes';
 import { DailyGuidance, getDailyGuidance } from '../../services/DailyGuidanceService';
 import { getTodayBlessing, type DayBlessing } from '../../services/DayBlessingService';
-import { calculateMomentState } from '../../services/ElementalHarmonyService';
 import { getMomentAlignment, MomentAlignment } from '../../services/MomentAlignmentService';
 import { calculatePlanetaryHours, PlanetaryHourData } from '../../services/PlanetaryHoursService';
 
@@ -381,34 +380,35 @@ export default function HomeScreen() {
             />
           </View>
           
-          {/* Moment Alignment - Right Side (Micro Card) */}
+          {/* Right Stack: Next Prayer + Today's Blessing */}
           <View style={styles.momentAlignmentColumn}>
-            <MomentAlignmentCard
-              status={momentAlignment?.status}
-              statusLabel={momentAlignment ? t(momentAlignment.shortLabelKey) : undefined}
-              hintText={momentAlignment ? t(momentAlignment.shortHintKey) : undefined}
-              zahirElement={momentAlignment?.zahirElement}
-              timeElement={momentAlignment?.timeElement}
-              updatedAt={momentAlignment?.updatedAt}
-              loading={!momentAlignment && hasProfileName}
-              hasProfileName={hasProfileName}
-              t={t}
-              planetaryData={planetaryData}
-              causeText={(() => {
-                // Calculate cause-based text from moment state
-                if (momentAlignment && planetaryData && momentAlignment.zahirElement && momentAlignment.timeElement) {
-                  const momentState = calculateMomentState(
-                    momentAlignment.zahirElement,
-                    momentAlignment.timeElement,
-                    planetaryData.currentHour.planet
-                  );
-                  return momentState.causeText;
-                }
-                return undefined;
+            <RightStackWidgets
+              nextPrayer={nextPrayer}
+              prayerLoading={prayerLoading}
+              prayerCountdown={prayerCountdown}
+              todayBlessing={todayBlessing}
+              tomorrowBlessing={(() => {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                return getTodayBlessing(tomorrow);
               })()}
+              planetaryData={planetaryData}
+              t={t}
             />
           </View>
         </View>
+        
+        {/* Full-width Moment Alignment Strip with Element Pills */}
+        <MomentAlignmentStrip
+          status={momentAlignment?.status}
+          statusLabel={momentAlignment ? t(momentAlignment.shortLabelKey) : undefined}
+          zahirElement={momentAlignment?.zahirElement}
+          timeElement={momentAlignment?.timeElement}
+          loading={!momentAlignment && hasProfileName}
+          hasProfileName={hasProfileName}
+          t={t}
+          planetaryData={planetaryData}
+        />
         
         {/* 2. Action Pills - Inline Buttons */}
         <View style={styles.actionPills}>
@@ -428,181 +428,6 @@ export default function HomeScreen() {
           >
             <Ionicons name="trending-up-outline" size={16} color="#6366f1" />
             <Text style={styles.pillText}>{t('home.actions.viewInsights')}</Text>
-          </TouchableOpacity>
-        </View>
-        
-        {/* 3. Next Prayer + Today's Blessing - Two Column Row */}
-        <View style={styles.twoColumnRow}>
-          {/* Next Prayer Card - Rotating */}
-          <TouchableOpacity 
-            style={styles.compactCard}
-            onPress={() => {
-              if (prayerCardSlide === 0) {
-                router.push('/prayer-times');
-              } else {
-                // Navigate to planetary hours details (could be moment-alignment-details)
-                router.push('/moment-alignment-details');
-              }
-            }}
-            activeOpacity={0.7}
-          >
-            <RotatingCardContent
-              slides={[
-                // Slide A: Next Prayer
-                <View key="prayer" style={[styles.cardGradient, { backgroundColor: 'rgba(16, 185, 129, 0.08)' }]}>
-                  <Text style={styles.compactLabel}>{t('home.nextPrayer')}</Text>
-                  {prayerLoading ? (
-                    <ActivityIndicator size="small" color="#10b981" />
-                  ) : nextPrayer ? (
-                    <>
-                      <Text style={styles.compactPrimary}>{nextPrayer.nameArabic}</Text>
-                      <Text style={[styles.compactSecondary, { color: '#10b981' }]}>
-                        {nextPrayer.time}
-                      </Text>
-                      {prayerCountdown && (
-                        <Text style={styles.compactTertiary}>in {prayerCountdown}</Text>
-                      )}
-                    </>
-                  ) : (
-                    <Text style={styles.compactTertiary}>{t('home.tapToSetLocation')}</Text>
-                  )}
-                </View>,
-                
-                // Slide B: Next Planetary Hour
-                <View key="planet-hour" style={[styles.cardGradient, { backgroundColor: 'rgba(139, 92, 246, 0.08)' }]}>
-                  <Text style={styles.compactLabel}>{t('home.cards.nextPlanetaryHour.title')}</Text>
-                  {planetaryData ? (
-                    <>
-                      <Text style={styles.compactPrimary}>
-                        {planetaryData.nextHour.planetInfo.symbol} {t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`)}
-                      </Text>
-                      <Text style={[styles.compactSecondary, { color: '#8b5cf6' }]}>
-                        {t('home.startsAt')} {(() => {
-                          const hours = planetaryData.nextHour.startTime.getHours().toString().padStart(2, '0');
-                          const minutes = planetaryData.nextHour.startTime.getMinutes().toString().padStart(2, '0');
-                          return `${hours}:${minutes}`;
-                        })()}
-                      </Text>
-                      {planetaryData.countdownSeconds > 0 && (
-                        <Text style={styles.compactTertiary}>
-                          {(() => {
-                            const seconds = planetaryData.countdownSeconds;
-                            const hours = Math.floor(seconds / 3600);
-                            const minutes = Math.floor((seconds % 3600) / 60);
-                            const secs = seconds % 60;
-                            let duration = '';
-                            if (hours > 0) duration = `${hours}h ${minutes}m`;
-                            else if (minutes > 0) duration = `${minutes}m ${secs}s`;
-                            else duration = `${secs}s`;
-                            return t('home.cards.nextPlanetaryHour.inTime', { duration });
-                          })()}
-                        </Text>
-                      )}
-                      <View style={[
-                        styles.miniElementBadge,
-                        { backgroundColor: ElementAccents[planetaryData.nextHour.planetInfo.element].glow }
-                      ]}>
-                        <Text style={[
-                          styles.miniElementText,
-                          { color: ElementAccents[planetaryData.nextHour.planetInfo.element].primary }
-                        ]}>
-                          {t(`elements.${planetaryData.nextHour.planetInfo.element}`).toUpperCase()}
-                        </Text>
-                      </View>
-                    </>
-                  ) : (
-                    <Text style={styles.compactTertiary}>{t('common.loading')}</Text>
-                  )}
-                </View>
-              ]}
-              intervalMs={8000}
-              showDots={true}
-              onSlideChange={setPrayerCardSlide}
-            />
-          </TouchableOpacity>
-          
-          {/* Today's Blessing Card - Rotating */}
-          {/* Today's Blessing Card - Rotating */}
-          <TouchableOpacity 
-            style={styles.compactCard}
-            onPress={() => {
-              if (blessingCardSlide === 0) {
-                router.push('/divine-timing');
-              } else {
-                // Navigate to tomorrow preview (can reuse divine-timing)
-                router.push('/divine-timing');
-              }
-            }}
-            activeOpacity={0.7}
-          >
-            {todayBlessing && (
-              <RotatingCardContent
-                slides={[
-                  // Slide A: Today's Blessing
-                  <View key="today" style={[
-                    styles.cardGradient,
-                    { backgroundColor: `${ElementAccents[todayBlessing.element].primary}15` }
-                  ]}>
-                    <Text style={styles.compactLabel}>{t('home.todayBlessing')}</Text>
-                    <Text style={styles.compactPrimary}>{todayBlessing.dayNameArabic}</Text>
-                    <Text style={[
-                      styles.compactSecondary,
-                      { color: ElementAccents[todayBlessing.element].primary }
-                    ]}>
-                      {todayBlessing.emoji} {todayBlessing.planetArabic}
-                    </Text>
-                    <View style={[
-                      styles.miniElementBadge,
-                      { backgroundColor: ElementAccents[todayBlessing.element].glow }
-                    ]}>
-                      <Text style={[
-                        styles.miniElementText,
-                        { color: ElementAccents[todayBlessing.element].primary }
-                      ]}>
-                        {t(`elements.${todayBlessing.element}`).toUpperCase()}
-                      </Text>
-                    </View>
-                  </View>,
-                  
-                  // Slide B: Tomorrow Preview
-                  (() => {
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    const tomorrowBlessing = getTodayBlessing(tomorrow);
-                    
-                    return (
-                      <View key="tomorrow" style={[
-                        styles.cardGradient,
-                        { backgroundColor: `${ElementAccents[tomorrowBlessing.element].primary}15` }
-                      ]}>
-                        <Text style={styles.compactLabel}>{t('home.cards.tomorrow.title')}</Text>
-                        <Text style={styles.compactPrimary}>{tomorrowBlessing.dayNameArabic}</Text>
-                        <Text style={[
-                          styles.compactSecondary,
-                          { color: ElementAccents[tomorrowBlessing.element].primary }
-                        ]}>
-                          {tomorrowBlessing.emoji} {tomorrowBlessing.planetArabic}
-                        </Text>
-                        <View style={[
-                          styles.miniElementBadge,
-                          { backgroundColor: ElementAccents[tomorrowBlessing.element].glow }
-                        ]}>
-                          <Text style={[
-                            styles.miniElementText,
-                            { color: ElementAccents[tomorrowBlessing.element].primary }
-                          ]}>
-                            {t(`elements.${tomorrowBlessing.element}`).toUpperCase()}
-                          </Text>
-                        </View>
-                      </View>
-                    );
-                  })()
-                ]}
-                intervalMs={8000}
-                showDots={true}
-                onSlideChange={setBlessingCardSlide}
-              />
-            )}
           </TouchableOpacity>
         </View>
       </View>

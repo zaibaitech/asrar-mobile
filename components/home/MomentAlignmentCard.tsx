@@ -8,9 +8,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
     Borders,
     DarkTheme,
-    ElementAccents,
     Spacing,
-    Typography,
+    Typography
 } from '@/constants/DarkTheme';
 import {
     AlignmentStatus,
@@ -61,13 +60,6 @@ const DEFAULT_THEME: StatusVisual = {
   glow: 'rgba(139, 115, 85, 0.14)',
   pillBackground: 'rgba(139, 115, 85, 0.18)',
 };
-
-function getElementLabel(element: Element | undefined, t: (key: string) => string) {
-  if (!element) {
-    return '';
-  }
-  return t(`elements.${element}`);
-}
 
 function getUpdatedLabel(updatedAt: string | undefined, t: (key: string) => string) {
   if (!updatedAt) {
@@ -152,28 +144,6 @@ export function MomentAlignmentCard({
   const theme = status ? STATUS_THEME[status] : DEFAULT_THEME;
   const updatedLabel = useMemo(() => getUpdatedLabel(updatedAt, t), [updatedAt, t]);
 
-  const renderElementChip = (labelKey: string, element?: Element) => {
-    if (!element) {
-      return null;
-    }
-
-    const accent = ElementAccents[element];
-
-    return (
-      <View style={styles.elementChip}>
-        <View style={[styles.elementIconBadge, { backgroundColor: accent.glow }]}> 
-          <Text style={styles.elementIcon}>{accent.emoji}</Text>
-        </View>
-        <View style={styles.elementTextColumn}>
-          <Text style={styles.elementChipLabel}>{t(labelKey)}</Text>
-          <Text style={[styles.elementChipValue, { color: accent.primary }]}>
-            {getElementLabel(element, t)}
-          </Text>
-        </View>
-      </View>
-    );
-  };
-
   // Empty state when user has no name configured
   if (!hasProfileName && !loading) {
     return (
@@ -187,17 +157,24 @@ export function MomentAlignmentCard({
           style={styles.gradient}
         >
           <View style={styles.emptyState}>
-            <View style={[styles.headerLeft, styles.emptyHeader]}> 
-              <View style={[styles.headerIcon, { backgroundColor: DEFAULT_THEME.glow }]}> 
-                <Ionicons name="sparkles-outline" size={16} color={DEFAULT_THEME.accent} />
+            <View style={[styles.headerRow, styles.emptyHeader]}> 
+              <View style={styles.headerLeft}>
+                <View style={[styles.headerIcon, { backgroundColor: DEFAULT_THEME.glow }]}> 
+                  <Ionicons name="sparkles-outline" size={16} color={DEFAULT_THEME.accent} />
+                </View>
+                <View style={styles.titleContainer}>
+                  <Text style={styles.headerTitle} numberOfLines={2} ellipsizeMode="tail">
+                    {t('home.cards.momentAlignment.title')}
+                  </Text>
+                  <Text style={styles.headerSubtext} numberOfLines={1} ellipsizeMode="tail">
+                    {t('home.cards.momentAlignment.nowLabel')}
+                  </Text>
+                </View>
               </View>
-              <Text style={styles.headerTitle}>{t('home.moment.title')}</Text>
             </View>
-            <Text style={styles.emptyHint}>{t('home.moment.addNamePrompt')}</Text>
-            <View style={styles.footerRow}>
-              <Ionicons name="arrow-forward" size={12} color={DarkTheme.textTertiary} />
-              <Text style={styles.footerText}>{t('common.tapForDetails')}</Text>
-            </View>
+            <Text style={styles.emptyHint} numberOfLines={2} ellipsizeMode="tail">
+              {t('home.moment.addNamePrompt')}
+            </Text>
           </View>
         </LinearGradient>
       </Pressable>
@@ -225,18 +202,24 @@ export function MomentAlignmentCard({
         style={styles.gradient}
       >
         <View style={styles.cardContent}>
+          {/* Header with Title + Subtext */}
           <View style={styles.headerRow}>
             <View style={styles.headerLeft}>
               <View style={[styles.headerIcon, { backgroundColor: theme.pillBackground }]}> 
                 <Ionicons name="sparkles-outline" size={18} color={theme.accent} />
               </View>
-              <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
-                {t('home.cards.momentAlignment.title')}
-              </Text>
-            </View>
-            <View style={styles.headerAction}>
-              <Text style={styles.headerActionText} numberOfLines={1} ellipsizeMode="tail">{t('home.cards.momentAlignment.details')}</Text>
-              <Ionicons name="chevron-forward" size={14} color={DarkTheme.textTertiary} />
+              <View style={styles.titleContainer}>
+                <Text 
+                  style={styles.headerTitle} 
+                  numberOfLines={2} 
+                  ellipsizeMode="tail"
+                >
+                  {t('home.cards.momentAlignment.title')}
+                </Text>
+                <Text style={styles.headerSubtext} numberOfLines={1} ellipsizeMode="tail">
+                  {t('home.cards.momentAlignment.nowLabel')}
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -252,29 +235,19 @@ export function MomentAlignmentCard({
             <View style={styles.planetaryRow}>
               <Text style={styles.planetaryIcon}>{planetaryData.currentHour.planetInfo.symbol}</Text>
               <View style={styles.planetaryTextContainer}>
-                <Text style={styles.planetaryLabel}>{t('home.cards.momentAlignment.now')}: </Text>
-                <Text style={styles.planetaryText}>{t(`planets.${planetaryData.currentHour.planet.toLowerCase()}`)}</Text>
-                <Text style={styles.planetaryArabic}> ({planetaryData.currentHour.planetInfo.arabicName})</Text>
+                <Text style={styles.planetaryLabel}>{t('home.cards.momentAlignment.nowLabel')}: </Text>
+                <Text style={styles.planetaryText} numberOfLines={1} ellipsizeMode="tail">{t(`planets.${planetaryData.currentHour.planet.toLowerCase()}`)}</Text>
+                <Text style={styles.planetaryArabic} numberOfLines={1} ellipsizeMode="tail"> ({planetaryData.currentHour.planetInfo.arabicName})</Text>
               </View>
             </View>
           )}
 
           {/* Cause-based hint text */}
           {causeText && (
-            <Text style={styles.signalText} numberOfLines={3} ellipsizeMode="tail">
+            <Text style={styles.signalText} numberOfLines={2} ellipsizeMode="tail">
               {causeText}
             </Text>
           )}
-
-          <View style={styles.elementColumn}>
-            {renderElementChip('home.moment.you', zahirElement)}
-            {renderElementChip('home.moment.now', timeElement)}
-          </View>
-        </View>
-
-        <View style={styles.footerRow}>
-          <Ionicons name="arrow-forward" size={12} color={DarkTheme.textTertiary} />
-          <Text style={styles.footerText} numberOfLines={1} ellipsizeMode="tail">{t('home.cards.momentAlignment.tapForDetails')}</Text>
         </View>
       </LinearGradient>
     </Pressable>
@@ -313,12 +286,12 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
   },
   headerLeft: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: Spacing.sm,
     flex: 1,
     minWidth: 0,
@@ -330,12 +303,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(139, 115, 85, 0.2)',
+    flexShrink: 0,
+  },
+  titleContainer: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
   },
   headerTitle: {
-    fontSize: Typography.caption + 1,
+    fontSize: 16,
     fontWeight: Typography.weightSemibold,
     color: DarkTheme.textPrimary,
     letterSpacing: 0.4,
+    flexShrink: 1,
+  },
+  headerSubtext: {
+    fontSize: 12,
+    fontWeight: Typography.weightMedium,
+    color: DarkTheme.textSecondary,
+    letterSpacing: 0.3,
+    opacity: 0.8,
     flexShrink: 1,
   },
   headerAction: {
@@ -412,71 +399,6 @@ const styles = StyleSheet.create({
     color: DarkTheme.textSecondary,
     marginTop: Spacing.xs,
   },
-  elementColumn: {
-    gap: Spacing.xs,
-    marginTop: Spacing.xs,
-    flexWrap: 'wrap',
-  },
-  elementChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    borderRadius: Borders.radiusMd,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    maxWidth: '100%',
-  },
-  elementIconBadge: {
-    width: 26,
-    height: 26,
-    borderRadius: Borders.radiusCircle,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  elementIcon: {
-    fontSize: 16,
-  },
-  elementTextColumn: {
-    flex: 1,
-    minWidth: 0,
-  },
-  elementChipLabel: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textTertiary,
-    fontWeight: Typography.weightMedium,
-    letterSpacing: 0.3,
-  },
-  elementChipValue: {
-    fontSize: Typography.label,
-    fontWeight: Typography.weightSemibold,
-    color: DarkTheme.textSecondary,
-    flexShrink: 1,
-  },
-  footerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: Spacing.sm,
-  },
-  footerText: {
-    fontSize: 10,
-    color: DarkTheme.textTertiary,
-    fontWeight: Typography.weightMedium,
-    flex: 1,
-    minWidth: 0,
-  },
-  footerSeparator: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textTertiary,
-    opacity: 0.7,
-  },
-  updatedText: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textMuted,
-  },
   emptyState: {
     gap: Spacing.md,
   },
@@ -487,5 +409,6 @@ const styles = StyleSheet.create({
     fontSize: Typography.label,
     color: DarkTheme.textSecondary,
     lineHeight: Typography.label * Typography.lineHeightNormal,
+    paddingHorizontal: Spacing.xs,
   },
 });
