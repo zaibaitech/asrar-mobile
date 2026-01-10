@@ -354,13 +354,14 @@ export function analyzeRelationshipCompatibility(
   const planetaryCosmic = calculatePlanetaryCosmic(person1AbjadTotal, person2AbjadTotal);
   const dailyInteraction = analyzeDailyInteraction(person1Arabic, person2Arabic);
   
-  // Calculate overall score (weighted average)
-  // Spiritual-Destiny: 30%, Elemental-Temperament: 25%, Planetary-Cosmic: 25%, Daily-Interaction: 20%
+  // Calculate Harmony Index (overall score) - EXCLUDING Soul Connection
+  // Soul Connection (Spiritual Destiny mod-9) is an independent metric
+  // Harmony Index reflects practical lived dynamics:
+  // Elemental: 35%, Planetary: 35%, Daily Interaction: 30%
   const overallScore = Math.round(
-    (spiritualDestiny.score * 0.30) + 
-    (elementalTemperament.score * 0.25) + 
-    (planetaryCosmic.score * 0.25) +
-    (dailyInteraction.score * 0.20)
+    (elementalTemperament.score * 0.35) + 
+    (planetaryCosmic.score * 0.35) +
+    (dailyInteraction.score * 0.30)
   );
   
   // Determine overall quality

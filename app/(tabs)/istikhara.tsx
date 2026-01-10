@@ -26,7 +26,6 @@ import {
     View
 } from 'react-native';
 import NameAutocomplete from '../../components/NameAutocomplete';
-import NameInputSection from '../../components/istikhara/NameInputSection';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useProfile } from '../../contexts/ProfileContext';
 import { useIstikhara } from '../../hooks/useIstikhara';
