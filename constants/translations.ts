@@ -3111,6 +3111,241 @@ export const translations = {
           protection: "Protection",
           reflection: "Reflection",
         },
+        
+        // Soul Connection Meanings by Relationship Context
+        meanings: {
+          // Universal Context (all relationship types)
+          universal: {
+            1: {
+              short: "Stable foundation with renewal needs",
+              meaning: "This connection often starts strong and feels steady. Over time, it may require conscious renewal to prevent stagnation. The bond tends to be grounded but can feel routine without active effort.",
+              watchOut: "Taking the connection for granted or letting it become purely transactional. Energy may plateau if not refreshed.",
+              keyToSuccess: "Regular check-ins, shared goals, and intentional renewal practices. Gratitude and active appreciation keep this bond alive.",
+            },
+            2: {
+              short: "Natural harmony and mutual support",
+              meaning: "This pattern supports balance and cooperation. People in this connection often understand each other naturally and work well together. Mutual respect tends to flow easily.",
+              watchOut: "Over-reliance on the other person or avoiding necessary conflict. Balance can become dependency if not monitored.",
+              keyToSuccess: "Maintain individual strength while cherishing the bond. Healthy boundaries and honest communication sustain this harmony.",
+            },
+            3: {
+              short: "Friction and growth through challenge",
+              meaning: "This connection may involve frequent disagreements or tension. It often requires patience and maturity to navigate. The friction can lead to growth if both parties commit to working through it.",
+              watchOut: "Constant conflict without resolution, or giving up too quickly. This path tests endurance and emotional regulation.",
+              keyToSuccess: "Clear communication, conflict resolution skills, and a commitment to personal growth. Patience (sabr) transforms friction into wisdom.",
+            },
+            4: {
+              short: "Burden and trial, emotional weight",
+              meaning: "This pattern can feel heavy. Emotional strain, unspoken burdens, or recurring difficulties may arise. It often requires significant inner work and maturity from both sides.",
+              watchOut: "Burnout, resentment, or neglecting self-care. The weight of this connection can drain energy if not managed wisely.",
+              keyToSuccess: "Prioritize emotional health, set boundaries, and seek support when needed. Calm routines and therapeutic practices help lighten the load.",
+            },
+            5: {
+              short: "Blessed connection, natural flow",
+              meaning: "This pattern is traditionally favorable. Balance, growth, and mutual benefit tend to occur more naturally. The connection often feels supportive and enriching.",
+              watchOut: "Taking blessings for granted or becoming distracted by ease. Comfort can lead to complacency.",
+              keyToSuccess: "Gratitude practices, using the blessing to support others, and maintaining spiritual discipline together.",
+            },
+            6: {
+              short: "Power struggles and ego tests",
+              meaning: "This connection often involves recurring conflicts around pride, control, or differing perspectives. Both parties may struggle with ego and the need to be right.",
+              watchOut: "Endless power struggles, blame cycles, and unresolved anger. Pride amplifies friction in this pattern.",
+              keyToSuccess: "Self-awareness, forgiveness practices, and letting go of the need to win. Spiritual remembrance (dhikr) softens the ego.",
+            },
+            7: {
+              short: "Deeply blessed, spiritually aligned",
+              meaning: "This is traditionally the most favorable pattern. The connection often carries spiritual harmony and mutual benefit. Challenges before the bond may strengthen it once formed.",
+              watchOut: "Pride in the blessing or assuming ease means no effort is needed. External interference can disrupt this bond.",
+              keyToSuccess: "Humility, gratitude, and aligning on shared values. Protect the connection from negativity and nurture it with care.",
+            },
+            8: {
+              short: "Slow start, strong over time",
+              meaning: "This connection may begin with misunderstandings or confusion, but it grows stronger with time. Patience (sabr) reveals the depth and resilience of this bond.",
+              watchOut: "Judging the connection too quickly or giving up before it matures. Early friction can mislead.",
+              keyToSuccess: "Give it time, practice patience, and communicate gently. Emotional intelligence and understanding deepen this bond.",
+            },
+            9: {
+              short: "Difficult path, requires caution",
+              meaning: "This pattern is traditionally associated with recurring hardship and sudden breaks. It requires vigilance, spiritual protection, and wise counsel. Approach with care.",
+              watchOut: "Sudden disruptions, recurring harm patterns, and cycles that repeat despite effort. This path requires serious discernment.",
+              keyToSuccess: "Seek guidance from trusted advisors, increase spiritual practices (duʿāʾ, charity), and honor your intuition. Free will and divine mercy remain.",
+            },
+          },
+          
+          // Friendship Context
+          friendship: {
+            1: {
+              short: "Steady but may grow distant",
+              meaning: "This friendship often starts well and feels comfortable. Over time, it may cool or become distant without regular contact and shared activities.",
+              watchOut: "Drifting apart due to routine or neglect. The friendship can become surface-level if not actively maintained.",
+              keyToSuccess: "Regular quality time, shared interests, and checking in often. Small gestures of care keep this friendship warm.",
+            },
+            2: {
+              short: "Natural companionship and ease",
+              meaning: "This friendship flows naturally. Mutual understanding, support, and cooperation are common. You tend to bring out the best in each other.",
+              watchOut: "Co-dependency or avoiding difficult conversations. The ease can mask unaddressed issues.",
+              keyToSuccess: "Honest communication, mutual respect, and celebrating each other's growth. Balance closeness with healthy independence.",
+            },
+            3: {
+              short: "Frequent disagreements, tension",
+              meaning: "This friendship may involve recurring friction or misunderstandings. Patience and maturity are needed to maintain the bond.",
+              watchOut: "Constant arguments that go unresolved. The friendship can become draining if conflict is not managed.",
+              keyToSuccess: "Clear boundaries, conflict resolution, and mutual commitment to growth. Choose your battles wisely.",
+            },
+            4: {
+              short: "Heavy energy, emotional drain",
+              meaning: "This friendship can feel burdensome. One or both may struggle with emotional weight, and the connection may require significant emotional labor.",
+              watchOut: "Emotional burnout or one-sided support. The friendship can become exhausting without balance.",
+              keyToSuccess: "Set boundaries, practice self-care, and be honest about your limits. Seek balance between giving and receiving.",
+            },
+            5: {
+              short: "Joyful, mutually enriching",
+              meaning: "This friendship is traditionally blessed. Laughter, growth, and mutual support tend to flow naturally. You uplift each other.",
+              watchOut: "Taking the friendship for granted or only connecting during good times. Ease can lead to shallow engagement.",
+              keyToSuccess: "Show gratitude, support each other through challenges, and deepen the bond with shared values and experiences.",
+            },
+            6: {
+              short: "Ego clashes, pride issues",
+              meaning: "This friendship often involves power dynamics and ego clashes. Both may struggle with being right or feeling superior.",
+              watchOut: "Recurring arguments about control, judgment, or differing opinions. Pride prevents reconciliation.",
+              keyToSuccess: "Practice humility, forgive quickly, and let go of needing to be right. Focus on mutual respect.",
+            },
+            7: {
+              short: "Deep bond, loyal and blessed",
+              meaning: "This is traditionally the best friendship pattern. Loyalty, trust, and spiritual connection are strong. You may feel like chosen companions.",
+              watchOut: "Pride in the friendship or assuming it requires no effort. External jealousy or interference can harm it.",
+              keyToSuccess: "Protect the bond, stay humble, and invest in it consistently. Align on shared values and purpose.",
+            },
+            8: {
+              short: "Awkward start, grows with time",
+              meaning: "This friendship may begin with misjudgment or distance. Over time, it deepens and becomes very strong. Patience reveals its value.",
+              watchOut: "Giving up too soon due to early misunderstandings. The friendship needs time to mature.",
+              keyToSuccess: "Be patient, give space for growth, and communicate openly. Trust builds slowly but solidly.",
+            },
+            9: {
+              short: "Fragile, prone to sudden breaks",
+              meaning: "This friendship is vulnerable to sudden endings or recurring harm. Caution and spiritual protection are advised.",
+              watchOut: "Unexpected betrayals, recurring conflicts, or patterns that don't resolve. The bond may break without warning.",
+              keyToSuccess: "Set clear boundaries, trust your intuition, and don't force the connection. Spiritual practices offer protection.",
+            },
+          },
+          
+          // Family Context
+          family: {
+            1: {
+              short: "Stable but emotionally distant",
+              meaning: "This family bond often feels steady and reliable, but emotional warmth may fade over time without intentional connection.",
+              watchOut: "Taking each other for granted or becoming emotionally detached. The relationship can feel transactional.",
+              keyToSuccess: "Regular quality time, expressing appreciation, and creating shared rituals. Small acts of love renew the bond.",
+            },
+            2: {
+              short: "Harmonious and supportive",
+              meaning: "This family relationship tends to be balanced and cooperative. Mutual respect and natural understanding are common.",
+              watchOut: "Avoiding conflict to keep peace, which can lead to unspoken resentment. Balance can become avoidance.",
+              keyToSuccess: "Honest communication, celebrating each other, and addressing issues early. Maintain healthy boundaries.",
+            },
+            3: {
+              short: "Tension and recurring conflict",
+              meaning: "This family bond may involve frequent disagreements or emotional friction. Patience and maturity are required to sustain it.",
+              watchOut: "Unresolved arguments that build resentment. The relationship can become a source of stress.",
+              keyToSuccess: "Family therapy, clear communication, and forgiveness practices. Establish routines that promote peace.",
+            },
+            4: {
+              short: "Heavy burdens, emotional strain",
+              meaning: "This family relationship can feel burdensome. Emotional or health challenges may be present, requiring significant care and patience.",
+              watchOut: "Caregiver burnout or unspoken resentment. The weight can damage both parties if not managed.",
+              keyToSuccess: "Seek external support, set boundaries, and prioritize self-care. Share the burden with others when possible.",
+            },
+            5: {
+              short: "Blessed bond, mutual joy",
+              meaning: "This family relationship is traditionally favorable. Love, support, and growth tend to flow naturally. You bring out the best in each other.",
+              watchOut: "Complacency or taking the blessing for granted. Ease can lead to shallow connection.",
+              keyToSuccess: "Express gratitude, deepen the bond through shared values, and support each other through all seasons.",
+            },
+            6: {
+              short: "Power struggles, pride clashes",
+              meaning: "This family bond often involves control issues, judgment, or clashing egos. Both may struggle with authority and respect.",
+              watchOut: "Endless arguments about being right or controlling each other. Pride prevents healing.",
+              keyToSuccess: "Practice forgiveness, respect differences, and focus on love over control. Let go of the need to dominate.",
+            },
+            7: {
+              short: "Deeply connected, spiritually aligned",
+              meaning: "This is traditionally the best family pattern. Deep love, loyalty, and spiritual connection are present. The bond feels sacred.",
+              watchOut: "Pride in the relationship or assuming it's unbreakable. External interference can still harm it.",
+              keyToSuccess: "Protect the bond, stay humble, and nurture it with consistent care and shared spiritual practices.",
+            },
+            8: {
+              short: "Misunderstood at first, strengthens later",
+              meaning: "This family relationship may start with distance or misjudgment. Over time, it grows into a strong, enduring bond.",
+              watchOut: "Judging too quickly or giving up before the bond matures. Early friction can be misleading.",
+              keyToSuccess: "Give it time, practice patience, and communicate with empathy. Deep connection develops gradually.",
+            },
+            9: {
+              short: "Fragile bond, recurring hardship",
+              meaning: "This family relationship is vulnerable to sudden breaks or recurring harm. Caution, prayer, and wise counsel are essential.",
+              watchOut: "Unexpected separations, harmful patterns, or cycles that don't resolve. The bond may fracture without warning.",
+              keyToSuccess: "Set boundaries, increase spiritual protection (duʿāʾ, charity), and seek guidance. Honor your wellbeing.",
+            },
+          },
+          
+          // Work Context
+          work: {
+            1: {
+              short: "Productive start, may plateau",
+              meaning: "This working relationship often starts well and feels stable. Over time, it may become routine or stagnant without fresh energy.",
+              watchOut: "Complacency or lack of innovation. The partnership can become unproductive if not renewed.",
+              keyToSuccess: "Set new goals regularly, celebrate wins, and inject fresh ideas. Active collaboration prevents stagnation.",
+            },
+            2: {
+              short: "Natural teamwork and balance",
+              meaning: "This work connection supports collaboration and mutual respect. You complement each other's strengths and work well together.",
+              watchOut: "Over-reliance on each other or avoiding necessary accountability. Balance can become avoidance of tough decisions.",
+              keyToSuccess: "Clear roles, honest feedback, and mutual accountability. Maintain professionalism and celebrate collaboration.",
+            },
+            3: {
+              short: "Friction and disagreements",
+              meaning: "This working relationship may involve frequent clashes or differing work styles. Patience and clear communication are needed.",
+              watchOut: "Constant conflict that disrupts productivity. The tension can harm both the work and the relationship.",
+              keyToSuccess: "Structured communication, defined boundaries, and conflict resolution protocols. Focus on shared goals.",
+            },
+            4: {
+              short: "Heavy workload, stress and strain",
+              meaning: "This work connection can feel burdensome. Stress, overwhelm, or unbalanced workloads may be common.",
+              watchOut: "Burnout or resentment from unequal contribution. The partnership can become unsustainable.",
+              keyToSuccess: "Distribute work fairly, communicate openly about capacity, and prioritize wellbeing. Seek support when needed.",
+            },
+            5: {
+              short: "Productive and mutually beneficial",
+              meaning: "This work relationship is traditionally favorable. Collaboration, success, and mutual growth tend to flow naturally.",
+              watchOut: "Taking the partnership for granted or becoming complacent. Success can lead to lack of vigilance.",
+              keyToSuccess: "Maintain professionalism, acknowledge contributions, and keep innovating. Shared success requires ongoing effort.",
+            },
+            6: {
+              short: "Power struggles, ego conflicts",
+              meaning: "This work connection often involves competition, control issues, or clashing work styles. Both may struggle with authority.",
+              watchOut: "Unproductive power battles or blame cycles. Pride prevents effective collaboration.",
+              keyToSuccess: "Define clear roles, practice humility, and focus on collective goals over individual ego.",
+            },
+            7: {
+              short: "Excellent partnership, aligned vision",
+              meaning: "This is traditionally the best work pattern. Shared vision, trust, and productivity are strong. You accomplish great things together.",
+              watchOut: "Pride in success or assuming the partnership requires no maintenance. External competition can create friction.",
+              keyToSuccess: "Protect the partnership, stay aligned on values, and invest in the relationship. Celebrate wins humbly.",
+            },
+            8: {
+              short: "Slow start, strengthens over time",
+              meaning: "This work relationship may begin with misalignment or miscommunication. Over time, it becomes very productive and reliable.",
+              watchOut: "Giving up too soon due to early challenges. The partnership needs time to find its rhythm.",
+              keyToSuccess: "Be patient, clarify expectations often, and give space for adjustment. Strong partnerships take time.",
+            },
+            9: {
+              short: "Unstable, prone to sudden endings",
+              meaning: "This work relationship is vulnerable to abrupt changes, conflicts, or partnership dissolution. Caution is advised.",
+              watchOut: "Unexpected betrayals, contract breaks, or recurring issues. The partnership may end without warning.",
+              keyToSuccess: "Maintain professional boundaries, document agreements, and trust your instincts. Have backup plans.",
+            },
+          },
+        },
       },
 
       // Universal Compatibility System (ʿIlm al-Asrār)
@@ -9289,6 +9524,241 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           guidance: "Conseil",
           protection: "Protection",
           reflection: "Réflexion",
+        },
+        
+        // Significations de la Connexion d'Âme par Contexte de Relation
+        meanings: {
+          // Contexte Universel (tous les types de relations)
+          universal: {
+            1: {
+              short: "Fondation stable avec besoins de renouvellement",
+              meaning: "Cette connexion commence souvent forte et se sent stable. Avec le temps, elle peut nécessiter un renouvellement conscient pour éviter la stagnation. Le lien tend à être ancré mais peut sembler routinier sans effort actif.",
+              watchOut: "Tenir la connexion pour acquise ou la laisser devenir purement transactionnelle. L'énergie peut plafonner si non rafraîchie.",
+              keyToSuccess: "Vérifications régulières, objectifs partagés et pratiques de renouvellement intentionnelles. La gratitude et l'appréciation active maintiennent ce lien vivant.",
+            },
+            2: {
+              short: "Harmonie naturelle et soutien mutuel",
+              meaning: "Ce motif soutient l'équilibre et la coopération. Les personnes dans cette connexion se comprennent souvent naturellement et travaillent bien ensemble. Le respect mutuel tend à couler facilement.",
+              watchOut: "Sur-dépendance envers l'autre personne ou éviter les conflits nécessaires. L'équilibre peut devenir dépendance s'il n'est pas surveillé.",
+              keyToSuccess: "Maintenir la force individuelle tout en chérissant le lien. Des limites saines et une communication honnête soutiennent cette harmonie.",
+            },
+            3: {
+              short: "Friction et croissance par le défi",
+              meaning: "Cette connexion peut impliquer des désaccords fréquents ou de la tension. Elle nécessite souvent patience et maturité pour naviguer. La friction peut mener à la croissance si les deux parties s'engagent à y travailler.",
+              watchOut: "Conflit constant sans résolution, ou abandonner trop rapidement. Ce chemin teste l'endurance et la régulation émotionnelle.",
+              keyToSuccess: "Communication claire, compétences en résolution de conflits et engagement envers la croissance personnelle. La patience (sabr) transforme la friction en sagesse.",
+            },
+            4: {
+              short: "Fardeau et épreuve, poids émotionnel",
+              meaning: "Ce motif peut sembler lourd. Une pression émotionnelle, des fardeaux non dits ou des difficultés récurrentes peuvent surgir. Il nécessite souvent un travail intérieur significatif et de la maturité des deux côtés.",
+              watchOut: "Épuisement, ressentiment ou négligence de l'auto-soin. Le poids de cette connexion peut drainer l'énergie s'il n'est pas géré sagement.",
+              keyToSuccess: "Prioriser la santé émotionnelle, établir des limites et chercher du soutien au besoin. Des routines calmes et des pratiques thérapeutiques aident à alléger la charge.",
+            },
+            5: {
+              short: "Connexion bénie, flux naturel",
+              meaning: "Ce motif est traditionnellement favorable. L'équilibre, la croissance et le bénéfice mutuel tendent à se produire plus naturellement. La connexion se sent souvent soutenante et enrichissante.",
+              watchOut: "Tenir les bénédictions pour acquises ou devenir distrait par la facilité. Le confort peut mener à la complaisance.",
+              keyToSuccess: "Pratiques de gratitude, utiliser la bénédiction pour soutenir les autres et maintenir la discipline spirituelle ensemble.",
+            },
+            6: {
+              short: "Luttes de pouvoir et tests d'ego",
+              meaning: "Cette connexion implique souvent des conflits récurrents autour de l'orgueil, du contrôle ou de perspectives différentes. Les deux parties peuvent lutter avec l'ego et le besoin d'avoir raison.",
+              watchOut: "Luttes de pouvoir sans fin, cycles de blâme et colère non résolue. L'orgueil amplifie la friction dans ce motif.",
+              keyToSuccess: "Conscience de soi, pratiques de pardon et lâcher le besoin de gagner. Le rappel spirituel (dhikr) adoucit l'ego.",
+            },
+            7: {
+              short: "Profondément béni, aligné spirituellement",
+              meaning: "C'est traditionnellement le motif le plus favorable. La connexion porte souvent une harmonie spirituelle et un bénéfice mutuel. Les défis avant le lien peuvent le renforcer une fois formé.",
+              watchOut: "Orgueil dans la bénédiction ou supposer que la facilité signifie qu'aucun effort n'est nécessaire. L'interférence externe peut perturber ce lien.",
+              keyToSuccess: "Humilité, gratitude et alignement sur des valeurs partagées. Protéger la connexion de la négativité et la nourrir avec soin.",
+            },
+            8: {
+              short: "Début lent, fort avec le temps",
+              meaning: "Cette connexion peut commencer avec des malentendus ou de la confusion, mais elle devient plus forte avec le temps. La patience (sabr) révèle la profondeur et la résilience de ce lien.",
+              watchOut: "Juger la connexion trop rapidement ou abandonner avant qu'elle ne mûrisse. La friction précoce peut induire en erreur.",
+              keyToSuccess: "Donner du temps, pratiquer la patience et communiquer doucement. L'intelligence émotionnelle et la compréhension approfondissent ce lien.",
+            },
+            9: {
+              short: "Chemin difficile, nécessite prudence",
+              meaning: "Ce motif est traditionnellement associé à des difficultés récurrentes et des ruptures soudaines. Il nécessite vigilance, protection spirituelle et conseil sage. Approcher avec précaution.",
+              watchOut: "Perturbations soudaines, schémas de préjudice récurrents et cycles qui se répètent malgré l'effort. Ce chemin nécessite un discernement sérieux.",
+              keyToSuccess: "Chercher conseil auprès de conseillers de confiance, augmenter les pratiques spirituelles (duʿāʾ, charité) et honorer votre intuition. Le libre arbitre et la miséricorde divine demeurent.",
+            },
+          },
+          
+          // Contexte Amitié
+          friendship: {
+            1: {
+              short: "Stable mais peut devenir distant",
+              meaning: "Cette amitié commence souvent bien et se sent confortable. Avec le temps, elle peut se refroidir ou devenir distante sans contact régulier et activités partagées.",
+              watchOut: "S'éloigner en raison de la routine ou de la négligence. L'amitié peut devenir superficielle si non activement maintenue.",
+              keyToSuccess: "Temps de qualité régulier, intérêts partagés et vérifications fréquentes. De petits gestes d'attention gardent cette amitié chaleureuse.",
+            },
+            2: {
+              short: "Camaraderie naturelle et facilité",
+              meaning: "Cette amitié coule naturellement. La compréhension mutuelle, le soutien et la coopération sont courants. Vous avez tendance à faire ressortir le meilleur l'un de l'autre.",
+              watchOut: "Co-dépendance ou éviter les conversations difficiles. La facilité peut masquer des problèmes non abordés.",
+              keyToSuccess: "Communication honnête, respect mutuel et célébrer la croissance de chacun. Équilibrer la proximité avec une indépendance saine.",
+            },
+            3: {
+              short: "Désaccords fréquents, tension",
+              meaning: "Cette amitié peut impliquer des frictions récurrentes ou des malentendus. Patience et maturité sont nécessaires pour maintenir le lien.",
+              watchOut: "Arguments constants qui ne sont pas résolus. L'amitié peut devenir épuisante si le conflit n'est pas géré.",
+              keyToSuccess: "Limites claires, résolution de conflits et engagement mutuel envers la croissance. Choisissez vos batailles sagement.",
+            },
+            4: {
+              short: "Énergie lourde, épuisement émotionnel",
+              meaning: "Cette amitié peut sembler pesante. Un ou les deux peuvent lutter avec un poids émotionnel, et la connexion peut nécessiter un travail émotionnel significatif.",
+              watchOut: "Épuisement émotionnel ou soutien unilatéral. L'amitié peut devenir épuisante sans équilibre.",
+              keyToSuccess: "Établir des limites, pratiquer l'auto-soin et être honnête sur vos limites. Chercher l'équilibre entre donner et recevoir.",
+            },
+            5: {
+              short: "Joyeux, mutuellement enrichissant",
+              meaning: "Cette amitié est traditionnellement bénie. Rire, croissance et soutien mutuel tendent à couler naturellement. Vous vous élevez mutuellement.",
+              watchOut: "Tenir l'amitié pour acquise ou se connecter seulement pendant les bons moments. La facilité peut mener à un engagement superficiel.",
+              keyToSuccess: "Montrer de la gratitude, se soutenir mutuellement à travers les défis et approfondir le lien avec des valeurs et expériences partagées.",
+            },
+            6: {
+              short: "Clash d'ego, problèmes d'orgueil",
+              meaning: "Cette amitié implique souvent des dynamiques de pouvoir et des clash d'ego. Les deux peuvent lutter pour avoir raison ou se sentir supérieurs.",
+              watchOut: "Arguments récurrents sur le contrôle, le jugement ou des opinions différentes. L'orgueil empêche la réconciliation.",
+              keyToSuccess: "Pratiquer l'humilité, pardonner rapidement et lâcher le besoin d'avoir raison. Se concentrer sur le respect mutuel.",
+            },
+            7: {
+              short: "Lien profond, loyal et béni",
+              meaning: "C'est traditionnellement le meilleur motif d'amitié. La loyauté, la confiance et la connexion spirituelle sont fortes. Vous pouvez vous sentir comme des compagnons choisis.",
+              watchOut: "Orgueil dans l'amitié ou supposer qu'elle ne nécessite aucun effort. La jalousie ou l'interférence externe peut lui nuire.",
+              keyToSuccess: "Protéger le lien, rester humble et y investir constamment. S'aligner sur des valeurs et un but partagés.",
+            },
+            8: {
+              short: "Début maladroit, grandit avec le temps",
+              meaning: "Cette amitié peut commencer avec un mauvais jugement ou de la distance. Avec le temps, elle s'approfondit et devient très forte. La patience révèle sa valeur.",
+              watchOut: "Abandonner trop tôt en raison de malentendus précoces. L'amitié a besoin de temps pour mûrir.",
+              keyToSuccess: "Être patient, donner de l'espace pour la croissance et communiquer ouvertement. La confiance se construit lentement mais solidement.",
+            },
+            9: {
+              short: "Fragile, sujet à des ruptures soudaines",
+              meaning: "Cette amitié est vulnérable à des fins soudaines ou à des préjudices récurrents. Prudence et protection spirituelle sont conseillées.",
+              watchOut: "Trahisons inattendues, conflits récurrents ou motifs qui ne se résolvent pas. Le lien peut se briser sans avertissement.",
+              keyToSuccess: "Établir des limites claires, faire confiance à votre intuition et ne pas forcer la connexion. Les pratiques spirituelles offrent protection.",
+            },
+          },
+          
+          // Contexte Familial
+          family: {
+            1: {
+              short: "Stable mais émotionnellement distant",
+              meaning: "Ce lien familial se sent souvent stable et fiable, mais la chaleur émotionnelle peut s'estomper avec le temps sans connexion intentionnelle.",
+              watchOut: "Se tenir mutuellement pour acquis ou devenir émotionnellement détaché. La relation peut sembler transactionnelle.",
+              keyToSuccess: "Temps de qualité régulier, exprimer l'appréciation et créer des rituels partagés. De petits actes d'amour renouvellent le lien.",
+            },
+            2: {
+              short: "Harmonieux et soutenant",
+              meaning: "Cette relation familiale tend à être équilibrée et coopérative. Le respect mutuel et la compréhension naturelle sont courants.",
+              watchOut: "Éviter les conflits pour garder la paix, ce qui peut mener à du ressentiment non dit. L'équilibre peut devenir évitement.",
+              keyToSuccess: "Communication honnête, célébrer l'un l'autre et aborder les problèmes tôt. Maintenir des limites saines.",
+            },
+            3: {
+              short: "Tension et conflit récurrent",
+              meaning: "Ce lien familial peut impliquer des désaccords fréquents ou de la friction émotionnelle. Patience et maturité sont requises pour le maintenir.",
+              watchOut: "Arguments non résolus qui construisent du ressentiment. La relation peut devenir une source de stress.",
+              keyToSuccess: "Thérapie familiale, communication claire et pratiques de pardon. Établir des routines qui favorisent la paix.",
+            },
+            4: {
+              short: "Fardeaux lourds, pression émotionnelle",
+              meaning: "Cette relation familiale peut sembler pesante. Des défis émotionnels ou de santé peuvent être présents, nécessitant soin et patience significatifs.",
+              watchOut: "Épuisement du soignant ou ressentiment non dit. Le poids peut endommager les deux parties s'il n'est pas géré.",
+              keyToSuccess: "Chercher du soutien externe, établir des limites et prioriser l'auto-soin. Partager le fardeau avec d'autres quand possible.",
+            },
+            5: {
+              short: "Lien béni, joie mutuelle",
+              meaning: "Cette relation familiale est traditionnellement favorable. L'amour, le soutien et la croissance tendent à couler naturellement. Vous faites ressortir le meilleur l'un de l'autre.",
+              watchOut: "Complaisance ou tenir la bénédiction pour acquise. La facilité peut mener à une connexion superficielle.",
+              keyToSuccess: "Exprimer la gratitude, approfondir le lien par des valeurs partagées et se soutenir mutuellement à travers toutes les saisons.",
+            },
+            6: {
+              short: "Luttes de pouvoir, clash d'orgueil",
+              meaning: "Ce lien familial implique souvent des problèmes de contrôle, de jugement ou d'ego en conflit. Les deux peuvent lutter avec l'autorité et le respect.",
+              watchOut: "Arguments sans fin sur avoir raison ou se contrôler mutuellement. L'orgueil empêche la guérison.",
+              keyToSuccess: "Pratiquer le pardon, respecter les différences et se concentrer sur l'amour plutôt que le contrôle. Lâcher le besoin de dominer.",
+            },
+            7: {
+              short: "Profondément connecté, aligné spirituellement",
+              meaning: "C'est traditionnellement le meilleur motif familial. L'amour profond, la loyauté et la connexion spirituelle sont présents. Le lien se sent sacré.",
+              watchOut: "Orgueil dans la relation ou supposer qu'elle est incassable. L'interférence externe peut encore lui nuire.",
+              keyToSuccess: "Protéger le lien, rester humble et le nourrir avec soin constant et pratiques spirituelles partagées.",
+            },
+            8: {
+              short: "Incompris au début, se renforce plus tard",
+              meaning: "Cette relation familiale peut commencer avec de la distance ou un mauvais jugement. Avec le temps, elle devient un lien fort et durable.",
+              watchOut: "Juger trop rapidement ou abandonner avant que le lien ne mûrisse. La friction précoce peut être trompeuse.",
+              keyToSuccess: "Donner du temps, pratiquer la patience et communiquer avec empathie. La connexion profonde se développe graduellement.",
+            },
+            9: {
+              short: "Lien fragile, difficulté récurrente",
+              meaning: "Cette relation familiale est vulnérable à des ruptures soudaines ou à des préjudices récurrents. Prudence, prière et conseil sage sont essentiels.",
+              watchOut: "Séparations inattendues, schémas nuisibles ou cycles qui ne se résolvent pas. Le lien peut se fracturer sans avertissement.",
+              keyToSuccess: "Établir des limites, augmenter la protection spirituelle (duʿāʾ, charité) et chercher conseil. Honorer votre bien-être.",
+            },
+          },
+          
+          // Contexte Travail
+          work: {
+            1: {
+              short: "Début productif, peut plafonner",
+              meaning: "Cette relation de travail commence souvent bien et se sent stable. Avec le temps, elle peut devenir routine ou stagnante sans énergie fraîche.",
+              watchOut: "Complaisance ou manque d'innovation. Le partenariat peut devenir improductif si non renouvelé.",
+              keyToSuccess: "Fixer de nouveaux objectifs régulièrement, célébrer les victoires et injecter des idées fraîches. La collaboration active prévient la stagnation.",
+            },
+            2: {
+              short: "Travail d'équipe naturel et équilibre",
+              meaning: "Cette connexion de travail soutient la collaboration et le respect mutuel. Vous complétez les forces de l'autre et travaillez bien ensemble.",
+              watchOut: "Sur-dépendance l'un envers l'autre ou éviter la responsabilisation nécessaire. L'équilibre peut devenir évitement de décisions difficiles.",
+              keyToSuccess: "Rôles clairs, retour honnête et responsabilisation mutuelle. Maintenir le professionnalisme et célébrer la collaboration.",
+            },
+            3: {
+              short: "Friction et désaccords",
+              meaning: "Cette relation de travail peut impliquer des clash fréquents ou des styles de travail différents. Patience et communication claire sont nécessaires.",
+              watchOut: "Conflit constant qui perturbe la productivité. La tension peut nuire à la fois au travail et à la relation.",
+              keyToSuccess: "Communication structurée, limites définies et protocoles de résolution de conflits. Se concentrer sur des objectifs partagés.",
+            },
+            4: {
+              short: "Charge de travail lourde, stress et pression",
+              meaning: "Cette connexion de travail peut sembler pesante. Stress, surcharge ou charges de travail déséquilibrées peuvent être courants.",
+              watchOut: "Épuisement ou ressentiment d'une contribution inégale. Le partenariat peut devenir insoutenable.",
+              keyToSuccess: "Distribuer le travail équitablement, communiquer ouvertement sur la capacité et prioriser le bien-être. Chercher du soutien au besoin.",
+            },
+            5: {
+              short: "Productif et mutuellement bénéfique",
+              meaning: "Cette relation de travail est traditionnellement favorable. Collaboration, succès et croissance mutuelle tendent à couler naturellement.",
+              watchOut: "Tenir le partenariat pour acquis ou devenir complaisant. Le succès peut mener à un manque de vigilance.",
+              keyToSuccess: "Maintenir le professionnalisme, reconnaître les contributions et continuer à innover. Le succès partagé nécessite un effort continu.",
+            },
+            6: {
+              short: "Luttes de pouvoir, conflits d'ego",
+              meaning: "Cette connexion de travail implique souvent de la compétition, des problèmes de contrôle ou des styles de travail en conflit. Les deux peuvent lutter avec l'autorité.",
+              watchOut: "Batailles de pouvoir improductives ou cycles de blâme. L'orgueil empêche une collaboration efficace.",
+              keyToSuccess: "Définir des rôles clairs, pratiquer l'humilité et se concentrer sur des objectifs collectifs plutôt que l'ego individuel.",
+            },
+            7: {
+              short: "Excellent partenariat, vision alignée",
+              meaning: "C'est traditionnellement le meilleur motif de travail. Vision partagée, confiance et productivité sont fortes. Vous accomplissez de grandes choses ensemble.",
+              watchOut: "Orgueil dans le succès ou supposer que le partenariat ne nécessite aucun entretien. La compétition externe peut créer de la friction.",
+              keyToSuccess: "Protéger le partenariat, rester aligné sur les valeurs et investir dans la relation. Célébrer les victoires humblement.",
+            },
+            8: {
+              short: "Début lent, se renforce avec le temps",
+              meaning: "Cette relation de travail peut commencer avec désalignement ou mauvaise communication. Avec le temps, elle devient très productive et fiable.",
+              watchOut: "Abandonner trop tôt en raison de défis précoces. Le partenariat a besoin de temps pour trouver son rythme.",
+              keyToSuccess: "Être patient, clarifier les attentes souvent et donner de l'espace pour l'ajustement. Les partenariats solides prennent du temps.",
+            },
+            9: {
+              short: "Instable, sujet à des fins soudaines",
+              meaning: "Cette relation de travail est vulnérable à des changements abrupts, des conflits ou une dissolution du partenariat. La prudence est conseillée.",
+              watchOut: "Trahisons inattendues, ruptures de contrat ou problèmes récurrents. Le partenariat peut se terminer sans avertissement.",
+              keyToSuccess: "Maintenir des limites professionnelles, documenter les accords et faire confiance à vos instincts. Avoir des plans de secours.",
+            },
+          },
         },
       },
     },

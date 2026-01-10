@@ -8,13 +8,20 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { getSeverityColor, getSoulArchetype } from '../../services/compatibility/soulArchetypes';
+import { 
+  getSoulMeaning, 
+  getIntensityColor, 
+  getArchetypeTitle,
+  type RelationshipContext,
+  type SoulNumber 
+} from '../../services/compatibility/soulConnectionMeanings';
 import type {
-  DivineNameIntentionCompatibility,
-  PersonDivineNameCompatibility,
-  PersonPersonCompatibility,
-  UniversalCompatibilityResult
+    DivineNameIntentionCompatibility,
+    PersonDivineNameCompatibility,
+    PersonPersonCompatibility,
+    UniversalCompatibilityResult
 } from '../../services/compatibility/types';
-import { getSoulArchetype, getSeverityColor } from '../../services/compatibility/soulArchetypes';
 import { CompatibilityGauge } from './CompatibilityGauge';
 import { SoulConnectionRing } from './SoulConnectionRing';
 
@@ -24,7 +31,14 @@ const isTablet = width >= 768;
 // Safe translation helper - never renders raw keys
 const safeT = (tFunc: (key: string, options?: any) => string, key: string, fallback: string, options?: any): string => {
   const value = tFunc(key, options);
-  return value === key ? fallback : value;
+  // If translation key is returned unchanged, use fallback
+  if (value === key || !value) {
+    if (__DEV__) {
+      console.warn(`[Translation Missing] Key: ${key}`);
+    }
+    return fallback;
+  }
+  return value;
 };
 
 interface CompatibilityResultViewProps {
@@ -361,10 +375,33 @@ function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, per
   const { t } = useLanguage();
   const theme = METHOD_THEMES.spiritual;
   const [showFormula, setShowFormula] = useState(false);
+  const [selectedContext, setSelectedContext] = useState<RelationshipContext>(relationshipContext);
   
-  // Get archetype for this soul connection number
-  const archetype = getSoulArchetype(method.remainder);
-  const severityColor = getSeverityColor(archetype.severity);
+  const soulNumber = method.remainder as SoulNumber;
+  
+  // Get meaning for selected context
+  const contextMeaning = getSoulMeaning(soulNumber, selectedContext);
+  
+  // Fallback to archetype for marriage context or if meaning not found
+  const archetype = getSoulArchetype(soulNumber);
+  
+  // Determine which data to use
+  const useArchetype = selectedContext === 'marriage' || !contextMeaning;
+  const displayColor = useArchetype 
+    ? getSeverityColor(archetype.severity) 
+    : getIntensityColor(contextMeaning.intensity);
+  
+  // Get archetype title (shared across all contexts)
+  const archetypeTitleKey = getArchetypeTitle(soulNumber);
+  
+  // Context selector options
+  const contextOptions: { value: RelationshipContext; labelKey: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+    { value: 'universal', labelKey: 'compatibility.universal.relationshipContext.universal', icon: 'infinite' },
+    { value: 'marriage', labelKey: 'compatibility.universal.relationshipContext.marriage', icon: 'heart' },
+    { value: 'friendship', labelKey: 'compatibility.universal.relationshipContext.friendship', icon: 'people' },
+    { value: 'family', labelKey: 'compatibility.universal.relationshipContext.family', icon: 'home' },
+    { value: 'work', labelKey: 'compatibility.universal.relationshipContext.work', icon: 'briefcase' },
+  ];
   
   return (
     <View style={styles.section}>
@@ -372,19 +409,19 @@ function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, per
         {/* Header */}
         <View style={styles.soulConnectionHeader}>
           <View style={styles.iconBadgeContainer}>
-            <Ionicons name="sparkles" size={24} color={severityColor} />
+            <Ionicons name="sparkles" size={24} color={displayColor} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.soulConnectionTitle}>
-              {t('compatibility.soul.title')}
+              {safeT(t, 'compatibility.soul.title', 'Soul Connection')}
             </Text>
             <Text style={styles.soulConnectionSubtitle}>
-              {t('compatibility.soul.subtitle')}
+              {safeT(t, 'compatibility.soul.subtitle', 'A traditional soul-resonance marker')}
             </Text>
             <View style={styles.badgeRow}>
-              <View style={[styles.badge, { backgroundColor: `${severityColor}20` }]}>
-                <Text style={[styles.badgeText, { color: severityColor }]}>
-                  {t('compatibility.soul.independentChip')}
+              <View style={[styles.badge, { backgroundColor: `${displayColor}20` }]}>
+                <Text style={[styles.badgeText, { color: displayColor }]}>
+                  {safeT(t, 'compatibility.soul.independentChip', 'Independent metric')}
                 </Text>
               </View>
             </View>
@@ -393,56 +430,108 @@ function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, per
 
         <View style={styles.divider} />
 
-        {/* The Result */}
-        <View style={styles.resultSection}>
-          <SoulConnectionRing 
-            value={method.remainder}
-            size={140}
-            activeColor={severityColor}
-          />
-          <Text style={[styles.soulConnectionBigNumber, { color: severityColor }]}>
-            {method.remainder}
+        {/* Context Selector */}
+        <View style={styles.contextSelectorContainer}>
+          <Text style={styles.contextSelectorLabel}>
+            {safeT(t, 'compatibility.universal.relationshipContext.title', 'Relationship Context')}
           </Text>
-          <Text style={[styles.soulConnectionQuality, { color: severityColor }]}>
-            {t(archetype.titleKey)}
-          </Text>
-          <Text style={styles.oneLineInterpretation}>
-            {t(archetype.oneLineKey)}
-          </Text>
-        </View>
-
-        {/* Tags */}
-        <View style={styles.badgeRow}>
-          {archetype.tags.map((tagKey, index) => (
-            <View key={index} style={[styles.badge, { backgroundColor: `${severityColor}15`, borderWidth: 1, borderColor: `${severityColor}30` }]}>
-              <Text style={[styles.badgeText, { color: severityColor }]}>
-                {t(tagKey)}
-              </Text>
-            </View>
-          ))}
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.contextChips}
+          >
+            {contextOptions.map((option) => {
+              const isSelected = selectedContext === option.value;
+              return (
+                <TouchableOpacity
+                  key={option.value}
+                  onPress={() => setSelectedContext(option.value)}
+                  style={[
+                    styles.contextChip,
+                    isSelected && { backgroundColor: `${displayColor}20`, borderColor: displayColor }
+                  ]}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons 
+                    name={option.icon} 
+                    size={16} 
+                    color={isSelected ? displayColor : '#94a3b8'} 
+                  />
+                  <Text style={[
+                    styles.contextChipText,
+                    isSelected && { color: displayColor, fontWeight: '600' }
+                  ]}>
+                    {safeT(t, option.labelKey, option.value)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
         </View>
 
         <View style={styles.divider} />
 
-        {/* Meaning */}
+        {/* The Result */}
+        <View style={styles.resultSection}>
+          <SoulConnectionRing 
+            value={soulNumber}
+            size={140}
+            activeColor={displayColor}
+          />
+          <Text style={[styles.soulConnectionBigNumber, { color: displayColor }]}>
+            {soulNumber}
+          </Text>
+          {archetypeTitleKey && (
+            <Text style={[styles.soulConnectionQuality, { color: displayColor }]}>
+              {safeT(t, archetypeTitleKey, '')}
+            </Text>
+          )}
+          <Text style={styles.oneLineInterpretation}>
+            {useArchetype 
+              ? safeT(t, archetype.oneLineKey, 'Spiritual resonance pattern')
+              : safeT(t, contextMeaning.shortLabelKey, 'Spiritual connection pattern')
+            }
+          </Text>
+        </View>
+
+        {/* Tags (only for marriage/archetype view) */}
+        {useArchetype && archetype.tags && (
+          <>
+            <View style={styles.badgeRow}>
+              {archetype.tags.map((tagKey, index) => (
+                <View key={index} style={[styles.badge, { backgroundColor: `${displayColor}15`, borderWidth: 1, borderColor: `${displayColor}30` }]}>
+                  <Text style={[styles.badgeText, { color: displayColor }]}>
+                    {safeT(t, tagKey, '')}
+                  </Text>
+                </View>
+              ))}
+            </View>
+            <View style={styles.divider} />
+          </>
+        )}
+
+        {/* Meaning Blocks */}
         <View style={styles.classicalStructure}>
           <View style={styles.classicalSection}>
             <Text style={[styles.classicalLabel, { color: '#3b82f6' }]}>
-              {t('compatibility.soul.blocks.meaning')}
+              {safeT(t, 'compatibility.soul.blocks.meaning', 'Meaning')}
             </Text>
             <Text style={styles.classicalText}>
-              {t(archetype.meaningKey)}
+              {useArchetype 
+                ? safeT(t, archetype.meaningKey, 'This reflects the underlying spiritual resonance.')
+                : safeT(t, contextMeaning.meaningKey, 'This reflects the connection pattern.')
+              }
             </Text>
           </View>
 
-          {/* Marriage Outlook (only in marriage context) */}
-          {relationshipContext === 'marriage' && (
+          {/* Marriage Outlook (only in marriage context using archetype) */}
+          {selectedContext === 'marriage' && useArchetype && (
             <View style={styles.classicalSection}>
               <Text style={[styles.classicalLabel, { color: '#8b5cf6' }]}>
-                {t('compatibility.soul.blocks.marriageOutlook')}
+                {safeT(t, 'compatibility.soul.blocks.marriageOutlook', 'Marriage Outlook')}
               </Text>
               <Text style={styles.classicalText}>
-                {t(archetype.marriageOutlookKey)}
+                {safeT(t, archetype.marriageOutlookKey, 'Every path has its lessons.')}
               </Text>
             </View>
           )}
@@ -450,20 +539,26 @@ function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, per
           {/* Watch Out */}
           <View style={styles.classicalSection}>
             <Text style={[styles.classicalLabel, { color: '#f59e0b' }]}>
-              {t('compatibility.soul.blocks.watchOut')}
+              {safeT(t, 'compatibility.soul.blocks.watchOut', 'Watch Out')}
             </Text>
             <Text style={styles.classicalText}>
-              {t(archetype.watchOutKey)}
+              {useArchetype 
+                ? safeT(t, archetype.watchOutKey, 'General caution and awareness.')
+                : safeT(t, contextMeaning.watchOutKey, 'Be mindful of challenges.')
+              }
             </Text>
           </View>
 
           {/* Key to Success */}
           <View style={styles.classicalSection}>
             <Text style={[styles.classicalLabel, { color: '#22c55e' }]}>
-              {t('compatibility.soul.blocks.keyToSuccess')}
+              {safeT(t, 'compatibility.soul.blocks.keyToSuccess', 'Key to Success')}
             </Text>
             <Text style={styles.classicalText}>
-              {t(archetype.keyToSuccessKey)}
+              {useArchetype 
+                ? safeT(t, archetype.keyToSuccessKey, 'Seek wise counsel and maintain spiritual practices.')
+                : safeT(t, contextMeaning.keyToSuccessKey, 'Nurture the connection with care.')
+              }
             </Text>
           </View>
         </View>
@@ -472,7 +567,7 @@ function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, per
         <View style={styles.contextNote}>
           <Ionicons name="information-circle-outline" size={18} color="#94a3b8" />
           <Text style={styles.contextNoteText}>
-            {t('compatibility.soul.disclaimer')}
+            {safeT(t, 'compatibility.soul.disclaimer', 'A reflection tool from traditional teachings — it does not replace faith, free will, or wise counsel.')}
           </Text>
         </View>
 
@@ -483,7 +578,7 @@ function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, per
           activeOpacity={0.7}
         >
           <Text style={styles.expandableTitle}>
-            {t('compatibility.soul.howCalculated.title')}
+            {safeT(t, 'compatibility.soul.howCalculated.title', 'How this number is calculated')}
           </Text>
           <Ionicons 
             name={showFormula ? 'chevron-up' : 'chevron-down'} 
@@ -503,14 +598,14 @@ function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, per
               <Text style={styles.formulaValue}>{person2Kabir}</Text>
             </View>
             <View style={styles.formulaRow}>
-              <Text style={styles.formulaLabel}>{t('compatibility.soul.howCalculated.constant')}</Text>
+              <Text style={styles.formulaLabel}>{safeT(t, 'compatibility.soul.howCalculated.constant', 'Constant')}</Text>
               <Text style={styles.formulaValue}>+7</Text>
             </View>
             <Text style={styles.formulaText}>
-              ({person1Kabir} + {person2Kabir} + 7) mod 9 = {method.remainder}
+              ({person1Kabir} + {person2Kabir} + 7) mod 9 = {soulNumber}
             </Text>
             <Text style={styles.formulaNote}>
-              {t('compatibility.soul.howCalculated.explanation')}
+              {safeT(t, 'compatibility.soul.howCalculated.explanation', 'We add the two name values, add 7, then reduce to a number 1–9.')}
             </Text>
           </View>
         )}
@@ -3276,6 +3371,38 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 10,
     fontWeight: '600',
+  },
+  contextSelectorContainer: {
+    marginBottom: 16,
+  },
+  contextSelectorLabel: {
+    color: '#94a3b8',
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  contextChips: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingBottom: 4,
+  },
+  contextChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  contextChipText: {
+    color: '#cbd5e1',
+    fontSize: 13,
+    fontWeight: '500',
   },
   resultSection: {
     alignItems: 'center',
