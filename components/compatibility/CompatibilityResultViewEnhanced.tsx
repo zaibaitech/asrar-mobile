@@ -14,6 +14,7 @@ import type {
   PersonPersonCompatibility,
   UniversalCompatibilityResult
 } from '../../services/compatibility/types';
+import { getSoulArchetype, getSeverityColor } from '../../services/compatibility/soulArchetypes';
 import { CompatibilityGauge } from './CompatibilityGauge';
 import { SoulConnectionRing } from './SoulConnectionRing';
 
@@ -248,6 +249,10 @@ function getLocalizedField(obj: any, baseField: string, language: 'en' | 'fr' | 
 
 function OverviewTab({ rc, theme, language, getQualityGradient, relationshipContext }: any) {
   const { t } = useLanguage();
+  
+  // Get soul archetype
+  const soulArchetype = getSoulArchetype(rc.methods.spiritualDestiny.remainder);
+  const severityColor = getSeverityColor(soulArchetype.severity);
 
   return (
     <View style={styles.section}>
@@ -281,22 +286,22 @@ function OverviewTab({ rc, theme, language, getQualityGradient, relationshipCont
         <View style={styles.kpiCard}>
           <View style={styles.soulConnectionKpi}>
             <Text style={styles.kpiLabel}>
-              {t('compatibility.results.overview.soulConnectionTitle')}
+              {t('compatibility.soul.title')}
             </Text>
             <SoulConnectionRing 
               value={rc.methods.spiritualDestiny.remainder}
               size={100}
-              activeColor={METHOD_THEMES.spiritual.color}
+              activeColor={severityColor}
             />
-            <Text style={[styles.soulConnectionNumber, { color: METHOD_THEMES.spiritual.color }]}>
+            <Text style={[styles.soulConnectionNumber, { color: severityColor }]}>
               {rc.methods.spiritualDestiny.remainder}
             </Text>
             <Text style={[styles.soulConnectionMeaning, { color: '#cbd5e1' }]}>
-              {rc.methods.spiritualDestiny.remainder} — deep spiritual resonance.
+              {t(soulArchetype.oneLineKey)}
             </Text>
             <View style={styles.independentBadge}>
               <Text style={styles.independentBadgeText}>
-                Soul metric
+                {t('compatibility.soul.independentChip')}
               </Text>
             </View>
           </View>
@@ -357,14 +362,9 @@ function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, per
   const theme = METHOD_THEMES.spiritual;
   const [showFormula, setShowFormula] = useState(false);
   
-  // Context-specific message
-  const contextMessages: Record<string, string> = {
-    marriage: t('compatibility.results.spiritual.contextMarriage'),
-    friendship: t('compatibility.results.spiritual.contextFriendship'),
-    work: t('compatibility.results.spiritual.contextWork'),
-    family: t('compatibility.results.spiritual.contextFamily'),
-    universal: ''
-  };
+  // Get archetype for this soul connection number
+  const archetype = getSoulArchetype(method.remainder);
+  const severityColor = getSeverityColor(archetype.severity);
   
   return (
     <View style={styles.section}>
@@ -372,19 +372,19 @@ function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, per
         {/* Header */}
         <View style={styles.soulConnectionHeader}>
           <View style={styles.iconBadgeContainer}>
-            <Ionicons name="sparkles" size={24} color={theme.color} />
+            <Ionicons name="sparkles" size={24} color={severityColor} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.soulConnectionTitle}>
-              {t('compatibility.results.spiritual.title')}
+              {t('compatibility.soul.title')}
             </Text>
             <Text style={styles.soulConnectionSubtitle}>
-              {t('compatibility.results.spiritual.subtitle')}
+              {t('compatibility.soul.subtitle')}
             </Text>
             <View style={styles.badgeRow}>
-              <View style={[styles.badge, { backgroundColor: `${theme.color}20` }]}>
-                <Text style={[styles.badgeText, { color: theme.color }]}>
-                  {t('compatibility.results.spiritual.badge')}
+              <View style={[styles.badge, { backgroundColor: `${severityColor}20` }]}>
+                <Text style={[styles.badgeText, { color: severityColor }]}>
+                  {t('compatibility.soul.independentChip')}
                 </Text>
               </View>
             </View>
@@ -398,59 +398,119 @@ function SoulConnectionTab({ method, person1Name, person2Name, person1Kabir, per
           <SoulConnectionRing 
             value={method.remainder}
             size={140}
-            activeColor={theme.color}
+            activeColor={severityColor}
           />
-          <Text style={[styles.soulConnectionBigNumber, { color: theme.color }]}>
+          <Text style={[styles.soulConnectionBigNumber, { color: severityColor }]}>
             {method.remainder}
           </Text>
-          <Text style={[styles.soulConnectionQuality, { color: theme.color }]}>
-            {t(`compatibility.results.enums.quality.${method.quality}`)?.toUpperCase() || method.quality.toUpperCase()}
+          <Text style={[styles.soulConnectionQuality, { color: severityColor }]}>
+            {t(archetype.titleKey)}
           </Text>
           <Text style={styles.oneLineInterpretation}>
-            {getLocalizedField(method, 'description', language)}
+            {t(archetype.oneLineKey)}
           </Text>
+        </View>
+
+        {/* Tags */}
+        <View style={styles.badgeRow}>
+          {archetype.tags.map((tagKey, index) => (
+            <View key={index} style={[styles.badge, { backgroundColor: `${severityColor}15`, borderWidth: 1, borderColor: `${severityColor}30` }]}>
+              <Text style={[styles.badgeText, { color: severityColor }]}>
+                {t(tagKey)}
+              </Text>
+            </View>
+          ))}
         </View>
 
         <View style={styles.divider} />
 
-        {/* 3-Part Classical Structure */}
+        {/* Meaning */}
         <View style={styles.classicalStructure}>
           <View style={styles.classicalSection}>
-            <Text style={styles.classicalLabel}>
-              {t('compatibility.results.spiritual.meaning')}
+            <Text style={[styles.classicalLabel, { color: '#3b82f6' }]}>
+              {t('compatibility.soul.blocks.meaning')}
             </Text>
             <Text style={styles.classicalText}>
-              {getLocalizedField(method, 'description', language)}
+              {t(archetype.meaningKey)}
             </Text>
           </View>
 
+          {/* Marriage Outlook (only in marriage context) */}
+          {relationshipContext === 'marriage' && (
+            <View style={styles.classicalSection}>
+              <Text style={[styles.classicalLabel, { color: '#8b5cf6' }]}>
+                {t('compatibility.soul.blocks.marriageOutlook')}
+              </Text>
+              <Text style={styles.classicalText}>
+                {t(archetype.marriageOutlookKey)}
+              </Text>
+            </View>
+          )}
+
+          {/* Watch Out */}
           <View style={styles.classicalSection}>
-            <Text style={styles.classicalLabel}>
-              {t('compatibility.results.spiritual.watchOut')}
+            <Text style={[styles.classicalLabel, { color: '#f59e0b' }]}>
+              {t('compatibility.soul.blocks.watchOut')}
             </Text>
             <Text style={styles.classicalText}>
-              {t(method.score >= 70 ? 'compatibility.results.spiritual.watchOut_high' : method.score >= 40 ? 'compatibility.results.spiritual.watchOut_medium' : 'compatibility.results.spiritual.watchOut_low')}
+              {t(archetype.watchOutKey)}
             </Text>
           </View>
 
+          {/* Key to Success */}
           <View style={styles.classicalSection}>
-            <Text style={styles.classicalLabel}>
-              {t('compatibility.results.spiritual.keyToSuccess')}
+            <Text style={[styles.classicalLabel, { color: '#22c55e' }]}>
+              {t('compatibility.soul.blocks.keyToSuccess')}
             </Text>
             <Text style={styles.classicalText}>
-              {t(method.score >= 70 ? 'compatibility.results.spiritual.success_high' : method.score >= 40 ? 'compatibility.results.spiritual.success_medium' : 'compatibility.results.spiritual.success_low')}
+              {t(archetype.keyToSuccessKey)}
             </Text>
           </View>
         </View>
 
-        {/* Relationship Context Note */}
-        {contextMessages[relationshipContext] && (
-          <View style={styles.contextNote}>
-            <Ionicons name="heart-circle" size={18} color={theme.color} />
-            <Text style={styles.contextNoteText}>
-              {t('compatibility.results.spiritual.contextNote', { 
-                context: relationshipContext 
-              })}: {contextMessages[relationshipContext]}
+        {/* Disclaimer */}
+        <View style={styles.contextNote}>
+          <Ionicons name="information-circle-outline" size={18} color="#94a3b8" />
+          <Text style={styles.contextNoteText}>
+            {t('compatibility.soul.disclaimer')}
+          </Text>
+        </View>
+
+        {/* How Calculated (Collapsible) */}
+        <TouchableOpacity 
+          onPress={() => setShowFormula(!showFormula)}
+          style={styles.expandableHeader}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.expandableTitle}>
+            {t('compatibility.soul.howCalculated.title')}
+          </Text>
+          <Ionicons 
+            name={showFormula ? 'chevron-up' : 'chevron-down'} 
+            size={20} 
+            color="#94a3b8" 
+          />
+        </TouchableOpacity>
+
+        {showFormula && (
+          <View style={styles.formulaSection}>
+            <View style={styles.formulaRow}>
+              <Text style={styles.formulaLabel}>{person1Name}</Text>
+              <Text style={styles.formulaValue}>{person1Kabir}</Text>
+            </View>
+            <View style={styles.formulaRow}>
+              <Text style={styles.formulaLabel}>{person2Name}</Text>
+              <Text style={styles.formulaValue}>{person2Kabir}</Text>
+            </View>
+            <View style={styles.formulaRow}>
+              <Text style={styles.formulaLabel}>{t('compatibility.soul.howCalculated.constant')}</Text>
+              <Text style={styles.formulaValue}>+7</Text>
+            </View>
+            <Text style={styles.formulaText}>
+              ({person1Kabir} + {person2Kabir} + 7) mod 9 = {method.remainder}
+            </Text>
+            <Text style={styles.formulaNote}>
+              {t('compatibility.soul.howCalculated.explanation')}
             </Text>
           </View>
         )}
