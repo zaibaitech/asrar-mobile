@@ -2,9 +2,9 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import * as Linking from 'expo-linking';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -12,6 +12,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useColorScheme } from '@/components/useColorScheme';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ProfileProvider, useProfile } from '@/contexts/ProfileContext';
+import { getOnboardingCompleted } from '@/services/OnboardingService';
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -19,8 +20,8 @@ export {
 } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  // Ensure proper initial route handling
+  initialRouteName: '(onboarding)',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -58,8 +59,10 @@ function RootLayoutNav() {
       <ProfileProvider>
         <LanguageProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <OnboardingGate />
             <DeepLinkHandler />
             <Stack>
+              <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen 
                 name="compatibility" 
@@ -89,6 +92,37 @@ function RootLayoutNav() {
       </ProfileProvider>
     </SafeAreaProvider>
   );
+}
+
+// Onboarding Gate - Redirect to onboarding if not completed
+function OnboardingGate() {
+  const router = useRouter();
+  const segments = useSegments();
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
+
+  useEffect(() => {
+    checkOnboarding();
+  }, []);
+
+  const checkOnboarding = async () => {
+    try {
+      const completed = await getOnboardingCompleted();
+      const inOnboarding = segments[0] === '(onboarding)';
+      
+      // If onboarding not completed and not already in onboarding, redirect
+      if (!completed && !inOnboarding) {
+        router.replace('/(onboarding)');
+      }
+      
+      setIsCheckingOnboarding(false);
+    } catch (error) {
+      console.error('Error checking onboarding:', error);
+      setIsCheckingOnboarding(false);
+    }
+  };
+
+  // Don't render anything, this just handles navigation
+  return null;
 }
 
 // Deep Link Handler Component

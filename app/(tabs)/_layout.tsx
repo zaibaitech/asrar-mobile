@@ -207,6 +207,20 @@ export default function TabLayout() {
           title: 'Daily Check-In',
         }}
       />
+      <Tabs.Screen
+        name="planet-detail"
+        options={{
+          href: null, // 🔒 Frozen for launch - redirects to coming soon
+          title: 'Planet Details',
+        }}
+      />
+      <Tabs.Screen
+        name="planetary-coming-soon"
+        options={{
+          href: null, // Placeholder screen for frozen planetary module
+          title: 'Planetary Module',
+        }}
+      />
     </Tabs>
   );
 }

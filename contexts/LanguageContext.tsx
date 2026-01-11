@@ -10,11 +10,35 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string, params?: TranslationParams) => string;
+  tSafe: (key: string, fallback: string, params?: TranslationParams) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 const LANGUAGE_STORAGE_KEY = '@asrar_language';
+
+// Dev-only missing key tracker (collected once per key, no spam)
+const missingKeys = new Set<string>();
+
+/**
+ * Humanize a translation key into a readable fallback
+ * Examples:
+ *   "home.now" => "Now"
+ *   "planetaryDivineResonance" => "Planetary Divine Resonance"
+ *   "planet.status.motion" => "Motion"
+ */
+const humanizeKey = (key: string): string => {
+  // Get last segment after dots
+  const lastSegment = key.split('.').pop() || key;
+  
+  // Convert camelCase to Title Case with spaces
+  const withSpaces = lastSegment
+    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+    .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
+    .trim();
+  
+  return withSpaces;
+};
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en');
@@ -83,21 +107,67 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       : resolveTranslation(fallbackLanguage, keys);
 
     if (fallbackValue) {
-      if (__DEV__) {
-        console.warn(`Missing translation for "${key}" in language "${language}". Falling back to ${fallbackLanguage}.`);
+      if (__DEV__ && !missingKeys.has(key)) {
+        missingKeys.add(key);
+        console.warn(`[i18n] Missing translation for "${key}" in language "${language}". Falling back to ${fallbackLanguage}.`);
       }
       return applyParams(fallbackValue, params);
     }
 
-    if (__DEV__) {
-      console.warn(`Missing translation for "${key}" in language "${language}" and fallback language.`);
+    // NEVER return raw key - use humanized fallback instead
+    const humanFallback = humanizeKey(key);
+    
+    if (__DEV__ && !missingKeys.has(key)) {
+      missingKeys.add(key);
+      console.warn(`[i18n] Missing translation for "${key}" in all languages. Using humanized fallback: "${humanFallback}"`);
     }
 
-    return key;
+    return applyParams(humanFallback, params);
+  };
+
+  /**
+   * Safe translation helper - returns fallback if key missing, NEVER shows raw keys
+   * Tracks missing keys in DEV mode only (once per key, no spam)
+   * 
+   * @param key - Translation key to look up
+   * @param fallback - Fallback text if translation missing
+   * @param params - Optional parameters for string interpolation
+   * @returns Translated string or fallback (never raw key)
+   */
+  const tSafe = (key: string, fallback: string, params?: TranslationParams): string => {
+    const keys = key.split('.');
+    const fallbackLanguage: Language = 'en';
+
+    // Try primary language
+    const primaryValue = resolveTranslation(language, keys);
+    if (primaryValue) {
+      return applyParams(primaryValue, params);
+    }
+
+    // Try fallback language if different
+    if (language !== fallbackLanguage) {
+      const fallbackLangValue = resolveTranslation(fallbackLanguage, keys);
+      if (fallbackLangValue) {
+        // Collect missing key in dev (once only)
+        if (__DEV__ && !missingKeys.has(key)) {
+          missingKeys.add(key);
+          console.warn(`[tSafe] Missing "${key}" in "${language}", using EN fallback`);
+        }
+        return applyParams(fallbackLangValue, params);
+      }
+    }
+
+    // Use provided fallback and collect in dev
+    if (__DEV__ && !missingKeys.has(key)) {
+      missingKeys.add(key);
+      console.warn(`[tSafe] Missing "${key}" in all languages, using hardcoded fallback: "${fallback}"`);
+    }
+
+    return applyParams(fallback, params);
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, tSafe }}>
       {children}
     </LanguageContext.Provider>
   );

@@ -15,6 +15,7 @@ import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { signIn, signUp } from '@/services/AuthService';
+import { clearGuestMode } from '@/services/SessionModeService';
 import { evaluatePasswordStrength, getPasswordStrengthLabel } from '@/utils/passwordStrength';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -105,6 +106,7 @@ export default function AuthScreen() {
       
       if (result.session) {
         // ✅ SUCCESS - Account created and auto-signed in (no email verification required)
+        await clearGuestMode(); // Clear guest mode on successful signup
         await setProfile({ 
           mode: 'account',
         });
@@ -176,7 +178,8 @@ export default function AuthScreen() {
       const result = await signIn({ email, password });
       
       if (result.session) {
-        // Update profile to account mode
+        // Update profile to account mode and clear guest mode
+        await clearGuestMode(); // Clear guest mode on successful sign in
         await setProfile({ 
           mode: 'account',
         });

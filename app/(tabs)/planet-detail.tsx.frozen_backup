@@ -1,0 +1,1309 @@
+/**
+ * 🔒 Planet Detail Screen - FROZEN FOR LAUNCH
+ * ====================
+ * This module is being refined and will return in a future update.
+ * Users will be redirected to PlanetaryComingSoonScreen.
+ * 
+ * DO NOT REMOVE - Kept for easy re-enable after launch.
+ */
+
+import { useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
+
+export default function PlanetDetailScreen() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // 🔒 Redirect to coming soon screen
+    router.replace('/(tabs)/planetary-coming-soon');
+  }, []);
+
+  return null;
+}
+
+/* 🔒 FROZEN CODE - DO NOT DELETE
+ * This code is preserved for easy re-enable after launch.
+ * To re-enable: Remove the redirect above and uncomment this section.
+
+import { PlanetStatusPanel } from '@/components/PlanetStatusPanel';
+import { Borders, DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useProfile } from '@/contexts/ProfileContext';
+import type { Element } from '@/services/MomentAlignmentService';
+import {
+    getPlanetSnapshot,
+    type BilingualText,
+    type DivineName,
+    type PlanetSnapshot,
+} from '@/services/PlanetDetailService';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+export default function PlanetDetailScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
+  const { language, t } = useLanguage();
+  const { profile } = useProfile();
+
+  const [snapshot, setSnapshot] = useState<PlanetSnapshot | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Extract params
+  const planetId = (params.planetId as string) || 'sun';
+  const mode = (params.mode as 'now' | 'next') || 'now';
+  const userElement = profile?.derived?.element as Element | undefined;
+  const isPremium = false; // TODO: integrate with actual subscription state
+
+  useEffect(() => {
+    loadPlanetData();
+  }, [planetId, mode]);
+
+  const loadPlanetData = async () => {
+    try {
+      setLoading(true);
+
+      // Get current planetary times (simplified - you may have these in context)
+      const now = new Date();
+      const sunrise = new Date(now);
+      sunrise.setHours(6, 30, 0, 0);
+      const sunset = new Date(now);
+      sunset.setHours(18, 30, 0, 0);
+      const nextSunrise = new Date(sunrise);
+      nextSunrise.setDate(nextSunrise.getDate() + 1);
+
+      // Validate planetId before calling service
+      if (!planetId || typeof planetId !== 'string') {
+        console.error('[PlanetDetail] Invalid planetId:', planetId);
+        setSnapshot(null);
+        return;
+      }
+
+      const snapshotData = await getPlanetSnapshot(
+        {
+          planetId: planetId.toLowerCase(),
+          mode,
+          userElement,
+          isPremium,
+        },
+        sunrise,
+        sunset,
+        nextSunrise,
+        now
+      );
+
+      if (!snapshotData) {
+        console.warn('[PlanetDetail] No snapshot data returned');
+      }
+
+      setSnapshot(snapshotData);
+    } catch (error) {
+      console.error('[PlanetDetail] Error loading data:', error);
+      setSnapshot(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getText = (bilingual: BilingualText): string => {
+    if (language === 'fr' && bilingual.fr) return bilingual.fr;
+    if (language === 'ar' && bilingual.ar) return bilingual.ar;
+    return bilingual.en;
+  };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <ActivityIndicator size="large" color={ElementAccents.fire.primary} />
+      </View>
+    );
+  }
+
+  if (!snapshot) {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <Text style={styles.errorText}>
+          {t('planetDetail.error')}
+        </Text>
+      </View>
+    );
+  }
+
+  const elementAccent = snapshot.element
+    ? ElementAccents[snapshot.element.key]
+    : ElementAccents.fire;
+
+  return (
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <Pressable onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
+        </Pressable>
+        <Text style={styles.headerTitle} numberOfLines={1}>
+          {t('planetDetail.title')}
+        </Text>
+        <View style={[styles.modeBadge, { backgroundColor: `${elementAccent.primary}22` }]}>
+          <Text style={[styles.modeBadgeText, { color: elementAccent.primary }]}>
+            {getText(snapshot.nowLabel)}
+          </Text>
+        </View>
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* HERO CARD - Planet Snapshot */}
+        <LinearGradient
+          colors={[`${elementAccent.primary}15`, `${elementAccent.primary}05`]}
+          style={styles.heroCard}
+        >
+          {/* Planet Glow Halo */}
+          <View style={[styles.planetGlow, { backgroundColor: `${elementAccent.primary}10` }]} />
+          
+          <View style={styles.heroTop}>
+            <View style={styles.heroLeft}>
+              <View style={[styles.symbolContainer, { 
+                backgroundColor: `${elementAccent.primary}20`,
+                shadowColor: elementAccent.primary,
+                shadowOpacity: 0.3,
+                shadowRadius: 12,
+                shadowOffset: { width: 0, height: 0 },
+              }]}>
+                <Text style={styles.planetSymbol}>{snapshot.symbol}</Text>
+              </View>
+              <View style={styles.planetInfo}>
+                <Text style={styles.planetName} numberOfLines={1}>
+                  {getText(snapshot.planetName)}
+                </Text>
+                <Text style={styles.planetNameAr} numberOfLines={1}>
+                  {snapshot.arabicName}
+                </Text>
+                {snapshot.transitSnapshot?.motion === 'retrograde' && (
+                  <View style={[styles.motionPill, { backgroundColor: `${ElementAccents.fire.primary}25` }]}>
+                    <Text style={[styles.retrogradeSymbol, { color: ElementAccents.fire.primary }]}>℞</Text>
+                    <Text style={[styles.motionPillText, { color: ElementAccents.fire.primary }]} numberOfLines={1}>
+                      {t('planetDetail.status.motionRetrograde')}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            {/* Resonance Score Badge */}
+            {snapshot.resonance && (
+              <View style={[styles.resonanceBadge, {
+                shadowColor: elementAccent.primary,
+                shadowOpacity: 0.4,
+                shadowRadius: 8,
+                shadowOffset: { width: 0, height: 2 },
+              }]}>
+                <Text style={styles.resonanceScore}>{snapshot.resonance.score}</Text>
+                <Text style={styles.resonanceLabel} numberOfLines={1}>
+                  {getText(snapshot.resonance.label)}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Chips Row - Sign, Element */}
+          <View style={styles.chipsRow}>
+            {snapshot.sign && (
+              <View style={[styles.chip, { backgroundColor: elementAccent.glow }]}>
+                <Text style={styles.chipLabel} numberOfLines={1}>
+                  {t('planetDetail.labels.sign')}:
+                </Text>
+                <Text style={[styles.chipValue, { color: elementAccent.primary }]} numberOfLines={1}>
+                  {getText(snapshot.sign.label)}
+                </Text>
+              </View>
+            )}
+            {snapshot.element && (
+              <View style={[styles.chip, { backgroundColor: elementAccent.glow }]}>
+                <Text style={styles.chipLabel} numberOfLines={1}>
+                  {t('planetDetail.labels.element')}:
+                </Text>
+                <Text style={[styles.chipValue, { color: elementAccent.primary }]} numberOfLines={1}>
+                  {getText(snapshot.element.label)}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Day & Hour Rulers */}
+          {(snapshot.dayRuler || snapshot.hourRuler) && (
+            <View style={styles.rulersRow}>
+              {snapshot.dayRuler && (
+                <View style={styles.rulerChip}>
+                  <Text style={styles.rulerLabel}>
+                    {t('planetDetail.labels.dayRuler')}:
+                  </Text>
+                  <Text style={styles.rulerValue}>
+                    {getText(snapshot.dayRuler)}
+                  </Text>
+                </View>
+              )}
+              {snapshot.hourRuler && (
+                <View style={styles.rulerChip}>
+                  <Text style={styles.rulerLabel}>
+                    {t('planetDetail.labels.hourRuler')}:
+                  </Text>
+                  <Text style={styles.rulerValue}>
+                    {getText(snapshot.hourRuler)}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
+        </LinearGradient>
+
+        {/* PLANET STATUS CARD */}
+        {snapshot.transitSnapshot && (
+          <PlanetStatusPanel
+            transitSnapshot={snapshot.transitSnapshot}
+            signLabel={snapshot.sign?.label ? getText(snapshot.sign.label) : undefined}
+            elementAccentColor={elementAccent.primary}
+          />
+        )}
+
+        {/* RUHANI FOCUS CARD */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle} numberOfLines={1}>
+            {t('planetDetail.sections.ruhaniFocus')}
+          </Text>
+          <Text style={styles.cardSubtitle} numberOfLines={2}>
+            {t('planetDetail.sections.ruhaniFocusDesc')}
+          </Text>
+
+          <View style={styles.guidanceSection}>
+            {snapshot.ruhaniFocus.map((item, index) => (
+              <View key={index} style={styles.bulletRow}>
+                <Text style={[styles.bullet, { color: elementAccent.primary }]}>✦</Text>
+                <Text style={styles.bulletText} numberOfLines={3}>
+                  {getText(item)}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* CAUTIONS CARD */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle} numberOfLines={1}>
+            {t('planetDetail.sections.cautions')}
+          </Text>
+          <Text style={styles.cardSubtitle} numberOfLines={2}>
+            {t('planetDetail.sections.cautionsDesc')}
+          </Text>
+
+          <View style={styles.guidanceSection}>
+            {snapshot.cautions.map((item, index) => (
+              <View key={index} style={styles.bulletRow}>
+                <Text style={styles.bullet}>⚠</Text>
+                <Text style={styles.bulletText} numberOfLines={3}>
+                  {getText(item)}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* TIMING WINDOWS CARD */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle} numberOfLines={1}>
+            {t('planetDetail.sections.timing')}
+          </Text>
+          
+          <View style={styles.timingSection}>
+            <Text style={styles.timingLabel} numberOfLines={1}>
+              {t('planetDetail.timing.generalWindow')}:
+            </Text>
+            <Text style={styles.timingValue} numberOfLines={2}>
+              {t(
+                `planetDetail.timing.${snapshot.timing.generalWindow.key}`
+              )}
+            </Text>
+          </View>
+
+          {snapshot.timing.notes && (
+            <View style={styles.timingNotes}>
+              <Text style={styles.timingNotesIcon}>ℹ️</Text>
+              <Text style={styles.timingNotesText} numberOfLines={3}>
+                {getText(snapshot.timing.notes)}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* PRACTICE METHOD CARD */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle} numberOfLines={1}>
+            {getText(snapshot.practice.title)}
+          </Text>
+          <Text style={styles.cardSubtitle} numberOfLines={2}>
+            {t('planetDetail.practice.subtitle')}
+          </Text>
+
+          {/* Steps */}
+          <View style={styles.practiceSteps}>
+            {snapshot.practice.steps.map((step, index) => (
+              <View key={index} style={styles.practiceStep}>
+                <View style={[styles.stepNumber, { backgroundColor: elementAccent.glow }]}>
+                  <Text style={[styles.stepNumberText, { color: elementAccent.primary }]}>
+                    {index + 1}
+                  </Text>
+                </View>
+                <Text style={styles.stepText} numberOfLines={4}>
+                  {getText(step)}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Adab (Etiquette) */}
+          <View style={styles.adabSection}>
+            <Text style={styles.adabTitle} numberOfLines={1}>
+              {t('planetDetail.practice.adab')}:
+            </Text>
+            {snapshot.practice.adab.map((item, index) => (
+              <View key={index} style={styles.bulletRow}>
+                <Text style={styles.bullet}>•</Text>
+                <Text style={styles.adabText} numberOfLines={3}>
+                  {getText(item)}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Duration hint */}
+          {snapshot.practice.durationHint && (
+            <Text style={styles.durationHint} numberOfLines={1}>
+              ⏱ {getText(snapshot.practice.durationHint)}
+            </Text>
+          )}
+        </View>
+
+        {/* PERSONAL RESONANCE CARD */}
+        {snapshot.resonance && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>
+              {t('planetDetail.sections.resonance')}
+            </Text>
+
+            {/* Score Meter */}
+            <View style={styles.resonanceRow}>
+              <View style={styles.resonanceMeter}>
+                <View style={styles.meterTrack}>
+                  <LinearGradient
+                    colors={[elementAccent.primary, elementAccent.glow]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[styles.meterFill, { width: `${snapshot.resonance.score}%` }]}
+                  />
+                </View>
+                <Text style={styles.meterLabel}>
+                  {snapshot.resonance.score}/100 — {getText(snapshot.resonance.label)}
+                </Text>
+              </View>
+            </View>
+
+            {/* Why */}
+            <Text style={styles.resonanceWhy} numberOfLines={3}>
+              {getText(snapshot.resonance.why)}
+            </Text>
+          </View>
+        )}
+
+        {/* PREMIUM DIVINE NAMES CARD */}
+        <View style={[styles.card, !isPremium && styles.cardLocked]}>
+          <View style={styles.premiumHeader}>
+            <Text style={styles.cardTitle}>
+              {t('planetDetail.sections.divineNames')}
+            </Text>
+            {isPremium && (
+              <View style={[styles.premiumBadge, { backgroundColor: elementAccent.primary }]}>
+                <Text style={styles.premiumBadgeText}>✨ PREMIUM</Text>
+              </View>
+            )}
+          </View>
+
+          {isPremium && snapshot.premium ? (
+            <>
+              {/* Personalization Note */}
+              <Text style={styles.personalizationNote}>
+                {getText(snapshot.premium.personalization.whyNeeded)}
+              </Text>
+
+              {/* Divine Names */}
+              {snapshot.premium.divineNames.map((divineName: DivineName, index: number) => (
+                <View key={divineName.id} style={[styles.divineNameCard, { borderLeftColor: elementAccent.primary }]}>
+                  {/* Arabic & Latin */}
+                  <View style={styles.divineNameHeader}>
+                    <Text style={styles.divineNameArabic}>{divineName.ar}</Text>
+                    <Text style={styles.divineNameLatin}>{divineName.latin}</Text>
+                  </View>
+
+                  {/* Meaning */}
+                  <Text style={styles.divineNameMeaning}>
+                    {getText(divineName.meaning)}
+                  </Text>
+
+                  {/* Why This Matches */}
+                  <View style={styles.divineNameWhy}>
+                    <Text style={styles.divineNameWhyLabel}>
+                      {t('planetDetail.divineNames.whyLabel')}:
+                    </Text>
+                    <Text style={styles.divineNameWhyText}>
+                      {getText(divineName.whyThisMatches)}
+                    </Text>
+                  </View>
+
+                  {/* Practice Suggestions */}
+                  <View style={styles.divineNameSuggestions}>
+                    <View style={styles.suggestionRow}>
+                      <Text style={styles.suggestionLabel}>📿</Text>
+                      <Text style={styles.suggestionText}>
+                        {getText(divineName.countSuggestion)}
+                      </Text>
+                    </View>
+                    <View style={styles.suggestionRow}>
+                      <Text style={styles.suggestionLabel}>⏰</Text>
+                      <Text style={styles.suggestionText}>
+                        {getText(divineName.timingSuggestion)}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </>
+          ) : (
+            <View style={styles.lockedContent}>
+              <Ionicons name="lock-closed" size={40} color={DarkTheme.textTertiary} />
+              <Text style={styles.lockedTitle}>
+                {t('planetDetail.premium.lockedTitle')}
+              </Text>
+              <Text style={styles.lockedBody}>
+                {t('planetDetail.premium.lockedBody')}
+              </Text>
+              <Pressable
+                style={[styles.upgradeButton, { backgroundColor: elementAccent.primary }]}
+                onPress={() => {
+                  // TODO: Navigate to paywall
+                  console.log('Navigate to premium');
+                }}
+              >
+                <Text style={styles.upgradeButtonText}>
+                  {t('planetDetail.premium.upgradeButton')}
+                </Text>
+              </Pressable>
+            </View>
+          )}
+        </View>
+
+        {/* PREMIUM APPETITE CARDS */}
+        {!isPremium && (
+          <>
+            {/* Planetary-Divine Resonance */}
+            <View style={[styles.card, styles.premiumAppetiteCard]}>
+              <LinearGradient
+                colors={['rgba(255, 215, 0, 0.15)', 'rgba(255, 215, 0, 0.05)']}
+                style={styles.premiumAppetiteGradient}
+              >
+                <View style={styles.premiumAppetiteBlur} />
+                <View style={styles.premiumAppetiteContent}>
+                  <View style={styles.premiumAppetiteIcon}>
+                    <Ionicons name="lock-closed" size={24} color="#FFD700" />
+                  </View>
+                  <Text style={styles.premiumAppetiteTitle} numberOfLines={1}>
+                    {t('planetDetail.premium.planetaryDivineResonance.title')}
+                  </Text>
+                  <Text style={styles.premiumAppetiteDescription} numberOfLines={3}>
+                    {t('planetDetail.premium.planetaryDivineResonance.description')}
+                  </Text>
+                  <Pressable
+                    style={styles.premiumAppetiteButton}
+                    onPress={() => console.log('Navigate to premium')}
+                  >
+                    <Text style={styles.premiumAppetiteButtonText} numberOfLines={1}>
+                      {t('ui.unlockPremium')}
+                    </Text>
+                    <Ionicons name="arrow-forward" size={16} color="#FFD700" />
+                  </Pressable>
+                </View>
+              </LinearGradient>
+            </View>
+
+            {/* Zikr Timing Optimizer */}
+            <View style={[styles.card, styles.premiumAppetiteCard]}>
+              <LinearGradient
+                colors={['rgba(255, 215, 0, 0.15)', 'rgba(255, 215, 0, 0.05)']}
+                style={styles.premiumAppetiteGradient}
+              >
+                <View style={styles.premiumAppetiteBlur} />
+                <View style={styles.premiumAppetiteContent}>
+                  <View style={styles.premiumAppetiteIcon}>
+                    <Ionicons name="time-outline" size={24} color="#FFD700" />
+                  </View>
+                  <Text style={styles.premiumAppetiteTitle} numberOfLines={1}>
+                    {t('planetDetail.premium.zikriTiming.title')}
+                  </Text>
+                  <Text style={styles.premiumAppetiteDescription} numberOfLines={3}>
+                    {t('planetDetail.premium.zikriTiming.description')}
+                  </Text>
+                  <Pressable
+                    style={styles.premiumAppetiteButton}
+                    onPress={() => console.log('Navigate to premium')}
+                  >
+                    <Text style={styles.premiumAppetiteButtonText} numberOfLines={1}>
+                      {t('ui.unlockPremium')}
+                    </Text>
+                    <Ionicons name="arrow-forward" size={16} color="#FFD700" />
+                  </Pressable>
+                </View>
+              </LinearGradient>
+            </View>
+          </>
+        )}
+
+        {/* FOOTER DISCLAIMER */}
+        <Text style={styles.disclaimer} numberOfLines={2}>
+          {t('ui.forReflectionOnly')}
+        </Text>
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: DarkTheme.screenBackground,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    gap: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  backButton: {
+    padding: Spacing.xs,
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    minWidth: 0,
+  },
+  modeBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: Borders.radiusSm,
+  },
+  modeBadgeText: {
+    fontSize: 11,
+    fontWeight: Typography.weightBold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: Spacing.md,
+    gap: Spacing.md,
+  },
+  
+  // Hero Card
+  heroCard: {
+    padding: Spacing.lg,
+    borderRadius: Borders.radiusLg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    gap: Spacing.md,
+  },
+  heroTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: Spacing.md,
+  },
+  heroLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    flex: 1,
+    minWidth: 0,
+  },
+  planetSymbol: {
+    fontSize: 48,
+    flexShrink: 0,
+  },
+  planetInfo: {
+    flex: 1,
+    minWidth: 0,
+    gap: 4,
+  },
+  planetName: {
+    fontSize: 22,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+  },
+  planetNameAr: {
+    fontSize: 14,
+    fontFamily: 'Amiri',
+    color: DarkTheme.textSecondary,
+  },
+  resonanceBadge: {
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: Borders.radiusMd,
+    minWidth: 60,
+  },
+  resonanceScore: {
+    fontSize: 24,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+  },
+  resonanceLabel: {
+    fontSize: 10,
+    color: DarkTheme.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  chipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: Borders.radiusMd,
+    flex: 1,
+    minWidth: 0,
+    maxWidth: '48%',
+  },
+  chipLabel: {
+    fontSize: 11,
+    color: DarkTheme.textSecondary,
+    flexShrink: 0,
+  },
+  chipValue: {
+    fontSize: 12,
+    fontWeight: Typography.weightSemibold,
+    flex: 1,
+    minWidth: 0,
+  },
+  vibeSection: {
+    gap: Spacing.xs,
+    paddingTop: Spacing.sm,
+  },
+  vibeTitle: {
+    fontSize: 16,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+  },
+  vibeBody: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: DarkTheme.textSecondary,
+  },
+
+  // Standard Card
+  card: {
+    backgroundColor: 'rgba(30, 20, 36, 0.65)',
+    borderRadius: Borders.radiusLg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    padding: Spacing.lg,
+    gap: Spacing.md,
+  },
+  cardLocked: {
+    borderStyle: 'dashed',
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  cardSubtitle: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    marginTop: -8,
+  },
+
+  // Rulers Row
+  rulersRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    flexWrap: 'wrap',
+  },
+  rulerChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: Borders.radiusMd,
+    flex: 1,
+    minWidth: 0,
+  },
+  rulerLabel: {
+    fontSize: 10,
+    color: DarkTheme.textSecondary,
+    flexShrink: 0,
+  },
+  rulerValue: {
+    fontSize: 11,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    flex: 1,
+  },
+
+  // Timing Section
+  timingSection: {
+    gap: Spacing.xs,
+  },
+  timingLabel: {
+    fontSize: 11,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textSecondary,
+    textTransform: 'uppercase',
+  },
+  timingValue: {
+    fontSize: 14,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+  },
+  timingNotes: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    padding: Spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderRadius: Borders.radiusSm,
+    alignItems: 'flex-start',
+  },
+  timingNotesIcon: {
+    fontSize: 16,
+    flexShrink: 0,
+  },
+  timingNotesText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    flex: 1,
+    lineHeight: 18,
+  },
+
+  // Practice Steps
+  practiceSteps: {
+    gap: Spacing.md,
+  },
+  practiceStep: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    alignItems: 'flex-start',
+  },
+  stepNumber: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  stepNumberText: {
+    fontSize: 13,
+    fontWeight: Typography.weightBold,
+  },
+  stepText: {
+    fontSize: 13,
+    color: DarkTheme.textPrimary,
+    flex: 1,
+    paddingTop: 4,
+    lineHeight: 19,
+  },
+  
+  // Adab Section
+  adabSection: {
+    gap: Spacing.xs,
+    paddingTop: Spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  adabTitle: {
+    fontSize: 11,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textSecondary,
+    textTransform: 'uppercase',
+  },
+  adabText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    flex: 1,
+    lineHeight: 18,
+  },
+  durationHint: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingTop: Spacing.xs,
+  },
+
+  // Premium Section
+  premiumHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  premiumBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: Borders.radiusSm,
+  },
+  premiumBadgeText: {
+    fontSize: 9,
+    fontWeight: Typography.weightBold,
+    color: '#FFFFFF',
+    letterSpacing: 0.8,
+  },
+  personalizationNote: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+    fontStyle: 'italic',
+    marginTop: -8,
+  },
+
+  // Divine Name Cards
+  divineNameCard: {
+    padding: Spacing.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderRadius: Borders.radiusMd,
+    borderLeftWidth: 3,
+    gap: Spacing.sm,
+  },
+  divineNameHeader: {
+    gap: 4,
+  },
+  divineNameArabic: {
+    fontSize: 22,
+    fontFamily: 'Amiri',
+    color: DarkTheme.textPrimary,
+    fontWeight: Typography.weightBold,
+  },
+  divineNameLatin: {
+    fontSize: 14,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textSecondary,
+  },
+  divineNameMeaning: {
+    fontSize: 13,
+    color: DarkTheme.textPrimary,
+    lineHeight: 19,
+  },
+  divineNameWhy: {
+    gap: 4,
+    paddingTop: Spacing.xs,
+  },
+  divineNameWhyLabel: {
+    fontSize: 10,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textSecondary,
+    textTransform: 'uppercase',
+  },
+  divineNameWhyText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+    fontStyle: 'italic',
+  },
+  divineNameSuggestions: {
+    gap: Spacing.xs,
+    paddingTop: Spacing.xs,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  suggestionRow: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+    alignItems: 'flex-start',
+  },
+  suggestionLabel: {
+    fontSize: 14,
+    flexShrink: 0,
+  },
+  suggestionText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    flex: 1,
+    lineHeight: 18,
+  },
+
+  // Guidance Section
+  guidanceSection: {
+    gap: Spacing.sm,
+  },
+  guidanceLabel: {
+    fontSize: 12,
+    fontWeight: Typography.weightSemibold,
+    color: ElementAccents.fire.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  bulletRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    alignItems: 'flex-start',
+  },
+  bullet: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+    flexShrink: 0,
+  },
+  bulletText: {
+    fontSize: 13,
+    lineHeight: 20,
+    color: DarkTheme.textPrimary,
+    flex: 1,
+    minWidth: 0,
+    flexWrap: 'wrap',
+  },
+
+  // Resonance
+  resonanceRow: {
+    gap: Spacing.sm,
+  },
+  resonanceMeter: {
+    gap: Spacing.xs,
+  },
+  meterTrack: {
+    height: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  meterFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  meterLabel: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: Typography.weightSemibold,
+  },
+  resonanceWhy: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: DarkTheme.textSecondary,
+    fontStyle: 'italic',
+  },
+
+  // Spiritual Layer
+  spiritualSection: {
+    gap: Spacing.xs,
+  },
+  spiritualLabel: {
+    fontSize: 11,
+    fontWeight: Typography.weightSemibold,
+    color: ElementAccents.fire.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  spiritualText: {
+    fontSize: 13,
+    color: DarkTheme.textPrimary,
+    lineHeight: 19,
+  },
+  lockedContent: {
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.lg,
+  },
+  lockedTitle: {
+    fontSize: 16,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    textAlign: 'center',
+  },
+  lockedBody: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: DarkTheme.textSecondary,
+    textAlign: 'center',
+    maxWidth: '90%',
+  },
+  upgradeButton: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: Borders.radiusMd,
+    marginTop: Spacing.sm,
+  },
+  upgradeButtonText: {
+    fontSize: 14,
+    fontWeight: Typography.weightBold,
+    color: '#FFFFFF',
+  },
+
+  // Footer
+  disclaimer: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    textAlign: 'center',
+    paddingTop: Spacing.sm,
+    fontStyle: 'italic',
+  },
+
+  // Error
+  errorText: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    textAlign: 'center',
+    padding: Spacing.lg,
+  },
+
+  // Planet Status Card
+  statusHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.md,
+  },
+  expandButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+  },
+  expandButtonText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    fontWeight: Typography.weightMedium,
+  },
+  statusGrid: {
+    gap: Spacing.sm,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: Spacing.xs,
+  },
+  statusLabel: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    fontWeight: Typography.weightMedium,
+  },
+  statusValue: {
+    fontSize: 14,
+    color: DarkTheme.textPrimary,
+    fontWeight: Typography.weightSemibold,
+  },
+  motionBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  retrogradeIcon: {
+    fontSize: 18,
+    color: ElementAccents.fire.primary,
+    fontWeight: Typography.weightBold,
+  },
+  retrogradeText: {
+    color: ElementAccents.fire.primary,
+  },
+  stationText: {
+    color: ElementAccents.air.primary,
+    fontStyle: 'italic',
+  },
+  expandedSection: {
+    marginTop: Spacing.md,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
+    gap: Spacing.md,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  detailLabel: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: Typography.weightMedium,
+  },
+  detailValue: {
+    fontSize: 13,
+    color: DarkTheme.textPrimary,
+  },
+  aspectsSection: {
+    gap: Spacing.sm,
+  },
+  aspectsTitle: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: Typography.weightSemibold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: Spacing.xs,
+  },
+  aspectRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.xs,
+  },
+  aspectType: {
+    fontSize: 13,
+    color: ElementAccents.water.primary,
+    fontWeight: Typography.weightSemibold,
+    minWidth: 80,
+  },
+  aspectOther: {
+    fontSize: 13,
+    color: DarkTheme.textPrimary,
+    flex: 1,
+  },
+  aspectOrb: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+  },
+  aspectApplying: {
+    fontSize: 11,
+    color: ElementAccents.earth.primary,
+    fontStyle: 'italic',
+  },
+  nextIngressDetail: {
+    gap: Spacing.xs,
+  },
+
+  // Planet Glow Effect
+  planetGlow: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 100,
+    borderTopLeftRadius: Borders.radiusLg,
+    borderTopRightRadius: Borders.radiusLg,
+    opacity: 0.3,
+  },
+  symbolContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  motionPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: Borders.radiusSm,
+    alignSelf: 'flex-start',
+  },
+  retrogradeSymbol: {
+    fontSize: 14,
+    fontWeight: Typography.weightBold,
+  },
+  motionPillText: {
+    fontSize: 11,
+    fontWeight: Typography.weightSemibold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+
+  // Premium Appetite Cards
+  premiumAppetiteCard: {
+    overflow: 'hidden',
+    padding: 0,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+  },
+  premiumAppetiteGradient: {
+    padding: Spacing.lg,
+  },
+  premiumAppetiteBlur: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backdropFilter: 'blur(20px)',
+  },
+  premiumAppetiteContent: {
+    gap: Spacing.sm,
+    alignItems: 'center',
+  },
+  premiumAppetiteIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.xs,
+  },
+  premiumAppetiteTitle: {
+    fontSize: 18,
+    fontWeight: Typography.weightBold,
+    color: '#FFD700',
+    textAlign: 'center',
+  },
+  premiumAppetiteDescription: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: DarkTheme.textSecondary,
+    textAlign: 'center',
+    maxWidth: '90%',
+  },
+  premiumAppetiteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: Borders.radiusMd,
+    borderWidth: 1,
+    borderColor: '#FFD700',
+    marginTop: Spacing.sm,
+  },
+  premiumAppetiteButtonText: {
+    fontSize: 14,
+    fontWeight: Typography.weightBold,
+    color: '#FFD700',
+  },
+});
+
+
+END OF FROZEN CODE - Preserved for future re-enable */
+

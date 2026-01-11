@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { DarkTheme, ElementAccents, Spacing, Borders, Typography } from "@/constants/DarkTheme";
+import { Borders, DarkTheme, ElementAccents, Typography } from "@/constants/DarkTheme";
 import { useLanguage } from "@/contexts/LanguageContext";
-import type { PlanetTransitInfo } from "@/services/PlanetTransitService";
 import type { Element } from "@/services/MomentAlignmentService";
+import type { PlanetTransitInfo } from "@/services/PlanetTransitService";
+import { router } from "expo-router";
+import React, { useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { RotatingCardContent } from "./RotatingCardContent";
 
 interface DayBlessing {
@@ -23,20 +22,12 @@ interface PlanetTransitWidgetProps {
 }
 
 export default function PlanetTransitWidget({ transitData, nextDayBlessing, compact = false }: PlanetTransitWidgetProps) {
-  const { t } = useLanguage();
+  const { t, tSafe } = useLanguage();
   const [activeSlide, setActiveSlide] = useState(0);
 
-  // Safe translation helper - fallback to English if key missing or returns raw key
-  const tSafe = (key: string, fallback: string): string => {
-    const value = t(key);
-    if (!value || value === key || value.startsWith('home.') || value.startsWith('HOME.')) {
-      return fallback;
-    }
-    return value;
-  };
-
+  // 🔒 Planetary details frozen for launch - redirect to coming soon
   const handlePress = () => {
-    router.push("/divine-timing");
+    router.push("/(tabs)/planetary-coming-soon");
   };
 
   if (!transitData) return null;
@@ -46,11 +37,15 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
 
   const slides = [
     // Slide 1: Planet Transit
-    <View key="transit" style={[styles.slideContent, { backgroundColor: `${elementAccent.primary}0d` }]}>
+    <Pressable
+      key="transit"
+      style={[styles.slideContent, { backgroundColor: `${elementAccent.primary}0d` }]}
+      onPress={handlePress}
+    >
       {/* Header - NOW badge removed to prevent title truncation */}
       <View style={styles.headerRow}>
         <Text style={styles.slideLabel} numberOfLines={2}>
-          {tSafe("home.cards.planetTransit.title", "Planet Transit")}
+          {t("home.cards.planetTransit.title")}
         </Text>
       </View>
 
@@ -65,11 +60,11 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
         </View>
 
         <View style={styles.rulesRow}>
-          <Text style={styles.rulesLabel}>{tSafe("home.cards.planetTransit.rulesLabel", "Rules")}</Text>
+          <Text style={styles.rulesLabel}>{t("home.cards.planetTransit.rulesLabel")}</Text>
           <View style={[styles.zodiacPill, { backgroundColor: elementAccent.glow }]}>
             <Text style={styles.zodiacSymbol}>{zodiacSymbol}</Text>
-            <Text style={[styles.zodiacText, { color: elementAccent.primary }]} numberOfLines={1}>
-              {tSafe(`zodiac.${zodiacKey}`, zodiacKey)}
+            <Text style={[styles.zodiacText, { color: elementAccent.primary }]} numberOfLines={2}>
+              {t(`zodiac.${zodiacKey}`)}
             </Text>
           </View>
         </View>
@@ -77,19 +72,28 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
 
       {/* Footer CTA - pinned to bottom */}
       <Text style={styles.footerCTA} numberOfLines={1}>
-        {tSafe("home.cards.planetTransit.seeDetails", "See details →")}
+        {t("home.cards.planetTransit.seeDetails")}
       </Text>
-    </View>
+    </Pressable>
   ];
 
   // Add Next Day Ruler slide if available
   if (nextDayBlessing) {
+    // 🔒 Planetary details frozen for launch - redirect to coming soon
+    const handleNextDayPress = () => {
+      router.push("/(tabs)/planetary-coming-soon");
+    };
+
     slides.push(
-      <View key="next-day" style={[styles.slideContent, { backgroundColor: `${ElementAccents[nextDayBlessing.element].primary}0d` }]}>
+      <Pressable
+        key="next-day"
+        style={[styles.slideContent, { backgroundColor: `${ElementAccents[nextDayBlessing.element].primary}0d` }]}
+        onPress={handleNextDayPress}
+      >
         {/* Header - NEXT badge removed to prevent title truncation */}
         <View style={styles.headerRow}>
           <Text style={styles.slideLabel} numberOfLines={2}>
-            {tSafe("home.cards.nextDayRuler.title", "Next Day Ruler")}
+            {t("home.cards.nextDayRuler.title")}
           </Text>
         </View>
 
@@ -106,21 +110,21 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
         </View>
 
         <Text style={styles.footerCTA} numberOfLines={1}>
-          {tSafe("home.cards.planetTransit.seeDetails", "See details →")}
+          {t("home.cards.planetTransit.seeDetails")}
         </Text>
-      </View>
+      </Pressable>
     );
   }
 
   return (
-    <Pressable style={styles.container} onPress={handlePress}>
+    <View style={styles.container}>
       <RotatingCardContent
         slides={slides}
         intervalMs={8000}
         showDots={true}
         onSlideChange={setActiveSlide}
       />
-    </Pressable>
+    </View>
   );
 }
 
@@ -199,22 +203,26 @@ const styles = StyleSheet.create({
   rulesRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
     marginTop: 4,
+    width: '100%',
   },
   rulesLabel: {
     fontSize: 11,
     color: DarkTheme.textSecondary,
     flexShrink: 0,
+    minWidth: 40,
   },
   zodiacPill: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
-    flex: 1,
+    flexGrow: 1,
+    flexShrink: 1,
     minWidth: 0,
   },
   zodiacSymbol: {
@@ -224,7 +232,8 @@ const styles = StyleSheet.create({
   zodiacText: {
     fontSize: 11,
     fontWeight: Typography.weightSemibold,
-    flex: 1,
+    textAlign: 'center',
+    flexShrink: 1,
     minWidth: 0,
   },
 
