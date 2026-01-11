@@ -46,7 +46,7 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
 
   const slides = [
     // Slide 1: Planet Transit
-    <View key="transit" style={[styles.slideContent, { backgroundColor: `${elementAccent.primary}15` }]}>
+    <View key="transit" style={[styles.slideContent, { backgroundColor: `${elementAccent.primary}0d` }]}>
       {/* Header - NOW badge removed to prevent title truncation */}
       <View style={styles.headerRow}>
         <Text style={styles.slideLabel} numberOfLines={2}>
@@ -85,7 +85,7 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
   // Add Next Day Ruler slide if available
   if (nextDayBlessing) {
     slides.push(
-      <View key="next-day" style={[styles.slideContent, { backgroundColor: `${ElementAccents[nextDayBlessing.element].primary}15` }]}>
+      <View key="next-day" style={[styles.slideContent, { backgroundColor: `${ElementAccents[nextDayBlessing.element].primary}0d` }]}>
         {/* Header - NEXT badge removed to prevent title truncation */}
         <View style={styles.headerRow}>
           <Text style={styles.slideLabel} numberOfLines={2}>
