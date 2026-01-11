@@ -381,6 +381,9 @@ export const translations = {
       export: "Export",
       showKeyboard: "Show Keyboard",
       tapForDetails: "Tap for details",
+      now: "NOW",
+      rules: "Rules",
+      seeDetails: "See details →",
       // Elements - shared across features
       elements: {
         air: "Air",
@@ -449,6 +452,17 @@ export const translations = {
         nextPlanetaryHour: {
           title: "Next Planetary Hour",
           inTime: "in {duration}",
+        },
+        planetTransit: {
+          title: "Planet Transit",
+          nowBadge: "NOW",
+          hourPlanetLabel: "Hour Planet",
+          rulesLabel: "Rules",
+          transitLabel: "Transit",
+          seeDetails: "See details →",
+        },
+        nextDayRuler: {
+          title: "Next Day Ruler",
         },
         tomorrow: {
           title: "Tomorrow",
@@ -3816,6 +3830,22 @@ export const translations = {
       saturn: "Saturn",
     },
 
+    // Zodiac signs
+    zodiac: {
+      aries: "Aries",
+      taurus: "Taurus",
+      gemini: "Gemini",
+      cancer: "Cancer",
+      leo: "Leo",
+      virgo: "Virgo",
+      libra: "Libra",
+      scorpio: "Scorpio",
+      sagittarius: "Sagittarius",
+      capricorn: "Capricorn",
+      aquarius: "Aquarius",
+      pisces: "Pisces",
+    },
+
     // Day names
     days: {
       sunday: "Sunday",
@@ -6648,6 +6678,9 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       export: "Exporter",
       showKeyboard: "Afficher le Clavier",
       tapForDetails: "Appuyez pour détails",
+      now: "EN COURS",
+      rules: "Règne",
+      seeDetails: "Voir détails →",
       // Elements - shared across features
       elements: {
         air: "Air",
@@ -7074,6 +7107,17 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           title: "Prochaine heure planétaire",
           startsAt: "Commence à {time}",
           inTime: "dans {duration}",
+        },
+        planetTransit: {
+          title: "Transit Planétaire",
+          nowBadge: "EN COURS",
+          hourPlanetLabel: "Planète de l'Heure",
+          rulesLabel: "Règne",
+          transitLabel: "Transit",
+          seeDetails: "Voir détails →",
+        },
+        nextDayRuler: {
+          title: "Règle de Demain",
         },
         tomorrow: {
           title: "Demain",
@@ -10193,6 +10237,22 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       jupiter: "Jupiter",
       venus: "Vénus",
       saturn: "Saturne",
+    },
+
+    // Zodiac signs
+    zodiac: {
+      aries: "Bélier",
+      taurus: "Taureau",
+      gemini: "Gémeaux",
+      cancer: "Cancer",
+      leo: "Lion",
+      virgo: "Vierge",
+      libra: "Balance",
+      scorpio: "Scorpion",
+      sagittarius: "Sagittaire",
+      capricorn: "Capricorne",
+      aquarius: "Verseau",
+      pisces: "Poissons",
     },
 
     // Day names

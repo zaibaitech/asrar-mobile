@@ -5,7 +5,9 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { Borders, DarkTheme, ElementAccents, Typography } from '@/constants/DarkTheme';
 import { Element } from '@/services/MomentAlignmentService';
 import { PlanetaryHourData } from '@/services/PlanetaryHoursService';
+import { PlanetTransitInfo } from '@/services/PlanetTransitService';
 
+import PlanetTransitWidget from './PlanetTransitWidget';
 import { RotatingCardContent } from './RotatingCardContent';
 
 interface NextPrayer {
@@ -26,8 +28,8 @@ interface RightStackWidgetsProps {
   nextPrayer?: NextPrayer | null;
   prayerLoading?: boolean;
   prayerCountdown?: string;
-  todayBlessing?: DayBlessing;
-  tomorrowBlessing?: DayBlessing;
+  planetTransit?: PlanetTransitInfo | null;
+  nextDayBlessing?: DayBlessing | null;
   planetaryData?: PlanetaryHourData | null;
   t: (key: string) => string;
 }
@@ -36,14 +38,13 @@ export function RightStackWidgets({
   nextPrayer,
   prayerLoading,
   prayerCountdown,
-  todayBlessing,
-  tomorrowBlessing,
+  planetTransit,
+  nextDayBlessing,
   planetaryData,
   t,
 }: RightStackWidgetsProps) {
   const router = useRouter();
   const [prayerSlide, setPrayerSlide] = useState(0);
-  const [blessingSlide, setBlessingSlide] = useState(0);
 
   return (
     <View style={styles.container}>
@@ -133,75 +134,14 @@ export function RightStackWidgets({
         />
       </TouchableOpacity>
 
-      {/* Today's Blessing Widget */}
-      <TouchableOpacity
-        style={styles.widget}
-        onPress={() => router.push('/divine-timing')}
-        activeOpacity={0.7}
-      >
-        {todayBlessing && (
-          <RotatingCardContent
-            slides={[
-              // Slide A: Today's Blessing
-              <View key="today" style={[
-                styles.widgetContent,
-                { backgroundColor: `${ElementAccents[todayBlessing.element].primary}15` }
-              ]}>
-                <Text style={styles.widgetLabel} numberOfLines={1}>{t('home.todayBlessing')}</Text>
-                <Text style={styles.widgetPrimary} numberOfLines={1}>{todayBlessing.dayNameArabic}</Text>
-                <Text style={[
-                  styles.widgetTime,
-                  { color: ElementAccents[todayBlessing.element].primary }
-                ]} numberOfLines={1}>
-                  {todayBlessing.emoji} {todayBlessing.planetArabic}
-                </Text>
-                <View style={[
-                  styles.elementBadge,
-                  { backgroundColor: ElementAccents[todayBlessing.element].glow }
-                ]}>
-                  <Text style={[
-                    styles.elementText,
-                    { color: ElementAccents[todayBlessing.element].primary }
-                  ]} numberOfLines={1}>
-                    {t(`elements.${todayBlessing.element}`).toUpperCase()}
-                  </Text>
-                </View>
-              </View>,
-
-              // Slide B: Tomorrow Preview
-              tomorrowBlessing ? (
-                <View key="tomorrow" style={[
-                  styles.widgetContent,
-                  { backgroundColor: `${ElementAccents[tomorrowBlessing.element].primary}15` }
-                ]}>
-                  <Text style={styles.widgetLabel} numberOfLines={1}>{t('home.cards.tomorrow.title')}</Text>
-                  <Text style={styles.widgetPrimary} numberOfLines={1}>{tomorrowBlessing.dayNameArabic}</Text>
-                  <Text style={[
-                    styles.widgetTime,
-                    { color: ElementAccents[tomorrowBlessing.element].primary }
-                  ]} numberOfLines={1}>
-                    {tomorrowBlessing.emoji} {tomorrowBlessing.planetArabic}
-                  </Text>
-                  <View style={[
-                    styles.elementBadge,
-                    { backgroundColor: ElementAccents[tomorrowBlessing.element].glow }
-                  ]}>
-                    <Text style={[
-                      styles.elementText,
-                      { color: ElementAccents[tomorrowBlessing.element].primary }
-                    ]} numberOfLines={1}>
-                      {t(`elements.${tomorrowBlessing.element}`).toUpperCase()}
-                    </Text>
-                  </View>
-                </View>
-              ) : null
-            ]}
-            intervalMs={8000}
-            showDots={true}
-            onSlideChange={setBlessingSlide}
-          />
-        )}
-      </TouchableOpacity>
+      {/* Planet Transit Widget */}
+      <View style={styles.widget}>
+        <PlanetTransitWidget 
+          transitData={planetTransit ?? null} 
+          nextDayBlessing={nextDayBlessing ?? null}
+          compact 
+        />
+      </View>
     </View>
   );
 }

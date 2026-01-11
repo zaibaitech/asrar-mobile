@@ -44,9 +44,10 @@ import {
     getTimeUntilPrayer
 } from '../../services/api/prayerTimes';
 import { DailyGuidance, getDailyGuidance } from '../../services/DailyGuidanceService';
-import { getTodayBlessing, type DayBlessing } from '../../services/DayBlessingService';
+import { getTodayBlessing } from '../../services/DayBlessingService';
 import { getMomentAlignment, MomentAlignment } from '../../services/MomentAlignmentService';
 import { calculatePlanetaryHours, PlanetaryHourData } from '../../services/PlanetaryHoursService';
+import { getPlanetTransitNow, PlanetTransitInfo } from '../../services/PlanetTransitService';
 
 /**
  * Module configuration for all spiritual features
@@ -174,9 +175,8 @@ export default function HomeScreen() {
   const [prayerLoading, setPrayerLoading] = useState(true);
   const [planetaryData, setPlanetaryData] = useState<PlanetaryHourData | null>(null);
   const [prayerTimesData, setPrayerTimesData] = useState<any>(null);
-  
-  // Today's blessing state
-  const [todayBlessing, setTodayBlessing] = useState<DayBlessing | null>(null);
+  const [planetTransit, setPlanetTransit] = useState<PlanetTransitInfo | null>(null);
+  const [tomorrowBlessing, setTomorrowBlessing] = useState<any>(null);
   
   // Calculate planetary hours when prayer times are available
   useEffect(() => {
@@ -198,6 +198,10 @@ export default function HomeScreen() {
       
       const planetary = calculatePlanetaryHours(sunrise, sunset, nextDay, now);
       setPlanetaryData(planetary);
+      
+      // Calculate planet transit
+      const transit = getPlanetTransitNow(sunrise, sunset, nextDay, now);
+      setPlanetTransit(transit);
     } catch (error) {
       console.error('Error calculating planetary hours:', error);
     }
@@ -240,17 +244,16 @@ export default function HomeScreen() {
   }, []);
   
   // Load today's blessing
-  const loadTodayBlessing = useCallback(() => {
-    const blessing = getTodayBlessing();
-    setTodayBlessing(blessing);
-  }, []);
-  
   useEffect(() => {
     loadDailyGuidance();
     loadMomentAlignment();
     loadPrayerTimes();
-    loadTodayBlessing();
-  }, [loadDailyGuidance, loadMomentAlignment, loadPrayerTimes, loadTodayBlessing]);
+    
+    // Calculate tomorrow's blessing
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setTomorrowBlessing(getTodayBlessing(tomorrow));
+  }, [loadDailyGuidance, loadMomentAlignment, loadPrayerTimes]);
   
   // Update countdown every minute
   useEffect(() => {
@@ -380,18 +383,14 @@ export default function HomeScreen() {
             />
           </View>
           
-          {/* Right Stack: Next Prayer + Today's Blessing */}
+          {/* Right Stack: Next Prayer + Planet Transit */}
           <View style={styles.momentAlignmentColumn}>
             <RightStackWidgets
               nextPrayer={nextPrayer}
               prayerLoading={prayerLoading}
               prayerCountdown={prayerCountdown}
-              todayBlessing={todayBlessing}
-              tomorrowBlessing={(() => {
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                return getTodayBlessing(tomorrow);
-              })()}
+              planetTransit={planetTransit}
+              nextDayBlessing={tomorrowBlessing}
               planetaryData={planetaryData}
               t={t}
             />
@@ -523,7 +522,7 @@ export default function HomeScreen() {
     nextPrayer,
     prayerLoading,
     prayerCountdown,
-    todayBlessing,
+    planetTransit,
     modulesExpanded,
     handleModulePress,
     t,
