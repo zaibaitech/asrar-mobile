@@ -910,23 +910,24 @@ export async function deleteAccount(password: string): Promise<{
         if (text) message = text;
       }
 
-      if (__DEV__) {
-        console.error('[AuthService] Auth user deletion failed:', {
-          status: deleteResponse.status,
-          body: text?.slice(0, 300),
-        });
-      }
-
       // If self-delete is not allowed by your Supabase/GoTrue configuration,
       // fall back to a server-side Edge Function.
-      if (deleteResponse.status === 401 || deleteResponse.status === 403 || deleteResponse.status === 404) {
+      if (deleteResponse.status === 401 || deleteResponse.status === 403 || deleteResponse.status === 404 || deleteResponse.status === 405) {
+        if (__DEV__) {
+          console.log('[AuthService] Direct deletion not allowed (status: ' + deleteResponse.status + '), trying Edge Function fallback...');
+        }
+        
         const fallback = await deleteUserViaEdgeFunction(session);
         if (fallback.ok) {
           await clearSession();
           if (__DEV__) {
-            console.log('[AuthService] Account deleted via Edge Function');
+            console.log('[AuthService] Account deleted successfully via Edge Function');
           }
           return { success: true, error: null };
+        }
+
+        if (__DEV__) {
+          console.error('[AuthService] Edge Function fallback also failed:', fallback.error);
         }
 
         return {
@@ -938,6 +939,14 @@ export async function deleteAccount(password: string): Promise<{
               'Account deletion is not enabled on the backend yet. Please deploy the delete-user Edge Function.',
           },
         };
+      }
+
+      // For other errors, log them
+      if (__DEV__) {
+        console.error('[AuthService] Auth user deletion failed:', {
+          status: deleteResponse.status,
+          body: text?.slice(0, 300),
+        });
       }
 
       return {

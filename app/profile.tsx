@@ -23,7 +23,8 @@ import { documentDirectory, writeAsStringAsync } from 'expo-file-system/legacy';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
-import React, { useEffect, useState } from 'react';
+import { Keyboard as KeyboardIcon } from 'lucide-react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -38,6 +39,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import ArabicKeyboard from '@/components/istikhara/ArabicKeyboard';
+import NameAutocomplete from '@/components/NameAutocomplete';
 import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -58,7 +61,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ postSave?: string }>();
   const postSave = Array.isArray(params.postSave) ? params.postSave[0] : params.postSave;
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const {
     profile,
     setProfile,
@@ -83,6 +86,13 @@ export default function ProfileScreen() {
   // Location state
   const [locationLabel, setLocationLabel] = useState(profile.location?.label || '');
   const [loadingLocation, setLoadingLocation] = useState(false);
+
+  // Arabic keyboard state
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [activeField, setActiveField] = useState<'name' | 'mother' | null>(null);
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const nameArInputRef = useRef<TextInput>(null);
+  const motherNameInputRef = useRef<TextInput>(null);
 
   // Account deletion UI state
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -392,6 +402,56 @@ export default function ProfileScreen() {
       setDeletingAccount(false);
     }
   };
+
+  // ============================================================================
+  // ARABIC KEYBOARD HANDLERS
+  // ============================================================================
+
+  const openKeyboard = (field: 'name' | 'mother') => {
+    setActiveField(field);
+    setKeyboardVisible(true);
+    const currentValue = field === 'name' ? nameAr : motherName;
+    setCursorPosition(currentValue.length);
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (!activeField) return;
+
+    const currentValue = activeField === 'name' ? nameAr : motherName;
+    const newValue = 
+      currentValue.slice(0, cursorPosition) + 
+      key + 
+      currentValue.slice(cursorPosition);
+    
+    if (activeField === 'name') {
+      setNameAr(newValue);
+    } else {
+      setMotherName(newValue);
+    }
+    
+    setCursorPosition(cursorPosition + 1);
+  };
+
+  const handleBackspace = () => {
+    if (!activeField || cursorPosition === 0) return;
+
+    const currentValue = activeField === 'name' ? nameAr : motherName;
+    const newValue = 
+      currentValue.slice(0, cursorPosition - 1) + 
+      currentValue.slice(cursorPosition);
+    
+    if (activeField === 'name') {
+      setNameAr(newValue);
+    } else {
+      setMotherName(newValue);
+    }
+    
+    setCursorPosition(cursorPosition - 1);
+  };
+
+  const handleSpace = () => {
+    handleKeyPress(' ');
+  };
   
   // ============================================================================
   // RENDER
@@ -530,24 +590,44 @@ export default function ProfileScreen() {
             {t('profile.name.subtitle')}
           </Text>
           
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>{t('profile.name.arabic')}</Text>
-            <TextInput
-              style={styles.input}
-              value={nameAr}
-              onChangeText={setNameAr}
-              placeholder={t('profile.name.arabicPlaceholder')}
-              placeholderTextColor={DarkTheme.textSecondary}
-            />
-          </View>
-          
+          {/* Latin Name Autocomplete */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>{t('profile.name.latin')}</Text>
-            <TextInput
-              style={styles.input}
+            <NameAutocomplete
               value={nameLatin}
-              onChangeText={setNameLatin}
+              onChange={setNameLatin}
+              onArabicSelect={(arabic, latin) => {
+                setNameAr(arabic);
+                setNameLatin(latin);
+              }}
               placeholder={t('profile.name.latinPlaceholder')}
+              showHelper={false}
+              language={language}
+            />
+          </View>
+
+          {/* Arabic Name Input with Keyboard Button */}
+          <View style={styles.inputGroup}>
+            <View style={styles.labelWithButton}>
+              <Text style={styles.inputLabel}>{t('profile.name.arabic')}</Text>
+              <TouchableOpacity
+                style={styles.keyboardButton}
+                onPress={() => openKeyboard('name')}
+              >
+                <KeyboardIcon size={14} color="#e0e7ff" strokeWidth={2} />
+                <Text style={styles.keyboardButtonText}>{t('nameDestiny.form.keyboardButton')}</Text>
+              </TouchableOpacity>
+            </View>
+            <TextInput
+              ref={nameArInputRef}
+              style={styles.input}
+              value={nameAr}
+              onChangeText={(text) => {
+                setNameAr(text);
+                setCursorPosition(text.length);
+              }}
+              onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
+              placeholder={t('profile.name.arabicPlaceholder')}
               placeholderTextColor={DarkTheme.textSecondary}
             />
           </View>
@@ -561,11 +641,25 @@ export default function ProfileScreen() {
           </Text>
           
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>{t('profile.mother.arabic')}</Text>
+            <View style={styles.labelWithButton}>
+              <Text style={styles.inputLabel}>{t('profile.mother.arabic')}</Text>
+              <TouchableOpacity
+                style={styles.keyboardButton}
+                onPress={() => openKeyboard('mother')}
+              >
+                <KeyboardIcon size={14} color="#e0e7ff" strokeWidth={2} />
+                <Text style={styles.keyboardButtonText}>{t('nameDestiny.form.keyboardButton')}</Text>
+              </TouchableOpacity>
+            </View>
             <TextInput
+              ref={motherNameInputRef}
               style={styles.input}
               value={motherName}
-              onChangeText={setMotherName}
+              onChangeText={(text) => {
+                setMotherName(text);
+                setCursorPosition(text.length);
+              }}
+              onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
               placeholder={t('profile.mother.arabicPlaceholder')}
               placeholderTextColor={DarkTheme.textSecondary}
             />
@@ -758,6 +852,15 @@ export default function ProfileScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Arabic Keyboard Modal */}
+      <ArabicKeyboard
+        visible={keyboardVisible}
+        onClose={() => setKeyboardVisible(false)}
+        onKeyPress={handleKeyPress}
+        onBackspace={handleBackspace}
+        onSpace={handleSpace}
+      />
     </SafeAreaView>
   );
 }
@@ -887,6 +990,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: DarkTheme.textSecondary,
     marginBottom: 8,
+  },
+  labelWithButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  keyboardButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+  },
+  keyboardButtonText: {
+    fontSize: 11,
+    color: '#e0e7ff',
+    marginLeft: 4,
+    fontWeight: '500',
   },
   input: {
     backgroundColor: DarkTheme.cardBackground,
