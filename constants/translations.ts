@@ -470,6 +470,51 @@ export const translations = {
           title: "Tomorrow",
         },
       },
+
+      planetTransitDetails: {
+        title: "Planet Transit",
+        subtitleNow: "Your current planetary hour — personalized to your profile",
+        subtitleNextDay: "Tomorrow's ruler — personalized to your profile",
+        error: "Unable to load details right now.",
+        nextChange: "Next change in {countdown}",
+        sections: {
+          personal: "Your Profile",
+          resonance: "How this resonates",
+        },
+        pills: {
+          element: "Element",
+          sign: "Sign",
+          dayRuler: "Day ruler",
+        },
+        yourElement: "Your element: {element}",
+        yourBurj: "Your burj: {burj}",
+        missingProfile: "Add your date of birth to personalize these insights.",
+        completeProfile: "Complete profile",
+        resonanceNoProfile: "Complete your profile to see personalized resonance.",
+        harmony: {
+          harmonious: {
+            label: "Harmonious",
+            description: "A strong match: your {userElement} nature aligns with {contextElement} energy.",
+            whatToDo: "Good for steady progress, clear intentions, and finishing what you started.",
+          },
+          supportive: {
+            label: "Supportive",
+            description: "Supportive flow: your {userElement} is helped by {contextElement} energy.",
+            whatToDo: "Good for collaboration, learning, and gentle forward motion.",
+          },
+          neutral: {
+            label: "Neutral",
+            description: "Balanced mix: your {userElement} meets {contextElement} without friction.",
+            whatToDo: "Good for routine tasks and measured decisions.",
+          },
+          challenging: {
+            label: "Challenging",
+            description: "Transformative tension: your {userElement} meets opposing {contextElement} energy.",
+            whatToDo: "Slow down, review, and avoid impulsive choices — let clarity arrive.",
+          },
+        },
+        disclaimer: "For reflection only • Not a ruling",
+      },
       
       // 🔒 Planetary Coming Soon (frozen for launch)
       planet: {
@@ -1025,7 +1070,7 @@ export const translations = {
       addNameMessage: "Add your name in Name Destiny to unlock moment alignment guidance.",
       goToNameDestiny: "Go to Name Destiny",
       updated: "Updated",
-      zahirOutward: "Ẓāhir (Outward)",
+      zahirOutward: "Name + Mother (Personal)",
       hourQuality: "Hour Quality",
       whyThisStatus: "Why This Status?",
       guidanceTitle: "Guidance",
@@ -1053,7 +1098,7 @@ export const translations = {
       },
       
       equation: {
-        zahir: "Ẓāhir",
+        zahir: "Personal",
         hour: "Hour",
       },
       
@@ -1073,17 +1118,17 @@ export const translations = {
       
       reasons: {
         act: {
-          bullet1: "Your Ẓāhir element perfectly matches the hour's element—natural alignment.",
+          bullet1: "Your personal element perfectly matches the hour's element—natural alignment.",
           bullet2: "This creates flow for initiating, communicating, and deciding.",
           bullet3: "Alignment window lasts for this planetary hour; observe how it shifts.",
         },
         maintain: {
-          bullet1: "Your Ẓāhir element is compatible with the hour's element—supportive conditions.",
+          bullet1: "Your personal element is compatible with the hour's element—supportive conditions.",
           bullet2: "Good for steady progress and follow-through without forcing.",
           bullet3: "Maintain calm effort; alignment shifts each hour.",
         },
         hold: {
-          bullet1: "Your Ẓāhir element contrasts with the hour's element—suggests gentler pace.",
+          bullet1: "Your personal element conflicts with the hour's element—pause is advised.",
           bullet2: "Better for observation, patience, and review than major initiatives.",
           bullet3: "Alignment changes hourly; next window may suit your rhythm better.",
         },
@@ -1480,6 +1525,11 @@ export const translations = {
       alreadyHaveAccount: "Already have an account?",
       dontHaveAccount: "Don't have an account?",
       forgotPassword: "Forgot password?",
+
+      // Password Reset
+      resetPasswordTitle: "Reset Password",
+      resetPasswordSubtitle: "Set a new password for your account.",
+      updatePasswordButton: "Update Password",
       
       // Errors
       emailRequired: "Email is required",
@@ -7068,6 +7118,51 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           title: "Demain",
         },
       },
+
+      planetTransitDetails: {
+        title: "Transit Planétaire",
+        subtitleNow: "Votre heure planétaire actuelle — personnalisée selon votre profil",
+        subtitleNextDay: "Le régent de demain — personnalisé selon votre profil",
+        error: "Impossible de charger les détails pour le moment.",
+        nextChange: "Prochain changement dans {countdown}",
+        sections: {
+          personal: "Votre profil",
+          resonance: "Comment cela résonne",
+        },
+        pills: {
+          element: "Élément",
+          sign: "Signe",
+          dayRuler: "Régent du jour",
+        },
+        yourElement: "Votre élément : {element}",
+        yourBurj: "Votre burj : {burj}",
+        missingProfile: "Ajoutez votre date de naissance pour personnaliser ces aperçus.",
+        completeProfile: "Compléter le profil",
+        resonanceNoProfile: "Complétez votre profil pour voir une résonance personnalisée.",
+        harmony: {
+          harmonious: {
+            label: "Harmonieux",
+            description: "Forte affinité : votre nature {userElement} s'aligne avec l'énergie {contextElement}.",
+            whatToDo: "Idéal pour progresser régulièrement, clarifier l'intention et finaliser ce qui est en cours.",
+          },
+          supportive: {
+            label: "Supportif",
+            description: "Flux supportif : votre {userElement} est aidé par l'énergie {contextElement}.",
+            whatToDo: "Idéal pour collaborer, apprendre et avancer en douceur.",
+          },
+          neutral: {
+            label: "Neutre",
+            description: "Mélange équilibré : votre {userElement} rencontre {contextElement} sans friction.",
+            whatToDo: "Idéal pour les tâches routinières et les décisions mesurées.",
+          },
+          challenging: {
+            label: "Transformateur",
+            description: "Tension transformatrice : votre {userElement} rencontre l'énergie opposée {contextElement}.",
+            whatToDo: "Ralentissez, révisez, évitez l'impulsivité — laissez la clarté apparaître.",
+          },
+        },
+        disclaimer: "Pour réflexion • Pas un avis religieux",
+      },
       
       // 🔒 Planetary Coming Soon (frozen for launch)
       planet: {
@@ -7636,7 +7731,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       addNameMessage: "Ajoutez votre nom dans Destinée du Nom pour débloquer l'alignement du moment.",
       goToNameDestiny: "Aller à Destinée du Nom",
       updated: "Mis à jour",
-      zahirOutward: "Ẓāhir (Extérieur)",
+      zahirOutward: "Nom + Mère (Personnel)",
       hourQuality: "Qualité de l'heure",
       whyThisStatus: "Pourquoi ce statut ?",
       guidanceTitle: "Guidance",
@@ -7664,7 +7759,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       },
       
       equation: {
-        zahir: "Ẓāhir",
+        zahir: "Personnel",
         hour: "Heure",
       },
       
@@ -7684,17 +7779,17 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       
       reasons: {
         act: {
-          bullet1: "Votre élément Ẓāhir correspond parfaitement à l'élément de l'heure—alignement naturel.",
+          bullet1: "Votre élément personnel correspond parfaitement à l'élément de l'heure—alignement naturel.",
           bullet2: "Cela crée un flux pour initier, communiquer et décider.",
           bullet3: "La fenêtre d'alignement dure cette heure planétaire ; observez comment elle évolue.",
         },
         maintain: {
-          bullet1: "Votre élément Ẓāhir est compatible avec l'élément de l'heure—conditions favorables.",
+          bullet1: "Votre élément personnel est compatible avec l'élément de l'heure—conditions favorables.",
           bullet2: "Bon pour un progrès régulier et le suivi sans forcer.",
           bullet3: "Maintenez un effort calme ; l'alignement change chaque heure.",
         },
         hold: {
-          bullet1: "Votre élément Ẓāhir contraste avec l'élément de l'heure—suggère un rythme plus doux.",
+          bullet1: "Votre élément personnel contraste avec l'élément de l'heure—suggère un rythme plus doux.",
           bullet2: "Mieux pour l'observation, la patience et la révision que pour des initiatives majeures.",
           bullet3: "L'alignement change chaque heure ; la prochaine fenêtre pourrait mieux convenir à votre rythme.",
         },
@@ -8090,6 +8185,11 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       alreadyHaveAccount: "Vous avez déjà un compte ?",
       dontHaveAccount: "Vous n'avez pas de compte ?",
       forgotPassword: "Mot de passe oublié ?",
+
+      // Réinitialisation du mot de passe
+      resetPasswordTitle: "Réinitialiser le mot de passe",
+      resetPasswordSubtitle: "Définissez un nouveau mot de passe pour votre compte.",
+      updatePasswordButton: "Mettre à jour le mot de passe",
       
       // Erreurs
       emailRequired: "L'email est requis",

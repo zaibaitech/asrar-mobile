@@ -21,12 +21,13 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { documentDirectory, writeAsStringAsync } from 'expo-file-system/legacy';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
+    Modal,
     Platform,
     ScrollView,
     StyleSheet,
@@ -55,6 +56,8 @@ import { exportProfile } from '@/services/UserProfileStorage';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ postSave?: string }>();
+  const postSave = Array.isArray(params.postSave) ? params.postSave[0] : params.postSave;
   const { t } = useLanguage();
   const {
     profile,
@@ -80,6 +83,11 @@ export default function ProfileScreen() {
   // Location state
   const [locationLabel, setLocationLabel] = useState(profile.location?.label || '');
   const [loadingLocation, setLoadingLocation] = useState(false);
+
+  // Account deletion UI state
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deletingAccount, setDeletingAccount] = useState(false);
   
   // Derived data preview
   const [burjPreview, setBurjPreview] = useState<string | null>(null);
@@ -192,6 +200,30 @@ export default function ProfileScreen() {
         motherName: motherName || undefined,
         dobISO: dobISO || undefined,
       });
+
+      // If this screen was opened for initial profile completion,
+      // redirect after saving instead of keeping the user here.
+      if (postSave === 'home') {
+        router.replace('/(tabs)');
+        return;
+      }
+
+      if (postSave === 'auth') {
+        router.replace('/auth');
+        return;
+      }
+
+      if (postSave === 'choose') {
+        Alert.alert(
+          'Profile Saved',
+          'Would you like to sign in/create an account, or continue to the app?',
+          [
+            { text: 'Sign In', onPress: () => router.replace('/auth') },
+            { text: 'Go Home', onPress: () => router.replace('/(tabs)') },
+          ]
+        );
+        return;
+      }
       
       Alert.alert(
         'Profile Saved',
@@ -317,63 +349,48 @@ export default function ProfileScreen() {
           text: t('profile.deleteAccount'),
           style: 'destructive',
           onPress: () => {
-            // Require password confirmation
-            Alert.prompt(
-              t('profile.deleteAccountTitle'),
-              t('profile.enterPassword'),
-              [
-                {
-                  text: t('common.cancel'),
-                  style: 'cancel',
-                },
-                {
-                  text: t('common.delete'),
-                  style: 'destructive',
-                  onPress: async (password?: string) => {
-                    if (!password || password.trim() === '') {
-                      Alert.alert(t('common.error'), t('auth.passwordRequired'));
-                      return;
-                    }
-                    
-                    try {
-                      setLoadingLocation(true); // Reuse existing loading state
-                      
-                      // Call delete service
-                      const result = await deleteAccount(password);
-                      
-                      if (result.error) {
-                        Alert.alert(t('common.error'), result.error.message);
-                        return;
-                      }
-                      
-                      // Clear local profile
-                      await resetProfile();
-                      
-                      Alert.alert(
-                        t('profile.deleteSuccess'),
-                        t('profile.deleteAccountMessage'),
-                        [
-                          {
-                            text: t('common.close'),
-                            onPress: () => router.replace('/auth'),
-                          },
-                        ]
-                      );
-                    } catch (error) {
-                      console.error('Delete account error:', error);
-                      Alert.alert(t('common.error'), t('profile.deleteError'));
-                    } finally {
-                      setLoadingLocation(false);
-                    }
-                  },
-                },
-              ],
-              'secure-text'
-            );
+            setDeletePassword('');
+            setDeleteModalVisible(true);
           },
         },
       ]
     );
+  };
+
+  const confirmDeleteAccount = async () => {
+    if (!deletePassword || deletePassword.trim() === '') {
+      Alert.alert(t('common.error'), t('auth.passwordRequired'));
+      return;
+    }
+
+    try {
+      setDeletingAccount(true);
+
+      const result = await deleteAccount(deletePassword);
+
+      if (result.error) {
+        Alert.alert(t('common.error'), result.error.message);
+        return;
+      }
+
+      // Clear local profile and return user to guest mode
+      await resetProfile();
+      await reloadProfile();
+
+      setDeleteModalVisible(false);
+      setDeletePassword('');
+
+      Alert.alert(
+        t('profile.deleteSuccess'),
+        'Your account has been deleted. You can continue using Asrār as a guest.',
+        [{ text: t('common.close'), onPress: () => router.replace('/(tabs)') }]
+      );
+    } catch (error) {
+      console.error('Delete account error:', error);
+      Alert.alert(t('common.error'), t('profile.deleteError'));
+    } finally {
+      setDeletingAccount(false);
+    }
   };
   
   // ============================================================================
@@ -692,6 +709,55 @@ export default function ProfileScreen() {
           <Text style={styles.clearButtonText}>{t('profile.deleteAllMyData')}</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <Modal
+        visible={deleteModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          if (!deletingAccount) setDeleteModalVisible(false);
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>{t('profile.deleteAccountTitle')}</Text>
+            <Text style={styles.modalText}>{t('profile.enterPassword')}</Text>
+
+            <TextInput
+              style={styles.modalInput}
+              value={deletePassword}
+              onChangeText={setDeletePassword}
+              placeholder="••••••••"
+              placeholderTextColor={DarkTheme.textSecondary}
+              secureTextEntry
+              autoCapitalize="none"
+              editable={!deletingAccount}
+            />
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalCancelButton]}
+                onPress={() => setDeleteModalVisible(false)}
+                disabled={deletingAccount}
+              >
+                <Text style={styles.modalCancelText}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalDeleteButton]}
+                onPress={confirmDeleteAccount}
+                disabled={deletingAccount}
+              >
+                {deletingAccount ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.modalDeleteText}>{t('common.delete')}</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -1050,4 +1116,71 @@ const styles = StyleSheet.create({
     color: '#ff4444',
     fontWeight: '500',
   },
+
+  // Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalCard: {
+    backgroundColor: DarkTheme.cardBackground,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+    marginBottom: 8,
+  },
+  modalText: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    marginBottom: 12,
+  },
+  modalInput: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: DarkTheme.textPrimary,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    marginBottom: 14,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCancelButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.10)',
+  },
+  modalDeleteButton: {
+    backgroundColor: '#dc2626',
+  },
+  modalCancelText: {
+    color: DarkTheme.textPrimary,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  modalDeleteText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+
 });

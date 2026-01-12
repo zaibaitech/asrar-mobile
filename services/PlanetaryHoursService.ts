@@ -129,7 +129,7 @@ const PLANET_INFO: Record<Planet, PlanetInfo> = {
     planet: 'Venus',
     symbol: '♀',
     arabicName: 'الزهرة',
-    element: 'earth',
+    element: 'water',
   },
   Saturn: {
     planet: 'Saturn',

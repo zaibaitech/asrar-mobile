@@ -22,7 +22,7 @@ function TabBarIcon(props: {
 function CustomHeader() {
   const { language, setLanguage } = useLanguage();
   const router = useRouter();
-  const segments = useSegments();
+  const segments = useSegments() as unknown as string[];
   const [showHistory, setShowHistory] = React.useState(false);
   const [showDrawer, setShowDrawer] = React.useState(false);
 
@@ -212,6 +212,13 @@ export default function TabLayout() {
         options={{
           href: null, // 🔒 Frozen for launch - redirects to coming soon
           title: 'Planet Details',
+        }}
+      />
+      <Tabs.Screen
+        name="planet-transit-details"
+        options={{
+          href: null, // Hidden from tab bar - accessed via Home widget
+          title: 'Planet Transit',
         }}
       />
       <Tabs.Screen

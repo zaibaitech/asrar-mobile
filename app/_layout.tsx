@@ -12,6 +12,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useColorScheme } from '@/components/useColorScheme';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ProfileProvider, useProfile } from '@/contexts/ProfileContext';
+import { handleAuthCallback } from '@/services/AuthService';
 import { getOnboardingCompleted } from '@/services/OnboardingService';
 
 export {
@@ -85,6 +86,7 @@ function RootLayoutNav() {
               <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
               <Stack.Screen name="email-verification" options={{ headerShown: false }} />
               <Stack.Screen name="auth" options={{ headerShown: false }} />
+              <Stack.Screen name="reset-password" options={{ headerShown: false }} />
               <Stack.Screen name="profile" options={{ headerShown: false }} />
             </Stack>
           </ThemeProvider>
@@ -160,6 +162,32 @@ function DeepLinkHandler() {
           return;
         }
 
+        if (type === 'recovery' && access_token && refresh_token) {
+          // Password reset flow - keep user in app
+          const result = await handleAuthCallback({
+            access_token,
+            refresh_token,
+            type,
+            error,
+            error_description,
+            expires_in: (queryParams as any)?.expires_in,
+            token_type: (queryParams as any)?.token_type,
+          });
+
+          if (result.error) {
+            Alert.alert(
+              'Reset Link Invalid',
+              result.error.message,
+              [{ text: 'OK', onPress: () => router.replace('/auth') }]
+            );
+            return;
+          }
+
+          await setProfile({ mode: 'account' });
+          router.replace('/reset-password');
+          return;
+        }
+
         if (type === 'signup' && access_token && refresh_token) {
           try {
             console.log('✅ Email verified! Processing...');
@@ -178,7 +206,7 @@ function DeepLinkHandler() {
                 [
                   {
                     text: 'Complete Profile',
-                    onPress: () => router.replace('/profile'),
+                    onPress: () => router.replace('/profile?postSave=home'),
                   }
                 ]
               );

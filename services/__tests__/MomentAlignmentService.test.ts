@@ -15,7 +15,7 @@ import { computeZahirElement, getCurrentTimeElement, getMomentAlignment } from '
 export function testElementMapping() {
   console.log('=== MOMENT ALIGNMENT: Element Mapping Tests ===\n');
   
-  // Test element calculation for known names
+  // Test element calculation for known names (name-only baseline)
   const testCases = [
     { name: 'محمد', expectedRemainder: 4, expectedElement: 'water' },
     { name: 'علي', expectedRemainder: 2, expectedElement: 'earth' },
@@ -110,7 +110,7 @@ export async function testFullAlignment() {
   
   const testProfile = {
     mode: 'guest' as const,
-    nameAr: 'محمد', // Should give Water element
+    nameAr: 'محمد', // If motherName is not provided, uses name-only baseline
     timezone: 'UTC',
     createdAt: Date.now(),
     updatedAt: Date.now(),

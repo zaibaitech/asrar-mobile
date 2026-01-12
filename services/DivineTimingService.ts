@@ -49,7 +49,7 @@ const DAY_TO_ELEMENT: Record<number, ElementalTone> = {
   2: 'fire',   // Tuesday - Mars (fire)
   3: 'air',    // Wednesday - Mercury (air)
   4: 'air',    // Thursday - Jupiter (air)
-  5: 'earth',  // Friday - Venus (earth) - CORRECTED from water
+  5: 'water',  // Friday - Venus (water)
   6: 'earth',  // Saturday - Saturn (earth)
 };
 

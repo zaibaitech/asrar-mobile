@@ -163,7 +163,12 @@ export function RealTimeDailyGuidance({
                 <Text style={[styles.dayBadge, compact && styles.dayBadgeCompact]}>{dayLabel}</Text>
               )}
               <Text style={[styles.title, compact && styles.titleCompact]} numberOfLines={1} ellipsizeMode="tail">{t('home.cards.dailyGuidance.title')}</Text>
-              <Text style={[styles.subtitle, { color: statusColor }, compact && styles.subtitleCompact]} numberOfLines={1} ellipsizeMode="tail">
+              <Text
+                style={[styles.subtitle, { color: statusColor }, compact && styles.subtitleCompact]}
+                numberOfLines={2}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
+              >
                 {statusLabel}
               </Text>
             </View>
@@ -314,10 +319,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     marginTop: 2,
+    flexShrink: 1,
+    flexWrap: 'wrap',
   },
   subtitleCompact: {
     fontSize: Typography.label,
     marginTop: 1,
+    flexShrink: 1,
+    flexWrap: 'wrap',
   },
   
   // Day Ruler Row

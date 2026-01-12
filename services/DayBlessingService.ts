@@ -175,7 +175,7 @@ const PLANETARY_DATA: Record<Planet, PlanetaryData> = {
     planet: 'Venus',
     arabic: 'الزُّهَرَة',
     arabicDay: 'الجمعة',
-    element: 'earth',
+    element: 'water',
     nature: 'Cold & Moist',
     quality: 'Beauty & Harmony',
     spiritualPower: 'Love, harmony, beauty, peace-making, relationships',

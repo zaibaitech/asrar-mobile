@@ -5,7 +5,7 @@
  */
 
 import AsrarLogo from '@/components/AsrarLogo';
-import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { setOnboardingCompleted } from '@/services/OnboardingService';
 import { setGuestMode } from '@/services/SessionModeService';

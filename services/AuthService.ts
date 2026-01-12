@@ -27,6 +27,175 @@ import * as SecureStore from 'expo-secure-store';
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
+export type AuthBackendPrereq = {
+  configured: boolean;
+  missing: string[];
+};
+
+export function getAuthBackendPrereq(): AuthBackendPrereq {
+  const missing: string[] = [];
+
+  if (!SUPABASE_URL) missing.push('EXPO_PUBLIC_SUPABASE_URL');
+  if (!SUPABASE_ANON_KEY) missing.push('EXPO_PUBLIC_SUPABASE_ANON_KEY');
+
+  const configured = missing.length === 0;
+
+  if (__DEV__) {
+    console.log('[AuthService] Backend prereq:', {
+      configured,
+      missing,
+      hasUrl: !!SUPABASE_URL,
+      hasAnonKey: !!SUPABASE_ANON_KEY,
+    });
+  }
+
+  return { configured, missing };
+}
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function deleteUserViaEdgeFunction(session: AuthSession): Promise<{ ok: boolean; error: AuthError | null }> {
+  // This requires a deployed Supabase Edge Function at: /functions/v1/delete-user
+  // The function must run with the SERVICE_ROLE key (server-side) and verify the caller.
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/delete-user`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.accessToken}`,
+        'apikey': SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({ confirm: true }),
+    });
+
+    const text = await response.text();
+
+    if (__DEV__) {
+      console.log('[AuthService] delete-user function response:', {
+        ok: response.ok,
+        status: response.status,
+        body: text?.slice(0, 300),
+      });
+    }
+
+    if (!response.ok) {
+      let message = text || 'Account deletion failed';
+      try {
+        const parsed = JSON.parse(text);
+        message = parsed?.message || parsed?.error || message;
+      } catch {
+        // keep raw text
+      }
+
+      return {
+        ok: false,
+        error: {
+          code: 'DELETE_FAILED',
+          message,
+        },
+      };
+    }
+
+    return { ok: true, error: null };
+  } catch (error) {
+    return {
+      ok: false,
+      error: {
+        code: 'NETWORK_ERROR',
+        message: error instanceof Error ? error.message : 'Network error',
+      },
+    };
+  }
+}
+
+export async function checkAuthBackendHealth(options?: {
+  timeoutMs?: number;
+}): Promise<{ ok: boolean; status?: number; error: AuthError | null }> {
+  const timeoutMs = options?.timeoutMs ?? 6000;
+  const prereq = getAuthBackendPrereq();
+
+  if (!prereq.configured) {
+    return {
+      ok: false,
+      error: {
+        code: 'NOT_CONFIGURED',
+        message: `Missing environment variables: ${prereq.missing.join(', ')}`,
+      },
+    };
+  }
+
+  // Prefer the GoTrue /health endpoint if present.
+  const healthUrl = `${SUPABASE_URL}/auth/v1/health`;
+
+  try {
+    const response = await fetchWithTimeout(
+      healthUrl,
+      {
+        method: 'GET',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+        },
+      },
+      timeoutMs
+    );
+
+    if (__DEV__) {
+      console.log('[AuthService] Backend health response:', {
+        url: '/auth/v1/health',
+        ok: response.ok,
+        status: response.status,
+      });
+    }
+
+    // If we got an HTTP response at all, the backend is reachable.
+    // Consider 2xx-4xx as reachable; 5xx likely indicates server-side trouble.
+    if (response.status >= 200 && response.status < 500) {
+      return { ok: true, status: response.status, error: null };
+    }
+
+    const body = await response.text();
+    return {
+      ok: false,
+      status: response.status,
+      error: {
+        code: 'HEALTH_CHECK_FAILED',
+        message: body || `Health check failed (${response.status})`,
+      },
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Network error';
+    const isTimeout = typeof message === 'string' && message.toLowerCase().includes('aborted');
+
+    if (__DEV__) {
+      console.error('[AuthService] Backend health check error:', {
+        code: isTimeout ? 'TIMEOUT' : 'NETWORK_ERROR',
+        message,
+      });
+    }
+
+    return {
+      ok: false,
+      error: {
+        code: isTimeout ? 'TIMEOUT' : 'NETWORK_ERROR',
+        message: isTimeout ? 'Health check timed out' : message,
+      },
+    };
+  }
+}
+
 const SECURE_TOKEN_KEY = 'asrar.auth.token';
 const SECURE_REFRESH_KEY = 'asrar.auth.refresh';
 
@@ -84,6 +253,16 @@ export interface SignUpData {
 export interface SignInData {
   email: string;
   password: string;
+}
+
+export interface AuthCallbackParams {
+  access_token?: string;
+  refresh_token?: string;
+  expires_in?: string | number;
+  token_type?: string;
+  type?: string;
+  error?: string;
+  error_description?: string;
 }
 
 // ============================================================================
@@ -180,6 +359,218 @@ async function refreshSession(refreshToken: string): Promise<AuthSession | null>
 }
 
 // ============================================================================
+// PASSWORD RESET / RECOVERY
+// ============================================================================
+
+export async function requestPasswordReset(email: string): Promise<{
+  success: boolean;
+  error: AuthError | null;
+}> {
+  try {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      return {
+        success: false,
+        error: {
+          code: 'NOT_CONFIGURED',
+          message: 'Password reset is not available. Backend not configured.',
+        },
+      };
+    }
+
+    const redirectTo = 'asrar://auth/callback';
+    const url = `${SUPABASE_URL}/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      return {
+        success: false,
+        error: {
+          code: 'RESET_FAILED',
+          message: text || 'Failed to send reset email',
+        },
+      };
+    }
+
+    return { success: true, error: null };
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[AuthService] Password reset request error:', error);
+    }
+
+    return {
+      success: false,
+      error: {
+        code: 'NETWORK_ERROR',
+        message: error instanceof Error ? error.message : 'Network error',
+      },
+    };
+  }
+}
+
+export async function updatePassword(newPassword: string): Promise<{
+  success: boolean;
+  error: AuthError | null;
+}> {
+  try {
+    const session = await getSession();
+
+    if (!session) {
+      return {
+        success: false,
+        error: {
+          code: 'NOT_AUTHENTICATED',
+          message: 'No active session. Please open the reset link again.',
+        },
+      };
+    }
+
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      return {
+        success: false,
+        error: {
+          code: 'NOT_CONFIGURED',
+          message: 'Backend not configured',
+        },
+      };
+    }
+
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.accessToken}`,
+        'apikey': SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({ password: newPassword }),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      return {
+        success: false,
+        error: {
+          code: 'UPDATE_PASSWORD_FAILED',
+          message: err || 'Failed to update password',
+        },
+      };
+    }
+
+    return { success: true, error: null };
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[AuthService] Update password error:', error);
+    }
+
+    return {
+      success: false,
+      error: {
+        code: 'NETWORK_ERROR',
+        message: error instanceof Error ? error.message : 'Network error',
+      },
+    };
+  }
+}
+
+/**
+ * Used for Supabase recovery links (type=recovery) to hydrate a session
+ * and persist it in SecureStore so the app can call updatePassword().
+ */
+export async function handleAuthCallback(params: AuthCallbackParams): Promise<{
+  session: AuthSession | null;
+  error: AuthError | null;
+}> {
+  try {
+    if (params.error) {
+      return {
+        session: null,
+        error: {
+          code: params.error,
+          message: params.error_description || params.error,
+        },
+      };
+    }
+
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      return {
+        session: null,
+        error: {
+          code: 'NOT_CONFIGURED',
+          message: 'Backend not configured',
+        },
+      };
+    }
+
+    const accessToken = params.access_token;
+    const refreshToken = params.refresh_token;
+    const expiresInRaw = params.expires_in;
+    const expiresIn = typeof expiresInRaw === 'string' ? parseInt(expiresInRaw, 10) : (expiresInRaw ?? 3600);
+
+    if (!accessToken || !refreshToken) {
+      return {
+        session: null,
+        error: {
+          code: 'INVALID_CALLBACK',
+          message: 'Missing auth tokens in callback',
+        },
+      };
+    }
+
+    const userResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'apikey': SUPABASE_ANON_KEY,
+      },
+    });
+
+    if (!userResponse.ok) {
+      const text = await userResponse.text();
+      return {
+        session: null,
+        error: {
+          code: 'INVALID_SESSION',
+          message: text || 'Failed to load user from callback token',
+        },
+      };
+    }
+
+    const userData = await userResponse.json();
+
+    const session: AuthSession = {
+      userId: userData.id,
+      email: userData.email,
+      accessToken,
+      refreshToken,
+      expiresAt: Date.now() + (expiresIn * 1000),
+    };
+
+    await saveSession(session);
+    return { session, error: null };
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[AuthService] Auth callback handling error:', error);
+    }
+
+    return {
+      session: null,
+      error: {
+        code: 'NETWORK_ERROR',
+        message: error instanceof Error ? error.message : 'Network error',
+      },
+    };
+  }
+}
+
+// ============================================================================
 // AUTHENTICATION
 // ============================================================================
 
@@ -221,12 +612,11 @@ export async function signUp(data: SignUpData): Promise<{
       const errorMessage = result.error_description || result.message || '';
 
       if (errorCode === 'email_exists' || errorMessage === 'User already registered') {
-        await resendEmailConfirmation(data.email);
         return {
           session: null,
           error: {
-            code: 'EMAIL_CONFIRMATION_REQUIRED',
-            message: 'We just sent you a new confirmation email. Please verify your address before signing in.',
+            code: 'EMAIL_EXISTS',
+            message: 'This email is already registered. Please sign in instead.',
           },
         };
       }
@@ -255,19 +645,15 @@ export async function signUp(data: SignUpData): Promise<{
     //   };
     // }
     
+    // If backend returns no session tokens (e.g., email confirmation is enabled),
+    // try an immediate password sign-in. With email confirmation disabled, this
+    // will succeed and keep the flow entirely in-app.
+    if (result.user && (!result.access_token || !result.refresh_token)) {
+      return await signIn({ email: data.email, password: data.password });
+    }
+
     // Ensure we have all required session data
     if (!result.user || !result.access_token || !result.refresh_token) {
-      // If user exists but no tokens, email confirmation might be required
-      if (result.user && !result.access_token) {
-        return {
-          session: null,
-          error: {
-            code: 'EMAIL_CONFIRMATION_REQUIRED',
-            message: 'Email confirmation is enabled. Please check Supabase settings to disable it.',
-          },
-        };
-      }
-      
       return {
         session: null,
         error: {
@@ -486,9 +872,25 @@ export async function deleteAccount(password: string): Promise<{
         },
       };
     }
+
+    // Step 2: Best-effort delete of user's profile row (if present)
+    // This requires an RLS policy allowing users to delete their own row.
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/profiles?user_id=eq.${session.userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.accessToken}`,
+          'apikey': SUPABASE_ANON_KEY,
+        },
+      });
+    } catch (error) {
+      if (__DEV__) {
+        console.error('[AuthService] Failed to delete profiles row (non-fatal):', error);
+      }
+    }
     
-    // Step 2: Delete user account via Supabase Management API
-    // Note: This requires the service_role key or user's own session token
+    // Step 3: Delete auth user
+    // Note: Depending on Supabase/GoTrue configuration, this may be denied.
     const deleteResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
       method: 'DELETE',
       headers: {
@@ -498,12 +900,51 @@ export async function deleteAccount(password: string): Promise<{
     });
     
     if (!deleteResponse.ok) {
-      const error = await deleteResponse.json();
+      const text = await deleteResponse.text();
+      let message = 'Failed to delete account. Please contact support.';
+
+      try {
+        const parsed = JSON.parse(text);
+        message = parsed?.msg || parsed?.message || message;
+      } catch {
+        if (text) message = text;
+      }
+
+      if (__DEV__) {
+        console.error('[AuthService] Auth user deletion failed:', {
+          status: deleteResponse.status,
+          body: text?.slice(0, 300),
+        });
+      }
+
+      // If self-delete is not allowed by your Supabase/GoTrue configuration,
+      // fall back to a server-side Edge Function.
+      if (deleteResponse.status === 401 || deleteResponse.status === 403 || deleteResponse.status === 404) {
+        const fallback = await deleteUserViaEdgeFunction(session);
+        if (fallback.ok) {
+          await clearSession();
+          if (__DEV__) {
+            console.log('[AuthService] Account deleted via Edge Function');
+          }
+          return { success: true, error: null };
+        }
+
+        return {
+          success: false,
+          error: {
+            code: 'DELETE_NOT_ALLOWED',
+            message:
+              fallback.error?.message ||
+              'Account deletion is not enabled on the backend yet. Please deploy the delete-user Edge Function.',
+          },
+        };
+      }
+
       return {
         success: false,
         error: {
-          code: 'DELETE_FAILED',
-          message: error.message || 'Failed to delete account. Please contact support.',
+          code: deleteResponse.status === 401 || deleteResponse.status === 403 ? 'DELETE_NOT_ALLOWED' : 'DELETE_FAILED',
+          message,
         },
       };
     }

@@ -1,12 +1,12 @@
 /**
  * Moment Alignment Service (Ẓāhir)
  * ===================================
- * Real-time alignment between user's Ẓāhir element (name only)
+ * Real-time alignment between user's element (name + mother's name when available)
  * and current PLANETARY HOUR element.
  * 
  * DISTINCTION FROM DAILY GUIDANCE:
- * - Daily Guidance: Uses Bāṭin element (name + mother) for DAILY FLOW (day-level)
- * - Moment Alignment: Uses Ẓāhir element (name only) for HOURLY alignment (planetary hours)
+ * - Daily Guidance: Day-level guidance
+ * - Moment Alignment: Hour-level alignment (planetary hours)
  * 
  * Uses traditional planetary hour calculations (Sā'āt al-Kawākib) following
  * the Chaldean order: Saturn → Jupiter → Mars → Sun → Venus → Mercury → Moon
@@ -38,7 +38,7 @@ export interface TimeWindow {
 }
 
 export interface MomentAlignment {
-  /** User's Ẓāhir element (name only) */
+  /** User element (name + mother when available; falls back to name only) */
   zahirElement: Element;
   
   /** Current time element */
@@ -85,15 +85,19 @@ function indexToElement(index: 1 | 2 | 3 | 4): Element {
 }
 
 /**
- * Compute Ẓāhir element from user's name ONLY (not including mother's name)
+ * Compute user element from name + mother's name (if provided).
  * Uses the same Abjad calculation and element mapping as the rest of the app.
  * 
  * @param name - User's name (will be normalized automatically)
+ * @param motherName - Mother's name (optional; will be normalized automatically)
  * @returns Element derived from name only
  */
-export function computeZahirElement(name: string): Element {
-  const normalized = normalizeArabic(name);
-  const kabir = calculateHadadKabir(normalized);
+export function computeZahirElement(name: string, motherName: string = ''): Element {
+  const normalizedName = normalizeArabic(name);
+  const normalizedMother = normalizeArabic(motherName);
+  const kabir =
+    calculateHadadKabir(normalizedName) +
+    (normalizedMother ? calculateHadadKabir(normalizedMother) : 0);
   const elementIndex = calculateTabElement(kabir);
   return indexToElement(elementIndex);
 }
@@ -237,9 +241,11 @@ export async function getMomentAlignment(
   if (!userName || userName.trim().length === 0) {
     return null;
   }
+
+  const motherName = profile?.motherName || '';
   
-  // Compute Ẓāhir element (name only)
-  const zahirElement = computeZahirElement(userName);
+  // Compute user element (name + mother when available; falls back to name only)
+  const zahirElement = computeZahirElement(userName, motherName);
   
   // Get current time element
   const timeElement = getCurrentTimeElement(now);

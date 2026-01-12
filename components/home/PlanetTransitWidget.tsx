@@ -25,9 +25,14 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
   const { t, tSafe } = useLanguage();
   const [activeSlide, setActiveSlide] = useState(0);
 
-  // 🔒 Planetary details frozen for launch - redirect to coming soon
   const handlePress = () => {
-    router.push("/(tabs)/planetary-coming-soon");
+    router.push({
+      pathname: '/(tabs)/planet-transit-details',
+      params: {
+        type: 'transit',
+        payload: JSON.stringify(transitData),
+      },
+    });
   };
 
   if (!transitData) return null;
@@ -63,7 +68,12 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
           <Text style={styles.rulesLabel}>{t("home.cards.planetTransit.rulesLabel")}</Text>
           <View style={[styles.zodiacPill, { backgroundColor: elementAccent.glow }]}>
             <Text style={styles.zodiacSymbol}>{zodiacSymbol}</Text>
-            <Text style={[styles.zodiacText, { color: elementAccent.primary }]} numberOfLines={2}>
+            <Text
+              style={[styles.zodiacText, { color: elementAccent.primary }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.7}
+            >
               {t(`zodiac.${zodiacKey}`)}
             </Text>
           </View>
@@ -79,9 +89,14 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
 
   // Add Next Day Ruler slide if available
   if (nextDayBlessing) {
-    // 🔒 Planetary details frozen for launch - redirect to coming soon
     const handleNextDayPress = () => {
-      router.push("/(tabs)/planetary-coming-soon");
+      router.push({
+        pathname: '/(tabs)/planet-transit-details',
+        params: {
+          type: 'nextDay',
+          payload: JSON.stringify(nextDayBlessing),
+        },
+      });
     };
 
     slides.push(
@@ -211,14 +226,14 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: DarkTheme.textSecondary,
     flexShrink: 0,
-    minWidth: 40,
+    minWidth: 34,
   },
   zodiacPill: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
     flexGrow: 1,

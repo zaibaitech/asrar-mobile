@@ -14,13 +14,13 @@
 import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { signIn, signUp } from '@/services/AuthService';
+import { checkAuthBackendHealth, getAuthBackendPrereq, requestPasswordReset, signIn, signUp } from '@/services/AuthService';
 import { clearGuestMode } from '@/services/SessionModeService';
 import { evaluatePasswordStrength, getPasswordStrengthLabel } from '@/utils/passwordStrength';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -37,9 +37,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 type AuthMode = 'signin' | 'signup';
 
-const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
-const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
-const IS_BACKEND_CONFIGURED = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+type BackendStatus = {
+  configured: boolean;
+  missing: string[];
+  health: 'unknown' | 'ok' | 'failed';
+  error: string | null;
+  checking: boolean;
+};
 
 export default function AuthScreen() {
   const router = useRouter();
@@ -51,9 +55,62 @@ export default function AuthScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const [backendStatus, setBackendStatus] = useState<BackendStatus>({
+    configured: true,
+    missing: [],
+    health: 'unknown',
+    error: null,
+    checking: false,
+  });
   
   // Password strength indicator
   const passwordStrength = evaluatePasswordStrength(password);
+
+  const hasEssentialProfileData =
+    !!(profile.nameAr || profile.nameLatin || profile.dobISO);
+
+  const runBackendCheck = useCallback(async () => {
+    const prereq = getAuthBackendPrereq();
+
+    setBackendStatus({
+      configured: prereq.configured,
+      missing: prereq.missing,
+      health: prereq.configured ? 'unknown' : 'failed',
+      error: prereq.configured ? null : `Missing: ${prereq.missing.join(', ')}`,
+      checking: prereq.configured,
+    });
+
+    if (!prereq.configured) {
+      if (__DEV__) {
+        console.log('[AuthScreen] Backend prereq failed:', { missing: prereq.missing });
+      }
+      return;
+    }
+
+    const health = await checkAuthBackendHealth({ timeoutMs: 6000 });
+
+    if (!health.ok) {
+      if (__DEV__) {
+        console.log('[AuthScreen] Backend health failed:', {
+          code: health.error?.code,
+          message: health.error?.message,
+        });
+      }
+    }
+
+    setBackendStatus({
+      configured: prereq.configured,
+      missing: prereq.missing,
+      health: health.ok ? 'ok' : 'failed',
+      error: health.error?.message ?? null,
+      checking: false,
+    });
+  }, []);
+
+  useEffect(() => {
+    runBackendCheck();
+  }, [runBackendCheck]);
   
   // Helper function for user-friendly error messages
   const getErrorMessage = (errorCode: string): string => {
@@ -77,7 +134,13 @@ export default function AuthScreen() {
         return 'No internet connection. Please check your network.';
       
       case 'NOT_CONFIGURED':
-        return 'Account creation is not available. Please continue as Guest.';
+        return 'Backend is not configured. Please check environment variables.';
+
+      case 'TIMEOUT':
+        return 'Backend check timed out. Please try again.';
+
+      case 'HEALTH_CHECK_FAILED':
+        return 'Backend is unreachable. Please check your network and try again.';
       
       default:
         return 'Something went wrong. Please try again.';
@@ -110,34 +173,20 @@ export default function AuthScreen() {
         await setProfile({ 
           mode: 'account',
         });
-        
+
+        // After signup, always take the user to Profile to complete their details.
         Alert.alert(
           '✅ Account Created!',
-          'Welcome to Asrar! Your account is ready to use.',
+          'Please complete your profile to unlock personalized features.',
           [
             {
               text: 'Continue',
-              onPress: () => router.replace('/(tabs)'),
+              onPress: () => router.replace('/profile?postSave=home'),
             },
           ]
         );
-      } else if (result.error?.code === 'EMAIL_CONFIRMATION_REQUIRED') {
-        // Email confirmation is enabled in backend - show configuration help
-        Alert.alert(
-          '⚠️ Email Confirmation Enabled',
-          'Please disable email confirmation in Supabase Dashboard:\n\nAuthentication → Settings → Email Auth → Uncheck "Enable email confirmations"',
-          [
-            {
-              text: 'Continue as Guest',
-              onPress: () => router.replace('/(tabs)'),
-            },
-            {
-              text: 'OK',
-              style: 'cancel'
-            }
-          ]
-        );
-      } else if (result.error?.message?.includes('User already registered') || 
+      } else if (result.error?.code === 'EMAIL_EXISTS' ||
+                 result.error?.message?.includes('already registered') ||
                  result.error?.message?.includes('already been registered')) {
         // User already exists
         Alert.alert(
@@ -152,6 +201,17 @@ export default function AuthScreen() {
               text: 'OK',
               style: 'cancel'
             }
+          ]
+        );
+      } else if (result.error?.code === 'EMAIL_CONFIRMATION_REQUIRED') {
+        // Fallback if backend still requires email verification
+        Alert.alert(
+          'Email Verification Required',
+          'Please verify your email address, then return and sign in. If this keeps happening, email verification is still enabled on the backend.',
+          [
+            {
+              text: 'OK',
+            },
           ]
         );
       } else {
@@ -183,14 +243,19 @@ export default function AuthScreen() {
         await setProfile({ 
           mode: 'account',
         });
-        
+
+        // If the local profile is empty, prompt completion first.
+        const nextRoute = hasEssentialProfileData ? '/(tabs)' : '/profile?postSave=home';
+
         Alert.alert(
           'Welcome Back!',
-          'You are now signed in.',
+          hasEssentialProfileData
+            ? 'You are now signed in.'
+            : 'Please complete your profile to unlock personalized features.',
           [
             {
               text: 'Continue',
-              onPress: () => router.replace('/(tabs)'),
+              onPress: () => router.replace(nextRoute),
             },
           ]
         );
@@ -218,6 +283,33 @@ export default function AuthScreen() {
   
   const handleContinueAsGuest = () => {
     router.replace('/(tabs)');
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      Alert.alert('Email required', 'Please enter your email first.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const result = await requestPasswordReset(email);
+
+      if (result.success) {
+        Alert.alert(
+          'Reset link sent',
+          'Check your email for a password reset link. Open it on this device to continue in the app.',
+          [{ text: 'OK' }]
+        );
+      } else {
+        Alert.alert('Error', result.error?.message || 'Failed to send reset email');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to send reset email');
+      console.error('Forgot password error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
   
   return (
@@ -269,15 +361,37 @@ export default function AuthScreen() {
             </View>
             
             {/* Backend Not Configured Notice */}
-            {!IS_BACKEND_CONFIGURED && (
+            {(backendStatus.health === 'failed' || !backendStatus.configured) && (
               <View style={styles.notConfiguredBanner}>
                 <Ionicons name="information-circle" size={24} color="#f59e0b" />
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.notConfiguredTitle}>Accounts Not Available</Text>
-                  <Text style={styles.notConfiguredText}>
-                    Account creation requires backend setup. Please continue as Guest to use all features.
+                  <Text style={styles.notConfiguredTitle}>
+                    {backendStatus.configured ? 'Backend Unreachable' : 'Accounts Not Available'}
                   </Text>
+                  <Text style={styles.notConfiguredText}>
+                    {backendStatus.error ||
+                      (backendStatus.configured
+                        ? 'We could not reach the backend. You can still try signing in/up to see the exact error.'
+                        : 'Missing backend configuration. You can still try signing in/up to see the exact error.')}
+                  </Text>
+                  {!backendStatus.configured && backendStatus.missing.length > 0 && (
+                    <Text style={[styles.notConfiguredText, { marginTop: 6, opacity: 0.85 }]}>
+                      Missing: {backendStatus.missing.join(', ')}
+                    </Text>
+                  )}
                 </View>
+
+                <TouchableOpacity
+                  style={styles.retryButton}
+                  onPress={runBackendCheck}
+                  disabled={backendStatus.checking || loading}
+                >
+                  {backendStatus.checking ? (
+                    <ActivityIndicator color="#f59e0b" />
+                  ) : (
+                    <Ionicons name="refresh" size={18} color="#f59e0b" />
+                  )}
+                </TouchableOpacity>
               </View>
             )}
             
@@ -374,9 +488,9 @@ export default function AuthScreen() {
               
               {/* Submit Button */}
               <TouchableOpacity
-                style={[styles.submitButton, (!IS_BACKEND_CONFIGURED || loading) && styles.submitButtonDisabled]}
+                style={[styles.submitButton, loading && styles.submitButtonDisabled]}
                 onPress={mode === 'signup' ? handleSignUp : handleSignIn}
-                disabled={loading || !IS_BACKEND_CONFIGURED}
+                disabled={loading}
               >
                 <LinearGradient
                   colors={['#8B7355', '#6B5645']}
@@ -406,7 +520,7 @@ export default function AuthScreen() {
               
               {/* Forgot Password */}
               {mode === 'signin' && (
-                <TouchableOpacity style={styles.forgotButton}>
+                <TouchableOpacity style={styles.forgotButton} onPress={handleForgotPassword}>
                   <Text style={styles.forgotText}>{t('auth.forgotPassword')}</Text>
                 </TouchableOpacity>
               )}
@@ -525,6 +639,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: DarkTheme.textSecondary,
     lineHeight: 18,
+  },
+
+  retryButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.25)',
   },
   
   // Benefits
