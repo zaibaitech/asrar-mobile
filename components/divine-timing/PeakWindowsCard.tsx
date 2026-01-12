@@ -27,9 +27,10 @@ import {
     PeakWindow,
     TimeSegment,
 } from '@/types/divine-timing-personal';
+import { formatZodiacWithArabic, resolveUserZodiacKey } from '@/utils/translationHelpers';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     Modal,
@@ -59,6 +60,14 @@ export function PeakWindowsCard({
   const router = useRouter();
   const { profile: userProfile } = useProfile();
   const { language } = useLanguage();
+  const userZodiacKey = useMemo(
+    () =>
+      resolveUserZodiacKey({
+        burjIndex: userProfile?.derived?.burjIndex,
+        burj: userProfile?.derived?.burj,
+      }),
+    [userProfile?.derived?.burjIndex, userProfile?.derived?.burj]
+  );
   const [windows, setWindows] = useState<PeakWindow[]>([]);
   const [loading, setLoading] = useState(true);
   const [dataQuality, setDataQuality] = useState<'full' | 'partial' | 'minimal'>('minimal');
@@ -321,7 +330,14 @@ export function PeakWindowsCard({
             {userProfile?.derived?.burj && (
               <View style={styles.tag}>
                 <Text style={styles.tagText}>
-                  {userProfile.derived.burj} {userBurjRuler ? `(${userBurjRuler})` : ''}
+                  {userZodiacKey
+                    ? formatZodiacWithArabic(userZodiacKey, language as any, {
+                        forceBilingual: language !== 'ar',
+                        arabicFirst: true,
+                        includeGlyph: true,
+                      })
+                    : userProfile.derived.burj}{' '}
+                  {userBurjRuler ? `(${userBurjRuler})` : ''}
                 </Text>
               </View>
             )}

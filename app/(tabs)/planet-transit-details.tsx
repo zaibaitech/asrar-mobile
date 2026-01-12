@@ -2,7 +2,8 @@ import { DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/Dark
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import type { Element } from '@/services/MomentAlignmentService';
-import type { PlanetTransitInfo, ZodiacSign } from '@/services/PlanetTransitService';
+import type { PlanetTransitInfo } from '@/services/PlanetTransitService';
+import { formatZodiacWithArabic, resolveUserZodiacKey } from '@/utils/translationHelpers';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -69,7 +70,7 @@ function formatCountdown(totalSeconds: number) {
 export default function PlanetTransitDetailsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { t, tSafe } = useLanguage();
+  const { t, tSafe, language } = useLanguage();
   const { profile } = useProfile();
   const params = useLocalSearchParams();
 
@@ -85,7 +86,14 @@ export default function PlanetTransitDetailsScreen() {
       : (nextDayPayload?.element as Element | undefined) ?? null;
 
   const userElement = (profile.derived?.element as Element | undefined) ?? null;
-  const userBurjKey = (profile.derived?.burj as ZodiacSign | undefined) ?? null;
+  const userZodiacKey = useMemo(
+    () =>
+      resolveUserZodiacKey({
+        burjIndex: profile.derived?.burjIndex,
+        burj: profile.derived?.burj,
+      }),
+    [profile.derived?.burjIndex, profile.derived?.burj]
+  );
 
   const harmony: HarmonyLevel | null =
     contextElement && userElement ? getHarmonyLevel(userElement, contextElement) : null;
@@ -106,10 +114,23 @@ export default function PlanetTransitDetailsScreen() {
   }, [detailsType, transitPayload?.nextHourStartTime, now]);
 
   const title = t('home.planetTransitDetails.title');
-  const subtitle =
+  const explainer =
+    detailsType === 'transit'
+      ? t('home.planetTransitDetails.explainers.currentHour')
+      : t('home.planetTransitDetails.explainers.tomorrowRuler');
+  const personalizationLine =
     detailsType === 'transit'
       ? t('home.planetTransitDetails.subtitleNow')
       : t('home.planetTransitDetails.subtitleNextDay');
+
+  const primaryCardTitle =
+    detailsType === 'transit'
+      ? t('home.planetTransitDetails.sections.currentHour')
+      : t('home.planetTransitDetails.sections.tomorrowRuler');
+  const primaryCardHint =
+    detailsType === 'transit'
+      ? t('home.planetTransitDetails.hints.currentHour')
+      : t('home.planetTransitDetails.hints.tomorrowRuler');
 
   return (
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
@@ -123,7 +144,7 @@ export default function PlanetTransitDetailsScreen() {
             {title}
           </Text>
           <Text style={styles.headerSubtitle} numberOfLines={2}>
-            {subtitle}
+            {primaryCardTitle}
           </Text>
         </View>
         <View style={styles.placeholder} />
@@ -134,8 +155,13 @@ export default function PlanetTransitDetailsScreen() {
         style={styles.gradientContainer}
       >
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-          {/* Context Card */}
+          {/* Explainer */}
+          <Text style={styles.explainerText}>{explainer}</Text>
+          <Text style={styles.explainerMeta}>{personalizationLine}</Text>
+          {/* Primary Context */}
           <View style={[styles.card, { borderColor: `${accent.primary}40` }]}>
+            <Text style={styles.sectionTitleInCard}>{primaryCardTitle}</Text>
+            <Text style={styles.cardHint}>{primaryCardHint}</Text>
             {detailsType === 'transit' && transitPayload ? (
               <>
                 <View style={styles.rowCenter}>
@@ -161,7 +187,7 @@ export default function PlanetTransitDetailsScreen() {
                   <View style={[styles.pill, { backgroundColor: accent.glow }]}>
                     <Text style={styles.pillLabel}>{t('home.planetTransitDetails.pills.sign')}</Text>
                     <Text style={[styles.pillValue, { color: accent.primary }]} numberOfLines={1}>
-                      {transitPayload.zodiacSymbol} {tSafe(`zodiac.${transitPayload.zodiacKey}`, toTitleCase(transitPayload.zodiacKey))}
+                      {transitPayload.zodiacSymbol} {formatZodiacWithArabic(transitPayload.zodiacKey, language as any)}
                     </Text>
                   </View>
                 </View>
@@ -206,9 +232,9 @@ export default function PlanetTransitDetailsScreen() {
             )}
           </View>
 
-          {/* Personalization */}
+          {/* Your Nature */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('home.planetTransitDetails.sections.personal')}</Text>
+            <Text style={styles.sectionTitle}>{t('home.planetTransitDetails.sections.yourNature')}</Text>
             {userElement ? (
               <View style={styles.card}>
                 <Text style={styles.bodyText}>
@@ -216,10 +242,16 @@ export default function PlanetTransitDetailsScreen() {
                     element: tSafe(`common.elements.${userElement}`, toTitleCase(userElement)),
                   })}
                 </Text>
-                {userBurjKey ? (
+                {userZodiacKey ? (
                   <Text style={styles.bodyText}>
-                    {t('home.planetTransitDetails.yourBurj', {
-                      burj: tSafe(`zodiac.${userBurjKey}`, toTitleCase(userBurjKey)),
+                    {t('home.planetTransitDetails.yourZodiac', {
+                      zodiac: formatZodiacWithArabic(userZodiacKey, language as any, {
+                        // EN/FR must never show Arabic-only
+                        forceBilingual: language !== 'ar',
+                        // AR future: العربية (Latin)
+                        arabicFirst: true,
+                        includeGlyph: true,
+                      }),
                     })}
                   </Text>
                 ) : null}
@@ -243,6 +275,7 @@ export default function PlanetTransitDetailsScreen() {
           {contextElement ? (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>{t('home.planetTransitDetails.sections.resonance')}</Text>
+              <Text style={styles.contextLine}>{t('home.planetTransitDetails.sections.context')}</Text>
               <View style={styles.card}>
                 {harmony ? (
                   <>
@@ -257,7 +290,22 @@ export default function PlanetTransitDetailsScreen() {
                         contextElement: tSafe(`common.elements.${contextElement}`, toTitleCase(contextElement)).toLowerCase(),
                       })}
                     </Text>
-                    <Text style={styles.bodyText}>{t(`home.planetTransitDetails.harmony.${harmony}.whatToDo`)}</Text>
+                    
+                    {/* Reflection Guidance Block */}
+                    <View style={styles.reflectionBlock}>
+                      <View style={styles.reflectionRow}>
+                        <Ionicons name="checkmark-circle" size={16} color={accent.primary} />
+                        <Text style={[styles.reflectionText, { color: accent.primary }]}>
+                          {t(`home.planetTransitDetails.harmony.${harmony}.bestFor`)}
+                        </Text>
+                      </View>
+                      <View style={styles.reflectionRow}>
+                        <Ionicons name="remove-circle-outline" size={16} color={DarkTheme.textTertiary} />
+                        <Text style={[styles.reflectionText, { color: DarkTheme.textTertiary }]}>
+                          {t(`home.planetTransitDetails.harmony.${harmony}.avoid`)}
+                        </Text>
+                      </View>
+                    </View>
                   </>
                 ) : (
                   <Text style={styles.bodyText}>{t('home.planetTransitDetails.resonanceNoProfile')}</Text>
@@ -319,6 +367,24 @@ const styles = StyleSheet.create({
     gap: Spacing.lg,
     paddingBottom: Spacing.xxxl,
   },
+  explainerText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    lineHeight: 19,
+    fontStyle: 'italic',
+    paddingHorizontal: Spacing.xs,
+  },
+  explainerMeta: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    paddingHorizontal: Spacing.xs,
+    marginTop: -8,
+  },
+  cardHint: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    marginTop: -6,
+  },
   section: {
     gap: Spacing.sm,
   },
@@ -326,6 +392,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: Typography.weightSemibold,
     color: DarkTheme.textSecondary,
+  },
+  sectionTitleInCard: {
+    fontSize: 14,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    marginBottom: Spacing.xs,
+  },
+  contextLine: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    fontStyle: 'italic',
+    marginBottom: Spacing.xs,
   },
   card: {
     backgroundColor: 'rgba(30, 20, 36, 0.65)',
@@ -398,6 +476,23 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: DarkTheme.textSecondary,
     lineHeight: 18,
+  },
+  reflectionBlock: {
+    marginTop: Spacing.sm,
+    gap: Spacing.sm,
+    paddingTop: Spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  reflectionRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.xs,
+  },
+  reflectionText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 17,
   },
   profileButton: {
     marginTop: Spacing.xs,

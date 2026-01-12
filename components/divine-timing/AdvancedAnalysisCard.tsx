@@ -7,6 +7,7 @@
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { IntentionTimingAnalysis } from '@/services/AdvancedDivineTimingService';
+import { formatPlanetWithArabic } from '@/utils/translationHelpers';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -26,6 +27,12 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const getMomentStatusColor = (status: 'ACT' | 'MAINTAIN' | 'HOLD') => {
+    if (status === 'ACT') return '#818CF8';
+    if (status === 'MAINTAIN') return '#38BDF8';
+    return '#94A3B8';
   };
 
   const getRecommendationColor = () => {
@@ -99,15 +106,15 @@ export function AdvancedAnalysisCard({ analysis }: AdvancedAnalysisCardProps) {
               <Text style={styles.infoLabel}>{t('divineTiming.results.labels.hourlyStatus')}</Text>
               <Text style={[
                 styles.infoValue,
-                { color: analysis.currentMoment.hourlyAlignment.status === 'ACT' ? '#10b981' : '#8B7355' }
+                { color: getMomentStatusColor(analysis.currentMoment.hourlyAlignment.status) }
               ]}>
-                {analysis.currentMoment.hourlyAlignment.status}
+                {t(analysis.currentMoment.hourlyAlignment.shortLabelKey)}
               </Text>
             </View>
             <View style={styles.infoBox}>
               <Text style={styles.infoLabel}>{t('divineTiming.results.labels.planetaryHour')}</Text>
               <Text style={styles.infoValue}>
-                {analysis.currentMoment.planetaryHour.planet}
+                {formatPlanetWithArabic(analysis.currentMoment.planetaryHour.planet, language)}
               </Text>
             </View>
           </View>

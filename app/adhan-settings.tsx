@@ -287,6 +287,7 @@ export default function AdhanSettingsScreen() {
           </Pressable>
         )}
 
+
         <View style={{ height: 40 }} />
       </ScrollView>
     </LinearGradient>
@@ -411,4 +412,5 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weightBold,
     color: '#ffffff',
   },
+
 });

@@ -2,6 +2,7 @@ import { Borders, DarkTheme, ElementAccents, Typography } from "@/constants/Dark
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Element } from "@/services/MomentAlignmentService";
 import type { PlanetTransitInfo } from "@/services/PlanetTransitService";
+import { formatZodiacWithArabic } from "@/utils/translationHelpers";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -22,7 +23,7 @@ interface PlanetTransitWidgetProps {
 }
 
 export default function PlanetTransitWidget({ transitData, nextDayBlessing, compact = false }: PlanetTransitWidgetProps) {
-  const { t, tSafe } = useLanguage();
+  const { t, tSafe, language } = useLanguage();
   const [activeSlide, setActiveSlide] = useState(0);
 
   const handlePress = () => {
@@ -74,7 +75,7 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
               adjustsFontSizeToFit
               minimumFontScale={0.7}
             >
-              {t(`zodiac.${zodiacKey}`)}
+              {formatZodiacWithArabic(zodiacKey, language as any)}
             </Text>
           </View>
         </View>
@@ -113,10 +114,17 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
         </View>
 
         <View style={styles.mainContent}>
-          <Text style={styles.dayName} numberOfLines={1}>{nextDayBlessing.dayNameArabic}</Text>
-          <Text style={[styles.planetInfo, { color: ElementAccents[nextDayBlessing.element].primary }]} numberOfLines={1}>
-            {nextDayBlessing.emoji} {nextDayBlessing.planetArabic}
-          </Text>
+          <Text style={styles.dayName} numberOfLines={1}>{nextDayBlessing.dayName}</Text>
+          <Text style={styles.dayNameArabic} numberOfLines={1}>{nextDayBlessing.dayNameArabic}</Text>
+
+          <View style={styles.nextDayRulerRow}>
+            <Text style={styles.nextDayRulerLabel} numberOfLines={1}>
+              {t('home.planetTransitDetails.pills.dayRuler')}
+            </Text>
+            <Text style={[styles.planetInfo, { color: ElementAccents[nextDayBlessing.element].primary }]} numberOfLines={1}>
+              {nextDayBlessing.emoji} {nextDayBlessing.planetArabic}
+            </Text>
+          </View>
           <View style={[styles.elementChip, { backgroundColor: ElementAccents[nextDayBlessing.element].glow }]}>
             <Text style={[styles.elementChipText, { color: ElementAccents[nextDayBlessing.element].primary }]} numberOfLines={1}>
               {tSafe(`elements.${nextDayBlessing.element}`, nextDayBlessing.element).toUpperCase()}
@@ -260,10 +268,27 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 0.3,
   },
+  dayNameArabic: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontFamily: 'Amiri',
+    textAlign: 'center',
+    marginTop: -4,
+  },
   planetInfo: {
     fontSize: 14,
     fontWeight: Typography.weightSemibold,
     textAlign: 'center',
+  },
+  nextDayRulerRow: {
+    alignItems: 'center',
+    gap: 2,
+  },
+  nextDayRulerLabel: {
+    fontSize: 10,
+    color: DarkTheme.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   elementChip: {
     paddingHorizontal: 8,

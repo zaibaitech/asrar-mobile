@@ -49,14 +49,28 @@ export function AdvancedDivineTimingGuidanceCard({
   };
 
   const getRecommendationColor = (rec: string) => {
+    const key = response.systemGuidance?.recommendationKey;
+    if (key) {
+      if (key === 'highly_favorable') return '#4CAF50';
+      if (key === 'act_now') return '#2196F3';
+      if (key === 'proceed_with_caution') return '#FF9800';
+      return '#F44336';
+    }
     const lowerRec = rec.toLowerCase();
     if (lowerRec.includes('highly favorable') || lowerRec.includes('très favorable')) return '#4CAF50';
     if (lowerRec.includes('favorable')) return '#2196F3';
-    if (lowerRec.includes('caution') || lowerRec.includes('prudence')) return '#FF9800';
+    if (lowerRec.includes('caution') || lowerRec.includes('prudence') || lowerRec.includes('mixed')) return '#FF9800';
     return '#F44336';
   };
   
   const getVerdictLabel = (rec: string) => {
+    const key = response.systemGuidance?.recommendationKey;
+    if (key) {
+      if (key === 'highly_favorable') return t('divineTiming.results.aiGuidanceCard.verdict.highlyFavorable');
+      if (key === 'act_now') return t('divineTiming.results.aiGuidanceCard.verdict.favorable');
+      if (key === 'proceed_with_caution') return t('divineTiming.results.aiGuidanceCard.verdict.mixed');
+      return t('divineTiming.results.aiGuidanceCard.verdict.unfavorable');
+    }
     const lowerRec = rec.toLowerCase();
     if (lowerRec.includes('highly favorable') || lowerRec.includes('très favorable')) {
       return t('divineTiming.results.aiGuidanceCard.verdict.highlyFavorable');

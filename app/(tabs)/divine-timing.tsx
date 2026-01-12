@@ -34,6 +34,7 @@ import {
     QuranReflection,
     selectReflectionVerse,
 } from '@/services/QuranReflectionService';
+import { getUserAbjadResultFromProfile } from '@/services/UserAbjadService';
 import {
     DivineTimingResult,
     IntentionCategory,
@@ -110,6 +111,9 @@ export default function DivineTimingScreen() {
   const colors = Colors[colorScheme];
   const { profile } = useProfile();
   const { language, t } = useLanguage();
+
+  const userAbjad: UserAbjadResult =
+    getUserAbjadResultFromProfile(profile) ?? PLACEHOLDER_USER_ABJAD;
   
   // Helper function to get localized intention name
   const getLocalizedIntentionName = (category: IntentionCategory): string => {
@@ -210,7 +214,7 @@ export default function DivineTimingScreen() {
       
       // Compute basic Divine Timing
       const timingResult = computeDivineTiming({
-        userAbjadResult: PLACEHOLDER_USER_ABJAD,
+        userAbjadResult: userAbjad,
         currentDate: { dayOfWeek, date },
         userIntentionCategory: selectedIntention,
       });
@@ -221,7 +225,7 @@ export default function DivineTimingScreen() {
       const analysis = await getAdvancedDivineTimingAnalysis(
         profile,
         selectedIntention,
-        PLACEHOLDER_USER_ABJAD
+        userAbjad
       );
       
       setAdvancedAnalysis(analysis);
@@ -328,7 +332,7 @@ export default function DivineTimingScreen() {
         urgency,
         divineTimingResult: result,
         userProfile: profile,
-        userAbjad: PLACEHOLDER_USER_ABJAD,
+        userAbjad,
         intention: selectedIntention,
         advancedAnalysis: advancedAnalysis || undefined,
         locale: language,

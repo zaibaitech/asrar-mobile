@@ -65,6 +65,160 @@ export interface AdvancedGuidanceResponse extends GuidanceResponse {
   };
   abjadWisdom: string; // Personalized based on name numerology
   generatedAt: string;
+
+  /**
+   * Authoritative system state used to compute this guidance.
+   * This is NOT AI-generated; it is attached by the app to keep UI coherent.
+   */
+  systemGuidance?: {
+    recommendationKey: IntentionTimingAnalysis['recommendation'];
+    recommendedMode: 'act' | 'caution' | 'hold';
+    relationshipType: 'harmonious' | 'supportive' | 'opposing';
+    moment: {
+      dayRuler?: string;
+      hourRuler?: string;
+      momentElement?: string;
+      userElement?: string;
+      momentStatus?: string;
+      dailyQuality?: string;
+    };
+  };
+}
+
+function getRecommendedModeFromKey(
+  key: IntentionTimingAnalysis['recommendation']
+): 'act' | 'caution' | 'hold' {
+  if (key === 'highly_favorable' || key === 'act_now') return 'act';
+  if (key === 'proceed_with_caution') return 'caution';
+  return 'hold';
+}
+
+function getRelationshipTypeFromMomentStatus(
+  status: string | undefined
+): 'harmonious' | 'supportive' | 'opposing' {
+  if (!status) return 'supportive';
+  if (status === 'ACT') return 'harmonious';
+  if (status === 'MAINTAIN') return 'supportive';
+  return 'opposing';
+}
+
+function formatSystemRecommendationLabel(
+  locale: SupportedLocale,
+  key: IntentionTimingAnalysis['recommendation']
+): string {
+  // These strings are intentionally simple because UI heuristics currently
+  // infer verdict color/label from keywords.
+  if (locale === 'fr') {
+    if (key === 'highly_favorable') return 'Très favorable';
+    if (key === 'act_now') return 'Favorable';
+    if (key === 'proceed_with_caution') return 'Prudence';
+    return 'Défavorable';
+  }
+  if (locale === 'ar') {
+    if (key === 'highly_favorable') return 'مواتٍ جدًا';
+    if (key === 'act_now') return 'مواتٍ';
+    if (key === 'proceed_with_caution') return 'بحذر';
+    return 'تأجيل/توقّف';
+  }
+
+  // en
+  if (key === 'highly_favorable') return 'Highly favorable';
+  if (key === 'act_now') return 'Favorable';
+  if (key === 'proceed_with_caution') return 'Proceed with caution';
+  return 'Unfavorable';
+}
+
+function collectAllTextForGuardrail(response: AdvancedGuidanceResponse): string {
+  return JSON.stringify(
+    {
+      summaryTitle: response.summaryTitle,
+      timingSignal: response.timingSignal,
+      recommendedApproach: response.recommendedApproach,
+      watchOuts: response.watchOuts,
+      nextStep: response.nextStep,
+      contextualInsight: response.contextualInsight,
+      spiritualAlignment: response.spiritualAlignment,
+      personalizedSteps: response.personalizedSteps,
+      timingWindow: response.timingWindow,
+      abjadWisdom: response.abjadWisdom,
+    },
+    null,
+    0
+  ).toLowerCase();
+}
+
+function violatesSystemTruth(
+  response: AdvancedGuidanceResponse,
+  analysis: IntentionTimingAnalysis,
+  locale: SupportedLocale
+): boolean {
+  const blob = collectAllTextForGuardrail(response);
+  const key = analysis.recommendation;
+
+  // For the strictest modes, reject “favorable/act now/optimal” language.
+  // This intentionally errs on the side of falling back to deterministic guidance.
+  const forbiddenEnHold = [
+    /highly favorable/, /\bfavorable\b/, /optimal/, /perfect time/, /act now/, /take action/, /proceed/, /expand/, /bold/,
+  ];
+  const forbiddenFrHold = [
+    /très favorable/, /\bfavorable\b/, /optimal/, /moment idéal/, /agir/, /passez à l'action/, /procédez/, /développer/, /audac/,
+  ];
+  const forbiddenArHold = [
+    /موات/, /مناسب/, /أفضل وقت/, /تصرف الآن/, /ابدأ/, /تقدّم/, /وسّع/, /بجرأة/,
+  ];
+
+  const forbiddenEnCaution = [/highly favorable/, /optimal/, /perfect time/, /bold/, /without hesitation/];
+  const forbiddenFrCaution = [/très favorable/, /optimal/, /moment idéal/, /audac/, /sans hésitation/];
+  const forbiddenArCaution = [/موات.? جدًا/, /أفضل وقت/, /بجرأة/, /بدون تردد/];
+
+  const checkAny = (patterns: RegExp[]) => patterns.some((re) => re.test(blob));
+
+  if (key === 'wait_for_better_time') {
+    if (locale === 'fr') return checkAny(forbiddenFrHold);
+    if (locale === 'ar') return checkAny(forbiddenArHold);
+    return checkAny(forbiddenEnHold);
+  }
+
+  if (key === 'proceed_with_caution') {
+    if (locale === 'fr') return checkAny(forbiddenFrCaution);
+    if (locale === 'ar') return checkAny(forbiddenArCaution);
+    return checkAny(forbiddenEnCaution);
+  }
+
+  return false;
+}
+
+function applySystemGuidanceOverlay(
+  response: AdvancedGuidanceResponse,
+  analysis: IntentionTimingAnalysis,
+  locale: SupportedLocale
+): AdvancedGuidanceResponse {
+  const moment = analysis.currentMoment;
+  const momentStatus = moment.hourlyAlignment?.status;
+  const systemGuidance = {
+    recommendationKey: analysis.recommendation,
+    recommendedMode: getRecommendedModeFromKey(analysis.recommendation),
+    relationshipType: getRelationshipTypeFromMomentStatus(momentStatus),
+    moment: {
+      dayRuler: moment.blessing?.planet,
+      hourRuler: moment.planetaryHour?.planet,
+      momentElement: moment.hourlyAlignment?.timeElement,
+      userElement: moment.hourlyAlignment?.zahirElement,
+      momentStatus,
+      dailyQuality: moment.dailyGuidance?.timingQuality,
+    },
+  };
+
+  return {
+    ...response,
+    // Lock these values to the computed engine outputs
+    spiritualAlignment: {
+      ...response.spiritualAlignment,
+      harmonyScore: analysis.harmonyScore,
+      recommendation: formatSystemRecommendationLabel(locale, analysis.recommendation),
+    },
+    systemGuidance,
+  };
 }
 
 /**
@@ -108,7 +262,7 @@ async function generateContextualInsight(
 
   const guidanceTone = dailyGuidance.timingQuality;
   insights.push(
-    `Today's flow is ${guidanceTone}, highlighting ${dailyGuidance.message}`
+    `Today's day-level flow is ${guidanceTone}, highlighting ${dailyGuidance.message}`
   );
 
   if (harmonyScore >= 80) {
@@ -131,7 +285,7 @@ async function generateContextualInsight(
 
   const recommendationText = recommendation.replace(/_/g, ' ');
   insights.push(
-    `Regarding your question about ${getCategoryDisplayName(category).toLowerCase()}: "${questionText.substring(0, 100)}${questionText.length > 100 ? '...' : ''}", the Divine Timing quality is ${divineTimingResult.timingQuality} and the wisdom suggests you ${recommendationText}.`
+    `Regarding your question about ${getCategoryDisplayName(category).toLowerCase()}: "${questionText.substring(0, 100)}${questionText.length > 100 ? '...' : ''}", the day-level Divine Timing quality is ${divineTimingResult.timingQuality} and the wisdom suggests you ${recommendationText}.`
   );
 
   return insights.join(' ');
@@ -728,7 +882,11 @@ You are Asrār's Divine Timing AI guide. Craft reflective yet grounded guidance 
 
 STRICT RULES:
 1. NEVER predict guaranteed outcomes or issue religious rulings.
-2. Base every statement on the provided timing analysis.
+2. The provided timing analysis is AUTHORITATIVE. You must not re-decide it.
+3. You must never contradict the system recommendation keyword or moment status.
+  - If system says HOLD / wait_for_better_time: emphasize restraint, dhikr, planning.
+  - If system says proceed_with_caution: emphasize careful, gentle steps.
+  - If system says act_now/highly_favorable: allow action but keep adab and humility.
 3. Keep tone humble, devotional, and practical.
 4. Use short paragraphs and bullet points when helpful.
 5. Return ONLY JSON matching this schema (no markdown, no commentary):
@@ -775,14 +933,45 @@ function buildAIUserPrompt(
     })
     .join('\n') || 'No extended outlook available';
 
+  const authoritativeState = {
+    moment: {
+      dayRuler: moment.blessing?.planet ?? null,
+      hourRuler: moment.planetaryHour?.planet ?? null,
+      momentElement: moment.hourlyAlignment?.timeElement ?? null,
+      dailyQuality: moment.dailyGuidance?.timingQuality ?? null,
+      momentStatus: moment.hourlyAlignment?.status ?? null,
+    },
+    user: {
+      userElement: moment.hourlyAlignment?.zahirElement ?? userProfile?.derived?.element ?? null,
+      profileType: userProfile?.motherName ? 'true' : 'basic',
+    },
+    relationship: {
+      relationshipType: getRelationshipTypeFromMomentStatus(moment.hourlyAlignment?.status),
+    },
+    systemGuidance: {
+      recommendationKey: analysis.recommendation,
+      recommendedMode: getRecommendedModeFromKey(analysis.recommendation),
+      harmonyScore: analysis.harmonyScore,
+    },
+  };
+
   return `User locale: ${locale}
 Question: ${questionText}
 Category: ${getCategoryDisplayName(category)}
 Time horizon: ${timeHorizon}
 Urgency: ${urgency}
 
+AUTHORITATIVE_STATE (DO NOT CHANGE OR OVERRIDE):
+${JSON.stringify(authoritativeState, null, 2)}
+
+CONSTRAINTS (MUST FOLLOW):
+- You must explicitly reference the relationship (e.g., "Because the moment is Fire and you are Water...").
+- You must match the system recommendedMode.
+- You must NOT label the moment as favorable/highly favorable if recommendationKey is proceed_with_caution or wait_for_better_time.
+- You are a commentator of the engine, not a second oracle.
+
 Divine Timing Snapshot:
-- Timing quality: ${divineTimingResult.timingQuality}
+- Day-level timing quality: ${divineTimingResult.timingQuality}
 - Cycle state: ${divineTimingResult.cycleState}
 - Elemental tone: ${divineTimingResult.elementalTone}
 - Recommendation keyword: ${analysis.recommendation}
@@ -791,8 +980,8 @@ Divine Timing Snapshot:
 Moment Alignment:
 - Planetary hour: ${moment.planetaryHour?.planet ?? 'unknown'}
 - Hour status: ${moment.hourlyAlignment?.status ?? 'unknown'}
-- Daily guidance quality: ${moment.dailyGuidance.timingQuality}
-- Daily guidance message: ${moment.dailyGuidance.message}
+- Day guidance quality (day-level): ${moment.dailyGuidance.timingQuality}
+- Day guidance message: ${moment.dailyGuidance.message}
 
 User & Abjad Profile:
 - Name reference: ${displayName}
@@ -890,7 +1079,14 @@ export async function generateAdvancedDivineTimingGuidance(
     if (__DEV__) {
       console.log('[DivineTiming][AskAI] AI guidance generated successfully', { locale });
     }
-    return aiResponse;
+    const overlaid = applySystemGuidanceOverlay(aiResponse, advancedAnalysis, locale);
+    if (violatesSystemTruth(overlaid, advancedAnalysis, locale)) {
+      if (__DEV__) {
+        console.warn('[DivineTiming][AI] Guardrail triggered (AI contradicted system). Falling back to deterministic guidance.');
+      }
+    } else {
+      return overlaid;
+    }
   }
   if (__DEV__) {
     console.warn('[DivineTiming][AskAI] AI generation unavailable, using deterministic fallback.');
@@ -957,7 +1153,7 @@ export async function generateAdvancedDivineTimingGuidance(
     });
   }
 
-  return localizedResponse;
+  return applySystemGuidanceOverlay(localizedResponse, advancedAnalysis, locale);
 }
 
 /**

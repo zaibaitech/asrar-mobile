@@ -7,6 +7,7 @@
  * NOT fatwa, NOT tafsir, NOT fortune-telling, NOT certainty.
  */
 
+import { resolveZodiacKey, ZODIAC_IDENTITY_MAP } from '@/constants/identityMaps';
 import { ElementalTone, TimingQuality } from '@/types/divine-timing';
 import {
     GuidanceCategory,
@@ -535,6 +536,15 @@ function personalizeTimingSignal(
   burj: string,
   element?: 'fire' | 'water' | 'air' | 'earth'
 ): string {
+  const resolvedKey = resolveZodiacKey(burj);
+  const renderedBurj = resolvedKey
+    ? (() => {
+        const zodiac = ZODIAC_IDENTITY_MAP[resolvedKey];
+        const base = `${zodiac.en} (${zodiac.ar})`;
+        return zodiac.symbol ? `${zodiac.symbol} ${base}` : base;
+      })()
+    : burj;
+
   // Add element-based personalization
   if (element) {
     const elementPhrases: Record<string, string> = {
@@ -544,10 +554,10 @@ function personalizeTimingSignal(
       earth: 'grounding your practical steps',
     };
     
-    return `${signal} As a ${burj}, this period may be ${elementPhrases[element]}.`;
+    return `${signal} As a ${renderedBurj}, this period may be ${elementPhrases[element]}.`;
   }
   
-  return `${signal} (${burj} influence noted).`;
+  return `${signal} (${renderedBurj} influence noted).`;
 }
 
 /**
