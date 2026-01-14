@@ -55,6 +55,7 @@ export interface PrayerGuidanceRecommendation {
   // Spiritual context
   context: {
     userElement: Element;
+    hourElement: Element;
     currentPlanetaryHour: {
       planet: Planet;
       number: number;
@@ -183,6 +184,7 @@ export class PrayerGuidanceEngine {
       },
       context: {
         userElement: userProfile.derived.element,
+        hourElement: planetaryHour.element,
         currentPlanetaryHour: {
           planet: planetaryHour.planet,
           number: planetaryHour.hourNumber,

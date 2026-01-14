@@ -434,6 +434,29 @@ export const translations = {
             transformative: "Transformative Window",
             delicate: "Delicate Window",
             neutral: "Neutral Window",
+            // Carte d'alignement (contexte spirituel)
+            alignmentLevel: {
+              exceptional: "EXCEPTIONNEL",
+              strong: "FORT",
+              favorable: "FAVORABLE",
+              moderate: "MODÉRÉ",
+              balanced: "ÉQUILIBRÉ",
+              challenging: "DIFFICILE",
+            },
+            alignmentDescription: {
+              exceptional:
+                "Votre nature {userElement} s'aligne parfaitement avec cette heure {hourElement}. Moment optimal pour le travail spirituel.",
+              strong:
+                "Votre nature {userElement} harmonise fortement avec cette heure {hourElement}. Excellentes conditions pour la pratique.",
+              favorable:
+                "Votre nature {userElement} fonctionne bien avec cette heure {hourElement}. Bon moment pour les activités spirituelles.",
+              moderate:
+                "Votre nature {userElement} a une compatibilité modérée avec cette heure {hourElement}. Pratique régulière recommandée.",
+              balanced:
+                "Votre nature {userElement} recherche l'équilibre avec cette heure {hourElement}. Concentrez-vous sur l'équilibre dans la pratique.",
+              challenging:
+                "Votre nature {userElement} rencontre son opposé durant cette heure {hourElement}. Gardez des pratiques douces, ancrées et constantes.",
+            },
           },
           dayRuler: "Day Ruler:",
           energyToday: "Energy Today",
@@ -731,6 +754,30 @@ export const translations = {
           classicalWisdom: "Classical Wisdom",
           noClassicalGuidance: "No specific classical guidance for this hour",
 
+          // Spiritual context alignment (warning) card
+          alignmentLevel: {
+            exceptional: "EXCEPTIONAL",
+            strong: "STRONG",
+            favorable: "FAVORABLE",
+            moderate: "MODERATE",
+            balanced: "BALANCED",
+            challenging: "CHALLENGING",
+          },
+          alignmentDescription: {
+            exceptional:
+              "Your {userElement} nature perfectly aligns with this {hourElement} hour. Optimal time for spiritual work.",
+            strong:
+              "Your {userElement} nature harmonizes strongly with this {hourElement} hour. Excellent conditions for practice.",
+            favorable:
+              "Your {userElement} nature works well with this {hourElement} hour. Good time for spiritual activities.",
+            moderate:
+              "Your {userElement} nature has moderate compatibility with this {hourElement} hour. Steady practice recommended.",
+            balanced:
+              "Your {userElement} nature seeks balance with this {hourElement} hour. Focus on equilibrium in practice.",
+            challenging:
+              "Your {userElement} nature meets its opposite in this {hourElement} hour. Keep practices gentle, grounded, and consistent.",
+          },
+
           // Adhkar list
           sunnahAdhkar: "Sunnah Adhkar",
           noAdhkarAvailable: "No adhkar available",
@@ -810,6 +857,56 @@ export const translations = {
           nightWorks: {
             name: "Nocturnal Works",
             description: "Operations specifically intended for deep night; often avoided in bright, solar hours even if it is currently night",
+          },
+
+          // Fallback/default keys used by the Prayer Guidance engine when a specific manuscript hour is not available
+          waterRelated: {
+            name: "Water-Related Works",
+            description: "Purification, cleansing, reconciliation, and gentle emotional work",
+          },
+          travelMovement: {
+            name: "Travel and Movement",
+            description: "Journeys, relocations, and initiating movement in lawful matters",
+          },
+          ironMetalwork: {
+            name: "Iron and Metalwork",
+            description: "Forge, tools, cutting, and heavy metal-related operations (often avoided in soft lunar/venusian hours)",
+          },
+          combatDefense: {
+            name: "Defense and Confrontation",
+            description: "Protective and confrontational work that requires firmness and restraint",
+          },
+          marriageFamily: {
+            name: "Marriage and Family Matters",
+            description: "Affairs of marriage, bonding, and family harmony",
+          },
+          studyKnowledge: {
+            name: "Study and Knowledge",
+            description: "Learning, reading, writing, research, and seeking understanding",
+          },
+          herbMedicine: {
+            name: "Herbs and Medicine",
+            description: "Remedies, herb work, and health-related practice (within lawful means)",
+          },
+          seekingKingsNobles: {
+            name: "Seeking Kings and Nobles",
+            description: "Seeking favor with authority, benefactors, and those in leadership",
+          },
+          landProperty: {
+            name: "Land and Property",
+            description: "Property matters, agriculture, long-term growth, and lawful expansion",
+          },
+          magicalWorkings: {
+            name: "Coercive or Aggressive Workings",
+            description: "Confrontational or coercive operations that contradict Jupiter’s benevolent, expansive quality",
+          },
+          imprisonmentBondage: {
+            name: "Imprisonment and Bondage",
+            description: "Restrictive work, constraints, and binding operations",
+          },
+          saturnWorks: {
+            name: "Saturnian Works",
+            description: "Discipline, boundaries, endings, and long-term endurance (used carefully)",
           },
           
           // Hour 2: Venus - Harmony and favor
@@ -7950,6 +8047,30 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           classicalWisdom: "Sagesse classique",
           noClassicalGuidance: "Aucune guidance classique spécifique pour cette heure",
 
+          // Carte d'alignement (contexte spirituel)
+          alignmentLevel: {
+            exceptional: "EXCEPTIONNEL",
+            strong: "FORT",
+            favorable: "FAVORABLE",
+            moderate: "MODÉRÉ",
+            balanced: "ÉQUILIBRÉ",
+            challenging: "DIFFICILE",
+          },
+          alignmentDescription: {
+            exceptional:
+              "Votre nature {userElement} s'aligne parfaitement avec cette heure {hourElement}. Moment optimal pour le travail spirituel.",
+            strong:
+              "Votre nature {userElement} harmonise fortement avec cette heure {hourElement}. Excellentes conditions pour la pratique.",
+            favorable:
+              "Votre nature {userElement} fonctionne bien avec cette heure {hourElement}. Bon moment pour les activités spirituelles.",
+            moderate:
+              "Votre nature {userElement} a une compatibilité modérée avec cette heure {hourElement}. Pratique régulière recommandée.",
+            balanced:
+              "Votre nature {userElement} recherche l'équilibre avec cette heure {hourElement}. Concentrez-vous sur l'équilibre dans la pratique.",
+            challenging:
+              "Votre nature {userElement} rencontre son opposé durant cette heure {hourElement}. Gardez des pratiques douces, ancrées et constantes.",
+          },
+
           // Adhkar
           sunnahAdhkar: "Adhkar de la Sunnah",
           noAdhkarAvailable: "Aucun adhkar disponible",
@@ -8024,6 +8145,61 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           burntWoolInk: {
             name: "Encre de Laine Brûlée (Midād al-Ṣūf al-Maḥrūq)",
             description: "Préparation d'encre sacrée utilisée dans l'écriture spirituelle traditionnelle",
+          },
+
+          nightWorks: {
+            name: "Travaux Nocturnes",
+            description: "Opérations destinées au cœur de la nuit ; souvent évitées dans les heures solaires même s'il fait nuit",
+          },
+
+          // Clés de secours utilisées par le moteur lorsque les données manuscrites ne sont pas disponibles
+          waterRelated: {
+            name: "Travaux liés à l'eau",
+            description: "Purification, apaisement, réconciliation et travail émotionnel doux",
+          },
+          travelMovement: {
+            name: "Voyage et mouvement",
+            description: "Déplacements, voyages et mise en mouvement dans des affaires licites",
+          },
+          ironMetalwork: {
+            name: "Fer et métallurgie",
+            description: "Forge, outils, coupe et opérations liées au métal (souvent évitées dans les heures lunaires/vénusiennes)",
+          },
+          combatDefense: {
+            name: "Défense et confrontation",
+            description: "Travail protecteur et confrontant qui exige fermeté et retenue",
+          },
+          marriageFamily: {
+            name: "Mariage et famille",
+            description: "Affaires de mariage, de lien et d'harmonie familiale",
+          },
+          studyKnowledge: {
+            name: "Étude et connaissance",
+            description: "Apprentissage, lecture, écriture, recherche et quête de compréhension",
+          },
+          herbMedicine: {
+            name: "Herbes et médecine",
+            description: "Remèdes, travail avec les herbes et pratiques liées à la santé (dans des moyens licites)",
+          },
+          seekingKingsNobles: {
+            name: "Recherche de rois et de nobles",
+            description: "Recherche de faveur auprès de l'autorité, de bienfaiteurs et de dirigeants",
+          },
+          landProperty: {
+            name: "Terre et propriété",
+            description: "Questions de propriété, agriculture, croissance à long terme et expansion licite",
+          },
+          magicalWorkings: {
+            name: "Opérations coercitives ou agressives",
+            description: "Opérations confrontantes ou coercitives qui contredisent la qualité bienveillante et expansive de Jupiter",
+          },
+          imprisonmentBondage: {
+            name: "Emprisonnement et servitude",
+            description: "Travaux restrictifs, contraintes et opérations de liaison",
+          },
+          saturnWorks: {
+            name: "Travaux saturniens",
+            description: "Discipline, limites, fins et endurance au long cours (à utiliser avec prudence)",
           },
           
           // Heure 2: Vénus - Harmonie et faveur

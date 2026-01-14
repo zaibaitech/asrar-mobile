@@ -24,6 +24,12 @@ export function ContextDisplay({ context, planetaryHour }: ContextDisplayProps) 
   const { t } = useLanguage();
   const alignmentColor = getAlignmentColor(context.alignment);
   const alignmentEmoji = getAlignmentEmoji(context.alignment);
+
+  const alignmentLabel = t(`prayerGuidance.ui.alignmentLevel.${context.alignment}`);
+  const alignmentDescription = t(`prayerGuidance.ui.alignmentDescription.${context.alignment}`, {
+    userElement: context.userElement,
+    hourElement: context.hourElement,
+  });
   
   return (
     <View style={styles.container}>
@@ -80,10 +86,10 @@ export function ContextDisplay({ context, planetaryHour }: ContextDisplayProps) 
       <View style={[styles.alignmentCard, { borderColor: alignmentColor }]}>
         <Text style={styles.alignmentEmoji}>{alignmentEmoji}</Text>
         <Text style={[styles.alignmentLevel, { color: alignmentColor }]}>
-          {context.alignment.toUpperCase()}
+          {alignmentLabel}
         </Text>
         <Text style={styles.alignmentDescription}>
-          {context.alignmentDescription}
+          {alignmentDescription || context.alignmentDescription}
         </Text>
       </View>
     </View>

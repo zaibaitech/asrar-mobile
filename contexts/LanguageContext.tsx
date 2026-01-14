@@ -69,17 +69,35 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   // Translation function with nested key support (e.g., "common.calculate")
   const resolveTranslation = (lang: Language, keys: string[]) => {
-    let value: any = translations[lang];
+    const resolvePath = (pathKeys: string[]) => {
+      let value: any = translations[lang];
 
-    for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
-        value = value[k];
-      } else {
-        return undefined;
+      for (const k of pathKeys) {
+        if (value && typeof value === 'object' && k in value) {
+          value = value[k];
+        } else {
+          return undefined;
+        }
+      }
+
+      return typeof value === 'string' ? value : undefined;
+    };
+
+    // Primary lookup
+    const direct = resolvePath(keys);
+    if (direct) {
+      return direct;
+    }
+
+    // Alias: Prayer Guidance translations are nested under home.prayerGuidance
+    if (keys[0] === 'prayerGuidance') {
+      const aliased = resolvePath(['home', ...keys]);
+      if (aliased) {
+        return aliased;
       }
     }
 
-    return typeof value === 'string' ? value : undefined;
+    return undefined;
   };
 
   const applyParams = (text: string, params?: TranslationParams) => {
