@@ -283,6 +283,7 @@ export const translations = {
       next: "NEXT",
       inTime: "in {{time}}",
       noPrayer: "No prayer",
+      getGuidance: "Get Prayer Guidance",
       calculationMethod: "Calculation Method",
       method: {
         mwl: "Muslim World League",
@@ -676,6 +677,548 @@ export const translations = {
         },
         disclaimer: "For reflection only • Not a religious ruling",
         back: "Back",
+      },
+      
+      // Prayer Guidance - Classical Planetary Hour Practices
+      prayerGuidance: {
+        title: "Prayer Guidance",
+        subtitle: "Classical planetary hour practices from traditional sources",
+
+        // UI labels used by the Prayer Guidance screens/cards
+        ui: {
+          headerSubtitle: "Personalized spiritual guidance based on classical Islamic sciences",
+          currentHour: "Current Hour: {planet} {arabicName}",
+          currentHourLabel: "Current Hour",
+          hourOfTwelve: "Hour {number}/12",
+          day: "Day",
+          night: "Night",
+          generating: "Generating guidance...",
+
+          profileHintTitle: "Complete your profile to personalize guidance",
+          profileHintBody: "Add your Arabic name in Profile so we can compute your Abjad signature and element.",
+          goToProfile: "Go to Profile",
+          missingArabicName: "Missing: Arabic name",
+
+          emptyTitle: "Select a Prayer",
+          emptyBody: "Choose a prayer above to receive spiritual guidance tailored to your abjad profile and the current planetary hour.",
+
+          footerBasedOn: "✨ Guidance based on your abjad value ({abjad}) and element ({element})",
+          sources: "Sources: {source}",
+
+          // Shared card labels
+          spiritualContext: "Spiritual Context",
+          yourElement: "Your Element",
+          hourNumber: "Hour Number",
+          timeRemaining: "Time Remaining",
+          dayRuler: "Day Ruler",
+          next: "Next",
+          current: "Current",
+          selectPrayer: "Select Prayer",
+
+          // Divine name card
+          recommendedDivineName: "Recommended Divine Name",
+          reciteCount: "Recite {count}×",
+          abjadValueLabel: "Abjad Value: {value}",
+          showReasoning: "▶ Show Reasoning",
+          hideReasoning: "▼ Hide Reasoning",
+          planetaryAlignment: "🪐 Planetary Alignment:",
+          elementalResonance: "💫 Elemental Resonance:",
+          numerologicalSignificance: "🔢 Numerological Significance:",
+          classicalSource: "📚 Classical Source:",
+          spiritualBenefits: "✨ Spiritual Benefits:",
+
+          // Classical wisdom card
+          classicalWisdom: "Classical Wisdom",
+          noClassicalGuidance: "No specific classical guidance for this hour",
+
+          // Adhkar list
+          sunnahAdhkar: "Sunnah Adhkar",
+          noAdhkarAvailable: "No adhkar available",
+          showTranslation: "Show Translation",
+          hideTranslation: "Hide Translation",
+          progressCompleted: "{completed} / {total} completed",
+          resetAll: "Reset All",
+
+          // Dhikr counter
+          dhikrCounter: "Dhikr Counter",
+          percentComplete: "{percent}% Complete",
+          completedAlhamdulillah: "✨ Completed! Alhamdulillah ✨",
+          complete: "✓ Complete",
+          tapToCount: "Tap to Count",
+          reset: "Reset",
+          dhikrHelper: "Tap the button each time you recite the Divine Name",
+        },
+        
+        // Days of the week
+        days: {
+          Sunday: "Sunday",
+          Monday: "Monday",
+          Tuesday: "Tuesday",
+          Wednesday: "Wednesday",
+          Thursday: "Thursday",
+          Friday: "Friday",
+          Saturday: "Saturday",
+        },
+        
+        // Planets
+        planets: {
+          Sun: "Sun",
+          Moon: "Moon",
+          Mars: "Mars",
+          Mercury: "Mercury",
+          Jupiter: "Jupiter",
+          Venus: "Venus",
+          Saturn: "Saturn",
+        },
+        
+        // Hour labels
+        hours: {
+          hour: "Hour",
+          hourNumber: "Hour {number}",
+          rulingPlanet: "Ruling Planet",
+          recommendedWorks: "Recommended Works",
+          avoidWorks: "Works to Avoid",
+          classicalText: "Classical Text",
+          source: "Source",
+          tradition: "Tradition",
+        },
+        
+        // Classical works/practices
+        works: {
+          // Hour 1: Sun - Talismans and sacred works
+          talismansSeals: {
+            name: "Talismans and Blessed Seals",
+            description: "Lawful talismans and blessed seals for protection and spiritual benefit",
+          },
+          reversalWork: {
+            name: "Reversal Work (al-Radd)",
+            description: "Practices for turning away harm and negative influences",
+          },
+          alMaski: {
+            name: "Al-Maski",
+            description: "Traditional binding practice for spiritual protection",
+          },
+          hinduBinding: {
+            name: "Hindu Binding (al-Qabd al-Hindi)",
+            description: "Classical method of spiritual binding from Eastern traditions",
+          },
+          burntWoolInk: {
+            name: "Burnt Wool Ink (Midād al-Ṣūf al-Maḥrūq)",
+            description: "Sacred ink preparation used in traditional spiritual writing",
+          },
+
+          nightWorks: {
+            name: "Nocturnal Works",
+            description: "Operations specifically intended for deep night; often avoided in bright, solar hours even if it is currently night",
+          },
+          
+          // Hour 2: Venus - Harmony and favor
+          correctnessSweetness: {
+            name: "Works for Correctness and Sweetness",
+            description: "Practices to bring harmony, correctness, and pleasant relations",
+          },
+          dominanceRulers: {
+            name: "Dominance Over Rulers",
+            description: "Seeking favor and influence with authority figures",
+          },
+          worksJudges: {
+            name: "Works on Judges and Leaders",
+            description: "Practices related to gaining favor in legal or leadership matters",
+          },
+          
+          // Hour 3: Mercury - Learning and communication
+          learningStudy: {
+            name: "Learning and Study",
+            description: "Educational pursuits, study, and acquiring knowledge",
+          },
+          communication: {
+            name: "Communication",
+            description: "Writing, speaking, and all forms of communication",
+          },
+          tradeCommerce: {
+            name: "Trade and Commerce",
+            description: "Business dealings, trade, and commercial activities",
+          },
+          
+          // Hour 4: Moon - Journeys and emotional work
+          journeysTravel: {
+            name: "Journeys and Travel",
+            description: "Physical and spiritual journeys, travel preparations",
+          },
+          waterWorks: {
+            name: "Water Works",
+            description: "Activities related to water, purification, and cleansing",
+          },
+          emotionalMatters: {
+            name: "Emotional Matters",
+            description: "Working with emotions, feelings, and inner states",
+          },
+          
+          // Hour 5: Saturn - Binding and restriction
+          bindingRestriction: {
+            name: "Binding and Restriction",
+            description: "Practices to bind, restrict, or contain negative influences",
+          },
+          protectionWork: {
+            name: "Protection Work",
+            description: "Establishing spiritual protection and boundaries",
+          },
+          marriageMatters: {
+            name: "Marriage Matters",
+            description: "Activities related to marriage and partnerships (avoid during Saturn)",
+          },
+          joyfulWorks: {
+            name: "Joyful Works",
+            description: "Celebrations and joyful activities (avoid during Saturn)",
+          },
+          
+          // Hour 6: Jupiter - Expansion and blessings
+          seekingFavor: {
+            name: "Seeking Favor",
+            description: "Requesting blessings, favors, and divine assistance",
+          },
+          wealthExpansion: {
+            name: "Wealth and Expansion",
+            description: "Practices for abundance, prosperity, and growth",
+          },
+          religiousMatters: {
+            name: "Religious Matters",
+            description: "Spiritual practices, worship, and religious activities",
+          },
+          
+          // Hour 7: Mars - Courage and conflict
+          courageStrength: {
+            name: "Courage and Strength",
+            description: "Building inner strength, courage, and determination",
+          },
+          conflictResolution: {
+            name: "Conflict Resolution",
+            description: "Dealing with conflicts and confrontations",
+          },
+          peacefulNegotiations: {
+            name: "Peaceful Negotiations",
+            description: "Peace-making and diplomatic activities (avoid during Mars)",
+          },
+          
+          // Hour 8: Sun (returns) - Authority and leadership
+          authorityLeadership: {
+            name: "Authority and Leadership",
+            description: "Matters of authority, leadership, and governance",
+          },
+          honorsRecognition: {
+            name: "Honors and Recognition",
+            description: "Seeking recognition, honors, and public acknowledgment",
+          },
+          
+          // Hour 9: Venus (returns) - Love and beauty
+          loveAttraction: {
+            name: "Love and Attraction",
+            description: "Matters of love, affection, and attraction",
+          },
+          beautyArts: {
+            name: "Beauty and Arts",
+            description: "Artistic pursuits, beauty, and aesthetic matters",
+          },
+          harmonyPeace: {
+            name: "Harmony and Peace",
+            description: "Creating harmony, peace, and pleasant conditions",
+          },
+          
+          // Hour 10: Mercury (returns) - Writing and contracts
+          writingDocumentation: {
+            name: "Writing and Documentation",
+            description: "Writing, recording, and documentation activities",
+          },
+          contractsAgreements: {
+            name: "Contracts and Agreements",
+            description: "Legal contracts, agreements, and formal arrangements",
+          },
+          intellectualPursuits: {
+            name: "Intellectual Pursuits",
+            description: "Mental work, research, and intellectual activities",
+          },
+          
+          // Hour 11: Moon (returns) - Dreams and intuition
+          dreamsVisions: {
+            name: "Dreams and Visions",
+            description: "Working with dreams, visions, and spiritual insights",
+          },
+          intuitionWork: {
+            name: "Intuition Work",
+            description: "Developing and following intuition and inner guidance",
+          },
+          feminineMatters: {
+            name: "Feminine Matters",
+            description: "Activities related to feminine energy and women's concerns",
+          },
+          
+          // Hour 12: Saturn (returns) - Endings and depth
+          endingsClosures: {
+            name: "Endings and Closures",
+            description: "Completing cycles, endings, and bringing closure",
+          },
+          deepMeditation: {
+            name: "Deep Meditation",
+            description: "Profound meditation, contemplation, and inner work",
+          },
+          ancestralWork: {
+            name: "Ancestral Work",
+            description: "Connecting with ancestors and lineage",
+          },
+          newBeginnings: {
+            name: "New Beginnings",
+            description: "Starting new ventures (avoid during Saturn's final hour)",
+          },
+        },
+      },
+      
+      // Divine Names Planetary Correspondences
+      divineNamesPlanetary: {
+        title: "Divine Names & Planetary Hours",
+        subtitle: "Classical correspondences between Divine Names and celestial timing",
+        
+        // Divine Name meanings
+        names: {
+          alQawiyy: { meaning: "The All-Strong" },
+          alQahhar: { meaning: "The Subduer" },
+          alWadud: { meaning: "The Most Loving" },
+          asSabur: { meaning: "The Patient" },
+          arRazzaq: { meaning: "The Provider" },
+          alHakim: { meaning: "The All-Wise" },
+          alAlim: { meaning: "The All-Knowing" },
+          asSami: { meaning: "The All-Hearing" },
+          alHadi: { meaning: "The Guide" },
+          anNur: { meaning: "The Light" },
+          alLatif: { meaning: "The Subtle" },
+          alJamil: { meaning: "The Beautiful" },
+          alHafiz: { meaning: "The Preserver" },
+          alMuqaddim: { meaning: "The Expediter" },
+          arRahman: { meaning: "The Beneficent" },
+          arRahim: { meaning: "The Merciful" },
+          alMalik: { meaning: "The King" },
+          alMumin: { meaning: "The Granter of Security" },
+          alWahhab: { meaning: "The Bestower" },
+          alKabir: { meaning: "The Great" },
+          alMujib: { meaning: "The Responsive" },
+          alWajid: { meaning: "The Finder" },
+          alMughni: { meaning: "The Enricher" },
+          alMuakhkhir: { meaning: "The Delayer" },
+          alHalim: { meaning: "The Forbearing" },
+          alHaqq: { meaning: "The Truth" },
+          alHadi2: { meaning: "The Guide (variant)" },
+        },
+        
+        // Benefits (translation keys)
+        benefits: {
+          // Mars/Strength
+          overcomingObstacles: "Overcoming obstacles",
+          physicalStrength: "Physical and spiritual strength",
+          protectionFromWeakness: "Protection from weakness",
+          authorityInDealings: "Authority in dealings",
+          overcomingOppression: "Overcoming oppression",
+          breakingBadHabits: "Breaking bad habits",
+          dominanceOverNafs: "Dominance over lower self",
+          protectionFromEnemies: "Protection from enemies",
+          
+          // Venus/Love
+          increasingLove: "Increasing love between people",
+          marriageHarmony: "Marriage and relationship harmony",
+          softeningHearts: "Softening hearts",
+          acceptancePopularity: "Acceptance and popularity",
+          patience: "Cultivating patience",
+          endurance: "Building endurance",
+          emotionalStability: "Emotional stability",
+          peacefulResolution: "Peaceful resolution",
+          
+          // Jupiter/Expansion
+          provision: "Divine provision",
+          abundance: "Abundance and prosperity",
+          sustenance: "Sustenance in all forms",
+          blessingsInWealth: "Blessings in wealth",
+          wisdom: "Wisdom and discernment",
+          soundJudgment: "Sound judgment",
+          understanding: "Deep understanding",
+          guidedDecisions: "Divinely guided decisions",
+          
+          // Mercury/Knowledge
+          knowledge: "Knowledge and learning",
+          learning: "Enhanced learning ability",
+          memory: "Improved memory",
+          answeredPrayers: "Answered prayers",
+          beingHeard: "Being heard and understood",
+          communication: "Clear communication",
+          receptivity: "Receptivity to guidance",
+          
+          // Sun/Guidance
+          guidance: "Divine guidance",
+          clarity: "Mental and spiritual clarity",
+          rightPath: "Walking the right path",
+          spiritualDirection: "Spiritual direction",
+          spiritualLight: "Spiritual light and illumination",
+          illumination: "Inner illumination",
+          insightClarity: "Insight and clarity",
+          removingDarkness: "Removing spiritual darkness",
+          
+          // Moon/Intuition
+          gentleness: "Gentleness in character",
+          subtlety: "Subtlety and refinement",
+          easeInDifficulty: "Ease in difficult situations",
+          refinedManners: "Refined manners",
+          beauty: "Beauty in all forms",
+          innerBeauty: "Inner beauty and grace",
+          beautifulCharacter: "Beautiful character",
+          aestheticSense: "Aesthetic sense",
+          
+          // Saturn/Protection
+          protection: "Divine protection",
+          preservation: "Preservation from harm",
+          safetyGuarding: "Safety and guarding",
+          shieldingFromHarm: "Shielding from harm",
+          advancement: "Advancement in rank",
+          priority: "Priority in matters",
+          precedence: "Precedence over others",
+          timingAlignment: "Perfect timing alignment",
+          
+          // Additional benefits
+          mercy: "Divine mercy",
+          compassion: "Compassion for all creation",
+          divineGrace: "Divine grace",
+          universalBeneficence: "Universal beneficence",
+          specificMercy: "Specific divine mercy",
+          forgiveness: "Forgiveness of sins",
+          lovingKindness: "Loving-kindness",
+          compassionateHeart: "Compassionate heart",
+          sovereignty: "Sovereignty over affairs",
+          kingship: "Spiritual kingship",
+          authority: "Righteous authority",
+          leadership: "Leadership through service",
+          faith: "Strengthening faith",
+          security: "Inner security",
+          trust: "Trust in the Divine",
+          innerPeace: "Inner peace and tranquility",
+          generosity: "Generosity of spirit",
+          gifts: "Divine gifts",
+          blessings: "Abundant blessings",
+          abundantGiving: "Abundant giving",
+          greatness: "Spiritual greatness",
+          magnitude: "Magnitude of vision",
+          majesty: "Divine majesty",
+          awe: "Spiritual awe",
+          responsiveness: "Divine responsiveness",
+          openDoors: "Opening of doors",
+          acceptance: "Acceptance of prayers",
+          finding: "Finding what is lost",
+          discovery: "Discovery of truth",
+          attainment: "Attainment of goals",
+          fulfillment: "Spiritual fulfillment",
+          enrichment: "Spiritual enrichment",
+          sufficiency: "Self-sufficiency",
+          independence: "Independence from creation",
+          contentment: "Contentment with provision",
+          delay: "Beneficial delay",
+          postponement: "Wise postponement",
+          timingControl: "Control of timing",
+          forbearance: "Forbearance with others",
+          clemency: "Clemency and mercy",
+          truth: "Manifestation of truth",
+          reality: "Understanding reality",
+          justice: "Divine justice",
+          authenticity: "Authenticity of being",
+          direction: "Clear direction",
+          spiritualGuidance: "Comprehensive spiritual guidance",
+        },
+      },
+      
+      // Prayer Adhkar Database
+      prayerAdhkar: {
+        title: "Prayer Adhkar",
+        subtitle: "Authentic remembrances after the five daily prayers",
+        
+        // Prayer names
+        prayers: {
+          Fajr: "Fajr",
+          Dhuhr: "Dhuhr",
+          Asr: "Asr",
+          Maghrib: "Maghrib",
+          Isha: "Isha",
+        },
+        
+        // Tradition names
+        traditions: {
+          Shadhili: "Shadhili Tradition",
+          Tijani: "Tijani Tradition",
+          Qadiri: "Qadiri Tradition",
+          Naqshbandi: "Naqshbandi Tradition",
+          WestAfricanScholarly: "West African Scholarly Tradition",
+        },
+        
+        // Benefits of Sunnah adhkar and classical practices
+        benefits: {
+          glorificationPurification: "Glorification and purification of the heart",
+          gratitudeContentment: "Gratitude and contentment in all circumstances",
+          magnificationReverence: "Magnification and reverence of the Divine Majesty",
+          protectionUntilNext: "Protection until next prayer; guard from evil",
+          tawhidAffirmationMorning: "Tawhid affirmation; protection from morning until evening",
+          protectionEvilEye: "Protection from evil eye, magic, and envy",
+          protectionWhispersShaytan: "Protection from whispers of shaytan and evil thoughts",
+          morningProtection: "Morning protection and acknowledgment of Divine sovereignty",
+          paradiseGuarantee: "Guarantee of Paradise if recited sincerely in morning",
+          spiritualIllumination: "Spiritual illumination at dawn; clarity of heart and mind",
+          trustProvision: "Trust in Divine provision for the day ahead",
+          strengtheningTrials: "Strengthening against trials; treasure from Paradise",
+          tawhidEquivalent: "Tawhid affirmation; equivalent to one-third of Quran",
+          protectionEvil: "Protection from evil and harm",
+          protectionWhispers: "Protection from whispers and evil thoughts",
+          forgivenessSeaFoam: "Forgiveness of sins even if numerous as sea foam",
+          vitalityMidday: "Vitality and sustenance during midday; spiritual renewal",
+          openingProvision: "Opening of provision and sustenance",
+          forgivenessEvenFled: "Forgiveness of sins even if one fled from battle",
+          gentlenessDifficulties: "Gentleness in difficulties; resolution of complex matters",
+          strengthCompleteDay: "Strength to complete the day; overcoming obstacles",
+          tawhidAffirmationEvening: "Tawhid affirmation; protection from evening until morning",
+          eveningProtection: "Evening protection and acknowledgment of Divine sovereignty",
+          beautificationCharacter: "Beautification of character; spiritual radiance at sunset",
+          concealmentFaults: "Concealment of faults; Divine protection from exposure",
+          increasingLoveHearts: "Increasing love in hearts; harmony in relationships",
+          remembranceSleep: "Remembrance before sleep; submission to Divine will",
+          comprehensiveProtection: "Comprehensive protection from worldly and spiritual ailments",
+          protectionNight: "Protection throughout the night; guardianship while asleep",
+          peacefulSleep: "Peaceful sleep; tranquility of heart and mind",
+          securityFear: "Security from fear; protection from nighttime anxieties",
+          tawhidAffirmation: "Tawhid affirmation",
+        },
+        
+        // Planetary connection descriptions
+        planetaryConnections: {
+          sunFajr: "Sun - Fajr hours ruled by celestial light",
+          mercuryProvision: "Mercury - Planet of provision and sustenance",
+          sunPeak: "Sun - Peak solar energy at Dhuhr",
+          jupiterAbundance: "Jupiter - Planet of expansion and abundance",
+          venusGentleness: "Venus - Planet of gentleness and harmony",
+          venusBeauty: "Venus - Planet of beauty and harmony",
+          moonConcealment: "Moon - Planet of concealment and protection",
+          saturnProtection: "Saturn - Planet of protection and preservation",
+          moonNight: "Moon - Planet of night and peaceful rest",
+          saturnSecurity: "Saturn - Planet of security and boundaries",
+        },
+        
+        // UI labels
+        labels: {
+          sunnahAdhkar: "Sunnah Adhkar",
+          classicalPractices: "Classical Practices",
+          count: "Count",
+          times: "{count}x",
+          benefit: "Benefit",
+          source: "Source",
+          tradition: "Tradition",
+          planetaryConnection: "Planetary Connection",
+          arabic: "Arabic",
+          transliteration: "Transliteration",
+          translation: "Translation",
+          afterPrayer: "After {prayer} Prayer",
+          completed: "Completed",
+          remaining: "{count} remaining",
+        },
       },
       
       // Daily Guidance Details Screen
@@ -6959,6 +7502,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       next: "SUIVANT",
       inTime: "dans {{time}}",
       noPrayer: "Pas de prière",
+      getGuidance: "Obtenir des conseils de prière",
       calculationMethod: "Méthode de calcul",
       method: {
         mwl: "Ligue musulmane mondiale",
@@ -7352,6 +7896,543 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         },
         disclaimer: "Pour réflexion seulement • Pas un avis religieux",
         back: "Retour",
+      },
+      
+      // Guidance de Prière - Pratiques Planétaires Classiques
+      prayerGuidance: {
+        title: "Guidance de Prière",
+        subtitle: "Pratiques classiques des heures planétaires issues de sources traditionnelles",
+
+        // Libellés UI utilisés par les écrans/cartes de Guidance de Prière
+        ui: {
+          headerSubtitle: "Guidance spirituelle personnalisée basée sur les sciences islamiques classiques",
+          currentHour: "Heure actuelle : {planet} {arabicName}",
+          currentHourLabel: "Heure actuelle",
+          hourOfTwelve: "Heure {number}/12",
+          day: "Jour",
+          night: "Nuit",
+          generating: "Génération de la guidance...",
+
+          profileHintTitle: "Complétez votre profil pour personnaliser la guidance",
+          profileHintBody: "Ajoutez votre nom arabe dans Profil afin de calculer votre signature Abjad et votre élément.",
+          goToProfile: "Aller au profil",
+          missingArabicName: "Manquant : nom arabe",
+
+          emptyTitle: "Choisir une prière",
+          emptyBody: "Choisissez une prière ci-dessus pour recevoir une guidance spirituelle adaptée à votre profil abjad et à l'heure planétaire actuelle.",
+
+          footerBasedOn: "✨ Guidance basée sur votre valeur abjad ({abjad}) et votre élément ({element})",
+          sources: "Sources : {source}",
+
+          // Libellés communs
+          spiritualContext: "Contexte spirituel",
+          yourElement: "Votre élément",
+          hourNumber: "Numéro de l'heure",
+          timeRemaining: "Temps restant",
+          dayRuler: "Régent du jour",
+          next: "Suivante",
+          current: "Actuelle",
+          selectPrayer: "Choisir une prière",
+
+          // Carte Nom divin
+          recommendedDivineName: "Nom divin recommandé",
+          reciteCount: "Réciter {count}×",
+          abjadValueLabel: "Valeur Abjad : {value}",
+          showReasoning: "▶ Voir le raisonnement",
+          hideReasoning: "▼ Masquer le raisonnement",
+          planetaryAlignment: "🪐 Alignement planétaire :",
+          elementalResonance: "💫 Résonance élémentaire :",
+          numerologicalSignificance: "🔢 Signification numérologique :",
+          classicalSource: "📚 Source classique :",
+          spiritualBenefits: "✨ Bienfaits spirituels :",
+
+          // Carte Sagesse classique
+          classicalWisdom: "Sagesse classique",
+          noClassicalGuidance: "Aucune guidance classique spécifique pour cette heure",
+
+          // Adhkar
+          sunnahAdhkar: "Adhkar de la Sunnah",
+          noAdhkarAvailable: "Aucun adhkar disponible",
+          showTranslation: "Afficher la traduction",
+          hideTranslation: "Masquer la traduction",
+          progressCompleted: "{completed} / {total} complétés",
+          resetAll: "Tout réinitialiser",
+
+          // Compteur
+          dhikrCounter: "Compteur de dhikr",
+          percentComplete: "{percent}% terminé",
+          completedAlhamdulillah: "✨ Terminé ! Alhamdulillah ✨",
+          complete: "✓ Terminé",
+          tapToCount: "Appuyez pour compter",
+          reset: "Réinitialiser",
+          dhikrHelper: "Appuyez sur le bouton à chaque récitation du Nom divin",
+        },
+        
+        // Jours de la semaine
+        days: {
+          Sunday: "Dimanche",
+          Monday: "Lundi",
+          Tuesday: "Mardi",
+          Wednesday: "Mercredi",
+          Thursday: "Jeudi",
+          Friday: "Vendredi",
+          Saturday: "Samedi",
+        },
+        
+        // Planètes
+        planets: {
+          Sun: "Soleil",
+          Moon: "Lune",
+          Mars: "Mars",
+          Mercury: "Mercure",
+          Jupiter: "Jupiter",
+          Venus: "Vénus",
+          Saturn: "Saturne",
+        },
+        
+        // Étiquettes des heures
+        hours: {
+          hour: "Heure",
+          hourNumber: "Heure {number}",
+          rulingPlanet: "Planète Gouvernante",
+          recommendedWorks: "Travaux Recommandés",
+          avoidWorks: "Travaux à Éviter",
+          classicalText: "Texte Classique",
+          source: "Source",
+          tradition: "Tradition",
+        },
+        
+        // Travaux/pratiques classiques
+        works: {
+          // Heure 1: Soleil - Talismans et travaux sacrés
+          talismansSeals: {
+            name: "Talismans et Sceaux Bénis",
+            description: "Talismans licites et sceaux bénis pour la protection et le bénéfice spirituel",
+          },
+          reversalWork: {
+            name: "Travail de Retournement (al-Radd)",
+            description: "Pratiques pour détourner le mal et les influences négatives",
+          },
+          alMaski: {
+            name: "Al-Maski",
+            description: "Pratique traditionnelle de liaison pour la protection spirituelle",
+          },
+          hinduBinding: {
+            name: "Liaison Hindoue (al-Qabd al-Hindi)",
+            description: "Méthode classique de liaison spirituelle des traditions orientales",
+          },
+          burntWoolInk: {
+            name: "Encre de Laine Brûlée (Midād al-Ṣūf al-Maḥrūq)",
+            description: "Préparation d'encre sacrée utilisée dans l'écriture spirituelle traditionnelle",
+          },
+          
+          // Heure 2: Vénus - Harmonie et faveur
+          correctnessSweetness: {
+            name: "Travaux de Justesse et de Douceur",
+            description: "Pratiques pour apporter harmonie, justesse et relations agréables",
+          },
+          dominanceRulers: {
+            name: "Domination sur les Dirigeants",
+            description: "Recherche de faveur et d'influence auprès des figures d'autorité",
+          },
+          worksJudges: {
+            name: "Travaux sur les Juges et Leaders",
+            description: "Pratiques liées à l'obtention de faveur dans les affaires juridiques ou de leadership",
+          },
+          
+          // Heure 3: Mercure - Apprentissage et communication
+          learningStudy: {
+            name: "Apprentissage et Étude",
+            description: "Poursuites éducatives, étude et acquisition de connaissances",
+          },
+          communication: {
+            name: "Communication",
+            description: "Écriture, parole et toutes formes de communication",
+          },
+          tradeCommerce: {
+            name: "Commerce et Négoce",
+            description: "Affaires commerciales, négoce et activités commerciales",
+          },
+          
+          // Heure 4: Lune - Voyages et travail émotionnel
+          journeysTravel: {
+            name: "Voyages et Déplacements",
+            description: "Voyages physiques et spirituels, préparatifs de voyage",
+          },
+          waterWorks: {
+            name: "Travaux d'Eau",
+            description: "Activités liées à l'eau, purification et nettoyage",
+          },
+          emotionalMatters: {
+            name: "Affaires Émotionnelles",
+            description: "Travail avec les émotions, sentiments et états intérieurs",
+          },
+          
+          // Heure 5: Saturne - Liaison et restriction
+          bindingRestriction: {
+            name: "Liaison et Restriction",
+            description: "Pratiques pour lier, restreindre ou contenir les influences négatives",
+          },
+          protectionWork: {
+            name: "Travail de Protection",
+            description: "Établissement de protection spirituelle et de frontières",
+          },
+          marriageMatters: {
+            name: "Affaires de Mariage",
+            description: "Activités liées au mariage et aux partenariats (à éviter pendant Saturne)",
+          },
+          joyfulWorks: {
+            name: "Travaux Joyeux",
+            description: "Célébrations et activités joyeuses (à éviter pendant Saturne)",
+          },
+          
+          // Heure 6: Jupiter - Expansion et bénédictions
+          seekingFavor: {
+            name: "Recherche de Faveur",
+            description: "Demande de bénédictions, faveurs et assistance divine",
+          },
+          wealthExpansion: {
+            name: "Richesse et Expansion",
+            description: "Pratiques pour l'abondance, la prospérité et la croissance",
+          },
+          religiousMatters: {
+            name: "Affaires Religieuses",
+            description: "Pratiques spirituelles, adoration et activités religieuses",
+          },
+          
+          // Heure 7: Mars - Courage et conflit
+          courageStrength: {
+            name: "Courage et Force",
+            description: "Construction de force intérieure, courage et détermination",
+          },
+          conflictResolution: {
+            name: "Résolution de Conflits",
+            description: "Gestion des conflits et confrontations",
+          },
+          peacefulNegotiations: {
+            name: "Négociations Pacifiques",
+            description: "Activités de pacification et diplomatiques (à éviter pendant Mars)",
+          },
+          
+          // Heure 8: Soleil (retour) - Autorité et leadership
+          authorityLeadership: {
+            name: "Autorité et Leadership",
+            description: "Questions d'autorité, de leadership et de gouvernance",
+          },
+          honorsRecognition: {
+            name: "Honneurs et Reconnaissance",
+            description: "Recherche de reconnaissance, d'honneurs et d'acknowledgment public",
+          },
+          
+          // Heure 9: Vénus (retour) - Amour et beauté
+          loveAttraction: {
+            name: "Amour et Attraction",
+            description: "Questions d'amour, d'affection et d'attraction",
+          },
+          beautyArts: {
+            name: "Beauté et Arts",
+            description: "Poursuites artistiques, beauté et questions esthétiques",
+          },
+          harmonyPeace: {
+            name: "Harmonie et Paix",
+            description: "Création d'harmonie, de paix et de conditions agréables",
+          },
+          
+          // Heure 10: Mercure (retour) - Écriture et contrats
+          writingDocumentation: {
+            name: "Écriture et Documentation",
+            description: "Activités d'écriture, d'enregistrement et de documentation",
+          },
+          contractsAgreements: {
+            name: "Contrats et Accords",
+            description: "Contrats légaux, accords et arrangements formels",
+          },
+          intellectualPursuits: {
+            name: "Poursuites Intellectuelles",
+            description: "Travail mental, recherche et activités intellectuelles",
+          },
+          
+          // Heure 11: Lune (retour) - Rêves et intuition
+          dreamsVisions: {
+            name: "Rêves et Visions",
+            description: "Travail avec les rêves, visions et insights spirituels",
+          },
+          intuitionWork: {
+            name: "Travail d'Intuition",
+            description: "Développement et suivi de l'intuition et de la guidance intérieure",
+          },
+          feminineMatters: {
+            name: "Affaires Féminines",
+            description: "Activités liées à l'énergie féminine et aux préoccupations des femmes",
+          },
+          
+          // Heure 12: Saturne (retour) - Fins et profondeur
+          endingsClosures: {
+            name: "Fins et Clôtures",
+            description: "Complétion de cycles, fins et apport de clôture",
+          },
+          deepMeditation: {
+            name: "Méditation Profonde",
+            description: "Méditation profonde, contemplation et travail intérieur",
+          },
+          ancestralWork: {
+            name: "Travail Ancestral",
+            description: "Connexion avec les ancêtres et la lignée",
+          },
+          newBeginnings: {
+            name: "Nouveaux Débuts",
+            description: "Démarrage de nouvelles entreprises (à éviter pendant la dernière heure de Saturne)",
+          },
+        },
+      },
+      
+      // Noms Divins et Correspondances Planétaires
+      divineNamesPlanetary: {
+        title: "Noms Divins & Heures Planétaires",
+        subtitle: "Correspondances classiques entre les Noms Divins et le timing céleste",
+        
+        // Significations des Noms Divins
+        names: {
+          alQawiyy: { meaning: "Le Très-Fort" },
+          alQahhar: { meaning: "Le Dominateur" },
+          alWadud: { meaning: "Le Très-Aimant" },
+          asSabur: { meaning: "Le Patient" },
+          arRazzaq: { meaning: "Le Pourvoyeur" },
+          alHakim: { meaning: "Le Très-Sage" },
+          alAlim: { meaning: "L'Omniscient" },
+          asSami: { meaning: "L'Audient" },
+          alHadi: { meaning: "Le Guide" },
+          anNur: { meaning: "La Lumière" },
+          alLatif: { meaning: "Le Subtil" },
+          alJamil: { meaning: "Le Beau" },
+          alHafiz: { meaning: "Le Préservateur" },
+          alMuqaddim: { meaning: "Celui qui Avance" },
+          arRahman: { meaning: "Le Tout-Miséricordieux" },
+          arRahim: { meaning: "Le Très-Miséricordieux" },
+          alMalik: { meaning: "Le Roi" },
+          alMumin: { meaning: "Le Garant de la Sécurité" },
+          alWahhab: { meaning: "Le Donateur" },
+          alKabir: { meaning: "Le Grand" },
+          alMujib: { meaning: "Celui qui Répond" },
+          alWajid: { meaning: "Celui qui Trouve" },
+          alMughni: { meaning: "L'Enrichisseur" },
+          alMuakhkhir: { meaning: "Celui qui Retarde" },
+          alHalim: { meaning: "Le Clément" },
+          alHaqq: { meaning: "La Vérité" },
+          alHadi2: { meaning: "Le Guide (variante)" },
+        },
+        
+        // Bienfaits (clés de traduction)
+        benefits: {
+          // Mars/Force
+          overcomingObstacles: "Surmonter les obstacles",
+          physicalStrength: "Force physique et spirituelle",
+          protectionFromWeakness: "Protection contre la faiblesse",
+          authorityInDealings: "Autorité dans les affaires",
+          overcomingOppression: "Surmonter l'oppression",
+          breakingBadHabits: "Briser les mauvaises habitudes",
+          dominanceOverNafs: "Domination du nafs inférieur",
+          protectionFromEnemies: "Protection contre les ennemis",
+          
+          // Vénus/Amour
+          increasingLove: "Augmenter l'amour entre les gens",
+          marriageHarmony: "Harmonie conjugale et relationnelle",
+          softeningHearts: "Adoucir les cœurs",
+          acceptancePopularity: "Acceptation et popularité",
+          patience: "Cultiver la patience",
+          endurance: "Développer l'endurance",
+          emotionalStability: "Stabilité émotionnelle",
+          peacefulResolution: "Résolution pacifique",
+          
+          // Jupiter/Expansion
+          provision: "Provision divine",
+          abundance: "Abondance et prospérité",
+          sustenance: "Subsistance sous toutes formes",
+          blessingsInWealth: "Bénédictions dans la richesse",
+          wisdom: "Sagesse et discernement",
+          soundJudgment: "Jugement sain",
+          understanding: "Compréhension profonde",
+          guidedDecisions: "Décisions guidées divinement",
+          
+          // Mercure/Connaissance
+          knowledge: "Connaissance et apprentissage",
+          learning: "Capacité d'apprentissage accrue",
+          memory: "Mémoire améliorée",
+          answeredPrayers: "Prières exaucées",
+          beingHeard: "Être entendu et compris",
+          communication: "Communication claire",
+          receptivity: "Réceptivité à la guidance",
+          
+          // Soleil/Guidance
+          guidance: "Guidance divine",
+          clarity: "Clarté mentale et spirituelle",
+          rightPath: "Marcher sur le droit chemin",
+          spiritualDirection: "Direction spirituelle",
+          spiritualLight: "Lumière spirituelle et illumination",
+          illumination: "Illumination intérieure",
+          insightClarity: "Insight et clarté",
+          removingDarkness: "Élimination des ténèbres spirituelles",
+          
+          // Lune/Intuition
+          gentleness: "Douceur de caractère",
+          subtlety: "Subtilité et raffinement",
+          easeInDifficulty: "Facilité dans les situations difficiles",
+          refinedManners: "Manières raffinées",
+          beauty: "Beauté sous toutes ses formes",
+          innerBeauty: "Beauté intérieure et grâce",
+          beautifulCharacter: "Beau caractère",
+          aestheticSense: "Sens esthétique",
+          
+          // Saturne/Protection
+          protection: "Protection divine",
+          preservation: "Préservation du mal",
+          safetyGuarding: "Sécurité et garde",
+          shieldingFromHarm: "Protection contre le mal",
+          advancement: "Avancement en rang",
+          priority: "Priorité dans les affaires",
+          precedence: "Préséance sur les autres",
+          timingAlignment: "Alignement parfait du timing",
+          
+          // Bienfaits additionnels
+          mercy: "Miséricorde divine",
+          compassion: "Compassion pour toute la création",
+          divineGrace: "Grâce divine",
+          universalBeneficence: "Bienfaisance universelle",
+          specificMercy: "Miséricorde divine spécifique",
+          forgiveness: "Pardon des péchés",
+          lovingKindness: "Bienveillance aimante",
+          compassionateHeart: "Cœur compatissant",
+          sovereignty: "Souveraineté sur les affaires",
+          kingship: "Royauté spirituelle",
+          authority: "Autorité juste",
+          leadership: "Leadership par le service",
+          faith: "Renforcement de la foi",
+          security: "Sécurité intérieure",
+          trust: "Confiance en le Divin",
+          innerPeace: "Paix intérieure et tranquillité",
+          generosity: "Générosité d'esprit",
+          gifts: "Dons divins",
+          blessings: "Bénédictions abondantes",
+          abundantGiving: "Don abondant",
+          greatness: "Grandeur spirituelle",
+          magnitude: "Magnitude de vision",
+          majesty: "Majesté divine",
+          awe: "Crainte spirituelle",
+          responsiveness: "Réactivité divine",
+          openDoors: "Ouverture de portes",
+          acceptance: "Acceptation des prières",
+          finding: "Trouver ce qui est perdu",
+          discovery: "Découverte de la vérité",
+          attainment: "Atteinte des objectifs",
+          fulfillment: "Accomplissement spirituel",
+          enrichment: "Enrichissement spirituel",
+          sufficiency: "Autosuffisance",
+          independence: "Indépendance de la création",
+          contentment: "Contentement avec la provision",
+          delay: "Retard bénéfique",
+          postponement: "Report sage",
+          timingControl: "Contrôle du timing",
+          forbearance: "Indulgence envers les autres",
+          clemency: "Clémence et miséricorde",
+          truth: "Manifestation de la vérité",
+          reality: "Compréhension de la réalité",
+          justice: "Justice divine",
+          authenticity: "Authenticité de l'être",
+          direction: "Direction claire",
+          spiritualGuidance: "Guidance spirituelle complète",
+        },
+      },
+      
+      // Prayer Adhkar Database
+      prayerAdhkar: {
+        title: "Adhkar de prière",
+        subtitle: "Invocations authentiques après les cinq prières quotidiennes",
+        
+        // Prayer names
+        prayers: {
+          Fajr: "Fajr",
+          Dhuhr: "Dhuhr",
+          Asr: "Asr",
+          Maghrib: "Maghrib",
+          Isha: "Isha",
+        },
+        
+        // Tradition names
+        traditions: {
+          Shadhili: "Tradition Shadhili",
+          Tijani: "Tradition Tijani",
+          Qadiri: "Tradition Qadiri",
+          Naqshbandi: "Tradition Naqshbandi",
+          WestAfricanScholarly: "Tradition savante ouest-africaine",
+        },
+        
+        // Benefits of Sunnah adhkar and classical practices
+        benefits: {
+          glorificationPurification: "Glorification et purification du cœur",
+          gratitudeContentment: "Gratitude et contentement en toutes circonstances",
+          magnificationReverence: "Magnification et révérence de la Majesté Divine",
+          protectionUntilNext: "Protection jusqu'à la prochaine prière ; garde contre le mal",
+          tawhidAffirmationMorning: "Affirmation du tawhid ; protection du matin au soir",
+          protectionEvilEye: "Protection contre le mauvais œil, la magie et l'envie",
+          protectionWhispersShaytan: "Protection contre les murmures de shaytan et les mauvaises pensées",
+          morningProtection: "Protection matinale et reconnaissance de la souveraineté divine",
+          paradiseGuarantee: "Garantie du Paradis si récité sincèrement le matin",
+          spiritualIllumination: "Illumination spirituelle à l'aube ; clarté du cœur et de l'esprit",
+          trustProvision: "Confiance en la providence divine pour la journée",
+          strengtheningTrials: "Renforcement contre les épreuves ; trésor du Paradis",
+          tawhidEquivalent: "Affirmation du tawhid ; équivalent à un tiers du Coran",
+          protectionEvil: "Protection contre le mal et les préjudices",
+          protectionWhispers: "Protection contre les murmures et les mauvaises pensées",
+          forgivenessSeaFoam: "Pardon des péchés même s'ils sont nombreux comme l'écume de la mer",
+          vitalityMidday: "Vitalité et subsistance à midi ; renouveau spirituel",
+          openingProvision: "Ouverture de la provision et de la subsistance",
+          forgivenessEvenFled: "Pardon des péchés même si on a fui le combat",
+          gentlenessDifficulties: "Douceur dans les difficultés ; résolution de problèmes complexes",
+          strengthCompleteDay: "Force pour terminer la journée ; surmonter les obstacles",
+          tawhidAffirmationEvening: "Affirmation du tawhid ; protection du soir au matin",
+          eveningProtection: "Protection du soir et reconnaissance de la souveraineté divine",
+          beautificationCharacter: "Embellissement du caractère ; rayonnement spirituel au coucher du soleil",
+          concealmentFaults: "Dissimulation des fautes ; protection divine contre l'exposition",
+          increasingLoveHearts: "Augmentation de l'amour dans les cœurs ; harmonie dans les relations",
+          remembranceSleep: "Rappel avant le sommeil ; soumission à la volonté divine",
+          comprehensiveProtection: "Protection complète contre les maux mondains et spirituels",
+          protectionNight: "Protection toute la nuit ; gardiennage pendant le sommeil",
+          peacefulSleep: "Sommeil paisible ; tranquillité du cœur et de l'esprit",
+          securityFear: "Sécurité contre la peur ; protection contre les angoisses nocturnes",
+          tawhidAffirmation: "Affirmation du tawhid",
+        },
+        
+        // Planetary connection descriptions
+        planetaryConnections: {
+          sunFajr: "Soleil - Les heures de Fajr gouvernées par la lumière céleste",
+          mercuryProvision: "Mercure - Planète de la provision et de la subsistance",
+          sunPeak: "Soleil - Pic d'énergie solaire à Dhuhr",
+          jupiterAbundance: "Jupiter - Planète d'expansion et d'abondance",
+          venusGentleness: "Vénus - Planète de douceur et d'harmonie",
+          venusBeauty: "Vénus - Planète de beauté et d'harmonie",
+          moonConcealment: "Lune - Planète de dissimulation et de protection",
+          saturnProtection: "Saturne - Planète de protection et de préservation",
+          moonNight: "Lune - Planète de la nuit et du repos paisible",
+          saturnSecurity: "Saturne - Planète de sécurité et de limites",
+        },
+        
+        // UI labels
+        labels: {
+          sunnahAdhkar: "Adhkar Sunnah",
+          classicalPractices: "Pratiques classiques",
+          count: "Nombre",
+          times: "{count} fois",
+          benefit: "Bienfait",
+          source: "Source",
+          tradition: "Tradition",
+          planetaryConnection: "Connexion planétaire",
+          arabic: "Arabe",
+          transliteration: "Translittération",
+          translation: "Traduction",
+          afterPrayer: "Après la prière de {prayer}",
+          completed: "Terminé",
+          remaining: "{count} restant",
+        },
       },
       
       // Daily Guidance Details Screen  
@@ -13270,6 +14351,75 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           disclaimer: "Cette application soutient la réflexion et la conscience spirituelle. Elle ne remplace pas les conseils religieux ou professionnels.",
           or: "ou",
         },
+      },
+    },
+  },
+  ar: {
+    // Minimal Arabic translations. Any missing keys fall back to EN automatically.
+    prayerGuidance: {
+      title: "إرشاد الصلاة",
+      subtitle: "ممارسات الساعات الكوكبية الكلاسيكية من مصادر تقليدية",
+      hours: {
+        recommendedWorks: "الأعمال الموصى بها",
+        avoidWorks: "أعمال يُتجنّب فعلها",
+      },
+      ui: {
+        headerSubtitle: "إرشاد روحي مُخصّص مبني على العلوم الإسلامية الكلاسيكية",
+        currentHour: "الساعة الحالية: {planet} {arabicName}",
+        currentHourLabel: "الساعة الحالية",
+        hourOfTwelve: "الساعة {number}/12",
+        day: "نهار",
+        night: "ليل",
+        generating: "جارٍ توليد الإرشاد...",
+
+        profileHintTitle: "أكمل ملفك الشخصي لتخصيص الإرشاد",
+        profileHintBody: "أضف اسمك العربي في الملف الشخصي حتى نتمكن من حساب بصمتك الأبجدية وعنصرك.",
+        goToProfile: "اذهب إلى الملف الشخصي",
+        missingArabicName: "مفقود: الاسم العربي",
+
+        emptyTitle: "اختر صلاة",
+        emptyBody: "اختر صلاة أعلاه للحصول على إرشاد روحي مُناسب لملفك الأبجدي والساعة الكوكبية الحالية.",
+
+        footerBasedOn: "✨ إرشاد مبني على قيمة الأبجد ({abjad}) والعنصر ({element})",
+        sources: "المصادر: {source}",
+
+        spiritualContext: "السياق الروحي",
+        yourElement: "عنصرك",
+        hourNumber: "رقم الساعة",
+        timeRemaining: "الوقت المتبقي",
+        dayRuler: "حاكم اليوم",
+        next: "التالي",
+        current: "الحالي",
+        selectPrayer: "اختر صلاة",
+
+        recommendedDivineName: "الاسم الإلهي الموصى به",
+        reciteCount: "ردّد {count}×",
+        abjadValueLabel: "قيمة الأبجد: {value}",
+        showReasoning: "▶ عرض السبب",
+        hideReasoning: "▼ إخفاء السبب",
+        planetaryAlignment: "🪐 توافق كوكبي:",
+        elementalResonance: "💫 رنين عنصري:",
+        numerologicalSignificance: "🔢 دلالة عددية:",
+        classicalSource: "📚 مصدر كلاسيكي:",
+        spiritualBenefits: "✨ فوائد روحية:",
+
+        classicalWisdom: "حكمة كلاسيكية",
+        noClassicalGuidance: "لا توجد إرشادات كلاسيكية محددة لهذه الساعة",
+
+        sunnahAdhkar: "أذكار السنة",
+        noAdhkarAvailable: "لا توجد أذكار متاحة",
+        showTranslation: "إظهار الترجمة",
+        hideTranslation: "إخفاء الترجمة",
+        progressCompleted: "{completed} / {total} مكتمل",
+        resetAll: "إعادة تعيين الكل",
+
+        dhikrCounter: "عداد الذكر",
+        percentComplete: "{percent}% مكتمل",
+        completedAlhamdulillah: "✨ اكتمل! الحمد لله ✨",
+        complete: "✓ اكتمل",
+        tapToCount: "اضغط للعد",
+        reset: "إعادة تعيين",
+        dhikrHelper: "اضغط على الزر في كل مرة تذكر فيها الاسم الإلهي",
       },
     },
   },

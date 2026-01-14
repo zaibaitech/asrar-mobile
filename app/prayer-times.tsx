@@ -47,6 +47,12 @@ interface PrayerInfo {
   isNext: boolean;
 }
 
+type ObligatoryPrayerName = 'Fajr' | 'Dhuhr' | 'Asr' | 'Maghrib' | 'Isha';
+
+function isObligatoryPrayerName(name: string): name is ObligatoryPrayerName {
+  return name === 'Fajr' || name === 'Dhuhr' || name === 'Asr' || name === 'Maghrib' || name === 'Isha';
+}
+
 export default function PrayerTimesScreen() {
   const router = useRouter();
   const { t } = useLanguage();
@@ -278,6 +284,7 @@ export default function PrayerTimesScreen() {
   }
 
   const prayers = getPrayersList();
+  const nextObligatoryPrayer = prayers.find((p) => p.isNext && isObligatoryPrayerName(p.name));
 
   return (
     <>
@@ -323,20 +330,53 @@ export default function PrayerTimesScreen() {
           )}
         </View>
 
+        {/* Prayer Guidance Link */}
+        <TouchableOpacity
+          style={styles.guidanceCard}
+          onPress={() =>
+            router.push({
+              pathname: '/prayer-guidance',
+              params: nextObligatoryPrayer ? { prayer: nextObligatoryPrayer.name } : undefined,
+            })
+          }
+        >
+          <View style={styles.guidanceLeft}
+          >
+            <Ionicons name="sparkles-outline" size={22} color="#64B5F6" />
+            <View style={styles.guidanceTextBlock}>
+              <Text style={styles.guidanceTitle}>{t('prayerTimes.getGuidance')}</Text>
+              <Text style={styles.guidanceSubtitle}>
+                {nextObligatoryPrayer ? `${nextObligatoryPrayer.name} • ${nextObligatoryPrayer.time}` : t('prayerTimes.title')}
+              </Text>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
+        </TouchableOpacity>
+
         {/* Prayer Times List */}
         <View style={styles.prayersList}>
           {prayers.map((prayer, index) => {
             const timeUntil = prayer.isNext ? getTimeUntilPrayer(prayer.time) : null;
             const isSunrise = prayer.name === 'Sunrise';
+            const isGuidanceSupported = isObligatoryPrayerName(prayer.name);
 
             return (
-              <View
+              <TouchableOpacity
                 key={prayer.name}
                 style={[
                   styles.prayerCard,
                   prayer.isNext && styles.prayerCardNext,
                   isSunrise && styles.prayerCardDisabled,
                 ]}
+                activeOpacity={0.85}
+                disabled={!isGuidanceSupported}
+                onPress={() => {
+                  if (!isGuidanceSupported) return;
+                  router.push({
+                    pathname: '/prayer-guidance',
+                    params: { prayer: prayer.name },
+                  });
+                }}
               >
                 <View style={styles.prayerLeft}>
                   <Text style={styles.prayerIcon}>{prayer.icon}</Text>
@@ -368,7 +408,7 @@ export default function PrayerTimesScreen() {
                     <Text style={styles.sunriseNote}>{t('prayerTimes.noPrayer')}</Text>
                   )}
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           })}
         </View>
@@ -468,6 +508,42 @@ const styles = StyleSheet.create({
     margin: 16,
     borderWidth: 1,
     borderColor: '#334155',
+  },
+
+  guidanceCard: {
+    backgroundColor: '#1e293b',
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#334155',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  guidanceLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+  },
+
+  guidanceTextBlock: {
+    flex: 1,
+  },
+
+  guidanceTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+
+  guidanceSubtitle: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginTop: 2,
   },
 
   dateRow: {

@@ -187,6 +187,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="prayer-guidance"
+        options={{
+          href: null, // Hide from tab bar - accessed via Home widget
+          title: 'Prayer Guidance',
+        }}
+      />
+      <Tabs.Screen
         name="quran/[surahNumber]"
         options={{
           href: null, // Hide individual surah route from bottom tabs

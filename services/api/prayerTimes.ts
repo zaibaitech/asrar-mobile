@@ -87,8 +87,13 @@ export async function fetchPrayerTimes(
   method: CalculationMethod = 3 // Default: Muslim World League
 ): Promise<PrayerTimeResponse> {
   try {
+    // If we're offline, prefer cache (even if stale) over hard failure.
+    const netInfo = await NetInfo.fetch();
+
     // Check cache first
-    const cached = await getCachedPrayerTimes(latitude, longitude);
+    const cached = await getCachedPrayerTimes(latitude, longitude, {
+      allowExpired: !netInfo.isConnected,
+    });
     if (cached) {
       return cached.data;
     }
@@ -99,7 +104,7 @@ export async function fetchPrayerTimes(
 
     console.log('Fetching prayer times from Aladhan API:', url);
 
-    const response = await fetch(url);
+    const response = await fetchWithTimeout(url, 12000);
     
     if (!response.ok) {
       throw new Error(`API request failed: ${response.status} ${response.statusText}`);
@@ -116,10 +121,38 @@ export async function fetchPrayerTimes(
     // Cache the results
     await cachePrayerTimes(prayerData, latitude, longitude);
 
+    // Warm daily caches opportunistically (WiFi only) for better offline support.
+    // Fire-and-forget: any errors are logged inside prefetchPrayerTimes.
+    void prefetchPrayerTimes(latitude, longitude, method);
+
     return prayerData;
   } catch (error) {
-    console.error('Failed to fetch prayer times:', error);
-    throw error;
+    // Retry once on transient network failure, then fall back to stale cache if available.
+    try {
+      const timestamp = Math.floor(Date.now() / 1000);
+      const url = `${ALADHAN_API_BASE}/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
+      const response = await fetchWithTimeout(url, 12000);
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      }
+      const json = await response.json();
+      if (json.code !== 200 || !json.data) {
+        throw new Error('Invalid API response');
+      }
+      const prayerData: PrayerTimeResponse = json.data;
+      await cachePrayerTimes(prayerData, latitude, longitude);
+      void prefetchPrayerTimes(latitude, longitude, method);
+      return prayerData;
+    } catch (retryError) {
+      const fallback = await getCachedPrayerTimes(latitude, longitude, { allowExpired: true });
+      if (fallback) {
+        console.warn('Using stale cached prayer times due to network failure:', retryError);
+        return fallback.data;
+      }
+
+      console.error('Failed to fetch prayer times:', retryError);
+      throw retryError;
+    }
   }
 }
 
@@ -129,6 +162,10 @@ export async function fetchPrayerTimes(
 async function getCachedPrayerTimes(
   latitude: number,
   longitude: number
+  ,
+  options?: {
+    allowExpired?: boolean;
+  }
 ): Promise<CachedPrayerData | null> {
   try {
     const cached = await AsyncStorage.getItem(CACHE_KEY);
@@ -145,16 +182,31 @@ async function getCachedPrayerTimes(
     const lonDiff = Math.abs(data.longitude - longitude);
     const locationChanged = latDiff > 0.01 || lonDiff > 0.01;
 
-    if (isExpired || locationChanged) {
+    if (locationChanged) {
+      console.log('Cache location changed, will fetch fresh data');
+      return null;
+    }
+
+    if (isExpired && !options?.allowExpired) {
       console.log('Cache expired or location changed, will fetch fresh data');
       return null;
     }
 
-    console.log('Using cached prayer times');
+    console.log(options?.allowExpired && isExpired ? 'Using stale cached prayer times' : 'Using cached prayer times');
     return data;
   } catch (error) {
     console.error('Failed to read prayer times cache:', error);
     return null;
+  }
+}
+
+async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
