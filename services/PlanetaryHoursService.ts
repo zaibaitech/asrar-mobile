@@ -15,14 +15,17 @@
  * Enhanced: Pre-calculation and caching for improved performance
  */
 
+import type { ElementType } from '@/contexts/ThemeContext';
+import { getPrayerTimesForDate, type CalculationMethod, type PrayerTimings } from '@/services/api/prayerTimes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Element } from './MomentAlignmentService';
 
 // Cache configuration
 const CACHE_KEY_PREFIX = '@asrar_planetary_hours_';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 export type Planet = 'Sun' | 'Moon' | 'Mars' | 'Mercury' | 'Jupiter' | 'Venus' | 'Saturn';
+
+export type Element = ElementType;
 
 export interface PlanetInfo {
   planet: Planet;
@@ -139,6 +142,105 @@ const PLANET_INFO: Record<Planet, PlanetInfo> = {
   },
 };
 
+function startOfLocalDay(date: Date): Date {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function addDays(date: Date, days: number): Date {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+function validateContiguousHours(hours: PlanetaryHour[], label: string): void {
+  if (!__DEV__) return;
+  for (let i = 0; i < hours.length - 1; i++) {
+    const a = hours[i];
+    const b = hours[i + 1];
+    const gapMs = new Date(b.startTime).getTime() - new Date(a.endTime).getTime();
+    if (gapMs !== 0) {
+      console.warn(
+        `[PlanetaryHoursService] Non-contiguous hours (${label}) at index ${i}: gapMs=${gapMs}`,
+        { a, b }
+      );
+      return;
+    }
+  }
+}
+
+function parseTimingToDate(timings: PrayerTimings, key: keyof PrayerTimings, day: Date): Date {
+  const raw = timings[key];
+  const match = String(raw).match(/(\d{1,2}):(\d{2})/);
+  const result = new Date(day);
+  if (!match) {
+    result.setHours(0, 0, 0, 0);
+    return result;
+  }
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  result.setHours(hours, minutes, 0, 0);
+  return result;
+}
+
+export interface PlanetaryDayBoundaries {
+  sunrise: Date;
+  sunset: Date;
+  nextSunrise: Date;
+}
+
+/**
+ * Resolve the correct sunrise/sunset/nextSunrise boundaries for planetary hours at `now`.
+ * Handles the pre-sunrise window by using yesterday's sunset and sunrise.
+ */
+export async function getPlanetaryDayBoundariesForNow(
+  location: { latitude: number; longitude: number },
+  options?: { now?: Date; method?: CalculationMethod }
+): Promise<PlanetaryDayBoundaries | null> {
+  const now = options?.now ?? new Date();
+  const method = options?.method ?? 3;
+
+  const today = startOfLocalDay(now);
+  const todayData = await getPrayerTimesForDate(today, location.latitude, location.longitude, method);
+  if (!todayData) return null;
+
+  const todaySunrise = parseTimingToDate(todayData.timings, 'Sunrise', today);
+  const todaySunset = parseTimingToDate(todayData.timings, 'Maghrib', today);
+
+  // Before today's sunrise: we are still in the previous planetary day's night.
+  if (now < todaySunrise) {
+    const yesterday = addDays(today, -1);
+    const yesterdayData = await getPrayerTimesForDate(yesterday, location.latitude, location.longitude, method);
+    if (!yesterdayData) return null;
+    const yesterdaySunrise = parseTimingToDate(yesterdayData.timings, 'Sunrise', yesterday);
+    const yesterdaySunset = parseTimingToDate(yesterdayData.timings, 'Maghrib', yesterday);
+    return { sunrise: yesterdaySunrise, sunset: yesterdaySunset, nextSunrise: todaySunrise };
+  }
+
+  // Otherwise: use today's sunrise/sunset, and tomorrow's sunrise.
+  const tomorrow = addDays(today, 1);
+  const tomorrowData = await getPrayerTimesForDate(tomorrow, location.latitude, location.longitude, method);
+  const tomorrowSunrise = tomorrowData
+    ? parseTimingToDate(tomorrowData.timings, 'Sunrise', tomorrow)
+    : addDays(todaySunrise, 1);
+
+  return { sunrise: todaySunrise, sunset: todaySunset, nextSunrise: tomorrowSunrise };
+}
+
+/**
+ * Convenience: compute PlanetaryHourData for `now` using location-based prayer times.
+ */
+export async function getPlanetaryHourDataForNow(
+  location: { latitude: number; longitude: number },
+  options?: { now?: Date; method?: CalculationMethod }
+): Promise<PlanetaryHourData | null> {
+  const now = options?.now ?? new Date();
+  const boundaries = await getPlanetaryDayBoundariesForNow(location, { now, method: options?.method });
+  if (!boundaries) return null;
+  return getPlanetaryHoursFromCache(now, boundaries.sunrise, boundaries.sunset, boundaries.nextSunrise);
+}
+
 /**
  * Get planet info by planet name
  */
@@ -188,6 +290,19 @@ export function calculatePlanetaryHours(
   nextSunrise: Date,
   now: Date = new Date()
 ): PlanetaryHourData {
+  // Guardrail: if called with "today" sunrise/sunset but `now` is before sunrise,
+  // shift the whole frame back one day. This avoids negative durations and large jumps.
+  if (now < sunrise && sunset > sunrise) {
+    sunrise = addDays(sunrise, -1);
+    sunset = addDays(sunset, -1);
+    nextSunrise = new Date(sunrise.getTime() + 24 * 60 * 60 * 1000);
+  }
+
+  // Guardrail: ensure nextSunrise is after sunset.
+  if (nextSunrise.getTime() <= sunset.getTime()) {
+    nextSunrise = addDays(nextSunrise, 1);
+  }
+
   const dayRuler = getDayRuler(sunrise);
   
   // Calculate hour durations
@@ -404,6 +519,8 @@ export async function preCalculateDailyPlanetaryHours(
         isDaytime: false,
       });
     }
+
+    validateContiguousHours(allHours, `precalc:${dateKey}`);
     
     // Create cache structure
     const cacheData: DailyPlanetaryHoursCache = {

@@ -46,7 +46,7 @@ import {
 import { DailyGuidance, getDailyGuidance } from '../../services/DailyGuidanceService';
 import { getTodayBlessing } from '../../services/DayBlessingService';
 import { getMomentAlignment, MomentAlignment } from '../../services/MomentAlignmentService';
-import { calculatePlanetaryHours, PlanetaryHourData } from '../../services/PlanetaryHoursService';
+import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, type PlanetaryDayBoundaries, PlanetaryHourData } from '../../services/PlanetaryHoursService';
 import { getPlanetTransitNow, PlanetTransitInfo } from '../../services/PlanetTransitService';
 
 /**
@@ -175,37 +175,49 @@ export default function HomeScreen() {
   const [prayerLoading, setPrayerLoading] = useState(true);
   const [planetaryData, setPlanetaryData] = useState<PlanetaryHourData | null>(null);
   const [prayerTimesData, setPrayerTimesData] = useState<any>(null);
+  const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
   const [planetTransit, setPlanetTransit] = useState<PlanetTransitInfo | null>(null);
   const [tomorrowBlessing, setTomorrowBlessing] = useState<any>(null);
+
+  // Lower-frequency ticker for recomputing sunrise/sunset boundaries.
+  const minuteNow = useNowTicker(60_000);
   
-  // Calculate planetary hours when prayer times are available
+  // Resolve correct planetary-day boundaries (handles pre-sunrise) once per minute.
   useEffect(() => {
-    if (!prayerTimesData) return;
-    
-    try {
-      const { timings } = prayerTimesData;
-      const parseTime = (timeStr: string) => {
-        const [hours, minutes] = timeStr.split(':');
-        const date = new Date();
-        date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-        return date;
-      };
-      
-      const sunrise = parseTime(timings.Sunrise);
-      const sunset = parseTime(timings.Maghrib);
-      const nextDay = new Date(sunrise);
-      nextDay.setDate(nextDay.getDate() + 1);
-      
-      const planetary = calculatePlanetaryHours(sunrise, sunset, nextDay, now);
-      setPlanetaryData(planetary);
-      
-      // Calculate planet transit
-      const transit = getPlanetTransitNow(sunrise, sunset, nextDay, now);
-      setPlanetTransit(transit);
-    } catch (error) {
-      console.error('Error calculating planetary hours:', error);
-    }
-  }, [prayerTimesData, now]);
+    const lat = prayerTimesData?.meta?.latitude ?? profile.location?.latitude;
+    const lon = prayerTimesData?.meta?.longitude ?? profile.location?.longitude;
+    if (typeof lat !== 'number' || typeof lon !== 'number') return;
+
+    let cancelled = false;
+    (async () => {
+      const boundaries = await getPlanetaryDayBoundariesForNow({ latitude: lat, longitude: lon }, { now: minuteNow });
+      if (!cancelled) setPlanetaryBoundaries(boundaries);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [minuteNow, prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude, profile.location?.latitude, profile.location?.longitude]);
+
+  // Compute current/next planetary hours every second for countdown accuracy.
+  useEffect(() => {
+    if (!planetaryBoundaries) return;
+    const planetary = calculatePlanetaryHours(
+      planetaryBoundaries.sunrise,
+      planetaryBoundaries.sunset,
+      planetaryBoundaries.nextSunrise,
+      now
+    );
+    setPlanetaryData(planetary);
+
+    const transit = getPlanetTransitNow(
+      planetaryBoundaries.sunrise,
+      planetaryBoundaries.sunset,
+      planetaryBoundaries.nextSunrise,
+      now
+    );
+    setPlanetTransit(transit);
+  }, [planetaryBoundaries, now]);
   
   // Load real-time daily guidance
   const loadDailyGuidance = useCallback(async () => {
@@ -215,9 +227,17 @@ export default function HomeScreen() {
   
   // Load moment alignment
   const loadMomentAlignment = useCallback(async () => {
-    const alignment = await getMomentAlignment(profile);
+    const lat = prayerTimesData?.meta?.latitude ?? profile.location?.latitude;
+    const lon = prayerTimesData?.meta?.longitude ?? profile.location?.longitude;
+    const alignment = await getMomentAlignment(
+      profile,
+      new Date(),
+      typeof lat === 'number' && typeof lon === 'number'
+        ? { location: { latitude: lat, longitude: lon } }
+        : undefined
+    );
     setMomentAlignment(alignment);
-  }, [profile]);
+  }, [profile, prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude]);
   
   // Load prayer times
   const loadPrayerTimes = useCallback(async () => {

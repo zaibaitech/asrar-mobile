@@ -183,16 +183,14 @@ async function getCachedPrayerTimes(
     const locationChanged = latDiff > 0.01 || lonDiff > 0.01;
 
     if (locationChanged) {
-      console.log('Cache location changed, will fetch fresh data');
       return null;
     }
 
     if (isExpired && !options?.allowExpired) {
-      console.log('Cache expired or location changed, will fetch fresh data');
       return null;
     }
 
-    console.log(options?.allowExpired && isExpired ? 'Using stale cached prayer times' : 'Using cached prayer times');
+    // Cache hit: intentionally silent to avoid log spam during UI tickers.
     return data;
   } catch (error) {
     console.error('Failed to read prayer times cache:', error);
@@ -453,7 +451,6 @@ export async function getPrayerTimesForDate(
       
       // Check if still valid
       if (Date.now() - cacheData.timestamp < CACHE_DURATION) {
-        console.log(`Using cached prayer times for ${dateKey}`);
         return cacheData.data;
       }
     }

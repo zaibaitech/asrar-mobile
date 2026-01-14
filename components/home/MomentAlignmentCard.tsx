@@ -14,6 +14,7 @@ import {
 import {
     AlignmentStatus,
     Element,
+    getAlignmentStatusForElements,
 } from '@/services/MomentAlignmentService';
 import { PlanetaryHourData } from '@/services/PlanetaryHoursService';
 
@@ -96,6 +97,15 @@ function getUpdatedLabel(updatedAt: string | undefined, t: (key: string) => stri
   return template.replace('{count}', String(diffHours));
 }
 
+function formatCountdownShort(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  if (minutes > 0) return `${minutes}m`;
+  return `${secs}s`;
+}
+
 export function MomentAlignmentCard({
   status,
   statusLabel,
@@ -143,6 +153,31 @@ export function MomentAlignmentCard({
 
   const theme = status ? STATUS_THEME[status] : DEFAULT_THEME;
   const updatedLabel = useMemo(() => getUpdatedLabel(updatedAt, t), [updatedAt, t]);
+
+  const nextHourPreview = (() => {
+    if (!planetaryData) return null;
+    if (!zahirElement) return null;
+    const seconds = planetaryData.countdownSeconds;
+    if (!(seconds > 0 && seconds <= 10 * 60)) return null;
+
+    const nextElement = planetaryData.nextHour.planetInfo.element;
+    const nextStatus = getAlignmentStatusForElements(zahirElement, nextElement);
+
+    const statusKey: Record<AlignmentStatus, string> = {
+      ACT: 'home.moment.status.act',
+      MAINTAIN: 'home.moment.status.maintain',
+      HOLD: 'home.moment.status.hold',
+    };
+
+    return {
+      seconds,
+      nextElement,
+      nextStatus,
+      nextStatusLabel: t(statusKey[nextStatus]),
+      nextPlanetLabel: t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`),
+      nextPlanetArabic: planetaryData.nextHour.planetInfo.arabicName,
+    };
+  })();
 
   // Empty state when user has no name configured
   if (!hasProfileName && !loading) {
@@ -247,6 +282,23 @@ export function MomentAlignmentCard({
             <Text style={styles.signalText} numberOfLines={2} ellipsizeMode="tail">
               {causeText}
             </Text>
+          )}
+
+          {nextHourPreview && (
+            <View style={styles.previewRow}>
+              <Text style={styles.previewLabel} numberOfLines={1} ellipsizeMode="tail">
+                {t('home.nextPlanetHour')}
+              </Text>
+              <Text style={styles.previewValue} numberOfLines={1} ellipsizeMode="tail">
+                {nextHourPreview.nextPlanetLabel} ({nextHourPreview.nextPlanetArabic}) • {t(`elements.${nextHourPreview.nextElement}`)} • {formatCountdownShort(nextHourPreview.seconds)}
+              </Text>
+              <View style={[styles.previewStatus, { borderColor: STATUS_THEME[nextHourPreview.nextStatus].accent, backgroundColor: STATUS_THEME[nextHourPreview.nextStatus].pillBackground }]}
+              >
+                <Text style={[styles.previewStatusText, { color: STATUS_THEME[nextHourPreview.nextStatus].accent }]} numberOfLines={1}>
+                  {nextHourPreview.nextStatusLabel}
+                </Text>
+              </View>
+            </View>
           )}
         </View>
       </LinearGradient>
@@ -410,5 +462,39 @@ const styles = StyleSheet.create({
     color: DarkTheme.textSecondary,
     lineHeight: Typography.label * Typography.lineHeightNormal,
     paddingHorizontal: Spacing.xs,
+  },
+  previewRow: {
+    marginTop: Spacing.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: Borders.radiusMd,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    gap: 6,
+  },
+  previewLabel: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    fontWeight: Typography.weightMedium,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  previewValue: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: Typography.weightMedium,
+  },
+  previewStatus: {
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderRadius: Borders.radiusSm,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  previewStatusText: {
+    fontSize: 10,
+    fontWeight: Typography.weightBold,
+    letterSpacing: 0.3,
   },
 });

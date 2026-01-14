@@ -19,12 +19,22 @@
  */
 
 import type { ElementType } from '@/contexts/ThemeContext';
+import type { CalculationMethod } from '@/services/api/prayerTimes';
 import { UserProfile } from '@/types/user-profile';
 import { calculateHadadKabir, calculateTabElement, normalizeArabic } from '@/utils/coreCalculations';
-import { getCurrentPlanetaryHour, getPlanetElement, type Planet } from './DayBlessingService';
+import { getCurrentPlanetaryHour as getSimplifiedPlanetaryHour, getPlanetElement as getSimplifiedPlanetElement, type Planet as SimplifiedPlanet } from './DayBlessingService';
+import {
+    getPlanetaryDayBoundariesForNow,
+    preCalculateDailyPlanetaryHours,
+    type Planet,
+} from './PlanetaryHoursService';
 
 export type Element = ElementType;
 export type AlignmentStatus = 'ACT' | 'MAINTAIN' | 'HOLD';
+
+export function getAlignmentStatusForElements(zahirElement: Element, timeElement: Element): AlignmentStatus {
+  return computeAlignmentStatus(zahirElement, timeElement);
+}
 
 export interface TimeWindow {
   element: Element;
@@ -110,8 +120,9 @@ export function computeZahirElement(name: string, motherName: string = ''): Elem
  * @returns Current planetary hour element
  */
 export function getCurrentTimeElement(now: Date = new Date()): Element {
-  const planetaryHour = getCurrentPlanetaryHour(now);
-  const planetElement = getPlanetElement(planetaryHour.planet);
+  // Backwards-compatible fallback when no location context is available.
+  const planetaryHour = getSimplifiedPlanetaryHour(now);
+  const planetElement = getSimplifiedPlanetElement(planetaryHour.planet as unknown as SimplifiedPlanet);
   return elementTypeToElement(planetElement);
 }
 
@@ -142,8 +153,8 @@ function getUpcomingPlanetaryHours(now: Date, hours: number = 24): TimeWindow[] 
     const endTime = new Date(startTime);
     endTime.setHours(endTime.getHours() + 1);
     
-    const planetaryHour = getCurrentPlanetaryHour(startTime);
-    const planetElement = getPlanetElement(planetaryHour.planet);
+    const planetaryHour = getSimplifiedPlanetaryHour(startTime);
+    const planetElement = getSimplifiedPlanetElement(planetaryHour.planet as unknown as SimplifiedPlanet);
     const element = elementTypeToElement(planetElement);
     
     windows.push({
@@ -151,7 +162,7 @@ function getUpcomingPlanetaryHours(now: Date, hours: number = 24): TimeWindow[] 
       startTime,
       endTime,
       status: 'ACT', // Will be calculated based on user element
-      planet: planetaryHour.planet,
+      planet: planetaryHour.planet as unknown as Planet,
       planetArabic: planetaryHour.planetArabic,
       hourNumber: i + 1,
       isCurrentHour: i === 0,
@@ -159,6 +170,62 @@ function getUpcomingPlanetaryHours(now: Date, hours: number = 24): TimeWindow[] 
   }
   
   return windows;
+}
+
+async function getUpcomingPlanetaryHourWindowsAccurate(
+  now: Date,
+  location: { latitude: number; longitude: number },
+  method: CalculationMethod = 3,
+  lookAheadHours: number = 24
+): Promise<{ currentWindowEnd?: Date; timeElement?: Element; windows: TimeWindow[] }> {
+  const boundaries = await getPlanetaryDayBoundariesForNow(location, { now, method });
+  if (!boundaries) {
+    return { currentWindowEnd: undefined, timeElement: undefined, windows: [] };
+  }
+
+  const cacheToday = await preCalculateDailyPlanetaryHours(boundaries.sunrise, boundaries.sunset, boundaries.nextSunrise);
+  if (!cacheToday) {
+    return { currentWindowEnd: undefined, timeElement: undefined, windows: [] };
+  }
+
+  // Determine current hour index from cached hours.
+  let currentIndex = 0;
+  for (let i = 0; i < cacheToday.hours.length; i++) {
+    const hour = cacheToday.hours[i];
+    const start = new Date(hour.startTime);
+    const end = new Date(hour.endTime);
+    if (now >= start && now < end) {
+      currentIndex = i;
+      break;
+    }
+  }
+
+  const currentHour = cacheToday.hours[currentIndex];
+  const currentWindowEnd = new Date(currentHour.endTime);
+  const timeElement = currentHour.planetInfo.element;
+
+  // Pre-calc next planetary day so we can return a true 24h look-ahead.
+  const nextDayNow = new Date(boundaries.nextSunrise.getTime() + 60_000);
+  const nextBoundaries = await getPlanetaryDayBoundariesForNow(location, { now: nextDayNow, method });
+  const cacheNext = nextBoundaries
+    ? await preCalculateDailyPlanetaryHours(nextBoundaries.sunrise, nextBoundaries.sunset, nextBoundaries.nextSunrise)
+    : null;
+
+  const combinedHours = cacheNext ? [...cacheToday.hours, ...cacheNext.hours] : [...cacheToday.hours];
+  const slice = combinedHours.slice(currentIndex, currentIndex + Math.max(1, lookAheadHours));
+
+  const windows: TimeWindow[] = slice.map((h, idx) => ({
+    element: h.planetInfo.element,
+    startTime: new Date(h.startTime),
+    endTime: new Date(h.endTime),
+    status: 'ACT',
+    planet: h.planet,
+    planetArabic: h.planetInfo.arabicName,
+    hourNumber: idx + 1,
+    isCurrentHour: idx === 0,
+  }));
+
+  return { currentWindowEnd, timeElement, windows };
 }
 
 /**
@@ -209,20 +276,31 @@ function computeAlignmentStatus(zahirElement: Element, timeElement: Element): Al
     return 'ACT';
   }
   
-  // Compatible pairs
-  const compatibilityMap: Record<string, string> = {
+  // Supportive pairs
+  const supportiveMap: Record<string, string> = {
     fire: 'air',
     air: 'fire',
     earth: 'water',
     water: 'earth',
   };
-  
-  if (compatibilityMap[userEl] === timeEl) {
+
+  if (supportiveMap[userEl] === timeEl) {
     return 'MAINTAIN';
   }
-  
-  // Not aligned
-  return 'HOLD';
+
+  // Challenging (oppositions)
+  const challenging =
+    (userEl === 'fire' && timeEl === 'water') ||
+    (userEl === 'water' && timeEl === 'fire') ||
+    (userEl === 'earth' && timeEl === 'air') ||
+    (userEl === 'air' && timeEl === 'earth');
+
+  if (challenging) {
+    return 'HOLD';
+  }
+
+  // Neutral defaults to MAINTAIN (steady/neutral window)
+  return 'MAINTAIN';
 }
 
 /**
@@ -234,7 +312,8 @@ function computeAlignmentStatus(zahirElement: Element, timeElement: Element): Al
  */
 export async function getMomentAlignment(
   profile?: UserProfile,
-  now: Date = new Date()
+  now: Date = new Date(),
+  options?: { location?: { latitude: number; longitude: number }; method?: CalculationMethod }
 ): Promise<MomentAlignment | null> {
   // Check if user has a name
   const userName = profile?.nameAr || profile?.nameLatin;
@@ -246,9 +325,30 @@ export async function getMomentAlignment(
   
   // Compute user element (name + mother when available; falls back to name only)
   const zahirElement = computeZahirElement(userName, motherName);
-  
-  // Get current time element
-  const timeElement = getCurrentTimeElement(now);
+
+  // Prefer accurate planetary-hour element when we have a location.
+  const location = options?.location ?? profile?.location;
+  const method = options?.method ?? 3;
+
+  let timeElement: Element = getCurrentTimeElement(now);
+  let currentWindowEnd: Date | undefined = getNextHourTransition(now);
+  let nextWindows: TimeWindow[] | undefined = getNextOptimalWindows(zahirElement, now, 24);
+
+  if (location?.latitude != null && location?.longitude != null) {
+    const resolved = await getUpcomingPlanetaryHourWindowsAccurate(
+      now,
+      { latitude: location.latitude, longitude: location.longitude },
+      method,
+      24
+    );
+    if (resolved.timeElement) {
+      timeElement = resolved.timeElement;
+      currentWindowEnd = resolved.currentWindowEnd;
+      nextWindows = resolved.windows
+        .map(w => ({ ...w, status: computeAlignmentStatus(zahirElement, w.element) }))
+        .filter(w => w.endTime > now);
+    }
+  }
   
   // Compute alignment status
   const status = computeAlignmentStatus(zahirElement, timeElement);
@@ -267,10 +367,7 @@ export async function getMomentAlignment(
   };
   
   // Get next hour transition (current window end)
-  const currentWindowEnd = getNextHourTransition(now);
-  
-  // Get upcoming optimal planetary hours (next 24 hours)
-  const nextWindows = getNextOptimalWindows(zahirElement, now, 24);
+  // currentWindowEnd / nextWindows already resolved above (accurate when location exists)
   
   return {
     zahirElement,

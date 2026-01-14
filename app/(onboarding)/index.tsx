@@ -39,128 +39,11 @@ type IconType = 'sparkle' | 'moon' | 'scroll' | 'hands' | 'lock' | 'compass' | '
 interface OnboardingSlide {
   id: string;
   icon: IconType;
-  taglineKey: string;
   titleKey: string;
   bodyKey: string;
   bulletsKey: [string, string, string];
   gradient: [string, string];
 }
-
-// Translations - Complete EN/FR
-export const ONBOARDING_TRANSLATIONS = {
-  en: {
-    'onboarding.skip': 'Skip',
-    'onboarding.back': 'Back',
-    'onboarding.next': 'Next',
-    'onboarding.stepOf': 'Step {{current}} of {{total}}',
-    
-    'onboarding.s1.tagline': 'One clear window for today.',
-    'onboarding.s1.credibility': 'Designed for reflection, not prediction.',
-    'onboarding.s1.title': 'Daily Guidance',
-    'onboarding.s1.body': 'Simple actions aligned with your inner state.',
-    'onboarding.s1.b1': 'Best moment to act on intentions',
-    'onboarding.s1.b2': 'What to avoid today',
-    'onboarding.s1.b3': 'Tap cards to reveal deeper details',
-    
-    'onboarding.s2.tagline': 'Your name carries a structure.',
-    'onboarding.s2.credibility': 'Inspired by traditional Abjad correspondences.',
-    'onboarding.s2.title': 'Calculator & Spiritual Profile',
-    'onboarding.s2.body': 'Explore markers linked to your name: element, temperament, and core meaning.',
-    'onboarding.s2.b1': 'Kabir & Saghir calculations',
-    'onboarding.s2.b2': 'Element & temperament',
-    'onboarding.s2.b3': 'Simple, grounded explanations',
-    
-    'onboarding.s3.tagline': 'Sacred hours, not random time.',
-    'onboarding.s3.credibility': 'Based on planetary hour systems.',
-    'onboarding.s3.title': 'Divine Timing',
-    'onboarding.s3.body': 'Discover windows of time for reflection and inner calm.',
-    'onboarding.s3.b1': 'Day & hourly planetary influence',
-    'onboarding.s3.b2': 'Harmonious and constricted hours',
-    'onboarding.s3.b3': 'A contemplative guide, not authority',
-    
-    'onboarding.s4.tagline': 'Consistency before intensity.',
-    'onboarding.s4.credibility': 'Built upon adab and continuity.',
-    'onboarding.s4.title': 'Dhikr & Practice',
-    'onboarding.s4.body': 'Track sessions, stay consistent, follow guided method.',
-    'onboarding.s4.b1': 'Session counter with intention',
-    'onboarding.s4.b2': 'Guided methodology (adab)',
-    'onboarding.s4.b3': 'Gentle reminders for continuity',
-    
-    'onboarding.s5.tagline': 'Your path, preserved.',
-    'onboarding.s5.credibility': 'Your data stays private and secure.',
-    'onboarding.s5.title': 'Begin Your Journey',
-    'onboarding.s5.body': 'Sync your spiritual profile across devices.',
-    'onboarding.s5.b1': 'Private and secure data',
-    'onboarding.s5.b2': 'Sync across devices',
-    'onboarding.s5.b3': 'Continue without account',
-    
-    'onboarding.final.tagline': 'Your path, preserved.',
-    'onboarding.final.title': 'Begin Your Journey',
-    'onboarding.final.description': 'Create an account to sync your profile and unlock advanced features.',
-    'onboarding.final.createAccount': 'Create Account',
-    'onboarding.final.signIn': 'Sign In',
-    'onboarding.final.continueGuest': 'Continue as Guest',
-    'onboarding.final.guestNote': 'Your data stays on this device only.',
-    'onboarding.final.disclaimer': 'This app supports reflection and spiritual awareness. It does not replace religious guidance.',
-    'onboarding.final.or': 'or',
-  },
-  fr: {
-    'onboarding.skip': 'Passer',
-    'onboarding.back': 'Retour',
-    'onboarding.next': 'Suivant',
-    'onboarding.stepOf': 'Étape {{current}} sur {{total}}',
-    
-    'onboarding.s1.tagline': 'Une fenêtre claire pour aujourd\'hui.',
-    'onboarding.s1.credibility': 'Conçu pour la réflexion, pas la prédiction.',
-    'onboarding.s1.title': 'Guidance quotidienne',
-    'onboarding.s1.body': 'Actions simples alignées avec votre état intérieur.',
-    'onboarding.s1.b1': 'Meilleur moment pour agir',
-    'onboarding.s1.b2': 'Ce qu\'il faut éviter',
-    'onboarding.s1.b3': 'Appuyez pour voir les détails',
-    
-    'onboarding.s2.tagline': 'Votre nom porte une structure.',
-    'onboarding.s2.credibility': 'Inspiré par les correspondances Abjad.',
-    'onboarding.s2.title': 'Calculatrice & profil spirituel',
-    'onboarding.s2.body': 'Explorez les marqueurs liés à votre nom.',
-    'onboarding.s2.b1': 'Calculs Kabir & Saghir',
-    'onboarding.s2.b2': 'Élément & tempérament',
-    'onboarding.s2.b3': 'Explications simples',
-    
-    'onboarding.s3.tagline': 'Heures sacrées, pas temps aléatoire.',
-    'onboarding.s3.credibility': 'Basé sur les heures planétaires.',
-    'onboarding.s3.title': 'Timing divin',
-    'onboarding.s3.body': 'Découvrez des fenêtres pour la réflexion et le calme.',
-    'onboarding.s3.b1': 'Influence planétaire',
-    'onboarding.s3.b2': 'Heures harmonieuses et contraintes',
-    'onboarding.s3.b3': 'Guide contemplatif',
-    
-    'onboarding.s4.tagline': 'Constance avant intensité.',
-    'onboarding.s4.credibility': 'Fondé sur l\'adab et la continuité.',
-    'onboarding.s4.title': 'Dhikr & pratique',
-    'onboarding.s4.body': 'Suivez vos sessions et restez constant.',
-    'onboarding.s4.b1': 'Compteur de session',
-    'onboarding.s4.b2': 'Méthodologie guidée (adab)',
-    'onboarding.s4.b3': 'Rappels doux',
-    
-    'onboarding.s5.tagline': 'Votre chemin, préservé.',
-    'onboarding.s5.credibility': 'Données privées et sécurisées.',
-    'onboarding.s5.title': 'Commencez votre voyage',
-    'onboarding.s5.body': 'Synchronisez votre profil entre appareils.',
-    'onboarding.s5.b1': 'Données privées et sécurisées',
-    'onboarding.s5.b2': 'Synchronisation entre appareils',
-    'onboarding.s5.b3': 'Continuez sans compte',
-    
-    'onboarding.final.tagline': 'Votre chemin, préservé.',
-    'onboarding.final.title': 'Commencez votre voyage',
-    'onboarding.final.description': 'Créez un compte pour synchroniser et débloquer des fonctionnalités.',
-    'onboarding.final.createAccount': 'Créer un compte',
-    'onboarding.final.signIn': 'Se connecter',
-    'onboarding.final.continueGuest': 'Continuer en invité',
-    'onboarding.final.guestNote': 'Vos données restent sur cet appareil.',
-    'onboarding.final.disclaimer': 'Cette application soutient la réflexion spirituelle. Elle ne remplace pas les conseils religieux.',
-    'onboarding.final.or': 'ou',
-  },
-};
 
 // Icon config
 const ICON_MAP: Record<IconType, { name: keyof typeof Ionicons.glyphMap; size: number }> = {
@@ -175,11 +58,11 @@ const ICON_MAP: Record<IconType, { name: keyof typeof Ionicons.glyphMap; size: n
 
 // Slides config
 const SLIDES: OnboardingSlide[] = [
-  { id: '1', icon: 'sparkle', taglineKey: 'onboarding.s1.tagline', titleKey: 'onboarding.s1.title', bodyKey: 'onboarding.s1.body', bulletsKey: ['onboarding.s1.b1', 'onboarding.s1.b2', 'onboarding.s1.b3'], gradient: ['#8B5CF6', '#6D28D9'] },
-  { id: '2', icon: 'calculator', taglineKey: 'onboarding.s2.tagline', titleKey: 'onboarding.s2.title', bodyKey: 'onboarding.s2.body', bulletsKey: ['onboarding.s2.b1', 'onboarding.s2.b2', 'onboarding.s2.b3'], gradient: ['#8B5CF6', '#7C3AED'] },
-  { id: '3', icon: 'moon', taglineKey: 'onboarding.s3.tagline', titleKey: 'onboarding.s3.title', bodyKey: 'onboarding.s3.body', bulletsKey: ['onboarding.s3.b1', 'onboarding.s3.b2', 'onboarding.s3.b3'], gradient: ['#6366F1', '#4F46E5'] },
-  { id: '4', icon: 'hands', taglineKey: 'onboarding.s4.tagline', titleKey: 'onboarding.s4.title', bodyKey: 'onboarding.s4.body', bulletsKey: ['onboarding.s4.b1', 'onboarding.s4.b2', 'onboarding.s4.b3'], gradient: ['#A855F7', '#9333EA'] },
-  { id: '5', icon: 'compass', taglineKey: 'onboarding.s5.tagline', titleKey: 'onboarding.s5.title', bodyKey: 'onboarding.s5.body', bulletsKey: ['onboarding.s5.b1', 'onboarding.s5.b2', 'onboarding.s5.b3'], gradient: ['#7C3AED', '#6D28D9'] },
+  { id: '1', icon: 'sparkle', titleKey: 'onboarding.s1.title', bodyKey: 'onboarding.s1.body', bulletsKey: ['onboarding.s1.b1', 'onboarding.s1.b2', 'onboarding.s1.b3'], gradient: ['#8B5CF6', '#6D28D9'] },
+  { id: '2', icon: 'calculator', titleKey: 'onboarding.s2.title', bodyKey: 'onboarding.s2.body', bulletsKey: ['onboarding.s2.b1', 'onboarding.s2.b2', 'onboarding.s2.b3'], gradient: ['#8B5CF6', '#7C3AED'] },
+  { id: '3', icon: 'moon', titleKey: 'onboarding.s3.title', bodyKey: 'onboarding.s3.body', bulletsKey: ['onboarding.s3.b1', 'onboarding.s3.b2', 'onboarding.s3.b3'], gradient: ['#6366F1', '#4F46E5'] },
+  { id: '4', icon: 'hands', titleKey: 'onboarding.s4.title', bodyKey: 'onboarding.s4.body', bulletsKey: ['onboarding.s4.b1', 'onboarding.s4.b2', 'onboarding.s4.b3'], gradient: ['#A855F7', '#9333EA'] },
+  { id: '5', icon: 'compass', titleKey: 'onboarding.s5.title', bodyKey: 'onboarding.s5.body', bulletsKey: ['onboarding.s5.b1', 'onboarding.s5.b2', 'onboarding.s5.b3'], gradient: ['#7C3AED', '#6D28D9'] },
 ];
 
 // Animated Logo Icon
@@ -287,7 +170,6 @@ const AnimatedDot = ({ isActive, onPress }: { isActive: boolean; index: number; 
 // Standard Slide Content
 const StandardSlideContent = ({ item, isActive, t }: { item: OnboardingSlide; isActive: boolean; t: (k: string) => string }) => (
   <View style={styles.cardContent}>
-    <Text style={styles.tagline}>{t(item.taglineKey)}</Text>
     <Text style={styles.title}>{t(item.titleKey)}</Text>
     <Text style={styles.body}>{t(item.bodyKey)}</Text>
     <View style={styles.bulletsContainer}>
@@ -328,7 +210,6 @@ const FinalSlide = ({ t, isActive, fadeAnim, slideAnim, onSignUp, onSignIn, onCo
 // Final Card Content
 const FinalCardContent = ({ t, onSignUp, onSignIn, onContinueAsGuest }: { t: (k: string) => string; onSignUp: () => void; onSignIn: () => void; onContinueAsGuest: () => void }) => (
   <View style={styles.finalCardContent}>
-    <Text style={styles.finalTagline}>{t('onboarding.final.tagline')}</Text>
     <Text style={styles.finalTitle}>{t('onboarding.final.title')}</Text>
     <Text style={styles.finalDescription}>{t('onboarding.final.description')}</Text>
     

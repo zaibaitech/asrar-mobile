@@ -65,15 +65,14 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
           </View>
         </View>
 
-        <View style={styles.rulesRow}>
+        <View style={styles.rulesBlock}>
           <Text style={styles.rulesLabel}>{t("home.cards.planetTransit.rulesLabel")}</Text>
           <View style={[styles.zodiacPill, { backgroundColor: elementAccent.glow }]}>
             <Text style={styles.zodiacSymbol}>{zodiacSymbol}</Text>
             <Text
               style={[styles.zodiacText, { color: elementAccent.primary }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              minimumFontScale={0.7}
+              numberOfLines={2}
+              ellipsizeMode="tail"
             >
               {formatZodiacWithArabic(zodiacKey, language as any)}
             </Text>
@@ -192,7 +191,7 @@ const styles = StyleSheet.create({
   mainContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'stretch',
     gap: 6,
   },
 
@@ -200,6 +199,7 @@ const styles = StyleSheet.create({
   planetRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 10,
   },
   planetSymbol: {
@@ -223,18 +223,17 @@ const styles = StyleSheet.create({
     fontFamily: 'Amiri',
     textAlign: 'center',
   },
-  rulesRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+  rulesBlock: {
     marginTop: 4,
     width: '100%',
+    gap: 6,
   },
   rulesLabel: {
-    fontSize: 11,
+    fontSize: 12,
     color: DarkTheme.textSecondary,
-    flexShrink: 0,
-    minWidth: 34,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   zodiacPill: {
     flexDirection: 'row',
@@ -242,22 +241,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 8,
     borderRadius: 12,
-    flexGrow: 1,
-    flexShrink: 1,
-    minWidth: 0,
+    width: '100%',
   },
   zodiacSymbol: {
-    fontSize: 14,
+    fontSize: 16,
     flexShrink: 0,
   },
   zodiacText: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: Typography.weightSemibold,
     textAlign: 'center',
-    flexShrink: 1,
-    minWidth: 0,
+    flex: 1,
+    lineHeight: 16,
   },
 
   // Next Day Ruler slide elements

@@ -8,8 +8,8 @@
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { getMomentAlignment, MomentAlignment } from '@/services/MomentAlignmentService';
-import { calculatePlanetaryHours, PlanetaryHourData } from '@/services/PlanetaryHoursService';
+import { getAlignmentStatusForElements, getMomentAlignment, MomentAlignment } from '@/services/MomentAlignmentService';
+import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, type PlanetaryDayBoundaries, PlanetaryHourData } from '@/services/PlanetaryHoursService';
 import { fetchPrayerTimes } from '@/services/api/prayerTimes';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -37,14 +37,21 @@ export default function MomentAlignmentDetailScreen() {
   const [showTimeline, setShowTimeline] = useState(false);
   const [planetaryData, setPlanetaryData] = useState<PlanetaryHourData | null>(null);
   const [prayerTimesData, setPrayerTimesData] = useState<any>(null);
+  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
   const [now, setNow] = useState(new Date());
+  const [minuteNow, setMinuteNow] = useState(new Date());
   
   const loadAlignment = useCallback(async () => {
     setLoading(true);
-    const result = await getMomentAlignment(profile);
+    const result = await getMomentAlignment(
+      profile,
+      new Date(),
+      coords ? { location: coords } : undefined
+    );
     setAlignment(result);
     setLoading(false);
-  }, [profile]);
+  }, [profile, coords]);
   
   const loadPrayerTimes = useCallback(async () => {
     try {
@@ -56,6 +63,7 @@ export default function MomentAlignmentDetailScreen() {
         });
         
         const { latitude, longitude } = location.coords;
+        setCoords({ latitude, longitude });
         const data = await fetchPrayerTimes(latitude, longitude);
         setPrayerTimesData(data);
       }
@@ -68,37 +76,54 @@ export default function MomentAlignmentDetailScreen() {
     loadAlignment();
     loadPrayerTimes();
   }, [loadAlignment, loadPrayerTimes]);
-  
-  // Calculate planetary hours when prayer times are available
+
+  // Recompute alignment when the minute ticks (keeps status synced around transitions)
   useEffect(() => {
-    if (!prayerTimesData) return;
-    
+    void loadAlignment();
+  }, [minuteNow, loadAlignment]);
+  
+  // Resolve correct planetary-day boundaries (handles pre-sunrise) once per minute.
+  useEffect(() => {
+    if (!coords) return;
+    let cancelled = false;
+    (async () => {
+      const boundaries = await getPlanetaryDayBoundariesForNow(coords, { now: minuteNow });
+      if (!cancelled) setPlanetaryBoundaries(boundaries);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [coords, minuteNow]);
+
+  // Compute current/next planetary hours every second for countdown accuracy.
+  useEffect(() => {
+    if (!planetaryBoundaries) return;
     try {
-      const { timings } = prayerTimesData;
-      const parseTime = (timeStr: string) => {
-        const [hours, minutes] = timeStr.split(':');
-        const date = new Date();
-        date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-        return date;
-      };
-      
-      const sunrise = parseTime(timings.Sunrise);
-      const sunset = parseTime(timings.Maghrib);
-      const nextDay = new Date(sunrise);
-      nextDay.setDate(nextDay.getDate() + 1);
-      
-      const planetary = calculatePlanetaryHours(sunrise, sunset, nextDay, now);
+      const planetary = calculatePlanetaryHours(
+        planetaryBoundaries.sunrise,
+        planetaryBoundaries.sunset,
+        planetaryBoundaries.nextSunrise,
+        now
+      );
       setPlanetaryData(planetary);
     } catch (error) {
       console.error('Error calculating planetary hours:', error);
     }
-  }, [prayerTimesData, now]);
+  }, [planetaryBoundaries, now]);
   
   // Update time every second for countdown
   useEffect(() => {
     const interval = setInterval(() => {
       setNow(new Date());
     }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Update minute ticker for boundary recalculation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMinuteNow(new Date());
+    }, 60_000);
     return () => clearInterval(interval);
   }, []);
   
@@ -304,6 +329,23 @@ export default function MomentAlignmentDetailScreen() {
             <Ionicons name="time-outline" size={16} color={DarkTheme.textTertiary} />
             <Text style={styles.windowInfoText}>
               {t('momentDetail.timeline.windowEnds')} {t('momentDetail.timeline.in')} {formatTimeUntil(alignment.currentWindowEnd)}
+            </Text>
+          </View>
+        )}
+
+        {/* Next hour preview (shown close to transition) */}
+        {planetaryData && alignment && planetaryData.countdownSeconds > 0 && planetaryData.countdownSeconds <= 10 * 60 && (
+          <View style={[styles.windowInfo, { marginTop: 6 }]}> 
+            <Ionicons name="alert-circle-outline" size={16} color={DarkTheme.textTertiary} />
+            <Text style={styles.windowInfoText}>
+              {t('home.nextPlanetHour')}: {t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`)} ({getElementLabel(planetaryData.nextHour.planetInfo.element)}) {t('momentDetail.timeline.in')} {formatTimeUntil(planetaryData.currentHour.endTime)} • {t(
+                (() => {
+                  const status = getAlignmentStatusForElements(alignment.zahirElement, planetaryData.nextHour.planetInfo.element);
+                  if (status === 'ACT') return 'home.moment.status.act';
+                  if (status === 'MAINTAIN') return 'home.moment.status.maintain';
+                  return 'home.moment.status.hold';
+                })()
+              )}
             </Text>
           </View>
         )}
