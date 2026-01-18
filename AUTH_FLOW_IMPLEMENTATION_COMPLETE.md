@@ -45,7 +45,7 @@ Implementation Date: December 28, 2025
 **Changes Made:**
 
 1. **[app.json](app.json)** - Added deep linking configuration
-   - ✅ Android `intentFilters` for `asrar://` scheme
+   - ✅ Android `intentFilters` for `asrariya://` scheme
    - ✅ iOS `associatedDomains` for universal links
    - ✅ Support for both custom scheme and HTTPS deep links
 
@@ -57,7 +57,7 @@ Implementation Date: December 28, 2025
    - ✅ Error handling for failed verifications
 
 3. **[services/AuthService.ts](services/AuthService.ts)** - Updated signup
-   - ✅ Added `emailRedirectTo: 'asrar://auth/callback'` to signup options
+   - ✅ Added `emailRedirectTo: 'asrariya://auth/callback'` to signup options
    - ✅ Ensures verification emails contain correct deep link
 
 **Result:** Clicking email verification link opens your app instead of browser!
@@ -157,7 +157,7 @@ Implementation Date: December 28, 2025
 ```bash
 # Run this in terminal:
 adb shell am start -W -a android.intent.action.VIEW \
-  -d "asrar://auth/callback?type=signup&access_token=test&refresh_token=test"
+   -d "asrariya://auth/callback?type=signup&access_token=test&refresh_token=test"
 
 # Expected:
 ✅ App opens
@@ -195,7 +195,7 @@ To make email links open your app, update the email template in Supabase:
 
 **Change to:**
 ```html
-<a href="asrar://auth/callback?access_token={{ .Token }}&refresh_token={{ .RefreshToken }}&type=signup">Confirm your email</a>
+<a href="asrariya://auth/callback?access_token={{ .Token }}&refresh_token={{ .RefreshToken }}&type=signup">Confirm your email</a>
 ```
 
 ### 2. Whitelist Redirect URLs
@@ -203,7 +203,7 @@ To make email links open your app, update the email template in Supabase:
 
 **Add these URLs:**
 ```
-asrar://auth/callback
+asrariya://auth/callback
 http://localhost:8081/auth/callback
 https://asrar.app/auth/callback
 ```

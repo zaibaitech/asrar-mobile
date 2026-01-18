@@ -9,6 +9,9 @@ import { Alert } from 'react-native';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AnimatedSplash } from '@/components/AnimatedSplash';
+import { NotificationInitializer } from '@/components/NotificationInitializer';
+import { NotificationTapHandler } from '@/components/NotificationTapHandler';
 import { useColorScheme } from '@/components/useColorScheme';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ProfileProvider, useProfile } from '@/contexts/ProfileContext';
@@ -33,6 +36,7 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
+  const [showAnimatedSplash, setShowAnimatedSplash] = useState(true);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
@@ -49,10 +53,10 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return <RootLayoutNav showAnimatedSplash={showAnimatedSplash} setShowAnimatedSplash={setShowAnimatedSplash} />;
 }
 
-function RootLayoutNav() {
+function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: { showAnimatedSplash: boolean; setShowAnimatedSplash: (val: boolean) => void }) {
   const colorScheme = useColorScheme();
 
   return (
@@ -60,10 +64,23 @@ function RootLayoutNav() {
       <ProfileProvider>
         <LanguageProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <OnboardingGate />
-            <DeepLinkHandler />
-            <Stack>
-              <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+            <RootLayoutContent showAnimatedSplash={showAnimatedSplash} setShowAnimatedSplash={setShowAnimatedSplash} />
+          </ThemeProvider>
+        </LanguageProvider>
+      </ProfileProvider>
+    </SafeAreaProvider>
+  );
+}
+
+function RootLayoutContent({ showAnimatedSplash, setShowAnimatedSplash }: { showAnimatedSplash: boolean; setShowAnimatedSplash: (val: boolean) => void }) {
+  return (
+    <>
+      <OnboardingGate />
+      <DeepLinkHandler />
+      <NotificationInitializer />
+      <NotificationTapHandler />
+      <Stack>
+        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen 
                 name="compatibility" 
@@ -89,10 +106,10 @@ function RootLayoutNav() {
               <Stack.Screen name="reset-password" options={{ headerShown: false }} />
               <Stack.Screen name="profile" options={{ headerShown: false }} />
             </Stack>
-          </ThemeProvider>
-        </LanguageProvider>
-      </ProfileProvider>
-    </SafeAreaProvider>
+            {showAnimatedSplash && (
+              <AnimatedSplash onFinish={() => setShowAnimatedSplash(false)} />
+            )}
+          </>
   );
 }
 

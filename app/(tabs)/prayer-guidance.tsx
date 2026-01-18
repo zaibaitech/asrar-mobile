@@ -24,10 +24,11 @@ import type { UserProfile as GuidanceUserProfile, PrayerGuidanceRecommendation }
 import { PrayerGuidanceEngine } from '@/services/PrayerGuidanceEngine';
 import { getUserAbjadResultFromProfile } from '@/services/UserAbjadService';
 import { getCurrentPlanetaryHour } from '@/utils/planetary-hours';
-import { getNextPrayerTime } from '@/utils/prayer-times';
+import { determineCurrentOrNextPrayer, formatPrayerTime, getPrayerTimeForGuidance } from '@/utils/prayer-times';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 function mapToneToElement(tone: 'fire' | 'water' | 'air' | 'earth'): Element {
@@ -78,9 +79,11 @@ export default function PrayerGuidanceScreen() {
   }, [profile.location?.latitude, profile.location?.longitude]);
 
   const [selectedPrayer, setSelectedPrayer] = useState<Prayer | null>(null);
+  const [showPrayerSelector, setShowPrayerSelector] = useState(false);
   const [guidance, setGuidance] = useState<PrayerGuidanceRecommendation | null>(null);
   const [loading, setLoading] = useState(false);
   const [planetaryHour, setPlanetaryHour] = useState<Awaited<ReturnType<typeof getCurrentPlanetaryHour>> | null>(null);
+  const [selectedPrayerTimeLabel, setSelectedPrayerTimeLabel] = useState<string>('—');
 
   const abjad = useMemo(() => {
     return getUserAbjadResultFromProfile(profile);
@@ -120,6 +123,26 @@ export default function PrayerGuidanceScreen() {
   useEffect(() => {
     let cancelled = false;
 
+    const ensureSelection = async () => {
+      if (selectedPrayer) return;
+      try {
+        const inferred = await determineCurrentOrNextPrayer(location);
+        if (!cancelled) setSelectedPrayer(inferred);
+      } catch (error) {
+        console.error('Failed to infer current/next prayer:', error);
+      }
+    };
+
+    void ensureSelection();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [location, selectedPrayer]);
+
+  useEffect(() => {
+    let cancelled = false;
+
     const update = async () => {
       try {
         const next = await getCurrentPlanetaryHour(location);
@@ -148,7 +171,8 @@ export default function PrayerGuidanceScreen() {
     setLoading(true);
     const generateGuidance = async () => {
       try {
-        const prayerTime = await getNextPrayerTime(selectedPrayer, location);
+        const prayerTime = await getPrayerTimeForGuidance(selectedPrayer, location);
+        setSelectedPrayerTimeLabel(formatPrayerTime(prayerTime));
         const recommendation = PrayerGuidanceEngine.generateGuidance(
           selectedPrayer,
           prayerTime,
@@ -173,16 +197,40 @@ export default function PrayerGuidanceScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.navHeader}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/prayer-times')}
+          style={styles.navButton}
+        >
+          <Ionicons name="chevron-back" size={22} color={DarkTheme.textPrimary} />
+        </Pressable>
+
+        <View style={styles.navTitleWrap}>
+          <Text style={styles.navTitle}>🌙 {t('prayerGuidance.title')}</Text>
+        </View>
+
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/prayer-times')}
+          style={styles.navButton}
+        >
+          <Ionicons name="time-outline" size={20} color={DarkTheme.textPrimary} />
+        </Pressable>
+      </View>
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>🌙 {t('prayerGuidance.title')}</Text>
-          <Text style={styles.headerSubtitle}>
-            {t('prayerGuidance.ui.headerSubtitle')}
-          </Text>
+          <View style={styles.headerSubtitleRow}>
+            <Text style={styles.headerSubtitleIcon}>✨</Text>
+            <Text style={styles.headerSubtitle}>
+              {t('prayerGuidance.ui.headerSubtitle')}
+            </Text>
+          </View>
         </View>
 
         <View style={styles.currentHourBanner}>
@@ -206,7 +254,30 @@ export default function PrayerGuidanceScreen() {
           </Text>
         </View>
 
-        <PrayerSelector onSelect={setSelectedPrayer} selectedPrayer={selectedPrayer} />
+        {!!selectedPrayer && (
+          <View style={styles.selectedPrayerCard}>
+            <View style={styles.selectedPrayerLeft}>
+              <Text style={styles.selectedPrayerIcon}>🕌</Text>
+              <View>
+                <Text style={styles.selectedPrayerTitle}>
+                  {t('prayerGuidance.ui.guidanceFor', { prayer: selectedPrayer })}
+                </Text>
+                <Text style={styles.selectedPrayerSubtitle}>
+                  {selectedPrayerTimeLabel}
+                </Text>
+              </View>
+            </View>
+
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setShowPrayerSelector(true)}
+              style={styles.changePrayerButton}
+            >
+              <Text style={styles.changePrayerText}>{t('prayerGuidance.ui.changePrayer')}</Text>
+              <Ionicons name="chevron-down" size={16} color={DarkTheme.textTertiary} />
+            </Pressable>
+          </View>
+        )}
 
         {!isProfileLoading && !guidanceUserProfile && (
           <View style={styles.profileHint}>
@@ -247,11 +318,14 @@ export default function PrayerGuidanceScreen() {
               }
             />
 
-            <ClassicalWisdomCard wisdom={guidance.classicalWisdom} />
+            <ClassicalWisdomCard
+              wisdom={guidance.classicalWisdom}
+              planet={guidance.context.currentPlanetaryHour.planet}
+            />
 
             <DivineNameCard divineName={guidance.divineName} />
 
-            <DhikrCounter dhikr={guidance.dhikr} onComplete={handleDhikrComplete} />
+            <DhikrCounter targetCount={guidance.divineName.count} onComplete={handleDhikrComplete} />
 
             <AdhkarList adhkar={guidance.adhkar} />
 
@@ -279,6 +353,37 @@ export default function PrayerGuidanceScreen() {
           </View>
         )}
       </ScrollView>
+
+      <Modal
+        visible={showPrayerSelector}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowPrayerSelector(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t('prayerGuidance.ui.selectPrayer')}</Text>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setShowPrayerSelector(false)}
+                style={styles.modalClose}
+              >
+                <Ionicons name="close" size={20} color={DarkTheme.textPrimary} />
+              </Pressable>
+            </View>
+
+            <PrayerSelector
+              onSelect={(p) => {
+                setSelectedPrayer(p);
+                setShowPrayerSelector(false);
+              }}
+              selectedPrayer={selectedPrayer}
+              location={location}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -287,6 +392,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: DarkTheme.screenBackground,
+  },
+  navHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.screenPadding,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: DarkTheme.borderSubtle,
+  },
+  navButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    backgroundColor: DarkTheme.cardBackgroundAlt,
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+  },
+  navTitleWrap: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  navTitle: {
+    fontSize: 16,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
   },
   scrollView: {
     flex: 1,
@@ -298,16 +431,25 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: Spacing.lg,
   },
-  headerTitle: {
-    fontSize: Typography.h2,
-    fontWeight: Typography.weightBold,
-    color: DarkTheme.textPrimary,
-    marginBottom: Spacing.xs,
+  headerSubtitleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+    padding: Spacing.md,
+    borderRadius: 16,
+    backgroundColor: DarkTheme.cardBackgroundAlt,
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+  },
+  headerSubtitleIcon: {
+    fontSize: 16,
+    marginTop: 2,
   },
   headerSubtitle: {
     fontSize: Typography.label,
     color: DarkTheme.textTertiary,
     lineHeight: 20,
+    flex: 1,
   },
   currentHourBanner: {
     backgroundColor: DarkTheme.cardBackgroundAlt,
@@ -326,6 +468,87 @@ const styles = StyleSheet.create({
   currentHourSubtext: {
     color: DarkTheme.textTertiary,
     fontSize: Typography.caption,
+  },
+  selectedPrayerCard: {
+    padding: Spacing.lg,
+    backgroundColor: DarkTheme.cardBackground,
+    borderRadius: 16,
+    marginBottom: Spacing.lg,
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+  },
+  selectedPrayerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    flex: 1,
+  },
+  selectedPrayerIcon: {
+    fontSize: 22,
+  },
+  selectedPrayerTitle: {
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+  },
+  selectedPrayerSubtitle: {
+    marginTop: 2,
+    fontSize: Typography.caption,
+    color: DarkTheme.textTertiary,
+  },
+  changePrayerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 12,
+    backgroundColor: DarkTheme.cardBackgroundAlt,
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+  },
+  changePrayerText: {
+    fontSize: Typography.caption,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textTertiary,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  modalCard: {
+    backgroundColor: DarkTheme.screenBackground,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: Spacing.lg,
+    borderTopWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.md,
+  },
+  modalTitle: {
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+  },
+  modalClose: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: DarkTheme.cardBackgroundAlt,
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
   },
   profileHint: {
     marginTop: Spacing.lg,

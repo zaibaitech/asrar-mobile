@@ -1,26 +1,27 @@
 {
   "expo": {
-    "name": "Asrar",
-    "slug": "asrar-mobile",
+    "name": "Asrariya",
+    "slug": "asrariya-mobile",
     "version": "1.0.0",
     "sdkVersion": "54.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "asrar",
+    "scheme": "asrariya",
     "userInterfaceStyle": "automatic",
-    "backgroundColor": "#0f172a",
+    "backgroundColor": "#FFFFFF",
     "primaryColor": "#6366f1",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0f172a"
+      "backgroundColor": "#FFFFFF"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.zaibaitech.asrar",
       "associatedDomains": ["applinks:asrar.app"],
       "infoPlist": {
+        "CFBundleDisplayName": "Asrariya",
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": false,
           "NSExceptionDomains": {
@@ -41,9 +42,10 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#0f172a"
+        "backgroundColor": "#FFFFFF"
       },
       "package": "com.zaibaitech.asrar",
+      "label": "Asrariya",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "intentFilters": [
@@ -52,7 +54,7 @@
           "autoVerify": true,
           "data": [
             {
-              "scheme": "asrar"
+              "scheme": "asrariya"
             },
             {
               "scheme": "https",

@@ -32,13 +32,13 @@
 ### Test Deep Link (Android)
 ```bash
 adb shell am start -W -a android.intent.action.VIEW \
-  -d "asrar://auth/callback?type=signup&access_token=test&refresh_token=test"
+   -d "asrariya://auth/callback?type=signup&access_token=test&refresh_token=test"
 ```
 
 ### Test Deep Link (iOS Simulator)
 ```bash
 xcrun simctl openurl booted \
-  "asrar://auth/callback?type=signup&access_token=test&refresh_token=test"
+   "asrariya://auth/callback?type=signup&access_token=test&refresh_token=test"
 ```
 
 ### Rebuild App (Required!)
@@ -65,7 +65,7 @@ npx expo run:ios
 
 **With:**
 ```html
-<a href="asrar://auth/callback?access_token={{ .Token }}&refresh_token={{ .RefreshToken }}&type=signup">Confirm your email</a>
+<a href="asrariya://auth/callback?access_token={{ .Token }}&refresh_token={{ .RefreshToken }}&type=signup">Confirm your email</a>
 ```
 
 ### 2. Redirect URLs
@@ -73,7 +73,7 @@ npx expo run:ios
 
 **Add:**
 ```
-asrar://auth/callback
+asrariya://auth/callback
 http://localhost:8081/auth/callback
 https://asrar.app/auth/callback
 ```

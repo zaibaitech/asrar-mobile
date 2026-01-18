@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { Stack, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     RefreshControl,
@@ -63,6 +63,7 @@ export default function PrayerTimesScreen() {
   const [gregorianDate, setGregorianDate] = useState<string>('');
   const [refreshing, setRefreshing] = useState(false);
   const [nextPrayerIndex, setNextPrayerIndex] = useState<number>(0);
+  const inFlightRef = useRef(false);
 
   useEffect(() => {
     loadCachedDataThenFresh();
@@ -81,8 +82,10 @@ export default function PrayerTimesScreen() {
       setState('loaded');
     }
     
-    // Then fetch fresh data in background
-    await loadPrayerTimes(!!cached);
+    // Only refresh if cache is missing or stale
+    if (!cached || cached.isStale) {
+      await loadPrayerTimes(!!cached);
+    }
   };
 
   const loadFromCache = async () => {
@@ -97,11 +100,9 @@ export default function PrayerTimesScreen() {
         return null;
       }
 
-      // Check if cache is still valid
-      const cacheAge = Date.now() - parseInt(lastFetch);
-      if (cacheAge > CACHE_DURATION) {
-        return null;
-      }
+      const lastFetchMs = Number(lastFetch);
+      const cacheAge = Date.now() - lastFetchMs;
+      const isStale = Number.isNaN(lastFetchMs) ? true : cacheAge > CACHE_DURATION;
 
       const data = JSON.parse(cachedTimings);
       return {
@@ -109,6 +110,8 @@ export default function PrayerTimesScreen() {
         location: JSON.parse(cachedLocation),
         hijriDate: data.hijriDate,
         gregorianDate: data.gregorianDate,
+        lastFetch: lastFetchMs,
+        isStale,
       };
     } catch (error) {
       console.error('Failed to load cached data:', error);
@@ -162,6 +165,8 @@ export default function PrayerTimesScreen() {
 
   const loadPrayerTimes = async (isBackgroundRefresh = false) => {
     try {
+      if (inFlightRef.current) return;
+      inFlightRef.current = true;
       if (!isBackgroundRefresh) {
         setState('loading');
       }
@@ -207,6 +212,8 @@ export default function PrayerTimesScreen() {
       if (!isBackgroundRefresh) {
         setState('error');
       }
+    } finally {
+      inFlightRef.current = false;
     }
   };
 
@@ -387,6 +394,11 @@ export default function PrayerTimesScreen() {
                     <Text style={[styles.prayerNameArabic, prayer.isNext && styles.prayerNameArabicNext]}>
                       {prayer.nameArabic}
                     </Text>
+                    {isGuidanceSupported && (
+                      <Text style={styles.guidanceHint}>
+                        {t('prayerTimes.tapForGuidance')}
+                      </Text>
+                    )}
                   </View>
                 </View>
 
@@ -640,6 +652,14 @@ const styles = StyleSheet.create({
 
   prayerNameArabicNext: {
     color: '#64B5F6',
+  },
+
+  guidanceHint: {
+    fontSize: 11,
+    color: '#64B5F6',
+    opacity: 0.7,
+    fontStyle: 'italic',
+    marginTop: 2,
   },
 
   prayerRight: {

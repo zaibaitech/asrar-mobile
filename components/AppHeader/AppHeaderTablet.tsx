@@ -1,3 +1,4 @@
+import { useProfile } from '@/contexts/ProfileContext';
 import { Clock, Menu, User } from 'lucide-react-native';
 import React from 'react';
 import {
@@ -9,7 +10,7 @@ import {
     useWindowDimensions,
     View,
 } from 'react-native';
-import AsrarLogo from '../AsrarLogo';
+import AsrarLogo, { ElementType } from '../AsrarLogo';
 
 interface AppHeaderTabletProps {
   logoSource?: ImageSourcePropType;
@@ -38,10 +39,12 @@ export default function AppHeaderTablet({
 }: AppHeaderTabletProps) {
   const { width } = useWindowDimensions();
   const isTablet = width > 768;
+  const { profile } = useProfile();
+  const logoElement = (profile.derived?.element ?? 'aether') as ElementType;
 
   // Tablet scaling factor
   const scale = isTablet ? 1.2 : 1;
-  const logoSize = Math.round(56 * scale);
+  const logoSize = Math.round(64 * scale);
   const iconSize = Math.round(48 * scale);
   const fontSize = Math.round(30 * scale);
   const langFontSize = Math.round(16 * scale);
@@ -50,9 +53,9 @@ export default function AppHeaderTablet({
     <View style={[styles.container, { backgroundColor, paddingHorizontal: 24 * scale }]}>
       {/* Left Section: Logo + App Name */}
       <View style={styles.leftSection}>
-        <TabletLogo source={logoSource} size={logoSize} />
+        <TabletLogo source={logoSource} size={logoSize} element={logoElement} />
         <Text style={[styles.appName, { fontSize, marginLeft: 12 * scale }]}>
-          Asrār
+          Asrariya
         </Text>
       </View>
 
@@ -171,9 +174,10 @@ export default function AppHeaderTablet({
 interface TabletLogoProps {
   source?: ImageSourcePropType;
   size: number;
+  element: ElementType;
 }
 
-function TabletLogo({ source, size }: TabletLogoProps) {
+function TabletLogo({ source, size, element }: TabletLogoProps) {
   const radius = size / 2;
 
   if (source) {
@@ -204,7 +208,7 @@ function TabletLogo({ source, size }: TabletLogoProps) {
         { width: size, height: size, borderRadius: radius, overflow: 'hidden' },
       ]}
     >
-      <AsrarLogo size={size} variant="icon" element="aether" mono={false} />
+      <AsrarLogo size={size} variant="icon" element={element} mono={false} />
     </View>
   );
 }
@@ -232,7 +236,7 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    backgroundColor: '#F0E6FF',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
   },

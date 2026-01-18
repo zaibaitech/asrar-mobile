@@ -1,6 +1,6 @@
-# Asrār Mobile App
+# Asrariya Mobile App
 
-A React Native mobile application built with Expo SDK 54 for the Asrār Everyday project. This app provides spiritual guidance through the ancient practice of Abjad numerology and Islamic spiritual practices.
+A React Native mobile application built with Expo SDK 54 for the Asrariya Everyday project. This app provides spiritual guidance through the ancient practice of Abjad numerology and Islamic spiritual practices.
 
 ## 🌙 Features
 
@@ -115,7 +115,7 @@ npm run web
 
 ### API Configuration
 
-The app connects to the Asrār Everyday API:
+The app connects to the Asrariya Everyday API:
 - **Base URL**: `https://asrar-everyday.vercel.app/api/v1`
 - **Endpoint**: `/istikhara`
 - **Method**: POST

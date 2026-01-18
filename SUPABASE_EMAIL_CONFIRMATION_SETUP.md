@@ -107,7 +107,7 @@ if (result.user && !result.access_token) {
 ### 3. User Flow Changes
 - Sign Up → Email Verification Screen → Check Email → Click Link → Home
 - Email verification screen already exists at `app/email-verification.tsx`
-- Deep linking configured for `asrar://auth/callback`
+- Deep linking configured for `asrariya://auth/callback`
 
 ---
 

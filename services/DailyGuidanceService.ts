@@ -45,8 +45,18 @@ export interface DailyGuidance {
  * Get real-time daily guidance for the user
  */
 export async function getDailyGuidance(profile?: UserProfile): Promise<DailyGuidance> {
-  const now = new Date();
-  const dayOfWeek = now.getDay();
+  return getDailyGuidanceForDate(profile, new Date());
+}
+
+/**
+ * Get daily guidance for a specific date.
+ * Useful for notifications scheduled in advance.
+ */
+export async function getDailyGuidanceForDate(
+  profile: UserProfile | undefined,
+  date: Date
+): Promise<DailyGuidance> {
+  const dayOfWeek = date.getDay();
   
   // Get day's element from planetary ruler
   // Based on traditional Maghribi planetary associations

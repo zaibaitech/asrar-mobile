@@ -9,7 +9,7 @@
  * Structure:
  * 1. Compact Header (minimal padding)
  * 2. Daily Overview Section:
- *    - Daily Guidance (full-width primary)
+ *    - Daily Energy (full-width primary)
  *    - Action Pills (inline buttons)
  *    - Next Prayer + Today's Blessing (2-column row)
  * 3. Quick Access: 2×2 grid shortcuts
@@ -31,8 +31,10 @@ import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 're
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RealTimeDailyGuidance } from '../../components/divine-timing/RealTimeDailyGuidance';
 import { ModuleCard } from '../../components/home';
+import { ManazilWidget } from '../../components/home/ManazilWidget';
 import { MomentAlignmentStrip } from '../../components/home/MomentAlignmentStrip';
 import { RightStackWidgets } from '../../components/home/RightStackWidgets';
+import { RotatingCardContent } from '../../components/home/RotatingCardContent';
 import { ModuleCardProps } from '../../components/home/types';
 import { DarkTheme, ElementAccents, Spacing, Typography } from '../../constants/DarkTheme';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -47,7 +49,6 @@ import { DailyGuidance, getDailyGuidance } from '../../services/DailyGuidanceSer
 import { getTodayBlessing } from '../../services/DayBlessingService';
 import { getMomentAlignment, MomentAlignment } from '../../services/MomentAlignmentService';
 import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, type PlanetaryDayBoundaries, PlanetaryHourData } from '../../services/PlanetaryHoursService';
-import { getPlanetTransitNow, PlanetTransitInfo } from '../../services/PlanetTransitService';
 
 /**
  * Module configuration for all spiritual features
@@ -176,7 +177,6 @@ export default function HomeScreen() {
   const [planetaryData, setPlanetaryData] = useState<PlanetaryHourData | null>(null);
   const [prayerTimesData, setPrayerTimesData] = useState<any>(null);
   const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
-  const [planetTransit, setPlanetTransit] = useState<PlanetTransitInfo | null>(null);
   const [tomorrowBlessing, setTomorrowBlessing] = useState<any>(null);
 
   // Lower-frequency ticker for recomputing sunrise/sunset boundaries.
@@ -209,17 +209,11 @@ export default function HomeScreen() {
       now
     );
     setPlanetaryData(planetary);
-
-    const transit = getPlanetTransitNow(
-      planetaryBoundaries.sunrise,
-      planetaryBoundaries.sunset,
-      planetaryBoundaries.nextSunrise,
-      now
-    );
-    setPlanetTransit(transit);
   }, [planetaryBoundaries, now]);
   
-  // Load real-time daily guidance
+  // Planet transits are now personalized inside RightStackWidgets (by user zodiac sign)
+  
+  // Load real-time daily energy / guidance
   const loadDailyGuidance = useCallback(async () => {
     const guidance = await getDailyGuidance(profile);
     setDailyGuidance(guidance);
@@ -389,17 +383,30 @@ export default function HomeScreen() {
 
       {/* Daily Overview Section - Moved Up */}
       <View style={styles.dailyOverview}>
-        {/* Hero Row: Daily Guidance (60%) + Moment Alignment (40%) */}
+        {/* Hero Row: Daily Energy (60%) + Moment Alignment (40%) */}
         <View style={styles.heroRow}>
-          {/* Daily Guidance - Left Side (Slightly Tightened) */}
+          {/* Daily Energy - Left Side (Slightly Tightened) */}
           <View style={styles.dailyGuidanceColumn}>
-            <RealTimeDailyGuidance 
-              guidance={dailyGuidance} 
-              loading={!dailyGuidance} 
-              compact 
-              showDayLabel
-              dayLabel={getDayName()}
-              showDetailsHint
+            <RotatingCardContent
+              slides={[
+                <RealTimeDailyGuidance
+                  key="dailyGuidance"
+                  guidance={dailyGuidance}
+                  loading={!dailyGuidance}
+                  compact
+                  showDayLabel
+                  dayLabel={getDayName()}
+                  showDetailsHint
+                />,
+                <ManazilWidget
+                  key="manazil"
+                  compact
+                  showDayLabel
+                  dayLabel={getDayName()}
+                />,
+              ]}
+              intervalMs={9000}
+              showDots={false}
             />
           </View>
           
@@ -409,7 +416,6 @@ export default function HomeScreen() {
               nextPrayer={nextPrayer}
               prayerLoading={prayerLoading}
               prayerCountdown={prayerCountdown}
-              planetTransit={planetTransit}
               nextDayBlessing={tomorrowBlessing}
               planetaryData={planetaryData}
               t={t}
@@ -542,7 +548,6 @@ export default function HomeScreen() {
     nextPrayer,
     prayerLoading,
     prayerCountdown,
-    planetTransit,
     modulesExpanded,
     handleModulePress,
     t,
@@ -643,7 +648,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   
-  // Hero Row: Daily Guidance + Moment Alignment
+  // Hero Row: Daily Energy + Moment Alignment
   heroRow: {
     flexDirection: 'row',
     gap: Spacing.sm,

@@ -148,7 +148,7 @@ export default function TabLayout() {
         name="daily-guidance-details"
         options={{
           href: null, // Hide from tab bar
-          title: 'Daily Guidance',
+          title: t('home.dailyGuidanceDetails.title'),
         }}
       />
       <Tabs.Screen
@@ -226,6 +226,13 @@ export default function TabLayout() {
         options={{
           href: null, // Hidden from tab bar - accessed via Home widget
           title: 'Planet Transit',
+        }}
+      />
+      <Tabs.Screen
+        name="manazil"
+        options={{
+          href: null, // Hide from tab bar - accessed via Home widget
+          title: 'Manazil',
         }}
       />
       <Tabs.Screen

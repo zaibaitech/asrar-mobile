@@ -1,11 +1,11 @@
-# Privacy Policy - Asrar Mobile App
+# Privacy Policy - Asrariya Mobile App
 
 **Effective Date**: January 3, 2026  
 **Last Updated**: January 3, 2026
 
 ## Overview
 
-Asrar ("we", "our", or "us") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data.
+Asrariya ("we", "our", or "us") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data.
 
 ## Data Collection
 
@@ -78,7 +78,7 @@ Asrar ("we", "our", or "us") respects your privacy and is committed to protectin
 
 ## Children's Privacy
 
-Asrar is intended for users 13 years and older. We do not knowingly collect data from children under 13. If you believe we have collected such data, contact us immediately at the email below.
+Asrariya is intended for users 13 years and older. We do not knowingly collect data from children under 13. If you believe we have collected such data, contact us immediately at the email below.
 
 ## Data Retention
 
@@ -138,4 +138,4 @@ To exercise these rights, contact us at support@asrar.app.
 
 ---
 
-**Consent**: By using Asrar, you acknowledge that you have read, understood, and agree to this Privacy Policy.
+**Consent**: By using Asrariya, you acknowledge that you have read, understood, and agree to this Privacy Policy.

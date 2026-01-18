@@ -24,6 +24,9 @@ export const translations = {
       compatibility: "Compatibility",
       istikhara: "Istikharah",
       divineTiming: "Divine Timing",
+      notifications: "NOTIFICATIONS",
+      notificationSettings: "Notification Settings",
+      notificationTest: "Test Notifications",
       app: "APP",
       about: "About Asrār",
       helpTutorial: "Help & Tutorial",
@@ -37,6 +40,211 @@ export const translations = {
       levelBasic: "BASIC",
       levelEnhanced: "ENHANCED",
       levelFull: "FULL",
+    },
+
+    notifications: {
+      harmony: {
+        favorableTitle: "🌟 Favorable Window",
+        transformativeTitle: "✨ Transformative Window",
+        delicateTitle: "⚠️ Gentle Timing",
+        updateTitle: "⏰ Timing Update",
+        personalNoteAligned: "Aligned with your {element} element.",
+        favorableBody: "A favorable hour is beginning for {activity}. {planet} hour • {element}.{personalNote} Open Moment Alignment for what’s supported now.",
+        transformativeBody: "A transformative hour is beginning for {activity}. {planet} hour • {element}.{personalNote} Open Moment Alignment for what’s supported now.",
+        delicateBody: "A delicate hour is beginning. Move gently and stay mindful. {planet} hour • {element}.{personalNote}",
+      },
+      timing: {
+        harmonyHigh: "highly favorable energies",
+        harmonyBalanced: "balanced energies with potential for growth",
+        harmonyReflective: "reflective energies, good for inner work",
+        personalNoteSameElement: "Your element ({element}) is strongly activated today.",
+        morningTitle: "{emoji} Morning Briefing — {dayName}",
+        morningBody: "Today carries {elementName} energy with {harmonyText}. Current hour: {planet}.{personalNote} Open Daily Guidance for personalized recommendations.",
+        alignmentTitle: "✨ Alignment Peak — {elementUpper}",
+        alignmentBody: "Strong {element} alignment right now. Best for {activity}. Open Moment Alignment for your next step.",
+      },
+      prayer: {
+        prayerTitle: "🕌 {prayerName} Prayer",
+        prayerBody: "It’s time for {prayerName} ({arabic}). {glimpse}Tap for Prayer Guidance + times.",
+        reminderTitle: "⏰ {prayerName} in {minutes} min",
+        reminderBody: "Prepare now: wudu, intention, and calm focus. {glimpse}Tap for Prayer Guidance.",
+        guidanceGlimpse: "Now: {planet} hour • {element}. {note} ",
+        guidanceNoteAligned: "Strong resonance for you.",
+        guidanceNoteSupportive: "Supportive tone—move steadily.",
+        guidanceNoteChallenging: "Challenging tone—go gently.",
+        guidanceNoteNeutral: "Balanced tone—stay mindful.",
+        testTitle: "🕌 Test Prayer Notification",
+        testBodySoundOn: "Testing adhan sound",
+        testBodySoundOff: "Testing notification (sound disabled)",
+      },
+      detail: {
+        back: "Back",
+        title: "Notification",
+        tip: "Tip: Android may collapse notification bodies in the tray; this screen always shows the full text.",
+        openPrayerTimes: "Open Prayer Times",
+        openPrayerGuidance: "Open Prayer Guidance",
+        openDivineTiming: "Open Divine Timing",
+        openDailyCheckIn: "Open Daily Check-In",
+        openMomentAlignment: "Open Moment Alignment",
+        openDailyGuidance: "Open Daily Energy",
+      },
+    },
+    
+    // Widgets (Home Screen Cards)
+    widgets: {
+      planetTransit: {
+        title: "Planet Transit",
+        subtitle: "Long-term",
+        cta: "See your impact →",
+        timeScale: "Long-term (weeks/months)",
+        updated: "Updated {time} ago",
+      },
+      dailyEnergy: {
+        title: "Daily Energy",
+        todaysElement: "Today's Element",
+        dayRuler: "Day Ruler",
+        bestFor: "BEST FOR",
+        todaysFocus: "Today's Focus",
+        forReflection: "For reflection",
+        viewDetails: "View details",
+        windows: {
+          neutral: "Neutral Window",
+          favorable: "Favorable Window",
+          transformative: "Transformative Window",
+          delicate: "Delicate Window",
+        },
+        energyDescriptions: {
+          fire: "Dynamic & energizing",
+          water: "Flowing & emotional",
+          air: "Mental & communicative",
+          earth: "Grounding & structured",
+        },
+        planetaryFocus: {
+          saturn: "Finish what you started, build solid foundations",
+          jupiter: "Expand your horizons, embrace opportunities",
+          mars: "Take bold action, assert yourself",
+          venus: "Nurture relationships, appreciate beauty",
+          mercury: "Communicate clearly, learn something new",
+          moon: "Trust your intuition, tend to emotions",
+          sun: "Lead with confidence, express yourself",
+        },
+      },
+      dailyGuidance: {
+        title: "Daily Guidance",
+        dayRuler: "Day ruler",
+        yourElement: "You",
+        bestForLabel: "Best for",
+        reflection: "For reflection",
+        windows: {
+          neutral: "Neutral Window",
+          favorable: "Favorable Window",
+          transformative: "Transformative Window",
+          delicate: "Delicate Window",
+        },
+        alignment: {
+          supportive: "Supportive Balance",
+          neutral: "Balanced Energy",
+          challenging: "Dynamic Tension",
+        },
+        focuses: {
+          neutral: {
+            0: "Balance routine with spontaneity",
+            1: "Maintain steady energy throughout",
+            2: "Ground yourself in the present",
+          },
+          favorable: {
+            0: "Seize opportunities that align",
+            1: "Trust your natural flow today",
+            2: "Express yourself authentically",
+          },
+          transformative: {
+            0: "Notice the shift and adapt gently",
+            1: "Let insight guide your next step",
+            2: "Embrace change with patience",
+          },
+          delicate: {
+            0: "Slow down and protect your focus",
+            1: "Observe before reacting",
+            2: "Choose calm over urgency",
+          },
+        },
+        cta: "View details →",
+      },
+
+      manazil: {
+        title: "Manazil",
+        badge: "Your Resonance",
+        completeProfile: "Complete profile",
+        todaysMansion: "Today's Mansion",
+        yourMansion: "Your Mansion",
+        dailyElement: "Daily Element",
+        yourElement: "Your Element",
+        resonanceLabel: "Resonance",
+        guidanceLabel: "Guidance",
+        understandResonance: "Understand resonance →",
+        favorable: "Favorable",
+        balanced: "Balanced",
+        delicate: "Delicate",
+        resonanceLevels: {
+          supportive: "Supportive",
+          harmonious: "Harmonious",
+          neutral: "Neutral",
+          challenging: "Challenging",
+          transformative: "Transformative",
+        },
+        guidanceByResonance: {
+          supportive: "Strong alignment today. Move with confidence and keep momentum.",
+          harmonious: "A helpful match. Collaborate, learn, and build steadily.",
+          neutral: "Balanced tone. Your intention determines the outcome—choose clarity.",
+          challenging: "Some friction is likely. Simplify, finish essentials, and be gentle.",
+          transformative: "High tension can catalyze growth. Go slowly and choose wisdom over force.",
+        },
+        realTime: "Real-time",
+        approximate: "Approximate",
+        currentMansion: "Current Mansion:",
+        yourBaseline: "Your Baseline",
+        reflection: "For reflection",
+        today: "🌙 Manazil today: {name}",
+        todayApprox: "≈ Manazil today (approx): {name}",
+        personal: "Your Baseline Mansion: {name}",
+        personalMissing: "🧿 Your Manazil: complete profile",
+        resonance: {
+          harmonious: "Resonance: strongly aligned",
+          supportive: "Resonance: supportive",
+          challenging: "Resonance: challenging",
+          neutral: "Resonance: balanced",
+        },
+        advice: {
+          bestForLabel: "Best for",
+          avoidLabel: "Avoid",
+          bestForShort: {
+            fire: "Initiative",
+            water: "Gentle repair",
+            air: "Clear planning",
+            earth: "Structure & completion",
+          },
+          bestFor: {
+            fire: "initiative, courageous action, starting what matters",
+            water: "reflection, healing, spiritual practice, gentle repair",
+            air: "learning, communication, planning, clear conversations",
+            earth: "structure, consistency, finances, finishing what’s planned",
+          },
+          avoid: {
+            fire: "impulsive conflict, rushing, burning out",
+            water: "overwhelm, emotional spirals, taking on too much",
+            air: "overthinking, scattered attention, empty debate",
+            earth: "stubbornness, rigidity, delaying decisions",
+          },
+          resonance: {
+            harmonious: "Your personal Manazil is strongly in tune with today—lean in.",
+            supportive: "Today supports your baseline—steady progress wins.",
+            challenging: "Today may feel tense—go gently and simplify.",
+            neutral: "Balanced tone—choose the clearest next step.",
+          },
+        },
+        compactAdvice: "Seize opportunities that align",
+        cta: "View details →",
+      },
     },
     
     // Home Screen Modules
@@ -284,6 +492,7 @@ export const translations = {
       inTime: "in {{time}}",
       noPrayer: "No prayer",
       getGuidance: "Get Prayer Guidance",
+      tapForGuidance: "Tap to see Prayer Guidance",
       calculationMethod: "Calculation Method",
       method: {
         mwl: "Muslim World League",
@@ -345,6 +554,10 @@ export const translations = {
 
     // Common UI
     common: {
+      buttons: {
+        learnMore: "Learn More",
+        collapse: "Show Less",
+      },
       calculate: "Calculate",
       clear: "Clear",
       submit: "Submit",
@@ -358,6 +571,8 @@ export const translations = {
       name: "Name",
       date: "Date",
       location: "Location",
+      element: "Element",
+      you: "You",
       enterName: "Enter name",
       selectDate: "Select date",
       results: "Results",
@@ -717,6 +932,22 @@ export const translations = {
           night: "Night",
           generating: "Generating guidance...",
 
+          forEveryone: "For Everyone",
+          forPractitioners: "For Practitioners",
+          primaryFocus: "Primary",
+          spiritualPrimary: "Spiritual practice is primary; worldly alignment is secondary.",
+          dhikrTitle: "Recommended Dhikr",
+          quranTitle: "Quranic Recitation",
+          duaTitle: "Recommended Duas",
+          intentionsTitle: "Spiritual Intentions (Niyyah)",
+          sunnahTitle: "Sunnah Practices",
+          adabTitle: "Proper Manners (Adab)",
+          expandAdvanced: "View Advanced Guidance",
+          collapseAdvanced: "Hide Advanced Guidance",
+          classicalReferences: "Traditional References",
+          traditionalContext: "Traditional Context",
+          naturalAlignment: "Natural Alignment",
+
           profileHintTitle: "Complete your profile to personalize guidance",
           profileHintBody: "Add your Arabic name in Profile so we can compute your Abjad signature and element.",
           goToProfile: "Go to Profile",
@@ -737,6 +968,8 @@ export const translations = {
           next: "Next",
           current: "Current",
           selectPrayer: "Select Prayer",
+          changePrayer: "Change",
+          guidanceFor: "{prayer} Prayer",
 
           // Divine name card
           recommendedDivineName: "Recommended Divine Name",
@@ -753,6 +986,10 @@ export const translations = {
           // Classical wisdom card
           classicalWisdom: "Classical Wisdom",
           noClassicalGuidance: "No specific classical guidance for this hour",
+          modernContext: "In Today's Context",
+          modernContextExplanation: "These classical terms refer to spiritual practices that can be understood in contemporary ways—setting intentions, creating beneficial routines, and working with positive symbols and practices.",
+          show: "Show",
+          hide: "Hide",
 
           // Spiritual context alignment (warning) card
           alignmentLevel: {
@@ -1320,13 +1557,20 @@ export const translations = {
       
       // Daily Guidance Details Screen
       dailyGuidanceDetails: {
-        title: "Daily Guidance",
+        title: "Daily Energy",
         sections: {
           dayRuler: "Day Ruler",
           dailyWindow: "Daily Window",
           elementalHarmony: "Elemental Harmony",
+          manazil: "Manazil (Lunar Mansion)",
           bestFor: "Best For",
           whyThis: "Why This?",
+        },
+        manazil: {
+          title: "Your lunar baseline",
+          baseline: "Baseline: #{index} — {name}",
+          hint: "This is a stable signature derived from your birth date. Use it as an extra lens for reflection alongside today’s guidance.",
+          missing: "Complete your profile (DOB) to unlock your Manazil baseline.",
         },
         days: {
           Sunday: "Sunday",
@@ -1685,6 +1929,235 @@ export const translations = {
       todayBlessing: "Today's Blessing",
       tomorrow: "Tomorrow",
       tapToSetLocation: "Tap to set location",
+    },
+
+    // Screens
+    screens: {
+      // Planet Transit Screen (System 1 - Long-term)
+      planetTransit: {
+        title: "Planet Transit",
+        headerSubtitle: "Long-term",
+        explanation: "Shows where a planet is in the zodiac — its long-term position that changes over weeks, months, or years.",
+        personalizedNote: "Personalized to your elemental nature",
+        
+        currentTransit: "Current Transit",
+        timeScale: "Long-term (weeks/months)",
+        in: "in",
+        signProgress: "Sign progress",
+        degreeInSign: "Degree in sign",
+        
+        retrograde: "Retrograde",
+        retrogradeArabic: "راجع",
+        nearingChange: "Approaching sign change",
+        
+        duration: {
+          title: "Transit Duration",
+          enteredSign: "Entered sign",
+          leavesSign: "Leaves sign",
+          total: "Duration",
+        },
+        durationStats: {
+          elapsed: "Elapsed",
+          remaining: "Remaining",
+          total: "Total",
+        },
+        timeline: {
+          now: "Now",
+        },
+        
+        dataSource: {
+          title: "Data Source",
+          api: "NASA JPL Horizons (Ephemeris)",
+          cached: "Cached ephemeris data",
+          lastUpdated: "Last updated",
+        },
+        
+        spiritualQuality: {
+          title: "Spiritual Quality",
+          saad: "Sa'd (سَعْد) — Auspicious",
+          nahs: "Naḥs (نَحْس) — Challenging",
+        },
+        
+        meaning: {
+          title: "Theme & Meaning",
+        },
+        
+        resonance: {
+          title: "Resonance with Your Nature",
+          description: "How this transit interacts with your {{element}} element:",
+          levels: {
+            strong: "Strong",
+            harmonious: "Harmonious",
+            neutral: "Neutral",
+            growth: "Growth",
+            challenge: "Challenge",
+          },
+          arabicTerms: {
+            harmonious: "سَكِينَة",
+            supportive: "تَوَافُق",
+            neutral: "تَوَازُن",
+            challenging: "تَحَوُّل",
+          },
+          context: "Based on elemental relationships in traditional spiritual astrology.",
+        },
+        quickImpact: {
+          title: "Quick Impact",
+          subtitle: "How this feels for you right now",
+        },
+        why: {
+          title: "Why it feels this way",
+          body: "This transit blends your elemental nature with the sign’s tone, shaping how you experience communication, mood, and momentum today.",
+          show: "Why it feels this way",
+          hide: "Hide details",
+        },
+        focus: {
+          title: "Today’s focus",
+          communication: "Communication",
+          patience: "Patience",
+          reflection: "Reflection",
+        },
+        
+        classicalWisdom: {
+          title: "Classical Wisdom",
+          arabicTradition: "From Arabic Astronomical Tradition",
+        },
+        degree: {
+          title: "Position in Sign",
+          explanation: "{{degree}} of 30° (~{{percent}}% through this sign).",
+          phases: {
+            early: "Early (0-10°)",
+            middle: "Middle (10-20°)",
+            late: "Late (20-30°)",
+          },
+        },
+        personalized: {
+          title: "Personalized Impact",
+          lead: "As a {{element}} nature with {{sign}}, this transit shapes how you process and express energy.",
+          point1: "Your natural depth meets a more expressive, outward tone.",
+          point2: "Communication may feel faster or more direct than your comfort zone.",
+          point3: "Use your element strengths to balance this transit’s pace and tone.",
+        },
+        daily: {
+          title: "Today’s Guidance",
+          morning: "This morning",
+          morningText: "Ground your intentions before engaging with bold communication.",
+          afternoon: "This afternoon",
+          afternoonText: "Channel creative confidence while staying emotionally aware.",
+          evening: "This evening",
+          eveningText: "Let intensity soften; restore through calm reflection.",
+        },
+        signComparison: {
+          title: "Your Sign vs Transit Sign",
+          yourSign: "Your sign",
+          transitSign: "Transit sign",
+          insight: "Contrasting energies can create powerful growth when balanced.",
+        },
+        balancing: {
+          title: "How to Balance This Energy",
+          subtitle: "Classical methods from Islamic spiritual sciences",
+          methodsLabel: "Classical Remedies",
+          repetitions: "Repetitions",
+          bestTime: "Best time",
+          startCounter: "Start Counter",
+          source: "Source",
+          challenge: "{userElement} nature meets {transitElement} energy — apply the remedies below for steadiness.",
+          disclaimer: "Traditional practices for reflection and balance.",
+          methods: {
+            latif: {
+              title: "Recite Al-Laṭīf",
+              titleArabic: "اللَّطِيف",
+              instruction: "Traditionally recited to soften opposing energies and bring gentleness. Say: “Yā Laṭīf”.",
+              numerology: "Abjad value: 129 (ل=30, ط=9, ي=10, ف=80)",
+              bestTime: "After Fajr or during Jupiter’s hour",
+              source: "Classical dhikr practice",
+            },
+            halim: {
+              title: "Recite Al-Ḥalīm",
+              titleArabic: "الحَلِيم",
+              instruction: "Traditionally recited for patience and forbearance. Say: “Yā Ḥalīm”.",
+              numerology: "Abjad value: 88 (ح=8, ل=30, ي=10, م=40)",
+              bestTime: "When feeling restless or stuck",
+              source: "Classical spiritual practice",
+            },
+            hajah: {
+              title: "Ṣalāt al-Ḥājah",
+              titleArabic: "صلاة الحاجة",
+              instruction: "Perform the Prayer of Need (2 rakʿahs), asking for ease and balance.",
+              bestTime: "Last third of the night",
+              source: "Prophetic tradition",
+            },
+            letters: {
+              title: "Balanced Letter Meditation",
+              titleArabic: "تأمل الحروف المتوازنة",
+              instruction: "Contemplate the letters م and ن together as a symbol of balance. Write them gently and reflect.",
+              bestTime: "During moments of inner conflict",
+              source: "Traditional ʿIlm al-Ḥurūf practice",
+            },
+            mubin: {
+              title: "Recite Al-Mubīn",
+              titleArabic: "المُبِين",
+              instruction: "Traditionally recited for clarity and direction. Say: “Yā Mubīn”.",
+              numerology: "Abjad value: 102 (م=40, ب=2, ي=10, ن=50)",
+              bestTime: "After ʿAṣr",
+              source: "Classical Sufi practice",
+            },
+            shukr: {
+              title: "Dhikr of Gratitude",
+              titleArabic: "ذِكر الشُكر",
+              instruction: "Recite “Alḥamdu lillāh” with gratitude to reinforce harmony.",
+              bestTime: "Throughout the day",
+              source: "Quranic encouragement (14:7)",
+            },
+            hakim: {
+              title: "Recite Al-Ḥakīm",
+              titleArabic: "الحَكِيم",
+              instruction: "Traditionally recited to seek balanced judgment. Say: “Yā Ḥakīm”.",
+              numerology: "Abjad value: 78 (ح=8, ك=20, ي=10, م=40)",
+              bestTime: "Wednesday during Mercury’s hour",
+              source: "Traditional ʿIlm al-Ḥurūf practice",
+            },
+            istighfar: {
+              title: "Istighfār",
+              titleArabic: "الاستغفار",
+              instruction: "Recite “Astaghfirullāh al-ʿAẓīm” to purify the heart and renew intention.",
+              bestTime: "Before dawn (Saḥar)",
+              source: "Prophetic tradition",
+            },
+            salawat: {
+              title: "Ṣalawāt on the Prophet",
+              titleArabic: "الصلاة على النبي",
+              instruction: "Recite: “Allāhumma ṣalli ʿalā Muḥammad” to invite barakah and balance.",
+              bestTime: "Friday and after prayers",
+              source: "Quranic command (33:56)",
+            },
+          },
+        },
+        history: {
+          title: "Transit History",
+          previous: "Previous sign",
+          next: "Next sign",
+          estimated: "Estimated",
+          current: "Currently here",
+        },
+      },
+      
+      // Moment Alignment Screen (System 3 - Hourly)
+      momentAlignment: {
+        title: "Moment Alignment",
+        headerSubtitle: "Current Hour",
+        explanation: "Shows the active planetary hour (changes through the day) and how it interacts with your spiritual nature.",
+        
+        currentHour: "Current Hour",
+        hourNumber: "Hour {{current}} of {{total}}",
+        nextChange: "Next change",
+        
+        transitContext: {
+          title: "Transit Context (Long-term)",
+          description: "Beyond the hourly energy, here is where this planet is in the zodiac long-term:",
+          planetIn: "{{planet}} is in {{sign}} ({{signArabic}})",
+          viewDetails: "View full transit details",
+        },
+      },
     },
 
     qibla: {
@@ -3029,6 +3502,11 @@ export const translations = {
       waterDesc: "Cold & Wet - Emotional and intuitive",
       airDesc: "Hot & Wet - Intellectual and communicative",
       earthDesc: "Cold & Dry - Stable and grounding",
+      // Arabic names (classical Islamic cosmology)
+      fireArabic: "نار",
+      waterArabic: "ماء",
+      airArabic: "هواء",
+      earthArabic: "تراب",
     },
 
     // Enhanced Temperament Profiles (Psychology + Career)
@@ -4682,6 +5160,14 @@ export const translations = {
       jupiter: "Jupiter",
       venus: "Venus",
       saturn: "Saturn",
+      // Arabic names (classical Islamic astronomy)
+      sunArabic: "الشمس",
+      moonArabic: "القمر",
+      marsArabic: "المريخ",
+      mercuryArabic: "عطارد",
+      jupiterArabic: "المشتري",
+      venusArabic: "الزهرة",
+      saturnArabic: "زحل",
     },
 
     // Zodiac signs
@@ -4698,6 +5184,19 @@ export const translations = {
       capricorn: "Capricorn",
       aquarius: "Aquarius",
       pisces: "Pisces",
+      // Arabic names (classical Islamic astronomy)
+      ariesArabic: "الحمل",
+      taurusArabic: "الثور",
+      geminiArabic: "الجوزاء",
+      cancerArabic: "السرطان",
+      leoArabic: "الأسد",
+      virgoArabic: "السنبلة",
+      libraArabic: "الميزان",
+      scorpioArabic: "العقرب",
+      sagittariusArabic: "القوس",
+      capricornArabic: "الجدي",
+      aquariusArabic: "الدلو",
+      piscesArabic: "الحوت",
     },
 
     // Aspects
@@ -6197,6 +6696,19 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       completeTutorial: "Complete tutorial",
       stepOf: "Step {current} of {total}",
       
+      // Welcome/Splash Screen
+      splash: {
+        appName: "Asrariya",
+        subtitle: "✦ ʿIlm al-Ḥurūf ✦",
+        description: "Discover the sacred science of letters and divine names through ancient wisdom and cosmic timing",
+        features: {
+          calculator: "Sacred Name Calculator",
+          timing: "Divine Timing Guidance",
+          insights: "Personalized Insights",
+        },
+        getStarted: "Get Started",
+      },
+      
       // First-Launch Walkthrough
       skip: "Skip",
       next: "Next",
@@ -6749,6 +7261,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         hide: "Hide",
         now: "Now",
         next: "Next",
+        tapForGuidance: "Tap to see Prayer Guidance",
         calculationsBasedOn: "Calculations based on",
         yourLocation: "your location",
         specialPrayerTime: "Special Prayer Time",
@@ -7240,6 +7753,19 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         // Progress indicator
         stepOf: "Your Journey — {current} / {total}",
 
+        // Welcome/Splash Screen
+        splash: {
+          appName: "Asrariya",
+          subtitle: "✦ ʿIlm al-Ḥurūf ✦",
+          description: "Découvrez la science sacrée des lettres et des noms divins à travers la sagesse ancienne et le timing cosmique",
+          features: {
+            calculator: "Calculateur de Nom Sacré",
+            timing: "Guidance du Timing Divin",
+            insights: "Aperçus Personnalisés",
+          },
+          getStarted: "Commencer",
+        },
+
         skip: "Skip",
         next: "Next",
         back: "Back",
@@ -7340,6 +7866,9 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       compatibility: "Compatibilité",
       istikhara: "Istikharah",
       divineTiming: "Moment Divin",
+      notifications: "NOTIFICATIONS",
+      notificationSettings: "Paramètres de Notifications",
+      notificationTest: "Tester les Notifications",
       app: "APPLICATION",
       about: "À Propos d'Asrār",
       helpTutorial: "Aide & Tutoriel",
@@ -7353,6 +7882,211 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       levelBasic: "BASIQUE",
       levelEnhanced: "AMÉLIORÉ",
       levelFull: "COMPLET",
+    },
+
+    notifications: {
+      harmony: {
+        favorableTitle: "🌟 Début d'une heure favorable",
+        transformativeTitle: "✨ Ouverture d'une fenêtre transformatrice",
+        delicateTitle: "⚠️ Période délicate à venir",
+        updateTitle: "⏰ Mise à jour du timing",
+        personalNoteAligned: "Votre élément {element} est aligné.",
+        favorableBody: "Une heure favorable commence pour {activity}. Heure de {planet} • {element}.{personalNote} Ouvrez Alignement du moment pour voir ce qui est soutenu maintenant.",
+        transformativeBody: "Une fenêtre transformatrice commence pour {activity}. Heure de {planet} • {element}.{personalNote} Ouvrez Alignement du moment pour voir ce qui est soutenu maintenant.",
+        delicateBody: "Une heure délicate commence. Avancez avec douceur et présence. Heure de {planet} • {element}.{personalNote}",
+      },
+      timing: {
+        harmonyHigh: "des énergies très favorables",
+        harmonyBalanced: "des énergies équilibrées, propices à l'évolution",
+        harmonyReflective: "des énergies introspectives, idéales pour le travail intérieur",
+        personalNoteSameElement: "Votre élément ({element}) est fortement activé aujourd'hui.",
+        morningTitle: "{emoji} Briefing du matin — {dayName}",
+        morningBody: "Aujourd'hui porte une énergie {elementName} avec {harmonyText}. Heure actuelle : {planet}.{personalNote} Ouvrez Guidance pour des recommandations personnalisées.",
+        alignmentTitle: "✨ Pic d'alignement — {elementUpper}",
+        alignmentBody: "Fort alignement {element} maintenant. Idéal pour {activity}. Ouvrez Alignement du moment pour votre prochaine étape.",
+      },
+      prayer: {
+        prayerTitle: "🕌 Prière de {prayerName}",
+        prayerBody: "C’est l’heure de {prayerName} ({arabic}). {glimpse}Appuyez pour la guidance + les horaires.",
+        reminderTitle: "⏰ {prayerName} dans {minutes} min",
+        reminderBody: "Préparez-vous : ablutions, intention et calme. {glimpse}Appuyez pour la guidance.",
+        guidanceGlimpse: "Maintenant : heure de {planet} • {element}. {note} ",
+        guidanceNoteAligned: "Forte résonance pour vous.",
+        guidanceNoteSupportive: "Énergie soutenante — avancez avec constance.",
+        guidanceNoteChallenging: "Énergie exigeante — allez doucement.",
+        guidanceNoteNeutral: "Énergie équilibrée — restez attentif.",
+        testTitle: "🕌 Notification test",
+        testBodySoundOn: "Test du son de l’adhan",
+        testBodySoundOff: "Test de notification (son désactivé)",
+      },
+      detail: {
+        back: "Retour",
+        title: "Notification",
+        tip: "Astuce : Android peut réduire le texte dans le volet ; cet écran affiche toujours le contenu complet.",
+        openPrayerTimes: "Ouvrir les heures de prière",
+        openPrayerGuidance: "Ouvrir Guidance de prière",
+        openDivineTiming: "Ouvrir Moment Divin",
+        openDailyCheckIn: "Ouvrir Bilan Quotidien",
+        openMomentAlignment: "Ouvrir Alignement du moment",
+        openDailyGuidance: "Ouvrir Énergie du Jour",
+      },
+    },
+    
+    // Widgets (Cartes de la Page d'Accueil)
+    widgets: {
+      planetTransit: {
+        title: "Transit Planétaire",
+        subtitle: "Long terme",
+        cta: "Voir impact →",
+        timeScale: "Long terme (semaines/mois)",
+        updated: "Mis à jour il y a {time}",
+      },
+      dailyEnergy: {
+        title: "Énergie du Jour",
+        todaysElement: "Élément du Jour",
+        dayRuler: "Maître du Jour",
+        bestFor: "IDÉAL POUR",
+        todaysFocus: "Focus du Jour",
+        forReflection: "Pour réflexion",
+        viewDetails: "Voir détails",
+        windows: {
+          neutral: "Fenêtre neutre",
+          favorable: "Fenêtre favorable",
+          transformative: "Fenêtre transformatrice",
+          delicate: "Fenêtre délicate",
+        },
+        energyDescriptions: {
+          fire: "Dynamique & énergisant",
+          water: "Fluide & émotionnel",
+          air: "Mental & communicatif",
+          earth: "Ancrant & structuré",
+        },
+        planetaryFocus: {
+          saturn: "Terminez ce que vous avez commencé, construisez des bases solides",
+          jupiter: "Élargissez vos horizons, saisissez les opportunités",
+          mars: "Agissez avec audace, affirmez-vous",
+          venus: "Cultivez les relations, appréciez la beauté",
+          mercury: "Communiquez clairement, apprenez quelque chose de nouveau",
+          moon: "Faites confiance à votre intuition, occupez-vous de vos émotions",
+          sun: "Dirigez avec confiance, exprimez-vous",
+        },
+      },
+      dailyGuidance: {
+        title: "Guidance",
+        dayRuler: "Planète",
+        yourElement: "Vous",
+        bestForLabel: "Idéal pour",
+        reflection: "Réflexion",
+        windows: {
+          neutral: "Fenêtre neutre",
+          favorable: "Fenêtre favorable",
+          transformative: "Fenêtre transformatrice",
+          delicate: "Fenêtre délicate",
+        },
+        alignment: {
+          supportive: "Équilibre favorable",
+          neutral: "Énergie équilibrée",
+          challenging: "Tension dynamique",
+        },
+        focuses: {
+          neutral: {
+            0: "Équilibrer routine et spontanéité",
+            1: "Maintenir une énergie stable",
+            2: "S'ancrer dans le présent",
+          },
+          favorable: {
+            0: "Saisir les opportunités alignées",
+            1: "Faire confiance à votre flux naturel",
+            2: "S'exprimer authentiquement",
+          },
+          transformative: {
+            0: "Accueillir le changement en douceur",
+            1: "Laisser l'intuition guider le pas suivant",
+            2: "Avancer avec patience",
+          },
+          delicate: {
+            0: "Ralentir et protéger votre attention",
+            1: "Observer avant de réagir",
+            2: "Choisir le calme plutôt que l'urgence",
+          },
+        },
+        cta: "Détails →",
+      },
+
+      manazil: {
+        title: "Manazil",
+        badge: "Votre Résonance",
+        completeProfile: "Compléter le profil",
+        todaysMansion: "Demeure du jour",
+        yourMansion: "Votre demeure",
+        dailyElement: "Élément du jour",
+        yourElement: "Votre élément",
+        resonanceLabel: "Résonance",
+        guidanceLabel: "Guidance",
+        understandResonance: "Comprendre la résonance →",
+        favorable: "Favorable",
+        balanced: "Équilibrée",
+        delicate: "Délicate",
+        resonanceLevels: {
+          supportive: "Favorable",
+          harmonious: "Harmonieuse",
+          neutral: "Neutre",
+          challenging: "Exigeante",
+          transformative: "Transformatrice",
+        },
+        guidanceByResonance: {
+          supportive: "Fort alignement aujourd’hui. Avancez avec confiance et gardez l’élan.",
+          harmonious: "Accord utile. Collaborez, apprenez, et construisez avec constance.",
+          neutral: "Tonalité équilibrée. Votre intention guide le résultat—choisissez la clarté.",
+          challenging: "Un peu de friction. Simplifiez, terminez l’essentiel, allez doucement.",
+          transformative: "Tension élevée, potentiel de percée. Ralentissez et choisissez la sagesse.",
+        },
+        realTime: "Temps réel",
+        approximate: "Approximatif",
+        currentMansion: "Demeure actuelle :",
+        yourBaseline: "Votre Base",
+        reflection: "Pour réflexion",
+        today: "🌙 Manazil du jour : {name}",
+        todayApprox: "≈ Manazil du jour (approx.) : {name}",
+        personal: "Votre Demeure de Base : {name}",
+        personalMissing: "🧿 Votre Manazil : complétez le profil",
+        resonance: {
+          harmonious: "Résonance : fortement alignée",
+          supportive: "Résonance : favorable",
+          challenging: "Résonance : exigeante",
+          neutral: "Résonance : équilibrée",
+        },
+        advice: {
+          bestForLabel: "Idéal pour",
+          avoidLabel: "À éviter",
+          bestForShort: {
+            fire: "Initiative",
+            water: "Réparation douce",
+            air: "Plan clair",
+            earth: "Structure & accomplissement",
+          },
+          bestFor: {
+            fire: "initiative, action courageuse, commencer l’essentiel",
+            water: "réflexion, guérison, pratique spirituelle, réparation douce",
+            air: "apprentissage, communication, planification, échanges clairs",
+            earth: "structure, constance, finances, finir ce qui est prévu",
+          },
+          avoid: {
+            fire: "conflits impulsifs, précipitation, épuisement",
+            water: "submersion, spirales émotionnelles, trop en faire",
+            air: "sur-analyse, dispersion, débats stériles",
+            earth: "entêtement, rigidité, remettre à plus tard",
+          },
+          resonance: {
+            harmonious: "Votre Manazil personnel est très accordé au jour—avancez.",
+            supportive: "Le jour soutient votre base—progrès réguliers.",
+            challenging: "Le jour peut être tendu—allez doucement, simplifiez.",
+            neutral: "Énergie équilibrée—choisissez le prochain pas clair.",
+          },
+        },
+        compactAdvice: "Saisis les opportunités alignées",
+        cta: "Voir détails →",
+      },
     },
     
     // Modules de la Page d'Accueil
@@ -7600,6 +8334,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       inTime: "dans {{time}}",
       noPrayer: "Pas de prière",
       getGuidance: "Obtenir des conseils de prière",
+      tapForGuidance: "Appuyez pour voir les conseils de prière",
       calculationMethod: "Méthode de calcul",
       method: {
         mwl: "Ligue musulmane mondiale",
@@ -7660,6 +8395,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
     },
 
     common: {
+      buttons: {
+        learnMore: "En Savoir Plus",
+        collapse: "Afficher Moins",
+      },
       calculate: "Calculer",
       clear: "Effacer",
       submit: "Soumettre",
@@ -7673,6 +8412,8 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       name: "Nom",
       date: "Date",
       location: "Lieu",
+      element: "Élément",
+      you: "Vous",
       enterName: "Entrez le nom",
       selectDate: "Sélectionnez la date",
       results: "Résultats",
@@ -8010,6 +8751,22 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           night: "Nuit",
           generating: "Génération de la guidance...",
 
+          forEveryone: "Pour Tous",
+          forPractitioners: "Pour les Praticiens",
+          primaryFocus: "Principal",
+          spiritualPrimary: "La pratique spirituelle est prioritaire ; l’alignement mondain est secondaire.",
+          dhikrTitle: "Dhikr Recommandé",
+          quranTitle: "Récitation Coranique",
+          duaTitle: "Invocations Recommandées",
+          intentionsTitle: "Intentions Spirituelles (Niyyah)",
+          sunnahTitle: "Pratiques de la Sunna",
+          adabTitle: "Bonnes Manières (Adab)",
+          expandAdvanced: "Voir les Conseils Avancés",
+          collapseAdvanced: "Masquer les Conseils Avancés",
+          classicalReferences: "Références Traditionnelles",
+          traditionalContext: "Contexte Traditionnel",
+          naturalAlignment: "Alignement Naturel",
+
           profileHintTitle: "Complétez votre profil pour personnaliser la guidance",
           profileHintBody: "Ajoutez votre nom arabe dans Profil afin de calculer votre signature Abjad et votre élément.",
           goToProfile: "Aller au profil",
@@ -8030,6 +8787,8 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           next: "Suivante",
           current: "Actuelle",
           selectPrayer: "Choisir une prière",
+          changePrayer: "Changer",
+          guidanceFor: "Prière {prayer}",
 
           // Carte Nom divin
           recommendedDivineName: "Nom divin recommandé",
@@ -8046,6 +8805,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           // Carte Sagesse classique
           classicalWisdom: "Sagesse classique",
           noClassicalGuidance: "Aucune guidance classique spécifique pour cette heure",
+          modernContext: "Dans le contexte d'aujourd'hui",
+          modernContextExplanation: "Ces termes classiques font référence à des pratiques spirituelles qui peuvent être comprises de manière contemporaine—fixer des intentions, créer des routines bénéfiques et travailler avec des symboles et pratiques positifs.",
+          show: "Afficher",
+          hide: "Masquer",
 
           // Carte d'alignement (contexte spirituel)
           alignmentLevel: {
@@ -8613,13 +9376,20 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       
       // Daily Guidance Details Screen  
       dailyGuidanceDetails: {
-        title: "Guidance du jour",
+        title: "Énergie du Jour",
         sections: {
           dayRuler: "Planète du jour",
           dailyWindow: "Fenêtre quotidienne",
           elementalHarmony: "Harmonie élémentaire",
+          manazil: "Manāzil (demeure lunaire)",
           bestFor: "Idéal pour",
           whyThis: "Pourquoi?",
+        },
+        manazil: {
+          title: "Votre signature lunaire",
+          baseline: "Base : n°{index} — {name}",
+          hint: "C’est une signature stable dérivée de votre date de naissance. Utilisez-la comme un prisme supplémentaire, en complément de la guidance du jour.",
+          missing: "Complétez votre profil (date de naissance) pour débloquer votre Manāzil de base.",
         },
         days: {
           Sunday: "Dimanche",
@@ -8991,6 +9761,235 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       todayBlessing: "Bénédiction d'Aujourd'hui",
       tomorrow: "Demain",
       tapToSetLocation: "Appuyez pour définir l'emplacement",
+    },
+
+    // Écrans
+    screens: {
+      // Écran de Transit Planétaire (Système 1 - Long terme)
+      planetTransit: {
+        title: "Transit Planétaire",
+        headerSubtitle: "Long terme",
+        explanation: "Indique où se trouve une planète dans le zodiaque — sa position à long terme qui change sur des semaines, des mois ou des années.",
+        personalizedNote: "Personnalisé à votre nature élémentaire",
+        
+        currentTransit: "Transit Actuel",
+        timeScale: "Long terme (semaines/mois)",
+        in: "en",
+        signProgress: "Progression dans le signe",
+        degreeInSign: "Degré dans le signe",
+        
+        retrograde: "Rétrograde",
+        retrogradeArabic: "راجع",
+        nearingChange: "Changement de signe imminent",
+        
+        duration: {
+          title: "Durée du Transit",
+          enteredSign: "Entré dans le signe",
+          leavesSign: "Quitte le signe",
+          total: "Durée",
+        },
+        durationStats: {
+          elapsed: "Écoulé",
+          remaining: "Restant",
+          total: "Total",
+        },
+        timeline: {
+          now: "Maintenant",
+        },
+        
+        dataSource: {
+          title: "Source de Données",
+          api: "NASA JPL Horizons (Éphémérides)",
+          cached: "Données éphémérides en cache",
+          lastUpdated: "Dernière mise à jour",
+        },
+        
+        spiritualQuality: {
+          title: "Qualité Spirituelle",
+          saad: "Sa'd (سَعْد) — Propice",
+          nahs: "Naḥs (نَحْس) — Difficile",
+        },
+        
+        meaning: {
+          title: "Thème & Signification",
+        },
+        
+        resonance: {
+          title: "Résonance avec Votre Nature",
+          description: "Comment ce transit interagit avec votre élément {{element}} :",
+          levels: {
+            strong: "Fort",
+            harmonious: "Harmonieux",
+            neutral: "Neutre",
+            growth: "Croissance",
+            challenge: "Défi",
+          },
+          arabicTerms: {
+            harmonious: "سَكِينَة",
+            supportive: "تَوَافُق",
+            neutral: "تَوَازُن",
+            challenging: "تَحَوُّل",
+          },
+          context: "Basé sur les relations élémentaires dans l'astrologie spirituelle traditionnelle.",
+        },
+        quickImpact: {
+          title: "Impact Immédiat",
+          subtitle: "Comment cela se ressent pour vous",
+        },
+        why: {
+          title: "Pourquoi cela se ressent ainsi",
+          body: "Ce transit mélange votre nature élémentaire avec le ton du signe, influençant la communication, l’humeur et l’élan du jour.",
+          show: "Pourquoi cela se ressent ainsi",
+          hide: "Masquer les détails",
+        },
+        focus: {
+          title: "Focus du jour",
+          communication: "Communication",
+          patience: "Patience",
+          reflection: "Réflexion",
+        },
+        
+        classicalWisdom: {
+          title: "Sagesse Classique",
+          arabicTradition: "De la Tradition Astronomique Arabe",
+        },
+        degree: {
+          title: "Position dans le Signe",
+          explanation: "{{degree}} sur 30° (~{{percent}}% de ce signe).",
+          phases: {
+            early: "Début (0-10°)",
+            middle: "Milieu (10-20°)",
+            late: "Fin (20-30°)",
+          },
+        },
+        personalized: {
+          title: "Impact Personnalisé",
+          lead: "En tant que nature {{element}} avec {{sign}}, ce transit façonne votre énergie et votre expression.",
+          point1: "Votre profondeur naturelle rencontre un ton plus expressif et visible.",
+          point2: "La communication peut sembler plus rapide ou directe.",
+          point3: "Utilisez vos forces élémentaires pour équilibrer le rythme et le ton.",
+        },
+        daily: {
+          title: "Conseils du Jour",
+          morning: "Ce matin",
+          morningText: "Ancrez vos intentions avant une communication audacieuse.",
+          afternoon: "Cet après-midi",
+          afternoonText: "Canalisez la confiance créative tout en restant sensible.",
+          evening: "Ce soir",
+          eveningText: "Adoucissez l’intensité et ressourcez-vous calmement.",
+        },
+        signComparison: {
+          title: "Votre Signe vs Signe du Transit",
+          yourSign: "Votre signe",
+          transitSign: "Signe du transit",
+          insight: "Les contrastes peuvent créer une croissance puissante quand ils sont équilibrés.",
+        },
+        balancing: {
+          title: "Comment Équilibrer Cette Énergie",
+          subtitle: "Méthodes classiques des sciences spirituelles islamiques",
+          methodsLabel: "Remèdes Classiques",
+          repetitions: "Répétitions",
+          bestTime: "Meilleur moment",
+          startCounter: "Commencer le compteur",
+          source: "Source",
+          challenge: "La nature {userElement} rencontre l’énergie {transitElement} — appliquez les remèdes ci‑dessous pour plus de stabilité.",
+          disclaimer: "Pratiques traditionnelles pour la réflexion et l’équilibre.",
+          methods: {
+            latif: {
+              title: "Réciter Al‑Laṭīf",
+              titleArabic: "اللَّطِيف",
+              instruction: "Traditionnellement récité pour adoucir les oppositions. Dites : “Yā Laṭīf”.",
+              numerology: "Valeur abjad : 129 (ل=30, ط=9, ي=10, ف=80)",
+              bestTime: "Après Fajr ou durant l’heure de Jupiter",
+              source: "Pratique de dhikr classique",
+            },
+            halim: {
+              title: "Réciter Al‑Ḥalīm",
+              titleArabic: "الحَلِيم",
+              instruction: "Traditionnellement récité pour la patience. Dites : “Yā Ḥalīm”.",
+              numerology: "Valeur abjad : 88 (ح=8, ل=30, ي=10, م=40)",
+              bestTime: "Quand vous sentez l’agitation",
+              source: "Pratique spirituelle classique",
+            },
+            hajah: {
+              title: "Ṣalāt al‑Ḥājah",
+              titleArabic: "صلاة الحاجة",
+              instruction: "Effectuez la Prière du Besoin (2 rakʿahs) en demandant l’apaisement.",
+              bestTime: "Dernier tiers de la nuit",
+              source: "Tradition prophétique",
+            },
+            letters: {
+              title: "Méditation des lettres",
+              titleArabic: "تأمل الحروف المتوازنة",
+              instruction: "Contemplez les lettres م et ن comme symbole d’équilibre. Écrivez‑les doucement et méditez.",
+              bestTime: "Lors d’un conflit intérieur",
+              source: "ʿIlm al‑Ḥurūf traditionnel",
+            },
+            mubin: {
+              title: "Réciter Al‑Mubīn",
+              titleArabic: "المُبِين",
+              instruction: "Traditionnellement récité pour la clarté. Dites : “Yā Mubīn”.",
+              numerology: "Valeur abjad : 102 (م=40, ب=2, ي=10, ن=50)",
+              bestTime: "Après ʿAṣr",
+              source: "Pratique soufie classique",
+            },
+            shukr: {
+              title: "Dhikr de gratitude",
+              titleArabic: "ذِكر الشُكر",
+              instruction: "Récitez “Alḥamdu lillāh” pour renforcer l’harmonie.",
+              bestTime: "Tout au long de la journée",
+              source: "Encouragement coranique (14:7)",
+            },
+            hakim: {
+              title: "Réciter Al‑Ḥakīm",
+              titleArabic: "الحَكِيم",
+              instruction: "Traditionnellement récité pour un jugement équilibré. Dites : “Yā Ḥakīm”.",
+              numerology: "Valeur abjad : 78 (ح=8, ك=20, ي=10, م=40)",
+              bestTime: "Mercredi durant l’heure de Mercure",
+              source: "ʿIlm al‑Ḥurūf traditionnel",
+            },
+            istighfar: {
+              title: "Istighfār",
+              titleArabic: "الاستغفار",
+              instruction: "Récitez “Astaghfirullāh al‑ʿAẓīm” pour purifier le cœur et renouveler l’intention.",
+              bestTime: "Avant l’aube (Saḥar)",
+              source: "Tradition prophétique",
+            },
+            salawat: {
+              title: "Ṣalawāt sur le Prophète",
+              titleArabic: "الصلاة على النبي",
+              instruction: "Récitez : “Allāhumma ṣalli ʿalā Muḥammad” pour la barakah et l’équilibre.",
+              bestTime: "Vendredi et après les prières",
+              source: "Commandement coranique (33:56)",
+            },
+          },
+        },
+        history: {
+          title: "Historique du Transit",
+          previous: "Signe précédent",
+          next: "Signe suivant",
+          estimated: "Estimé",
+          current: "Vous êtes ici",
+        },
+      },
+      
+      // Écran d'Alignement du Moment (Système 3 - Horaire)
+      momentAlignment: {
+        title: "Alignement du Moment",
+        headerSubtitle: "Heure Actuelle",
+        explanation: "Indique l'heure planétaire active (change tout au long de la journée) et comment elle interagit avec votre nature spirituelle.",
+        
+        currentHour: "Heure Actuelle",
+        hourNumber: "Heure {{current}} de {{total}}",
+        nextChange: "Prochain changement",
+        
+        transitContext: {
+          title: "Contexte de Transit (Long terme)",
+          description: "Au-delà de l'énergie horaire, voici où se trouve cette planète dans le zodiaque à long terme :",
+          planetIn: "{{planet}} est en {{sign}} ({{signArabic}})",
+          viewDetails: "Voir les détails complets du transit",
+        },
+      },
     },
 
     qibla: {
@@ -10328,6 +11327,11 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       waterDesc: "Froid et Humide - Émotionnel et intuitif",
       airDesc: "Chaud et Humide - Intellectuel et communicatif",
       earthDesc: "Froid et Sec - Stable et ancré",
+      // Noms arabes (cosmologie islamique classique)
+      fireArabic: "نار",
+      waterArabic: "ماء",
+      airArabic: "هواء",
+      earthArabic: "تراب",
     },
 
     // Profils de Tempérament Améliorés (Psychologie + Carrière)
@@ -12098,6 +13102,14 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       jupiter: "Jupiter",
       venus: "Vénus",
       saturn: "Saturne",
+      // Noms arabes (astronomie islamique classique)
+      sunArabic: "الشمس",
+      moonArabic: "القمر",
+      marsArabic: "المريخ",
+      mercuryArabic: "عطارد",
+      jupiterArabic: "المشتري",
+      venusArabic: "الزهرة",
+      saturnArabic: "زحل",
     },
 
     // Zodiac signs
@@ -12114,6 +13126,19 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       capricorn: "Capricorne",
       aquarius: "Verseau",
       pisces: "Poissons",
+      // Noms arabes (astronomie islamique classique)
+      ariesArabic: "الحمل",
+      taurusArabic: "الثور",
+      geminiArabic: "الجوزاء",
+      cancerArabic: "السرطان",
+      leoArabic: "الأسد",
+      virgoArabic: "السنبلة",
+      libraArabic: "الميزان",
+      scorpioArabic: "العقرب",
+      sagittariusArabic: "القوس",
+      capricornArabic: "الجدي",
+      aquariusArabic: "الدلو",
+      piscesArabic: "الحوت",
     },
 
     // Aspects
@@ -13407,6 +14432,19 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       completeTutorial: "Terminer le tutoriel",
       stepOf: "Étape {current} sur {total}",
       
+      // Welcome/Splash Screen
+      splash: {
+        appName: "Asrariya",
+        subtitle: "✦ ʿIlm al-Ḥurūf ✦",
+        description: "Découvrez la science sacrée des lettres et des noms divins à travers la sagesse ancienne et le timing cosmique",
+        features: {
+          calculator: "Calculateur de Nom Sacré",
+          timing: "Guidance du Timing Divin",
+          insights: "Aperçus Personnalisés",
+        },
+        getStarted: "Commencer",
+      },
+      
       // First-Launch Walkthrough
       skip: "Passer",
       next: "Suivant",
@@ -13959,6 +14997,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         hide: "Masquer",
         now: "Actuel",
         next: "Prochain",
+        tapForGuidance: "Appuyez pour voir les conseils de prière",
         calculationsBasedOn: "Calculs basés sur",
         yourLocation: "votre position",
         specialPrayerTime: "Temps Spécial de Prière",
@@ -14532,6 +15571,28 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
   },
   ar: {
     // Minimal Arabic translations. Any missing keys fall back to EN automatically.
+    common: {
+      buttons: {
+        learnMore: "اعرف المزيد",
+        collapse: "إظهار أقل",
+      },
+    },
+    
+    onboarding: {
+      // Welcome/Splash Screen
+      splash: {
+        appName: "أسراريا",
+        subtitle: "✦ عِلْم الحُرُوف ✦",
+        description: "اكتشف علم الحروف والأسماء الإلهية من خلال الحكمة القديمة والتوقيت الكوني",
+        features: {
+          calculator: "حاسبة الاسم المقدس",
+          timing: "إرشاد التوقيت الإلهي",
+          insights: "رؤى شخصية",
+        },
+        getStarted: "ابدأ",
+      },
+    },
+    
     prayerGuidance: {
       title: "إرشاد الصلاة",
       subtitle: "ممارسات الساعات الكوكبية الكلاسيكية من مصادر تقليدية",
@@ -14547,6 +15608,22 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         day: "نهار",
         night: "ليل",
         generating: "جارٍ توليد الإرشاد...",
+
+        forEveryone: "للجميع",
+        forPractitioners: "للممارسين",
+        primaryFocus: "أساسي",
+        spiritualPrimary: "الممارسة الروحية هي الأساس؛ والمواءمة الدنيوية ثانوية.",
+        dhikrTitle: "ذكر مُوصى به",
+        quranTitle: "تلاوة قرآنية",
+        duaTitle: "أدعية مُوصى بها",
+        intentionsTitle: "النّوايا الروحية (النية)",
+        sunnahTitle: "ممارسات السنّة",
+        adabTitle: "الآداب الصحيحة",
+        expandAdvanced: "عرض الإرشاد المتقدم",
+        collapseAdvanced: "إخفاء الإرشاد المتقدم",
+        classicalReferences: "مراجع تقليدية",
+        traditionalContext: "السياق التقليدي",
+        naturalAlignment: "التوافق الطبيعي",
 
         profileHintTitle: "أكمل ملفك الشخصي لتخصيص الإرشاد",
         profileHintBody: "أضف اسمك العربي في الملف الشخصي حتى نتمكن من حساب بصمتك الأبجدية وعنصرك.",
@@ -14567,6 +15644,8 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         next: "التالي",
         current: "الحالي",
         selectPrayer: "اختر صلاة",
+        changePrayer: "تغيير",
+        guidanceFor: "صلاة {prayer}",
 
         recommendedDivineName: "الاسم الإلهي الموصى به",
         reciteCount: "ردّد {count}×",
@@ -14581,6 +15660,10 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
 
         classicalWisdom: "حكمة كلاسيكية",
         noClassicalGuidance: "لا توجد إرشادات كلاسيكية محددة لهذه الساعة",
+        modernContext: "في سياق اليوم",
+        modernContextExplanation: "تشير هذه المصطلحات الكلاسيكية إلى ممارسات روحية يمكن فهمها بطرق معاصرة—تحديد النوايا، وإنشاء روتينات مفيدة، والعمل مع الرموز والممارسات الإيجابية.",
+        show: "إظهار",
+        hide: "إخفاء",
 
         sunnahAdhkar: "أذكار السنة",
         noAdhkarAvailable: "لا توجد أذكار متاحة",
@@ -14604,9 +15687,131 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       startsAt: "تبدأ عند",
     },
 
+    prayerTimes: {
+      title: "أوقات الصلاة",
+      next: "التالي",
+      inTime: "بعد {{time}}",
+      noPrayer: "لا صلاة",
+      getGuidance: "احصل على إرشاد الصلاة",
+      tapForGuidance: "اضغط لرؤية إرشاد الصلاة",
+      calculationMethod: "طريقة الحساب",
+      method: {
+        mwl: "رابطة العالم الإسلامي",
+      },
+      timesBasedOnLocation: "يتم حساب الأوقات بناءً على موقعك الحالي والمنطقة الزمنية.",
+      configureAdhan: "إعداد إشعارات الأذان",
+    },
+
     momentDetail: {
       timeline: {
         in: "بعد",
+      },
+    },
+
+    widgets: {
+      dailyEnergy: {
+        title: "طاقة اليوم",
+        todaysElement: "عنصر اليوم",
+        dayRuler: "حاكم اليوم",
+        bestFor: "الأفضل لـ",
+        todaysFocus: "تركيز اليوم",
+        forReflection: "للتأمل",
+        viewDetails: "عرض التفاصيل",
+        windows: {
+          neutral: "فترة متوازنة",
+          favorable: "نافذة ملائمة",
+          transformative: "نافذة تحول",
+          delicate: "توقيت لطيف",
+        },
+        energyDescriptions: {
+          fire: "ديناميكي ومنشط",
+          water: "متدفق وعاطفي",
+          air: "ذهني وتواصلي",
+          earth: "مؤسس ومنظم",
+        },
+        planetaryFocus: {
+          saturn: "أكمل ما بدأته، وابنِ أساسًا متينًا",
+          jupiter: "وسّع آفاقك، واغتنم الفرص",
+          mars: "اتخذ خطوة جريئة وكن حازمًا",
+          venus: "اعتنِ بالعلاقات وقدّر الجمال",
+          mercury: "تواصل بوضوح وتعلّم شيئًا جديدًا",
+          moon: "اتبع حدسك واعتنِ بمشاعرك",
+          sun: "قد بثقة وعبّر عن نفسك",
+        },
+      },
+      manazil: {
+        title: "المنازل",
+        badge: "رنينك",
+        completeProfile: "أكمل الملف",
+        todaysMansion: "منزلة اليوم",
+        yourMansion: "منزلتك",
+        dailyElement: "عنصر اليوم",
+        yourElement: "عنصرك",
+        resonanceLabel: "الرنين",
+        guidanceLabel: "إرشاد",
+        understandResonance: "فهم الرنين →",
+        favorable: "ملائم",
+        balanced: "متوازن",
+        delicate: "لطيف",
+        resonanceLevels: {
+          supportive: "داعمة",
+          harmonious: "منسجمة",
+          neutral: "متوازنة",
+          challenging: "صعبة",
+          transformative: "تحويلية",
+        },
+        guidanceByResonance: {
+          supportive: "انسجام قوي اليوم. تحرّك بثقة وحافظ على الزخم.",
+          harmonious: "توافق مساعد. تعاون، تعلّم، وابنِ بخطوات ثابتة.",
+          neutral: "توازن عام. نيتك تحدد النتيجة—اختر الوضوح.",
+          challenging: "قد يظهر احتكاك. بسّط، أنجز الأساسيات، وكن لطيفًا.",
+          transformative: "توتر مرتفع قد يفتح بابًا للنمو. تمهّل واختر الحكمة.",
+        },
+        realTime: "فوري",
+        approximate: "تقريبي",
+        currentMansion: "المنزل الحالي:",
+        yourBaseline: "أساسك",
+        reflection: "للتأمل",
+        today: "🌙 منازل اليوم: {name}",
+        todayApprox: "≈ منازل اليوم (تقريبي): {name}",
+        personal: "منزل أساسك: {name}",
+        personalMissing: "🧿 منزلك: أكمل الملف الشخصي",
+        resonance: {
+          harmonious: "التوافق: قوي",
+          supportive: "التوافق: داعم",
+          challenging: "التوافق: صعب",
+          neutral: "التوافق: متوازن",
+        },
+        advice: {
+          bestForLabel: "مناسب لـ",
+          avoidLabel: "تجنب",
+          bestForShort: {
+            fire: "مبادرة",
+            water: "إصلاح لطيف",
+            air: "تخطيط واضح",
+            earth: "تنظيم وإتمام",
+          },
+          bestFor: {
+            fire: "البدء والمبادرة والعمل الشجاع",
+            water: "التأمل والتهدئة والشفاء",
+            air: "التعلم والتواصل والتخطيط",
+            earth: "الثبات والتنظيم وإكمال المهام",
+          },
+          avoid: {
+            fire: "الاندفاع والخصام والإرهاق",
+            water: "الضغط العاطفي وتحمل أكثر من اللازم",
+            air: "الإفراط في التفكير والتشتت",
+            earth: "العناد والجمود والتأجيل",
+          },
+          resonance: {
+            harmonious: "انسجام قوي مع منزلك الشخصي—تقدم بثقة.",
+            supportive: "اليوم يدعم أساسك—خطوات ثابتة.",
+            challenging: "قد يكون اليوم متوتراً—خفف الإيقاع وبسّط.",
+            neutral: "توازن عام—اختر الخطوة الأوضح.",
+          },
+        },
+        compactAdvice: "اغتنم الفرص المتوافقة",
+        cta: "عرض التفاصيل →",
       },
     },
   },

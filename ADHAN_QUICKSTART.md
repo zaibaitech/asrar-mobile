@@ -1,5 +1,10 @@
 # Adhan Notifications - Quick Start Guide
 
+## Launch Note (Jan 2026)
+
+The in-app "Test Notification" button was removed before launch.
+Use `NOTIFICATION_LAUNCH_QA_CHECKLIST.md` to validate Adhan notifications end-to-end (timing, sound/vibration behavior, and tap → Prayer Guidance).
+
 ## 🚀 Get Started in 60 Seconds
 
 ### For Users
@@ -18,9 +23,9 @@
    - Settings screen opens
    - Adjust volume, select adhan, enable/disable prayers
 
-4. **Test It**
-   - Tap "Test Notification" button
-   - Verify sound and vibration work
+4. **Verify It**
+   - Wait for the next upcoming prayer notification
+   - Verify the notification appears and tapping it opens **Prayer Guidance**
    - Done! ✅
 
 ### For Developers

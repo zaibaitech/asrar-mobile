@@ -1,5 +1,6 @@
 import React from 'react';
 import { ImageSourcePropType, useWindowDimensions } from 'react-native';
+import appLogo from '../../assets/images/logo_1024_transparent.png';
 import AppHeader from './AppHeader';
 import AppHeaderTablet from './AppHeaderTablet';
 
@@ -39,10 +40,11 @@ export default function ResponsiveAppHeader({
 }: ResponsiveAppHeaderProps) {
   const { width } = useWindowDimensions();
   const isTablet = width >= tabletBreakpoint;
+  const logoSource: ImageSourcePropType = props.logoSource ?? appLogo;
 
   if (isTablet) {
-    return <AppHeaderTablet {...props} showProfileIcon={showProfileIcon} />;
+    return <AppHeaderTablet {...props} logoSource={logoSource} showProfileIcon={showProfileIcon} />;
   }
 
-  return <AppHeader {...props} showProfileIcon={showProfileIcon} />;
+  return <AppHeader {...props} logoSource={logoSource} showProfileIcon={showProfileIcon} />;
 }

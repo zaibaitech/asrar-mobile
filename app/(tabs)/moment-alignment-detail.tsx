@@ -14,7 +14,7 @@ import { fetchPrayerTimes } from '@/services/api/prayerTimes';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     SafeAreaView,
@@ -31,7 +31,7 @@ export default function MomentAlignmentDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile } = useProfile();
-  
+
   const [alignment, setAlignment] = useState<MomentAlignment | null>(null);
   const [loading, setLoading] = useState(true);
   const [showTimeline, setShowTimeline] = useState(false);
@@ -41,27 +41,39 @@ export default function MomentAlignmentDetailScreen() {
   const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
   const [now, setNow] = useState(new Date());
   const [minuteNow, setMinuteNow] = useState(new Date());
-  
-  const loadAlignment = useCallback(async () => {
-    setLoading(true);
-    const result = await getMomentAlignment(
-      profile,
-      new Date(),
-      coords ? { location: coords } : undefined
-    );
-    setAlignment(result);
-    setLoading(false);
-  }, [profile, coords]);
-  
+  const alignmentInFlightRef = useRef(false);
+
+  const loadAlignment = useCallback(async (options?: { silent?: boolean }) => {
+    if (alignmentInFlightRef.current) return;
+    alignmentInFlightRef.current = true;
+    const shouldShowLoading = !options?.silent && !alignment;
+    if (shouldShowLoading) {
+      setLoading(true);
+    }
+    try {
+      const result = await getMomentAlignment(
+        profile,
+        new Date(),
+        coords ? { location: coords } : undefined
+      );
+      setAlignment(result);
+    } finally {
+      alignmentInFlightRef.current = false;
+      if (shouldShowLoading) {
+        setLoading(false);
+      }
+    }
+  }, [profile, coords, alignment]);
+
   const loadPrayerTimes = useCallback(async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      
+
       if (status === 'granted') {
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
         });
-        
+
         const { latitude, longitude } = location.coords;
         setCoords({ latitude, longitude });
         const data = await fetchPrayerTimes(latitude, longitude);
@@ -71,18 +83,16 @@ export default function MomentAlignmentDetailScreen() {
       console.error('Error loading prayer times:', error);
     }
   }, []);
-  
+
   useEffect(() => {
     loadAlignment();
     loadPrayerTimes();
   }, [loadAlignment, loadPrayerTimes]);
 
-  // Recompute alignment when the minute ticks (keeps status synced around transitions)
   useEffect(() => {
-    void loadAlignment();
+    void loadAlignment({ silent: true });
   }, [minuteNow, loadAlignment]);
-  
-  // Resolve correct planetary-day boundaries (handles pre-sunrise) once per minute.
+
   useEffect(() => {
     if (!coords) return;
     let cancelled = false;
@@ -95,7 +105,6 @@ export default function MomentAlignmentDetailScreen() {
     };
   }, [coords, minuteNow]);
 
-  // Compute current/next planetary hours every second for countdown accuracy.
   useEffect(() => {
     if (!planetaryBoundaries) return;
     try {
@@ -110,8 +119,7 @@ export default function MomentAlignmentDetailScreen() {
       console.error('Error calculating planetary hours:', error);
     }
   }, [planetaryBoundaries, now]);
-  
-  // Update time every second for countdown
+
   useEffect(() => {
     const interval = setInterval(() => {
       setNow(new Date());
@@ -119,14 +127,13 @@ export default function MomentAlignmentDetailScreen() {
     return () => clearInterval(interval);
   }, []);
 
-  // Update minute ticker for boundary recalculation
   useEffect(() => {
     const interval = setInterval(() => {
       setMinuteNow(new Date());
     }, 60_000);
     return () => clearInterval(interval);
   }, []);
-  
+
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'ACT':
@@ -139,7 +146,7 @@ export default function MomentAlignmentDetailScreen() {
         return '#64B5F6';
     }
   };
-  
+
   const getElementIcon = (element?: string) => {
     switch (element) {
       case 'fire':
@@ -154,20 +161,20 @@ export default function MomentAlignmentDetailScreen() {
         return '✨';
     }
   };
-  
+
   const getElementLabel = (element?: string) => {
     if (!element) return '';
     return element.charAt(0).toUpperCase() + element.slice(1);
   };
-  
+
   const formatTime = () => {
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const current = new Date();
+    const hours = current.getHours().toString().padStart(2, '0');
+    const minutes = current.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   };
-  
-  const getGuidanceLists = (status?: string, zahir?: string, hour?: string) => {
+
+  const getGuidanceLists = (status?: string) => {
     const key = status?.toLowerCase();
     return {
       bestNow: [
@@ -181,43 +188,30 @@ export default function MomentAlignmentDetailScreen() {
       ].filter(Boolean),
     };
   };
-  
+
   const formatTimeUntil = (targetDate: Date) => {
-    const now = new Date();
-    const diffMs = targetDate.getTime() - now.getTime();
+    const diffMs = targetDate.getTime() - new Date().getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     if (diffHours > 0) {
       return t('momentDetail.timeline.hours', { count: diffHours });
     }
     return t('momentDetail.timeline.minutes', { count: diffMinutes });
   };
-  
+
   const formatWindowDay = (window: any) => {
-    const now = new Date();
     const windowDate = new Date(window.startTime);
-    const hoursAway = Math.floor((windowDate.getTime() - now.getTime()) / (1000 * 60 * 60));
-    
-    if (hoursAway === 0) {
-      return t('momentDetail.timeline.today'); // Current hour
-    }
-    if (hoursAway === 1) {
-      return t('momentDetail.timeline.in') + ' 1h';
-    }
-    if (hoursAway < 24) {
-      return t('momentDetail.timeline.in') + ` ${hoursAway}h`;
-    }
-    
+    const hoursAway = Math.floor((windowDate.getTime() - new Date().getTime()) / (1000 * 60 * 60));
+
+    if (hoursAway === 0) return t('momentDetail.timeline.today');
+    if (hoursAway === 1) return `${t('momentDetail.timeline.in')} 1h`;
+    if (hoursAway < 24) return `${t('momentDetail.timeline.in')} ${hoursAway}h`;
+
     const daysAway = Math.floor(hoursAway / 24);
     return t('momentDetail.timeline.daysAway', { count: daysAway });
   };
-  
-  const formatPlanetaryHour = (window: any) => {
-    // Format as "Planet (Element)" e.g. "Sun (Fire)"
-    return `${window.planet} (${window.element})`;
-  };
-  
+
   const getReasonBullets = (status?: string) => {
     const key = status?.toLowerCase();
     return [
@@ -226,10 +220,24 @@ export default function MomentAlignmentDetailScreen() {
       t(`momentDetail.reasons.${key}.bullet3`),
     ].filter(Boolean);
   };
-  
+
+  const currentHourProgress = useMemo(() => {
+    if (!planetaryData) return null;
+    const start = planetaryData.currentHour.startTime.getTime();
+    const end = planetaryData.currentHour.endTime.getTime();
+    const total = Math.max(1, end - start);
+    const remaining = Math.max(0, end - now.getTime());
+    const percent = Math.min(100, Math.max(0, 100 - (remaining / total) * 100));
+    return {
+      percent,
+      remainingLabel: formatTimeUntil(planetaryData.currentHour.endTime),
+    };
+  }, [planetaryData, now]);
+
   if (loading) {
     return (
-      <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
+      <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}
+        >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#8B7355" />
           <Text style={styles.loadingText}>{t('common.loading')}</Text>
@@ -237,11 +245,11 @@ export default function MomentAlignmentDetailScreen() {
       </SafeAreaView>
     );
   }
-  
+
   if (!alignment) {
     return (
-      <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
-        {/* Header */}
+      <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}
+        >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
@@ -249,12 +257,11 @@ export default function MomentAlignmentDetailScreen() {
           <Text style={styles.headerTitle}>{t('momentDetail.title')}</Text>
           <View style={styles.placeholder} />
         </View>
-        
+
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon}>✨</Text>
           <Text style={styles.emptyTitle}>{t('momentDetail.noName')}</Text>
           <Text style={styles.emptyMessage}>{t('momentDetail.addNameMessage')}</Text>
-          
           <TouchableOpacity
             style={styles.addNameButton}
             onPress={() => router.push('/(tabs)/name-destiny')}
@@ -267,12 +274,12 @@ export default function MomentAlignmentDetailScreen() {
       </SafeAreaView>
     );
   }
-  
+
   const statusColor = getStatusColor(alignment.status);
-  
+
   return (
-    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Header */}
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}
+      >
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
@@ -280,106 +287,115 @@ export default function MomentAlignmentDetailScreen() {
         <Text style={styles.headerTitle}>{t('momentDetail.title')}</Text>
         <View style={styles.placeholder} />
       </View>
-      
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Compact Status Row */}
-        <View style={styles.statusRow}>
-          <View style={styles.statusMain}>
-            <View style={[styles.statusPill, { backgroundColor: `${statusColor}20`, borderColor: statusColor }]}>
-              <Text style={[styles.statusPillText, { color: statusColor }]}>
+        <View style={styles.summaryCard}>
+          <View style={styles.summaryHeader}>
+            <View style={[styles.summaryIcon, { backgroundColor: `${statusColor}20` }]}
+              >
+              <Ionicons name="sparkles" size={18} color={statusColor} />
+            </View>
+            <View style={styles.summaryHeaderText}>
+              <Text style={styles.summaryTitle}>{t('momentDetail.title')}</Text>
+              <Text style={styles.summarySubtitle}>{t(alignment.shortHintKey)}</Text>
+            </View>
+            <View style={[styles.statusPill, { backgroundColor: `${statusColor}20`, borderColor: statusColor }]}
+              >
+              <Text style={[styles.statusPillText, { color: statusColor }]}
+                >
                 {t(alignment.shortLabelKey)}
               </Text>
             </View>
-            <Text style={styles.statusHintText}>{t(alignment.shortHintKey)}</Text>
           </View>
-          <View style={styles.statusTimestamp}>
+
+          <View style={styles.summaryMetaRow}>
             <Text style={styles.timestampLabel}>{t('momentDetail.updated')}</Text>
             <Text style={styles.timestampValue}>{formatTime()}</Text>
           </View>
-        </View>
-        
-        {/* System Equation */}
-        <View style={styles.equationRow}>
-          <View style={styles.equationChip}>
-            <Text style={styles.equationChipText}>
-              {t('momentDetail.equation.zahir')} ({getElementLabel(alignment.zahirElement)})
-            </Text>
-          </View>
-          <Text style={styles.equationOperator}>×</Text>
-          <View style={styles.equationChip}>
-            <Text style={styles.equationChipText}>
-              {t('momentDetail.equation.hour')} ({getElementLabel(alignment.timeElement)})
-            </Text>
-          </View>
-          <Text style={styles.equationOperator}>→</Text>
-          <View style={[styles.equationChip, { backgroundColor: `${statusColor}20`, borderColor: statusColor }]}>
-            <Text style={[styles.equationChipText, { color: statusColor }]}>
-              {t(alignment.shortLabelKey)}
-            </Text>
-          </View>
-        </View>
-        
-        {/* Current Window End Time */}
-        {alignment.currentWindowEnd && (
-          <View style={styles.windowInfo}>
-            <Ionicons name="time-outline" size={16} color={DarkTheme.textTertiary} />
-            <Text style={styles.windowInfoText}>
-              {t('momentDetail.timeline.windowEnds')} {t('momentDetail.timeline.in')} {formatTimeUntil(alignment.currentWindowEnd)}
-            </Text>
-          </View>
-        )}
 
-        {/* Next hour preview (shown close to transition) */}
-        {planetaryData && alignment && planetaryData.countdownSeconds > 0 && planetaryData.countdownSeconds <= 10 * 60 && (
-          <View style={[styles.windowInfo, { marginTop: 6 }]}> 
-            <Ionicons name="alert-circle-outline" size={16} color={DarkTheme.textTertiary} />
-            <Text style={styles.windowInfoText}>
-              {t('home.nextPlanetHour')}: {t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`)} ({getElementLabel(planetaryData.nextHour.planetInfo.element)}) {t('momentDetail.timeline.in')} {formatTimeUntil(planetaryData.currentHour.endTime)} • {t(
-                (() => {
-                  const status = getAlignmentStatusForElements(alignment.zahirElement, planetaryData.nextHour.planetInfo.element);
-                  if (status === 'ACT') return 'home.moment.status.act';
-                  if (status === 'MAINTAIN') return 'home.moment.status.maintain';
-                  return 'home.moment.status.hold';
-                })()
-              )}
-            </Text>
+          <View style={styles.equationRow}>
+            <View style={styles.equationChip}>
+              <Text style={styles.equationChipText}>
+                {t('momentDetail.equation.zahir')} ({getElementLabel(alignment.zahirElement)})
+              </Text>
+            </View>
+            <Text style={styles.equationOperator}>×</Text>
+            <View style={styles.equationChip}>
+              <Text style={styles.equationChipText}>
+                {t('momentDetail.equation.hour')} ({getElementLabel(alignment.timeElement)})
+              </Text>
+            </View>
+            <Text style={styles.equationOperator}>→</Text>
+            <View style={[styles.equationChip, { backgroundColor: `${statusColor}20`, borderColor: statusColor }]}
+              >
+              <Text style={[styles.equationChipText, { color: statusColor }]}
+                >
+                {t(alignment.shortLabelKey)}
+              </Text>
+            </View>
           </View>
-        )}
-        
-        {/* Timeline Toggle Button */}
+
+          {alignment.currentWindowEnd && (
+            <View style={styles.windowInfo}>
+              <Ionicons name="time-outline" size={16} color={DarkTheme.textTertiary} />
+              <Text style={styles.windowInfoText}>
+                {t('momentDetail.timeline.windowEnds')} {t('momentDetail.timeline.in')} {formatTimeUntil(alignment.currentWindowEnd)}
+              </Text>
+            </View>
+          )}
+
+          {planetaryData && planetaryData.countdownSeconds > 0 && planetaryData.countdownSeconds <= 10 * 60 && (
+            <View style={[styles.windowInfo, { marginTop: 6 }]}
+              >
+              <Ionicons name="alert-circle-outline" size={16} color={DarkTheme.textTertiary} />
+              <Text style={styles.windowInfoText}>
+                {t('home.nextPlanetHour')}: {t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`)} ({getElementLabel(planetaryData.nextHour.planetInfo.element)}) {t('momentDetail.timeline.in')} {formatTimeUntil(planetaryData.currentHour.endTime)} • {t(
+                  (() => {
+                    const status = getAlignmentStatusForElements(alignment.zahirElement, planetaryData.nextHour.planetInfo.element);
+                    if (status === 'ACT') return 'home.moment.status.act';
+                    if (status === 'MAINTAIN') return 'home.moment.status.maintain';
+                    return 'home.moment.status.hold';
+                  })()
+                )}
+              </Text>
+            </View>
+          )}
+        </View>
+
         {alignment.nextWindows && alignment.nextWindows.length > 0 && (
           <TouchableOpacity
             style={styles.timelineButton}
             onPress={() => setShowTimeline(!showTimeline)}
           >
-            <Ionicons 
-              name={showTimeline ? "chevron-up" : "chevron-down"} 
-              size={20} 
-              color={DarkTheme.textSecondary} 
+            <Ionicons
+              name={showTimeline ? 'chevron-up' : 'chevron-down'}
+              size={20}
+              color={DarkTheme.textSecondary}
             />
             <Text style={styles.timelineButtonText}>
               {showTimeline ? t('momentDetail.timeline.hideTimeline') : t('momentDetail.timeline.showTimeline')}
             </Text>
           </TouchableOpacity>
         )}
-        
-        {/* Timeline View */}
+
         {showTimeline && alignment.nextWindows && alignment.nextWindows.length > 0 && (
           <View style={styles.timeline}>
             <Text style={styles.timelineTitle}>{t('momentDetail.timeline.nextOptimal')}</Text>
             {alignment.nextWindows
-              .filter(window => window.status === 'ACT' || window.status === 'MAINTAIN')
-              .slice(0, 8) // Show more hours since they're hourly
+              .filter((window) => window.status === 'ACT' || window.status === 'MAINTAIN')
+              .slice(0, 8)
               .map((window, idx) => (
                 <View key={idx} style={styles.timelineItem}>
-                  <View style={[
-                    styles.timelineStatus,
-                    { backgroundColor: window.status === 'ACT' ? '#10b981' : '#8B7355' }
-                  ]}>
+                  <View
+                    style={[
+                      styles.timelineStatus,
+                      { backgroundColor: window.status === 'ACT' ? '#10b981' : '#8B7355' },
+                    ]}
+                  >
                     <Text style={styles.timelineStatusText}>
                       {t(window.status === 'ACT' ? 'home.moment.status.act' : 'home.moment.status.maintain')}
                     </Text>
@@ -399,16 +415,13 @@ export default function MomentAlignmentDetailScreen() {
                   </View>
                 </View>
               ))}
-            {alignment.nextWindows.filter(w => w.status === 'ACT' || w.status === 'MAINTAIN').length === 0 && (
+            {alignment.nextWindows.filter((w) => w.status === 'ACT' || w.status === 'MAINTAIN').length === 0 && (
               <Text style={styles.noWindows}>{t('momentDetail.timeline.noOptimalWindows')}</Text>
             )}
           </View>
         )}
-        
-        {/* Elements Grid */}
-        {/* Element Cards Row */}
+
         <View style={styles.elementsGrid}>
-          {/* Your Element */}
           <View style={styles.elementCard}>
             <Text style={styles.elementCardLabel}>{t('momentDetail.zahirOutward')}</Text>
             <View style={styles.elementDisplay}>
@@ -419,8 +432,7 @@ export default function MomentAlignmentDetailScreen() {
               {t(`momentDetail.zahirShort.${alignment.zahirElement}`)}
             </Text>
           </View>
-          
-          {/* Time Element */}
+
           <View style={styles.elementCard}>
             <Text style={styles.elementCardLabel}>{t('momentDetail.hourQuality')}</Text>
             <View style={styles.elementDisplay}>
@@ -432,16 +444,14 @@ export default function MomentAlignmentDetailScreen() {
             </Text>
           </View>
         </View>
-        
-        {/* Planetary Hours Section */}
+
         {planetaryData && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Ionicons name="planet-outline" size={20} color="#8B7355" />
               <Text style={styles.sectionTitle}>{t('planetaryHours.title')}</Text>
             </View>
-            
-            {/* Current Hour */}
+
             <View style={styles.planetaryHourCard}>
               <View style={styles.planetaryHourHeader}>
                 <Text style={styles.planetaryHourLabel}>{t('planetaryHours.currentHour')}</Text>
@@ -456,40 +466,44 @@ export default function MomentAlignmentDetailScreen() {
                 <View style={styles.planetInfo}>
                   <Text style={styles.planetName}>{planetaryData.currentHour.planet}</Text>
                   <Text style={styles.planetArabic}>{planetaryData.currentHour.planetInfo.arabicName}</Text>
-                  <View style={[styles.elementBadge, { backgroundColor: `rgba(139, 115, 85, 0.1)` }]}>
-                    <Text style={[styles.elementBadgeText, { color: '#8B7355' }]}>
+                  <View style={[styles.elementBadge, { backgroundColor: 'rgba(139, 115, 85, 0.1)' }]}
+                    >
+                    <Text style={[styles.elementBadgeText, { color: '#8B7355' }]}
+                      >
                       {getElementIcon(planetaryData.currentHour.planetInfo.element)} {getElementLabel(planetaryData.currentHour.planetInfo.element)}
                     </Text>
                   </View>
                 </View>
               </View>
+              {currentHourProgress && (
+                <View style={styles.progressBlock}>
+                  <View style={styles.progressHeader}>
+                    <Text style={styles.progressLabel}>{t('momentDetail.timeline.windowEnds')}</Text>
+                    <Text style={styles.progressValue}>
+                      {t('momentDetail.timeline.in')} {currentHourProgress.remainingLabel}
+                    </Text>
+                  </View>
+                  <View style={styles.progressTrack}>
+                    <View style={[styles.progressFill, { width: `${currentHourProgress.percent}%` }]} />
+                  </View>
+                </View>
+              )}
               <View style={styles.timeRange}>
                 <Ionicons name="time-outline" size={14} color={DarkTheme.textTertiary} />
                 <Text style={styles.timeRangeText}>
                   {planetaryData.currentHour.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {planetaryData.currentHour.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Text>
-                {planetaryData.countdownSeconds > 0 && (
-                  <Text style={styles.countdown}>
-                    ({(() => {
-                      const seconds = planetaryData.countdownSeconds;
-                      const hours = Math.floor(seconds / 3600);
-                      const minutes = Math.floor((seconds % 3600) / 60);
-                      const secs = seconds % 60;
-                      if (hours > 0) return `${hours}h ${minutes}m left`;
-                      if (minutes > 0) return `${minutes}m ${secs}s left`;
-                      return `${secs}s left`;
-                    })()})
-                  </Text>
-                )}
               </View>
             </View>
-            
-            {/* Next Hour */}
-            <View style={[styles.planetaryHourCard, { backgroundColor: 'rgba(255, 255, 255, 0.02)' }]}>
+
+            <View style={[styles.planetaryHourCard, { backgroundColor: 'rgba(255, 255, 255, 0.02)' }]}
+              >
               <View style={styles.planetaryHourHeader}>
                 <Text style={styles.planetaryHourLabel}>{t('home.nextPlanetHour')}</Text>
-                <View style={[styles.hourBadge, { backgroundColor: 'rgba(100, 181, 246, 0.15)' }]}>
-                  <Text style={[styles.hourBadgeText, { color: '#64B5F6' }]}>
+                <View style={[styles.hourBadge, { backgroundColor: 'rgba(100, 181, 246, 0.15)' }]}
+                  >
+                  <Text style={[styles.hourBadgeText, { color: '#64B5F6' }]}
+                    >
                     Hour #{planetaryData.nextHour.hourNumber}
                   </Text>
                 </View>
@@ -499,8 +513,10 @@ export default function MomentAlignmentDetailScreen() {
                 <View style={styles.planetInfo}>
                   <Text style={styles.planetName}>{planetaryData.nextHour.planet}</Text>
                   <Text style={styles.planetArabic}>{planetaryData.nextHour.planetInfo.arabicName}</Text>
-                  <View style={[styles.elementBadge, { backgroundColor: `rgba(100, 181, 246, 0.1)` }]}>
-                    <Text style={[styles.elementBadgeText, { color: '#64B5F6' }]}>
+                  <View style={[styles.elementBadge, { backgroundColor: 'rgba(100, 181, 246, 0.1)' }]}
+                    >
+                    <Text style={[styles.elementBadgeText, { color: '#64B5F6' }]}
+                      >
                       {getElementIcon(planetaryData.nextHour.planetInfo.element)} {getElementLabel(planetaryData.nextHour.planetInfo.element)}
                     </Text>
                   </View>
@@ -513,14 +529,16 @@ export default function MomentAlignmentDetailScreen() {
                 </Text>
               </View>
             </View>
-            
-            {/* After Next Hour (if available) */}
+
             {planetaryData.afterNextHour && (
-              <View style={[styles.planetaryHourCard, { backgroundColor: 'rgba(255, 255, 255, 0.015)' }]}>
+              <View style={[styles.planetaryHourCard, { backgroundColor: 'rgba(255, 255, 255, 0.015)' }]}
+                >
                 <View style={styles.planetaryHourHeader}>
                   <Text style={styles.planetaryHourLabel}>Hour After Next</Text>
-                  <View style={[styles.hourBadge, { backgroundColor: 'rgba(148, 163, 184, 0.15)' }]}>
-                    <Text style={[styles.hourBadgeText, { color: '#94a3b8' }]}>
+                  <View style={[styles.hourBadge, { backgroundColor: 'rgba(148, 163, 184, 0.15)' }]}
+                    >
+                    <Text style={[styles.hourBadgeText, { color: '#94a3b8' }]}
+                      >
                       Hour #{planetaryData.afterNextHour.hourNumber}
                     </Text>
                   </View>
@@ -530,8 +548,10 @@ export default function MomentAlignmentDetailScreen() {
                   <View style={styles.planetInfo}>
                     <Text style={styles.planetName}>{planetaryData.afterNextHour.planet}</Text>
                     <Text style={styles.planetArabic}>{planetaryData.afterNextHour.planetInfo.arabicName}</Text>
-                    <View style={[styles.elementBadge, { backgroundColor: `rgba(148, 163, 184, 0.1)` }]}>
-                      <Text style={[styles.elementBadgeText, { color: '#94a3b8' }]}>
+                    <View style={[styles.elementBadge, { backgroundColor: 'rgba(148, 163, 184, 0.1)' }]}
+                      >
+                      <Text style={[styles.elementBadgeText, { color: '#94a3b8' }]}
+                        >
                         {getElementIcon(planetaryData.afterNextHour.planetInfo.element)} {getElementLabel(planetaryData.afterNextHour.planetInfo.element)}
                       </Text>
                     </View>
@@ -547,43 +567,41 @@ export default function MomentAlignmentDetailScreen() {
             )}
           </View>
         )}
-        
-        {/* Why This Status - Bullet Points */}
+
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="information-circle-outline" size={20} color="#8B7355" />
             <Text style={styles.sectionTitle}>{t('momentDetail.whyThisStatus')}</Text>
           </View>
-          {getReasonBullets(alignment.status).map((bullet, idx) => (
-            <View key={idx} style={styles.bulletRow}>
-              <Text style={styles.bulletDot}>•</Text>
-              <Text style={styles.bulletText}>{bullet}</Text>
-            </View>
-          ))}
+          <View style={styles.sectionCard}>
+            {getReasonBullets(alignment.status).map((bullet, idx) => (
+              <View key={idx} style={styles.bulletRow}>
+                <Text style={styles.bulletDot}>•</Text>
+                <Text style={styles.bulletText}>{bullet}</Text>
+              </View>
+            ))}
+          </View>
         </View>
-        
-        {/* Guidance Lists */}
+
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="bulb-outline" size={20} color="#8B7355" />
             <Text style={styles.sectionTitle}>{t('momentDetail.guidanceTitle')}</Text>
           </View>
-          
-          {/* Best Now */}
-          <View style={styles.guidanceBlock}>
+
+          <View style={[styles.guidanceBlock, styles.guidanceBest]}>
             <Text style={styles.guidanceListTitle}>{t('momentDetail.bestNow')}</Text>
-            {getGuidanceLists(alignment.status, alignment.zahirElement, alignment.timeElement).bestNow.map((item, idx) => (
+            {getGuidanceLists(alignment.status).bestNow.map((item, idx) => (
               <View key={idx} style={styles.bulletRow}>
                 <Text style={[styles.bulletDot, { color: '#10b981' }]}>✓</Text>
                 <Text style={styles.bulletText}>{item}</Text>
               </View>
             ))}
           </View>
-          
-          {/* Avoid Now */}
-          <View style={styles.guidanceBlock}>
+
+          <View style={[styles.guidanceBlock, styles.guidanceAvoid]}>
             <Text style={styles.guidanceListTitle}>{t('momentDetail.avoidNow')}</Text>
-            {getGuidanceLists(alignment.status, alignment.zahirElement, alignment.timeElement).avoidNow.map((item, idx) => (
+            {getGuidanceLists(alignment.status).avoidNow.map((item, idx) => (
               <View key={idx} style={styles.bulletRow}>
                 <Text style={[styles.bulletDot, { color: '#94a3b8' }]}>○</Text>
                 <Text style={styles.bulletText}>{item}</Text>
@@ -591,8 +609,7 @@ export default function MomentAlignmentDetailScreen() {
             ))}
           </View>
         </View>
-        
-        {/* Disclaimer */}
+
         <View style={styles.disclaimer}>
           <Ionicons name="shield-checkmark-outline" size={16} color={DarkTheme.textTertiary} />
           <Text style={styles.disclaimerText}>{t('momentDetail.disclaimer')}</Text>
@@ -607,8 +624,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: DarkTheme.screenBackground,
   },
-  
-  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -629,8 +644,6 @@ const styles = StyleSheet.create({
   placeholder: {
     width: 40,
   },
-  
-  // Loading
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -641,8 +654,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: DarkTheme.textSecondary,
   },
-  
-  // Empty State
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -679,8 +690,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#fff',
   },
-  
-  // Scroll View
   scrollView: {
     flex: 1,
   },
@@ -688,17 +697,43 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     gap: Spacing.lg,
   },
-  
-  // Compact Status Row
-  statusRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+  summaryCard: {
+    padding: Spacing.lg,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
     gap: Spacing.md,
   },
-  statusMain: {
+  summaryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  summaryIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  summaryHeaderText: {
     flex: 1,
-    gap: Spacing.xs,
+  },
+  summaryTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+  },
+  summarySubtitle: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    marginTop: 2,
+  },
+  summaryMetaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   statusPill: {
     alignSelf: 'flex-start',
@@ -708,32 +743,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   statusPillText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
     letterSpacing: 0.8,
   },
-  statusHintText: {
-    fontSize: 13,
-    lineHeight: 18,
-    color: DarkTheme.textSecondary,
-  },
-  statusTimestamp: {
-    alignItems: 'flex-end',
-    gap: 2,
-  },
   timestampLabel: {
-    fontSize: 10,
+    fontSize: 12,
     color: DarkTheme.textTertiary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   timestampValue: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
     color: DarkTheme.textSecondary,
   },
-  
-  // System Equation
   equationRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -751,123 +775,15 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   equationChipText: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '600',
     color: DarkTheme.textSecondary,
   },
   equationOperator: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: DarkTheme.textTertiary,
-  },
-  
-  // Elements Grid
-  elementsGrid: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-  },
-  elementCard: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    padding: Spacing.md,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
-    gap: Spacing.sm,
-  },
-  elementCardLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: DarkTheme.textTertiary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  elementDisplay: {
-    alignItems: 'center',
-    gap: Spacing.xs,
-    paddingVertical: Spacing.sm,
-  },
-  elementIcon: {
-    fontSize: 32,
-  },
-  elementName: {
     fontSize: 16,
     fontWeight: '700',
-    color: DarkTheme.textPrimary,
-  },
-  elementDescription: {
-    fontSize: 11,
-    lineHeight: 16,
-    color: DarkTheme.textSecondary,
-    textAlign: 'center',
-  },
-  
-  // Section
-  section: {
-    gap: Spacing.sm,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    marginBottom: Spacing.xs,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: DarkTheme.textPrimary,
-  },
-  
-  // Bullets
-  bulletRow: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-    paddingLeft: Spacing.xs,
-    marginBottom: Spacing.xs,
-  },
-  bulletDot: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#8B7355',
-    lineHeight: 20,
-  },
-  bulletText: {
-    flex: 1,
-    fontSize: 13,
-    color: DarkTheme.textSecondary,
-    lineHeight: 20,
-  },
-  
-  // Guidance Lists
-  guidanceBlock: {
-    gap: Spacing.xs,
-    marginTop: Spacing.xs,
-  },
-  guidanceListTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: DarkTheme.textPrimary,
-    marginBottom: 4,
-  },
-  
-  // Disclaimer
-  disclaimer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    padding: Spacing.md,
-    borderRadius: 12,
-    marginTop: Spacing.md,
-  },
-  disclaimerText: {
-    flex: 1,
-    fontSize: 11,
     color: DarkTheme.textTertiary,
-    lineHeight: 16,
   },
-  
-  // Window Info
   windowInfo: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -879,12 +795,10 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   windowInfoText: {
-    fontSize: 12,
+    fontSize: 13,
     color: DarkTheme.textSecondary,
     fontWeight: '500',
   },
-  
-  // Timeline
   timelineButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -898,7 +812,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   timelineButtonText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
     color: DarkTheme.textSecondary,
   },
@@ -910,7 +824,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   timelineTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '700',
     color: DarkTheme.textPrimary,
     marginBottom: Spacing.xs,
@@ -931,7 +845,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   timelineStatusText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
     color: '#fff',
     letterSpacing: 0.5,
@@ -946,12 +860,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   timelineDay: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
     color: DarkTheme.textPrimary,
   },
   timelineDayName: {
-    fontSize: 11,
+    fontSize: 12,
     color: DarkTheme.textTertiary,
   },
   timelineElement: {
@@ -963,23 +877,137 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   timelineElementText: {
-    fontSize: 12,
+    fontSize: 13,
     color: DarkTheme.textSecondary,
   },
   timelineTime: {
-    fontSize: 11,
+    fontSize: 12,
     color: DarkTheme.textTertiary,
     fontWeight: '500',
   },
   noWindows: {
-    fontSize: 12,
+    fontSize: 13,
     color: DarkTheme.textTertiary,
     textAlign: 'center',
     paddingVertical: Spacing.md,
     fontStyle: 'italic',
   },
-  
-  // Planetary Hours
+  elementsGrid: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+  },
+  elementCard: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    padding: Spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    gap: Spacing.sm,
+  },
+  elementCardLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: DarkTheme.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  elementDisplay: {
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingVertical: Spacing.sm,
+  },
+  elementIcon: {
+    fontSize: 32,
+  },
+  elementName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+  },
+  elementDescription: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: DarkTheme.textSecondary,
+    textAlign: 'center',
+  },
+  section: {
+    gap: Spacing.sm,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.xs,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+  },
+  sectionCard: {
+    padding: Spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+  },
+  bulletRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    paddingLeft: Spacing.xs,
+    marginBottom: Spacing.xs,
+  },
+  bulletDot: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#8B7355',
+    lineHeight: 20,
+  },
+  bulletText: {
+    flex: 1,
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  guidanceBlock: {
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
+    padding: Spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  guidanceBest: {
+    borderColor: 'rgba(16, 185, 129, 0.35)',
+    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+  },
+  guidanceAvoid: {
+    borderColor: 'rgba(148, 163, 184, 0.3)',
+    backgroundColor: 'rgba(148, 163, 184, 0.08)',
+  },
+  guidanceListTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: DarkTheme.textPrimary,
+    marginBottom: 4,
+  },
+  disclaimer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    padding: Spacing.md,
+    borderRadius: 12,
+    marginTop: Spacing.md,
+  },
+  disclaimerText: {
+    flex: 1,
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+    lineHeight: 18,
+  },
   planetaryHourCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
     padding: Spacing.md,
@@ -995,7 +1023,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   planetaryHourLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     color: DarkTheme.textTertiary,
     textTransform: 'uppercase',
@@ -1007,7 +1035,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   hourBadgeText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
@@ -1039,7 +1067,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   elementBadgeText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
   },
   timeRange: {
@@ -1052,12 +1080,262 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   timeRangeText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    fontWeight: '500',
+  },
+  progressBlock: {
+    marginTop: Spacing.sm,
+    gap: 6,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  progressLabel: {
     fontSize: 12,
+    color: DarkTheme.textTertiary,
+    fontWeight: '600',
+  },
+  progressValue: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    fontWeight: '600',
+  },
+  progressTrack: {
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 999,
+    backgroundColor: '#8B7355',
+  },
+
+  // Window Info
+  windowInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    backgroundColor: 'rgba(139, 115, 85, 0.1)',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: 8,
+    marginBottom: Spacing.sm,
+  },
+  windowInfoText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    fontWeight: '500',
+  },
+  
+  // Timeline
+  timelineButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    paddingVertical: Spacing.sm,
+    borderRadius: 8,
+    marginBottom: Spacing.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  timelineButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: DarkTheme.textSecondary,
+  },
+  timeline: {
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    padding: Spacing.md,
+    borderRadius: 12,
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  timelineTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+    marginBottom: Spacing.xs,
+  },
+  timelineItem: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    padding: Spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  timelineStatus: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 4,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+  },
+  timelineStatusText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
+  timelineContent: {
+    flex: 1,
+    gap: Spacing.xs,
+  },
+  timelineHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  timelineDay: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: DarkTheme.textPrimary,
+  },
+  timelineDayName: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+  },
+  timelineElement: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  timelineElementIcon: {
+    fontSize: 16,
+  },
+  timelineElementText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+  },
+  timelineTime: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+    fontWeight: '500',
+  },
+  noWindows: {
+    fontSize: 13,
+    color: DarkTheme.textTertiary,
+    textAlign: 'center',
+    paddingVertical: Spacing.md,
+    fontStyle: 'italic',
+  },
+  
+  // Planetary Hours
+  planetaryHourCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    padding: Spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  progressBlock: {
+    marginTop: Spacing.sm,
+    gap: 6,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  progressLabel: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+    fontWeight: '600',
+  },
+  progressValue: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    fontWeight: '600',
+  },
+  progressTrack: {
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 999,
+    backgroundColor: '#8B7355',
+  },
+  planetaryHourHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  planetaryHourLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: DarkTheme.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  hourBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  hourBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  planetaryHourContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  planetSymbol: {
+    fontSize: 48,
+  },
+  planetInfo: {
+    flex: 1,
+    gap: Spacing.xs,
+  },
+  planetName: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+  },
+  planetArabic: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+  },
+  elementBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  elementBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  timeRange: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingTop: Spacing.xs,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+    flexWrap: 'wrap',
+  },
+  timeRangeText: {
+    fontSize: 13,
     color: DarkTheme.textSecondary,
     fontWeight: '500',
   },
   countdown: {
-    fontSize: 11,
+    fontSize: 12,
     color: DarkTheme.textTertiary,
     fontStyle: 'italic',
   },

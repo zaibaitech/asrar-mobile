@@ -1,15 +1,15 @@
-# Terms of Service - Asrar Mobile App
+# Terms of Service - Asrariya Mobile App
 
 **Effective Date**: January 3, 2026  
 **Last Updated**: January 3, 2026
 
 ## Acceptance of Terms
 
-By downloading, installing, or using Asrar ("the App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the App.
+By downloading, installing, or using Asrariya ("the App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the App.
 
 ## Description of Service
 
-Asrar is an Islamic spiritual guidance app offering:
+Asrariya is an Islamic spiritual guidance app offering:
 - **Divine Timing**: Astrological insights based on Islamic tradition (Ilm al-Nujum)
 - **Istikhara**: AI-assisted guidance for important decisions
 - **Name Destiny**: Numerology based on Abjad (Ilm al-Huruf)
@@ -35,7 +35,7 @@ Asrar is an Islamic spiritual guidance app offering:
 
 ### Nature of Guidance
 
-**IMPORTANT**: The interpretations and guidance provided by Asrar are based on traditional Islamic sciences including:
+**IMPORTANT**: The interpretations and guidance provided by Asrariya are based on traditional Islamic sciences including:
 - Ilm al-Huruf (Science of Letters/Numerology)
 - Ilm al-Nujum (Islamic Astrology)
 - Abjad numerical system
@@ -57,7 +57,7 @@ Asrar is an Islamic spiritual guidance app offering:
 ## Intellectual Property
 
 ### App Content
-- **Copyright**: © 2026 Asrar. All rights reserved.
+- **Copyright**: © 2026 Asrariya. All rights reserved.
 - **Islamic Texts**: Traditional Islamic texts referenced are in the public domain
 - **Original Content**: UI, design, original commentary, and app features are copyrighted
 - **Open Source**: Portions of the app may be open-source under applicable licenses
@@ -161,7 +161,7 @@ If any provision of these Terms is found to be unenforceable, the remaining prov
 
 ## Entire Agreement
 
-These Terms, together with our Privacy Policy, constitute the entire agreement between you and Asrar regarding the App.
+These Terms, together with our Privacy Policy, constitute the entire agreement between you and Asrariya regarding the App.
 
 ## Contact
 
@@ -179,7 +179,7 @@ For legal inquiries, please use the email above with "Legal" in the subject line
 
 ### Religious Context
 
-Asrar is designed to complement Islamic spiritual practice, not replace it. Users should:
+Asrariya is designed to complement Islamic spiritual practice, not replace it. Users should:
 - Maintain regular prayer (Salah)
 - Consult knowledgeable Islamic scholars for religious questions
 - Use the app as a tool for reflection, not as religious authority
@@ -206,7 +206,7 @@ We encourage users to research and follow the scholarly opinions they trust.
 
 ## Acknowledgment
 
-**By using Asrar, you acknowledge that you have:**
+**By using Asrariya, you acknowledge that you have:**
 - Read and understood these Terms of Service
 - Read and understood our Privacy Policy
 - Agreed to be bound by both documents

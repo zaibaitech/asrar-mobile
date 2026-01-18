@@ -86,10 +86,10 @@
        ▼
 ┌──────────────────────────────────────────────┐
 │         🔗 Deep Link Triggered               │
-│         asrar://auth/callback?...            │
+│         asrariya://auth/callback?...            │
 │                                              │
 │  Operating System intercepts URL            │
-│  Checks: Is "asrar://" registered?          │
+│  Checks: Is "asrariya://" registered?          │
 │  ✅ YES → Open Asrar app                     │
 └──────┬───────────────────────────────────────┘
        │
@@ -194,7 +194,7 @@ Sign Up Attempt
 ## 📡 Deep Link Processing Flow
 
 ```
-Deep Link Received: asrar://auth/callback?type=signup&access_token=xxx&...
+Deep Link Received: asrariya://auth/callback?type=signup&access_token=xxx&...
       │
       ▼
 ┌──────────────────────┐

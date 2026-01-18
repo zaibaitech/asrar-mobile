@@ -100,6 +100,12 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   // ============================================================================
   // INITIALIZATION
   // ============================================================================
+
+  const needsDerivedBackfill = useCallback((p: UserProfile): boolean => {
+    const needsBaseline = !!p.dobISO && (!p.derived || typeof p.derived.manazilBaseline !== 'number');
+    const needsPersonal = !!p.nameAr && (!p.derived || typeof p.derived.manazilPersonal !== 'number');
+    return needsBaseline || needsPersonal;
+  }, []);
   
   /**
    * Load profile at app startup
@@ -113,20 +119,29 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       
       const initialProfile = await initializeProfile();
+
+      // Backfill derived astrological data (incl. Manazil baseline) for profiles
+      // that have DOB but were created before derivation existed.
+      const ensuredProfile = needsDerivedBackfill(initialProfile)
+        ? updateProfileWithDerivedData(initialProfile)
+        : initialProfile;
+      if (ensuredProfile !== initialProfile) {
+        await saveProfile(ensuredProfile);
+      }
       
       // Check if user has active auth session
       const session = await getSession();
-      if (session && initialProfile.mode !== 'account') {
+      if (session && ensuredProfile.mode !== 'account') {
         // User is signed in but profile is still in guest mode
         // Update to account mode
         const updatedProfile: UserProfile = {
-          ...initialProfile,
+          ...ensuredProfile,
           mode: 'account',
         };
         await saveProfile(updatedProfile);
         updateProfileState(updatedProfile);
       } else {
-        updateProfileState(initialProfile);
+        updateProfileState(ensuredProfile);
       }
       
     } catch (error) {
@@ -176,12 +191,15 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const handleSetProfile = useCallback(async (updates: PartialProfileUpdate) => {
     try {
       const dobChanged = updates.dobISO !== undefined && updates.dobISO !== profile.dobISO;
+      const nameChanged =
+        (updates.nameAr !== undefined && updates.nameAr !== profile.nameAr) ||
+        (updates.motherName !== undefined && updates.motherName !== profile.motherName);
       
       // Update profile in storage
       const updatedProfile = await updateProfile(updates);
       
-      // Re-derive if DOB changed
-      if (dobChanged) {
+      // Re-derive if DOB changed, names changed, OR derived data is missing.
+      if (dobChanged || nameChanged || needsDerivedBackfill(updatedProfile)) {
         const derivedProfile = updateProfileWithDerivedData(updatedProfile);
         await saveProfile(derivedProfile);
         updateProfileState(derivedProfile);
@@ -199,7 +217,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       }
       throw error;
     }
-  }, [profile.dobISO, updateProfileState]);
+  }, [profile.dobISO, profile.motherName, profile.nameAr, needsDerivedBackfill, updateProfileState]);
   
   /**
    * Re-derive astrological data from current DOB

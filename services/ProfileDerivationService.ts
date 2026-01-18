@@ -8,6 +8,7 @@
  * - Element (Fire, Earth, Air, Water) from Burj
  * - Planetary ruler from Burj
  * - Manazil baseline from DOB
+ * - Personal Manazil from name + mother's name (Abjad)
  * 
  * Uses classical Islamic astronomy framework (Ilm al-Nujum)
  */
@@ -17,6 +18,7 @@ import {
     DerivedAstrologicalData,
     UserProfile,
 } from '@/types/user-profile';
+import { calculateHadadKabir, normalizeArabic } from '@/utils/coreCalculations';
 
 // ============================================================================
 // BURJ (ZODIAC) SYSTEM
@@ -248,42 +250,57 @@ export function calculateManazilBaseline(dobISO: string): number {
 }
 
 /**
+ * Calculate personal Manazil index from Arabic name + optional mother's name.
+ *
+ * Mapping:
+ * - Compute Kabir total for (name + mother)
+ * - Map into 1..28 via (kabir % 28, with 0 -> 28)
+ * - Convert to 0..27 index used by `data/lunarMansions`
+ */
+export function calculateManazilPersonalFromNames(nameAr: string, motherName?: string): number | null {
+  const normalizedName = normalizeArabic(nameAr);
+  if (!normalizedName) return null;
+
+  const normalizedMother = normalizeArabic(motherName ?? '');
+  const kabir =
+    calculateHadadKabir(normalizedName) + (normalizedMother ? calculateHadadKabir(normalizedMother) : 0);
+
+  // Convert 1..28 mapping to 0..27 index.
+  return normalizeMansionIndex(kabir - 1);
+}
+
+/**
  * Derive all astrological data from user profile
  * Main function used by ProfileContext
  */
 export function deriveAstrologicalData(
   profile: UserProfile
 ): DerivedAstrologicalData | null {
-  // Requires DOB
-  if (!profile.dobISO) {
-    return null;
-  }
-  
   try {
-    // Derive Burj
-    const burjData = deriveBurjFromDOB(profile.dobISO);
-    
-    if (!burjData) {
-      return null;
+    const derived: DerivedAstrologicalData = {};
+
+    // DOB-derived fields
+    if (profile.dobISO) {
+      const burjData = deriveBurjFromDOB(profile.dobISO);
+      if (burjData) {
+        derived.burj = burjData.burjAr;
+        derived.burjIndex = burjData.burjIndex;
+        derived.element = deriveElementFromBurj(burjData.burjIndex);
+        const planetaryRuler = derivePlanetaryRulerFromBurj(burjData.burjIndex);
+        derived.planetaryRuler = planetaryRuler as any;
+        derived.manazilBaseline = calculateManazilBaseline(profile.dobISO);
+      }
     }
-    
-    // Derive element
-    const element = deriveElementFromBurj(burjData.burjIndex);
-    
-    // Derive planetary ruler
-    const planetaryRuler = derivePlanetaryRulerFromBurj(burjData.burjIndex);
-    
-    // Calculate Manazil baseline
-    const manazilBaseline = calculateManazilBaseline(profile.dobISO);
-    
-    return {
-      burj: burjData.burjAr,
-      burjIndex: burjData.burjIndex,
-      element,
-      planetaryRuler: planetaryRuler as any, // Type assertion for lowercase planetary names
-      manazilBaseline,
-    };
-    
+
+    // Name-derived personal Manazil
+    if (profile.nameAr) {
+      const personal = calculateManazilPersonalFromNames(profile.nameAr, profile.motherName);
+      if (typeof personal === 'number') {
+        derived.manazilPersonal = personal;
+      }
+    }
+
+    return Object.keys(derived).length > 0 ? derived : null;
   } catch (error) {
     if (__DEV__) {
       console.error('[ProfileDerivation] Error deriving astrological data:', error);

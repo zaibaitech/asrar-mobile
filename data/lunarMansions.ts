@@ -13,6 +13,18 @@ export interface LunarMansion {
 }
 
 /**
+ * Convert a Moon ecliptic longitude (degrees 0-360) to a Manazil index (0-27).
+ *
+ * Each mansion spans 360/28 degrees.
+ */
+export function getMansionIndexFromEclipticLongitude(longitudeDeg: number): number {
+  const lon = ((longitudeDeg % 360) + 360) % 360;
+  const mansionSize = 360 / 28;
+  const rawIndex = Math.floor(lon / mansionSize);
+  return ((rawIndex % 28) + 28) % 28;
+}
+
+/**
  * Normalize any raw lunar mansion index to 0-27 range
  */
 export function normalizeMansionIndex(raw?: number | null): number | null {
@@ -45,7 +57,7 @@ export const LUNAR_MANSIONS: LunarMansion[] = [
   { index: 8, nameArabic: 'الطرف', nameTransliteration: 'Al-Ṭarf', nameEnglish: 'The Glance', element: 'fire' },
   { index: 9, nameArabic: 'الجبهة', nameTransliteration: 'Al-Jabhah', nameEnglish: 'The Forehead', element: 'earth' },
   { index: 10, nameArabic: 'الزبرة', nameTransliteration: 'Al-Zubrah', nameEnglish: 'The Mane', element: 'air' },
-  { index: 11, nameArabic: 'الصرفة', nameTransliteration: 'Al-Ṣarfah', nameEnglish: 'The Changer', element: 'water' },
+  { index: 11, nameArabic: 'الصرفة', nameTransliteration: 'Al-Ṣarfah', nameEnglish: 'The Changer', element: 'fire' },
   { index: 12, nameArabic: 'العواء', nameTransliteration: 'Al-ʿAwwāʾ', nameEnglish: 'The Barker', element: 'fire' },
   { index: 13, nameArabic: 'السماك', nameTransliteration: 'Al-Simāk', nameEnglish: 'The Unarmed', element: 'earth' },
   
@@ -67,6 +79,33 @@ export const LUNAR_MANSIONS: LunarMansion[] = [
   { index: 26, nameArabic: 'الفرغ المؤخر', nameTransliteration: 'Al-Fargh al-Muʾakhkhar', nameEnglish: 'The Second Pourer', element: 'air' },
   { index: 27, nameArabic: 'بطن الحوت', nameTransliteration: 'Baṭn al-Ḥūt', nameEnglish: 'The Belly of the Fish', element: 'water' },
 ];
+
+if (__DEV__) {
+  // Lightweight integrity checks to prevent silent data regressions.
+  if (LUNAR_MANSIONS.length !== 28) {
+    // eslint-disable-next-line no-console
+    console.warn(`[lunarMansions] Expected 28 mansions, got ${LUNAR_MANSIONS.length}`);
+  }
+
+  for (let i = 0; i < LUNAR_MANSIONS.length; i++) {
+    if (LUNAR_MANSIONS[i].index !== i) {
+      // eslint-disable-next-line no-console
+      console.warn(`[lunarMansions] Mansion at position ${i} has index ${LUNAR_MANSIONS[i].index}`);
+    }
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { validateManazilElements } = require('./manazilElementReference') as typeof import('./manazilElementReference');
+    const res = validateManazilElements(LUNAR_MANSIONS);
+    if (!res.ok) {
+      // eslint-disable-next-line no-console
+      console.warn('[lunarMansions] Element reference mismatches:', res.problems);
+    }
+  } catch {
+    // ignore (dev-only validation)
+  }
+}
 
 /**
  * Get lunar mansion by index (0-27)
@@ -104,4 +143,31 @@ export function getLunarMansionName(
   }
   
   return `${mansion.nameTransliteration} (${mansion.nameArabic})`;
+}
+
+/**
+ * Get a daily/cosmic lunar mansion index for a given date.
+ *
+ * Notes:
+ * - This is a deterministic daily cycle (1 mansion per day) suitable for UI.
+ * - It is not an astronomical ephemeris calculation.
+ */
+export function getCosmicLunarMansionIndexForDate(date: Date = new Date()): number {
+  // Use local midday to avoid DST edge cases around midnight.
+  const localNoon = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0);
+
+  // Fixed epoch (local noon Jan 1, 2000) to keep the cycle stable.
+  const epochLocalNoon = new Date(2000, 0, 1, 12, 0, 0, 0);
+  const dayMs = 24 * 60 * 60 * 1000;
+  const daysSinceEpoch = Math.floor((localNoon.getTime() - epochLocalNoon.getTime()) / dayMs);
+
+  return ((daysSinceEpoch % 28) + 28) % 28;
+}
+
+/**
+ * Get the daily/cosmic lunar mansion for a given date.
+ */
+export function getCosmicLunarMansionForDate(date: Date = new Date()): LunarMansion {
+  const index = getCosmicLunarMansionIndexForDate(date);
+  return LUNAR_MANSIONS[index];
 }

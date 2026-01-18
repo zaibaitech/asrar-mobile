@@ -1,11 +1,17 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Borders, DarkTheme, ElementAccents, Typography } from '@/constants/DarkTheme';
+import { useProfile } from '@/contexts/ProfileContext';
+import { useAllTransits } from '@/hooks/useTransit';
 import { Element } from '@/services/MomentAlignmentService';
+import { ZODIAC_DATA } from '@/services/PlanetTransitService';
+import type { Planet } from '@/services/PlanetaryHoursService';
 import { PlanetaryHourData } from '@/services/PlanetaryHoursService';
-import { PlanetTransitInfo } from '@/services/PlanetTransitService';
+import { deriveBurjFromDOB } from '@/services/ProfileDerivationService';
+import { adaptTransitToLegacyFormat } from '@/utils/transitAdapters';
+import { resolveUserZodiacKey } from '@/utils/translationHelpers';
 
 import PlanetTransitWidget from './PlanetTransitWidget';
 import { RotatingCardContent } from './RotatingCardContent';
@@ -28,7 +34,6 @@ interface RightStackWidgetsProps {
   nextPrayer?: NextPrayer | null;
   prayerLoading?: boolean;
   prayerCountdown?: string;
-  planetTransit?: PlanetTransitInfo | null;
   nextDayBlessing?: DayBlessing | null;
   planetaryData?: PlanetaryHourData | null;
   t: (key: string) => string;
@@ -38,13 +43,80 @@ export function RightStackWidgets({
   nextPrayer,
   prayerLoading,
   prayerCountdown,
-  planetTransit,
   nextDayBlessing,
   planetaryData,
   t,
 }: RightStackWidgetsProps) {
   const router = useRouter();
   const [prayerSlide, setPrayerSlide] = useState(0);
+
+  const { profile } = useProfile();
+  const { transits } = useAllTransits();
+
+  const myZodiacKey = useMemo(() => {
+    // Prefer derived profile value if present
+    const fromDerived = resolveUserZodiacKey({
+      burjIndex: profile?.derived?.burjIndex,
+      burj: profile?.derived?.burj,
+    });
+    if (fromDerived) return fromDerived;
+
+    // Fallback: derive from DOB if available
+    if (profile?.dobISO) {
+      const burjData = deriveBurjFromDOB(profile.dobISO);
+      return resolveUserZodiacKey({
+        burjIndex: burjData?.burjIndex,
+        burj: burjData?.burjEn,
+      });
+    }
+
+    return null;
+  }, [profile?.derived?.burjIndex, profile?.derived?.burj, profile?.dobISO]);
+
+  const selectedTransit = useMemo(() => {
+    if (!transits || !myZodiacKey) return null;
+    const all = Object.values(transits);
+    const inMySign = all.filter((t) => t?.sign === myZodiacKey);
+    if (inMySign.length === 0) return null;
+
+    const now = new Date();
+    const isActive = (t: (typeof inMySign)[number]) => {
+      const start = t.transitStartDate ? new Date(t.transitStartDate) : null;
+      const end = t.transitEndDate ? new Date(t.transitEndDate) : null;
+      if (start && end) return now >= start && now <= end;
+      return true; // If missing window, assume it's the current sign position
+    };
+
+    const active = inMySign.filter(isActive);
+    const candidates = (active.length ? active : inMySign).slice();
+
+    // Pick “most relevant” deterministically (UI supports 1 item)
+    const priority: Planet[] = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'];
+    const planetRank = (p: Planet) => {
+      const idx = priority.indexOf(p);
+      return idx === -1 ? 999 : idx;
+    };
+
+    candidates.sort((a, b) => {
+      const byPlanet = planetRank(a.planet) - planetRank(b.planet);
+      if (byPlanet !== 0) return byPlanet;
+      // Tie-breaker: sooner ending transit feels more “current”
+      const aEnd = a.transitEndDate ? new Date(a.transitEndDate).getTime() : Number.POSITIVE_INFINITY;
+      const bEnd = b.transitEndDate ? new Date(b.transitEndDate).getTime() : Number.POSITIVE_INFINITY;
+      return aEnd - bEnd;
+    });
+
+    return candidates[0] ?? null;
+  }, [transits, myZodiacKey]);
+
+  // Convert new transit format to legacy format for widget
+  const legacyTransit = selectedTransit ? adaptTransitToLegacyFormat(selectedTransit) : null;
+  const nextDayBlessingWithElement = nextDayBlessing
+    ? {
+        ...nextDayBlessing,
+        element: nextDayBlessing.element ?? (myZodiacKey ? ZODIAC_DATA[myZodiacKey].element : 'earth'),
+      }
+    : null;
 
   return (
     <View style={styles.container}>
@@ -55,7 +127,7 @@ export function RightStackWidgets({
           if (prayerSlide === 0) {
             router.push('/prayer-times');
           } else {
-            router.push('/moment-alignment-details');
+            router.push('/(tabs)/moment-alignment-detail');
           }
         }}
         activeOpacity={0.7}
@@ -137,8 +209,8 @@ export function RightStackWidgets({
       {/* Planet Transit Widget */}
       <View style={styles.widget}>
         <PlanetTransitWidget 
-          transitData={planetTransit ?? null} 
-          nextDayBlessing={nextDayBlessing ?? null}
+          transitData={legacyTransit} 
+          nextDayBlessing={nextDayBlessingWithElement}
           compact 
         />
       </View>

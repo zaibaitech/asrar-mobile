@@ -51,6 +51,12 @@ export interface DerivedAstrologicalData {
   
   /** Moon mansion (manazil) baseline - optional advanced feature */
   manazilBaseline?: number;
+
+  /**
+   * Personal Manazil (lunar mansion) derived from name + mother's name (Abjad total).
+   * Used for personal mansion resonance against today's mansion.
+   */
+  manazilPersonal?: number;
 }
 
 /**

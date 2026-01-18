@@ -28,17 +28,22 @@ export function DivineNameCard({ divineName }: DivineNameCardProps) {
         <Text style={styles.arabicName}>{divineName.arabic}</Text>
       </View>
       
-      {/* Transliteration */}
-      <Text style={styles.transliteration}>{divineName.transliteration}</Text>
-
-      {!!divineName.translationKey && (
-        <Text style={styles.translation}>
-          {tSafe(divineName.translationKey, divineName.transliteration)}
-        </Text>
-      )}
+      {/* Transliteration + Translation */}
+      <View style={styles.metaRow}>
+        <Text style={styles.transliteration}>{divineName.transliteration}</Text>
+        {!!divineName.translationKey && (
+          <>
+            <Text style={styles.metaSeparator}>•</Text>
+            <Text style={styles.translation}>
+              {tSafe(divineName.translationKey, divineName.transliteration)}
+            </Text>
+          </>
+        )}
+      </View>
       
       {/* Count */}
       <View style={styles.countBadge}>
+        <Text style={styles.countValue}>{divineName.count}×</Text>
         <Text style={styles.countText}>
           {t('prayerGuidance.ui.reciteCount', { count: divineName.count })}
         </Text>
@@ -151,34 +156,51 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'System'
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    marginBottom: Spacing.lg,
+  },
+  metaSeparator: {
+    marginHorizontal: 8,
+    color: DarkTheme.textMuted,
+    fontSize: 14,
+  },
   transliteration: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
     color: DarkTheme.textSecondary,
     textAlign: 'center',
-    marginBottom: Spacing.lg,
   },
   translation: {
     fontSize: 14,
     color: DarkTheme.textTertiary,
     textAlign: 'center',
-    marginBottom: Spacing.md,
     lineHeight: 18,
   },
   countBadge: {
-    backgroundColor: 'rgba(100, 181, 246, 0.18)',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 24,
+    backgroundColor: 'rgba(100, 181, 246, 0.16)',
+    paddingVertical: 14,
+    paddingHorizontal: 26,
+    borderRadius: 20,
     alignSelf: 'center',
     marginBottom: Spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(100, 181, 246, 0.35)',
+    borderColor: 'rgba(100, 181, 246, 0.45)',
+    alignItems: 'center',
+    gap: 4,
+  },
+  countValue: {
+    color: '#64B5F6',
+    fontSize: 26,
+    fontWeight: '800',
   },
   countText: {
-    color: '#64B5F6',
-    fontSize: 18,
-    fontWeight: '700'
+    color: DarkTheme.textSecondary,
+    fontSize: 12,
+    fontWeight: '600',
   },
   abjadValue: {
     fontSize: 14,

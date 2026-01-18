@@ -102,7 +102,9 @@ export async function fetchPrayerTimes(
     const timestamp = Math.floor(Date.now() / 1000);
     const url = `${ALADHAN_API_BASE}/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
 
-    console.log('Fetching prayer times from Aladhan API:', url);
+    if (__DEV__) {
+      console.log('Fetching prayer times from Aladhan API:', url);
+    }
 
     const response = await fetchWithTimeout(url, 12000);
     
@@ -224,7 +226,9 @@ async function cachePrayerTimes(
       longitude,
     };
     await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-    console.log('Prayer times cached successfully');
+    if (__DEV__) {
+      console.log('Prayer times cached successfully');
+    }
   } catch (error) {
     console.error('Failed to cache prayer times:', error);
   }

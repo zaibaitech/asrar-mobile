@@ -131,6 +131,18 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
       ],
     },
     {
+      title: t('drawer.notifications'),
+      items: [
+        {
+          id: 'notification-settings',
+          label: t('drawer.notificationSettings'),
+          icon: 'notifications',
+          route: '/(screens)/notification-settings',
+          color: '#8B7355',
+        },
+      ],
+    },
+    {
       title: t('drawer.app'),
       items: [
         {
@@ -191,7 +203,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
               {/* Header */}
               <View style={styles.header}>
                 <View style={styles.headerContent}>
-                  <Text style={styles.logo}>Asrār ✦</Text>
+                  <Text style={styles.logo}>Asrariya ✦</Text>
                   <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                     <Ionicons name="close" size={24} color={DarkTheme.textSecondary} />
                   </TouchableOpacity>
@@ -308,7 +320,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                 
                 {/* App Version */}
                 <View style={styles.footer}>
-                  <Text style={styles.footerText}>Asrār v1.0.0</Text>
+                  <Text style={styles.footerText}>Asrariya v1.0.0</Text>
                   <Text style={styles.footerText}>{t('drawer.guestMode')}</Text>
                 </View>
               </ScrollView>

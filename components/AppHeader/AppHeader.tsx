@@ -1,3 +1,4 @@
+import { useProfile } from '@/contexts/ProfileContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { History, Menu, User } from 'lucide-react-native';
 import React from 'react';
@@ -11,7 +12,7 @@ import {
     View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import AsrarLogo from '../AsrarLogo';
+import AsrarLogo, { ElementType } from '../AsrarLogo';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -44,6 +45,8 @@ export default function AppHeader({
 }: AppHeaderProps) {
   const isSmallScreen = SCREEN_WIDTH < 350;
   const insets = useSafeAreaInsets();
+  const { profile } = useProfile();
+  const logoElement = (profile.derived?.element ?? 'aether') as ElementType;
 
   // Centered/Minimal variant - matches Home page aesthetic
   if (variant === 'centered' || variant === 'minimal') {
@@ -77,14 +80,12 @@ export default function AppHeader({
           {/* Center Section - Logo + Title */}
           <View style={styles.centerSection}>
             <View style={styles.titleRow}>
-              <AsrarLogo 
-                size={28} 
-                variant="icon" 
-                element="aether" 
-                mono={true}
-                monoColor="rgba(255, 255, 255, 0.9)"
+              <AppLogo
+                source={logoSource}
+                isSmallScreen={isSmallScreen}
+                element={logoElement}
               />
-              <Text style={styles.centeredTitle}>Asrār</Text>
+              <Text style={styles.centeredTitle}>Asrariya</Text>
             </View>
             {showSubtitle && (
               <Text style={styles.centeredSubtitle}>ʿIlm al-Ḥurūf & ʿAdad</Text>
@@ -165,9 +166,9 @@ export default function AppHeader({
       <View style={styles.container}>
         {/* Left Section: Logo + App Name */}
         <View style={styles.leftSection}>
-          <AppLogo source={logoSource} isSmallScreen={isSmallScreen} />
+          <AppLogo source={logoSource} isSmallScreen={isSmallScreen} element={logoElement} />
           <Text style={[styles.appName, isSmallScreen && styles.appNameSmall]}>
-            Asrār
+            Asrariya
           </Text>
         </View>
 
@@ -273,20 +274,24 @@ export default function AppHeader({
 interface AppLogoProps {
   source?: ImageSourcePropType;
   isSmallScreen: boolean;
+  element: ElementType;
+  backgroundColor?: string;
+  borderColor?: string;
 }
 
-function AppLogo({ source, isSmallScreen }: AppLogoProps) {
-  const logoSize = isSmallScreen ? 36 : 42;
+function AppLogo({ source, isSmallScreen, element, backgroundColor, borderColor }: AppLogoProps) {
+  const logoSize = isSmallScreen ? 44 : 52;
   const logoRadius = logoSize / 2;
+  const containerStyle = [
+    styles.logoContainer,
+    { width: logoSize, height: logoSize, borderRadius: logoRadius },
+    backgroundColor ? { backgroundColor } : null,
+    borderColor ? { borderColor, borderWidth: 1 } : null,
+  ];
 
   if (source) {
     return (
-      <View
-        style={[
-          styles.logoContainer,
-          { width: logoSize, height: logoSize, borderRadius: logoRadius },
-        ]}
-      >
+      <View style={containerStyle}>
         <Image
           source={source}
           style={styles.logoImage}
@@ -298,15 +303,8 @@ function AppLogo({ source, isSmallScreen }: AppLogoProps) {
 
   // Use AsrarLogo component instead of placeholder
   return (
-    <View
-      style={{
-        width: logoSize,
-        height: logoSize,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <AsrarLogo size={logoSize} variant="icon" element="aether" mono={false} />
+    <View style={containerStyle}>
+      <AsrarLogo size={logoSize} variant="icon" element={element} mono={false} />
     </View>
   );
 }
@@ -451,15 +449,15 @@ const styles = StyleSheet.create({
   },
 
   logoContainer: {
-    backgroundColor: '#F0E6FF',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
   },
 
   logoImage: {
-    width: '70%',
-    height: '70%',
+    width: '100%',
+    height: '100%',
   },
 
   logoPlaceholderText: {

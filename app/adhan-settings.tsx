@@ -6,7 +6,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import {
-    Alert,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -21,9 +20,7 @@ import {
     AdhanSettings,
     cancelAllPrayerNotifications,
     getAdhanSettings,
-    requestNotificationPermissions,
     saveAdhanSettings,
-    sendTestNotification,
 } from '../services/AdhanNotificationService';
 
 export default function AdhanSettingsScreen() {
@@ -60,25 +57,6 @@ export default function AdhanSettingsScreen() {
     if (key === 'enabled' && !value) {
       await cancelAllPrayerNotifications();
     }
-  };
-
-  const handleTestNotification = async () => {
-    const hasPermission = await requestNotificationPermissions();
-    if (!hasPermission) {
-      Alert.alert(
-        'Permission Required',
-        'Please enable notifications in your device settings to receive adhan alerts.',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
-
-    await sendTestNotification();
-    Alert.alert(
-      'Test Sent',
-      'A test notification will appear in 2 seconds',
-      [{ text: 'OK' }]
-    );
   };
 
   if (loading || !settings) {
@@ -280,14 +258,6 @@ export default function AdhanSettingsScreen() {
           </View>
         )}
 
-        {/* Test Button */}
-        {settings.enabled && (
-          <Pressable style={styles.testButton} onPress={handleTestNotification}>
-            <Text style={styles.testButtonText}>🔔 {t('adhanSettings.sendTest')}</Text>
-          </Pressable>
-        )}
-
-
         <View style={{ height: 40 }} />
       </ScrollView>
     </LinearGradient>
@@ -399,18 +369,4 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: Typography.weightBold,
   },
-  testButton: {
-    backgroundColor: '#64B5F6',
-    paddingVertical: Spacing.lg,
-    paddingHorizontal: Spacing.xl,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: Spacing.md,
-  },
-  testButtonText: {
-    fontSize: Typography.body,
-    fontWeight: Typography.weightBold,
-    color: '#ffffff',
-  },
-
 });

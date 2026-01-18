@@ -15,9 +15,10 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 interface PrayerSelectorProps {
   onSelect: (prayer: Prayer) => void;
   selectedPrayer?: Prayer | null;
+  location?: { latitude: number; longitude: number };
 }
 
-export const PrayerSelector = React.memo(function PrayerSelector({ onSelect, selectedPrayer }: PrayerSelectorProps) {
+export const PrayerSelector = React.memo(function PrayerSelector({ onSelect, selectedPrayer, location }: PrayerSelectorProps) {
   const { t, tSafe } = useLanguage();
   const prayers: Prayer[] = useMemo(() => ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'], []);
   const [prayerContexts, setPrayerContexts] = useState<PrayerTimeContext[]>([]);
@@ -26,7 +27,7 @@ export const PrayerSelector = React.memo(function PrayerSelector({ onSelect, sel
     // Load prayer contexts
     const loadContexts = async () => {
       try {
-        const contexts = await getAllPrayerContexts();
+        const contexts = await getAllPrayerContexts(location);
         setPrayerContexts(contexts);
       } catch (error) {
         console.error('Error loading prayer contexts:', error);
@@ -34,7 +35,7 @@ export const PrayerSelector = React.memo(function PrayerSelector({ onSelect, sel
     };
     
     loadContexts();
-  }, []);
+  }, [location?.latitude, location?.longitude]);
   
   return (
     <View style={styles.container}>

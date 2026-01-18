@@ -51,7 +51,7 @@ export default function LoadingOverlayTest() {
         <View style={styles.info}>
           <Text style={styles.infoTitle}>What to expect:</Text>
           <Text style={styles.infoText}>• Full-screen dark overlay</Text>
-          <Text style={styles.infoText}>• Spinning Asrār logo</Text>
+          <Text style={styles.infoText}>• Spinning Asrariya logo</Text>
           <Text style={styles.infoText}>• Pulsing animation</Text>
           <Text style={styles.infoText}>• Purple glow effect</Text>
           <Text style={styles.infoText}>• Progress bar (0-100%)</Text>

@@ -216,7 +216,7 @@ async function resendEmailConfirmation(email: string): Promise<void> {
         type: 'signup',
         email,
         options: {
-          emailRedirectTo: 'asrar://auth/callback',
+          emailRedirectTo: 'asrariya://auth/callback',
         },
       }),
     });
@@ -377,7 +377,7 @@ export async function requestPasswordReset(email: string): Promise<{
       };
     }
 
-    const redirectTo = 'asrar://auth/callback';
+    const redirectTo = 'asrariya://auth/callback';
     const url = `${SUPABASE_URL}/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`;
 
     const response = await fetch(url, {
@@ -600,7 +600,7 @@ export async function signUp(data: SignUpData): Promise<{
         password: data.password,
         data: data.profile || {},
         options: {
-          emailRedirectTo: 'asrar://auth/callback',
+          emailRedirectTo: 'asrariya://auth/callback',
         },
       }),
     });

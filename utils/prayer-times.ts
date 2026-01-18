@@ -8,7 +8,7 @@
  */
 
 import type { Prayer } from '@/data/divine-names-planetary';
-import { fetchPrayerTimes, type PrayerTimings } from '@/services/api/prayerTimes';
+import { fetchPrayerTimes } from '@/services/api/prayerTimes';
 
 // ============================================================================
 // TYPES
@@ -30,9 +30,8 @@ export interface PrayerTimeContext {
   timeUntilPrayer: number; // minutes
 }
 
-// Cache for prayer times
-let cachedPrayerTimes: PrayerTimes | null = null;
-let cacheDate: string | null = null;
+// Cache for prayer times (keyed by date + coarse location)
+const prayerTimesCache = new Map<string, PrayerTimes>();
 
 // ============================================================================
 // PRAYER TIME CALCULATION
@@ -56,16 +55,18 @@ export async function getPrayerTimes(
   location?: { latitude: number; longitude: number }
 ): Promise<PrayerTimes> {
   const dateStr = date.toISOString().split('T')[0];
+
+  const lat = location?.latitude ?? 33.5731; // Default: Casablanca
+  const lon = location?.longitude ?? -7.5898;
+
+  // Coarse key (~1km+) to avoid cache fragmentation while still being location-aware.
+  const locKey = `${lat.toFixed(2)},${lon.toFixed(2)}`;
+  const cacheKey = `${dateStr}:${locKey}`;
   
-  // Return cached times if same date
-  if (cachedPrayerTimes && cacheDate === dateStr) {
-    return cachedPrayerTimes;
-  }
+  const cached = prayerTimesCache.get(cacheKey);
+  if (cached) return cached;
   
   try {
-    const lat = location?.latitude ?? 33.5731; // Default: Casablanca
-    const lon = location?.longitude ?? -7.5898;
-    
     const data = await fetchPrayerTimes(lat, lon);
     const timings = data.timings;
     
@@ -78,8 +79,7 @@ export async function getPrayerTimes(
     };
     
     // Cache the results
-    cachedPrayerTimes = prayerTimes;
-    cacheDate = dateStr;
+    prayerTimesCache.set(cacheKey, prayerTimes);
     
     return prayerTimes;
   } catch (error) {
@@ -217,6 +217,35 @@ export async function getAllPrayerContexts(
 }
 
 /**
+ * Determine which prayer should be shown by default on the guidance screen.
+ * We prefer the current prayer window; if unavailable, fall back to next upcoming.
+ */
+export async function determineCurrentOrNextPrayer(
+  location?: { latitude: number; longitude: number }
+): Promise<Prayer> {
+  const current = await getCurrentPrayer(location);
+  if (current) return current;
+  const next = await getNextPrayer(location);
+  return next.prayer;
+}
+
+/**
+ * Get the most relevant time to associate with a selected prayer on the guidance screen.
+ * - If the selected prayer is the next upcoming prayer, use its upcoming time (may be tomorrow).
+ * - Otherwise, use today's time for that prayer (even if already passed).
+ */
+export async function getPrayerTimeForGuidance(
+  prayer: Prayer,
+  location?: { latitude: number; longitude: number }
+): Promise<Date> {
+  const now = new Date();
+  const times = await getPrayerTimes(now, location);
+  const next = await getNextPrayer(location);
+  if (next.prayer === prayer) return next.time;
+  return times[prayer];
+}
+
+/**
  * Calculate minutes until a specific prayer
  */
 export async function getMinutesUntilPrayer(
@@ -233,13 +262,13 @@ export async function getMinutesUntilPrayer(
 /**
  * Check if we're within a prayer window (recommended time for dhikr)
  */
-export function isWithinPrayerWindow(
+export async function isWithinPrayerWindow(
   prayer: Prayer,
   windowMinutes: number = 30,
   location?: { latitude: number; longitude: number }
-): boolean {
+): Promise<boolean> {
   const now = new Date();
-  const times = getPrayerTimes(now, location);
+  const times = await getPrayerTimes(now, location);
   const prayerTime = times[prayer];
   
   const minutesSince = (now.getTime() - prayerTime.getTime()) / (1000 * 60);
@@ -311,12 +340,12 @@ export function getPrayerIcon(prayer: Prayer): string {
  * Get notification times for a prayer
  * (e.g., 15 minutes before, at prayer time)
  */
-export function getPrayerNotificationTimes(
+export async function getPrayerNotificationTimes(
   prayer: Prayer,
   minutesBefore: number = 15,
   location?: { latitude: number; longitude: number }
-): { beforePrayer: Date; atPrayer: Date } {
-  const prayerTime = getNextPrayerTime(prayer, location);
+): Promise<{ beforePrayer: Date; atPrayer: Date }> {
+  const prayerTime = await getNextPrayerTime(prayer, location);
   
   const beforePrayer = new Date(prayerTime);
   beforePrayer.setMinutes(beforePrayer.getMinutes() - minutesBefore);

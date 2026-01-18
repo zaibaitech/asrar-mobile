@@ -6,7 +6,9 @@
  * AI is OFF by default. User must explicitly enable.
  */
 
+import AsrarLogo, { ElementType } from '@/components/AsrarLogo';
 import Colors from '@/constants/Colors';
+import { useProfile } from '@/contexts/ProfileContext';
 import {
     isAIAvailable,
     loadAISettings,
@@ -57,6 +59,8 @@ const TONE_OPTIONS: { value: AITone; label: string; icon: string; description: s
 export default function AISettingsScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
+  const { profile } = useProfile();
+  const logoElement = (profile.derived?.element ?? 'aether') as ElementType;
   
   const [settings, setSettings] = useState<AISettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -167,6 +171,15 @@ Do you want to enable AI assistance?`,
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
+        <View style={styles.logoWrapper}>
+          <AsrarLogo
+            size={28}
+            variant="icon"
+            element={logoElement}
+            mono={colorScheme === 'dark'}
+            monoVariant={colorScheme === 'dark' ? 'dark' : 'light'}
+          />
+        </View>
         <View style={styles.headerContent}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
             ✨ AI Settings
@@ -431,6 +444,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 20,
     gap: 16,
+  },
+  logoWrapper: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   backButton: {
     width: 40,

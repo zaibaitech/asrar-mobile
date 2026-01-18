@@ -16,6 +16,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { PrayerTimings } from './api/prayerTimes';
+import { formatElementName, formatPlanetName } from './NotificationLocalization';
+import { getStoredLanguage, tStatic } from './StaticI18n';
+import { getAsrarTimingSnapshot } from './TimingSnapshotService';
+import { loadProfile } from './UserProfileStorage';
 
 // Lazy import to avoid Expo Go warning on initial load
 let Notifications: any;
@@ -29,6 +33,8 @@ let channelsInitialized = false;
 // - Channel sound cannot be changed after creation; use versioned IDs to apply updates.
 const ANDROID_CHANNEL_VERSION = 'v2';
 const ANDROID_CHANNEL_PREFIX = `adhan-${ANDROID_CHANNEL_VERSION}`;
+
+type ElementKey = 'fire' | 'water' | 'air' | 'earth';
 
 const initNotifications = async () => {
   if (!Notifications) {
@@ -55,6 +61,60 @@ const initNotifications = async () => {
   }
   return Notifications;
 };
+
+async function buildPrayerGuidanceGlimpse(triggerDate: Date): Promise<string> {
+  try {
+    const lang = await getStoredLanguage();
+    const profile = await loadProfile();
+    const userElement = (profile?.derived?.element as ElementKey | undefined) ?? undefined;
+
+    const snapshot = await getAsrarTimingSnapshot(triggerDate);
+    const hourPlanet = formatPlanetName(lang, snapshot.planetaryHour.ruler);
+    const hourElement = formatElementName(lang, snapshot.planetaryHour.element);
+
+    let noteKey: string = 'notifications.prayer.guidanceNoteNeutral';
+    if (userElement) {
+      const relationship = calculateElementRelationship(userElement, snapshot.planetaryHour.element as ElementKey);
+      if (relationship === 'harmonious') noteKey = 'notifications.prayer.guidanceNoteAligned';
+      else if (relationship === 'complementary') noteKey = 'notifications.prayer.guidanceNoteSupportive';
+      else if (relationship === 'transformative') noteKey = 'notifications.prayer.guidanceNoteChallenging';
+      else noteKey = 'notifications.prayer.guidanceNoteNeutral';
+    }
+
+    return tStatic(lang, 'notifications.prayer.guidanceGlimpse', {
+      planet: hourPlanet,
+      element: hourElement,
+      note: tStatic(lang, noteKey),
+    });
+  } catch {
+    return '';
+  }
+}
+
+function calculateElementRelationship(
+  userElement: ElementKey,
+  hourElement: ElementKey
+): 'harmonious' | 'complementary' | 'neutral' | 'transformative' {
+  if (userElement === hourElement) return 'harmonious';
+
+  const activeElements = new Set<ElementKey>(['fire', 'air']);
+  const receptiveElements = new Set<ElementKey>(['water', 'earth']);
+  if (
+    (activeElements.has(userElement) && activeElements.has(hourElement)) ||
+    (receptiveElements.has(userElement) && receptiveElements.has(hourElement))
+  ) {
+    return 'complementary';
+  }
+
+  const oppositions: Record<ElementKey, ElementKey> = {
+    fire: 'water',
+    water: 'fire',
+    air: 'earth',
+    earth: 'air',
+  };
+  if (oppositions[userElement] === hourElement) return 'transformative';
+  return 'neutral';
+}
 
 /**
  * Setup Android notification channels with sound support
@@ -264,6 +324,7 @@ export async function schedulePrayerNotifications(
   try {
     await initNotifications();
     const settings = await getAdhanSettings();
+    const lang = await getStoredLanguage();
 
     if (!settings.enabled) {
       return;
@@ -305,16 +366,30 @@ export async function schedulePrayerNotifications(
         const androidChannelId = Platform.OS === 'android'
           ? androidChannelIdFromSettings(prayer.isFajr, settings)
           : undefined;
+
+        const title = tStatic(lang, 'notifications.prayer.prayerTitle', {
+          prayerName: prayer.name,
+        });
+        const glimpse = await buildPrayerGuidanceGlimpse(prayerDate);
+        const body = tStatic(lang, 'notifications.prayer.prayerBody', {
+          prayerName: prayer.name,
+          arabic: prayer.nameArabic,
+          glimpse,
+        });
         
         const notificationContent: any = {
-          title: `🕌 ${prayer.name} Prayer Time`,
-          body: `It's time for ${prayer.name} prayer (${prayer.nameArabic})`,
+          title,
+          body,
           // iOS plays sound per-notification. Note: iOS custom notification sounds must be .caf/.wav/.aiff.
           // Our bundled adhan assets are .mp3, so we fall back to the default iOS notification sound.
           sound: Platform.OS === 'ios' ? (settings.playSound ? 'default' : null) : undefined,
           data: {
+            category: 'prayer',
             type: 'prayer',
+            action: 'prayerGuidance',
+            prayer: prayer.name,
             prayerName: prayer.name,
+            prayerArabic: prayer.nameArabic,
             isFajr: prayer.isFajr,
           },
         };
@@ -350,15 +425,31 @@ export async function schedulePrayerNotifications(
               ? `${ANDROID_CHANNEL_PREFIX}-silent`
               : undefined;
 
+            const reminderTitle = tStatic(lang, 'notifications.prayer.reminderTitle', {
+              prayerName: prayer.name,
+              minutes: settings.reminderMinutes,
+            });
+            const reminderGlimpse = await buildPrayerGuidanceGlimpse(reminderDate);
+            const reminderBody = tStatic(lang, 'notifications.prayer.reminderBody', {
+              prayerName: prayer.name,
+              minutes: settings.reminderMinutes,
+              glimpse: reminderGlimpse,
+            });
+
             const reminderId = await Notifications.scheduleNotificationAsync({
               content: {
-                title: `⏰ Reminder: ${prayer.name} Prayer`,
-                body: `${prayer.name} prayer in ${settings.reminderMinutes} minutes`,
+                title: reminderTitle,
+                body: reminderBody,
                 // Explicitly disable sound for reminders
                 sound: null,
                 data: {
+                  category: 'prayer',
                   type: 'reminder',
+                  action: 'prayerGuidance',
+                  prayer: prayer.name,
                   prayerName: prayer.name,
+                  prayerArabic: prayer.nameArabic,
+                  minutes: settings.reminderMinutes,
                 },
               },
               trigger: {
@@ -431,51 +522,3 @@ function parsePrayerTime(timeStr: string, baseDate: Date = new Date()): Date {
   return date;
 }
 
-/**
- * Test notification (for debugging)
- * 
- * IMPORTANT LIMITATION:
- * - In Expo Go: Only default system notification sound will play
- * - In EAS Build: Custom adhan audio will play correctly
- * 
- * This is an Expo Go limitation, not a bug in our code.
- */
-export async function sendTestNotification(): Promise<void> {
-  try {
-    await initNotifications();
-    const settings = await getAdhanSettings();
-    const androidChannelId = Platform.OS === 'android'
-      ? androidChannelIdFromSettings(false, settings)
-      : undefined;
-    
-    const notificationContent: any = {
-      title: '🕌 Test Prayer Notification',
-      body: settings.playSound
-        ? 'Testing adhan sound'
-        : 'Testing notification (sound disabled in settings)',
-      // iOS custom sounds must be .caf/.wav/.aiff; use default iOS sound until we ship an iOS-compatible asset.
-      sound: Platform.OS === 'ios' ? (settings.playSound ? 'default' : null) : undefined,
-      data: {
-        type: 'test',
-      },
-    };
-
-    // Android-specific configuration
-    if (Platform.OS === 'android') {
-      notificationContent.priority = 'max';
-      notificationContent.vibrate = settings.vibrate ? [0, 250, 250, 250] : undefined;
-    }
-
-    await Notifications.scheduleNotificationAsync({
-      content: notificationContent,
-      trigger: {
-        type: SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: 2,
-        channelId: androidChannelId,
-      },
-    });
-  } catch (error) {
-    console.error('Failed to send test notification:', error);
-    throw error;
-  }
-}

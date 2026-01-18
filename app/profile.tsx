@@ -392,7 +392,7 @@ export default function ProfileScreen() {
 
       Alert.alert(
         t('profile.deleteSuccess'),
-        'Your account has been deleted. You can continue using Asrār as a guest.',
+        'Your account has been deleted. You can continue using Asrariya as a guest.',
         [{ text: t('common.close'), onPress: () => router.replace('/(tabs)') }]
       );
     } catch (error) {

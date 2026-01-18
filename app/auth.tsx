@@ -335,7 +335,7 @@ export default function AuthScreen() {
           >
             {/* Logo & Title */}
             <View style={styles.header}>
-              <Text style={styles.logo}>Asrār ✦</Text>
+              <Text style={styles.logo}>Asrariya ✦</Text>
               <Text style={styles.subtitle}>Sacred Numerology & Mysticism</Text>
             </View>
             

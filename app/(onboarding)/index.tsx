@@ -4,7 +4,7 @@
  * FIXED: Final slide layout - clean, scrollable, properly spaced
  */
 
-import AsrarLogo from '@/components/AsrarLogo';
+import appLogo from '@/assets/images/logo_1024_transparent.png';
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { setOnboardingCompleted } from '@/services/OnboardingService';
@@ -20,6 +20,7 @@ import {
     Dimensions,
     Easing,
     FlatList,
+    Image,
     Platform,
     ScrollView,
     StyleSheet,
@@ -85,7 +86,7 @@ const AnimatedLogoIcon = ({ isActive }: { isActive: boolean }) => {
       <View style={styles.logoGlow} />
       <LinearGradient colors={['#8B5CF620', '#A855F710']} style={styles.logoBackground}>
         <Animated.View style={{ transform: [{ rotate: spinAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }] }}>
-          <AsrarLogo size={IS_SMALL_DEVICE ? 52 : 64} mono={false} variant="icon" />
+          <Image source={appLogo} style={{ width: IS_SMALL_DEVICE ? 52 : 64, height: IS_SMALL_DEVICE ? 52 : 64 }} resizeMode="contain" />
         </Animated.View>
       </LinearGradient>
     </Animated.View>
@@ -312,8 +313,8 @@ export default function OnboardingScreen() {
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <Animated.View style={[styles.header, { opacity: fadeAnim }]}>
           <View style={styles.headerLeft}>
-            <AsrarLogo size={IS_SMALL_DEVICE ? 32 : 40} mono={true} />
-            <View><Text style={styles.logoText}>Asrār</Text><Text style={styles.logoSub}>✦ ʿIlm al-Ḥurūf</Text></View>
+            <Image source={appLogo} style={{ width: IS_SMALL_DEVICE ? 32 : 40, height: IS_SMALL_DEVICE ? 32 : 40 }} resizeMode="contain" />
+            <View><Text style={styles.logoText}>Asrariya</Text><Text style={styles.logoSub}>✦ ʿIlm al-Ḥurūf</Text></View>
           </View>
           {!isLastSlide && <TouchableOpacity onPress={handleSkip} style={styles.skipBtn}><Text style={styles.skipText}>{t('onboarding.skip')}</Text></TouchableOpacity>}
         </Animated.View>

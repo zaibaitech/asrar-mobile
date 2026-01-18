@@ -106,7 +106,9 @@ export function PrayerTimesWidget() {
       const { status } = await Location.requestForegroundPermissionsAsync();
       
       if (status !== 'granted') {
-        console.log('Location permission denied');
+        if (__DEV__) {
+          console.log('Location permission denied');
+        }
         setState('permission-denied');
         return;
       }
@@ -117,7 +119,9 @@ export function PrayerTimesWidget() {
       });
 
       const { latitude, longitude } = location.coords;
-      console.log('Location:', latitude, longitude);
+      if (__DEV__) {
+        console.log('Location:', latitude, longitude);
+      }
 
       // Fetch prayer times
       const data = await fetchPrayerTimes(latitude, longitude);

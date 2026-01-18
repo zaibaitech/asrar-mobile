@@ -1,12 +1,16 @@
 /**
  * Animated Splash Screen Component
  * Mobile Implementation - Expo Go 54
+ * Enhanced Welcome Screen with Get Started
  */
 
+import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useEffect, useRef } from 'react';
-import { Animated, Dimensions, StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+const appLogo = require('../assets/images/logo_1024_transparent.png');
 
 const { width, height } = Dimensions.get('window');
 
@@ -15,116 +19,156 @@ interface AnimatedSplashProps {
 }
 
 export function AnimatedSplash({ onFinish }: AnimatedSplashProps) {
+  const { t } = useLanguage();
+  const [showWelcome, setShowWelcome] = useState(false);
+  
+  // Phase 1: Logo animation
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.8)).current;
-  const rotateAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1.5)).current;
+  const logoRotateAnim = useRef(new Animated.Value(0)).current;
+  
+  // Phase 2: Welcome screen
+  const welcomeFadeAnim = useRef(new Animated.Value(0)).current;
+  const buttonSlideAnim = useRef(new Animated.Value(50)).current;
 
   useEffect(() => {
-    // Prevent auto-hide of splash screen
     SplashScreen.preventAutoHideAsync();
 
-    // Start animations
+    // Phase 1: Logo zoom out animation
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 800,
+        duration: 600,
         useNativeDriver: true,
       }),
       Animated.spring(scaleAnim, {
         toValue: 1,
-        friction: 5,
+        friction: 8,
         tension: 40,
         useNativeDriver: true,
       }),
-      Animated.loop(
-        Animated.timing(rotateAnim, {
-          toValue: 1,
-          duration: 3000,
-          useNativeDriver: true,
-        })
-      ),
+      Animated.timing(logoRotateAnim, {
+        toValue: 1,
+        duration: 1200,
+        useNativeDriver: true,
+      }),
     ]).start();
 
-    // Hide splash after animation
+    // Transition to welcome screen after 1.5s
     const timer = setTimeout(async () => {
       await SplashScreen.hideAsync();
+      setShowWelcome(true);
       
-      // Fade out
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 400,
-        useNativeDriver: true,
-      }).start(() => {
-        onFinish();
-      });
-    }, 2000);
+      // Fade in welcome content
+      Animated.parallel([
+        Animated.timing(welcomeFadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.spring(buttonSlideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const spin = rotateAnim.interpolate({
+  const logoRotate = logoRotateAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
   });
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          opacity: fadeAnim,
-        },
-      ]}
-    >
+    <Animated.View style={styles.container}>
       <LinearGradient
-        colors={['#0f172a', '#1e1b4b', '#312e81']}
+        colors={['#0f172a', '#1e1b4b', '#1a1625']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={styles.gradient}
       >
-        <Animated.View
-          style={[
-            styles.logoContainer,
-            {
+        {!showWelcome ? (
+          // Phase 1: Animated Logo
+          <Animated.View
+            style={{
+              opacity: fadeAnim,
               transform: [
                 { scale: scaleAnim },
-                { rotate: spin },
+                { rotate: logoRotate },
               ],
-            },
-          ]}
-        >
-          {/* Star/Moon Icon */}
-          <View style={styles.icon}>
-            <View style={styles.star}>
-              <View style={styles.starInner} />
+            }}
+          >
+            <Image source={appLogo} style={styles.logo} resizeMode="contain" />
+            <Animated.Text
+              style={[
+                styles.appName,
+                {
+                  opacity: fadeAnim,
+                  transform: [{ scale: scaleAnim }],
+                },
+              ]}
+            >
+              <Text style={styles.welcomeTitle}>{t('onboarding.splash.appName')}</Text>
+            </Animated.Text>
+          </Animated.View>
+        ) : (
+          // Phase 2: Welcome Screen
+          <Animated.View style={[styles.welcomeContainer, { opacity: welcomeFadeAnim }]}>
+            <Image source={appLogo} style={styles.welcomeLogo} resizeMode="contain" />
+            
+            <Text style={styles.welcomeTitle}>{t('onboarding.splash.appName')}</Text>
+            <Text style={styles.welcomeSubtitle}>{t('onboarding.splash.subtitle')}</Text>
+            
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.welcomeDescription}>
+                {t('onboarding.splash.description')}
+              </Text>
+              
+              <View style={styles.featuresContainer}>
+                <FeatureItem icon="✨" text={t('onboarding.splash.features.calculator')} />
+                <FeatureItem icon="🌙" text={t('onboarding.splash.features.timing')} />
+                <FeatureItem icon="🔮" text={t('onboarding.splash.features.insights')} />
+              </View>
             </View>
-          </View>
-        </Animated.View>
 
-        <Animated.Text
-          style={[
-            styles.appName,
-            {
-              opacity: fadeAnim,
-              transform: [{ scale: scaleAnim }],
-            },
-          ]}
-        >
-          Asrar
-        </Animated.Text>
-        
-        <Animated.Text
-          style={[
-            styles.tagline,
-            {
-              opacity: fadeAnim,
-            },
-          ]}
-        >
-          Unveiling Sacred Wisdom
-        </Animated.Text>
+            <Animated.View
+              style={{
+                transform: [{ translateY: buttonSlideAnim }],
+                opacity: welcomeFadeAnim,
+              }}
+            >
+              <TouchableOpacity
+                style={styles.getStartedButton}
+                onPress={onFinish}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={['#8B5CF6', '#7C3AED']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.buttonGradient}
+                >
+                  <Text style={styles.buttonText}>{t('onboarding.splash.getStarted')}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
+          </Animated.View>
+        )}
       </LinearGradient>
     </Animated.View>
   );
 }
+
+const FeatureItem = ({ icon, text }: { icon: string; text: string }) => (
+  <View style={styles.featureItem}>
+    <Text style={styles.featureIcon}>{icon}</Text>
+    <Text style={styles.featureText}>{text}</Text>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -139,54 +183,110 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 20,
   },
-  logoContainer: {
-    marginBottom: 24,
-  },
-  icon: {
-    width: 120,
-    height: 120,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  star: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#6366f1',
-    transform: [{ rotate: '45deg' }],
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#6366f1',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  starInner: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#8b5cf6',
-    borderRadius: 8,
-    shadowColor: '#8b5cf6',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 15,
+  // Phase 1: Logo Animation
+  logo: {
+    width: 140,
+    height: 140,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   appName: {
     fontSize: 48,
     fontWeight: '800',
     color: '#ffffff',
     letterSpacing: 2,
-    marginBottom: 8,
-    textShadowColor: 'rgba(99, 102, 241, 0.5)',
+    textAlign: 'center',
+    textShadowColor: 'rgba(139, 92, 246, 0.5)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 10,
   },
-  tagline: {
+  // Phase 2: Welcome Screen
+  welcomeContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    paddingHorizontal: 24,
+  },
+  welcomeLogo: {
+    width: 100,
+    height: 100,
+    marginBottom: 16,
+  },
+  welcomeTitle: {
+    fontSize: 42,
+    fontWeight: '800',
+    color: '#ffffff',
+    letterSpacing: 1.5,
+    marginBottom: 8,
+    textShadowColor: 'rgba(139, 92, 246, 0.4)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+  },
+  welcomeSubtitle: {
     fontSize: 16,
     color: '#c4b5fd',
-    letterSpacing: 1,
+    letterSpacing: 1.2,
+    marginBottom: 40,
     fontWeight: '500',
+  },
+  descriptionContainer: {
+    width: '100%',
+    marginBottom: 40,
+  },
+  welcomeDescription: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.85)',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 32,
+    paddingHorizontal: 8,
+  },
+  featuresContainer: {
+    width: '100%',
+    gap: 16,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  featureIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  featureText: {
+    fontSize: 15,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '600',
+    flex: 1,
+  },
+  getStartedButton: {
+    width: width - 48,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  buttonGradient: {
+    paddingVertical: 18,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#ffffff',
+    letterSpacing: 0.5,
   },
 });

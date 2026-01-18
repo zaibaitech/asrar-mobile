@@ -5,14 +5,12 @@
  * Always displays real-time data (not dependent on check-ins)
  */
 
-import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { Borders, DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DailyGuidance } from '@/services/DailyGuidanceService';
-import { calculateElementalHarmony } from '@/services/ElementalHarmonyService';
 import { getDayRuler, getPlanetInfo } from '@/services/PlanetaryHoursService';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -36,6 +34,38 @@ export function RealTimeDailyGuidance({
 }: RealTimeDailyGuidanceProps) {
   const router = useRouter();
   const { t } = useLanguage();
+
+  const getElementColor = React.useCallback((element?: string) => {
+    switch (element) {
+      case 'fire':
+        return '#fb7185';
+      case 'water':
+        return '#60a5fa';
+      case 'air':
+        return '#a78bfa';
+      case 'earth':
+        return '#4ade80';
+      default:
+        return '#64B5F6';
+    }
+  }, []);
+
+  const getObjectiveTimingQuality = React.useCallback((dayRuler: string): DailyGuidance['timingQuality'] => {
+    switch (dayRuler) {
+      case 'Sun':
+      case 'Jupiter':
+      case 'Venus':
+        return 'favorable';
+      case 'Mars':
+        return 'transformative';
+      case 'Moon':
+      case 'Saturn':
+        return 'delicate';
+      case 'Mercury':
+      default:
+        return 'neutral';
+    }
+  }, []);
   
   const handlePress = async () => {
     try {
@@ -46,18 +76,33 @@ export function RealTimeDailyGuidance({
     
     // Navigate to daily guidance details with data
     if (guidance) {
+      const now = new Date();
+      const ruler = getDayRuler(now);
+      const rulerInfo = getPlanetInfo(ruler);
+      const objectiveQuality = getObjectiveTimingQuality(ruler);
+
+      const dayOfWeek = now.getDay();
+      const dayKeys = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const;
+      const dayKey = dayKeys[dayOfWeek] ?? 'Sunday';
+      const dayName = t(`home.dailyGuidanceDetails.days.${dayKey}`);
+
+      const genericMessageKey = `home.dailyGuidanceContent.generic.${rulerInfo.element}.message`;
+      const genericMessageParams = { day: dayName };
+      const genericBestForKeys = [0, 1, 2, 3].map(i => `home.dailyGuidanceContent.generic.${rulerInfo.element}.bestFor.${i}`);
+      const genericAvoidKeys = [0, 1, 2].map(i => `home.dailyGuidanceContent.generic.${rulerInfo.element}.avoid.${i}`);
+
       router.push({
         pathname: '/(tabs)/daily-guidance-details',
         params: {
-          timingQuality: guidance.timingQuality,
-          dayElement: guidance.dayElement,
-          userElement: guidance.userElement || '',
-          relationship: guidance.relationship,
-          messageKey: guidance.messageKey,
-          messageParams: JSON.stringify(guidance.messageParams || {}),
-          bestForKeys: JSON.stringify(guidance.bestForKeys || []),
-          avoidKeys: JSON.stringify(guidance.avoidKeys || []),
-          peakHoursKey: guidance.peakHoursKey || '',
+          timingQuality: objectiveQuality,
+          dayElement: rulerInfo.element,
+          userElement: '',
+          relationship: 'neutral',
+          messageKey: genericMessageKey,
+          messageParams: JSON.stringify(genericMessageParams),
+          bestForKeys: JSON.stringify(genericBestForKeys),
+          avoidKeys: JSON.stringify(genericAvoidKeys),
+          peakHoursKey: '',
         },
       });
     }
@@ -79,13 +124,13 @@ export function RealTimeDailyGuidance({
   const getStatusLabel = (quality?: string) => {
     switch (quality) {
       case 'favorable':
-        return t('home.cards.dailyGuidance.window.favorable');
+        return t('widgets.dailyEnergy.windows.favorable');
       case 'transformative':
-        return t('home.cards.dailyGuidance.window.transformative');
+        return t('widgets.dailyEnergy.windows.transformative');
       case 'delicate':
-        return t('home.cards.dailyGuidance.window.delicate');
+        return t('widgets.dailyEnergy.windows.delicate');
       default:
-        return t('home.cards.dailyGuidance.window.neutral');
+        return t('widgets.dailyEnergy.windows.neutral');
     }
   };
   
@@ -108,6 +153,7 @@ export function RealTimeDailyGuidance({
     if (!element) return '';
     return t(`elements.${element}`);
   };
+
   
   if (loading || !guidance) {
     return (
@@ -116,130 +162,149 @@ export function RealTimeDailyGuidance({
         onPress={handlePress}
         android_ripple={{ color: 'rgba(255, 255, 255, 0.1)' }}
       >
-        <LinearGradient
-          colors={['rgba(139, 115, 85, 0.15)', 'rgba(139, 115, 85, 0.05)']}
-          style={styles.gradient}
-        >
+        <View style={[styles.gradient, { backgroundColor: 'rgba(139, 115, 85, 0.08)' }]}>
           <Text style={styles.loadingText}>Loading guidance...</Text>
-        </LinearGradient>
+        </View>
       </Pressable>
     );
   }
-  
-  const statusColor = getStatusColor(guidance.timingQuality);
-  const statusLabel = getStatusLabel(guidance.timingQuality);
-  
-  // Get first bestFor item if available
-  const firstBestForKey = guidance.bestForKeys && guidance.bestForKeys.length > 0 ? guidance.bestForKeys[0] : null;
-  const bestForText = firstBestForKey ? t(firstBestForKey) : '';
-  const hasBestFor = firstBestForKey !== null;
   
   // Get day ruler
   const now = new Date();
   const dayRuler = getDayRuler(now);
   const dayRulerInfo = getPlanetInfo(dayRuler);
-  
-  // Calculate elemental harmony if user element exists
-  const harmonyData = guidance.userElement 
-    ? calculateElementalHarmony(guidance.userElement, guidance.dayElement)
-    : null;
+
+  // Objective day tone (universal, no personal comparison)
+  const objectiveTimingQuality = getObjectiveTimingQuality(dayRuler);
+  const statusColor = getStatusColor(objectiveTimingQuality);
+  const statusLabel = getStatusLabel(objectiveTimingQuality);
+
+  // Objective sections derived from day element + day ruler
+  const elementColor = getElementColor(dayRulerInfo.element);
+  const energyDescription = t(`widgets.dailyEnergy.energyDescriptions.${dayRulerInfo.element}`);
+
+  const bestForKeys = [0, 1, 3].map(i => `home.dailyGuidanceContent.generic.${dayRulerInfo.element}.bestFor.${i}`);
+  const bestForText = bestForKeys.map(key => t(key)).filter(Boolean).join(', ');
+  const hasBestFor = bestForText.length > 0;
   
   return (
     <Pressable
-      style={styles.container}
+      style={[styles.container, compact && styles.containerCompact]}
       onPress={handlePress}
       android_ripple={{ color: 'rgba(255, 255, 255, 0.1)' }}
     >
-      <LinearGradient
-        colors={[`${statusColor}15`, `${statusColor}05`]}
-        style={compact ? styles.gradientCompact : styles.gradient}
+      <View
+        style={[
+          compact ? styles.gradientCompact : styles.gradient,
+          { backgroundColor: `${statusColor}0d` },
+        ]}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.titleRow}>
-            <Ionicons name="compass-outline" size={compact ? 22 : 28} color={statusColor} />
-            <View style={styles.titleContainer}>
-              {showDayLabel && dayLabel && (
-                <Text style={[styles.dayBadge, compact && styles.dayBadgeCompact]}>{dayLabel}</Text>
-              )}
-              <Text style={[styles.title, compact && styles.titleCompact]} numberOfLines={1} ellipsizeMode="tail">{t('home.cards.dailyGuidance.title')}</Text>
+        <View style={styles.body}>
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.titleRow}>
+              <View style={styles.titleContainer}>
+                {showDayLabel && dayLabel && (
+                  <Text style={[styles.dayBadge, compact && styles.dayBadgeCompact]} numberOfLines={1}>
+                    {dayLabel}
+                  </Text>
+                )}
+                <Text
+                  style={[styles.title, compact && styles.titleCompact]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.85}
+                >
+                  🌍 {t('widgets.dailyEnergy.title')}
+                </Text>
+              </View>
+            </View>
+            <View style={[styles.windowBadge, { backgroundColor: `${statusColor}15`, borderColor: `${statusColor}35` }]}> 
               <Text
-                style={[styles.subtitle, { color: statusColor }, compact && styles.subtitleCompact]}
-                numberOfLines={2}
+                style={[styles.windowText, { color: statusColor }]}
+                numberOfLines={1}
                 adjustsFontSizeToFit
-                minimumFontScale={0.8}
+                minimumFontScale={0.85}
               >
                 {statusLabel}
               </Text>
             </View>
           </View>
-        </View>
-        
-        {/* Day Ruler Row */}
-        <View style={styles.rulerRow}>
-          <Text style={styles.rulerIcon}>{dayRulerInfo.symbol}</Text>
-          <Text style={styles.rulerLabel}>{t('home.cards.dailyGuidance.dayRuler')}</Text>
-          <Text style={styles.rulerText}>{t(`planets.${dayRuler.toLowerCase()}`)}</Text>
-          <Text style={styles.rulerArabic}>({dayRulerInfo.arabicName})</Text>
-        </View>
-        
-        {/* Elements Display */}
-        <View style={styles.elementsContainer}>
-          <View style={[styles.elementsRow, compact && styles.elementsRowCompact]}>
-            <View style={[styles.elementBadge, compact && styles.elementBadgeCompact]}>
-              <Text style={styles.elementIcon}>{getElementIcon(guidance.dayElement)}</Text>
-              <Text style={[styles.elementLabel, compact && styles.elementLabelCompact]}>
-                {getElementLabel(guidance.dayElement)} {t('home.cards.dailyGuidance.energyToday')}
+          
+          {/* Day Ruler Row */}
+          <View style={styles.rulerRow}>
+            <Text style={styles.rulerIcon}>{dayRulerInfo.symbol}</Text>
+            <Text style={styles.rulerLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
+              {t('widgets.dailyEnergy.dayRuler')}:
+            </Text>
+            <Text style={styles.rulerText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
+              {t(`planets.${dayRuler.toLowerCase()}`)}
+            </Text>
+            <Text style={styles.rulerArabic} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
+              ({dayRulerInfo.arabicName})
+            </Text>
+          </View>
+
+          {/* Today's Element (Objective) */}
+          <View style={styles.elementSection}>
+            <Text style={styles.elementSectionLabel} numberOfLines={1}>
+              {t('widgets.dailyEnergy.todaysElement')}
+            </Text>
+            <View
+              style={[
+                styles.elementBadge,
+                compact && styles.elementBadgeCompact,
+                { backgroundColor: `${elementColor}26`, borderColor: `${elementColor}44` },
+              ]}
+            >
+              <Text style={styles.elementIcon}>{getElementIcon(dayRulerInfo.element)}</Text>
+              <Text
+                style={[styles.elementLabel, compact && styles.elementLabelCompact]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.85}
+              >
+                {getElementLabel(dayRulerInfo.element)}
               </Text>
             </View>
-            
-            {guidance.userElement && (
-              <View style={[styles.elementBadge, styles.userElementBadge, compact && styles.elementBadgeCompact]}>
-                <Text style={styles.elementIcon}>{getElementIcon(guidance.userElement)}</Text>
-                <Text style={[styles.elementLabel, compact && styles.elementLabelCompact]}>
-                  {t('home.cards.dailyGuidance.yourElement', { element: getElementLabel(guidance.userElement) })}
-                </Text>
-              </View>
-            )}
+          </View>
+
+          {/* Energy Description */}
+          <View style={styles.energyDescriptionRow}>
+            <Text style={styles.energyBullet}>●</Text>
+            <Text style={styles.energyDescriptionText} numberOfLines={1}>
+              {energyDescription}
+            </Text>
           </View>
           
-          {/* Elemental Harmony Caption */}
-          {harmonyData && (
-            <View style={styles.harmonyCaption}>
-              <Text style={styles.harmonyCaptionText}>
-                <Text style={styles.harmonyCaptionIcon}>◐</Text> {t('home.cards.dailyGuidance.supportiveBalance')}
-              </Text>
-            </View>
-          )}
-        </View>
-        
-        {/* Best For / Avoid */}
-        {hasBestFor && (
-          <View style={[styles.activityRow, compact && styles.activityRowCompact]}>
-            <View style={styles.activitySection}>
-              <Text style={[styles.activityLabel, compact && styles.activityLabelCompact]}>{t('home.cards.dailyGuidance.bestFor')}</Text>
-              <Text style={[styles.activityText, compact && styles.activityTextCompact]} numberOfLines={1}>
+          {/* Best For */}
+          {hasBestFor && (
+            <View style={styles.bestForCard}>
+              <View style={styles.bestForHeader}>
+                <Ionicons name="checkmark-circle" size={12} color="#10b981" />
+                <Text style={styles.bestForLabel}>{t('widgets.dailyEnergy.bestFor')}</Text>
+              </View>
+              <Text style={styles.bestForText} numberOfLines={2} ellipsizeMode="tail">
                 {bestForText}
               </Text>
             </View>
-          </View>
-        )}
-        
-        {showDetailsHint && (
-          <View style={styles.detailsRow}>
-            <Ionicons name="arrow-forward" size={12} color={DarkTheme.textTertiary} />
-            <Text style={styles.detailsText} numberOfLines={1} ellipsizeMode="tail">{t('home.cards.dailyGuidance.tapForDetails')}</Text>
-          </View>
-        )}
+          )}
 
-        {/* Footer */}
+        </View>
+
+        {/* Footer (pinned) */}
         <View style={[styles.footer, compact && styles.footerCompact]}>
-          <Ionicons name="information-circle-outline" size={12} color={DarkTheme.textTertiary} />
-          <Text style={compact ? styles.footerTextCompact : styles.footerText} numberOfLines={2} ellipsizeMode="tail">
-            {t('home.cards.dailyGuidance.disclaimer')}
+          <View style={styles.disclaimerRow}>
+            <Ionicons name="information-circle-outline" size={12} color={DarkTheme.textTertiary} />
+            <Text style={styles.disclaimerText} numberOfLines={1}>
+              {t('widgets.dailyEnergy.forReflection')}
+            </Text>
+          </View>
+          <Text style={styles.ctaText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
+            {t('widgets.dailyEnergy.viewDetails')} →
           </Text>
         </View>
-      </LinearGradient>
+      </View>
     </Pressable>
   );
 }
@@ -259,30 +324,36 @@ function getHarmonyColor(level: string): string {
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 20,
+    borderRadius: Borders.radiusLg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 5,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: 'rgba(30, 20, 36, 0.65)',
+  },
+  containerCompact: {
+    minHeight: 380,
+    maxHeight: 400,
   },
   gradient: {
-    paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.xl,
-    gap: Spacing.md,
+    flex: 1,
+    paddingHorizontal: Spacing.xxl,
+    paddingVertical: Spacing.xxl,
+    gap: 12,
   },
   gradientCompact: {
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.lg,
-    gap: Spacing.sm,
+    flex: 1,
+    paddingHorizontal: Spacing.xxl,
+    paddingVertical: Spacing.xxl,
+    gap: 12,
+  },
+
+  body: {
+    gap: 12,
   },
   
   // Header
   header: {
-    marginBottom: Spacing.sm,
+    gap: 8,
   },
   titleRow: {
     flexDirection: 'row',
@@ -294,10 +365,9 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   dayBadge: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: DarkTheme.textTertiary,
-    opacity: 0.6,
+    fontSize: 12,
+    fontWeight: '500',
+    color: 'rgba(255, 255, 255, 0.6)',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 2,
@@ -308,25 +378,23 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   title: {
-    fontSize: 18,
+    fontSize: 32,
     fontWeight: '700',
     color: DarkTheme.textPrimary,
   },
   titleCompact: {
-    fontSize: Typography.h3,
+    fontSize: 32,
   },
-  subtitle: {
+  windowBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  windowText: {
     fontSize: 13,
     fontWeight: '600',
-    marginTop: 2,
-    flexShrink: 1,
-    flexWrap: 'wrap',
-  },
-  subtitleCompact: {
-    fontSize: Typography.label,
-    marginTop: 1,
-    flexShrink: 1,
-    flexWrap: 'wrap',
   },
   
   // Day Ruler Row
@@ -355,36 +423,15 @@ const styles = StyleSheet.create({
   },
   
   // Elements Container
-  elementsContainer: {
-    gap: Spacing.xs,
-  },
-  
-  // Harmony Caption (under pills)
-  harmonyCaption: {
-    paddingLeft: 2,
-  },
-  harmonyCaptionText: {
-    fontSize: 11,
-    color: DarkTheme.textTertiary,
-    fontWeight: '500',
-    opacity: 0.8,
-  },
-  harmonyCaptionIcon: {
-    fontSize: 10,
-    opacity: 0.6,
-  },
-  
-  // Elements
-  elementsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  elementSection: {
     gap: 8,
-    marginBottom: 4,
   },
-  elementsRowCompact: {
-    flexWrap: 'wrap',
-    gap: Spacing.xs,
-    marginBottom: Spacing.sm,
+  elementSectionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: 'rgba(255, 255, 255, 0.7)',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   elementBadge: {
     flexDirection: 'row',
@@ -403,15 +450,11 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     borderRadius: Spacing.md,
   },
-  userElementBadge: {
-    backgroundColor: 'rgba(139, 115, 85, 0.2)',
-    borderColor: 'rgba(139, 115, 85, 0.3)',
-  },
   elementIcon: {
     fontSize: 14,
   },
   elementLabel: {
-    fontSize: 11,
+    fontSize: 14,
     fontWeight: '600',
     color: DarkTheme.textSecondary,
     flexShrink: 1,
@@ -437,33 +480,70 @@ const styles = StyleSheet.create({
   
   // Activity
   activityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.xs,
     marginTop: Spacing.xs,
   },
   activityRowCompact: {
     gap: Spacing.xs,
   },
-  activitySection: {
-    gap: Spacing.xs,
-  },
-  activityLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: DarkTheme.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  activityLabelCompact: {
-    fontSize: Typography.caption,
-  },
   activityText: {
     fontSize: 12,
     color: DarkTheme.textSecondary,
+    flex: 1,
   },
   activityTextCompact: {
     fontSize: Typography.caption,
     color: DarkTheme.textTertiary,
   },
+
+  // Best For Card
+  bestForCard: {
+    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+    borderRadius: 10,
+    padding: Spacing.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.2)',
+    gap: 6,
+  },
+  bestForHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  bestForLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#10b981',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  bestForText: {
+    fontSize: 11,
+    color: DarkTheme.textSecondary,
+    lineHeight: 16,
+  },
+
+  // Energy Description
+  energyDescriptionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  energyBullet: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+  energyDescriptionText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontStyle: 'italic',
+    flex: 1,
+  },
+
   
   // Peak Hours
   peakHoursBadge: {
@@ -506,25 +586,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginTop: 4,
+    justifyContent: 'space-between',
   },
   footerCompact: {
-    marginTop: Spacing.xs,
+    marginTop: 0,
   },
-  footerText: {
-    fontSize: 10,
-    color: DarkTheme.textTertiary,
+  disclaimerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     flex: 1,
-    minWidth: 0,
-    lineHeight: 14,
   },
-  footerTextCompact: {
+  disclaimerText: {
     fontSize: 9,
     color: DarkTheme.textTertiary,
-    opacity: 0.8,
+  },
+  ctaText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#B481C4',
     flex: 1,
-    minWidth: 0,
-    lineHeight: 13,
+    textAlign: 'right',
   },
   
   // Loading

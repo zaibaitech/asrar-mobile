@@ -52,12 +52,32 @@ const HORIZONS_PLANET_CODES: Record<PlanetId, string> = {
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 /**
+ * Moon longitude is used for Manazil and changes faster than planetary sign positions,
+ * but we still don't want to hit Horizons every hour (especially on flaky networks).
+ *
+ * Strategy:
+ * - Cache in coarse time buckets (default: 6h)
+ * - Cache both ephemeris and approx results (approx cache prevents repeated failing fetches)
+ */
+const MOON_CACHE_BUCKET_HOURS = 6;
+const MOON_CACHE_TTL_MS = MOON_CACHE_BUCKET_HOURS * 60 * 60 * 1000;
+
+/**
  * AsyncStorage keys
  */
 const STORAGE_KEYS = {
   CACHE_PREFIX: 'ephemeris.cache.',
+  MOON_CACHE_PREFIX: 'ephemeris.moon.cache.',
   LAST_FETCH: 'ephemeris.lastFetch',
 } as const;
+
+export type MoonLongitudeResult = {
+  timestamp: number;
+  dateISO: string;
+  longitude: number;
+  source: 'ephemeris' | 'approx';
+  expiresAt: number;
+};
 
 // ============================================================================
 // TYPES
@@ -153,6 +173,107 @@ export async function getPlanetPositions(
     // Return approx positions as fallback
     const dateISO = date.toISOString().split('T')[0];
     return getApproxPositions(date, dateISO);
+  }
+}
+
+/**
+ * Get Moon ecliptic longitude only.
+ *
+ * This is used by Manazil and should not depend on every planet succeeding.
+ */
+export async function getMoonEclipticLongitude(
+  date: Date,
+  timezone: string = 'UTC'
+): Promise<MoonLongitudeResult> {
+  try {
+    // Bucket time to avoid generating a new cache key every hour.
+    const bucketedDate = new Date(date);
+    bucketedDate.setMinutes(0, 0, 0);
+    const bucketHour = Math.floor(bucketedDate.getHours() / MOON_CACHE_BUCKET_HOURS) * MOON_CACHE_BUCKET_HOURS;
+    bucketedDate.setHours(bucketHour);
+
+    const dateISO = bucketedDate.toISOString().split('T')[0];
+    const hourKey = bucketedDate.toISOString().split(':')[0];
+    const cacheKey = `${STORAGE_KEYS.MOON_CACHE_PREFIX}${hourKey}_${timezone}`;
+
+    const cached = await getCachedMoonLongitude(cacheKey);
+    if (cached) {
+      if (__DEV__) {
+        console.log('[EphemerisService] Using cached Moon longitude');
+      }
+      return cached;
+    }
+
+    // If we're offline, don't even try Horizons — return & cache approx.
+    const netInfo = await NetInfo.fetch();
+    if (!netInfo.isConnected) {
+      const approx: MoonLongitudeResult = {
+        timestamp: bucketedDate.getTime(),
+        dateISO,
+        longitude: getApproxPositions(bucketedDate, dateISO).planets.moon.longitude,
+        source: 'approx',
+        expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
+      };
+      await cacheMoonLongitude(cacheKey, approx);
+      return approx;
+    }
+
+    if (__DEV__) {
+      console.log('[EphemerisService] Fetching Moon longitude from JPL Horizons...');
+    }
+
+    // Reuse the same Horizons query logic, but only for the Moon.
+    const dateStr = bucketedDate.toISOString().split('.')[0].replace('T', ' ').slice(0, 16);
+    const position = await fetchSinglePlanetPosition('moon', HORIZONS_PLANET_CODES.moon, dateStr);
+
+    if (position && typeof position.longitude === 'number') {
+      const result: MoonLongitudeResult = {
+        timestamp: bucketedDate.getTime(),
+        dateISO,
+        longitude: position.longitude,
+        source: 'ephemeris',
+        expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
+      };
+      await cacheMoonLongitude(cacheKey, result);
+      return result;
+    }
+
+    if (__DEV__) {
+      console.warn('[EphemerisService] Moon longitude fetch failed; using approx');
+    }
+
+    const approx: MoonLongitudeResult = {
+      timestamp: bucketedDate.getTime(),
+      dateISO,
+      longitude: getApproxPositions(bucketedDate, dateISO).planets.moon.longitude,
+      source: 'approx',
+      expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
+    };
+    await cacheMoonLongitude(cacheKey, approx);
+    return approx;
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[EphemerisService] Moon longitude error:', error);
+    }
+    // Final fallback — still cache approx (best effort) using the current bucket.
+    const fallbackBucket = new Date(date);
+    fallbackBucket.setMinutes(0, 0, 0);
+    const bucketHour = Math.floor(fallbackBucket.getHours() / MOON_CACHE_BUCKET_HOURS) * MOON_CACHE_BUCKET_HOURS;
+    fallbackBucket.setHours(bucketHour);
+
+    const dateISO = fallbackBucket.toISOString().split('T')[0];
+    const hourKey = fallbackBucket.toISOString().split(':')[0];
+    const cacheKey = `${STORAGE_KEYS.MOON_CACHE_PREFIX}${hourKey}_${timezone}`;
+
+    const approx: MoonLongitudeResult = {
+      timestamp: fallbackBucket.getTime(),
+      dateISO,
+      longitude: getApproxPositions(fallbackBucket, dateISO).planets.moon.longitude,
+      source: 'approx',
+      expiresAt: fallbackBucket.getTime() + MOON_CACHE_TTL_MS,
+    };
+    await cacheMoonLongitude(cacheKey, approx);
+    return approx;
   }
 }
 
@@ -481,7 +602,9 @@ export function getZodiacSignElement(signIndex: number): 'fire' | 'earth' | 'air
 export async function clearEphemerisCache(): Promise<void> {
   try {
     const keys = await AsyncStorage.getAllKeys();
-    const ephemerisKeys = keys.filter(key => key.startsWith(STORAGE_KEYS.CACHE_PREFIX));
+    const ephemerisKeys = keys.filter(
+      key => key.startsWith(STORAGE_KEYS.CACHE_PREFIX) || key.startsWith(STORAGE_KEYS.MOON_CACHE_PREFIX)
+    );
     await AsyncStorage.multiRemove(ephemerisKeys);
     
     if (__DEV__) {
@@ -490,6 +613,35 @@ export async function clearEphemerisCache(): Promise<void> {
   } catch (error) {
     if (__DEV__) {
       console.error('[EphemerisService] Error clearing cache:', error);
+    }
+  }
+}
+
+async function getCachedMoonLongitude(cacheKey: string): Promise<MoonLongitudeResult | null> {
+  try {
+    const cached = await AsyncStorage.getItem(cacheKey);
+    if (!cached) return null;
+
+    const result: MoonLongitudeResult = JSON.parse(cached);
+    if (Date.now() > result.expiresAt) {
+      await AsyncStorage.removeItem(cacheKey);
+      return null;
+    }
+    return result;
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[EphemerisService] Moon cache read error:', error);
+    }
+    return null;
+  }
+}
+
+async function cacheMoonLongitude(cacheKey: string, result: MoonLongitudeResult): Promise<void> {
+  try {
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(result));
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[EphemerisService] Moon cache write error:', error);
     }
   }
 }
@@ -570,7 +722,9 @@ export async function prefetchEphemerisData(
 export async function cleanupExpiredEphemerisCache(): Promise<number> {
   try {
     const keys = await AsyncStorage.getAllKeys();
-    const ephemerisKeys = keys.filter(key => key.startsWith(STORAGE_KEYS.CACHE_PREFIX));
+    const ephemerisKeys = keys.filter(
+      key => key.startsWith(STORAGE_KEYS.CACHE_PREFIX) || key.startsWith(STORAGE_KEYS.MOON_CACHE_PREFIX)
+    );
     
     const toRemove: string[] = [];
     const now = Date.now();
@@ -579,8 +733,8 @@ export async function cleanupExpiredEphemerisCache(): Promise<number> {
       const cached = await AsyncStorage.getItem(key);
       if (cached) {
         try {
-          const positions: PlanetPositions = JSON.parse(cached);
-          if (now > positions.expiresAt) {
+          const parsed = JSON.parse(cached) as { expiresAt?: number };
+          if (typeof parsed.expiresAt !== 'number' || now > parsed.expiresAt) {
             toRemove.push(key);
           }
         } catch {

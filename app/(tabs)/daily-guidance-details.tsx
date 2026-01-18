@@ -1,5 +1,5 @@
 /**
- * Daily Guidance Details Screen
+ * Daily Energy Details Screen
  * ===============================
  * Detailed view of today's spiritual timing guidance
  * Shows day ruler, elemental harmony, best activities, and explanations
@@ -7,7 +7,8 @@
 
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { calculateElementalHarmony } from '@/services/ElementalHarmonyService';
+import { useProfile } from '@/contexts/ProfileContext';
+import { getLunarMansionByIndex, normalizeMansionIndex } from '@/data/lunarMansions';
 import { getDayRuler, getPlanetInfo } from '@/services/PlanetaryHoursService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -23,6 +24,7 @@ export default function DailyGuidanceDetailsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t } = useLanguage();
+  const { profile } = useProfile();
   const params = useLocalSearchParams();
   
   const [bestForExpanded, setBestForExpanded] = useState(true);
@@ -31,8 +33,6 @@ export default function DailyGuidanceDetailsScreen() {
   // Parse params
   const timingQuality = (params.timingQuality as TimingQuality) || 'neutral';
   const dayElement = (params.dayElement as Element) || 'earth';
-  const userElement = (params.userElement as Element) || undefined;
-  const relationship = (params.relationship as string) || 'neutral';
   const messageKey = (params.messageKey as string) || '';
   const messageParams = params.messageParams ? JSON.parse(params.messageParams as string) : {};
   const bestForKeys = params.bestForKeys ? JSON.parse(params.bestForKeys as string) : [];
@@ -49,15 +49,6 @@ export default function DailyGuidanceDetailsScreen() {
   // Get day ruler
   const dayRuler = getDayRuler(now);
   const dayRulerInfo = getPlanetInfo(dayRuler);
-  
-  // Calculate harmony
-  const harmony = userElement ? calculateElementalHarmony(userElement, dayElement) : null;
-  const harmonyDescription = harmony && userElement
-    ? t(harmony.explanationKey, {
-        userElement: getElementLabel(userElement).toLowerCase(),
-        dayElement: getElementLabel(dayElement).toLowerCase(),
-      })
-    : '';
   
   function getStatusColor() {
     switch (timingQuality) {
@@ -91,6 +82,11 @@ export default function DailyGuidanceDetailsScreen() {
   }
   
   const statusColor = getStatusColor();
+
+  const manazilBaselineIndex = normalizeMansionIndex(profile?.derived?.manazilBaseline);
+  const manazilBaseline = manazilBaselineIndex !== null
+    ? getLunarMansionByIndex(manazilBaselineIndex)
+    : null;
   
   return (
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
@@ -160,38 +156,39 @@ export default function DailyGuidanceDetailsScreen() {
               )}
             </View>
           </View>
-          
-          {/* Elemental Harmony Section */}
-          {harmony && userElement && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>{t('home.dailyGuidanceDetails.sections.elementalHarmony')}</Text>
-              <View style={styles.harmonyCard}>
-                <View style={styles.harmonyHeader}>
-                  <View style={styles.harmonyElementBox}>
-                    <Text style={styles.harmonyElementIcon}>{getElementIcon(userElement)}</Text>
-                    <Text style={styles.harmonyElementLabel}>
-                      {t('home.dailyGuidanceDetails.harmonyYour', { element: getElementLabel(userElement) })}
-                    </Text>
-                  </View>
-                  <Text style={styles.harmonySymbol}>◐</Text>
-                  <View style={styles.harmonyElementBox}>
-                    <Text style={styles.harmonyElementIcon}>{getElementIcon(dayElement)}</Text>
-                    <Text style={styles.harmonyElementLabel}>
-                      {t('home.dailyGuidanceDetails.harmonyDay', { element: getElementLabel(dayElement) })}
-                    </Text>
-                  </View>
-                </View>
-                <View style={[styles.harmonyBadge, { backgroundColor: getHarmonyColor(harmony.level) + '20' }]}>
-                  <Text style={[styles.harmonyLevel, { color: getHarmonyColor(harmony.level) }]}>
-                    {t(`home.dailyGuidanceDetails.harmonyLevels.${harmony.level}`)}
-                  </Text>
-                </View>
-                {harmonyDescription && (
-                  <Text style={styles.harmonyExplanation}>{harmonyDescription}</Text>
-                )}
+
+          {/* Manazil (Lunar Mansion) Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('home.dailyGuidanceDetails.sections.manazil')}</Text>
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Ionicons name="moon-outline" size={24} color={DarkTheme.accent} />
+                <Text style={[styles.cardTitle, { color: DarkTheme.accent }]}>
+                  {t('home.dailyGuidanceDetails.manazil.title')}
+                </Text>
               </View>
+
+              {manazilBaseline ? (
+                <>
+                  <Text style={styles.cardText}>
+                    {t('home.dailyGuidanceDetails.manazil.baseline', {
+                      index: String(manazilBaseline.index + 1),
+                      name: `${manazilBaseline.nameTransliteration} (${manazilBaseline.nameArabic})`,
+                    })}
+                  </Text>
+                  <Text style={styles.planetElement}>
+                    {getElementIcon(manazilBaseline.element)}{' '}
+                    {t('home.dailyGuidanceDetails.elementText', { element: getElementLabel(manazilBaseline.element) })}
+                  </Text>
+                  <Text style={styles.cardText}>
+                    {t('home.dailyGuidanceDetails.manazil.hint')}
+                  </Text>
+                </>
+              ) : (
+                <Text style={styles.cardText}>{t('home.dailyGuidanceDetails.manazil.missing')}</Text>
+              )}
             </View>
-          )}
+          </View>
           
           {/* Best For Section */}
           {bestForKeys.length > 0 && (
@@ -238,7 +235,6 @@ export default function DailyGuidanceDetailsScreen() {
                 <Text style={styles.cardText}>
                   • {t('home.dailyGuidanceDetails.whyThisContent.line1', { day: dayName, planet: dayRuler })}{'\n\n'}
                   • {t('home.dailyGuidanceDetails.whyThisContent.line2', { element: getElementLabel(dayElement).toLowerCase(), planet: dayRuler })}{'\n\n'}
-                  {userElement && `• ${t('home.dailyGuidanceDetails.whyThisContent.line3', { userElement: getElementLabel(userElement).toLowerCase() })}\n\n`}
                   • {t('home.dailyGuidanceDetails.whyThisContent.line4')}
                 </Text>
               </View>

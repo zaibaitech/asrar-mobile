@@ -9,7 +9,7 @@ import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { PrayerGuidanceRecommendation } from '@/services/PrayerGuidanceEngine';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface AdhkarListProps {
   adhkar: PrayerGuidanceRecommendation['adhkar'];
@@ -73,7 +73,7 @@ export function AdhkarList({ adhkar }: AdhkarListProps) {
       </View>
       
       {/* Adhkar List */}
-      <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
+      <View style={styles.list}>
         {adhkar.map((dhikr, index) => {
           const isCompleted = completedAdhkar.has(index);
           
@@ -130,7 +130,7 @@ export function AdhkarList({ adhkar }: AdhkarListProps) {
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+      </View>
       
       {/* Reset Button */}
       {completedAdhkar.size > 0 && (
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     textAlign: 'right'
   },
   list: {
-    maxHeight: 400
+    // No maxHeight - let parent ScrollView handle scrolling
   },
   adhkarItem: {
     flexDirection: 'row',

@@ -35,7 +35,7 @@ npx expo run:ios
    ```
 6. Replace it with:
    ```html
-   <a href="asrar://auth/callback?access_token={{ .Token }}&refresh_token={{ .RefreshToken }}&type=signup">Confirm your email</a>
+   <a href="asrariya://auth/callback?access_token={{ .Token }}&refresh_token={{ .RefreshToken }}&type=signup">Confirm your email</a>
    ```
 7. Click **Save**
 
@@ -48,7 +48,7 @@ npx expo run:ios
 2. Go to: **Authentication** → **URL Configuration**
 3. Under **Redirect URLs**, add:
    ```
-   asrar://auth/callback
+   asrariya://auth/callback
    http://localhost:8081/auth/callback
    ```
 4. Click **Save**
@@ -121,13 +121,13 @@ Expected:
 **Android:**
 ```bash
 adb shell am start -W -a android.intent.action.VIEW \
-  -d "asrar://auth/callback?type=signup&access_token=test&refresh_token=test"
+   -d "asrariya://auth/callback?type=signup&access_token=test&refresh_token=test"
 ```
 
 **iOS Simulator:**
 ```bash
 xcrun simctl openurl booted \
-  "asrar://auth/callback?type=signup&access_token=test&refresh_token=test"
+   "asrariya://auth/callback?type=signup&access_token=test&refresh_token=test"
 ```
 
 **Expected:**
@@ -252,7 +252,7 @@ If you encounter issues:
    ```
 
 2. **Look for these messages:**
-   - `📱 Deep link received: asrar://...`
+   - `📱 Deep link received: asrariya://...`
    - `✅ Email verified! Processing...`
    - `❌ Auth callback error: ...`
 
