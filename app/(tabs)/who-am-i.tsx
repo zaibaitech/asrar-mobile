@@ -1,6 +1,6 @@
 /**
- * Istikhara Tab - Main Istikhara Calculator
- * Full Istikhara form for sacred numerology calculations
+ * Who Am I Tab - Personal Analysis Calculator
+ * Deep self-discovery through sacred numerology (name + mother's name analysis)
  */
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -31,7 +31,7 @@ import { useProfile } from '../../contexts/ProfileContext';
 import { useIstikhara } from '../../hooks/useIstikhara';
 import { HistoryService } from '../../services/HistoryService';
 
-export default function IstikharaCalculator() {
+export default function WhoAmICalculator() {
   const router = useRouter();
   const { t } = useLanguage();
   const { profile } = useProfile();

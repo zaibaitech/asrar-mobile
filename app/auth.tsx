@@ -14,7 +14,7 @@
 import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { checkAuthBackendHealth, getAuthBackendPrereq, requestPasswordReset, signIn, signUp } from '@/services/AuthService';
+import { checkAuthBackendHealth, getAuthBackendPrereq, loadProfileFromCloud, requestPasswordReset, signIn, signUp } from '@/services/AuthService';
 import { clearGuestMode } from '@/services/SessionModeService';
 import { evaluatePasswordStrength, getPasswordStrengthLabel } from '@/utils/passwordStrength';
 import { Ionicons } from '@expo/vector-icons';
@@ -238,27 +238,46 @@ export default function AuthScreen() {
       const result = await signIn({ email, password });
       
       if (result.session) {
-        // Update profile to account mode and clear guest mode
-        await clearGuestMode(); // Clear guest mode on successful sign in
-        await setProfile({ 
-          mode: 'account',
-        });
+        // Clear guest mode on successful sign in
+        await clearGuestMode();
+        
+        // Try to load profile from cloud first
+        const cloudResult = await loadProfileFromCloud();
+        
+        if (cloudResult.profile) {
+          // Cloud profile found - restore it with account mode
+          await setProfile({
+            ...cloudResult.profile,
+            mode: 'account',
+          });
+          
+          Alert.alert(
+            'Welcome Back!',
+            'Your profile has been restored.',
+            [
+              {
+                text: 'Continue',
+                onPress: () => router.replace('/(tabs)'),
+              },
+            ]
+          );
+        } else {
+          // No cloud profile - user needs to set up profile
+          await setProfile({ 
+            mode: 'account',
+          });
 
-        // If the local profile is empty, prompt completion first.
-        const nextRoute = hasEssentialProfileData ? '/(tabs)' : '/profile?postSave=home';
-
-        Alert.alert(
-          'Welcome Back!',
-          hasEssentialProfileData
-            ? 'You are now signed in.'
-            : 'Please complete your profile to unlock personalized features.',
-          [
-            {
-              text: 'Continue',
-              onPress: () => router.replace(nextRoute),
-            },
-          ]
-        );
+          Alert.alert(
+            'Welcome Back!',
+            'Please complete your profile to unlock personalized features.',
+            [
+              {
+                text: 'Continue',
+                onPress: () => router.replace('/profile?postSave=home'),
+              },
+            ]
+          );
+        }
       } else if (result.error?.code === 'EMAIL_CONFIRMATION_REQUIRED') {
         // Email not confirmed yet
         Alert.alert(

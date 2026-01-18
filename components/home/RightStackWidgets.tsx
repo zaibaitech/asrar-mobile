@@ -73,44 +73,60 @@ export function RightStackWidgets({
     return null;
   }, [profile?.derived?.burjIndex, profile?.derived?.burj, profile?.dobISO]);
 
-  const selectedTransit = useMemo(() => {
-    if (!transits || !myZodiacKey) return null;
-    const all = Object.values(transits);
-    const inMySign = all.filter((t) => t?.sign === myZodiacKey);
-    if (inMySign.length === 0) return null;
+const selectedTransit = useMemo(() => {
+    if (!transits) return null;
+    const all = Object.values(transits).filter(Boolean);
+    if (all.length === 0) return null;
 
     const now = new Date();
-    const isActive = (t: (typeof inMySign)[number]) => {
+    const isActive = (t: (typeof all)[number]) => {
       const start = t.transitStartDate ? new Date(t.transitStartDate) : null;
       const end = t.transitEndDate ? new Date(t.transitEndDate) : null;
       if (start && end) return now >= start && now <= end;
-      return true; // If missing window, assume it's the current sign position
+      return true;
     };
 
-    const active = inMySign.filter(isActive);
-    const candidates = (active.length ? active : inMySign).slice();
-
-    // Pick “most relevant” deterministically (UI supports 1 item)
     const priority: Planet[] = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'];
     const planetRank = (p: Planet) => {
       const idx = priority.indexOf(p);
       return idx === -1 ? 999 : idx;
     };
 
+    // First: try to find a transit in the user's sign
+    if (myZodiacKey) {
+      const inMySign = all.filter((t) => t?.sign === myZodiacKey);
+      if (inMySign.length > 0) {
+        const active = inMySign.filter(isActive);
+        const candidates = (active.length ? active : inMySign).slice();
+        candidates.sort((a, b) => {
+          const byPlanet = planetRank(a.planet) - planetRank(b.planet);
+          if (byPlanet !== 0) return byPlanet;
+          const aEnd = a.transitEndDate ? new Date(a.transitEndDate).getTime() : Number.POSITIVE_INFINITY;
+          const bEnd = b.transitEndDate ? new Date(b.transitEndDate).getTime() : Number.POSITIVE_INFINITY;
+          return aEnd - bEnd;
+        });
+        // Return with personal flag
+        return { transit: candidates[0] ?? null, isPersonal: true };
+      }
+    }
+
+    // Fallback: show the most relevant transit (Sun first) for all users
+    const active = all.filter(isActive);
+    const candidates = (active.length ? active : all).slice();
     candidates.sort((a, b) => {
       const byPlanet = planetRank(a.planet) - planetRank(b.planet);
       if (byPlanet !== 0) return byPlanet;
-      // Tie-breaker: sooner ending transit feels more “current”
       const aEnd = a.transitEndDate ? new Date(a.transitEndDate).getTime() : Number.POSITIVE_INFINITY;
       const bEnd = b.transitEndDate ? new Date(b.transitEndDate).getTime() : Number.POSITIVE_INFINITY;
       return aEnd - bEnd;
     });
-
-    return candidates[0] ?? null;
+    // Return with fallback flag
+    return { transit: candidates[0] ?? null, isPersonal: false };
   }, [transits, myZodiacKey]);
 
   // Convert new transit format to legacy format for widget
-  const legacyTransit = selectedTransit ? adaptTransitToLegacyFormat(selectedTransit) : null;
+  const legacyTransit = selectedTransit?.transit ? adaptTransitToLegacyFormat(selectedTransit.transit) : null;
+  const isPersonalTransit = selectedTransit?.isPersonal ?? false;
   const nextDayBlessingWithElement = nextDayBlessing
     ? {
         ...nextDayBlessing,
@@ -211,7 +227,8 @@ export function RightStackWidgets({
         <PlanetTransitWidget 
           transitData={legacyTransit} 
           nextDayBlessing={nextDayBlessingWithElement}
-          compact 
+          compact
+          isPersonal={isPersonalTransit}
         />
       </View>
     </View>

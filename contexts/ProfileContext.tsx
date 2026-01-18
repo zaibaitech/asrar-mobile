@@ -16,7 +16,7 @@
  * - Optional cloud sync (future - account mode)
  */
 
-import { getSession } from '@/services/AuthService';
+import { getSession, syncProfileToCloud } from '@/services/AuthService';
 import {
     deriveAstrologicalData,
     updateProfileWithDerivedData,
@@ -187,6 +187,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   /**
    * Update profile (partial or full)
    * Auto-derives astrological data if DOB changes
+   * Auto-syncs to cloud when in account mode
    */
   const handleSetProfile = useCallback(async (updates: PartialProfileUpdate) => {
     try {
@@ -198,13 +199,29 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       // Update profile in storage
       const updatedProfile = await updateProfile(updates);
       
+      let finalProfile = updatedProfile;
+      
       // Re-derive if DOB changed, names changed, OR derived data is missing.
       if (dobChanged || nameChanged || needsDerivedBackfill(updatedProfile)) {
         const derivedProfile = updateProfileWithDerivedData(updatedProfile);
         await saveProfile(derivedProfile);
         updateProfileState(derivedProfile);
+        finalProfile = derivedProfile;
       } else {
         updateProfileState(updatedProfile);
+      }
+      
+      // Sync to cloud if in account mode
+      if (finalProfile.mode === 'account') {
+        const session = await getSession();
+        if (session) {
+          // Sync in background - don't block UI
+          syncProfileToCloud(finalProfile).catch((err) => {
+            if (__DEV__) {
+              console.warn('[ProfileContext] Cloud sync failed:', err);
+            }
+          });
+        }
       }
       
       if (__DEV__) {

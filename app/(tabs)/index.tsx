@@ -76,11 +76,11 @@ const getModules = (t: any): (Omit<ModuleCardProps, 'onPress'> & { id: string })
     comingSoon: false,
   },
   {
-    id: 'istikhara',
-    title: t('modules.istikhara.title'),
-    titleArabic: 'الاستخارة',
-    description: t('modules.istikhara.description'),
-    icon: '🌙',
+    id: 'whoAmI',
+    title: t('modules.whoAmI.title'),
+    titleArabic: 'مَن أنا',
+    description: t('modules.whoAmI.description'),
+    icon: '🔮',
     element: 'water',
     comingSoon: false,
   },
@@ -310,8 +310,8 @@ export default function HomeScreen() {
       case 'calculator':
         router.push('/calculator');
         break;
-      case 'istikhara':
-        router.push('/(tabs)/istikhara');
+      case 'whoAmI':
+        router.push('/(tabs)/who-am-i');
         break;
       case 'guidedIstikhara':
         router.push('/istikhara-sessions');

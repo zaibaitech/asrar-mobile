@@ -25,6 +25,7 @@ interface PlanetTransitWidgetProps {
   transitData: LegacyPlanetTransitInfo | null;
   nextDayBlessing?: DayBlessing | null;
   compact?: boolean;
+  isPersonal?: boolean;
 }
 
 type HarmonyLevel = 'harmonious' | 'supportive' | 'neutral' | 'challenging';
@@ -82,7 +83,7 @@ function getPlanetGradient(planetKey?: string): [string, string] {
   }
 }
 
-export default function PlanetTransitWidget({ transitData, nextDayBlessing, compact = false }: PlanetTransitWidgetProps) {
+export default function PlanetTransitWidget({ transitData, nextDayBlessing, compact = false, isPersonal = true }: PlanetTransitWidgetProps) {
   const { t, tSafe, language } = useLanguage();
   const { profile } = useProfile();
   const [activeSlide, setActiveSlide] = useState(0);
@@ -106,6 +107,7 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
       params: {
         type: 'transit',
         payload: JSON.stringify(transitData),
+        isPersonal: isPersonal ? 'true' : 'false',
       },
     });
   };
@@ -115,7 +117,15 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
     ? 'Set your zodiac sign to personalize.'
     : 'No current transit for your sign';
 
-  const subtitleText = hasTransit ? t('widgets.planetTransit.subtitle') : fallbackMessage;
+  // Short labels: "Your Sign" for personal, "Sky Now" for fallback
+  const transitTypeLabel = hasTransit 
+    ? (isPersonal ? (language === 'ar' ? 'برجك' : language === 'fr' ? 'Ton signe' : 'Your Sign') 
+                  : (language === 'ar' ? 'السماء' : language === 'fr' ? 'Ciel' : 'Sky Now'))
+    : '';
+  
+  const subtitleText = hasTransit 
+    ? (transitTypeLabel ? `${transitTypeLabel} • ${t('widgets.planetTransit.subtitle')}` : t('widgets.planetTransit.subtitle'))
+    : fallbackMessage;
 
   const planetName = transitData?.planetName ?? fallbackMessage;
   const planetNameAr = transitData?.planetNameAr ?? '';

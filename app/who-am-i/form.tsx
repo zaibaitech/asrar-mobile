@@ -30,7 +30,7 @@ import ResponsiveAppHeader from '../../components/AppHeader';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useIstikhara } from '../../hooks/useIstikhara';
 
-export default function IstikharaForm() {
+export default function WhoAmIForm() {
   const router = useRouter();
   const { language, setLanguage } = useLanguage();
   const { calculate, loading, error, result } = useIstikhara();
@@ -88,7 +88,7 @@ export default function IstikharaForm() {
     if (result && !error && !loading) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.push({
-        pathname: '/istikhara/results',
+        pathname: '/who-am-i/results',
         params: {
           data: JSON.stringify(result.data),
           personName: personName.trim(),

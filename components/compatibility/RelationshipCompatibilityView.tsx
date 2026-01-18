@@ -1,4 +1,5 @@
 import { useProfile } from '@/contexts/ProfileContext';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 import { enhanceCompatibilityWithAI, isAIAvailable, loadAISettings } from '@/services/AIReflectionService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,6 +8,7 @@ import { ActivityIndicator, Dimensions, ScrollView, StyleSheet, Text, TouchableO
 import { DarkTheme } from '../../constants/DarkTheme';
 import { RelationshipCompatibility } from '../../types/compatibility';
 import { AIBadge } from '../divine-timing/AIBadge';
+import { PremiumSection } from '../subscription/PremiumSection';
 import { CompatibilityGauge } from './CompatibilityGauge';
 
 interface RelationshipCompatibilityViewProps {
@@ -24,6 +26,11 @@ export function RelationshipCompatibilityView({
 }: RelationshipCompatibilityViewProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'spiritual' | 'elemental' | 'planetary' | 'recommendations'>('overview');
   const isFrench = language === 'fr';
+  const isArabic = language === 'ar';
+  
+  // Subscription state
+  const { isPremium, isAdmin } = useSubscription();
+  const hasAccess = isPremium || isAdmin;
   
   // AI enhancement state
   const [aiAvailable, setAiAvailable] = useState(false);
@@ -194,22 +201,30 @@ export function RelationshipCompatibilityView({
               <Text style={styles.qualityText}>{analysis.overallQuality.toUpperCase()}</Text>
             </LinearGradient>
             
-            {/* Summary */}
-            <View style={styles.summaryCard}>
-              <View style={styles.summaryHeader}>
-                <Ionicons name="information-circle" size={24} color="#6366f1" />
-                <Text style={styles.summaryTitle}>
-                  {isFrench ? 'Ce que cela signifie' : 'What This Means'}
+            {/* Summary - PREMIUM: Interpretation */}
+            <PremiumSection
+              featureId="compatibilityDeep"
+              title={isFrench ? 'Interprétation' : isArabic ? 'التفسير' : 'Interpretation'}
+              description={isFrench ? 'Découvrez ce que cette connexion signifie pour vous' : isArabic ? 'اكتشف معنى هذا الاتصال لك' : 'Discover what this connection means for you'}
+              icon="heart"
+              variant="compact"
+            >
+              <View style={styles.summaryCard}>
+                <View style={styles.summaryHeader}>
+                  <Ionicons name="information-circle" size={24} color="#6366f1" />
+                  <Text style={styles.summaryTitle}>
+                    {isFrench ? 'Ce que cela signifie' : 'What This Means'}
+                  </Text>
+                </View>
+                <Text style={styles.summaryText}>
+                  {aiEnhanced && enhancedSummary ? enhancedSummary : (isFrench ? analysis.summaryFrench : analysis.summary)}
                 </Text>
+                {aiEnhanced && enhancedSummary && <AIBadge show={true} />}
               </View>
-              <Text style={styles.summaryText}>
-                {aiEnhanced && enhancedSummary ? enhancedSummary : (isFrench ? analysis.summaryFrench : analysis.summary)}
-              </Text>
-              {aiEnhanced && enhancedSummary && <AIBadge show={true} />}
-            </View>
+            </PremiumSection>
             
-            {/* AI Enhancement Button */}
-            {aiAvailable && !aiEnhanced && (
+            {/* AI Enhancement Button - PREMIUM */}
+            {hasAccess && aiAvailable && !aiEnhanced && (
               <TouchableOpacity 
                 onPress={handleEnhanceWithAI}
                 activeOpacity={0.8}
@@ -235,8 +250,8 @@ export function RelationshipCompatibilityView({
               </TouchableOpacity>
             )}
             
-            {/* Personalized Insight */}
-            {aiEnhanced && personalizedInsight && (
+            {/* Personalized Insight - PREMIUM */}
+            {hasAccess && aiEnhanced && personalizedInsight && (
               <View style={styles.personalizedInsightCard}>
                 <View style={styles.insightHeader}>
                   <Ionicons name="person" size={20} color="#8b5cf6" />
@@ -310,38 +325,44 @@ export function RelationshipCompatibilityView({
         
         {activeTab === 'spiritual' && (
           <View style={styles.section}>
-            <LinearGradient
-              colors={['rgba(251, 146, 60, 0.1)', 'rgba(249, 115, 22, 0.1)']}
-              style={styles.detailCard}
+            <PremiumSection
+              featureId="compatibilityDeep"
+              title={isFrench ? 'Analyse Spirituelle' : isArabic ? 'التحليل الروحاني' : 'Spiritual Analysis'}
+              description={isFrench ? 'Explorez la connexion spirituelle profonde' : isArabic ? 'استكشف الاتصال الروحي العميق' : 'Explore the deep spiritual connection'}
+              icon="sparkles"
             >
-              <View style={styles.detailHeader}>
-                <View style={styles.detailIcon}>
-                  <Ionicons name="sparkles" size={28} color="#fb923c" />
+              <LinearGradient
+                colors={['rgba(251, 146, 60, 0.1)', 'rgba(249, 115, 22, 0.1)']}
+                style={styles.detailCard}
+              >
+                <View style={styles.detailHeader}>
+                  <View style={styles.detailIcon}>
+                    <Ionicons name="sparkles" size={28} color="#fb923c" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.detailTitle}>
+                      {isFrench ? 'Destinée Spirituelle' : 'Spiritual Destiny'}
+                    </Text>
+                    <Text style={styles.detailSubtitle}>
+                      {isFrench ? 'Chemin spirituel et harmonie' : 'Spiritual path and harmony'}
+                    </Text>
+                  </View>
+                  <CompatibilityGauge
+                    score={analysis.methods.spiritualDestiny.score}
+                    label=""
+                    color="#fb923c"
+                    size={80}
+                  />
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.detailTitle}>
-                    {isFrench ? 'Destinée Spirituelle' : 'Spiritual Destiny'}
-                  </Text>
-                  <Text style={styles.detailSubtitle}>
-                    {isFrench ? 'Chemin spirituel et harmonie' : 'Spiritual path and harmony'}
-                  </Text>
-                </View>
-                <CompatibilityGauge
-                  score={analysis.methods.spiritualDestiny.score}
-                  label=""
-                  color="#fb923c"
-                  size={80}
-                />
-              </View>
-              
-              <View style={styles.dividerHorizontal} />
-              
-              <Text style={styles.detailDescription}>
-                {aiEnhanced && enhancedSpiritualExplanation 
-                  ? enhancedSpiritualExplanation 
-                  : (isFrench 
-                    ? analysis.methods.spiritualDestiny.descriptionFrench 
-                    : analysis.methods.spiritualDestiny.description)}
+                
+                <View style={styles.dividerHorizontal} />
+                
+                <Text style={styles.detailDescription}>
+                  {aiEnhanced && enhancedSpiritualExplanation 
+                    ? enhancedSpiritualExplanation 
+                    : (isFrench 
+                      ? analysis.methods.spiritualDestiny.descriptionFrench 
+                      : analysis.methods.spiritualDestiny.description)}
               </Text>
               {aiEnhanced && enhancedSpiritualExplanation && (
                 <AIBadge show={true} />
@@ -362,16 +383,23 @@ export function RelationshipCompatibilityView({
                 </View>
               </View>
             </LinearGradient>
+            </PremiumSection>
           </View>
         )}
         
         {activeTab === 'elemental' && (
           <View style={styles.section}>
-            <LinearGradient
-              colors={['rgba(34, 197, 94, 0.1)', 'rgba(22, 163, 74, 0.1)']}
-              style={styles.detailCard}
+            <PremiumSection
+              featureId="compatibilityDeep"
+              title={isFrench ? 'Analyse Élémentale' : isArabic ? 'التحليل العنصري' : 'Elemental Analysis'}
+              description={isFrench ? 'Comprenez l\'harmonie des énergies naturelles' : isArabic ? 'افهم انسجام الطاقات الطبيعية' : 'Understand the harmony of natural energies'}
+              icon="leaf"
             >
-              <View style={styles.detailHeader}>
+              <LinearGradient
+                colors={['rgba(34, 197, 94, 0.1)', 'rgba(22, 163, 74, 0.1)']}
+                style={styles.detailCard}
+              >
+                <View style={styles.detailHeader}>
                 <View style={styles.detailIcon}>
                   <Ionicons name="leaf" size={28} color="#22c55e" />
                 </View>
@@ -417,39 +445,46 @@ export function RelationshipCompatibilityView({
                 </View>
               </View>
             </LinearGradient>
+            </PremiumSection>
           </View>
         )}
         
         {activeTab === 'planetary' && (
           <View style={styles.section}>
-            <LinearGradient
-              colors={['rgba(139, 92, 246, 0.1)', 'rgba(124, 58, 237, 0.1)']}
-              style={styles.detailCard}
+            <PremiumSection
+              featureId="compatibilityDeep"
+              title={isFrench ? 'Analyse Planétaire' : isArabic ? 'التحليل الكوكبي' : 'Planetary Analysis'}
+              description={isFrench ? 'Découvrez les influences cosmiques' : isArabic ? 'اكتشف التأثيرات الكونية' : 'Discover cosmic influences'}
+              icon="planet"
             >
-              <View style={styles.detailHeader}>
-                <View style={styles.detailIcon}>
-                  <Ionicons name="planet" size={28} color="#8b5cf6" />
+              <LinearGradient
+                colors={['rgba(139, 92, 246, 0.1)', 'rgba(124, 58, 237, 0.1)']}
+                style={styles.detailCard}
+              >
+                <View style={styles.detailHeader}>
+                  <View style={styles.detailIcon}>
+                    <Ionicons name="planet" size={28} color="#8b5cf6" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.detailTitle}>
+                      {isFrench ? 'Harmonie Cosmique' : 'Cosmic Harmony'}
+                    </Text>
+                    <Text style={styles.detailSubtitle}>
+                      {isFrench ? 'Influences planétaires' : 'Planetary influences'}
+                    </Text>
+                  </View>
+                  <CompatibilityGauge
+                    score={analysis.methods.planetaryCosmic.score}
+                    label=""
+                    color="#8b5cf6"
+                    size={80}
+                  />
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.detailTitle}>
-                    {isFrench ? 'Harmonie Cosmique' : 'Cosmic Harmony'}
-                  </Text>
-                  <Text style={styles.detailSubtitle}>
-                    {isFrench ? 'Influences planétaires' : 'Planetary influences'}
-                  </Text>
-                </View>
-                <CompatibilityGauge
-                  score={analysis.methods.planetaryCosmic.score}
-                  label=""
-                  color="#8b5cf6"
-                  size={80}
-                />
-              </View>
-              
-              <View style={styles.dividerHorizontal} />
-              
-              <Text style={styles.detailDescription}>
-                {aiEnhanced && enhancedPlanetaryExplanation 
+                
+                <View style={styles.dividerHorizontal} />
+                
+                <Text style={styles.detailDescription}>
+                  {aiEnhanced && enhancedPlanetaryExplanation 
                   ? enhancedPlanetaryExplanation 
                   : (isFrench 
                     ? analysis.methods.planetaryCosmic.descriptionFrench 
@@ -497,36 +532,44 @@ export function RelationshipCompatibilityView({
                 </View>
               </View>
             </LinearGradient>
+            </PremiumSection>
           </View>
         )}
         
         {activeTab === 'recommendations' && (
           <View style={styles.section}>
-            <View style={styles.recommendationsHeader}>
-              <LinearGradient
-                colors={['#f59e0b', '#d97706']}
-                style={styles.recommendationsIcon}
-              >
-                <Ionicons name="bulb" size={28} color="#fff" />
-              </LinearGradient>
-              <Text style={styles.recommendationsTitle}>
-                {isFrench ? 'Recommandations' : 'Recommendations'}
-              </Text>
-              <Text style={styles.recommendationsSubtitle}>
-                {isFrench 
-                  ? 'Conseils pour améliorer votre harmonie'
-                  : 'Guidance to enhance your harmony'}
-              </Text>
-            </View>
-            
-            {(isFrench ? analysis.recommendationsFrench : analysis.recommendations).map((rec, index) => (
-              <View key={index} style={styles.recommendationCard}>
-                <View style={styles.recommendationNumber}>
-                  <Text style={styles.recommendationNumberText}>{index + 1}</Text>
-                </View>
-                <Text style={styles.recommendationText}>{rec}</Text>
+            <PremiumSection
+              featureId="compatibilityDeep"
+              title={isFrench ? 'Conseils Personnalisés' : isArabic ? 'نصائح شخصية' : 'Personalized Advice'}
+              description={isFrench ? 'Obtenez des conseils pour améliorer votre harmonie' : isArabic ? 'احصل على نصائح لتحسين انسجامك' : 'Get guidance to enhance your harmony'}
+              icon="bulb"
+            >
+              <View style={styles.recommendationsHeader}>
+                <LinearGradient
+                  colors={['#f59e0b', '#d97706']}
+                  style={styles.recommendationsIcon}
+                >
+                  <Ionicons name="bulb" size={28} color="#fff" />
+                </LinearGradient>
+                <Text style={styles.recommendationsTitle}>
+                  {isFrench ? 'Recommandations' : 'Recommendations'}
+                </Text>
+                <Text style={styles.recommendationsSubtitle}>
+                  {isFrench 
+                    ? 'Conseils pour améliorer votre harmonie'
+                    : 'Guidance to enhance your harmony'}
+                </Text>
               </View>
-            ))}
+              
+              {(isFrench ? analysis.recommendationsFrench : analysis.recommendations).map((rec, index) => (
+                <View key={index} style={styles.recommendationCard}>
+                  <View style={styles.recommendationNumber}>
+                    <Text style={styles.recommendationNumberText}>{index + 1}</Text>
+                  </View>
+                  <Text style={styles.recommendationText}>{rec}</Text>
+                </View>
+              ))}
+            </PremiumSection>
           </View>
         )}
       </ScrollView>

@@ -117,6 +117,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="who-am-i"
+        options={{
+          title: t('nav.whoAmI') || 'Who Am I',
+          tabBarIcon: ({ color }) => <TabBarIcon name="user-circle-o" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="quran"
         options={{
           title: 'Quran',

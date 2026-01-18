@@ -3,8 +3,12 @@
  * ===============================
  * Detailed view of today's spiritual timing guidance
  * Shows day ruler, elemental harmony, best activities, and explanations
+ * 
+ * FREE: Day ruler, Element, General theme, Generic "Best for" categories
+ * PREMIUM: Personal impact on user, Elemental harmony guidance, Personalized spiritual advice
  */
 
+import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -190,34 +194,42 @@ export default function DailyGuidanceDetailsScreen() {
             </View>
           </View>
           
-          {/* Best For Section */}
+          {/* PREMIUM: Best For Section - Personal action guidance */}
           {bestForKeys.length > 0 && (
-            <View style={styles.section}>
-              <TouchableOpacity 
-                style={styles.expandableHeader}
-                onPress={() => setBestForExpanded(!bestForExpanded)}
-              >
-                <Text style={styles.sectionTitle}>✅ {t('home.dailyGuidanceDetails.sections.bestFor')}</Text>
-                <Ionicons 
-                  name={bestForExpanded ? 'chevron-up' : 'chevron-down'} 
-                  size={20} 
-                  color={DarkTheme.textSecondary}
-                />
-              </TouchableOpacity>
-              {bestForExpanded && (
-                <View style={styles.listCard}>
-                  {bestForKeys.map((key: string, index: number) => (
-                    <View key={index} style={styles.listItem}>
-                      <View style={[styles.listDot, { backgroundColor: '#10b981' }]} />
-                      <Text style={styles.listText}>{t(key)}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </View>
+            <PremiumSection
+              featureId="personalGuidance"
+              title={t('home.dailyGuidanceDetails.sections.bestFor') || 'Best Actions Today'}
+              description={t('premium.dailyEnergy.bestFor') || 'Discover what activities align best with today\'s energy'}
+              icon="✅"
+              compact={false}
+            >
+              <View style={styles.section}>
+                <TouchableOpacity 
+                  style={styles.expandableHeader}
+                  onPress={() => setBestForExpanded(!bestForExpanded)}
+                >
+                  <Text style={styles.sectionTitle}>✅ {t('home.dailyGuidanceDetails.sections.bestFor')}</Text>
+                  <Ionicons 
+                    name={bestForExpanded ? 'chevron-up' : 'chevron-down'} 
+                    size={20} 
+                    color={DarkTheme.textSecondary}
+                  />
+                </TouchableOpacity>
+                {bestForExpanded && (
+                  <View style={styles.listCard}>
+                    {bestForKeys.map((key: string, index: number) => (
+                      <View key={index} style={styles.listItem}>
+                        <View style={[styles.listDot, { backgroundColor: '#10b981' }]} />
+                        <Text style={styles.listText}>{t(key)}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            </PremiumSection>
           )}
           
-          {/* Why This? Section */}
+          {/* Why This? Section - FREE (Educational) */}
           <View style={styles.section}>
             <TouchableOpacity 
               style={styles.expandableHeader}

@@ -256,6 +256,7 @@ export default function PlanetTransitDetailsScreen() {
 
   const detailsType = (params.type as DetailsType) || 'transit';
   const payload = params.payload;
+  const isPersonalTransit = params.isPersonal === 'true';
 
   const transitPayload = useMemo(
     () => safeJsonParse<PlanetTransitInfo | LegacyPlanetTransitInfo>(payload),
@@ -361,6 +362,17 @@ export default function PlanetTransitDetailsScreen() {
   };
 
   const title = detailsType === 'transit' ? t('screens.planetTransit.title') : t('home.planetTransitDetails.title');
+  
+  // Transit type labels for personal vs cosmic weather
+  const transitTypeLabel = useMemo(() => {
+    if (detailsType !== 'transit') return null;
+    if (isPersonalTransit) {
+      return language === 'ar' ? 'في برجك' : language === 'fr' ? 'Dans ton signe' : 'In Your Sign';
+    } else {
+      return language === 'ar' ? 'الطقس الكوني' : language === 'fr' ? 'Météo cosmique' : 'Cosmic Weather';
+    }
+  }, [detailsType, isPersonalTransit, language]);
+  
   const explainer =
     detailsType === 'transit'
       ? t('screens.planetTransit.explanation')
@@ -556,9 +568,18 @@ export default function PlanetTransitDetailsScreen() {
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
             <Text style={styles.headerTitle}>{title}</Text>
-            <Text style={styles.headerSubtitle}>
-              {detailsType === 'transit' ? t('screens.planetTransit.headerSubtitle') : primaryCardTitle}
-            </Text>
+            <View style={styles.headerSubtitleRow}>
+              <Text style={styles.headerSubtitle}>
+                {detailsType === 'transit' ? t('screens.planetTransit.headerSubtitle') : primaryCardTitle}
+              </Text>
+              {transitTypeLabel && (
+                <View style={[styles.transitTypeBadge, { backgroundColor: isPersonalTransit ? 'rgba(76, 175, 80, 0.2)' : 'rgba(100, 149, 237, 0.2)' }]}>
+                  <Text style={[styles.transitTypeBadgeText, { color: isPersonalTransit ? '#4CAF50' : '#6495ED' }]}>
+                    {transitTypeLabel}
+                  </Text>
+                </View>
+              )}
+            </View>
           </View>
           {detailsType === 'transit' ? (
             <TouchableOpacity
@@ -813,6 +834,38 @@ export default function PlanetTransitDetailsScreen() {
 
               {expandedSections.personalized ? (
                 <>
+                  {/* Transit Type Context Banner */}
+                  <View style={[styles.transitContextBanner, { 
+                    backgroundColor: isPersonalTransit ? 'rgba(76, 175, 80, 0.1)' : 'rgba(100, 149, 237, 0.1)',
+                    borderColor: isPersonalTransit ? 'rgba(76, 175, 80, 0.3)' : 'rgba(100, 149, 237, 0.3)',
+                  }]}>
+                    <Ionicons 
+                      name={isPersonalTransit ? 'star' : 'globe-outline'} 
+                      size={18} 
+                      color={isPersonalTransit ? '#4CAF50' : '#6495ED'} 
+                    />
+                    <View style={styles.transitContextTextContainer}>
+                      <Text style={[styles.transitContextTitle, { color: isPersonalTransit ? '#4CAF50' : '#6495ED' }]}>
+                        {isPersonalTransit 
+                          ? (language === 'ar' ? 'عبور شخصي' : language === 'fr' ? 'Transit Personnel' : 'Personal Transit')
+                          : (language === 'ar' ? 'طقس كوني عام' : language === 'fr' ? 'Météo Cosmique' : 'Cosmic Weather')}
+                      </Text>
+                      <Text style={styles.transitContextDesc}>
+                        {isPersonalTransit 
+                          ? (language === 'ar' 
+                              ? 'هذا الكوكب يعبر برجك مباشرة - تأثيره عليك أقوى وأكثر شخصية.'
+                              : language === 'fr' 
+                              ? 'Cette planète traverse votre signe - son influence sur vous est plus forte et personnelle.'
+                              : 'This planet is transiting your sign directly - its influence on you is stronger and more personal.')
+                          : (language === 'ar' 
+                              ? 'لا يوجد كوكب في برجك حالياً. هذا العبور يؤثر على الجميع بشكل عام.'
+                              : language === 'fr' 
+                              ? 'Aucune planète dans votre signe actuellement. Ce transit affecte tout le monde de manière générale.'
+                              : 'No planet in your sign currently. This transit affects everyone generally.')}
+                      </Text>
+                    </View>
+                  </View>
+
                   <View style={styles.elementComparison}>
                     <View style={styles.elementCircle}>
                       <LinearGradient
@@ -951,6 +1004,30 @@ export default function PlanetTransitDetailsScreen() {
                           </Text>
                         </View>
                         <Text style={styles.guidanceItem}>{avoidBody || avoidText}</Text>
+                      </View>
+                      {/* Personal/Cosmic Impact Note */}
+                      <View style={[styles.impactNoteContainer, {
+                        backgroundColor: isPersonalTransit ? 'rgba(76, 175, 80, 0.08)' : 'rgba(100, 149, 237, 0.08)',
+                        borderColor: isPersonalTransit ? 'rgba(76, 175, 80, 0.2)' : 'rgba(100, 149, 237, 0.2)',
+                      }]}>
+                        <Ionicons 
+                          name={isPersonalTransit ? 'flash' : 'earth'} 
+                          size={16} 
+                          color={isPersonalTransit ? '#4CAF50' : '#6495ED'} 
+                        />
+                        <Text style={styles.impactNoteText}>
+                          {isPersonalTransit 
+                            ? (language === 'ar' 
+                                ? 'لأنه عبور شخصي، ستشعر بهذه الطاقات بشكل أقوى. ركز على النمو الشخصي في هذه الفترة.'
+                                : language === 'fr' 
+                                ? 'Étant un transit personnel, vous ressentirez ces énergies plus intensément. Concentrez-vous sur la croissance personnelle.'
+                                : 'Being a personal transit, you\'ll feel these energies more intensely. Focus on personal growth during this period.')
+                            : (language === 'ar' 
+                                ? 'هذا عبور عام يؤثر على الجميع. ستشعر به بشكل طفيف ولكنه يخلق أجواء عامة مفيدة.'
+                                : language === 'fr' 
+                                ? 'C\'est un transit général affectant tout le monde. Vous le sentirez légèrement mais il crée une ambiance favorable.'
+                                : 'This is a general transit affecting everyone. You\'ll feel it subtly but it creates a helpful collective atmosphere.')}
+                        </Text>
                       </View>
                     </View>
                   ) : (
@@ -1242,6 +1319,43 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 13,
     color: 'rgba(255, 255, 255, 0.6)',
+  },
+  headerSubtitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  transitTypeBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  transitTypeBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  transitContextBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: Spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: Spacing.md,
+    gap: Spacing.sm,
+  },
+  transitContextTextContainer: {
+    flex: 1,
+    gap: 4,
+  },
+  transitContextTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  transitContextDesc: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
   },
   refreshButtonDisabled: {
     opacity: 0.6,
@@ -1772,6 +1886,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: DarkTheme.textSecondary,
     lineHeight: 18,
+  },
+  impactNoteContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: Spacing.sm,
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
+  },
+  impactNoteText: {
+    flex: 1,
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 17,
   },
   dailyStack: {
     gap: Spacing.md,

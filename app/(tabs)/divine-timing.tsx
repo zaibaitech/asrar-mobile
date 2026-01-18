@@ -6,6 +6,9 @@
  * Phase 1: Basic interface with intention selection and result display
  * Phase 2: Qur'an Resonance Attachment with auto/manual mode
  * Phase 3: Interactive Question + Guidance Response
+ * 
+ * FREE: Basic timing results, Cycle state, Element, Neutral explanation
+ * PREMIUM: AI Guidance, Personalized recommendations, Advanced analysis
  */
 
 import { AdvancedAnalysisCard } from '@/components/divine-timing/AdvancedAnalysisCard';
@@ -15,6 +18,7 @@ import { DivineTimingGuidanceCard } from '@/components/divine-timing/DivineTimin
 import { DivineTimingQuestionCard } from '@/components/divine-timing/DivineTimingQuestionCard';
 import { ManualVerseSelector } from '@/components/divine-timing/ManualVerseSelector';
 import { QuranReflectionCard } from '@/components/divine-timing/QuranReflectionCard';
+import { PremiumSection } from '@/components/subscription/PremiumSection';
 import Colors from '@/constants/Colors';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -687,72 +691,79 @@ export default function DivineTimingScreen() {
               />
             )}
             
-            {/* Phase 3: Interactive Guidance Section */}
-            <View style={[styles.guidanceSection, { backgroundColor: colors.card }]}>
-              <View style={styles.guidanceSectionHeader}>
-                <Ionicons name="bulb" size={24} color="#FFD700" />
-                <View style={{ flex: 1 }}>
-                  <View style={styles.guidanceTitleRow}>
-                    <Text style={[styles.guidanceSectionTitle, { color: colors.text }]}>
-                      {t('divineTiming.results.aiGuidance.title')}
-                    </Text>
-                    <View style={styles.aiBadge}>
-                      <Ionicons name="sparkles" size={10} color="#000" />
-                      <Text style={styles.aiBadgeText}>{t('divineTiming.results.aiGuidance.badge')}</Text>
+            {/* PREMIUM: AI Guidance Section */}
+            <PremiumSection
+              featureId="aiGuidance"
+              title={t('divineTiming.results.aiGuidance.title') || 'AI Spiritual Guidance'}
+              description={t('premium.divineTiming.aiGuidance') || 'Get personalized guidance based on your spiritual profile and current timing'}
+              icon="✨"
+            >
+              <View style={[styles.guidanceSection, { backgroundColor: colors.card }]}>
+                <View style={styles.guidanceSectionHeader}>
+                  <Ionicons name="bulb" size={24} color="#FFD700" />
+                  <View style={{ flex: 1 }}>
+                    <View style={styles.guidanceTitleRow}>
+                      <Text style={[styles.guidanceSectionTitle, { color: colors.text }]}>
+                        {t('divineTiming.results.aiGuidance.title')}
+                      </Text>
+                      <View style={styles.aiBadge}>
+                        <Ionicons name="sparkles" size={10} color="#000" />
+                        <Text style={styles.aiBadgeText}>{t('divineTiming.results.aiGuidance.badge')}</Text>
+                      </View>
                     </View>
+                    <Text style={[styles.guidanceSectionDesc, { color: colors.textSecondary }]}>
+                      {t('divineTiming.results.aiGuidance.description')}
+                    </Text>
                   </View>
-                  <Text style={[styles.guidanceSectionDesc, { color: colors.textSecondary }]}>
-                    {t('divineTiming.results.aiGuidance.description')}
-                  </Text>
                 </View>
+                
+                {!showGuidanceInput && !guidanceResponse && (
+                  <TouchableOpacity
+                    style={[styles.showGuidanceButton, { backgroundColor: colors.primary }]}
+                    onPress={() => setShowGuidanceInput(true)}
+                  >
+                    <Ionicons name="chatbubble-ellipses" size={20} color="#fff" />
+                    <Text style={styles.showGuidanceButtonText}>
+                      {t('divineTiming.results.aiGuidance.cta')}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
               
-              {!showGuidanceInput && !guidanceResponse && (
-                <TouchableOpacity
-                  style={[styles.showGuidanceButton, { backgroundColor: colors.primary }]}
-                  onPress={() => setShowGuidanceInput(true)}
-                >
-                  <Ionicons name="chatbubble-ellipses" size={20} color="#fff" />
-                  <Text style={styles.showGuidanceButtonText}>
-                    {t('divineTiming.results.aiGuidance.cta')}
-                  </Text>
-                </TouchableOpacity>
+              {/* Guidance Input Card */}
+              {showGuidanceInput && !guidanceResponse && (
+                <DivineTimingQuestionCard
+                  onSubmit={handleGuidanceSubmit}
+                  colorScheme={colorScheme}
+                  initialCategory={guidancePrefs.lastCategory}
+                  initialTimeHorizon={guidancePrefs.lastTimeHorizon}
+                  initialUrgency={guidancePrefs.lastUrgency}
+                />
               )}
-            </View>
-            
-            {/* Guidance Input Card */}
-            {showGuidanceInput && !guidanceResponse && (
-              <DivineTimingQuestionCard
-                onSubmit={handleGuidanceSubmit}
-                colorScheme={colorScheme}
-                initialCategory={guidancePrefs.lastCategory}
-                initialTimeHorizon={guidancePrefs.lastTimeHorizon}
-                initialUrgency={guidancePrefs.lastUrgency}
-              />
-            )}
-            
-            {/* Guidance Response Card */}
-            {advancedGuidanceResponse ? (
-              <AdvancedDivineTimingGuidanceCard
-                response={advancedGuidanceResponse}
-                colorScheme={colorScheme}
-                onReset={handleGuidanceReset}
-              />
-            ) : guidanceResponse ? (
-              <DivineTimingGuidanceCard
-                response={guidanceResponse}
-                colorScheme={colorScheme}
-                onReset={handleGuidanceReset}
-                quranContext={
-                  reflection
-                    ? {
-                        verseReference: `${reflection.verse.surahNameEn} ${reflection.verse.surahNumber}:${reflection.verse.ayahNumber}`,
-                        translationEn: reflection.verse.translationEn,
-                      }
-                    : undefined
-                }
-              />
-            ) : null}
+              
+              {/* Guidance Response Card */}
+              {advancedGuidanceResponse ? (
+                <AdvancedDivineTimingGuidanceCard
+                  response={advancedGuidanceResponse}
+                  colorScheme={colorScheme}
+                  onReset={handleGuidanceReset}
+                />
+              ) : guidanceResponse ? (
+                <DivineTimingGuidanceCard
+                  response={guidanceResponse}
+                  colorScheme={colorScheme}
+                  onReset={handleGuidanceReset}
+                  quranContext={
+                    reflection
+                      ? {
+                          verseReference: `${reflection.verse.surahNameEn} ${reflection.verse.surahNumber}:${reflection.verse.ayahNumber}`,
+                          translationEn: reflection.verse.translationEn,
+                        }
+                      : undefined
+                  }
+                />
+              ) : null}
+            </PremiumSection>
             
             {/* Reset Button - Secondary Style */}
             <TouchableOpacity

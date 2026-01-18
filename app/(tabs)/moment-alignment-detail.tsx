@@ -3,8 +3,12 @@
  * ================================
  * Expanded explanation of current moment alignment status.
  * Shows why the alignment status was chosen and provides non-prescriptive guidance.
+ * 
+ * FREE: User element, Moment element, Alignment state, Short neutral explanation
+ * PREMIUM: What actions are favored now, What to avoid, Suggested dhikr, Deeper guidance
  */
 
+import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -583,32 +587,40 @@ export default function MomentAlignmentDetailScreen() {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="bulb-outline" size={20} color="#8B7355" />
-            <Text style={styles.sectionTitle}>{t('momentDetail.guidanceTitle')}</Text>
-          </View>
+        {/* PREMIUM: Personal Guidance Section */}
+        <PremiumSection
+          featureId="personalGuidance"
+          title={t('momentDetail.guidanceTitle') || 'Personal Guidance'}
+          description={t('premium.momentAlignment.guidance') || 'Discover what actions align best with this moment'}
+          icon="💡"
+        >
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="bulb-outline" size={20} color="#8B7355" />
+              <Text style={styles.sectionTitle}>{t('momentDetail.guidanceTitle')}</Text>
+            </View>
 
-          <View style={[styles.guidanceBlock, styles.guidanceBest]}>
-            <Text style={styles.guidanceListTitle}>{t('momentDetail.bestNow')}</Text>
-            {getGuidanceLists(alignment.status).bestNow.map((item, idx) => (
-              <View key={idx} style={styles.bulletRow}>
-                <Text style={[styles.bulletDot, { color: '#10b981' }]}>✓</Text>
-                <Text style={styles.bulletText}>{item}</Text>
-              </View>
-            ))}
-          </View>
+            <View style={[styles.guidanceBlock, styles.guidanceBest]}>
+              <Text style={styles.guidanceListTitle}>{t('momentDetail.bestNow')}</Text>
+              {getGuidanceLists(alignment.status).bestNow.map((item, idx) => (
+                <View key={idx} style={styles.bulletRow}>
+                  <Text style={[styles.bulletDot, { color: '#10b981' }]}>✓</Text>
+                  <Text style={styles.bulletText}>{item}</Text>
+                </View>
+              ))}
+            </View>
 
-          <View style={[styles.guidanceBlock, styles.guidanceAvoid]}>
-            <Text style={styles.guidanceListTitle}>{t('momentDetail.avoidNow')}</Text>
-            {getGuidanceLists(alignment.status).avoidNow.map((item, idx) => (
-              <View key={idx} style={styles.bulletRow}>
-                <Text style={[styles.bulletDot, { color: '#94a3b8' }]}>○</Text>
-                <Text style={styles.bulletText}>{item}</Text>
-              </View>
-            ))}
+            <View style={[styles.guidanceBlock, styles.guidanceAvoid]}>
+              <Text style={styles.guidanceListTitle}>{t('momentDetail.avoidNow')}</Text>
+              {getGuidanceLists(alignment.status).avoidNow.map((item, idx) => (
+                <View key={idx} style={styles.bulletRow}>
+                  <Text style={[styles.bulletDot, { color: '#94a3b8' }]}>○</Text>
+                  <Text style={styles.bulletText}>{item}</Text>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
+        </PremiumSection>
 
         <View style={styles.disclaimer}>
           <Ionicons name="shield-checkmark-outline" size={16} color={DarkTheme.textTertiary} />

@@ -15,6 +15,7 @@ import { NotificationTapHandler } from '@/components/NotificationTapHandler';
 import { useColorScheme } from '@/components/useColorScheme';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ProfileProvider, useProfile } from '@/contexts/ProfileContext';
+import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 import { handleAuthCallback } from '@/services/AuthService';
 import { getOnboardingCompleted } from '@/services/OnboardingService';
 
@@ -62,11 +63,13 @@ function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: { showAnim
   return (
     <SafeAreaProvider>
       <ProfileProvider>
-        <LanguageProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <RootLayoutContent showAnimatedSplash={showAnimatedSplash} setShowAnimatedSplash={setShowAnimatedSplash} />
-          </ThemeProvider>
-        </LanguageProvider>
+        <SubscriptionProvider>
+          <LanguageProvider>
+            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <RootLayoutContent showAnimatedSplash={showAnimatedSplash} setShowAnimatedSplash={setShowAnimatedSplash} />
+            </ThemeProvider>
+          </LanguageProvider>
+        </SubscriptionProvider>
       </ProfileProvider>
     </SafeAreaProvider>
   );

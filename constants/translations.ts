@@ -11,6 +11,7 @@ export const translations = {
       guidance: "Life Guidance",
       advanced: "Istikharah",
       menu: "Menu",
+      whoAmI: "Who Am I",
     },
     
     // Drawer Menu
@@ -257,9 +258,9 @@ export const translations = {
         title: "Name Destiny",
         description: "Discover the spiritual significance and destiny encoded in names",
       },
-      istikhara: {
-        title: "Istikhara",
-        description: "Spiritual consultation combining prayer guidance with numerology",
+      whoAmI: {
+        title: "Who Am I",
+        description: "Deep self-analysis through name numerology: element, personality, career & spiritual path",
       },
       guidedIstikhara: {
         title: "Guided Istikhārah",
@@ -7490,15 +7491,16 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
     },
 
     // ============================================================================
-    // ISTIKHARA MODULE - Istikharah al-Asmā' (الاستخارة بالأسماء)
+    // ============================================================================
+    // WHO AM I MODULE - Deep Self-Analysis Through Sacred Numerology
     // ============================================================================
     istikhara: {
       // Main panel
-      title: "Istikharah al-Asmā'",
-      titleArabic: "الاستخارة بالأسماء",
-      subtitle: "Spiritual Guidance Through Names",
-      formInstruction: "Enter two names to receive spiritual guidance",
-      description: "Seek divine guidance by examining the spiritual connection between two names using the sacred science of ʿIlm al-Ḥurūf.",
+      title: "Who Am I",
+      titleArabic: "مَن أنا",
+      subtitle: "Discover Your True Self",
+      formInstruction: "Enter your name and mother's name for deep self-analysis",
+      description: "Discover your element, personality, career path, and spiritual practices through the sacred science of ʿIlm al-Ḥurūf.",
       
       // Collapsible sections
       educationTitle: "What is Ilm al-Ḥurūf?",
@@ -7550,18 +7552,18 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       
       // Form section
       form: {
-        title: "Enter Names for Guidance",
-        personName: "Person's Name",
+        title: "Discover Who You Are",
+        personName: "Your Name",
         personNamePlaceholder: "e.g., Muhammad, Fatima, Ibrahim",
         motherName: "Mother's Name",
         motherNamePlaceholder: "e.g., Khadija, Aisha, Maryam",
         latinName: "Latin Name",
         latinNamePlaceholder: "e.g., Muhammad, Fatima, Aisha",
         latinNameHint: "Type your name in Latin letters — we'll show the Arabic equivalent",
-        calculateButton: "Seek Guidance",
+        calculateButton: "Discover Myself",
         clearButton: "Clear",
         validationError: "Please enter both names to continue",
-        bothNamesRequired: "Both names are required for accurate guidance",
+        bothNamesRequired: "Both names are required for accurate analysis",
         arabicRequiredNote: "Names should be in Arabic script for accurate results",
       },
       
@@ -7854,6 +7856,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       guidance: "Guide de Vie",
       advanced: "Istikharah",
       menu: "Menu",
+      whoAmI: "Qui Suis-Je",
     },
 
     drawer: {
@@ -8099,9 +8102,9 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         title: "Destinée des Noms",
         description: "Découvrez la signification spirituelle et le destin encodés dans les noms",
       },
-      istikhara: {
-        title: "Istikharah",
-        description: "Consultation spirituelle combinant guidance de prière et numérologie",
+      whoAmI: {
+        title: "Qui Suis-Je",
+        description: "Auto-analyse approfondie par numérologie: élément, personnalité, carrière & chemin spirituel",
       },
       guidedIstikhara: {
         title: "Istikharah Guidée",
@@ -15226,15 +15229,15 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     },
 
     // ============================================================================
-    // MODULE ISTIKHARA - Istikharah al-Asmā' (الاستخارة بالأسماء)
+    // MODULE QUI SUIS-JE - Analyse Profonde à Travers la Numérologie Sacrée
     // ============================================================================
     istikhara: {
       // Panneau principal
-      title: "Istikharah al-Asmā'",
-      titleArabic: "الاستخارة بالأسماء",
-      subtitle: "Guidance Spirituelle par les Noms",
-      formInstruction: "Entrez deux noms pour recevoir une guidance spirituelle",
-      description: "Cherchez la guidance divine en examinant la connexion spirituelle entre deux noms en utilisant la science sacrée du ʿIlm al-Ḥurūf.",
+      title: "Qui Suis-Je",
+      titleArabic: "مَن أنا",
+      subtitle: "Découvrez Votre Véritable Nature",
+      formInstruction: "Entrez votre nom et celui de votre mère pour une analyse approfondie",
+      description: "Découvrez votre élément, personnalité, chemin de carrière et pratiques spirituelles à travers la science sacrée du ʿIlm al-Ḥurūf.",
       
       // Éducation & Introduction
       educationTitle: "Qu'est-ce que Ilm al-Ḥurūf ?",
@@ -15290,18 +15293,18 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       
       // Section formulaire
       form: {
-        title: "Entrez les Noms pour la Guidance",
-        personName: "Nom de la Personne",
+        title: "Découvrez Qui Vous Êtes",
+        personName: "Votre Nom",
         personNamePlaceholder: "p.ex., Muhammad, Fatima, Ibrahim",
         motherName: "Nom de la Mère",
         motherNamePlaceholder: "p.ex., Khadija, Aisha, Maryam",
         latinName: "Nom en lettres latines",
         latinNamePlaceholder: "ex : Muhammad, Fatima, Aisha",
         latinNameHint: "Écrivez votre nom en lettres latines — l'équivalent arabe sera affiché",
-        calculateButton: "Chercher la Guidance",
+        calculateButton: "Me Découvrir",
         clearButton: "Effacer",
         validationError: "Veuillez entrer les deux noms pour continuer",
-        bothNamesRequired: "Les deux noms sont requis pour une guidance précise",
+        bothNamesRequired: "Les deux noms sont requis pour une analyse précise",
         arabicRequiredNote: "Les noms doivent être en écriture arabe pour des résultats précis",
       },
       
@@ -15571,10 +15574,49 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
   },
   ar: {
     // Minimal Arabic translations. Any missing keys fall back to EN automatically.
+    nav: {
+      home: "الرئيسية",
+      calculator: "الحاسبة",
+      whoAmI: "مَن أنا",
+      advanced: "الاستخارة",
+    },
+    
     common: {
       buttons: {
         learnMore: "اعرف المزيد",
         collapse: "إظهار أقل",
+      },
+    },
+    
+    // Home screen modules
+    modules: {
+      whoAmI: {
+        title: "مَن أنا",
+        description: "تحليل ذاتي عميق عبر علم الحروف: العنصر والشخصية والمهنة والمسار الروحي",
+      },
+    },
+    
+    // Who Am I module (istikhara key for compatibility)
+    istikhara: {
+      title: "مَن أنا",
+      titleArabic: "مَن أنا",
+      subtitle: "اكتشف ذاتك الحقيقية",
+      formInstruction: "أدخل اسمك واسم والدتك للتحليل العميق",
+      educationTitle: "ما هو علم الحروف؟",
+      discoveryTitle: "ما ستكتشفه",
+      examplesTitle: "أمثلة على الأسماء",
+      privacyTitle: "خصوصيتك",
+      arabicName: "الاسم بالعربية",
+      helperText: "يجب أن تكون الأسماء بالخط العربي للحصول على نتائج دقيقة",
+      form: {
+        personName: "اسمك",
+        motherName: "اسم الأم",
+        latinName: "الاسم باللاتينية",
+        calculateButton: "اكتشف ذاتي",
+      },
+      validation: {
+        missingNames: "يرجى إدخال كلا الاسمين للمتابعة",
+        nameRequired: "الاسم مطلوب",
       },
     },
     

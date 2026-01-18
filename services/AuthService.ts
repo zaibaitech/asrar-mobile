@@ -18,6 +18,7 @@
  */
 
 import { UserProfile } from '@/types/user-profile';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 
 // ============================================================================
@@ -812,6 +813,65 @@ export async function signOut(): Promise<void> {
     }
   } finally {
     await clearSession();
+  }
+}
+
+/**
+ * Clear all user-specific data from local storage
+ * Call this on sign out to ensure the next user doesn't see previous user's data
+ * 
+ * Clears:
+ * - User profile
+ * - Divine timing check-ins and streaks
+ * - Istikhara sessions and history
+ * - Dhikr counter
+ * - AI guidance history
+ * - Quran bookmarks and progress
+ * 
+ * Does NOT clear:
+ * - Language preference (app setting, not user data)
+ * - Notification preferences (device setting)
+ * - Theme preference
+ */
+export async function clearAllUserData(): Promise<void> {
+  const USER_DATA_KEYS = [
+    // Profile
+    'asrar.profile.v1',
+    
+    // Divine Timing
+    'dt_checkins_v1',
+    'dt_streak_v1',
+    'divine_timing_verse_mode',
+    'divine_timing_manual_verse',
+    'divine_timing_guidance_history',
+    'divine_timing_guidance_prefs',
+    
+    // Istikhara
+    'guided_istikhara_sessions_v1',
+    'istikhara_history',
+    
+    // Dhikr
+    '@asrar_dhikr_count',
+    
+    // Quran
+    'quran_bookmarks',
+    'quran_progress',
+    
+    // Check-in storage
+    'asrar_check_in_storage_v1',
+    'asrar_user_timing_profile_v1',
+  ];
+
+  try {
+    await AsyncStorage.multiRemove(USER_DATA_KEYS);
+    
+    if (__DEV__) {
+      console.log('[AuthService] All user data cleared');
+    }
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[AuthService] Error clearing user data:', error);
+    }
   }
 }
 

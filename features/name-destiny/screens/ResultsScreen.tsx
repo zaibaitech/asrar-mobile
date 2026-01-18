@@ -1,6 +1,9 @@
 /**
  * Name Destiny Results Screen - Enhanced UX
  * Staged revelation with beginner-friendly presentation
+ * 
+ * FREE: Raw numeric results (Kabīr, Ṣaghīr), Element, Basic outcome
+ * PREMIUM: Meaning & explanation, Quran Resonance, AI enhancement, Divine Name, Practical guidance
  */
 
 import { AIBadge } from '@/components/divine-timing/AIBadge';
@@ -15,6 +18,7 @@ import {
     SacredNumberCard
 } from '@/components/nameDestiny';
 import { QuranResonanceCard } from '@/components/quran/QuranResonanceCard';
+import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { DivineResonanceCard } from '@/features/name-destiny/components';
@@ -414,74 +418,90 @@ export default function ResultsScreen() {
               elementFr={result.element?.fr}
             />
 
-            {/* AI Enhancement Button */}
-            {aiAvailable && !aiEnhanced && (
-              <TouchableOpacity
-                style={styles.aiEnhanceButton}
-                onPress={handleEnhanceWithAI}
-                disabled={aiLoading}
-                activeOpacity={0.7}
-              >
-                <LinearGradient
-                  colors={['rgba(139, 115, 85, 0.3)', 'rgba(139, 115, 85, 0.15)']}
-                  style={styles.aiEnhanceGradient}
+            {/* PREMIUM: AI Enhancement - Personal interpretation */}
+            <PremiumSection
+              featureId="aiInterpretation"
+              title={t('nameDestiny.results.personalizeExplanation') || 'AI Personalization'}
+              description={t('premium.nameDestiny.aiEnhancement') || 'Get personalized AI-powered interpretation of your element'}
+              icon="✨"
+              compact={!aiEnhanced}
+            >
+              {/* AI Enhancement Button */}
+              {aiAvailable && !aiEnhanced && (
+                <TouchableOpacity
+                  style={styles.aiEnhanceButton}
+                  onPress={handleEnhanceWithAI}
+                  disabled={aiLoading}
+                  activeOpacity={0.7}
                 >
-                  <Sparkles size={18} color="#8B7355" />
-                  <Text style={styles.aiEnhanceText}>
-                    {aiLoading
-                      ? t('nameDestiny.results.enhancing')
-                      : t('nameDestiny.results.personalizeExplanation')}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            )}
-
-            {/* AI Enhanced Content */}
-            {aiEnhanced && aiElementExplanation && (
-              <View style={styles.aiEnhancedCard}>
-                <View style={styles.aiEnhancedHeader}>
-                  <Sparkles size={16} color="#8B7355" />
-                  <Text style={styles.aiEnhancedTitle}>
-                    {t('nameDestiny.results.enhancedExplanation')}
-                  </Text>
-                  <AIBadge size="small" />
-                </View>
-                <Text style={styles.aiEnhancedText}>{aiElementExplanation}</Text>
-                
-                {aiPersonalizedInsight && (
-                  <View style={styles.personalizedInsightCard}>
-                    <Text style={styles.personalizedInsightLabel}>
-                      {t('nameDestiny.results.personalizedInsight')}
+                  <LinearGradient
+                    colors={['rgba(139, 115, 85, 0.3)', 'rgba(139, 115, 85, 0.15)']}
+                    style={styles.aiEnhanceGradient}
+                  >
+                    <Sparkles size={18} color="#8B7355" />
+                    <Text style={styles.aiEnhanceText}>
+                      {aiLoading
+                        ? t('nameDestiny.results.enhancing')
+                        : t('nameDestiny.results.personalizeExplanation')}
                     </Text>
-                    <Text style={styles.personalizedInsightText}>{aiPersonalizedInsight}</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              )}
+
+              {/* AI Enhanced Content */}
+              {aiEnhanced && aiElementExplanation && (
+                <View style={styles.aiEnhancedCard}>
+                  <View style={styles.aiEnhancedHeader}>
+                    <Sparkles size={16} color="#8B7355" />
+                    <Text style={styles.aiEnhancedTitle}>
+                      {t('nameDestiny.results.enhancedExplanation')}
+                    </Text>
+                    <AIBadge size="small" />
                   </View>
-                )}
-              </View>
-            )}
+                  <Text style={styles.aiEnhancedText}>{aiElementExplanation}</Text>
+                  
+                  {aiPersonalizedInsight && (
+                    <View style={styles.personalizedInsightCard}>
+                      <Text style={styles.personalizedInsightLabel}>
+                        {t('nameDestiny.results.personalizedInsight')}
+                      </Text>
+                      <Text style={styles.personalizedInsightText}>{aiPersonalizedInsight}</Text>
+                    </View>
+                  )}
+                </View>
+              )}
+            </PremiumSection>
           </View>
 
-          {/* Divine Name Resonance */}
+          {/* PREMIUM: Divine Name Resonance */}
           {result.divineResonance && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>
-                {language === 'ar'
-                  ? 'رنين الاسم الإلهي'
-                  : language === 'fr'
-                  ? 'Résonance du Nom Divin'
-                  : 'Divine Name Resonance'}
-              </Text>
-              <Text style={styles.sectionExplainer}>
-                {language === 'ar'
-                  ? 'الاسم الإلهي الذي يتردد صداه مع اسمك'
-                  : language === 'fr'
-                  ? 'Le Nom Divin qui résonne avec votre nom'
-                  : 'The Divine Name that resonates with your name'}
-              </Text>
-              <DivineResonanceCard resonance={result.divineResonance} />
-            </View>
+            <PremiumSection
+              featureId="divineNameResonance"
+              title={language === 'ar' ? 'رنين الاسم الإلهي' : language === 'fr' ? 'Résonance du Nom Divin' : 'Divine Name Resonance'}
+              description={language === 'ar' ? 'الاسم الإلهي الذي يتردد صداه مع اسمك' : language === 'fr' ? 'Le Nom Divin qui résonne avec votre nom' : 'The Divine Name that resonates with your name'}
+              icon="🌟"
+            >
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>
+                  {language === 'ar'
+                    ? 'رنين الاسم الإلهي'
+                    : language === 'fr'
+                    ? 'Résonance du Nom Divin'
+                    : 'Divine Name Resonance'}
+                </Text>
+                <Text style={styles.sectionExplainer}>
+                  {language === 'ar'
+                    ? 'الاسم الإلهي الذي يتردد صداه مع اسمك'
+                    : language === 'fr'
+                    ? 'Le Nom Divin qui résonne avec votre nom'
+                    : 'The Divine Name that resonates with your name'}
+                </Text>
+                <DivineResonanceCard resonance={result.divineResonance} />
+              </View>
+            </PremiumSection>
           )}
 
-          {/* 5) Elemental Composition with Dominance Summary */}
+          {/* 5) Elemental Composition with Dominance Summary - FREE (basic data) */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
               {language === 'ar'
@@ -669,39 +689,53 @@ export default function ResultsScreen() {
             )}
           </View>
 
-          {/* 8) Qur'anic Resonance with Reflection Prompt */}
-          <View style={styles.section}>
-            <QuranResonanceCard
-              resonance={quranResonance}
-              loading={quranLoading}
-              error={quranError || undefined}
-              accentColor={theme.accentColor}
-              language={lang}
-              onRetry={loadQuranResonance}
-            />
-            {quranResonance && (
-              <View style={styles.reflectionPrompt}>
-                <HelpCircle size={16} color="#a78bfa" strokeWidth={2} />
-                <Text style={styles.reflectionText}>
-                  {t('nameDestiny.results.reflectionPrompt')}
-                </Text>
-              </View>
-            )}
-          </View>
+          {/* PREMIUM: Qur'anic Resonance */}
+          <PremiumSection
+            featureId="quranResonance"
+            title={t('nameDestiny.results.quranResonance') || 'Qur\'anic Resonance'}
+            description={t('premium.nameDestiny.quranResonance') || 'Discover the ayat connected to your sacred numbers'}
+            icon="📖"
+          >
+            <View style={styles.section}>
+              <QuranResonanceCard
+                resonance={quranResonance}
+                loading={quranLoading}
+                error={quranError || undefined}
+                accentColor={theme.accentColor}
+                language={lang}
+                onRetry={loadQuranResonance}
+              />
+              {quranResonance && (
+                <View style={styles.reflectionPrompt}>
+                  <HelpCircle size={16} color="#a78bfa" strokeWidth={2} />
+                  <Text style={styles.reflectionText}>
+                    {t('nameDestiny.results.reflectionPrompt')}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </PremiumSection>
 
-          {/* 9) Key Takeaways + Practical Guidance - MOVED HERE */}
-          <View style={styles.section}>
-            <KeyTakeawaysCard takeaways={keyTakeaways} language={lang} />
-          </View>
+          {/* PREMIUM: Key Takeaways + Practical Guidance */}
+          <PremiumSection
+            featureId="spiritualGuidance"
+            title={t('nameDestiny.results.keyTakeaways') || 'Spiritual Guidance'}
+            description={t('premium.nameDestiny.guidance') || 'Personalized insights and practical guidance for your path'}
+            icon="💡"
+          >
+            <View style={styles.section}>
+              <KeyTakeawaysCard takeaways={keyTakeaways} language={lang} />
+            </View>
 
-          <View style={styles.section}>
-            <PracticalGuidanceCard
-              doActions={practicalGuidance.doActions}
-              avoidActions={practicalGuidance.avoidActions}
-              bestTime={bestTimeWindow}
-              language={lang}
-            />
-          </View>
+            <View style={styles.section}>
+              <PracticalGuidanceCard
+                doActions={practicalGuidance.doActions}
+                avoidActions={practicalGuidance.avoidActions}
+                bestTime={bestTimeWindow}
+                language={lang}
+              />
+            </View>
+          </PremiumSection>
 
           {/* 10) Advanced/Classical Sections - LAST */}
           {showAdvanced && (

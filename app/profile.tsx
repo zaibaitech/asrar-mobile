@@ -44,7 +44,7 @@ import NameAutocomplete from '@/components/NameAutocomplete';
 import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { deleteAccount, signOut } from '@/services/AuthService';
+import { clearAllUserData, deleteAccount, signOut } from '@/services/AuthService';
 import {
     getCurrentLocation,
     requestLocationPermission,
@@ -331,8 +331,12 @@ export default function ProfileScreen() {
               // Sign out clears the session tokens
               await signOut();
               
-              // Reload profile - this will re-check session (now null) and switch to guest mode
-              await reloadProfile();
+              // IMPORTANT: Clear ALL user-specific data to prevent showing old user's data
+              // This includes profile, check-ins, dhikr count, istikhara history, etc.
+              await clearAllUserData();
+              
+              // Reset profile context to fresh guest state
+              await resetProfile();
               
               Alert.alert(t('common.success'), t('profile.signOutMessage'));
               router.replace('/(tabs)');
@@ -769,6 +773,18 @@ export default function ProfileScreen() {
             </>
           )}
           
+          {/* Sign In Button (only show if in guest mode) */}
+          {profile.mode === 'guest' && (
+            <TouchableOpacity 
+              style={styles.signInButton} 
+              onPress={() => router.push('/auth')}
+            >
+              <Ionicons name="log-in-outline" size={20} color="#10b981" />
+              <Text style={styles.signInButtonText}>{t('profile.signIn')}</Text>
+              <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
+            </TouchableOpacity>
+          )}
+          
           {/* Privacy Notice */}
           <View style={styles.privacyNoticeCard}>
             <Ionicons name="shield-checkmark" size={16} color="#10b981" />
@@ -1175,6 +1191,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#ef4444',
+    marginLeft: 8,
+    flex: 1,
+  },
+  signInButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+  },
+  signInButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#10b981',
     marginLeft: 8,
     flex: 1,
   },
