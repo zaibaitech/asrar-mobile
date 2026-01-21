@@ -131,15 +131,30 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       
       // Check if user has active auth session
       const session = await getSession();
-      if (session && ensuredProfile.mode !== 'account') {
-        // User is signed in but profile is still in guest mode
-        // Update to account mode
-        const updatedProfile: UserProfile = {
-          ...ensuredProfile,
-          mode: 'account',
-        };
-        await saveProfile(updatedProfile);
-        updateProfileState(updatedProfile);
+      if (session) {
+        // User is signed in - ensure account mode and sync email
+        const needsUpdate = ensuredProfile.mode !== 'account' || 
+                           ensuredProfile.account?.email !== session.email;
+        
+        if (needsUpdate) {
+          const updatedProfile: UserProfile = {
+            ...ensuredProfile,
+            mode: 'account',
+            account: {
+              ...ensuredProfile.account,
+              email: session.email,
+              userId: session.userId,
+            },
+          };
+          await saveProfile(updatedProfile);
+          updateProfileState(updatedProfile);
+          
+          if (__DEV__) {
+            console.log('[ProfileContext] Updated profile with session email:', session.email);
+          }
+        } else {
+          updateProfileState(ensuredProfile);
+        }
       } else {
         updateProfileState(ensuredProfile);
       }

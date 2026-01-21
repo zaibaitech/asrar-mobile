@@ -1,17 +1,26 @@
+import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import type { Element } from '@/services/MomentAlignmentService';
 import type { Planet } from '@/services/PlanetaryHoursService';
-import type { PlanetTransitInfo } from '@/services/PlanetTransitService';
-import { getTransit } from '@/services/TransitService';
+import {
+    getDegreeStageColor,
+    getDegreeStageIcon,
+    getInfluenceTypeColor,
+    getPersonalizedInfluence,
+    type PersonalizedInfluence
+} from '@/services/PlanetaryInfluenceService';
+import { ZODIAC_DATA, type PlanetTransitInfo, type ZodiacSign as ZodiacKey } from '@/services/PlanetTransitService';
+import { getAllTransits, getTransit } from '@/services/TransitService';
+import type { AllPlanetTransits, PlanetTransit } from '@/types/planetary-systems';
 import { adaptTransitToLegacyFormat, type LegacyPlanetTransitInfo } from '@/utils/transitAdapters';
 import { formatZodiacWithArabic, resolveUserZodiacKey } from '@/utils/translationHelpers';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Animated,
     LayoutAnimation,
@@ -152,6 +161,16 @@ function getMethodIcon(type: BalancingMethodType): keyof typeof Ionicons.glyphMa
 
 const ZODIAC_ORDER = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'] as const;
 
+const PLANET_SYMBOLS: Record<string, string> = {
+  sun: '☉',
+  moon: '☽',
+  mercury: '☿',
+  venus: '♀',
+  mars: '♂',
+  jupiter: '♃',
+  saturn: '♄',
+};
+
 const AVG_DAYS_PER_SIGN: Record<Planet, number> = {
   Moon: 2.5,
   Mercury: 22,
@@ -247,6 +266,25 @@ function mapPlanetKeyToPlanet(planetKey: string | undefined): Planet | null {
   return null;
 }
 
+/**
+ * Derive element from zodiac key when elementKey is not in transit data
+ */
+function getElementFromZodiacKey(zodiacKey: string | undefined): Element | null {
+  if (!zodiacKey) return null;
+  const normalized = zodiacKey.toLowerCase();
+  
+  // Fire signs
+  if (['aries', 'leo', 'sagittarius'].includes(normalized)) return 'fire';
+  // Earth signs
+  if (['taurus', 'virgo', 'capricorn'].includes(normalized)) return 'earth';
+  // Air signs
+  if (['gemini', 'libra', 'aquarius'].includes(normalized)) return 'air';
+  // Water signs
+  if (['cancer', 'scorpio', 'pisces'].includes(normalized)) return 'water';
+  
+  return null;
+}
+
 export default function PlanetTransitDetailsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -275,6 +313,10 @@ export default function PlanetTransitDetailsScreen() {
     personalized: true,
     guidance: false,
   });
+  
+  // Fetch all planet transits for the comprehensive view
+  const [allTransits, setAllTransits] = useState<AllPlanetTransits | null>(null);
+  const [loadingAllTransits, setLoadingAllTransits] = useState(true);
 
   const toggleSection = (section: ExpandableSection) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -285,10 +327,16 @@ export default function PlanetTransitDetailsScreen() {
   const isLegacyTransit = (data: LegacyPlanetTransitInfo | PlanetTransitInfo | null): data is LegacyPlanetTransitInfo =>
     !!data && 'signDegree' in data;
 
-  const contextElement: Element | null =
-    detailsType === 'transit'
-      ? ((transitState ?? transitPayload)?.elementKey as Element | undefined) ?? null
-      : (nextDayPayload?.element as Element | undefined) ?? null;
+  const contextElement: Element | null = useMemo(() => {
+    if (detailsType === 'transit') {
+      const transit = transitState ?? transitPayload;
+      // Try elementKey first, fallback to deriving from zodiacKey
+      return (transit?.elementKey as Element | undefined) ?? 
+             getElementFromZodiacKey(transit?.zodiacKey) ?? 
+             null;
+    }
+    return (nextDayPayload?.element as Element | undefined) ?? null;
+  }, [detailsType, transitState, transitPayload, nextDayPayload]);
 
   const userElement = (profile.derived?.element as Element | undefined) ?? null;
   const safeUserElement = userElement ?? 'earth';
@@ -546,6 +594,105 @@ export default function PlanetTransitDetailsScreen() {
   }, [transitDates, transitState, transitPayload]);
   const adjacent = getAdjacentSigns((transitState ?? transitPayload)?.zodiacKey as any);
 
+  const influenceTypeLabel = useMemo(() => {
+    const labels = {
+      en: { universal: 'Universal', personal: 'Personal', immediate: 'Immediate' },
+      fr: { universal: 'Universel', personal: 'Personnel', immediate: 'Immédiat' },
+      ar: { universal: 'عام', personal: 'شخصي', immediate: 'فوري' },
+    } as const;
+    return labels[language as 'en' | 'fr' | 'ar'];
+  }, [language]);
+
+  const getDegreePhaseLabel = useCallback(
+    (stage: 'entry' | 'stabilization' | 'completion') => {
+      if (language === 'fr') {
+        return stage === 'entry'
+          ? '🔵 Phase d’entrée'
+          : stage === 'stabilization'
+            ? '🟢 Phase de pointe'
+            : '🟠 Phase de clôture';
+      }
+      if (language === 'ar') {
+        return stage === 'entry'
+          ? '🔵 مرحلة الدخول'
+          : stage === 'stabilization'
+            ? '🟢 مرحلة الذروة'
+            : '🟠 مرحلة الإغلاق';
+      }
+      return stage === 'entry' ? '🔵 Entry Phase' : stage === 'stabilization' ? '🟢 Peak Phase' : '🟠 Closing Phase';
+    },
+    [language]
+  );
+
+  const getDegreeStageBadgeLabel = useCallback(
+    (stage: 'entry' | 'stabilization' | 'completion') => {
+      if (language === 'fr') {
+        return stage === 'entry' ? 'Entrée' : stage === 'stabilization' ? 'Pic' : 'Clôture';
+      }
+      if (language === 'ar') {
+        return stage === 'entry' ? 'دخول' : stage === 'stabilization' ? 'ذروة' : 'إغلاق';
+      }
+      return stage === 'entry' ? 'Entry' : stage === 'stabilization' ? 'Peak' : 'Closing';
+    },
+    [language]
+  );
+
+  const getElementalResonanceLabel = useCallback(
+    (resonance: 'harmonious' | 'supportive' | 'neutral' | 'challenging') => {
+      if (language === 'fr') {
+        return resonance === 'harmonious'
+          ? 'Harmonieux'
+          : resonance === 'supportive'
+            ? 'Supportif'
+            : resonance === 'neutral'
+              ? 'Neutre'
+              : 'Transformateur';
+      }
+      if (language === 'ar') {
+        return resonance === 'harmonious'
+          ? 'منسجم'
+          : resonance === 'supportive'
+            ? 'داعمة'
+            : resonance === 'neutral'
+              ? 'متوازن'
+              : 'تحويلي';
+      }
+      return resonance === 'harmonious'
+        ? 'Harmonious'
+        : resonance === 'supportive'
+          ? 'Supportive'
+          : resonance === 'neutral'
+            ? 'Neutral'
+            : 'Challenging';
+    },
+    [language]
+  );
+  
+  // Calculate personalized planetary influence
+  const personalizedInfluence: PersonalizedInfluence | null = useMemo(() => {
+    if (detailsType !== 'transit') return null;
+    const data = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
+    if (!data) return null;
+    
+    const planet = mapPlanetKeyToPlanet(data.planetKey);
+    if (!planet) return null; // Can't calculate without valid planet
+    
+    // Use safe defaults when user data is missing
+    const transitElement = contextElement ?? 'earth';
+    const userElem = userElement ?? 'earth';
+    const degree = isLegacyTransit(data) ? (data.signDegree ?? 0) : 0;
+    
+    // ALWAYS return influence - service handles all cases including non-personal transits
+    return getPersonalizedInfluence(
+      planet,
+      degree,
+      transitElement,
+      userElem,
+      isPersonalTransit,
+      language as any
+    );
+  }, [detailsType, transitState, transitPayload, contextElement, userElement, isPersonalTransit, language]);
+
   useEffect(() => {
     Animated.timing(orbScale, {
       toValue: 1,
@@ -553,6 +700,25 @@ export default function PlanetTransitDetailsScreen() {
       useNativeDriver: true,
     }).start();
   }, [orbScale]);
+  
+  // Load all transits on mount
+  useEffect(() => {
+    const loadAllTransits = async () => {
+      try {
+        setLoadingAllTransits(true);
+        const transits = await getAllTransits();
+        setAllTransits(transits);
+      } catch (error) {
+        if (__DEV__) {
+          console.error('[PlanetTransitDetails] Error loading all transits:', error);
+        }
+      } finally {
+        setLoadingAllTransits(false);
+      }
+    };
+    
+    loadAllTransits();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -833,7 +999,12 @@ export default function PlanetTransitDetailsScreen() {
               </TouchableOpacity>
 
               {expandedSections.personalized ? (
-                <>
+                <PremiumSection
+                  featureId="personalGuidance"
+                  title={t('premiumSections.personalizedImpact.title')}
+                  description={t('premiumSections.personalizedImpact.description')}
+                  icon="🎯"
+                >
                   {/* Transit Type Context Banner */}
                   <View style={[styles.transitContextBanner, { 
                     backgroundColor: isPersonalTransit ? 'rgba(76, 175, 80, 0.1)' : 'rgba(100, 149, 237, 0.1)',
@@ -931,17 +1102,172 @@ export default function PlanetTransitDetailsScreen() {
                       </View>
                     </View>
                   ) : null}
-                </>
+                </PremiumSection>
               ) : null}
             </GlassCard>
 
-            <GlassCard style={styles.yourNatureCard}>
-              <View style={styles.cardHeader}>
-                <Ionicons name="leaf" size={18} color={accent.primary} />
-                <Text style={styles.cardTitle}>{t('home.planetTransitDetails.sections.yourNature')}</Text>
-              </View>
-              {userElement ? (
-                <>
+            {/* Personalized Planetary Influence Engine - Show at TOP only if personal transit */}
+            {personalizedInfluence && isPersonalTransit && (
+              <GlassCard style={styles.influenceCard}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="planet" size={20} color={getInfluenceTypeColor(personalizedInfluence.influenceType)} />
+                  <Text style={styles.cardTitle}>
+                    {t('home.planetTransitDetails.influenceEngine.personalInfluence')}
+                  </Text>
+                </View>
+
+                {/* Influence Type & Scope */}
+                <View style={styles.influenceBadges}>
+                  <View style={[styles.influenceTypeBadge, { backgroundColor: getInfluenceTypeColor(personalizedInfluence.influenceType) + '20', borderColor: getInfluenceTypeColor(personalizedInfluence.influenceType) + '50' }]}>
+                    <Text style={[styles.influenceTypeText, { color: getInfluenceTypeColor(personalizedInfluence.influenceType) }]}>
+                      {(influenceTypeLabel?.[personalizedInfluence.influenceType] ?? personalizedInfluence.influenceType).toUpperCase()}
+                    </Text>
+                  </View>
+                  <View style={[styles.degreeStageBadge, { backgroundColor: getDegreeStageColor(personalizedInfluence.degreeStage.stage) + '20', borderColor: getDegreeStageColor(personalizedInfluence.degreeStage.stage) + '50' }]}>
+                    <Ionicons name={getDegreeStageIcon(personalizedInfluence.degreeStage.stage) as any} size={14} color={getDegreeStageColor(personalizedInfluence.degreeStage.stage)} />
+                    <Text style={[styles.degreeStageText, { color: getDegreeStageColor(personalizedInfluence.degreeStage.stage) }]}>
+                      {(language === 'ar'
+                        ? getDegreeStageBadgeLabel(personalizedInfluence.degreeStage.stage)
+                        : getDegreeStageBadgeLabel(personalizedInfluence.degreeStage.stage).toUpperCase())}
+                    </Text>
+                  </View>
+                </View>
+
+                <Text style={styles.influenceScopeText}>{personalizedInfluence.scope}</Text>
+
+                {/* Collective Impact (Cosmic Weather) - Always visible */}
+                <View style={[styles.summaryCard, { borderColor: '#6495ED30' }]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                    <Ionicons name="globe-outline" size={16} color="#6495ED" />
+                    <Text style={[styles.summaryTitle, { color: '#6495ED' }]}>
+                      {t('home.planetTransitDetails.influenceEngine.collectiveImpact')}
+                    </Text>
+                  </View>
+                  <Text style={styles.summaryText}>{personalizedInfluence.collectiveSummary}</Text>
+                </View>
+
+                {/* Personal Relevance - Always visible */}
+                <View style={[styles.summaryCard, { borderColor: '#9C27B030' }]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                    <Ionicons name="person-outline" size={16} color="#9C27B0" />
+                    <Text style={[styles.summaryTitle, { color: '#9C27B0' }]}>
+                      {t('home.planetTransitDetails.influenceEngine.howRelates')}
+                    </Text>
+                  </View>
+                  <Text style={styles.summaryText}>{personalizedInfluence.personalSummary}</Text>
+                </View>
+
+                {/* Degree Stage Explanation */}
+                <View style={[styles.degreeExplanationCard, { borderColor: getDegreeStageColor(personalizedInfluence.degreeStage.stage) + '30' }]}>
+                  <Text style={styles.degreeStageDescription}>
+                    <Text style={{ fontWeight: '700' }}>
+                      {getDegreePhaseLabel(personalizedInfluence.degreeStage.stage)}:
+                    </Text>
+                    {' '}{personalizedInfluence.degreeStage.description}
+                  </Text>
+                  <Text style={styles.degreeValue}>
+                    {Math.floor(personalizedInfluence.degreeStage.degree)}° / 30°
+                  </Text>
+                </View>
+
+                {/* Elemental Resonance */}
+                <View style={[styles.resonanceCard, { borderColor: resonancePalette.primary }]}>
+                  <Text style={[styles.resonanceLabel, { color: resonancePalette.primary }]}>
+                    {(language === 'ar'
+                      ? getElementalResonanceLabel(personalizedInfluence.elementalResonance)
+                      : getElementalResonanceLabel(personalizedInfluence.elementalResonance).toUpperCase())}{' '}
+                    {(language === 'fr' ? 'RÉSONANCE' : language === 'ar' ? 'رنين' : 'RESONANCE')}
+                  </Text>
+                  <Text style={styles.resonanceDescription}>
+                    {personalizedInfluence.resonanceExplanation}
+                  </Text>
+                </View>
+
+                {/* Timing Guidance */}
+                <Text style={[styles.influenceTimingText, { fontStyle: 'italic' }]}>
+                  {personalizedInfluence.personalizedGuidance.timing}
+                </Text>
+
+                {/* Premium: Detailed Guidance */}
+                <PremiumSection
+                  featureId="personalGuidance"
+                  title={t('home.planetTransitDetails.influenceEngine.detailedGuidance')}
+                  description={t('home.planetTransitDetails.influenceEngine.guidanceDescription')}
+                  icon="🧭"
+                >
+                  {/* Best For */}
+                  <View style={styles.guidanceSection}>
+                    <View style={styles.guidanceSectionHeader}>
+                      <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+                      <Text style={styles.guidanceSectionTitle}>
+                        {t('home.planetTransitDetails.influenceEngine.bestForNow')}
+                      </Text>
+                    </View>
+                    {personalizedInfluence.personalizedGuidance.bestFor.map((item, idx) => (
+                      <View key={idx} style={styles.guidanceListItem}>
+                        <Text style={styles.guidanceBullet}>•</Text>
+                        <Text style={styles.guidanceItemText}>{item}</Text>
+                      </View>
+                    ))}
+                  </View>
+
+                  {/* Better to Avoid */}
+                  <View style={styles.guidanceSection}>
+                    <View style={styles.guidanceSectionHeader}>
+                      <Ionicons name="close-circle" size={16} color="#FF6B35" />
+                      <Text style={styles.guidanceSectionTitle}>
+                        {t('home.planetTransitDetails.influenceEngine.betterToAvoid')}
+                      </Text>
+                    </View>
+                    {personalizedInfluence.personalizedGuidance.avoid.map((item, idx) => (
+                      <View key={idx} style={styles.guidanceListItem}>
+                        <Text style={styles.guidanceBullet}>•</Text>
+                        <Text style={styles.guidanceItemText}>{item}</Text>
+                      </View>
+                    ))}
+                  </View>
+
+                  {/* Reflective Practices */}
+                  <View style={styles.guidanceSection}>
+                    <View style={styles.guidanceSectionHeader}>
+                      <Ionicons name="moon" size={16} color="#9C27B0" />
+                      <Text style={styles.guidanceSectionTitle}>
+                        {t('home.planetTransitDetails.influenceEngine.reflectivePractices')}
+                      </Text>
+                    </View>
+                    {personalizedInfluence.personalizedGuidance.reflectivePractices.map((item, idx) => (
+                      <View key={idx} style={styles.guidanceListItem}>
+                        <Text style={styles.guidanceBullet}>•</Text>
+                        <Text style={styles.guidanceItemText}>{item}</Text>
+                      </View>
+                    ))}
+                  </View>
+
+                  {/* Disclaimer */}
+                  <View style={styles.disclaimerBox}>
+                    <Ionicons name="information-circle-outline" size={14} color={DarkTheme.textMuted} />
+                    <Text style={styles.disclaimerBoxText}>
+                      {t('home.planetTransitDetails.disclaimer')}
+                    </Text>
+                  </View>
+                </PremiumSection>
+              </GlassCard>
+            )}
+
+            {/* All sections below are Premium - wrapped in PremiumSection */}
+            <PremiumSection
+              featureId="personalGuidance"
+              title={t('premiumSections.personalizedInsights.title')}
+              description={t('premiumSections.personalizedInsights.description')}
+              icon="🎯"
+            >
+              <GlassCard style={styles.yourNatureCard}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="leaf" size={18} color={accent.primary} />
+                  <Text style={styles.cardTitle}>{t('home.planetTransitDetails.sections.yourNature')}</Text>
+                </View>
+                {userElement ? (
+                  <>
                   <Text style={styles.bodyText}>
                     {t('home.planetTransitDetails.yourElement', {
                       element: tSafe(`common.elements.${userElement}`, toTitleCase(userElement)),
@@ -1220,6 +1546,7 @@ export default function PlanetTransitDetailsScreen() {
                 ) : null}
               </GlassCard>
             ) : null}
+            </PremiumSection>
 
             <GlassCard style={styles.dataSourceCard}>
               <View style={styles.cardHeader}>
@@ -1265,6 +1592,152 @@ export default function PlanetTransitDetailsScreen() {
         ) : (
           <GlassCard style={styles.nextDayCard}>
             <Text style={styles.bodyText}>{t('home.planetTransitDetails.error')}</Text>
+          </GlassCard>
+        )}
+
+        {/* All Planet Transits Section */}
+        {detailsType === 'transit' && allTransits && (
+          <GlassCard style={styles.allTransitsCard}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="planet" size={20} color="#9FA9B3" />
+              <Text style={styles.cardTitle}>
+                {language === 'ar' ? 'جميع عبور الكواكب' : language === 'fr' ? 'Tous les Transits' : 'All Planet Transits'}
+              </Text>
+            </View>
+            <Text style={[styles.bodyText, { marginBottom: Spacing.md }]}>
+              {language === 'ar' 
+                ? 'موقع جميع الكواكب في البروج حالياً'
+                : language === 'fr' 
+                ? 'Position actuelle de toutes les planètes dans les signes'
+                : 'Current position of all planets in the zodiac signs'}
+            </Text>
+            
+            <View style={styles.allTransitsGrid}>
+              {Object.entries(allTransits).map(([planetKey, transitInfo]: [string, PlanetTransit]) => {
+                const planetName = planetKey.charAt(0).toUpperCase() + planetKey.slice(1);
+                const zodiacData = ZODIAC_DATA[transitInfo.sign as ZodiacKey];
+                const planetGrad = getPlanetGradient(planetKey);
+                const elementKey = zodiacData?.element || 'earth';
+                const elementAcc = ElementAccents[elementKey as Element];
+                const isUserSign = transitInfo.sign === userZodiacKey;
+                const planetSymbol = PLANET_SYMBOLS[planetKey.toLowerCase()] || '✦';
+                
+                return (
+                  <TouchableOpacity
+                    key={planetKey}
+                    style={[
+                      styles.transitMiniCard,
+                      isUserSign && styles.transitMiniCardHighlight,
+                      { borderColor: isUserSign ? elementAcc.primary + '50' : 'rgba(255,255,255,0.08)' }
+                    ]}
+                    onPress={() => {
+                      const legacyFormat = adaptTransitToLegacyFormat(transitInfo);
+                      router.push({
+                        pathname: '/(tabs)/planet-transit-details',
+                        params: {
+                          type: 'transit',
+                          payload: JSON.stringify(legacyFormat),
+                          isPersonal: isUserSign ? 'true' : 'false',
+                        },
+                      });
+                    }}
+                  >
+                    {isUserSign && (
+                      <View style={[styles.yourSignBadge, { backgroundColor: elementAcc.primary + '30' }]}>
+                        <Ionicons name="star" size={10} color={elementAcc.primary} />
+                        <Text style={[styles.yourSignText, { color: elementAcc.primary }]}>
+                          {language === 'ar' ? 'برجك' : language === 'fr' ? 'Ton signe' : 'Your sign'}
+                        </Text>
+                      </View>
+                    )}
+                    
+                    <LinearGradient
+                      colors={planetGrad}
+                      style={styles.miniPlanetOrb}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                    >
+                      <Text style={styles.miniPlanetSymbol}>{planetSymbol}</Text>
+                    </LinearGradient>
+                    
+                    <Text style={styles.miniPlanetName} numberOfLines={1}>
+                      {language === 'ar' 
+                        ? (tSafe(`planets.${planetKey}Arabic`, planetName))
+                        : planetName}
+                    </Text>
+                    
+                    <View style={[styles.miniZodiacBadge, { backgroundColor: elementAcc.glow }]}>
+                      <Text style={styles.miniZodiacSymbol}>{zodiacData?.symbol || '✦'}</Text>
+                      <Text style={[styles.miniZodiacName, { color: elementAcc.primary }]} numberOfLines={1}>
+                        {formatZodiacWithArabic(transitInfo.sign as any, language as any)}
+                      </Text>
+                    </View>
+                    
+                    {transitInfo.signDegree !== undefined && (
+                      <Text style={styles.miniDegree}>
+                        {Math.floor(transitInfo.signDegree)}°
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+            
+            {loadingAllTransits && (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.bodyText}>{t('common.loading')}</Text>
+              </View>
+            )}
+          </GlassCard>
+        )}
+
+        {/* Collective Transit Explanation - Simplified for non-personal transits */}
+        {personalizedInfluence && !isPersonalTransit && (
+          <GlassCard style={styles.influenceCard}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="globe-outline" size={20} color="#6495ED" />
+              <Text style={styles.cardTitle}>
+                {t('home.planetTransitDetails.influenceEngine.collectiveInfluence')}
+              </Text>
+            </View>
+
+            {/* Influence Type Badge (smaller) */}
+            <View style={[styles.influenceTypeBadge, { backgroundColor: getInfluenceTypeColor(personalizedInfluence.influenceType) + '20', borderColor: getInfluenceTypeColor(personalizedInfluence.influenceType) + '50', alignSelf: 'flex-start' }]}>
+              <Text style={[styles.influenceTypeText, { color: getInfluenceTypeColor(personalizedInfluence.influenceType) }]}>
+                {(influenceTypeLabel?.[personalizedInfluence.influenceType] ?? personalizedInfluence.influenceType).toUpperCase()}{' '}
+                {(language === 'ar' ? 'عبور' : 'TRANSIT')}
+              </Text>
+            </View>
+
+            {/* Collective Impact (Cosmic Weather) */}
+            <View style={[styles.summaryCard, { borderColor: '#6495ED30' }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                <Ionicons name="cloudy-night-outline" size={16} color="#6495ED" />
+                <Text style={[styles.summaryTitle, { color: '#6495ED' }]}>
+                  {t('home.planetTransitDetails.influenceEngine.cosmicWeather')}
+                </Text>
+              </View>
+              <Text style={styles.summaryText}>{personalizedInfluence.collectiveSummary}</Text>
+            </View>
+
+            {/* Personal Relevance (Brief) */}
+            <View style={[styles.summaryCard, { borderColor: '#9C27B030' }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                <Ionicons name="person-outline" size={16} color="#9C27B0" />
+                <Text style={[styles.summaryTitle, { color: '#9C27B0' }]}>
+                  {t('home.planetTransitDetails.influenceEngine.forYou')}
+                </Text>
+              </View>
+              <Text style={styles.summaryText}>{personalizedInfluence.personalSummary}</Text>
+            </View>
+
+            {/* Simple disclaimer */}
+            <View style={[styles.disclaimerBox, { marginTop: 0 }]}>
+              <Ionicons name="information-circle-outline" size={14} color={DarkTheme.textMuted} />
+              <Text style={styles.disclaimerBoxText}>
+                {t('home.planetTransitDetails.disclaimer')}
+              </Text>
+            </View>
           </GlassCard>
         )}
 
@@ -2267,6 +2740,208 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: DarkTheme.textMuted,
     textAlign: 'center',
+    lineHeight: 16,
+  },
+  allTransitsCard: {
+    gap: Spacing.md,
+  },
+  allTransitsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.md,
+  },
+  transitMiniCard: {
+    width: '48%',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 16,
+    borderWidth: 1.5,
+    padding: Spacing.md,
+    gap: Spacing.xs,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  transitMiniCardHighlight: {
+    backgroundColor: 'rgba(76, 175, 80, 0.05)',
+  },
+  yourSignBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  yourSignText: {
+    fontSize: 9,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  miniPlanetOrb: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  miniPlanetSymbol: {
+    fontSize: 24,
+    color: '#fff',
+  },
+  miniPlanetName: {
+    fontSize: 13,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    textAlign: 'center',
+  },
+  miniZodiacBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    width: '100%',
+    justifyContent: 'center',
+  },
+  miniZodiacSymbol: {
+    fontSize: 14,
+  },
+  miniZodiacName: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  miniDegree: {
+    fontSize: 10,
+    color: DarkTheme.textTertiary,
+  },
+  loadingContainer: {
+    padding: Spacing.lg,
+    alignItems: 'center',
+  },
+  influenceCard: {
+    gap: Spacing.md,
+  },
+  influenceBadges: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    flexWrap: 'wrap',
+  },
+  influenceTypeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1.5,
+  },
+  influenceTypeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  degreeStageBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1.5,
+  },
+  degreeStageText: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  influenceScopeText: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+    fontStyle: 'italic',
+  },
+  summaryCard: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 12,
+    borderWidth: 1.5,
+    padding: Spacing.md,
+  },
+  summaryTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  summaryText: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  degreeExplanationCard: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    padding: Spacing.md,
+    gap: Spacing.xs,
+  },
+  degreeStageDescription: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  influenceTimingText: {
+    fontSize: 13,
+    color: DarkTheme.textTertiary,
+    lineHeight: 18,
+  },
+  guidanceSection: {
+    gap: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  guidanceSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
+  },
+  guidanceSectionTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+  },
+  guidanceListItem: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'flex-start',
+  },
+  guidanceBullet: {
+    fontSize: 16,
+    color: DarkTheme.textTertiary,
+    lineHeight: 20,
+  },
+  guidanceItemText: {
+    flex: 1,
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  disclaimerBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 10,
+    padding: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  disclaimerBoxText: {
+    flex: 1,
+    fontSize: 11,
+    color: DarkTheme.textMuted,
     lineHeight: 16,
   },
 });

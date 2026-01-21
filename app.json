@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Asrariya",
-    "slug": "asrariya-mobile",
+    "slug": "asrar-mobile",
     "version": "1.0.0",
     "sdkVersion": "54.0.0",
     "orientation": "portrait",
@@ -18,8 +18,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.zaibaitech.asrar",
-      "associatedDomains": ["applinks:asrar.app"],
+      "bundleIdentifier": "com.zaibaitech.asrariya",
+      "associatedDomains": [
+        "applinks:asrar.app"
+      ],
       "infoPlist": {
         "CFBundleDisplayName": "Asrariya",
         "NSAppTransportSecurity": {
@@ -44,10 +46,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.zaibaitech.asrar",
-      "label": "Asrariya",
+      "package": "com.zaibaitech.asrariya",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
       "intentFilters": [
         {
           "action": "VIEW",
@@ -62,7 +62,10 @@
               "pathPrefix": "/auth"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ],
       "permissions": [
@@ -74,8 +77,7 @@
         "android.permission.WAKE_LOCK",
         "android.permission.SCHEDULE_EXACT_ALARM",
         "android.permission.USE_EXACT_ALARM"
-      ],
-      "usesCleartextTraffic": true
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -98,7 +100,8 @@
           ]
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true

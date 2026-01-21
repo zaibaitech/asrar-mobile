@@ -15,6 +15,7 @@ import {
     DivineNameCard,
     PrayerSelector,
 } from '@/components/prayer-guidance';
+import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -200,7 +201,7 @@ export default function PrayerGuidanceScreen() {
       <View style={styles.navHeader}>
         <Pressable
           accessibilityRole="button"
-          onPress={() => router.push('/prayer-times')}
+          onPress={() => router.replace('/')}
           style={styles.navButton}
         >
           <Ionicons name="chevron-back" size={22} color={DarkTheme.textPrimary} />
@@ -318,28 +319,36 @@ export default function PrayerGuidanceScreen() {
               }
             />
 
-            <ClassicalWisdomCard
-              wisdom={guidance.classicalWisdom}
-              planet={guidance.context.currentPlanetaryHour.planet}
-            />
+            {/* Classical Wisdom & Practice - Premium */}
+            <PremiumSection
+              featureId="spiritualGuidance"
+              title={t('premiumSections.prayerGuidance.title')}
+              description={t('premiumSections.prayerGuidance.description')}
+              icon="🤲"
+            >
+              <ClassicalWisdomCard
+                wisdom={guidance.classicalWisdom}
+                planet={guidance.context.currentPlanetaryHour.planet}
+              />
 
-            <DivineNameCard divineName={guidance.divineName} />
+              <DivineNameCard divineName={guidance.divineName} />
 
-            <DhikrCounter targetCount={guidance.divineName.count} onComplete={handleDhikrComplete} />
+              <DhikrCounter targetCount={guidance.divineName.count} onComplete={handleDhikrComplete} />
 
-            <AdhkarList adhkar={guidance.adhkar} />
+              <AdhkarList adhkar={guidance.adhkar} />
 
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>
-                {t('prayerGuidance.ui.footerBasedOn', {
-                  abjad: guidanceUserProfile?.abjadValue ?? '—',
-                  element: guidanceUserProfile?.derived.element ?? '—',
-                })}
-              </Text>
-              <Text style={styles.footerSubtext}>
-                {t('prayerGuidance.ui.sources', { source: guidance.classicalWisdom.source })}
-              </Text>
-            </View>
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>
+                  {t('prayerGuidance.ui.footerBasedOn', {
+                    abjad: guidanceUserProfile?.abjadValue ?? '—',
+                    element: guidanceUserProfile?.derived.element ?? '—',
+                  })}
+                </Text>
+                <Text style={styles.footerSubtext}>
+                  {t('prayerGuidance.ui.sources', { source: guidance.classicalWisdom.source })}
+                </Text>
+              </View>
+            </PremiumSection>
           </>
         )}
 

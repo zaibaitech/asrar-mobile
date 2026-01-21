@@ -172,6 +172,10 @@ export default function AuthScreen() {
         await clearGuestMode(); // Clear guest mode on successful signup
         await setProfile({ 
           mode: 'account',
+          account: {
+            email: result.session.email || email,
+            userId: result.session.userId,
+          },
         });
 
         // After signup, always take the user to Profile to complete their details.
@@ -241,14 +245,24 @@ export default function AuthScreen() {
         // Clear guest mode on successful sign in
         await clearGuestMode();
         
-        // Try to load profile from cloud first
-        const cloudResult = await loadProfileFromCloud();
+        // Try to load profile from cloud first - pass the session directly to avoid race condition
+        const cloudResult = await loadProfileFromCloud(result.session);
+        
+        if (__DEV__) {
+          console.log('[AuthScreen] Cloud profile result:', cloudResult.profile ? 'Found' : 'Not found', cloudResult.error?.code || '');
+        }
         
         if (cloudResult.profile) {
           // Cloud profile found - restore it with account mode
+          // Also restore account info from session
           await setProfile({
             ...cloudResult.profile,
             mode: 'account',
+            account: {
+              ...cloudResult.profile.account,
+              email: result.session.email,
+              userId: result.session.userId,
+            },
           });
           
           Alert.alert(
@@ -265,6 +279,10 @@ export default function AuthScreen() {
           // No cloud profile - user needs to set up profile
           await setProfile({ 
             mode: 'account',
+            account: {
+              email: result.session.email || email,
+              userId: result.session.userId,
+            },
           });
 
           Alert.alert(

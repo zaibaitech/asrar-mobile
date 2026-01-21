@@ -23,6 +23,7 @@ import type {
     PersonPersonCompatibility,
     UniversalCompatibilityResult
 } from '../../services/compatibility/types';
+import { PremiumSection } from '../subscription/PremiumSection';
 import { CompatibilityGauge } from './CompatibilityGauge';
 import { SoulConnectionRing } from './SoulConnectionRing';
 
@@ -213,31 +214,52 @@ function PersonPersonResultView({ result, language }: { result: PersonPersonComp
         )}
         
         {activeTab === 'soulConnection' && (
-          <SoulConnectionTab 
-            method={methods.spiritualDestiny} 
-            person1Name={person1.name}
-            person2Name={person2.name}
-            person1Kabir={person1.destiny.kabir}
-            person2Kabir={person2.destiny.kabir}
-            relationshipContext={relationshipContext}
-            language={language} 
-          />
+          <PremiumSection
+            featureId="compatibilityDeep"
+            title={t('premiumSections.soulConnection.title')}
+            description={t('premiumSections.soulConnection.description')}
+            icon="✨"
+          >
+            <SoulConnectionTab 
+              method={methods.spiritualDestiny} 
+              person1Name={person1.name}
+              person2Name={person2.name}
+              person1Kabir={person1.destiny.kabir}
+              person2Kabir={person2.destiny.kabir}
+              relationshipContext={relationshipContext}
+              language={language} 
+            />
+          </PremiumSection>
         )}
         
         {activeTab === 'harmony' && (
-          <HarmonyTab 
-            rc={rc}
-            theme={theme}
-            language={language} 
-          />
+          <PremiumSection
+            featureId="compatibilityDeep"
+            title={t('premiumSections.harmonyAnalysis.title')}
+            description={t('premiumSections.harmonyAnalysis.description')}
+            icon="🌿"
+          >
+            <HarmonyTab 
+              rc={rc}
+              theme={theme}
+              language={language} 
+            />
+          </PremiumSection>
         )}
         
         {activeTab === 'advice' && (
-          <AdviceTab 
-            rc={rc} 
-            theme={theme}
-            language={language} 
-          />
+          <PremiumSection
+            featureId="compatibilityDeep"
+            title={t('premiumSections.personalizedAdvice.title')}
+            description={t('premiumSections.personalizedAdvice.description')}
+            icon="💡"
+          >
+            <AdviceTab 
+              rc={rc} 
+              theme={theme}
+              language={language} 
+            />
+          </PremiumSection>
         )}
       </ScrollView>
     </View>
@@ -338,18 +360,25 @@ function OverviewTab({ rc, theme, language, getQualityGradient, relationshipCont
         </View>
       </View>
 
-      {/* Summary */}
-      <View style={styles.summaryCard}>
-        <View style={styles.summaryHeader}>
-          <Ionicons name="document-text" size={24} color={theme.primary[0]} />
-          <Text style={styles.summaryTitle}>
-            {safeT(t, 'compatibility.results.overview.summary', 'Summary')}
+      {/* Summary - Premium */}
+      <PremiumSection
+        featureId="compatibilityDeep"
+        title={t('premiumSections.compatibilitySummary.title')}
+        description={t('premiumSections.compatibilitySummary.description')}
+        icon="📝"
+      >
+        <View style={styles.summaryCard}>
+          <View style={styles.summaryHeader}>
+            <Ionicons name="document-text" size={24} color={theme.primary[0]} />
+            <Text style={styles.summaryTitle}>
+              {safeT(t, 'compatibility.results.overview.summary', 'Summary')}
+            </Text>
+          </View>
+          <Text style={styles.summaryText}>
+            {getLocalizedField(rc, 'summary', language)}
           </Text>
         </View>
-        <Text style={styles.summaryText}>
-          {getLocalizedField(rc, 'summary', language)}
-        </Text>
-      </View>
+      </PremiumSection>
 
       {/* Quick Stats Grid - showing Harmony components only */}
       <Text style={styles.sectionTitle}>{safeT(t, 'compatibility.results.overview.harmony', 'Harmony Components')}</Text>
@@ -1684,15 +1713,21 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
         )}
 
         {activeTab === 'guidance' && (
-          <View style={styles.section}>
-            {/* Manifestation Guidance */}
-            <LinearGradient
-              colors={['rgba(251, 146, 60, 0.1)', 'rgba(249, 115, 22, 0.1)']}
-              style={styles.detailCard}
-            >
-              <View style={styles.detailHeader}>
-                <View style={styles.detailIconContainer}>
-                  <Ionicons name="hourglass" size={28} color={getSpeedColor(manifestationGuidance.speed)} />
+          <PremiumSection
+            featureId="compatibilityDeep"
+            title={t('premiumSections.divineGuidance.title')}
+            description={t('premiumSections.divineGuidance.description')}
+            icon="🧭"
+          >
+            <View style={styles.section}>
+              {/* Manifestation Guidance */}
+              <LinearGradient
+                colors={['rgba(251, 146, 60, 0.1)', 'rgba(249, 115, 22, 0.1)']}
+                style={styles.detailCard}
+              >
+                <View style={styles.detailHeader}>
+                  <View style={styles.detailIconContainer}>
+                    <Ionicons name="hourglass" size={28} color={getSpeedColor(manifestationGuidance.speed)} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.detailTitle}>
@@ -1741,17 +1776,24 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                 {t('compatibility.divineNameResults.spiritualWisdomText')}
               </Text>
             </LinearGradient>
-          </View>
+            </View>
+          </PremiumSection>
         )}
 
         {activeTab === 'practice' && (
-          <View style={styles.section}>
-            {/* Classical Function */}
-            <LinearGradient
-              colors={['rgba(59, 130, 246, 0.1)', 'rgba(37, 99, 235, 0.1)']}
-              style={styles.detailCard}
-            >
-              <View style={styles.detailHeader}>
+          <PremiumSection
+            featureId="compatibilityDeep"
+            title={t('premiumSections.practiceGuide.title')}
+            description={t('premiumSections.practiceGuide.description')}
+            icon="📖"
+          >
+            <View style={styles.section}>
+              {/* Classical Function */}
+              <LinearGradient
+                colors={['rgba(59, 130, 246, 0.1)', 'rgba(37, 99, 235, 0.1)']}
+                style={styles.detailCard}
+              >
+                <View style={styles.detailHeader}>
                 <View style={styles.detailIconContainer}>
                   <Ionicons name="book" size={28} color="#3b82f6" />
                 </View>
@@ -1795,7 +1837,8 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
                 {t('compatibility.divineNameResults.practice.disclaimer')}
               </Text>
             </View>
-          </View>
+            </View>
+          </PremiumSection>
         )}
       </ScrollView>
     </View>
@@ -2158,27 +2201,33 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
         )}
 
         {activeTab === 'guidance' && (
-          <View style={styles.section}>
-            {/* Main Guidance */}
-            <LinearGradient
-              colors={['rgba(59, 130, 246, 0.1)', 'rgba(37, 99, 235, 0.1)']}
-              style={styles.guidanceCard}>
-              <View style={styles.guidanceHeader}>
-                <Ionicons name="compass" size={28} color="#3b82f6" />
-                <Text style={styles.guidanceTitle}>
-                  {tr('compatibility.form.divineNameIntention.results.guidance.title')}
+          <PremiumSection
+            featureId="compatibilityDeep"
+            title={t('premiumSections.practiceGuidance.title')}
+            description={t('premiumSections.practiceGuidance.description')}
+            icon="🧭"
+          >
+            <View style={styles.section}>
+              {/* Main Guidance */}
+              <LinearGradient
+                colors={['rgba(59, 130, 246, 0.1)', 'rgba(37, 99, 235, 0.1)']}
+                style={styles.guidanceCard}>
+                <View style={styles.guidanceHeader}>
+                  <Ionicons name="compass" size={28} color="#3b82f6" />
+                  <Text style={styles.guidanceTitle}>
+                    {tr('compatibility.form.divineNameIntention.results.guidance.title')}
+                  </Text>
+                </View>
+
+                <View style={styles.divider} />
+
+                <Text style={styles.guidanceMainText}>
+                  {t(result.guidanceKey, { 
+                    name: divineName.transliteration,
+                    intention: tr(`compatibility.form.divineNameIntention.results.intentions.${intention}`)
+                  })}
                 </Text>
-              </View>
-
-              <View style={styles.divider} />
-
-              <Text style={styles.guidanceMainText}>
-                {t(result.guidanceKey, { 
-                  name: divineName.transliteration,
-                  intention: tr(`compatibility.form.divineNameIntention.results.intentions.${intention}`)
-                })}
-              </Text>
-            </LinearGradient>
+              </LinearGradient>
 
             {/* How to Use */}
             <View style={styles.howToUseCard}>
@@ -2238,7 +2287,8 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
                 {tr('compatibility.form.divineNameIntention.results.practice.disclaimer')}
               </Text>
             </View>
-          </View>
+            </View>
+          </PremiumSection>
         )}
       </ScrollView>
     </View>

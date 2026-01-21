@@ -13,6 +13,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View
 import { EnhancedCalculationResult } from '../../types/calculator-enhanced';
 import { AIBadge } from '../divine-timing/AIBadge';
 import { CoreResultsGrid } from '../results/CoreResultsGrid';
+import { PremiumSection } from '../subscription/PremiumSection';
 import { AdvancedMethods } from './AdvancedMethods';
 import { BurjSign } from './BurjSign';
 import { ElementalComposition } from './ElementalComposition';
@@ -190,23 +191,30 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
           <BurjSign kabir={result.core.kabir} />
         </View>
         
-        {/* AI Enhancement Button */}
-        {aiAvailable && !aiEnhanced && (
-          <TouchableOpacity 
-            onPress={handleEnhanceWithAI}
-            activeOpacity={0.8}
-            disabled={aiLoading}
-          >
-            <LinearGradient
-              colors={['#6366f1', '#8b5cf6']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.aiEnhanceButton}
+        {/* Premium Section: AI Enhancement + Insights + Elemental + Advanced */}
+        <PremiumSection
+          featureId="advancedCalculator"
+          title={t('premiumSections.deepNumerologicalAnalysis.title')}
+          description={t('premiumSections.deepNumerologicalAnalysis.description')}
+          icon="🔮"
+        >
+          {/* AI Enhancement Button */}
+          {aiAvailable && !aiEnhanced && (
+            <TouchableOpacity 
+              onPress={handleEnhanceWithAI}
+              activeOpacity={0.8}
+              disabled={aiLoading}
             >
-              {aiLoading ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <Ionicons name="sparkles" size={18} color="#fff" />
+              <LinearGradient
+                colors={['#6366f1', '#8b5cf6']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.aiEnhanceButton}
+              >
+                {aiLoading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Ionicons name="sparkles" size={18} color="#fff" />
               )}
               <Text style={styles.aiEnhanceButtonText}>
                 {aiLoading ? 'Enhancing...' : '✨ Personalize Explanation'}
@@ -291,6 +299,7 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
             saghir={result.core.saghir}
           />
         </View>
+        </PremiumSection>
         
         {/* Disclaimer */}
         <View style={styles.disclaimer}>

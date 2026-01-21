@@ -694,8 +694,8 @@ export default function DivineTimingScreen() {
             {/* PREMIUM: AI Guidance Section */}
             <PremiumSection
               featureId="aiGuidance"
-              title={t('divineTiming.results.aiGuidance.title') || 'AI Spiritual Guidance'}
-              description={t('premium.divineTiming.aiGuidance') || 'Get personalized guidance based on your spiritual profile and current timing'}
+              title={t('premiumSections.aiSpiritualGuidance.title')}
+              description={t('premiumSections.aiSpiritualGuidance.description')}
               icon="✨"
             >
               <View style={[styles.guidanceSection, { backgroundColor: colors.card }]}>

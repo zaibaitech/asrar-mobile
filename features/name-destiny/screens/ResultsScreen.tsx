@@ -421,8 +421,8 @@ export default function ResultsScreen() {
             {/* PREMIUM: AI Enhancement - Personal interpretation */}
             <PremiumSection
               featureId="aiInterpretation"
-              title={t('nameDestiny.results.personalizeExplanation') || 'AI Personalization'}
-              description={t('premium.nameDestiny.aiEnhancement') || 'Get personalized AI-powered interpretation of your element'}
+              title={t('premiumSections.aiPersonalization.title')}
+              description={t('premiumSections.aiPersonalization.description')}
               icon="✨"
               compact={!aiEnhanced}
             >
@@ -477,8 +477,8 @@ export default function ResultsScreen() {
           {result.divineResonance && (
             <PremiumSection
               featureId="divineNameResonance"
-              title={language === 'ar' ? 'رنين الاسم الإلهي' : language === 'fr' ? 'Résonance du Nom Divin' : 'Divine Name Resonance'}
-              description={language === 'ar' ? 'الاسم الإلهي الذي يتردد صداه مع اسمك' : language === 'fr' ? 'Le Nom Divin qui résonne avec votre nom' : 'The Divine Name that resonates with your name'}
+              title={t('premiumSections.divineNameResonance.title')}
+              description={t('premiumSections.divineNameResonance.description')}
               icon="🌟"
             >
               <View style={styles.section}>
@@ -692,8 +692,8 @@ export default function ResultsScreen() {
           {/* PREMIUM: Qur'anic Resonance */}
           <PremiumSection
             featureId="quranResonance"
-            title={t('nameDestiny.results.quranResonance') || 'Qur\'anic Resonance'}
-            description={t('premium.nameDestiny.quranResonance') || 'Discover the ayat connected to your sacred numbers'}
+            title={t('premiumSections.quranResonance.title')}
+            description={t('premiumSections.quranResonance.description')}
             icon="📖"
           >
             <View style={styles.section}>
@@ -719,8 +719,8 @@ export default function ResultsScreen() {
           {/* PREMIUM: Key Takeaways + Practical Guidance */}
           <PremiumSection
             featureId="spiritualGuidance"
-            title={t('nameDestiny.results.keyTakeaways') || 'Spiritual Guidance'}
-            description={t('premium.nameDestiny.guidance') || 'Personalized insights and practical guidance for your path'}
+            title={t('premiumSections.spiritualGuidanceInsights.title')}
+            description={t('premiumSections.spiritualGuidanceInsights.description')}
             icon="💡"
           >
             <View style={styles.section}>

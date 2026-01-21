@@ -93,6 +93,13 @@ export const PREMIUM_FEATURES = {
     icon: '💞',
     tier: 'medium',
   },
+  manazilPractices: {
+    id: 'manazilPractices',
+    nameKey: 'premium.features.manazilPractices',
+    descriptionKey: 'premium.features.manazilPractices.description',
+    icon: '🌙',
+    tier: 'medium',
+  },
   
   // Tier 3: Extras (Nice to Have)
   pdfExport: {

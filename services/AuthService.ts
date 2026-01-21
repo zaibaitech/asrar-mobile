@@ -1054,6 +1054,9 @@ export async function syncProfileToCloud(profile: UserProfile): Promise<{
     const session = await getSession();
     
     if (!session) {
+      if (__DEV__) {
+        console.log('[AuthService] syncProfileToCloud: No session, skipping sync');
+      }
       return {
         success: false,
         error: { code: 'NOT_AUTHENTICATED', message: 'User not signed in' },
@@ -1064,7 +1067,13 @@ export async function syncProfileToCloud(profile: UserProfile): Promise<{
       throw new Error('Supabase not configured');
     }
     
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+    if (__DEV__) {
+      console.log('[AuthService] syncProfileToCloud: Syncing profile for user', session.userId);
+      console.log('[AuthService] syncProfileToCloud: Profile has name:', profile.nameAr || profile.nameLatin || 'none');
+    }
+    
+    // Use UPSERT: on conflict with user_id, update the profile_data
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?on_conflict=user_id`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1081,6 +1090,9 @@ export async function syncProfileToCloud(profile: UserProfile): Promise<{
     
     if (!response.ok) {
       const error = await response.json();
+      if (__DEV__) {
+        console.error('[AuthService] syncProfileToCloud: API error', error);
+      }
       return {
         success: false,
         error: {
@@ -1088,6 +1100,10 @@ export async function syncProfileToCloud(profile: UserProfile): Promise<{
           message: error.message || 'Failed to sync profile',
         },
       };
+    }
+    
+    if (__DEV__) {
+      console.log('[AuthService] syncProfileToCloud: SUCCESS - Profile synced to cloud');
     }
     
     return { success: true, error: null };
@@ -1107,18 +1123,26 @@ export async function syncProfileToCloud(profile: UserProfile): Promise<{
   }
 }
 
-export async function loadProfileFromCloud(): Promise<{
+export async function loadProfileFromCloud(providedSession?: AuthSession): Promise<{
   profile: UserProfile | null;
   error: AuthError | null;
 }> {
   try {
-    const session = await getSession();
+    // Use provided session or get from storage
+    const session = providedSession || await getSession();
     
     if (!session) {
+      if (__DEV__) {
+        console.log('[AuthService] loadProfileFromCloud: No session available');
+      }
       return {
         profile: null,
         error: { code: 'NOT_AUTHENTICATED', message: 'User not signed in' },
       };
+    }
+    
+    if (__DEV__) {
+      console.log('[AuthService] loadProfileFromCloud: Loading for user', session.userId);
     }
     
     if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -1137,6 +1161,9 @@ export async function loadProfileFromCloud(): Promise<{
     
     if (!response.ok) {
       const error = await response.json();
+      if (__DEV__) {
+        console.error('[AuthService] loadProfileFromCloud: API error', error);
+      }
       return {
         profile: null,
         error: {
@@ -1148,11 +1175,22 @@ export async function loadProfileFromCloud(): Promise<{
     
     const data = await response.json();
     
+    if (__DEV__) {
+      console.log('[AuthService] loadProfileFromCloud: Got', data.length, 'profile(s)');
+    }
+    
     if (data.length === 0) {
+      if (__DEV__) {
+        console.log('[AuthService] loadProfileFromCloud: No profile found in cloud');
+      }
       return { profile: null, error: null };
     }
     
     const profileData = data[0].profile_data as UserProfile;
+    
+    if (__DEV__) {
+      console.log('[AuthService] loadProfileFromCloud: Loaded profile with name:', profileData?.nameAr || profileData?.nameLatin || 'none');
+    }
     
     return { profile: profileData, error: null };
     

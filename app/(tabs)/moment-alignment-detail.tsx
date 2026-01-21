@@ -590,8 +590,8 @@ export default function MomentAlignmentDetailScreen() {
         {/* PREMIUM: Personal Guidance Section */}
         <PremiumSection
           featureId="personalGuidance"
-          title={t('momentDetail.guidanceTitle') || 'Personal Guidance'}
-          description={t('premium.momentAlignment.guidance') || 'Discover what actions align best with this moment'}
+          title={t('premiumSections.personalGuidance.title')}
+          description={t('premiumSections.personalGuidance.description')}
           icon="💡"
         >
           <View style={styles.section}>

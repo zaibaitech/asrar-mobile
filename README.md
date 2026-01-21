@@ -145,8 +145,8 @@ Consistent spacing scale:
 
 ## 🔐 Bundle Identifiers
 
-- **iOS**: `com.zaibaitech.asrar`
-- **Android**: `com.zaibaitech.asrar`
+- **iOS**: `com.zaibaitech.asrariya`
+- **Android**: `com.zaibaitech.asrariya`
 
 ## 📦 Dependencies
 

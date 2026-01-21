@@ -174,10 +174,11 @@ export function RealTimeDailyGuidance({
   const dayRuler = getDayRuler(now);
   const dayRulerInfo = getPlanetInfo(dayRuler);
 
-  // Objective day tone (universal, no personal comparison)
-  const objectiveTimingQuality = getObjectiveTimingQuality(dayRuler);
-  const statusColor = getStatusColor(objectiveTimingQuality);
-  const statusLabel = getStatusLabel(objectiveTimingQuality);
+  // Use personalized timing quality from guidance (already considers user element)
+  // Falls back to objective quality only if guidance somehow doesn't have it
+  const timingQuality = guidance.timingQuality || getObjectiveTimingQuality(dayRuler);
+  const statusColor = getStatusColor(timingQuality);
+  const statusLabel = getStatusLabel(timingQuality);
 
   // Objective sections derived from day element + day ruler
   const elementColor = getElementColor(dayRulerInfo.element);

@@ -782,6 +782,182 @@ export const translations = {
           },
         },
         disclaimer: "For reflection only • Not a ruling",
+        influenceEngine: {
+          personalInfluence: "Personalized Influence",
+          collectiveInfluence: "Collective Influence",
+          collectiveImpact: "Collective Impact",
+          cosmicWeather: "Cosmic Weather",
+          forYou: "For You",
+          howRelates: "How This Relates to You",
+          detailedGuidance: "Detailed Guidance",
+          guidanceDescription: "Personalized advice for this planetary influence",
+          bestForNow: "Best For Now",
+          betterToAvoid: "Better to Avoid",
+          reflectivePractices: "Reflective Practices",
+          items: {
+            takingAlignedAction: "Taking aligned action",
+            makingImportantDecisions: "Making important decisions",
+            beginningNewInitiatives: "Beginning new initiatives",
+            buildMeaningfulConnections: "Build meaningful connections",
+            createBeauty: "Create beauty",
+            trustYourNaturalInstincts: "Trust your natural instincts",
+            observationAndPatience: "Observation and patience",
+            planningWithoutRushing: "Planning without rushing",
+            seekingClarityBeforeActing: "Seeking clarity before acting",
+            forcingDecisions: "Forcing decisions",
+            majorCommitments: "Major commitments",
+            hastyActions: "Hasty actions",
+            completingExistingWork: "Completing existing work",
+            reflectionAndReview: "Reflection and review",
+            releasingWhatNoLongerServes: "Releasing what no longer serves",
+            startingNewProjects: "Starting new projects",
+            majorDecisions: "Major decisions",
+            pushingAgainstResistance: "Pushing against resistance",
+            acceptLimitations: "Accept limitations",
+            buildFoundationsSlowly: "Build foundations slowly",
+            rebellionAgainstStructure: "Rebellion against structure",
+            shortcuts: "Shortcuts",
+            disciplineAndCommitment: "Discipline and commitment",
+            longTermPlanning: "Long-term planning",
+            laziness: "Laziness",
+            avoidingResponsibility: "Avoiding responsibility",
+            harvestLessonsLearned: "Harvest lessons learned",
+            honorCommitmentsMade: "Honor commitments made",
+            bitterness: "Bitterness",
+            regretWithoutAction: "Regret without action",
+            opennessToExpansion: "Openness to expansion",
+            learningAndTeaching: "Learning and teaching",
+            overconfidence: "Overconfidence",
+            excess: "Excess",
+            growthOpportunities: "Growth opportunities",
+            sharingWisdom: "Sharing wisdom",
+            greed: "Greed",
+            takingMoreThanNeeded: "Taking more than needed",
+            integrateWhatWasGained: "Integrate what was gained",
+            shareBlessings: "Share blessings",
+            hoarding: "Hoarding",
+            prideInAchievements: "Pride in achievements",
+            assessChallengesCarefully: "Assess challenges carefully",
+            buildCourage: "Build courage",
+            impulsiveAnger: "Impulsive anger",
+            rushingIntoConflict: "Rushing into conflict",
+            courageousAction: "Courageous action",
+            defendingTruth: "Defending truth",
+            aggression: "Aggression",
+            harmingOthers: "Harming others",
+            completeBattlesWisely: "Complete battles wisely",
+            forgiveWhenAble: "Forgive when able",
+            prolongingConflict: "Prolonging conflict",
+            holdingGrudges: "Holding grudges",
+            exploreValuesAndDesires: "Explore values and desires",
+            appreciateBeauty: "Appreciate beauty",
+            attachmentToFleetingPleasures: "Attachment to fleeting pleasures",
+            vanity: "Vanity",
+            releaseAttachments: "Release attachments",
+            appreciateWhatRemains: "Appreciate what remains",
+            clingingToWhatsEnding: "Clinging to what’s ending",
+            jealousy: "Jealousy",
+            listenMoreThanSpeak: "Listen more than speak",
+            gatherInformation: "Gather information",
+            gossip: "Gossip",
+            hastyConclusions: "Hasty conclusions",
+            clearCommunication: "Clear communication",
+            deception: "Deception",
+            withholdingTruth: "Withholding truth",
+            concludeConversations: "Conclude conversations",
+            summarizeLearnings: "Summarize learnings",
+            overExplaining: "Over-explaining",
+            endlessDebate: "Endless debate",
+            clarifyIntentions: "Clarify intentions",
+            identifyPurpose: "Identify purpose",
+            egoDrivenAction: "Ego-driven action",
+            seekingValidation: "Seeking validation",
+            leadWithIntegrity: "Lead with integrity",
+            shineYourGifts: "Shine your gifts",
+            arrogance: "Arrogance",
+            overshadowingOthers: "Overshadowing others",
+            acknowledgeAchievementsHumbly: "Acknowledge achievements humbly",
+            rest: "Rest",
+            burnout: "Burnout",
+            pride: "Pride",
+            honorEmotions: "Honor emotions",
+            nurtureYourself: "Nurture yourself",
+            emotionalReactivity: "Emotional reactivity",
+            ignoringFeelings: "Ignoring feelings",
+            trustIntuition: "Trust intuition",
+            careForOthers: "Care for others",
+            emotionalManipulation: "Emotional manipulation",
+            codependency: "Codependency",
+            releaseEmotionalBaggage: "Release emotional baggage",
+            forgive: "Forgive",
+            holdingOntoPain: "Holding onto pain",
+            collaborateWithTheEnergy: "Collaborate with the energy",
+            forcingYourWayAlone: "Forcing your way alone",
+            stayFlexibleAndObservant: "Stay flexible and observant",
+            strongCommitmentsEitherWay: "Strong commitments either way",
+            patienceAndLearningFromFriction: "Patience and learning from friction",
+            fightingAgainstTheCurrent: "Fighting against the current",
+            procrastination: "Procrastination",
+            ignoringOpportunities: "Ignoring opportunities",
+            excessiveHesitation: "Excessive hesitation",
+            superficiality: "Superficiality",
+            excessIndulgence: "Excess indulgence",
+            doubtingYourselfUnnecessarily: "Doubting yourself unnecessarily",
+            purposefulActionWithIntention: "Purposeful action with intention",
+            actsOfKindness: "Acts of kindness",
+            artisticExpression: "Artistic expression",
+
+            // Reflective practices (translated for Premium guidance lists)
+            istighfarSeekingForgiveness: "Istighfār (seeking forgiveness)",
+            duaForGuidance: "Duʿāʾ for guidance",
+            contemplationAndSilence: "Contemplation and silence",
+            shukrGratitude: "Shukr (gratitude)",
+            salawatUponTheProphet: "Ṣalawāt upon the Prophet ﷺ",
+            tasbihGlorification: "Tasbīḥ (glorification of Allah)",
+            closingPrayersAndGratitude: "Closing prayers and gratitude",
+            restAndRestoration: "Rest and restoration",
+            patienceSabr: "Patience (Ṣabr)",
+            trustInDivineTimingTawakkul: "Trust in divine timing (Tawakkul)",
+            consistentWorship: "Consistent worship",
+            fulfillingObligations: "Fulfilling obligations",
+            gratitudeForTrials: "Gratitude for trials",
+            duaForRelief: "Duʿāʾ for relief",
+            seekingKnowledge: "Seeking knowledge",
+            generosityInMeasure: "Generosity in measure",
+            sadaqahCharity: "Ṣadaqah (charity)",
+            teachingOthers: "Teaching others",
+            humility: "Humility",
+            passingKnowledgeForward: "Passing knowledge forward",
+            controllingAngerGhayz: "Controlling anger (Ghayẓ)",
+            seekingCalm: "Seeking calm",
+            jihadAlNafsInnerStruggle: "Jihād al-Nafs (inner struggle)",
+            righteousEffort: "Righteous effort",
+            forgivenessAfw: "Forgiveness (ʿAfw)",
+            peaceMaking: "Peace-making",
+            gratitudeForBlessings: "Gratitude for blessings",
+            moderation: "Moderation",
+            contentmentQanah: "Contentment (Qanāʿah)",
+            trustInProvision: "Trust in provision",
+            mindfulSpeech: "Mindful speech",
+            activeListening: "Active listening",
+            speakingTruthWithWisdom: "Speaking truth with wisdom",
+            sharingKnowledge: "Sharing knowledge",
+            silenceWhenNeeded: "Silence when needed",
+            reflectionOnWords: "Reflection on words",
+            ikhlasSincerity: "Ikhlas (sincerity)",
+            purifyingIntention: "Purifying intention",
+            humilityInService: "Humility in service",
+            authenticExpression: "Authentic expression",
+            gratitudeToAllah: "Gratitude to Allah",
+            renewal: "Renewal",
+            dhikrForPeace: "Dhikr for peace",
+            selfCompassion: "Self-compassion",
+            prayerForEmotionalHealing: "Prayer for emotional healing",
+            actsOfNurturing: "Acts of nurturing",
+            emotionalCleansingDua: "Emotional cleansing duʿāʾ",
+            lettingGo: "Letting go",
+          },
+        },
       },
       
       // 🔒 Planetary Coming Soon (frozen for launch)
@@ -6775,6 +6951,175 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       noResults: "No terms found matching",
     },
 
+    // ============================================================================
+    // PREMIUM SECTIONS - Titles & Descriptions for PremiumSection components
+    // ============================================================================
+    premiumSections: {
+      // Who Am I / Istikhara Overview
+      spiritualDetails: {
+        title: "Spiritual Details",
+        description: "Unlock deeper spiritual practices",
+      },
+      // Prayer Guidance
+      prayerGuidance: {
+        title: "Prayer Guidance",
+        description: "Unlock personalized spiritual practices",
+      },
+      // Compatibility - Person to Person
+      soulConnection: {
+        title: "Soul Connection",
+        description: "Explore the spiritual bond between souls",
+      },
+      harmonyAnalysis: {
+        title: "Harmony Analysis",
+        description: "Discover elemental and cosmic harmony",
+      },
+      personalizedAdvice: {
+        title: "Personalized Advice",
+        description: "Get actionable recommendations",
+      },
+      compatibilitySummary: {
+        title: "Compatibility Summary",
+        description: "Unlock detailed interpretation",
+      },
+      // Compatibility - Person to Divine Name / Divine Name to Intention
+      divineGuidance: {
+        title: "Divine Guidance",
+        description: "Discover manifestation and spiritual wisdom",
+      },
+      practiceGuide: {
+        title: "Practice Guide",
+        description: "Learn traditional recitation methods",
+      },
+      practiceGuidance: {
+        title: "Practice Guidance",
+        description: "Learn how to work with this Divine Name",
+      },
+      // Divine Timing
+      aiGuidance: {
+        title: "AI Guidance",
+        description: "Get personalized spiritual guidance",
+      },
+      // Moment Alignment Detail
+      personalGuidance: {
+        title: "Personal Guidance",
+        description: "Discover what actions are favored now",
+      },
+      // Daily Guidance Details
+      bestFor: {
+        title: "Best For",
+        description: "Personal action guidance",
+      },
+      // Name Destiny Results
+      aiEnhancement: {
+        title: "AI Enhancement",
+        description: "Personal interpretation of your name",
+      },
+      divineNameResonance: {
+        title: "Divine Name Resonance",
+        description: "Discover your resonant Divine Names",
+      },
+      quranResonance: {
+        title: "Quranic Resonance",
+        description: "Discover verses that resonate with your name",
+      },
+      keyTakeaways: {
+        title: "Key Takeaways",
+        description: "Practical guidance for your path",
+      },
+      // Manazil
+      manazilPractices: {
+        title: "Lunar Mansion Practices",
+        description: "Unlock traditional practices for this mansion",
+      },
+      // Planet Transit Details
+      transitGuidance: {
+        title: "Transit Guidance",
+        description: "Personalized planetary transit insights",
+      },
+      planetaryPractices: {
+        title: "Planetary Practices",
+        description: "Spiritual practices for this transit",
+      },
+      // Calculator Enhanced Results
+      advancedAnalysis: {
+        title: "Advanced Analysis",
+        description: "Deeper numerical insights",
+      },
+      // Results (Istikhara Results tabs)
+      personality: {
+        title: "Personality Insights",
+        description: "Discover your deep personality traits",
+      },
+      career: {
+        title: "Career Guidance",
+        description: "Career direction based on your spiritual profile",
+      },
+      blessedDay: {
+        title: "Your Blessed Day",
+        description: "Discover your most favorable day",
+      },
+      spiritualPractice: {
+        title: "Spiritual Practice",
+        description: "Personalized spiritual practices",
+      },
+      // Name Destiny Results
+      aiPersonalization: {
+        title: "AI Personalization",
+        description: "Get personalized AI-powered interpretation of your element",
+      },
+      spiritualGuidanceInsights: {
+        title: "Spiritual Guidance",
+        description: "Personalized insights and practical guidance for your path",
+      },
+      // Planet Transit Details
+      personalizedImpact: {
+        title: "Personalized Impact",
+        description: "Discover how this transit affects your elemental nature",
+      },
+      personalizedInsights: {
+        title: "Personalized Insights",
+        description: "Discover your nature, daily guidance, balancing methods, and more",
+      },
+      // Daily Guidance Details
+      bestActionsToday: {
+        title: "Best Actions Today",
+        description: "Discover what activities align best with today's energy",
+      },
+      // Relationship Compatibility
+      interpretation: {
+        title: "Interpretation",
+        description: "Discover what this connection means for you",
+      },
+      spiritualAnalysis: {
+        title: "Spiritual Analysis",
+        description: "Explore the deep spiritual connection",
+      },
+      elementalAnalysis: {
+        title: "Elemental Analysis",
+        description: "Understand the harmony of natural energies",
+      },
+      planetaryAnalysis: {
+        title: "Planetary Analysis",
+        description: "Discover cosmic influences",
+      },
+      // Calculator Enhanced Results  
+      deepNumerologicalAnalysis: {
+        title: "Deep Numerological Analysis",
+        description: "Unlock AI insights, elemental composition, and advanced calculation methods",
+      },
+      // AI Guidance (Divine Timing)
+      aiSpiritualGuidance: {
+        title: "AI Spiritual Guidance",
+        description: "Get personalized guidance based on your spiritual profile and current timing",
+      },
+      // Manazil
+      spiritualPractices: {
+        title: "Spiritual Practices",
+        description: "Adhkar, angels, Quran verses, and wafq for this mansion",
+      },
+    },
+
     controls: {
       closeKeyboard: "Close keyboard",
       closeMenu: "Close menu",
@@ -8603,6 +8948,182 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           },
         },
         disclaimer: "Pour réflexion • Pas un avis religieux",
+        influenceEngine: {
+          personalInfluence: "Influence Personnelle",
+          collectiveInfluence: "Influence Collective",
+          collectiveImpact: "Impact Collectif",
+          cosmicWeather: "Météo Cosmique",
+          forYou: "Pour Vous",
+          howRelates: "Votre Connexion",
+          detailedGuidance: "Conseils Détaillés",
+          guidanceDescription: "Conseils personnalisés pour cette influence",
+          bestForNow: "Meilleur maintenant",
+          betterToAvoid: "Mieux éviter",
+          reflectivePractices: "Pratiques Spirituelles",
+          items: {
+            takingAlignedAction: "Prendre des actions alignées",
+            makingImportantDecisions: "Prendre des décisions importantes",
+            beginningNewInitiatives: "Commencer de nouvelles initiatives",
+            buildMeaningfulConnections: "Établir des connexions significatives",
+            createBeauty: "Créer de la beauté",
+            trustYourNaturalInstincts: "Faire confiance à vos instincts naturels",
+            observationAndPatience: "Observation et patience",
+            planningWithoutRushing: "Planifier sans se précipiter",
+            seekingClarityBeforeActing: "Chercher la clarté avant d’agir",
+            forcingDecisions: "Forcer des décisions",
+            majorCommitments: "Engagements majeurs",
+            hastyActions: "Actions hâtives",
+            completingExistingWork: "Terminer ce qui est déjà en cours",
+            reflectionAndReview: "Réflexion et bilan",
+            releasingWhatNoLongerServes: "Lâcher ce qui ne sert plus",
+            startingNewProjects: "Démarrer de nouveaux projets",
+            majorDecisions: "Décisions majeures",
+            pushingAgainstResistance: "Forcer malgré les résistances",
+            acceptLimitations: "Accepter les limites",
+            buildFoundationsSlowly: "Construire des bases lentement",
+            rebellionAgainstStructure: "Rébellion contre la structure",
+            shortcuts: "Raccourcis",
+            disciplineAndCommitment: "Discipline et engagement",
+            longTermPlanning: "Planification à long terme",
+            laziness: "Paresse",
+            avoidingResponsibility: "Éviter les responsabilités",
+            harvestLessonsLearned: "Récolter les leçons apprises",
+            honorCommitmentsMade: "Honorer les engagements pris",
+            bitterness: "Amertume",
+            regretWithoutAction: "Regret sans passage à l’action",
+            opennessToExpansion: "Ouverture à l’expansion",
+            learningAndTeaching: "Apprendre et enseigner",
+            overconfidence: "Excès de confiance",
+            excess: "Excès",
+            growthOpportunities: "Opportunités de croissance",
+            sharingWisdom: "Partager la sagesse",
+            greed: "Avidité",
+            takingMoreThanNeeded: "Prendre plus que nécessaire",
+            integrateWhatWasGained: "Intégrer ce qui a été acquis",
+            shareBlessings: "Partager les bienfaits",
+            hoarding: "Thésauriser",
+            prideInAchievements: "Fierté des accomplissements",
+            assessChallengesCarefully: "Évaluer les défis avec attention",
+            buildCourage: "Cultiver le courage",
+            impulsiveAnger: "Colère impulsive",
+            rushingIntoConflict: "Se précipiter dans le conflit",
+            courageousAction: "Action courageuse",
+            defendingTruth: "Défendre la vérité",
+            aggression: "Agressivité",
+            harmingOthers: "Faire du mal aux autres",
+            completeBattlesWisely: "Conclure les batailles avec sagesse",
+            forgiveWhenAble: "Pardonner quand c’est possible",
+            prolongingConflict: "Prolonger le conflit",
+            holdingGrudges: "Rancune",
+            exploreValuesAndDesires: "Explorer valeurs et désirs",
+            appreciateBeauty: "Apprécier la beauté",
+            attachmentToFleetingPleasures: "Attachement aux plaisirs passagers",
+            vanity: "Vanité",
+            releaseAttachments: "Relâcher les attachements",
+            appreciateWhatRemains: "Apprécier ce qui reste",
+            clingingToWhatsEnding: "S’accrocher à ce qui se termine",
+            jealousy: "Jalousie",
+            listenMoreThanSpeak: "Écouter plus que parler",
+            gatherInformation: "Rassembler des informations",
+            gossip: "Commérages",
+            hastyConclusions: "Conclusions hâtives",
+            clearCommunication: "Communication claire",
+            deception: "Tromperie",
+            withholdingTruth: "Retenir la vérité",
+            concludeConversations: "Conclure les conversations",
+            summarizeLearnings: "Synthétiser les apprentissages",
+            overExplaining: "Trop expliquer",
+            endlessDebate: "Débat sans fin",
+            clarifyIntentions: "Clarifier les intentions",
+            identifyPurpose: "Identifier le but",
+            egoDrivenAction: "Action guidée par l’ego",
+            seekingValidation: "Chercher la validation",
+            leadWithIntegrity: "Mener avec intégrité",
+            shineYourGifts: "Rayonner vos dons",
+            arrogance: "Arrogance",
+            overshadowingOthers: "Éclipser les autres",
+            acknowledgeAchievementsHumbly: "Reconnaître ses réussites avec humilité",
+            rest: "Repos",
+            burnout: "Épuisement",
+            pride: "Orgueil",
+            honorEmotions: "Honorer ses émotions",
+            nurtureYourself: "Prendre soin de vous",
+            emotionalReactivity: "Réactivité émotionnelle",
+            ignoringFeelings: "Ignorer ses ressentis",
+            trustIntuition: "Faire confiance à l’intuition",
+            careForOthers: "Prendre soin des autres",
+            emotionalManipulation: "Manipulation émotionnelle",
+            codependency: "Codépendance",
+            releaseEmotionalBaggage: "Libérer les bagages émotionnels",
+            forgive: "Pardonner",
+            holdingOntoPain: "S’accrocher à la douleur",
+            collaborateWithTheEnergy: "Collaborer avec l’énergie",
+            forcingYourWayAlone: "Forcer seul(e) votre chemin",
+            stayFlexibleAndObservant: "Rester flexible et observateur",
+            strongCommitmentsEitherWay: "Engagements forts dans un sens ou dans l’autre",
+            patienceAndLearningFromFriction: "Patience et apprentissage par la friction",
+            fightingAgainstTheCurrent: "Lutter contre le courant",
+            procrastination: "Procrastination",
+            ignoringOpportunities: "Ignorer les opportunités",
+            excessiveHesitation: "Hésitation excessive",
+            superficiality: "Superficialité",
+            excessIndulgence: "Excès d'indulgence",
+            doubtingYourselfUnnecessarily: "Douter de vous inutilement",
+            purposefulActionWithIntention: "Action intentionnelle avec détermination",
+            actsOfKindness: "Actes de gentillesse",
+            artisticExpression: "Expression artistique",
+
+            // Pratiques spirituelles
+            istighfarSeekingForgiveness: "Istighfār (demande de pardon)",
+            duaForGuidance: "Duʿāʾ pour la guidance",
+            contemplationAndSilence: "Contemplation et silence",
+            shukrGratitude: "Shukr (gratitude)",
+            salawatUponTheProphet: "Ṣalawāt sur le Prophète ﷺ",
+            tasbihGlorification: "Tasbīḥ (glorification d’Allah)",
+            closingPrayersAndGratitude: "Prières de clôture et gratitude",
+            restAndRestoration: "Repos et restauration",
+            patienceSabr: "Patience (Ṣabr)",
+            trustInDivineTimingTawakkul: "Confiance dans le timing divin (Tawakkul)",
+            consistentWorship: "Adoration régulière",
+            fulfillingObligations: "Accomplir ses obligations",
+            gratitudeForTrials: "Gratitude face aux épreuves",
+            duaForRelief: "Duʿāʾ pour le soulagement",
+            seekingKnowledge: "Recherche du savoir",
+            generosityInMeasure: "Générosité avec mesure",
+            sadaqahCharity: "Ṣadaqah (aumône)",
+            teachingOthers: "Enseigner aux autres",
+            humility: "Humilité",
+            passingKnowledgeForward: "Transmettre le savoir",
+            controllingAngerGhayz: "Maîtriser la colère (Ghayẓ)",
+            seekingCalm: "Rechercher le calme",
+            jihadAlNafsInnerStruggle: "Jihād al-Nafs (lutte intérieure)",
+            righteousEffort: "Effort juste",
+            forgivenessAfw: "Pardon (ʿAfw)",
+            peaceMaking: "Réconciliation",
+            gratitudeForBlessings: "Gratitude pour les bienfaits",
+            moderation: "Modération",
+            contentmentQanah: "Contentement (Qanāʿah)",
+            trustInProvision: "Confiance dans la subsistance",
+            mindfulSpeech: "Parole consciente",
+            activeListening: "Écoute active",
+            speakingTruthWithWisdom: "Dire la vérité avec sagesse",
+            sharingKnowledge: "Partager le savoir",
+            silenceWhenNeeded: "Silence quand nécessaire",
+            reflectionOnWords: "Réflexion sur les mots",
+            ikhlasSincerity: "Ikhlas (sincérité)",
+            purifyingIntention: "Purifier l’intention",
+            humilityInService: "Humilité au service",
+            authenticExpression: "Expression authentique",
+            gratitudeToAllah: "Gratitude envers Allah",
+            renewal: "Renouveau",
+            dhikrForPeace: "Dhikr pour la paix",
+            selfCompassion: "Auto-compassion",
+            prayerForEmotionalHealing: "Prière pour la guérison émotionnelle",
+            actsOfNurturing: "Actes de soin",
+            emotionalCleansingDua: "Duʿāʾ de purification émotionnelle",
+            lettingGo: "Lâcher prise",
+          },
+        },
       },
       
       // 🔒 Planetary Coming Soon (frozen for launch)
@@ -14513,6 +15034,175 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       noResults: "Aucun terme ne correspond",
     },
 
+    // ============================================================================
+    // PREMIUM SECTIONS - Titres & Descriptions pour les composants PremiumSection
+    // ============================================================================
+    premiumSections: {
+      // Who Am I / Istikhara Overview
+      spiritualDetails: {
+        title: "Détails spirituels",
+        description: "Débloquez des pratiques spirituelles approfondies",
+      },
+      // Prayer Guidance
+      prayerGuidance: {
+        title: "Guidance de prière",
+        description: "Débloquez des pratiques spirituelles personnalisées",
+      },
+      // Compatibility - Person to Person
+      soulConnection: {
+        title: "Connexion des âmes",
+        description: "Explorez le lien spirituel entre les âmes",
+      },
+      harmonyAnalysis: {
+        title: "Analyse d'harmonie",
+        description: "Découvrez l'harmonie élémentaire et cosmique",
+      },
+      personalizedAdvice: {
+        title: "Conseils personnalisés",
+        description: "Obtenez des recommandations pratiques",
+      },
+      compatibilitySummary: {
+        title: "Résumé de compatibilité",
+        description: "Débloquez l'interprétation détaillée",
+      },
+      // Compatibility - Person to Divine Name / Divine Name to Intention
+      divineGuidance: {
+        title: "Guidance divine",
+        description: "Découvrez la manifestation et la sagesse spirituelle",
+      },
+      practiceGuide: {
+        title: "Guide de pratique",
+        description: "Apprenez les méthodes de récitation traditionnelles",
+      },
+      practiceGuidance: {
+        title: "Guidance de pratique",
+        description: "Apprenez à travailler avec ce Nom Divin",
+      },
+      // Divine Timing
+      aiGuidance: {
+        title: "Guidance IA",
+        description: "Obtenez une guidance spirituelle personnalisée",
+      },
+      // Moment Alignment Detail
+      personalGuidance: {
+        title: "Guidance personnelle",
+        description: "Découvrez quelles actions sont favorisées maintenant",
+      },
+      // Daily Guidance Details
+      bestFor: {
+        title: "Idéal pour",
+        description: "Guidance d'action personnelle",
+      },
+      // Name Destiny Results
+      aiEnhancement: {
+        title: "Amélioration IA",
+        description: "Interprétation personnelle de votre nom",
+      },
+      divineNameResonance: {
+        title: "Résonance des Noms Divins",
+        description: "Découvrez vos Noms Divins résonnants",
+      },
+      quranResonance: {
+        title: "Résonance coranique",
+        description: "Découvrez les versets qui résonnent avec votre nom",
+      },
+      keyTakeaways: {
+        title: "Points clés",
+        description: "Guidance pratique pour votre chemin",
+      },
+      // Manazil
+      manazilPractices: {
+        title: "Pratiques des Manazil",
+        description: "Débloquez les pratiques traditionnelles pour cette mansion",
+      },
+      // Planet Transit Details
+      transitGuidance: {
+        title: "Guidance de transit",
+        description: "Aperçus personnalisés des transits planétaires",
+      },
+      planetaryPractices: {
+        title: "Pratiques planétaires",
+        description: "Pratiques spirituelles pour ce transit",
+      },
+      // Calculator Enhanced Results
+      advancedAnalysis: {
+        title: "Analyse avancée",
+        description: "Aperçus numériques approfondis",
+      },
+      // Results (Istikhara Results tabs)
+      personality: {
+        title: "Aperçus de personnalité",
+        description: "Découvrez vos traits de personnalité profonds",
+      },
+      career: {
+        title: "Guidance de carrière",
+        description: "Direction de carrière basée sur votre profil spirituel",
+      },
+      blessedDay: {
+        title: "Votre jour béni",
+        description: "Découvrez votre jour le plus favorable",
+      },
+      spiritualPractice: {
+        title: "Pratique spirituelle",
+        description: "Pratiques spirituelles personnalisées",
+      },
+      // Name Destiny Results additional
+      aiPersonalization: {
+        title: "Personnalisation IA",
+        description: "Obtenez une interprétation personnalisée par IA de votre élément",
+      },
+      spiritualGuidanceInsights: {
+        title: "Guidance spirituelle",
+        description: "Aperçus personnalisés et guidance pratique pour votre chemin",
+      },
+      // Planet Transit Details additional
+      personalizedImpact: {
+        title: "Impact personnalisé",
+        description: "Découvrez comment ce transit affecte votre nature élémentaire",
+      },
+      personalizedInsights: {
+        title: "Aperçus personnalisés",
+        description: "Découvrez votre nature, guidance quotidienne, méthodes d'équilibre, et plus",
+      },
+      // Daily Guidance Details additional
+      bestActionsToday: {
+        title: "Meilleures actions aujourd'hui",
+        description: "Découvrez quelles activités s'alignent le mieux avec l'énergie d'aujourd'hui",
+      },
+      // Relationship Compatibility
+      interpretation: {
+        title: "Interprétation",
+        description: "Découvrez ce que cette connexion signifie pour vous",
+      },
+      spiritualAnalysis: {
+        title: "Analyse spirituelle",
+        description: "Explorez la connexion spirituelle profonde",
+      },
+      elementalAnalysis: {
+        title: "Analyse élémentaire",
+        description: "Comprenez l'harmonie des énergies naturelles",
+      },
+      planetaryAnalysis: {
+        title: "Analyse planétaire",
+        description: "Découvrez les influences cosmiques",
+      },
+      // Calculator Enhanced Results additional
+      deepNumerologicalAnalysis: {
+        title: "Analyse numérologique approfondie",
+        description: "Débloquez les aperçus IA, composition élémentaire, et méthodes de calcul avancées",
+      },
+      // AI Guidance (Divine Timing)
+      aiSpiritualGuidance: {
+        title: "Guidance spirituelle IA",
+        description: "Obtenez une guidance personnalisée basée sur votre profil spirituel et le timing actuel",
+      },
+      // Manazil additional
+      spiritualPractices: {
+        title: "Pratiques spirituelles",
+        description: "Adhkar, anges, versets coraniques, et wafq pour cette mansion",
+      },
+    },
+
     controls: {
       closeKeyboard: "Fermer le clavier",
       closeMenu: "Fermer le menu",
@@ -15586,6 +16276,269 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         learnMore: "اعرف المزيد",
         collapse: "إظهار أقل",
       },
+
+      loading: "جارٍ التحميل...",
+      unknown: "—",
+      element: "العنصر",
+      you: "أنت",
+
+      // Elements - shared across features
+      elements: {
+        air: "هواء",
+        fire: "نار",
+        water: "ماء",
+        earth: "أرض",
+      },
+    },
+
+    // Zodiac (used by Planet Transit screen hero)
+    zodiac: {
+      aries: "الحمل",
+      taurus: "الثور",
+      gemini: "الجوزاء",
+      cancer: "السرطان",
+      leo: "الأسد",
+      virgo: "السنبلة",
+      libra: "الميزان",
+      scorpio: "العقرب",
+      sagittarius: "القوس",
+      capricorn: "الجدي",
+      aquarius: "الدلو",
+      pisces: "الحوت",
+
+      // Keep explicit Arabic keys for compatibility with existing lookups
+      ariesArabic: "الحمل",
+      taurusArabic: "الثور",
+      geminiArabic: "الجوزاء",
+      cancerArabic: "السرطان",
+      leoArabic: "الأسد",
+      virgoArabic: "السنبلة",
+      libraArabic: "الميزان",
+      scorpioArabic: "العقرب",
+      sagittariusArabic: "القوس",
+      capricornArabic: "الجدي",
+      aquariusArabic: "الدلو",
+      piscesArabic: "الحوت",
+    },
+
+    // Screens
+    screens: {
+      // Planet Transit Screen (System 1 - Long-term)
+      planetTransit: {
+        title: "عبور الكواكب",
+        headerSubtitle: "طويل المدى",
+        explanation: "يعرض موقع الكوكب في الأبراج — وهو موضع طويل المدى يتغير خلال أسابيع أو أشهر أو سنوات.",
+        personalizedNote: "مُخصّص حسب طبيعتك العنصرية",
+
+        currentTransit: "العبور الحالي",
+        timeScale: "طويل المدى (أسابيع/أشهر)",
+        in: "في",
+        signProgress: "تقدّم داخل البرج",
+        degreeInSign: "الدرجة داخل البرج",
+
+        retrograde: "متراجع",
+        retrogradeArabic: "راجع",
+        nearingChange: "اقتراب تغيير البرج",
+
+        duration: {
+          title: "مدة العبور",
+          enteredSign: "دخل البرج",
+          leavesSign: "يغادر البرج",
+          total: "المدة",
+        },
+        durationStats: {
+          elapsed: "انقضى",
+          remaining: "متبقٍ",
+          total: "الإجمالي",
+        },
+        timeline: {
+          now: "الآن",
+        },
+
+        dataSource: {
+          title: "مصدر البيانات",
+          api: "NASA JPL Horizons (الإفيميريدس)",
+          cached: "بيانات إفيميريدس مخزنة",
+          lastUpdated: "آخر تحديث",
+        },
+
+        spiritualQuality: {
+          title: "الجودة الروحية",
+          saad: "سَعْد — مُبارك",
+          nahs: "نَحْس — صعب",
+        },
+
+        meaning: {
+          title: "المعنى والموضوع",
+        },
+
+        resonance: {
+          title: "الرنين مع طبيعتك",
+          description: "كيف يتفاعل هذا العبور مع عنصر {{element}} لديك:",
+          levels: {
+            strong: "قوي",
+            harmonious: "منسجم",
+            neutral: "متوازن",
+            growth: "نمو",
+            challenge: "تحدّي",
+          },
+          arabicTerms: {
+            harmonious: "سَكِينَة",
+            supportive: "تَوَافُق",
+            neutral: "تَوَازُن",
+            challenging: "تَحَوُّل",
+          },
+          context: "استنادًا إلى العلاقات العنصرية في علم الفلك الروحي التقليدي.",
+        },
+
+        quickImpact: {
+          title: "الأثر السريع",
+          subtitle: "كيف تشعر به الآن",
+        },
+
+        why: {
+          title: "لماذا تشعر بهذا الشكل",
+          body: "يمزج هذا العبور بين طبيعتك العنصرية ونبرة البرج، فيؤثر على التواصل والمزاج والزخم اليوم.",
+          show: "لماذا تشعر بهذا الشكل",
+          hide: "إخفاء التفاصيل",
+        },
+
+        focus: {
+          title: "تركيز اليوم",
+          communication: "التواصل",
+          patience: "الصبر",
+          reflection: "التأمل",
+        },
+
+        classicalWisdom: {
+          title: "حكمة كلاسيكية",
+          arabicTradition: "من التراث الفلكي العربي",
+        },
+
+        degree: {
+          title: "الموقع داخل البرج",
+          explanation: "{{degree}} من 30° (~{{percent}}% داخل هذا البرج).",
+          phases: {
+            early: "بداية (0–10°)",
+            middle: "وسط (10–20°)",
+            late: "نهاية (20–30°)",
+          },
+        },
+
+        personalized: {
+          title: "تأثير مُخصّص",
+          lead: "بصفتك طبيعة {{element}} مع {{sign}}، يشكّل هذا العبور كيفية استقبال الطاقة والتعبير عنها.",
+          point1: "عمقك الطبيعي يلتقي بنبرة أكثر ظهورًا وتعبيرًا.",
+          point2: "قد يبدو التواصل أسرع أو أكثر مباشرة مما اعتدت.",
+          point3: "استخدم نقاط قوة عنصرك لموازنة إيقاع هذا العبور ونبرته.",
+        },
+
+        daily: {
+          title: "إرشاد اليوم",
+          morning: "هذا الصباح",
+          morningText: "ثبّت نيتك قبل الدخول في تواصل جريء.",
+          afternoon: "هذا بعد الظهر",
+          afternoonText: "وجّه الثقة الإبداعية مع بقاء الحسّ العاطفي حاضرًا.",
+          evening: "هذا المساء",
+          eveningText: "خفّف حدّة الشدة واستعد الهدوء بالتأمل.",
+        },
+
+        signComparison: {
+          title: "برجك مقابل برج العبور",
+          yourSign: "برجك",
+          transitSign: "برج العبور",
+          insight: "قد يصنع التباين نموًا قويًا عندما يُوازن بحكمة.",
+        },
+
+        balancing: {
+          title: "كيف تُوازن هذه الطاقة",
+          subtitle: "طرق كلاسيكية من العلوم الروحية الإسلامية",
+          methodsLabel: "العلاجات الكلاسيكية",
+          repetitions: "التكرارات",
+          bestTime: "أفضل وقت",
+          startCounter: "ابدأ العدّاد",
+          source: "المصدر",
+          challenge: "طبيعة {userElement} تلتقي بطاقة {transitElement} — طبّق العلاجات أدناه للثبات.",
+          disclaimer: "ممارسات تقليدية للتأمل وتحقيق التوازن.",
+          methods: {
+            latif: {
+              title: "تلاوة اللَّطِيف",
+              titleArabic: "اللَّطِيف",
+              instruction: "يُتلى تقليديًا لتليين الطاقات المتعارضة وإحضار اللطف. قل: «يا لطيف».",
+              numerology: "قيمة الأبجد: 129 (ل=30، ط=9، ي=10، ف=80)",
+              bestTime: "بعد الفجر أو في ساعة المشتري",
+              source: "ممارسة ذكر كلاسيكية",
+            },
+            halim: {
+              title: "تلاوة الحَلِيم",
+              titleArabic: "الحَلِيم",
+              instruction: "يُتلى تقليديًا للصبر والحِلم. قل: «يا حليم».",
+              numerology: "قيمة الأبجد: 88 (ح=8، ل=30، ي=10، م=40)",
+              bestTime: "عند الشعور بالقلق أو التعثّر",
+              source: "ممارسة روحية كلاسيكية",
+            },
+            hajah: {
+              title: "صلاة الحاجة",
+              titleArabic: "صلاة الحاجة",
+              instruction: "أدِّ صلاة الحاجة (ركعتان) واطلب اليسر والتوازن.",
+              bestTime: "الثلث الأخير من الليل",
+              source: "السنة النبوية",
+            },
+            letters: {
+              title: "تأمل الحروف المتوازنة",
+              titleArabic: "تأمل الحروف المتوازنة",
+              instruction: "تأمل الحرفين م و ن معًا رمزًا للتوازن. اكتبْهما برفق وتأمل.",
+              bestTime: "في لحظات الصراع الداخلي",
+              source: "علم الحروف التقليدي",
+            },
+            mubin: {
+              title: "تلاوة المُبِين",
+              titleArabic: "المُبِين",
+              instruction: "يُتلى تقليديًا للوضوح والهداية. قل: «يا مبين».",
+              numerology: "قيمة الأبجد: 102 (م=40، ب=2، ي=10، ن=50)",
+              bestTime: "بعد العصر",
+              source: "ممارسة صوفية كلاسيكية",
+            },
+            shukr: {
+              title: "ذكر الشكر",
+              titleArabic: "ذِكر الشُكر",
+              instruction: "ردد «الحمد لله» بامتنان لتقوية الانسجام.",
+              bestTime: "طوال اليوم",
+              source: "توجيه قرآني (14:7)",
+            },
+            hakim: {
+              title: "تلاوة الحَكِيم",
+              titleArabic: "الحَكِيم",
+              instruction: "يُتلى تقليديًا لطلب الحكمة والتوازن. قل: «يا حكيم».",
+              numerology: "قيمة الأبجد: 78 (ح=8، ك=20، ي=10، م=40)",
+              bestTime: "الأربعاء في ساعة عطارد",
+              source: "علم الحروف التقليدي",
+            },
+            istighfar: {
+              title: "الاستغفار",
+              titleArabic: "الاستغفار",
+              instruction: "ردد «أستغفر الله العظيم» لتصفية القلب وتجديد النية.",
+              bestTime: "وقت السحر قبل الفجر",
+              source: "السنة النبوية",
+            },
+            salawat: {
+              title: "الصلاة على النبي",
+              titleArabic: "الصلاة على النبي",
+              instruction: "ردد: «اللهم صلِّ على محمد» لطلب البركة والتوازن.",
+              bestTime: "الجمعة وبعد الصلوات",
+              source: "أمر قرآني (33:56)",
+            },
+          },
+        },
+
+        history: {
+          title: "تاريخ العبور",
+          previous: "البرج السابق",
+          next: "البرج التالي",
+          estimated: "تقديري",
+          current: "هنا الآن",
+        },
+      },
     },
     
     // Home screen modules
@@ -15724,9 +16677,230 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       },
     },
 
+    // ============================================================================
+    // PREMIUM SECTIONS - عناوين ووصف لمكونات PremiumSection
+    // ============================================================================
+    premiumSections: {
+      // Who Am I / Istikhara Overview
+      spiritualDetails: {
+        title: "التفاصيل الروحية",
+        description: "افتح ممارسات روحية أعمق",
+      },
+      // Prayer Guidance
+      prayerGuidance: {
+        title: "إرشاد الصلاة",
+        description: "افتح ممارسات روحية مخصصة",
+      },
+      // Compatibility - Person to Person
+      soulConnection: {
+        title: "اتصال الأرواح",
+        description: "استكشف الرابطة الروحية بين الأرواح",
+      },
+      harmonyAnalysis: {
+        title: "تحليل الانسجام",
+        description: "اكتشف الانسجام العنصري والكوني",
+      },
+      personalizedAdvice: {
+        title: "نصائح مخصصة",
+        description: "احصل على توصيات عملية",
+      },
+      compatibilitySummary: {
+        title: "ملخص التوافق",
+        description: "افتح التفسير التفصيلي",
+      },
+      // Compatibility - Person to Divine Name / Divine Name to Intention
+      divineGuidance: {
+        title: "الإرشاد الإلهي",
+        description: "اكتشف التجلي والحكمة الروحية",
+      },
+      practiceGuide: {
+        title: "دليل الممارسة",
+        description: "تعلم طرق التلاوة التقليدية",
+      },
+      practiceGuidance: {
+        title: "إرشاد الممارسة",
+        description: "تعلم كيفية العمل مع هذا الاسم الإلهي",
+      },
+      // Divine Timing
+      aiGuidance: {
+        title: "إرشاد الذكاء الاصطناعي",
+        description: "احصل على إرشاد روحي مخصص",
+      },
+      // Moment Alignment Detail
+      personalGuidance: {
+        title: "إرشاد شخصي",
+        description: "اكتشف الأعمال المفضلة الآن",
+      },
+      // Daily Guidance Details
+      bestFor: {
+        title: "الأفضل لـ",
+        description: "إرشاد العمل الشخصي",
+      },
+      // Name Destiny Results
+      aiEnhancement: {
+        title: "تحسين الذكاء الاصطناعي",
+        description: "تفسير شخصي لاسمك",
+      },
+      divineNameResonance: {
+        title: "رنين الأسماء الإلهية",
+        description: "اكتشف أسماءك الإلهية المتناغمة",
+      },
+      quranResonance: {
+        title: "الرنين القرآني",
+        description: "اكتشف الآيات التي تتناغم مع اسمك",
+      },
+      keyTakeaways: {
+        title: "النقاط الرئيسية",
+        description: "إرشاد عملي لمسارك",
+      },
+      // Manazil
+      manazilPractices: {
+        title: "ممارسات المنازل",
+        description: "افتح الممارسات التقليدية لهذا المنزل",
+      },
+      // Planet Transit Details
+      transitGuidance: {
+        title: "إرشاد العبور",
+        description: "رؤى مخصصة لعبور الكواكب",
+      },
+      planetaryPractices: {
+        title: "الممارسات الكوكبية",
+        description: "ممارسات روحية لهذا العبور",
+      },
+      // Calculator Enhanced Results
+      advancedAnalysis: {
+        title: "تحليل متقدم",
+        description: "رؤى عددية أعمق",
+      },
+      // Results (Istikhara Results tabs)
+      personality: {
+        title: "رؤى الشخصية",
+        description: "اكتشف سماتك الشخصية العميقة",
+      },
+      career: {
+        title: "إرشاد المسار المهني",
+        description: "اتجاه المهنة بناءً على ملفك الروحي",
+      },
+      blessedDay: {
+        title: "يومك المبارك",
+        description: "اكتشف يومك الأكثر ملاءمة",
+      },
+      spiritualPractice: {
+        title: "الممارسة الروحية",
+        description: "ممارسات روحية مخصصة",
+      },
+      // Name Destiny Results additional
+      aiPersonalization: {
+        title: "التخصيص بالذكاء الاصطناعي",
+        description: "احصل على تفسير مخصص بالذكاء الاصطناعي لعنصرك",
+      },
+      spiritualGuidanceInsights: {
+        title: "الإرشاد الروحي",
+        description: "رؤى مخصصة وإرشاد عملي لمسارك",
+      },
+      // Planet Transit Details additional
+      personalizedImpact: {
+        title: "التأثير المخصص",
+        description: "اكتشف كيف يؤثر هذا العبور على طبيعتك العنصرية",
+      },
+      personalizedInsights: {
+        title: "رؤى مخصصة",
+        description: "اكتشف طبيعتك، الإرشاد اليومي، طرق التوازن، والمزيد",
+      },
+      // Daily Guidance Details additional
+      bestActionsToday: {
+        title: "أفضل الأعمال اليوم",
+        description: "اكتشف الأنشطة التي تتوافق مع طاقة اليوم",
+      },
+      // Relationship Compatibility
+      interpretation: {
+        title: "التفسير",
+        description: "اكتشف ما تعنيه هذه العلاقة لك",
+      },
+      spiritualAnalysis: {
+        title: "التحليل الروحي",
+        description: "استكشف الرابطة الروحية العميقة",
+      },
+      elementalAnalysis: {
+        title: "التحليل العنصري",
+        description: "افهم انسجام الطاقات الطبيعية",
+      },
+      planetaryAnalysis: {
+        title: "التحليل الكوكبي",
+        description: "اكتشف التأثيرات الكونية",
+      },
+      // Calculator Enhanced Results additional
+      deepNumerologicalAnalysis: {
+        title: "تحليل عددي معمق",
+        description: "افتح رؤى الذكاء الاصطناعي، التركيب العنصري، وطرق الحساب المتقدمة",
+      },
+      // AI Guidance (Divine Timing)
+      aiSpiritualGuidance: {
+        title: "إرشاد روحي بالذكاء الاصطناعي",
+        description: "احصل على إرشاد مخصص بناءً على ملفك الروحي والتوقيت الحالي",
+      },
+      // Manazil additional
+      spiritualPractices: {
+        title: "الممارسات الروحية",
+        description: "أذكار، ملائكة، آيات قرآنية، ووفق لهذا المنزل",
+      },
+    },
+
     home: {
       nextPlanetHour: "الساعة الكوكبية التالية",
       startsAt: "تبدأ عند",
+      planetTransitDetails: {
+        title: "عبور الكواكب",
+        explainers: {
+          tomorrowRuler: "يعرض حاكم كوكب الغد (تأثير يوم الأسبوع) وكيف يتفاعل مع طبيعتك الروحية.",
+        },
+        subtitleNextDay: "حاكم الغد — مُخصّص حسب ملفك",
+        error: "تعذر تحميل التفاصيل الآن.",
+        nextChange: "التغيير التالي بعد {countdown}",
+        sections: {
+          tomorrowRuler: "حاكم الغد",
+          yourNature: "طبيعتك",
+        },
+        pills: {
+          element: "العنصر",
+          dayRuler: "حاكم اليوم",
+        },
+        missingProfile: "أضف تاريخ ميلادك لتخصيص هذه الرؤى.",
+        completeProfile: "أكمل الملف",
+        resonanceNoProfile: "أكمل ملفك لرؤية رنين مُخصّص.",
+        harmony: {
+          harmonious: {
+            label: "منسجم",
+            description: "توافق قوي: طبيعتك {userElement} تنسجم مع طاقة {contextElement}.",
+          },
+          supportive: {
+            label: "داعمة",
+            description: "تدفق داعم: عنصرك {userElement} يستفيد من طاقة {contextElement}.",
+          },
+          neutral: {
+            label: "متوازن",
+            description: "مزيج متوازن: عنصرك {userElement} يلتقي {contextElement} دون احتكاك.",
+          },
+          challenging: {
+            label: "تحويلي",
+            description: "توتر تحويلي: طبيعتك {userElement} تلتقي طاقة {contextElement} المقابلة.",
+          },
+        },
+        disclaimer: "للتأمل فقط • ليس حكمًا شرعيًا",
+        influenceEngine: {
+          personalInfluence: "التأثير الشخصي",
+          collectiveInfluence: "التأثير الجماعي",
+          collectiveImpact: "التأثير الجماعي",
+          cosmicWeather: "الطقس الكوني",
+          forYou: "لك",
+          howRelates: "كيف يتعلق بك",
+          detailedGuidance: "إرشادات مفصلة",
+          guidanceDescription: "نصائح شخصية لهذا التأثير الكوكبي",
+          bestForNow: "الأفضل الآن",
+          betterToAvoid: "من الأفضل تجنبه",
+          reflectivePractices: "ممارسات روحية",
+        },
+      },
     },
 
     prayerTimes: {

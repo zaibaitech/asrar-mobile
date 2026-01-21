@@ -198,8 +198,8 @@ export default function DailyGuidanceDetailsScreen() {
           {bestForKeys.length > 0 && (
             <PremiumSection
               featureId="personalGuidance"
-              title={t('home.dailyGuidanceDetails.sections.bestFor') || 'Best Actions Today'}
-              description={t('premium.dailyEnergy.bestFor') || 'Discover what activities align best with today\'s energy'}
+              title={t('premiumSections.bestActionsToday.title')}
+              description={t('premiumSections.bestActionsToday.description')}
               icon="✅"
               compact={false}
             >

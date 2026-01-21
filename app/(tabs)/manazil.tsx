@@ -4,6 +4,7 @@ import { LunarPhaseIndicator } from '@/components/manazil/LunarPhaseIndicator';
 import { MysticalCorrespondencesCard } from '@/components/manazil/MysticalCorrespondencesCard';
 import { PlanetaryHoursCard } from '@/components/manazil/PlanetaryHoursCard';
 import { SpiritualPracticesCard } from '@/components/manazil/SpiritualPracticesCard';
+import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { Borders, DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -403,26 +404,33 @@ export default function ManazilScreen() {
                   Personalized for: {practiceMansion.nameTransliteration} ({practiceMansion.nameArabic})
                 </Text>
               ) : null}
-              <SpiritualPracticesCard
-                accent={practiceAccent}
-                pack={practicePack}
-                advancedMode={tracking.advancedMode}
-                tracking={tracking}
-                language={(language as ManazilLanguage) ?? 'en'}
-              />
+              <PremiumSection
+                featureId="manazilPractices"
+                title={t('premiumSections.spiritualPractices.title')}
+                description={t('premiumSections.spiritualPractices.description')}
+                icon="🌙"
+              >
+                <SpiritualPracticesCard
+                  accent={practiceAccent}
+                  pack={practicePack}
+                  advancedMode={tracking.advancedMode}
+                  tracking={tracking}
+                  language={(language as ManazilLanguage) ?? 'en'}
+                />
 
-              <PlanetaryHoursCard
-                accent={practiceAccent}
-                pack={practicePack}
-                location={
-                  typeof profile?.location?.latitude === 'number' && typeof profile?.location?.longitude === 'number'
-                    ? { latitude: profile.location.latitude, longitude: profile.location.longitude }
-                    : undefined
-                }
-                language={(language as ManazilLanguage) ?? 'en'}
-              />
+                <PlanetaryHoursCard
+                  accent={practiceAccent}
+                  pack={practicePack}
+                  location={
+                    typeof profile?.location?.latitude === 'number' && typeof profile?.location?.longitude === 'number'
+                      ? { latitude: profile.location.latitude, longitude: profile.location.longitude }
+                      : undefined
+                  }
+                  language={(language as ManazilLanguage) ?? 'en'}
+                />
 
-              <MysticalCorrespondencesCard accent={practiceAccent} pack={practicePack} language={(language as ManazilLanguage) ?? 'en'} />
+                <MysticalCorrespondencesCard accent={practiceAccent} pack={practicePack} language={(language as ManazilLanguage) ?? 'en'} />
+              </PremiumSection>
             </View>
           ) : null}
 

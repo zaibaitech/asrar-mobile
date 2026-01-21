@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { PremiumSection } from '../../../components/subscription/PremiumSection';
 import { ElementAccents, Spacing } from '../../../constants/DarkTheme';
 import { getElementBackgroundColors, getZodiacSign } from '../../../constants/zodiacData';
 import { useLanguage } from '../../../contexts/LanguageContext';
@@ -166,23 +167,29 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           </View>
         </View>
 
-        {/* Collapsible Spiritual Details */}
-        <TouchableOpacity
-          style={[styles.detailsToggle, {
-            backgroundColor: `${accent.primary}26`,
-            borderColor: `${accent.primary}33`,
-          }]}
-          onPress={() => setShowDetails(!showDetails)}
-          activeOpacity={0.7}
+        {/* Collapsible Spiritual Details - Premium */}
+        <PremiumSection
+          featureId="spiritualGuidance"
+          title={t('premiumSections.spiritualDetails.title')}
+          description={t('premiumSections.spiritualDetails.description')}
+          icon="📊"
         >
-          <View style={styles.detailsToggleHeader}>
-            <Text style={styles.detailsToggleIcon}>📊</Text>
-            <Text style={styles.detailsToggleText}>
-              {showDetails ? t('istikhara.overview.hideDetails') : t('istikhara.overview.showDetails')}
-            </Text>
-          </View>
-          <Text style={[styles.detailsToggleChevron, { color: accent.primary }]}>{showDetails ? '▼' : '▶'}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.detailsToggle, {
+              backgroundColor: `${accent.primary}26`,
+              borderColor: `${accent.primary}33`,
+            }]}
+            onPress={() => setShowDetails(!showDetails)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.detailsToggleHeader}>
+              <Text style={styles.detailsToggleIcon}>📊</Text>
+              <Text style={styles.detailsToggleText}>
+                {showDetails ? t('istikhara.overview.hideDetails') : t('istikhara.overview.showDetails')}
+              </Text>
+            </View>
+            <Text style={[styles.detailsToggleChevron, { color: accent.primary }]}>{showDetails ? '▼' : '▶'}</Text>
+          </TouchableOpacity>
 
         {showDetails && (
           <View style={[styles.detailsSection, {
@@ -287,6 +294,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
             )}
           </View>
         )}
+        </PremiumSection>
       </View>
     </ScrollView>
   );

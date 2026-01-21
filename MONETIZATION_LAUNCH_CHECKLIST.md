@@ -45,8 +45,8 @@
 ### App Store Connect (iOS)
 - [ ] Create app in App Store Connect (if not already)
 - [ ] Add in-app purchase products:
-  - [ ] Monthly subscription (com.zaibaitech.asrar.premium.monthly)
-  - [ ] Yearly subscription (com.zaibaitech.asrar.premium.yearly)
+  - [ ] Monthly subscription (asrariya_premium_monthly)
+  - [ ] Yearly subscription (asrariya_premium_yearly)
 - [ ] Configure subscription group
 - [ ] Set pricing for each product
 - [ ] Submit products for review
@@ -54,8 +54,8 @@
 ### Google Play Console (Android)
 - [ ] Create app in Play Console (if not already)
 - [ ] Add in-app products:
-  - [ ] Monthly subscription (asrar_premium_monthly)
-  - [ ] Yearly subscription (asrar_premium_yearly)
+  - [ ] Monthly subscription (asrariya_premium_monthly)
+  - [ ] Yearly subscription (asrariya_premium_yearly)
 - [ ] Set pricing for each product
 - [ ] Activate products
 

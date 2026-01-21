@@ -15,7 +15,7 @@ function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome size={22} style={{ marginBottom: -2 }} {...props} />;
 }
 
 // Custom header component for tabs
@@ -86,9 +86,11 @@ export default function TabLayout() {
           shadowOpacity: 0, // Remove iOS shadow
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 9,
           fontWeight: '600',
-          letterSpacing: 0.3,
+        },
+        tabBarItemStyle: {
+          paddingVertical: 4,
         },
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
@@ -121,6 +123,13 @@ export default function TabLayout() {
         options={{
           title: t('nav.whoAmI') || 'Who Am I',
           tabBarIcon: ({ color }) => <TabBarIcon name="user-circle-o" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="compatibility"
+        options={{
+          title: t('nav.compatibility') || 'Compatibility',
+          tabBarIcon: ({ color }) => <TabBarIcon name="balance-scale" color={color} />,
         }}
       />
       <Tabs.Screen

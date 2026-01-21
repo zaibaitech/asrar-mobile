@@ -204,8 +204,8 @@ export function RelationshipCompatibilityView({
             {/* Summary - PREMIUM: Interpretation */}
             <PremiumSection
               featureId="compatibilityDeep"
-              title={isFrench ? 'Interprétation' : isArabic ? 'التفسير' : 'Interpretation'}
-              description={isFrench ? 'Découvrez ce que cette connexion signifie pour vous' : isArabic ? 'اكتشف معنى هذا الاتصال لك' : 'Discover what this connection means for you'}
+              title={t('premiumSections.interpretation.title')}
+              description={t('premiumSections.interpretation.description')}
               icon="heart"
               variant="compact"
             >
@@ -327,8 +327,8 @@ export function RelationshipCompatibilityView({
           <View style={styles.section}>
             <PremiumSection
               featureId="compatibilityDeep"
-              title={isFrench ? 'Analyse Spirituelle' : isArabic ? 'التحليل الروحاني' : 'Spiritual Analysis'}
-              description={isFrench ? 'Explorez la connexion spirituelle profonde' : isArabic ? 'استكشف الاتصال الروحي العميق' : 'Explore the deep spiritual connection'}
+              title={t('premiumSections.spiritualAnalysis.title')}
+              description={t('premiumSections.spiritualAnalysis.description')}
               icon="sparkles"
             >
               <LinearGradient
@@ -391,8 +391,8 @@ export function RelationshipCompatibilityView({
           <View style={styles.section}>
             <PremiumSection
               featureId="compatibilityDeep"
-              title={isFrench ? 'Analyse Élémentale' : isArabic ? 'التحليل العنصري' : 'Elemental Analysis'}
-              description={isFrench ? 'Comprenez l\'harmonie des énergies naturelles' : isArabic ? 'افهم انسجام الطاقات الطبيعية' : 'Understand the harmony of natural energies'}
+              title={t('premiumSections.elementalAnalysis.title')}
+              description={t('premiumSections.elementalAnalysis.description')}
               icon="leaf"
             >
               <LinearGradient
@@ -453,8 +453,8 @@ export function RelationshipCompatibilityView({
           <View style={styles.section}>
             <PremiumSection
               featureId="compatibilityDeep"
-              title={isFrench ? 'Analyse Planétaire' : isArabic ? 'التحليل الكوكبي' : 'Planetary Analysis'}
-              description={isFrench ? 'Découvrez les influences cosmiques' : isArabic ? 'اكتشف التأثيرات الكونية' : 'Discover cosmic influences'}
+              title={t('premiumSections.planetaryAnalysis.title')}
+              description={t('premiumSections.planetaryAnalysis.description')}
               icon="planet"
             >
               <LinearGradient
@@ -540,8 +540,8 @@ export function RelationshipCompatibilityView({
           <View style={styles.section}>
             <PremiumSection
               featureId="compatibilityDeep"
-              title={isFrench ? 'Conseils Personnalisés' : isArabic ? 'نصائح شخصية' : 'Personalized Advice'}
-              description={isFrench ? 'Obtenez des conseils pour améliorer votre harmonie' : isArabic ? 'احصل على نصائح لتحسين انسجامك' : 'Get guidance to enhance your harmony'}
+              title={t('premiumSections.personalizedAdvice.title')}
+              description={t('premiumSections.personalizedAdvice.description')}
               icon="bulb"
             >
               <View style={styles.recommendationsHeader}>

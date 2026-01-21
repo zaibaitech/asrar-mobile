@@ -348,8 +348,8 @@ Set up actual payment processing through RevenueCat and app stores.
   
   | Product ID | Name | Price | Duration |
   |------------|------|-------|----------|
-  | `asrar_premium_monthly` | Asrar Premium Monthly | $3.99 | 1 month |
-  | `asrar_premium_yearly` | Asrar Premium Yearly | $29.99 | 1 year |
+  | `asrariya_premium_monthly` | Asrariya Premium Monthly | $3.99 | 1 month |
+  | `asrariya_premium_yearly` | Asrariya Premium Yearly | $29.99 | 1 year |
 
 - [ ] Set localized names (EN, FR, AR)
 - [ ] Configure App Store promotional images
@@ -363,21 +363,21 @@ Set up actual payment processing through RevenueCat and app stores.
   
   | Product ID | Name | Price | Duration |
   |------------|------|-------|----------|
-  | `asrar_premium_monthly` | Asrar Premium Monthly | $3.99 | 1 month |
-  | `asrar_premium_yearly` | Asrar Premium Yearly | $29.99 | 1 year |
+  | `asrariya_premium_monthly` | Asrariya Premium Monthly | $3.99 | 1 month |
+  | `asrariya_premium_yearly` | Asrariya Premium Yearly | $29.99 | 1 year |
 
 - [ ] Get Service Account credentials
 - [ ] Upload credentials to RevenueCat
 
 ### 3.4 RevenueCat Configuration
-- [ ] Add iOS app with Bundle ID: `com.zaibaitech.asrar`
-- [ ] Add Android app with Package: `com.zaibaitech.asrar`
+- [ ] Add iOS app with Bundle ID: `com.zaibaitech.asrariya`
+- [ ] Add Android app with Package: `com.zaibaitech.asrariya`
 - [ ] Create Entitlement: `premium`
 - [ ] Add both products to `premium` entitlement
 - [ ] Create Offering: `default`
 - [ ] Add packages to offering:
-  - `$rc_monthly` → `asrar_premium_monthly`
-  - `$rc_annual` → `asrar_premium_yearly`
+  - `$rc_monthly` → `asrariya_premium_monthly`
+  - `$rc_annual` → `asrariya_premium_yearly`
 - [ ] Get API Keys:
   - iOS: `appl_xxxxxxxxxxxxxx`
   - Android: `goog_xxxxxxxxxxxxxx`

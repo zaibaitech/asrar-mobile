@@ -141,16 +141,23 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   const isAdminUser = useMemo(() => {
     const userEmail = profile?.account?.email?.toLowerCase().trim();
     
+    if (__DEV__) {
+      console.log('[SubscriptionContext] Checking admin status:');
+      console.log('  - User email:', userEmail || '(not set)');
+      console.log('  - Admin emails:', ADMIN_EMAILS);
+      console.log('  - Profile mode:', profile?.mode);
+    }
+    
     if (!userEmail) return false;
     
     const isAdmin = ADMIN_EMAILS.includes(userEmail);
     
-    if (__DEV__ && isAdmin) {
-      console.log('[SubscriptionContext] 🔑 Admin access granted for:', userEmail);
+    if (__DEV__) {
+      console.log('  - Is admin:', isAdmin ? '✅ YES' : '❌ NO');
     }
     
     return isAdmin;
-  }, [profile?.account?.email]);
+  }, [profile?.account?.email, profile?.mode]);
 
   // ============================================================================
   // SUBSCRIPTION CHECK
@@ -248,9 +255,10 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (!isRevenueCatConfigured()) {
       if (__DEV__) {
-        console.log('[SubscriptionContext] RevenueCat not configured - skipping initialization');
+        console.log('[SubscriptionContext] RevenueCat not configured - checking admin status only');
       }
-      setState(prev => ({ ...prev, isLoading: false }));
+      // Even without RevenueCat, we should check admin status
+      checkSubscription();
       return;
     }
     
@@ -270,7 +278,15 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     };
     
     init();
-  }, [profile?.account?.userId]);
+  }, [profile?.account?.userId, isAdminUser]);
+  
+  // Re-check subscription when admin status changes
+  useEffect(() => {
+    if (__DEV__) {
+      console.log('[SubscriptionContext] Admin status changed, isAdmin:', isAdminUser);
+    }
+    checkSubscription();
+  }, [isAdminUser]);
   
   // Sync RevenueCat user when profile changes
   useEffect(() => {

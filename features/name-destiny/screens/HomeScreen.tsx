@@ -4,21 +4,22 @@
  */
 
 import ArabicKeyboard from '@/components/istikhara/ArabicKeyboard';
+import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState } from 'react';
 import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DivineResonanceCard } from '../components/DivineResonanceCard';
@@ -419,44 +420,51 @@ export default function NameDestinyHomeScreen() {
                 </View>
               )}
 
-              {/* Collapsible Spiritual Details */}
-              <Pressable
-                style={styles.detailsToggle}
-                onPress={() => setShowDetails(!showDetails)}
+              {/* Collapsible Spiritual Details - Premium */}
+              <PremiumSection
+                featureId="spiritualGuidance"
+                title={t('premiumSections.spiritualDetails.title')}
+                description={t('premiumSections.spiritualDetails.description')}
+                icon="📊"
               >
-                <View style={styles.detailsToggleHeader}>
-                  <Text style={styles.detailsToggleIcon}>📊</Text>
-                  <Text style={styles.detailsToggleText}>
-                    {showDetails ? 'Hide' : 'Show'} Spiritual Details
+                <Pressable
+                  style={styles.detailsToggle}
+                  onPress={() => setShowDetails(!showDetails)}
+                >
+                  <View style={styles.detailsToggleHeader}>
+                    <Text style={styles.detailsToggleIcon}>📊</Text>
+                    <Text style={styles.detailsToggleText}>
+                      {showDetails ? 'Hide' : 'Show'} Spiritual Details
+                    </Text>
+                  </View>
+                  <Text style={styles.detailsToggleChevron}>
+                    {showDetails ? '▲' : '▼'}
                   </Text>
-                </View>
-                <Text style={styles.detailsToggleChevron}>
-                  {showDetails ? '▲' : '▼'}
-                </Text>
-              </Pressable>
+                </Pressable>
 
-              {showDetails && (
-                <View style={styles.detailsSection}>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailRowLabel}>Total Kabīr</Text>
-                    <Text style={styles.detailRowValue}>{result.totalKabir}</Text>
-                  </View>
-                  
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailRowLabel}>Ṣaghīr</Text>
-                    <Text style={styles.detailRowValue}>{result.saghir}</Text>
-                  </View>
-                  
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailRowLabel}>Planetary Ruler</Text>
-                    <Text style={styles.detailRowValue}>{result.burj.planet}</Text>
-                  </View>
+                {showDetails && (
+                  <View style={styles.detailsSection}>
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailRowLabel}>Total Kabīr</Text>
+                      <Text style={styles.detailRowValue}>{result.totalKabir}</Text>
+                    </View>
+                    
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailRowLabel}>Ṣaghīr</Text>
+                      <Text style={styles.detailRowValue}>{result.saghir}</Text>
+                    </View>
+                    
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailRowLabel}>Planetary Ruler</Text>
+                      <Text style={styles.detailRowValue}>{result.burj.planet}</Text>
+                    </View>
 
-                  <Text style={styles.detailNote}>
-                    These values represent the traditional Abjad calculations following the Maghribi system.
-                  </Text>
-                </View>
-              )}
+                    <Text style={styles.detailNote}>
+                      These values represent the traditional Abjad calculations following the Maghribi system.
+                    </Text>
+                  </View>
+                )}
+              </PremiumSection>
             </View>
           )}
 

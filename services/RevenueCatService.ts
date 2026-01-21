@@ -17,9 +17,9 @@
  * - "premium" - Full access to all premium features
  * 
  * Products (configure in RevenueCat dashboard):
- * - asrar_premium_monthly ($3.99/month)
- * - asrar_premium_yearly ($29.99/year)
- * - asrar_premium_lifetime ($79.99 one-time) [optional]
+ * - asrariya_premium_monthly ($3.99/month)
+ * - asrariya_premium_yearly ($29.99/year)
+ * - asrariya_premium_lifetime ($79.99 one-time) [optional]
  */
 
 import { Platform } from 'react-native';
@@ -36,9 +36,9 @@ export const PREMIUM_ENTITLEMENT_ID = 'premium';
 
 /** Product identifiers */
 export const PRODUCT_IDS = {
-  MONTHLY: 'asrar_premium_monthly',
-  YEARLY: 'asrar_premium_yearly',
-  LIFETIME: 'asrar_premium_lifetime',
+  MONTHLY: 'asrariya_premium_monthly',
+  YEARLY: 'asrariya_premium_yearly',
+  LIFETIME: 'asrariya_premium_lifetime',
 } as const;
 
 // ============================================================================
