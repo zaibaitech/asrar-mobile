@@ -17,6 +17,7 @@
  * - 1000 users × 10s = 0 Horizons calls during normal operation
  */
 
+import { globalRequestManager } from '@/services/cache/RequestManager';
 import { MoonLongitudeResult } from '@/services/EphemerisService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -130,25 +131,35 @@ export async function getMoonLongitudeFromServer(
 
   // Layer 3: Edge Function (database-backed, shared cache)
   try {
-    const url = `${SUPABASE_URL}${EDGE_FUNCTION_PATH}?type=moon&date=${date.toISOString()}`;
-    
-    if (__DEV__) {
-      console.log('[CosmicDataService] Fetching from Edge Function...');
-    }
+    const data = await globalRequestManager.schedule(
+      async () => {
+        const url = `${SUPABASE_URL}${EDGE_FUNCTION_PATH}?type=moon&date=${date.toISOString()}`;
+        
+        if (__DEV__) {
+          console.log('[CosmicDataService] Fetching from Edge Function...');
+        }
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Edge Function error: ${response.status}`);
+        }
+
+        return (await response.json()) as CosmicDataResponse;
       },
-    });
+      {
+        key: `cosmic.moon.${cacheKey}`,
+        dedupeInflight: true,
+        // Avoid bursts when multiple widgets mount together.
+        throttleMs: 2_000,
+      }
+    );
 
-    if (!response.ok) {
-      throw new Error(`Edge Function error: ${response.status}`);
-    }
-
-    const data: CosmicDataResponse = await response.json();
-    
     // Cache locally
     const cacheEntry: LocalCacheEntry<CosmicDataResponse> = {
       data,

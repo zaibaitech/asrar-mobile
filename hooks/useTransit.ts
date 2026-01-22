@@ -9,6 +9,7 @@ import { Planet } from '@/services/PlanetaryHoursService';
 import {
     getAllTransits,
     getTransit,
+    getTransitsFromMemory,
     refreshTransits,
 } from '@/services/TransitService';
 import {
@@ -124,14 +125,17 @@ export interface UseAllTransitsResult {
  * Hook to get transits for all planets
  */
 export function useAllTransits(): UseAllTransitsResult {
-  const [transits, setTransits] = useState<AllPlanetTransits | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [transits, setTransits] = useState<AllPlanetTransits | null>(() => getTransitsFromMemory());
+  const [loading, setLoading] = useState(() => !getTransitsFromMemory());
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   
   const loadTransits = useCallback(async () => {
     try {
-      setLoading(true);
+      // Only show loading if we have nothing to render yet.
+      if (!transits) {
+        setLoading(true);
+      }
       setError(null);
       
       const data = await getAllTransits();
@@ -145,7 +149,7 @@ export function useAllTransits(): UseAllTransitsResult {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [transits]);
   
   const refresh = useCallback(async () => {
     try {

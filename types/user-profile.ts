@@ -52,6 +52,21 @@ export interface DerivedAstrologicalData {
   /** Moon mansion (manazil) baseline - optional advanced feature */
   manazilBaseline?: number;
 
+  /** Ascendant (Rising Sign) - computed from DOB + birth time + location + timezone */
+  ascendantBurj?: string;
+
+  /** Ascendant (Rising Sign) in English */
+  ascendantBurjEn?: string;
+
+  /** Ascendant Burj index (0-11, Aries to Pisces) */
+  ascendantBurjIndex?: number;
+
+  /** Degree within ascendant sign (0-30) */
+  ascendantDegree?: number;
+
+  /** Elemental tone of the ascendant sign */
+  ascendantElement?: 'fire' | 'water' | 'air' | 'earth';
+
   /**
    * Personal Manazil (lunar mansion) derived from name + mother's name (Abjad total).
    * Used for personal mansion resonance against today's mansion.
@@ -96,6 +111,12 @@ export interface UserProfile {
    * Used to compute: burj, element, planetary ruler
    */
   dobISO?: string;
+
+  /**
+   * Time of birth (24h format: HH:mm)
+   * Optional; used for Ascendant (Rising Sign) and natal calculations.
+   */
+  birthTime?: string;
   
   /**
    * User's timezone (IANA format, e.g., 'America/New_York')
@@ -109,6 +130,14 @@ export interface UserProfile {
    * Only requested if user enables location-based features
    */
   location?: UserLocation;
+
+  /**
+   * Birth location (optional)
+   * Used for: Ascendant (Rising Sign) and natal calculations.
+   * Kept separate from current location so users can enter birthplace
+   * without enabling live location.
+   */
+  birthLocation?: UserLocation;
   
   /**
    * Derived astrological data

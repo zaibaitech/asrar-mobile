@@ -104,7 +104,12 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const needsDerivedBackfill = useCallback((p: UserProfile): boolean => {
     const needsBaseline = !!p.dobISO && (!p.derived || typeof p.derived.manazilBaseline !== 'number');
     const needsPersonal = !!p.nameAr && (!p.derived || typeof p.derived.manazilPersonal !== 'number');
-    return needsBaseline || needsPersonal;
+    const needsAscendant =
+      !!p.dobISO &&
+      !!p.birthTime &&
+      !!(p.birthLocation || p.location) &&
+      (!p.derived || typeof p.derived.ascendantBurjIndex !== 'number');
+    return needsBaseline || needsPersonal || needsAscendant;
   }, []);
   
   /**
@@ -207,6 +212,19 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const handleSetProfile = useCallback(async (updates: PartialProfileUpdate) => {
     try {
       const dobChanged = updates.dobISO !== undefined && updates.dobISO !== profile.dobISO;
+      const birthTimeChanged = updates.birthTime !== undefined && updates.birthTime !== profile.birthTime;
+      const timezoneChanged = updates.timezone !== undefined && updates.timezone !== profile.timezone;
+      const locationChanged =
+        updates.location !== undefined &&
+        (updates.location?.latitude !== profile.location?.latitude ||
+          updates.location?.longitude !== profile.location?.longitude ||
+          updates.location?.label !== profile.location?.label);
+
+      const birthLocationChanged =
+        updates.birthLocation !== undefined &&
+        (updates.birthLocation?.latitude !== profile.birthLocation?.latitude ||
+          updates.birthLocation?.longitude !== profile.birthLocation?.longitude ||
+          updates.birthLocation?.label !== profile.birthLocation?.label);
       const nameChanged =
         (updates.nameAr !== undefined && updates.nameAr !== profile.nameAr) ||
         (updates.motherName !== undefined && updates.motherName !== profile.motherName);
@@ -216,8 +234,16 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       
       let finalProfile = updatedProfile;
       
-      // Re-derive if DOB changed, names changed, OR derived data is missing.
-      if (dobChanged || nameChanged || needsDerivedBackfill(updatedProfile)) {
+      // Re-derive if key inputs changed OR derived data is missing.
+      if (
+        dobChanged ||
+        birthTimeChanged ||
+        timezoneChanged ||
+        locationChanged ||
+        birthLocationChanged ||
+        nameChanged ||
+        needsDerivedBackfill(updatedProfile)
+      ) {
         const derivedProfile = updateProfileWithDerivedData(updatedProfile);
         await saveProfile(derivedProfile);
         updateProfileState(derivedProfile);
@@ -249,7 +275,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       }
       throw error;
     }
-  }, [profile.dobISO, profile.motherName, profile.nameAr, needsDerivedBackfill, updateProfileState]);
+  }, [profile.birthLocation, profile.birthTime, profile.dobISO, profile.location, profile.motherName, profile.nameAr, profile.timezone, needsDerivedBackfill, updateProfileState]);
   
   /**
    * Re-derive astrological data from current DOB

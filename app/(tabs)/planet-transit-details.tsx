@@ -3,7 +3,12 @@ import { DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/Dark
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import type { Element } from '@/services/MomentAlignmentService';
-import type { Planet } from '@/services/PlanetaryHoursService';
+import {
+    calculatePlanetaryHours,
+    getPlanetaryDayBoundariesForNow,
+    type Planet,
+    type PlanetaryHourData
+} from '@/services/PlanetaryHoursService';
 import {
     getDegreeStageColor,
     getDegreeStageIcon,
@@ -63,6 +68,313 @@ type BalancingMethod = {
   bestTime?: string;
   source?: string;
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DEGREE-BASED SPIRITUAL GUIDANCE (Classical Islamic Esoteric Framework)
+// Masters divide each sign (30°) into three spiritual phases:
+//   Entry (0°–10°):   Influence forming — focus on purification
+//   Strength (10°–20°): Fully active — best for spiritual work  
+//   Exit (20°–30°):   Fading — seal and protect, do not initiate
+// ─────────────────────────────────────────────────────────────────────────────
+
+type SpiritualPhase = 'entry' | 'strength' | 'exit';
+
+// Dhikr count tier system (classical ʿAdad)
+type DhikrTier = 'quick' | 'standard' | 'deep';
+
+type DhikrTierConfig = {
+  tier: DhikrTier;
+  counts: number[];   // e.g., [33, 66, 99]
+  defaultCount: number;
+  estimatedMinutes: number; // based on ~2 sec per dhikr
+};
+
+const DHIKR_TIERS: Record<DhikrTier, Omit<DhikrTierConfig, 'tier'>> = {
+  quick: { counts: [33, 66, 99], defaultCount: 99, estimatedMinutes: 3 },
+  standard: { counts: [101, 111, 313], defaultCount: 313, estimatedMinutes: 10 },
+  deep: { counts: [1000, 3000, 7000], defaultCount: 1000, estimatedMinutes: 33 },
+};
+
+// Timing strength system
+type TimingStrength = 'peak' | 'strong' | 'supportive' | 'gentle';
+
+type PlanetaryHourWindow = {
+  planet: Planet;
+  startTime: Date;
+  endTime: Date;
+  isToday: boolean;
+  minutesUntil: number;
+};
+
+type SpiritualGuidance = {
+  phase: SpiritualPhase;
+  phaseLabel: string;
+  phaseArabic: string;
+  statusText: string;
+  guidanceText: string;
+  dhikrName: string;
+  dhikrArabic: string;
+  // New tier-based count system
+  dhikrTiers: {
+    quick: DhikrTierConfig;
+    standard: DhikrTierConfig;
+    deep: DhikrTierConfig;
+  };
+  recommendedTier: DhikrTier;
+  avoidText: string;
+  // Timing support
+  nextPlanetHour: PlanetaryHourWindow | null;
+  timingStrength: TimingStrength;
+  isInMatchingHour: boolean;
+};
+
+/**
+ * Determine spiritual phase from degree (classical 0-10 / 10-20 / 20-30 system)
+ */
+function getSpiritualPhase(degree: number): SpiritualPhase {
+  const normalizedDegree = Math.max(0, Math.min(30, degree));
+  if (normalizedDegree < 10) return 'entry';
+  if (normalizedDegree < 20) return 'strength';
+  return 'exit';
+}
+
+/**
+ * Select recommended dhikr tier based on transit phase
+ */
+function getRecommendedTier(phase: SpiritualPhase): DhikrTier {
+  switch (phase) {
+    case 'strength': return 'standard';
+    case 'entry':
+    case 'exit':
+    default: return 'quick';
+  }
+}
+
+/**
+ * Build dhikr tier configurations
+ */
+function buildDhikrTiers(): SpiritualGuidance['dhikrTiers'] {
+  return {
+    quick: { tier: 'quick', ...DHIKR_TIERS.quick },
+    standard: { tier: 'standard', ...DHIKR_TIERS.standard },
+    deep: { tier: 'deep', ...DHIKR_TIERS.deep },
+  };
+}
+
+/**
+ * Calculate timing strength based on phase and planetary hour match
+ */
+function getTimingStrength(phase: SpiritualPhase, isInMatchingHour: boolean): TimingStrength {
+  if (phase === 'strength' && isInMatchingHour) return 'peak';
+  if (phase === 'strength') return 'strong';
+  if (isInMatchingHour) return 'supportive';
+  return 'gentle';
+}
+
+/**
+ * Find the next planetary hour matching the given planet
+ */
+function findNextPlanetHour(
+  targetPlanet: string,
+  planetaryData: PlanetaryHourData | null,
+  sunrise: Date,
+  sunset: Date,
+  nextSunrise: Date,
+  now: Date
+): PlanetaryHourWindow | null {
+  if (!planetaryData) return null;
+  
+  const targetPlanetKey = targetPlanet.charAt(0).toUpperCase() + targetPlanet.slice(1).toLowerCase() as Planet;
+  
+  // Check if we're currently in the matching hour
+  if (planetaryData.currentHour.planet === targetPlanetKey) {
+    return {
+      planet: targetPlanetKey,
+      startTime: new Date(planetaryData.currentHour.startTime),
+      endTime: new Date(planetaryData.currentHour.endTime),
+      isToday: true,
+      minutesUntil: 0,
+    };
+  }
+  
+  // Calculate all 24 hours and find next matching
+  const dayRuler = planetaryData.dayRulerPlanet;
+  const dayDuration = sunset.getTime() - sunrise.getTime();
+  const nightDuration = nextSunrise.getTime() - sunset.getTime();
+  const dayHourDuration = dayDuration / 12;
+  const nightHourDuration = nightDuration / 12;
+  
+  const CHALDEAN_ORDER: Planet[] = ['Saturn', 'Jupiter', 'Mars', 'Sun', 'Venus', 'Mercury', 'Moon'];
+  const dayRulerIndex = CHALDEAN_ORDER.indexOf(dayRuler);
+  
+  // Generate all 24 hours
+  for (let h = 0; h < 24; h++) {
+    const planet = CHALDEAN_ORDER[(dayRulerIndex + h) % 7];
+    
+    let startTime: Date;
+    let endTime: Date;
+    
+    if (h < 12) {
+      // Day hours
+      startTime = new Date(sunrise.getTime() + h * dayHourDuration);
+      endTime = new Date(sunrise.getTime() + (h + 1) * dayHourDuration);
+    } else {
+      // Night hours
+      const nightHourIndex = h - 12;
+      startTime = new Date(sunset.getTime() + nightHourIndex * nightHourDuration);
+      endTime = new Date(sunset.getTime() + (nightHourIndex + 1) * nightHourDuration);
+    }
+    
+    // Skip hours that have already passed
+    if (endTime <= now) continue;
+    
+    if (planet === targetPlanetKey) {
+      const minutesUntil = Math.max(0, Math.floor((startTime.getTime() - now.getTime()) / (1000 * 60)));
+      return {
+        planet: targetPlanetKey,
+        startTime,
+        endTime,
+        isToday: true,
+        minutesUntil,
+      };
+    }
+  }
+  
+  // No match today, return first occurrence tomorrow (simplified)
+  return {
+    planet: targetPlanetKey,
+    startTime: new Date(nextSunrise.getTime() + dayHourDuration), // approximation
+    endTime: new Date(nextSunrise.getTime() + 2 * dayHourDuration),
+    isToday: false,
+    minutesUntil: Math.floor((nextSunrise.getTime() - now.getTime()) / (1000 * 60)),
+  };
+}
+
+/**
+ * Planet-specific spiritual guidance based on classical Islamic sources
+ * Each planet has: spiritual focus, recommended dhikr, and what to avoid
+ */
+function getPlanetSpiritualData(
+  planetKey: string | undefined,
+  phase: SpiritualPhase,
+  t: TTranslate,
+  tSafe: TSafety,
+  planetaryData: PlanetaryHourData | null,
+  sunrise: Date | null,
+  sunset: Date | null,
+  nextSunrise: Date | null,
+  now: Date
+): Omit<SpiritualGuidance, 'phase'> {
+  const key = (planetKey ?? 'saturn').toLowerCase();
+  
+  // Phase labels (universal)
+  const phaseLabels: Record<SpiritualPhase, { en: string; ar: string }> = {
+    entry: { en: 'Entering', ar: 'دخول' },
+    strength: { en: 'Active', ar: 'فعّال' },
+    exit: { en: 'Exiting', ar: 'خروج' },
+  };
+  
+  // Phase status text (universal)
+  const statusByPhase: Record<SpiritualPhase, string> = {
+    entry: tSafe('screens.planetTransit.spiritual.status.entry', 'The influence is forming. Focus on purification, not action.'),
+    strength: tSafe('screens.planetTransit.spiritual.status.strength', 'This transit is at full strength. Spiritual work is supported.'),
+    exit: tSafe('screens.planetTransit.spiritual.status.exit', 'The influence is fading. Seal and protect, do not initiate.'),
+  };
+
+  // Planet-specific dhikr and guidance
+  const planetData: Record<string, {
+    focus: { en: string; ar: string };
+    dhikr: { name: string; arabic: string };
+    avoid: { en: string; ar: string };
+  }> = {
+    sun: {
+      focus: { en: 'Tawḥīd, purpose, and clarity of intention', ar: 'التوحيد والغاية ووضوح النية' },
+      dhikr: { name: 'Yā Nūr / Yā Ḥayy', arabic: 'يا نُور / يا حَيّ' },
+      avoid: { en: 'Ego inflation, arrogance', ar: 'تضخم الأنا والغرور' },
+    },
+    moon: {
+      focus: { en: 'Emotional balance and intuition', ar: 'التوازن العاطفي والحدس' },
+      dhikr: { name: 'Yā Laṭīf', arabic: 'يا لَطِيف' },
+      avoid: { en: 'Decisions driven by mood', ar: 'القرارات المبنية على المزاج' },
+    },
+    mercury: {
+      focus: { en: 'Knowledge, speech, and learning', ar: 'العلم والكلام والتعلّم' },
+      dhikr: { name: 'Yā ʿAlīm', arabic: 'يا عَلِيم' },
+      avoid: { en: 'Gossip, overthinking', ar: 'النميمة وكثرة التفكير' },
+    },
+    venus: {
+      focus: { en: 'Harmony, love, and beauty', ar: 'الانسجام والمحبة والجمال' },
+      dhikr: { name: 'Yā Wadūd', arabic: 'يا وَدُود' },
+      avoid: { en: 'Excess pleasure, attachment', ar: 'الإفراط في الملذات والتعلق' },
+    },
+    mars: {
+      focus: { en: 'Courage, discipline, cutting obstacles', ar: 'الشجاعة والانضباط وإزالة العوائق' },
+      dhikr: { name: 'Yā Qawiyy', arabic: 'يا قَوِيّ' },
+      avoid: { en: 'Anger, impulsiveness', ar: 'الغضب والتهور' },
+    },
+    jupiter: {
+      focus: { en: 'Expansion, rizq, and wisdom', ar: 'التوسع والرزق والحكمة' },
+      dhikr: { name: 'Yā Razzāq', arabic: 'يا رَزَّاق' },
+      avoid: { en: 'Arrogance, excess', ar: 'الكبر والإسراف' },
+    },
+    saturn: {
+      focus: { en: 'Patience, endurance, karmic repair', ar: 'الصبر والتحمل وإصلاح الأثر' },
+      dhikr: { name: 'Yā Ṣabūr', arabic: 'يا صَبُور' },
+      avoid: { en: 'Heavy works unless guided, despair', ar: 'الأعمال الثقيلة دون إرشاد واليأس' },
+    },
+  };
+
+  const data = planetData[key] ?? planetData.saturn;
+  
+  // Build guidance text based on phase
+  let guidanceText: string;
+  if (phase === 'entry') {
+    guidanceText = tSafe(
+      'screens.planetTransit.spiritual.guidance.entry',
+      'Focus on istighfār and general dhikr (lā ilāha illa Llāh). Avoid binding intentions or starting major spiritual works.'
+    );
+  } else if (phase === 'strength') {
+    const focusText = tSafe(`screens.planetTransit.spiritual.focus.${key}`, data.focus.en);
+    guidanceText = tSafe(
+      'screens.planetTransit.spiritual.guidance.strength',
+      `Best time for focused dhikr and duʿāʾ. Spiritual focus: ${focusText}`
+    ).replace('${focusText}', focusText);
+  } else {
+    guidanceText = tSafe(
+      'screens.planetTransit.spiritual.guidance.exit',
+      'Seal what was started. Focus on protective dhikr, ṣalawāt, and gratitude. Avoid new spiritual initiatives.'
+    );
+  }
+
+  // Build dhikr tiers
+  const dhikrTiers = buildDhikrTiers();
+  const recommendedTier = getRecommendedTier(phase);
+  
+  // Calculate planetary hour timing
+  const nextPlanetHour = sunrise && sunset && nextSunrise 
+    ? findNextPlanetHour(key, planetaryData, sunrise, sunset, nextSunrise, now)
+    : null;
+  
+  const isInMatchingHour = nextPlanetHour?.minutesUntil === 0;
+  const timingStrength = getTimingStrength(phase, isInMatchingHour);
+
+  return {
+    phaseLabel: tSafe(`screens.planetTransit.spiritual.phaseLabel.${phase}`, phaseLabels[phase].en),
+    phaseArabic: phaseLabels[phase].ar,
+    statusText: statusByPhase[phase],
+    guidanceText,
+    dhikrName: data.dhikr.name,
+    dhikrArabic: data.dhikr.arabic,
+    dhikrTiers,
+    recommendedTier,
+    avoidText: phase === 'strength' 
+      ? tSafe(`screens.planetTransit.spiritual.avoid.${key}`, data.avoid.en)
+      : '',
+    nextPlanetHour,
+    timingStrength,
+    isInMatchingHour,
+  };
+}
 
 function safeJsonParse<T>(value: unknown): T | null {
   if (!value || typeof value !== 'string') return null;
@@ -140,6 +452,169 @@ function getElementIconName(element: Element): keyof typeof Ionicons.glyphMap {
   if (element === 'fire') return 'flame';
   if (element === 'air') return 'cloud';
   return 'leaf';
+}
+
+function getElementIcon(element: Element): string {
+  const icons = {
+    fire: '🔥',
+    water: '💧',
+    air: '🌬️',
+    earth: '🌱',
+  };
+  return icons[element];
+}
+
+function getElementDescription(element: Element, language: string): string {
+  const descriptions = {
+    fire: {
+      en: 'Fire energy brings action, courage, and transformation. It\'s a time for bold moves and clearing obstacles.',
+      fr: 'L\'énergie du feu apporte l\'action, le courage et la transformation. C\'est le moment de faire des mouvements audacieux et d\'éliminer les obstacles.',
+      ar: 'طاقة النار تجلب العمل والشجاعة والتحول. إنه وقت للحركات الجريئة وإزالة العقبات.',
+    },
+    water: {
+      en: 'Water energy emphasizes emotions, intuition, and healing. A favorable day for inner work and spiritual connection.',
+      fr: 'L\'énergie de l\'eau met l\'accent sur les émotions, l\'intuition et la guérison. Un jour favorable pour le travail intérieur et la connexion spirituelle.',
+      ar: 'طاقة الماء تركز على العواطف والحدس والشفاء. يوم مناسب للعمل الداخلي والاتصال الروحي.',
+    },
+    air: {
+      en: 'Air energy supports communication, learning, and mental clarity. Great for planning, studying, and meaningful conversations.',
+      fr: 'L\'énergie de l\'air soutient la communication, l\'apprentissage et la clarté mentale. Idéal pour planifier, étudier et avoir des conversations significatives.',
+      ar: 'طاقة الهواء تدعم التواصل والتعلم والوضوح الذهني. رائع للتخطيط والدراسة والمحادثات الهادفة.',
+    },
+    earth: {
+      en: 'Earth energy grounds us in practicality, stability, and tangible results. Perfect for building, organizing, and material matters.',
+      fr: 'L\'énergie de la terre nous ancre dans la praticité, la stabilité et les résultats tangibles. Parfait pour construire, organiser et les questions matérielles.',
+      ar: 'طاقة الأرض تثبتنا في العملية والاستقرار والنتائج الملموسة. مثالي للبناء والتنظيم والأمور المادية.',
+    },
+  };
+  
+  return descriptions[element][language as 'en' | 'fr' | 'ar'] || descriptions[element].en;
+}
+
+function getSpiritualFocus(element: Element, language: string): string {
+  const focus = {
+    fire: {
+      en: 'Focus on courage (yā Qawiyy), purification through action, and cutting through stagnation. Recommended dhikr: Yā Qawiyy, Yā Nūr.',
+      fr: 'Concentrez-vous sur le courage (yā Qawiyy), la purification par l\'action et le dépassement de la stagnation. Dhikr recommandé: Yā Qawiyy, Yā Nūr.',
+      ar: 'ركز على الشجاعة (يا قَوِيّ)، التطهير من خلال العمل، وقطع الركود. الذكر الموصى به: يا قَوِيّ، يا نُور.',
+    },
+    water: {
+      en: 'Focus on divine gentleness (yā Laṭīf), emotional healing, and intuitive connection. Recommended dhikr: Yā Laṭīf, Yā Wadūd.',
+      fr: 'Concentrez-vous sur la douceur divine (yā Laṭīf), la guérison émotionnelle et la connexion intuitive. Dhikr recommandé: Yā Laṭīf, Yā Wadūd.',
+      ar: 'ركز على اللطف الإلهي (يا لَطِيف)، الشفاء العاطفي، والاتصال الحدسي. الذكر الموصى به: يا لَطِيف، يا وَدُود.',
+    },
+    air: {
+      en: 'Focus on divine knowledge (yā ʿAlīm), clear communication, and learning. Recommended dhikr: Yā ʿAlīm, Yā Ḥakīm.',
+      fr: 'Concentrez-vous sur la connaissance divine (yā ʿAlīm), la communication claire et l\'apprentissage. Dhikr recommandé: Yā ʿAlīm, Yā Ḥakīm.',
+      ar: 'ركز على العلم الإلهي (يا عَلِيم)، التواصل الواضح، والتعلم. الذكر الموصى به: يا عَلِيم، يا حَكِيم.',
+    },
+    earth: {
+      en: 'Focus on divine provision (yā Razzāq), patience, and building stable foundations. Recommended dhikr: Yā Razzāq, Yā Ṣabūr.',
+      fr: 'Concentrez-vous sur la provision divine (yā Razzāq), la patience et la construction de fondations stables. Dhikr recommandé: Yā Razzāq, Yā Ṣabūr.',
+      ar: 'ركز على الرزق الإلهي (يا رَزَّاق)، الصبر، وبناء أسس مستقرة. الذكر الموصى به: يا رَزَّاق، يا صَبُور.',
+    },
+  };
+  
+  return focus[element][language as 'en' | 'fr' | 'ar'] || focus[element].en;
+}
+
+function getBestActivities(element: Element, language: string): string[] {
+  const activities = {
+    fire: {
+      en: [
+        'Starting new projects or ventures',
+        'Physical exercise and movement',
+        'Clearing clutter and obstacles',
+        'Making bold decisions',
+        'Leadership and taking initiative',
+      ],
+      fr: [
+        'Commencer de nouveaux projets ou entreprises',
+        'Exercice physique et mouvement',
+        'Éliminer l\'encombrement et les obstacles',
+        'Prendre des décisions audacieuses',
+        'Leadership et prise d\'initiative',
+      ],
+      ar: [
+        'بدء مشاريع أو مبادرات جديدة',
+        'التمارين البدنية والحركة',
+        'تنظيف الفوضى والعوائق',
+        'اتخاذ قرارات جريئة',
+        'القيادة وأخذ المبادرة',
+      ],
+    },
+    water: {
+      en: [
+        'Meditation and contemplation',
+        'Emotional healing work',
+        'Creative and artistic pursuits',
+        'Connecting with loved ones',
+        'Prayer and spiritual practices',
+      ],
+      fr: [
+        'Méditation et contemplation',
+        'Travail de guérison émotionnelle',
+        'Activités créatives et artistiques',
+        'Se connecter avec ses proches',
+        'Prière et pratiques spirituelles',
+      ],
+      ar: [
+        'التأمل والتفكر',
+        'العمل على الشفاء العاطفي',
+        'المساعي الإبداعية والفنية',
+        'التواصل مع الأحباء',
+        'الصلاة والممارسات الروحية',
+      ],
+    },
+    air: {
+      en: [
+        'Learning and studying',
+        'Writing and communication',
+        'Planning and strategizing',
+        'Networking and socializing',
+        'Teaching and sharing knowledge',
+      ],
+      fr: [
+        'Apprentissage et étude',
+        'Écriture et communication',
+        'Planification et stratégie',
+        'Réseautage et socialisation',
+        'Enseignement et partage de connaissances',
+      ],
+      ar: [
+        'التعلم والدراسة',
+        'الكتابة والتواصل',
+        'التخطيط والاستراتيجية',
+        'التواصل الاجتماعي',
+        'التعليم ومشاركة المعرفة',
+      ],
+    },
+    earth: {
+      en: [
+        'Financial planning and budgeting',
+        'Home organization and repairs',
+        'Building routines and habits',
+        'Physical health care',
+        'Practical problem-solving',
+      ],
+      fr: [
+        'Planification financière et budgétisation',
+        'Organisation et réparations domestiques',
+        'Construire des routines et des habitudes',
+        'Soins de santé physique',
+        'Résolution pratique de problèmes',
+      ],
+      ar: [
+        'التخطيط المالي والميزانية',
+        'تنظيم المنزل والإصلاحات',
+        'بناء الروتين والعادات',
+        'العناية بالصحة البدنية',
+        'حل المشكلات العملية',
+      ],
+    },
+  };
+  
+  return activities[element][language as 'en' | 'fr' | 'ar'] || activities[element].en;
 }
 
 function getMethodIcon(type: BalancingMethodType): keyof typeof Ionicons.glyphMap {
@@ -285,6 +760,122 @@ function getElementFromZodiacKey(zodiacKey: string | undefined): Element | null 
   return null;
 }
 
+type TransitLensCopy = {
+  aboutTitle: string;
+  aboutBody: string;
+  collectiveTitle: string;
+  collectiveBody: string;
+  resonanceTitle: string;
+  resonanceBody: string;
+  degreeBody?: string;
+};
+
+type TSafety = (key: string, fallback: string, vars?: Record<string, any>) => string;
+type TTranslate = (key: string, vars?: Record<string, any>) => string;
+
+function getPlanetFunctionText(planetKey: string | undefined, tSafe: TSafety): string {
+  const key = (planetKey ?? '').toLowerCase();
+  const en: Record<string, string> = {
+    sun: 'The Sun governs authority, vitality, clarity, and purpose.',
+    moon: 'The Moon governs moods, memory, nourishment, and the rhythms of daily life.',
+    mercury: 'Mercury governs speech, trade, learning, and the movement of information.',
+    venus: 'Venus governs harmony, affection, beauty, and the ease of relationships.',
+    mars: 'Mars governs drive, conflict, courage, and decisive action.',
+    jupiter: 'Jupiter governs growth, wisdom, generosity, and meaningful expansion.',
+    saturn: 'Saturn governs structure, limits, responsibility, time, and endurance.',
+  };
+
+  const resolved = en[key] ? key : 'saturn';
+  return tSafe(`screens.planetTransit.lens.planetFunction.${resolved}`, en[resolved]);
+}
+
+function getSignThemeText(zodiacKey: string | undefined, tSafe: TSafety): string {
+  const key = (zodiacKey ?? '').toLowerCase();
+  const en: Record<string, string> = {
+    aries: 'initiative, leadership, and courageous beginnings',
+    taurus: 'stability, resources, and steady building',
+    gemini: 'communication, learning, and quick exchange',
+    cancer: 'home, protection, and emotional security',
+    leo: 'visibility, authority, and creative confidence',
+    virgo: 'details, health, and practical refinement',
+    libra: 'balance, agreements, and relationship dynamics',
+    scorpio: 'depth, boundaries, and transformative pressure',
+    sagittarius: 'belief, exploration, and broader meaning',
+    capricorn: 'duty, institutions, and long-term structure',
+    aquarius: 'community, innovation, and collective systems',
+    pisces: 'compassion, sensitivity, and dissolving old forms',
+  };
+
+  const resolved = en[key] ? key : 'aries';
+  return tSafe(`screens.planetTransit.lens.signThemes.${resolved}`, en[resolved]);
+}
+
+function getElementResonanceTail(userElement: Element | null, tSafe: TSafety): string {
+  if (!userElement) return '';
+  const en: Record<Element, string> = {
+    water: 'Water nature often absorbs this quietly rather than confrontationally.',
+    fire: 'Fire nature tends to feel it as urgency—channel it into clean action.',
+    earth: 'Earth nature tends to seek structure—steady routines help.',
+    air: 'Air nature often feels it mentally—name priorities to reduce scatter.',
+  };
+
+  return tSafe(`screens.planetTransit.lens.elementTails.${userElement}`, en[userElement]);
+}
+
+function buildTransitLensCopy(args: {
+  planetKey: string | undefined;
+  planetName: string;
+  zodiacKey: string | undefined;
+  signName: string;
+  userElement: Element | null;
+  isPersonalTransit: boolean;
+  t: TTranslate;
+  tSafe: TSafety;
+  degreePhase: { phase: 'early' | 'middle' | 'late'; percent: number } | null;
+}): TransitLensCopy {
+  const { planetKey, planetName, zodiacKey, signName, userElement, isPersonalTransit, t, tSafe, degreePhase } = args;
+
+  const labels = {
+    about: t('screens.planetTransit.lens.sections.about'),
+    collective: t('screens.planetTransit.lens.sections.collective'),
+    resonance: t('screens.planetTransit.lens.sections.resonance'),
+    degree: t('screens.planetTransit.lens.sections.degree'),
+  };
+
+  const aboutBody = getPlanetFunctionText(planetKey, tSafe);
+
+  const signTheme = getSignThemeText(zodiacKey, tSafe);
+  const collectiveBody = t('screens.planetTransit.lens.collectiveTemplate', {
+    planet: planetName,
+    sign: signName,
+    theme: signTheme,
+  });
+
+  const resonanceBodyBase = t(
+    isPersonalTransit
+      ? 'screens.planetTransit.lens.resonanceBase.personal'
+      : 'screens.planetTransit.lens.resonanceBase.collective'
+  );
+  const resonanceTail = getElementResonanceTail(userElement, tSafe);
+  const resonanceBody = resonanceTail ? `${resonanceBodyBase} ${resonanceTail}` : resonanceBodyBase;
+
+  let degreeBody: string | undefined;
+  if (degreePhase) {
+    const stage = degreePhase.phase;
+    degreeBody = t(`screens.planetTransit.lens.degreePhases.${stage}`);
+  }
+
+  return {
+    aboutTitle: labels.about,
+    aboutBody,
+    collectiveTitle: labels.collective,
+    collectiveBody,
+    resonanceTitle: labels.resonance,
+    resonanceBody,
+    degreeBody: degreeBody ? `${labels.degree}: ${degreeBody}` : undefined,
+  };
+}
+
 export default function PlanetTransitDetailsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -305,6 +896,16 @@ export default function PlanetTransitDetailsScreen() {
     transitPayload
   );
   const [refreshing, setRefreshing] = useState(false);
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // BUG FIX: Sync transitState when route params change (clicking different planet)
+  // useState only uses initial value; we must explicitly update when payload changes
+  // ─────────────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (transitPayload) {
+      setTransitState(transitPayload);
+    }
+  }, [transitPayload]);
   const orbScale = useRef(new Animated.Value(0.92)).current;
   const [showWhy, setShowWhy] = useState(false);
   const [expandedMethod, setExpandedMethod] = useState<number | null>(null);
@@ -317,6 +918,68 @@ export default function PlanetTransitDetailsScreen() {
   // Fetch all planet transits for the comprehensive view
   const [allTransits, setAllTransits] = useState<AllPlanetTransits | null>(null);
   const [loadingAllTransits, setLoadingAllTransits] = useState(true);
+  
+  // Planetary hours state for spiritual practice timing
+  const [planetaryHourData, setPlanetaryHourData] = useState<PlanetaryHourData | null>(null);
+  const [planetaryBoundaries, setPlanetaryBoundaries] = useState<{
+    sunrise: Date;
+    sunset: Date;
+    nextSunrise: Date;
+  } | null>(null);
+  
+  // Selected dhikr tier for user choice
+  const [selectedTier, setSelectedTier] = useState<DhikrTier>('standard');
+  
+  // ScrollView ref for scroll-to-top when tapping transits
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  // Fetch planetary hours based on user location
+  useEffect(() => {
+    const fetchPlanetaryHours = async () => {
+      const location = profile.location;
+      if (!location?.latitude || !location?.longitude) {
+        // Use approximate times if no location
+        const approxSunrise = new Date();
+        approxSunrise.setHours(6, 30, 0, 0);
+        const approxSunset = new Date();
+        approxSunset.setHours(18, 30, 0, 0);
+        const approxNextSunrise = new Date(approxSunrise);
+        approxNextSunrise.setDate(approxNextSunrise.getDate() + 1);
+        
+        const data = calculatePlanetaryHours(approxSunrise, approxSunset, approxNextSunrise, new Date());
+        setPlanetaryHourData(data);
+        setPlanetaryBoundaries({
+          sunrise: approxSunrise,
+          sunset: approxSunset,
+          nextSunrise: approxNextSunrise,
+        });
+        return;
+      }
+      
+      try {
+        const boundaries = await getPlanetaryDayBoundariesForNow(
+          { latitude: location.latitude, longitude: location.longitude }
+        );
+        if (boundaries) {
+          const data = calculatePlanetaryHours(
+            boundaries.sunrise,
+            boundaries.sunset,
+            boundaries.nextSunrise,
+            new Date()
+          );
+          setPlanetaryHourData(data);
+          setPlanetaryBoundaries(boundaries);
+        }
+      } catch (error) {
+        console.warn('[PlanetTransit] Failed to fetch planetary hours:', error);
+      }
+    };
+    
+    fetchPlanetaryHours();
+    // Refresh every minute for accurate timing
+    const interval = setInterval(fetchPlanetaryHours, 60000);
+    return () => clearInterval(interval);
+  }, [profile.location?.latitude, profile.location?.longitude]);
 
   const toggleSection = (section: ExpandableSection) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -463,9 +1126,45 @@ export default function PlanetTransitDetailsScreen() {
   const degreePhase = useMemo(() => {
     if (!signProgress) return null;
     const percent = signProgress.percent;
-    const phase = percent < 33.4 ? 'early' : percent < 66.7 ? 'middle' : 'late';
+    const phase: 'early' | 'middle' | 'late' = percent < 33.4 ? 'early' : percent < 66.7 ? 'middle' : 'late';
     return { percent: Math.round(percent), phase };
   }, [signProgress]);
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // SPIRITUAL GUIDANCE based on classical degree system (0-10 / 10-20 / 20-30)
+  // Enhanced with planetary hour timing and dhikr tiers
+  // ─────────────────────────────────────────────────────────────────────────────
+  const spiritualGuidance = useMemo<SpiritualGuidance | null>(() => {
+    if (detailsType !== 'transit') return null;
+    const data = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
+    if (!data || !isLegacyTransit(data)) return null;
+    
+    const degree = data.signDegree ?? 0;
+    const phase = getSpiritualPhase(degree);
+    const planetData = getPlanetSpiritualData(
+      data.planetKey,
+      phase,
+      t,
+      tSafe,
+      planetaryHourData,
+      planetaryBoundaries?.sunrise ?? null,
+      planetaryBoundaries?.sunset ?? null,
+      planetaryBoundaries?.nextSunrise ?? null,
+      now
+    );
+    
+    return {
+      phase,
+      ...planetData,
+    };
+  }, [detailsType, transitState, transitPayload, t, tSafe, planetaryHourData, planetaryBoundaries, now]);
+  
+  // Update selected tier when recommended tier changes
+  useEffect(() => {
+    if (spiritualGuidance?.recommendedTier) {
+      setSelectedTier(spiritualGuidance.recommendedTier);
+    }
+  }, [spiritualGuidance?.recommendedTier]);
 
   const focusPills = useMemo(
     () => [
@@ -763,7 +1462,12 @@ export default function PlanetTransitDetailsScreen() {
         </View>
       </LinearGradient>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        ref={scrollViewRef}
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+      >
         {detailsType === 'transit' && transitData ? (
           <>
             <View style={styles.heroContainer}>
@@ -817,61 +1521,131 @@ export default function PlanetTransitDetailsScreen() {
               <Text style={styles.explainerMeta}>{personalizationLine}</Text>
             </GlassCard>
 
+            {/* Collective Influence - interpretation (Premium) */}
+            {personalizedInfluence && !isPersonalTransit && (
+              <PremiumSection
+                featureId="personalGuidance"
+                title={t('premiumSections.transitGuidance.title')}
+                description={t('premiumSections.transitGuidance.description')}
+                icon="🧭"
+              >
+                <GlassCard style={styles.influenceCard}>
+                  <View style={styles.cardHeader}>
+                    <Ionicons name="globe-outline" size={20} color="#6495ED" />
+                    <Text style={styles.cardTitle}>
+                      {t('home.planetTransitDetails.influenceEngine.collectiveInfluence')}
+                    </Text>
+                  </View>
+
+                  {/* Influence Type Badge */}
+                  <View
+                    style={[
+                      styles.influenceTypeBadge,
+                      {
+                        backgroundColor: getInfluenceTypeColor(personalizedInfluence.influenceType) + '20',
+                        borderColor: getInfluenceTypeColor(personalizedInfluence.influenceType) + '50',
+                        alignSelf: 'flex-start',
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.influenceTypeText, { color: getInfluenceTypeColor(personalizedInfluence.influenceType) }]}>
+                      {(influenceTypeLabel?.[personalizedInfluence.influenceType] ?? personalizedInfluence.influenceType).toUpperCase()}{' '}
+                      {language === 'ar' ? 'عبور' : 'TRANSIT'}
+                    </Text>
+                  </View>
+
+                  {/* Collective Impact (Cosmic Weather) */}
+                  <View style={[styles.summaryCard, { borderColor: '#6495ED30' }]}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                      <Ionicons name="cloudy-night-outline" size={16} color="#6495ED" />
+                      <Text style={[styles.summaryTitle, { color: '#6495ED' }]}>
+                        {t('home.planetTransitDetails.influenceEngine.cosmicWeather')}
+                      </Text>
+                    </View>
+                    <Text style={styles.summaryText}>{personalizedInfluence.collectiveSummary}</Text>
+                  </View>
+
+                  {/* Personal Relevance (Brief) */}
+                  <View style={[styles.summaryCard, { borderColor: '#9C27B030' }]}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                      <Ionicons name="person-outline" size={16} color="#9C27B0" />
+                      <Text style={[styles.summaryTitle, { color: '#9C27B0' }]}>
+                        {t('home.planetTransitDetails.influenceEngine.forYou')}
+                      </Text>
+                    </View>
+                    <Text style={styles.summaryText}>{personalizedInfluence.personalSummary}</Text>
+                  </View>
+
+                  {/* Simple disclaimer */}
+                  <View style={[styles.disclaimerBox, { marginTop: 0 }]}>
+                    <Ionicons name="information-circle-outline" size={14} color={DarkTheme.textMuted} />
+                    <Text style={styles.disclaimerBoxText}>{t('home.planetTransitDetails.disclaimer')}</Text>
+                  </View>
+                </GlassCard>
+              </PremiumSection>
+            )}
+
             {detailsType === 'transit' && harmony ? (
-              <View style={[styles.impactBanner, { borderColor: `${resonancePalette.primary}40` }]}> 
-                <BlurView intensity={24} tint="dark" style={styles.impactBlur}>
-                  <View style={styles.impactRow}>
-                    <View style={[styles.impactIcon, { backgroundColor: `${resonancePalette.primary}20` }]}> 
-                      <Ionicons name="sparkles" size={20} color={resonancePalette.primary} />
-                    </View>
-                    <View style={styles.impactText}>
-                      <Text style={styles.impactLabel}>{t('screens.planetTransit.quickImpact.title')}</Text>
-                      <Text style={[styles.impactValue, { color: resonancePalette.primary }]}> 
-                        {t(`home.planetTransitDetails.harmony.${harmony}.label`)}
-                      </Text>
-                      <Text style={styles.impactArabic}>
-                        {t(`screens.planetTransit.resonance.arabicTerms.${harmony}`)}
-                      </Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={18} color={DarkTheme.textTertiary} />
-                  </View>
-                </BlurView>
-                <Text style={styles.bodyText}>
-                  {t(`home.planetTransitDetails.harmony.${harmony}.description`, {
-                    userElement: tSafe(`common.elements.${userElement}`, toTitleCase(safeUserElement)).toLowerCase(),
-                    contextElement: tSafe(`common.elements.${contextElement}`, toTitleCase(safeContextElement)).toLowerCase(),
-                  })}
-                </Text>
-                <TouchableOpacity
-                  style={styles.whyToggle}
-                  onPress={() => {
-                    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                    setShowWhy((prev) => !prev);
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name={showWhy ? 'chevron-up' : 'chevron-down'} size={16} color={DarkTheme.textSecondary} />
-                  <Text style={styles.whyToggleText}>
-                    {showWhy ? t('screens.planetTransit.why.hide') : t('screens.planetTransit.why.show')}
-                  </Text>
-                </TouchableOpacity>
-                {showWhy ? (
-                  <View style={styles.whyPanel}>
-                    <Text style={styles.whyTitle}>{t('screens.planetTransit.why.title')}</Text>
-                    <Text style={styles.bodyText}>{t('screens.planetTransit.why.body')}</Text>
-                  </View>
-                ) : null}
-                <View style={styles.focusRow}>
-                  <Text style={styles.focusTitle}>{t('screens.planetTransit.focus.title')}</Text>
-                  <View style={styles.focusPills}>
-                    {focusPills.map((pill) => (
-                      <View key={pill} style={styles.focusPill}>
-                        <Text style={styles.focusPillText}>{pill}</Text>
+              <PremiumSection
+                featureId="elementalHarmony"
+                compact
+                title={t('premiumSections.personalizedImpact.title')}
+                description={t('premiumSections.personalizedImpact.description')}
+                icon="💫"
+              >
+                <View style={[styles.impactBanner, { borderColor: `${resonancePalette.primary}40` }]}>
+                  <BlurView intensity={24} tint="dark" style={styles.impactBlur}>
+                    <View style={styles.impactRow}>
+                      <View style={[styles.impactIcon, { backgroundColor: `${resonancePalette.primary}20` }]}>
+                        <Ionicons name="sparkles" size={20} color={resonancePalette.primary} />
                       </View>
-                    ))}
+                      <View style={styles.impactText}>
+                        <Text style={styles.impactLabel}>{t('screens.planetTransit.quickImpact.title')}</Text>
+                        <Text style={[styles.impactValue, { color: resonancePalette.primary }]}>
+                          {t(`home.planetTransitDetails.harmony.${harmony}.label`)}
+                        </Text>
+                        <Text style={styles.impactArabic}>{t(`screens.planetTransit.resonance.arabicTerms.${harmony}`)}</Text>
+                      </View>
+                      <Ionicons name="chevron-forward" size={18} color={DarkTheme.textTertiary} />
+                    </View>
+                  </BlurView>
+                  <Text style={styles.bodyText}>
+                    {t(`home.planetTransitDetails.harmony.${harmony}.description`, {
+                      userElement: tSafe(`common.elements.${userElement}`, toTitleCase(safeUserElement)).toLowerCase(),
+                      contextElement: tSafe(`common.elements.${contextElement}`, toTitleCase(safeContextElement)).toLowerCase(),
+                    })}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.whyToggle}
+                    onPress={() => {
+                      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                      setShowWhy((prev) => !prev);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name={showWhy ? 'chevron-up' : 'chevron-down'} size={16} color={DarkTheme.textSecondary} />
+                    <Text style={styles.whyToggleText}>
+                      {showWhy ? t('screens.planetTransit.why.hide') : t('screens.planetTransit.why.show')}
+                    </Text>
+                  </TouchableOpacity>
+                  {showWhy ? (
+                    <View style={styles.whyPanel}>
+                      <Text style={styles.whyTitle}>{t('screens.planetTransit.why.title')}</Text>
+                      <Text style={styles.bodyText}>{t('screens.planetTransit.why.body')}</Text>
+                    </View>
+                  ) : null}
+                  <View style={styles.focusRow}>
+                    <Text style={styles.focusTitle}>{t('screens.planetTransit.focus.title')}</Text>
+                    <View style={styles.focusPills}>
+                      {focusPills.map((pill) => (
+                        <View key={pill} style={styles.focusPill}>
+                          <Text style={styles.focusPillText}>{pill}</Text>
+                        </View>
+                      ))}
+                    </View>
                   </View>
                 </View>
-              </View>
+              </PremiumSection>
             ) : null}
 
             <GlassCard style={styles.durationCard}>
@@ -1017,22 +1791,14 @@ export default function PlanetTransitDetailsScreen() {
                     />
                     <View style={styles.transitContextTextContainer}>
                       <Text style={[styles.transitContextTitle, { color: isPersonalTransit ? '#4CAF50' : '#6495ED' }]}>
-                        {isPersonalTransit 
-                          ? (language === 'ar' ? 'عبور شخصي' : language === 'fr' ? 'Transit Personnel' : 'Personal Transit')
-                          : (language === 'ar' ? 'طقس كوني عام' : language === 'fr' ? 'Météo Cosmique' : 'Cosmic Weather')}
+                          {isPersonalTransit
+                            ? t('screens.planetTransit.context.title.personal')
+                            : t('screens.planetTransit.context.title.collective')}
                       </Text>
                       <Text style={styles.transitContextDesc}>
-                        {isPersonalTransit 
-                          ? (language === 'ar' 
-                              ? 'هذا الكوكب يعبر برجك مباشرة - تأثيره عليك أقوى وأكثر شخصية.'
-                              : language === 'fr' 
-                              ? 'Cette planète traverse votre signe - son influence sur vous est plus forte et personnelle.'
-                              : 'This planet is transiting your sign directly - its influence on you is stronger and more personal.')
-                          : (language === 'ar' 
-                              ? 'لا يوجد كوكب في برجك حالياً. هذا العبور يؤثر على الجميع بشكل عام.'
-                              : language === 'fr' 
-                              ? 'Aucune planète dans votre signe actuellement. Ce transit affecte tout le monde de manière générale.'
-                              : 'No planet in your sign currently. This transit affects everyone generally.')}
+                          {isPersonalTransit
+                            ? t('screens.planetTransit.context.desc.personal')
+                            : t('screens.planetTransit.context.desc.collective')}
                       </Text>
                     </View>
                   </View>
@@ -1312,49 +2078,88 @@ export default function PlanetTransitDetailsScreen() {
 
                 {expandedSections.guidance ? (
                   harmony ? (
-                    <View style={styles.guidanceGrid}>
-                      <View style={[styles.guidanceBox, styles.bestForBox]}>
+                    <View>
+                      <View style={styles.guidanceGrid}>
+                        <View style={[styles.guidanceBox, styles.bestForBox]}>
                         <View style={styles.guidanceBoxHeader}>
-                          <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
+                          <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
                           <Text style={styles.guidanceBoxTitle}>
                             {bestForLabel || t('screens.planetTransit.daily.title')}
                           </Text>
                         </View>
-                        <Text style={styles.guidanceItem}>{bestForBody || bestForText}</Text>
-                      </View>
-                      <View style={[styles.guidanceBox, styles.avoidBox]}>
+                        <Text style={styles.guidanceItem} numberOfLines={6}>{bestForBody || bestForText}</Text>
+                        </View>
+                        <View style={[styles.guidanceBox, styles.avoidBox]}>
                         <View style={styles.guidanceBoxHeader}>
-                          <Ionicons name="alert-circle" size={18} color="#FF9800" />
+                          <Ionicons name="alert-circle" size={16} color="#FF9800" />
                           <Text style={styles.guidanceBoxTitle}>
                             {avoidLabel || t('screens.planetTransit.daily.title')}
                           </Text>
                         </View>
-                        <Text style={styles.guidanceItem}>{avoidBody || avoidText}</Text>
+                        <Text style={styles.guidanceItem} numberOfLines={6}>{avoidBody || avoidText}</Text>
+                        </View>
                       </View>
-                      {/* Personal/Cosmic Impact Note */}
-                      <View style={[styles.impactNoteContainer, {
-                        backgroundColor: isPersonalTransit ? 'rgba(76, 175, 80, 0.08)' : 'rgba(100, 149, 237, 0.08)',
-                        borderColor: isPersonalTransit ? 'rgba(76, 175, 80, 0.2)' : 'rgba(100, 149, 237, 0.2)',
-                      }]}>
-                        <Ionicons 
-                          name={isPersonalTransit ? 'flash' : 'earth'} 
-                          size={16} 
-                          color={isPersonalTransit ? '#4CAF50' : '#6495ED'} 
-                        />
-                        <Text style={styles.impactNoteText}>
-                          {isPersonalTransit 
-                            ? (language === 'ar' 
-                                ? 'لأنه عبور شخصي، ستشعر بهذه الطاقات بشكل أقوى. ركز على النمو الشخصي في هذه الفترة.'
-                                : language === 'fr' 
-                                ? 'Étant un transit personnel, vous ressentirez ces énergies plus intensément. Concentrez-vous sur la croissance personnelle.'
-                                : 'Being a personal transit, you\'ll feel these energies more intensely. Focus on personal growth during this period.')
-                            : (language === 'ar' 
-                                ? 'هذا عبور عام يؤثر على الجميع. ستشعر به بشكل طفيف ولكنه يخلق أجواء عامة مفيدة.'
-                                : language === 'fr' 
-                                ? 'C\'est un transit général affectant tout le monde. Vous le sentirez légèrement mais il crée une ambiance favorable.'
-                                : 'This is a general transit affecting everyone. You\'ll feel it subtly but it creates a helpful collective atmosphere.')}
-                        </Text>
-                      </View>
+
+                      {/* 3-layer explanation (classical + non-fatalistic) */}
+                      {(() => {
+                        const planetName = transitData.planetName || toTitleCase(String(transitData.planetKey ?? ''));
+                        const signName = transitData.zodiacKey
+                          ? formatZodiacWithArabic(transitData.zodiacKey as any, language as any, { forceBilingual: language !== 'ar' })
+                          : t('common.unknown');
+
+                        const lens = buildTransitLensCopy({
+                          planetKey: transitData.planetKey,
+                          planetName,
+                          zodiacKey: transitData.zodiacKey,
+                          signName,
+                          userElement: userElement ?? null,
+                          isPersonalTransit,
+                          t,
+                          tSafe,
+                          degreePhase,
+                        });
+
+                        const toneBg = isPersonalTransit ? 'rgba(76, 175, 80, 0.08)' : 'rgba(100, 149, 237, 0.08)';
+                        const toneBorder = isPersonalTransit ? 'rgba(76, 175, 80, 0.2)' : 'rgba(100, 149, 237, 0.2)';
+
+                        return (
+                          <View style={[styles.transitLensCard, { backgroundColor: toneBg, borderColor: toneBorder }]}>
+                            <View style={styles.transitLensRow}>
+                              <Ionicons
+                                name={isPersonalTransit ? 'flash' : 'earth'}
+                                size={16}
+                                color={isPersonalTransit ? '#4CAF50' : '#6495ED'}
+                              />
+                              <Text style={styles.transitLensTitle} numberOfLines={1}>
+                                {isPersonalTransit
+                                  ? t('screens.planetTransit.lens.badge.personal')
+                                  : t('screens.planetTransit.lens.badge.collective')}
+                              </Text>
+                            </View>
+
+                            <View style={styles.transitLensSection}>
+                              <Text style={styles.transitLensLabel}>{lens.aboutTitle}</Text>
+                              <Text style={styles.transitLensText}>{lens.aboutBody}</Text>
+                            </View>
+
+                            <View style={styles.transitLensSection}>
+                              <Text style={styles.transitLensLabel}>{lens.collectiveTitle}</Text>
+                              <Text style={styles.transitLensText}>{lens.collectiveBody}</Text>
+                            </View>
+
+                            <View style={styles.transitLensSection}>
+                              <Text style={styles.transitLensLabel}>{lens.resonanceTitle}</Text>
+                              <Text style={styles.transitLensText}>{lens.resonanceBody}</Text>
+                            </View>
+
+                            {lens.degreeBody ? (
+                              <View style={styles.transitLensSection}>
+                                <Text style={styles.transitLensText}>{lens.degreeBody}</Text>
+                              </View>
+                            ) : null}
+                          </View>
+                        );
+                      })()}
                     </View>
                   ) : (
                     <View style={styles.dailyStack}>
@@ -1495,6 +2300,221 @@ export default function PlanetTransitDetailsScreen() {
               </GlassCard>
             ) : null}
 
+            {/* ─────────────────────────────────────────────────────────────────
+                SPIRITUAL PRACTICE CARD (Enhanced with Dhikr Tiers + Planetary Hour Timing)
+                Based on ʿIlm al-Asrār: Entry (0-10°), Strength (10-20°), Exit (20-30°)
+            ───────────────────────────────────────────────────────────────── */}
+            {detailsType === 'transit' && spiritualGuidance && transitData ? (
+              <GlassCard style={styles.spiritualCard}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="sparkles" size={18} color="#FFD700" />
+                  <Text style={styles.cardTitle}>
+                    {tSafe('screens.planetTransit.practice.title', 'Spiritual Practice')}
+                  </Text>
+                </View>
+                
+                {/* Phase Badge with Strength Indicator */}
+                <View style={[
+                  styles.spiritualPhaseBadge,
+                  spiritualGuidance.phase === 'entry' && { backgroundColor: 'rgba(255, 193, 7, 0.15)', borderColor: 'rgba(255, 193, 7, 0.4)' },
+                  spiritualGuidance.phase === 'strength' && { backgroundColor: 'rgba(76, 175, 80, 0.15)', borderColor: 'rgba(76, 175, 80, 0.4)' },
+                  spiritualGuidance.phase === 'exit' && { backgroundColor: 'rgba(156, 39, 176, 0.15)', borderColor: 'rgba(156, 39, 176, 0.4)' },
+                ]}>
+                  <View style={styles.spiritualPhaseRow}>
+                    <Ionicons 
+                      name={spiritualGuidance.phase === 'entry' ? 'enter-outline' : spiritualGuidance.phase === 'strength' ? 'flash' : 'exit-outline'} 
+                      size={16} 
+                      color={spiritualGuidance.phase === 'entry' ? '#FFC107' : spiritualGuidance.phase === 'strength' ? '#4CAF50' : '#9C27B0'} 
+                    />
+                    <Text style={[
+                      styles.spiritualPhaseLabel,
+                      spiritualGuidance.phase === 'entry' && { color: '#FFC107' },
+                      spiritualGuidance.phase === 'strength' && { color: '#4CAF50' },
+                      spiritualGuidance.phase === 'exit' && { color: '#9C27B0' },
+                    ]}>
+                      {tSafe(`screens.planetTransit.practice.phase.${spiritualGuidance.phase}`, spiritualGuidance.phaseLabel)}
+                    </Text>
+                    <Text style={styles.spiritualPhaseArabic}>{spiritualGuidance.phaseArabic}</Text>
+                    <Text style={styles.spiritualDegreeBadge}>
+                      {transitData && isLegacyTransit(transitData) ? `${Math.floor(transitData.signDegree ?? 0)}°` : '—'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Status Text */}
+                <Text style={styles.spiritualStatusText}>{spiritualGuidance.statusText}</Text>
+                
+                {/* Guidance Text */}
+                <View style={styles.spiritualGuidanceBox}>
+                  <Text style={styles.spiritualGuidanceText}>{spiritualGuidance.guidanceText}</Text>
+                </View>
+                
+                {/* ─────── RECOMMENDED COUNT (Tier Selector) ─────── */}
+                <View style={styles.practiceSection}>
+                  <View style={styles.practiceSectionHeader}>
+                    <Ionicons name="options" size={14} color="#FFD700" />
+                    <Text style={styles.practiceSectionTitle}>
+                      {tSafe('screens.planetTransit.practice.counts.title', 'Recommended Count')}
+                    </Text>
+                  </View>
+                  
+                  {/* Tier Selector Pills */}
+                  <View style={styles.tierSelector}>
+                    {(['quick', 'standard', 'deep'] as DhikrTier[]).map((tier) => {
+                      const tierConfig = spiritualGuidance.dhikrTiers[tier];
+                      const isSelected = selectedTier === tier;
+                      const isRecommended = spiritualGuidance.recommendedTier === tier;
+                      return (
+                        <TouchableOpacity
+                          key={tier}
+                          style={[
+                            styles.tierPill,
+                            isSelected && styles.tierPillSelected,
+                            isRecommended && !isSelected && styles.tierPillRecommended,
+                          ]}
+                          onPress={() => setSelectedTier(tier)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={[
+                            styles.tierPillLabel,
+                            isSelected && styles.tierPillLabelSelected,
+                          ]}>
+                            {tSafe(`screens.planetTransit.practice.counts.tier.${tier}`, tier.charAt(0).toUpperCase() + tier.slice(1))}
+                          </Text>
+                          {isRecommended && (
+                            <View style={styles.tierRecommendedDot} />
+                          )}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                  
+                  {/* Selected Tier Details */}
+                  <View style={styles.tierDetails}>
+                    <View style={styles.tierCountRow}>
+                      <Text style={styles.tierCountLabel}>{spiritualGuidance.dhikrName}</Text>
+                      <Text style={styles.tierCountArabic}>{spiritualGuidance.dhikrArabic}</Text>
+                    </View>
+                    <View style={styles.tierCountBadges}>
+                      {spiritualGuidance.dhikrTiers[selectedTier].counts.map((count, idx) => (
+                        <View 
+                          key={count} 
+                          style={[
+                            styles.tierCountBadge,
+                            count === spiritualGuidance.dhikrTiers[selectedTier].defaultCount && styles.tierCountBadgeDefault,
+                          ]}
+                        >
+                          <Text style={[
+                            styles.tierCountValue,
+                            count === spiritualGuidance.dhikrTiers[selectedTier].defaultCount && styles.tierCountValueDefault,
+                          ]}>
+                            {count}×
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                    <Text style={styles.tierEstimate}>
+                      {tSafe('screens.planetTransit.practice.counts.estimate', '~{minutes} min').replace('{minutes}', String(spiritualGuidance.dhikrTiers[selectedTier].estimatedMinutes))}
+                    </Text>
+                  </View>
+                </View>
+                
+                {/* ─────── BEST TIME (Planetary Hour Window) ─────── */}
+                <View style={styles.practiceSection}>
+                  <View style={styles.practiceSectionHeader}>
+                    <Ionicons name="time" size={14} color="#FFD700" />
+                    <Text style={styles.practiceSectionTitle}>
+                      {tSafe('screens.planetTransit.practice.timing.title', 'Best Time')}
+                    </Text>
+                    {/* Strength Badge */}
+                    <View style={[
+                      styles.strengthBadge,
+                      spiritualGuidance.timingStrength === 'peak' && styles.strengthBadgePeak,
+                      spiritualGuidance.timingStrength === 'strong' && styles.strengthBadgeStrong,
+                      spiritualGuidance.timingStrength === 'supportive' && styles.strengthBadgeSupportive,
+                      spiritualGuidance.timingStrength === 'gentle' && styles.strengthBadgeGentle,
+                    ]}>
+                      <Text style={[
+                        styles.strengthBadgeText,
+                        spiritualGuidance.timingStrength === 'peak' && styles.strengthBadgeTextPeak,
+                        spiritualGuidance.timingStrength === 'strong' && styles.strengthBadgeTextStrong,
+                        spiritualGuidance.timingStrength === 'supportive' && styles.strengthBadgeTextSupportive,
+                        spiritualGuidance.timingStrength === 'gentle' && styles.strengthBadgeTextGentle,
+                      ]}>
+                        {tSafe(`screens.planetTransit.practice.strength.${spiritualGuidance.timingStrength}`, spiritualGuidance.timingStrength)}
+                      </Text>
+                    </View>
+                  </View>
+                  
+                  {spiritualGuidance.nextPlanetHour ? (
+                    <View style={styles.planetHourWindow}>
+                      {spiritualGuidance.isInMatchingHour ? (
+                        <View style={styles.planetHourActive}>
+                          <Ionicons name="radio-button-on" size={16} color="#4CAF50" />
+                          <Text style={styles.planetHourActiveText}>
+                            {tSafe('screens.planetTransit.practice.timing.activeNow', 'Active now until {end}')
+                              .replace('{end}', spiritualGuidance.nextPlanetHour.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}
+                          </Text>
+                        </View>
+                      ) : (
+                        <View style={styles.planetHourNext}>
+                          <Text style={styles.planetHourNextLabel}>
+                            {tSafe('screens.planetTransit.practice.timing.nextPlanetHour', 'Next {planet} hour: {start}–{end}')
+                              .replace('{planet}', transitData?.planetKey ?? 'Planet')
+                              .replace('{start}', spiritualGuidance.nextPlanetHour.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
+                              .replace('{end}', spiritualGuidance.nextPlanetHour.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}
+                          </Text>
+                          <Text style={styles.planetHourCountdown}>
+                            {spiritualGuidance.nextPlanetHour.isToday 
+                              ? tSafe('screens.planetTransit.practice.timing.in', 'in {time}')
+                                  .replace('{time}', spiritualGuidance.nextPlanetHour.minutesUntil < 60 
+                                    ? `${spiritualGuidance.nextPlanetHour.minutesUntil} min`
+                                    : `${Math.floor(spiritualGuidance.nextPlanetHour.minutesUntil / 60)}h ${spiritualGuidance.nextPlanetHour.minutesUntil % 60}m`)
+                              : tSafe('screens.planetTransit.practice.timing.tomorrow', 'Tomorrow')}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  ) : (
+                    <Text style={styles.planetHourUnavailable}>
+                      {tSafe('screens.planetTransit.practice.timing.unavailable', 'Planetary hour data unavailable')}
+                    </Text>
+                  )}
+                  
+                  {/* Fallback Guidance */}
+                  <View style={styles.fallbackGuidance}>
+                    <Text style={styles.fallbackTitle}>
+                      {tSafe('screens.planetTransit.practice.fallback.title', "If you can't wait")}
+                    </Text>
+                    <Text style={styles.fallbackText}>
+                      {tSafe('screens.planetTransit.practice.fallback.afterPrayer', 'Do the Quick tier after the next prayer.')}
+                    </Text>
+                  </View>
+                </View>
+                
+                {/* Avoid Warning (only shown during Strength phase) */}
+                {spiritualGuidance.avoidText && spiritualGuidance.phase === 'strength' && (
+                  <View style={styles.spiritualAvoidBox}>
+                    <View style={styles.spiritualAvoidHeader}>
+                      <Ionicons name="warning" size={14} color="#FF6B35" />
+                      <Text style={styles.spiritualAvoidLabel}>
+                        {tSafe('screens.planetTransit.spiritual.avoid', 'Avoid')}
+                      </Text>
+                    </View>
+                    <Text style={styles.spiritualAvoidText}>{spiritualGuidance.avoidText}</Text>
+                  </View>
+                )}
+                
+                {/* Disclaimer */}
+                <View style={styles.spiritualDisclaimer}>
+                  <Ionicons name="information-circle-outline" size={12} color={DarkTheme.textTertiary} />
+                  <Text style={styles.spiritualDisclaimerText}>
+                    {tSafe('screens.planetTransit.practice.disclaimer', 'For reflection, not ruling. Based on classical Islamic esoteric tradition.')}
+                  </Text>
+                </View>
+              </GlassCard>
+            ) : null}
+
             {detailsType === 'transit' && adjacent && historyDates ? (
               <GlassCard style={styles.historyCard}>
                 <View style={styles.cardHeader}>
@@ -1562,33 +2582,122 @@ export default function PlanetTransitDetailsScreen() {
             </GlassCard>
           </>
         ) : detailsType === 'nextDay' && nextDayPayload ? (
-          <GlassCard style={styles.nextDayCard}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="calendar" size={18} color={accent.primary} />
-              <Text style={styles.cardTitle}>{primaryCardTitle}</Text>
-            </View>
-            <View style={styles.rowCenter}>
-              <View style={styles.nextDayOrb}>
-                <Text style={styles.nextDayEmoji}>{nextDayPayload.emoji}</Text>
+          <>
+            {/* Next Day Header Card */}
+            <GlassCard style={styles.nextDayCard}>
+              <View style={styles.cardHeader}>
+                <Ionicons name="calendar" size={18} color={accent.primary} />
+                <Text style={styles.cardTitle}>{primaryCardTitle}</Text>
               </View>
-              <View style={styles.namesCol}>
-                <Text style={styles.primaryName}>{nextDayPayload.dayName}</Text>
-                <Text style={styles.secondaryName}>{nextDayPayload.dayNameArabic}</Text>
+              <View style={styles.rowCenter}>
+                <View style={styles.nextDayOrb}>
+                  <Text style={styles.nextDayEmoji}>{nextDayPayload.emoji}</Text>
+                </View>
+                <View style={styles.namesCol}>
+                  <Text style={styles.primaryName}>{nextDayPayload.dayName}</Text>
+                  <Text style={styles.secondaryName}>{nextDayPayload.dayNameArabic}</Text>
+                </View>
               </View>
-            </View>
-            <View style={styles.pillsRow}>
-              <View style={[styles.pill, { backgroundColor: accent.glow }]}>
-                <Text style={styles.pillLabel}>{t('home.planetTransitDetails.pills.dayRuler')}</Text>
-                <Text style={[styles.pillValue, { color: accent.primary }]}>{nextDayPayload.planetArabic}</Text>
+              <View style={styles.pillsRow}>
+                <View style={[styles.pill, { backgroundColor: accent.glow }]}>
+                  <Text style={styles.pillLabel}>{t('home.planetTransitDetails.pills.dayRuler')}</Text>
+                  <Text style={[styles.pillValue, { color: accent.primary }]}>{nextDayPayload.planetArabic}</Text>
+                </View>
+                <View style={[styles.pill, { backgroundColor: accent.glow }]}>
+                  <Text style={styles.pillLabel}>{t('home.planetTransitDetails.pills.element')}</Text>
+                  <Text style={[styles.pillValue, { color: accent.primary }]}>
+                    {tSafe(`common.elements.${nextDayPayload.element}`, toTitleCase(nextDayPayload.element))}
+                  </Text>
+                </View>
               </View>
-              <View style={[styles.pill, { backgroundColor: accent.glow }]}>
-                <Text style={styles.pillLabel}>{t('home.planetTransitDetails.pills.element')}</Text>
-                <Text style={[styles.pillValue, { color: accent.primary }]}>
-                  {tSafe(`common.elements.${nextDayPayload.element}`, toTitleCase(nextDayPayload.element))}
+            </GlassCard>
+
+            {/* Planet Information Card */}
+            <GlassCard style={styles.infoCard}>
+              <View style={styles.cardHeader}>
+                <Ionicons name="information-circle" size={18} color={accent.primary} />
+                <Text style={styles.cardTitle}>
+                  {language === 'ar' ? 'عن حاكم اليوم' : language === 'fr' ? 'À Propos du Dirigeant' : 'About the Day Ruler'}
                 </Text>
               </View>
-            </View>
-          </GlassCard>
+              <Text style={styles.bodyText}>
+                {language === 'ar' 
+                  ? `${nextDayPayload.planetArabic} يحكم ${nextDayPayload.dayNameArabic} ويحمل طاقة عنصر ${tSafe(`common.elements.${nextDayPayload.element}`, toTitleCase(nextDayPayload.element))}.`
+                  : language === 'fr'
+                  ? `${nextDayPayload.planetArabic} gouverne ${nextDayPayload.dayName} et porte l'énergie de l'élément ${tSafe(`common.elements.${nextDayPayload.element}`, toTitleCase(nextDayPayload.element)).toLowerCase()}.`
+                  : `The ${nextDayPayload.dayName} will be ruled by ${nextDayPayload.planetArabic}, carrying the energy of the ${nextDayPayload.element} element.`}
+              </Text>
+            </GlassCard>
+
+            {/* Element Energy Card */}
+            <GlassCard style={styles.infoCard}>
+              <View style={styles.cardHeader}>
+                <Ionicons name={getElementIconName(nextDayPayload.element)} size={18} color={accent.primary} />
+                <Text style={styles.cardTitle}>
+                  {language === 'ar' ? 'طاقة العنصر' : language === 'fr' ? 'Énergie Élémentaire' : 'Elemental Energy'}
+                </Text>
+              </View>
+              <View style={styles.elementSection}>
+                <View style={[styles.elementBadge, { backgroundColor: accent.glow }]}>
+                  <Text style={styles.elementIcon}>{getElementIcon(nextDayPayload.element)}</Text>
+                  <Text style={[styles.elementName, { color: accent.primary }]}>
+                    {tSafe(`common.elements.${nextDayPayload.element}`, toTitleCase(nextDayPayload.element))}
+                  </Text>
+                </View>
+                <Text style={styles.bodyText}>
+                  {getElementDescription(nextDayPayload.element, language)}
+                </Text>
+              </View>
+            </GlassCard>
+
+            {/* Spiritual Focus Card */}
+            <GlassCard style={styles.infoCard}>
+              <View style={styles.cardHeader}>
+                <Ionicons name="sparkles" size={18} color={accent.primary} />
+                <Text style={styles.cardTitle}>
+                  {language === 'ar' ? 'التركيز الروحي' : language === 'fr' ? 'Focus Spirituel' : 'Spiritual Focus'}
+                </Text>
+              </View>
+              <Text style={styles.bodyText}>
+                {getSpiritualFocus(nextDayPayload.element, language)}
+              </Text>
+            </GlassCard>
+
+            {/* Best Activities Card */}
+            <GlassCard style={styles.infoCard}>
+              <View style={styles.cardHeader}>
+                <Ionicons name="checkmark-circle" size={18} color="#10b981" />
+                <Text style={styles.cardTitle}>
+                  {language === 'ar' ? 'أفضل الأنشطة' : language === 'fr' ? 'Meilleures Activités' : 'Best Activities'}
+                </Text>
+              </View>
+              <View style={styles.activityList}>
+                {getBestActivities(nextDayPayload.element, language).map((activity, index) => (
+                  <View key={index} style={styles.activityItem}>
+                    <View style={[styles.activityDot, { backgroundColor: '#10b981' }]} />
+                    <Text style={styles.activityText}>{activity}</Text>
+                  </View>
+                ))}
+              </View>
+            </GlassCard>
+
+            {/* Preparation Card */}
+            <GlassCard style={styles.infoCard}>
+              <View style={styles.cardHeader}>
+                <Ionicons name="bulb" size={18} color={accent.primary} />
+                <Text style={styles.cardTitle}>
+                  {language === 'ar' ? 'كيف تستعد' : language === 'fr' ? 'Comment se Préparer' : 'How to Prepare'}
+                </Text>
+              </View>
+              <Text style={styles.bodyText}>
+                {language === 'ar'
+                  ? 'خطط ليومك غداً مع وضع هذه الطاقات في الاعتبار. ضع نواياك في الليلة السابقة وتأمل في كيفية مواءمة أفعالك مع حاكم اليوم.'
+                  : language === 'fr'
+                  ? 'Planifiez votre journée de demain en tenant compte de ces énergies. Fixez vos intentions la veille au soir et réfléchissez à la façon d\'aligner vos actions avec le dirigeant du jour.'
+                  : 'Plan your day tomorrow with these energies in mind. Set your intentions the night before and reflect on how to align your actions with the day ruler.'}
+              </Text>
+            </GlassCard>
+          </>
         ) : (
           <GlassCard style={styles.nextDayCard}>
             <Text style={styles.bodyText}>{t('home.planetTransitDetails.error')}</Text>
@@ -1631,6 +2740,9 @@ export default function PlanetTransitDetailsScreen() {
                       { borderColor: isUserSign ? elementAcc.primary + '50' : 'rgba(255,255,255,0.08)' }
                     ]}
                     onPress={() => {
+                      // Scroll to top for better UX when viewing new transit
+                      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+                      
                       const legacyFormat = adaptTransitToLegacyFormat(transitInfo);
                       router.push({
                         pathname: '/(tabs)/planet-transit-details',
@@ -1688,56 +2800,6 @@ export default function PlanetTransitDetailsScreen() {
                 <Text style={styles.bodyText}>{t('common.loading')}</Text>
               </View>
             )}
-          </GlassCard>
-        )}
-
-        {/* Collective Transit Explanation - Simplified for non-personal transits */}
-        {personalizedInfluence && !isPersonalTransit && (
-          <GlassCard style={styles.influenceCard}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="globe-outline" size={20} color="#6495ED" />
-              <Text style={styles.cardTitle}>
-                {t('home.planetTransitDetails.influenceEngine.collectiveInfluence')}
-              </Text>
-            </View>
-
-            {/* Influence Type Badge (smaller) */}
-            <View style={[styles.influenceTypeBadge, { backgroundColor: getInfluenceTypeColor(personalizedInfluence.influenceType) + '20', borderColor: getInfluenceTypeColor(personalizedInfluence.influenceType) + '50', alignSelf: 'flex-start' }]}>
-              <Text style={[styles.influenceTypeText, { color: getInfluenceTypeColor(personalizedInfluence.influenceType) }]}>
-                {(influenceTypeLabel?.[personalizedInfluence.influenceType] ?? personalizedInfluence.influenceType).toUpperCase()}{' '}
-                {(language === 'ar' ? 'عبور' : 'TRANSIT')}
-              </Text>
-            </View>
-
-            {/* Collective Impact (Cosmic Weather) */}
-            <View style={[styles.summaryCard, { borderColor: '#6495ED30' }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                <Ionicons name="cloudy-night-outline" size={16} color="#6495ED" />
-                <Text style={[styles.summaryTitle, { color: '#6495ED' }]}>
-                  {t('home.planetTransitDetails.influenceEngine.cosmicWeather')}
-                </Text>
-              </View>
-              <Text style={styles.summaryText}>{personalizedInfluence.collectiveSummary}</Text>
-            </View>
-
-            {/* Personal Relevance (Brief) */}
-            <View style={[styles.summaryCard, { borderColor: '#9C27B030' }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                <Ionicons name="person-outline" size={16} color="#9C27B0" />
-                <Text style={[styles.summaryTitle, { color: '#9C27B0' }]}>
-                  {t('home.planetTransitDetails.influenceEngine.forYou')}
-                </Text>
-              </View>
-              <Text style={styles.summaryText}>{personalizedInfluence.personalSummary}</Text>
-            </View>
-
-            {/* Simple disclaimer */}
-            <View style={[styles.disclaimerBox, { marginTop: 0 }]}>
-              <Ionicons name="information-circle-outline" size={14} color={DarkTheme.textMuted} />
-              <Text style={styles.disclaimerBoxText}>
-                {t('home.planetTransitDetails.disclaimer')}
-              </Text>
-            </View>
           </GlassCard>
         )}
 
@@ -2327,14 +3389,15 @@ const styles = StyleSheet.create({
   },
   guidanceGrid: {
     flexDirection: 'row',
-    gap: Spacing.sm,
+    gap: 10,
   },
   guidanceBox: {
     flex: 1,
-    borderRadius: 14,
-    padding: Spacing.md,
-    gap: Spacing.sm,
+    borderRadius: 12,
+    padding: 12,
+    gap: 8,
     backgroundColor: 'rgba(255,255,255,0.05)',
+    minHeight: 100,
   },
   bestForBox: {
     borderColor: 'rgba(76, 175, 80, 0.35)',
@@ -2350,30 +3413,50 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   guidanceBoxTitle: {
-    fontSize: 12,
+    fontSize: 11,
+    fontWeight: '700',
     color: DarkTheme.textSecondary,
     textTransform: 'uppercase',
-    letterSpacing: 0.4,
+    letterSpacing: 0.5,
   },
   guidanceItem: {
     fontSize: 13,
     color: DarkTheme.textSecondary,
-    lineHeight: 18,
+    lineHeight: 19,
+    flexShrink: 1,
   },
-  impactNoteContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    padding: Spacing.sm,
-    borderRadius: 8,
+  transitLensCard: {
+    marginTop: 10,
+    borderRadius: 12,
     borderWidth: 1,
-    gap: Spacing.xs,
-    marginTop: Spacing.xs,
+    padding: 12,
+    gap: 10,
   },
-  impactNoteText: {
+  transitLensRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  transitLensTitle: {
     flex: 1,
     fontSize: 12,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+  },
+  transitLensSection: {
+    gap: 4,
+  },
+  transitLensLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: DarkTheme.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  transitLensText: {
+    fontSize: 13,
     color: DarkTheme.textSecondary,
-    lineHeight: 17,
+    lineHeight: 19,
   },
   dailyStack: {
     gap: Spacing.md,
@@ -2724,6 +3807,50 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: Typography.weightSemibold,
   },
+  // Element section styling
+  elementSection: {
+    gap: Spacing.md,
+  },
+  elementBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    padding: Spacing.md,
+    borderRadius: Spacing.md,
+    alignSelf: 'flex-start',
+  },
+  elementIcon: {
+    fontSize: 24,
+  },
+  elementName: {
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightBold,
+  },
+  // Activity list styling
+  activityList: {
+    gap: Spacing.sm,
+  },
+  activityItem: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    alignItems: 'flex-start',
+  },
+  activityDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginTop: 6,
+  },
+  activityText: {
+    flex: 1,
+    fontSize: Typography.body,
+    lineHeight: Typography.body * Typography.lineHeightNormal,
+    color: DarkTheme.textSecondary,
+  },
+  // Info card styling
+  infoCard: {
+    gap: Spacing.md,
+  },
   bodyText: {
     fontSize: 14,
     color: DarkTheme.textSecondary,
@@ -2943,6 +4070,351 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: DarkTheme.textMuted,
     lineHeight: 16,
+  },
+  // ─────────────────────────────────────────────────────────────────────────────
+  // SPIRITUAL PRACTICE CARD STYLES (Classical Degree-Based Guidance)
+  // ─────────────────────────────────────────────────────────────────────────────
+  spiritualCard: {
+    gap: Spacing.md,
+  },
+  spiritualPhaseBadge: {
+    alignSelf: 'flex-start',
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  spiritualPhaseRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  spiritualPhaseLabel: {
+    fontSize: 13,
+    fontWeight: Typography.weightSemibold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  spiritualPhaseArabic: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    fontFamily: Platform.OS === 'ios' ? 'Geeza Pro' : undefined,
+  },
+  spiritualDegreeBadge: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 4,
+  },
+  spiritualStatusText: {
+    fontSize: 14,
+    color: DarkTheme.textPrimary,
+    fontWeight: Typography.weightMedium,
+    lineHeight: 20,
+  },
+  spiritualGuidanceBox: {
+    backgroundColor: 'rgba(255, 215, 0, 0.08)',
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#FFD700',
+    padding: Spacing.md,
+  },
+  spiritualGuidanceText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  spiritualDhikrCard: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 12,
+    padding: Spacing.md,
+    gap: Spacing.sm,
+  },
+  spiritualDhikrHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  spiritualDhikrLabel: {
+    fontSize: 11,
+    color: '#FFD700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    fontWeight: Typography.weightSemibold,
+  },
+  spiritualDhikrContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  spiritualDhikrName: {
+    fontSize: 15,
+    color: DarkTheme.textPrimary,
+    fontWeight: Typography.weightMedium,
+  },
+  spiritualDhikrArabic: {
+    fontSize: 18,
+    color: DarkTheme.textPrimary,
+    fontFamily: Platform.OS === 'ios' ? 'Geeza Pro' : undefined,
+  },
+  spiritualDhikrCountBadge: {
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  spiritualDhikrCount: {
+    fontSize: 13,
+    color: '#4CAF50',
+    fontWeight: Typography.weightBold,
+  },
+  spiritualDhikrNote: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+    fontStyle: 'italic',
+    lineHeight: 18,
+  },
+  spiritualAvoidBox: {
+    backgroundColor: 'rgba(255, 107, 53, 0.1)',
+    borderRadius: 10,
+    padding: Spacing.sm,
+    gap: 6,
+  },
+  spiritualAvoidHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  spiritualAvoidLabel: {
+    fontSize: 11,
+    color: '#FF6B35',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    fontWeight: Typography.weightSemibold,
+  },
+  spiritualAvoidText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+  },
+  spiritualDisclaimer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingTop: Spacing.xs,
+  },
+  spiritualDisclaimerText: {
+    fontSize: 10,
+    color: DarkTheme.textTertiary,
+    flex: 1,
+  },
+  // ─────────────────────────────────────────────────────────────────────────────
+  // NEW: Practice Section Styles (Tier Selector + Timing Window)
+  // ─────────────────────────────────────────────────────────────────────────────
+  practiceSection: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 12,
+    padding: Spacing.md,
+    gap: Spacing.sm,
+  },
+  practiceSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  practiceSectionTitle: {
+    fontSize: 11,
+    color: '#FFD700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    fontWeight: Typography.weightSemibold,
+    flex: 1,
+  },
+  // Tier Selector
+  tierSelector: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 4,
+  },
+  tierPill: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tierPillSelected: {
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    borderColor: '#4CAF50',
+  },
+  tierPillRecommended: {
+    borderColor: 'rgba(255, 215, 0, 0.4)',
+  },
+  tierPillLabel: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: Typography.weightMedium,
+    textTransform: 'capitalize',
+  },
+  tierPillLabelSelected: {
+    color: '#4CAF50',
+    fontWeight: Typography.weightSemibold,
+  },
+  tierRecommendedDot: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#FFD700',
+  },
+  tierDetails: {
+    marginTop: 8,
+    gap: 8,
+  },
+  tierCountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  tierCountLabel: {
+    fontSize: 14,
+    color: DarkTheme.textPrimary,
+    fontWeight: Typography.weightMedium,
+  },
+  tierCountArabic: {
+    fontSize: 16,
+    color: DarkTheme.textPrimary,
+    fontFamily: Platform.OS === 'ios' ? 'Geeza Pro' : undefined,
+  },
+  tierCountBadges: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  tierCountBadge: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  tierCountBadgeDefault: {
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(76, 175, 80, 0.4)',
+  },
+  tierCountValue: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    fontWeight: Typography.weightMedium,
+  },
+  tierCountValueDefault: {
+    color: '#4CAF50',
+    fontWeight: Typography.weightBold,
+  },
+  tierEstimate: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+  },
+  // Strength Badge
+  strengthBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: 'rgba(158, 158, 158, 0.2)',
+  },
+  strengthBadgePeak: {
+    backgroundColor: 'rgba(255, 215, 0, 0.2)',
+  },
+  strengthBadgeStrong: {
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+  },
+  strengthBadgeSupportive: {
+    backgroundColor: 'rgba(33, 150, 243, 0.2)',
+  },
+  strengthBadgeGentle: {
+    backgroundColor: 'rgba(158, 158, 158, 0.2)',
+  },
+  strengthBadgeText: {
+    fontSize: 10,
+    fontWeight: Typography.weightBold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
+    color: '#9E9E9E',
+  },
+  strengthBadgeTextPeak: {
+    color: '#FFD700',
+  },
+  strengthBadgeTextStrong: {
+    color: '#4CAF50',
+  },
+  strengthBadgeTextSupportive: {
+    color: '#2196F3',
+  },
+  strengthBadgeTextGentle: {
+    color: '#9E9E9E',
+  },
+  // Planet Hour Window
+  planetHourWindow: {
+    marginTop: 4,
+  },
+  planetHourActive: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    borderRadius: 8,
+    padding: Spacing.sm,
+  },
+  planetHourActiveText: {
+    fontSize: 13,
+    color: '#4CAF50',
+    fontWeight: Typography.weightMedium,
+    flex: 1,
+  },
+  planetHourNext: {
+    gap: 4,
+  },
+  planetHourNextLabel: {
+    fontSize: 14,
+    color: DarkTheme.textPrimary,
+    fontWeight: Typography.weightMedium,
+  },
+  planetHourCountdown: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+  },
+  planetHourUnavailable: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+    fontStyle: 'italic',
+  },
+  // Fallback Guidance
+  fallbackGuidance: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+  },
+  fallbackTitle: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    fontWeight: Typography.weightMedium,
+    marginBottom: 2,
+  },
+  fallbackText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
   },
 });
 

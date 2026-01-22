@@ -22,6 +22,9 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 
+const inflightPositions = new Map<string, Promise<PlanetPositions | null>>();
+const inflightMoon = new Map<string, Promise<MoonLongitudeResult>>();
+
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
@@ -131,39 +134,54 @@ export async function getPlanetPositions(
       }
       return cached;
     }
-    
-    // Fetch from JPL Horizons
-    if (__DEV__) {
-      console.log('[EphemerisService] Fetching from JPL Horizons...');
+
+    // Inflight dedupe: avoid multiple concurrent Horizons requests for same hour.
+    const inflight = inflightPositions.get(cacheKey);
+    if (inflight) {
+      return await inflight;
     }
     
-    const positions = await fetchPositionsFromHorizons(hourlyDate);
-    
-    if (positions) {
-      // Cache successful result
-      const result: PlanetPositions = {
-        timestamp: hourlyDate.getTime(),
-        dateISO,
-        planets: positions,
-        source: 'ephemeris',
-        expiresAt: hourlyDate.getTime() + CACHE_TTL_MS,
-      };
-      
-      await cachePositions(cacheKey, result);
-      
+    const promise = (async () => {
+      // Fetch from JPL Horizons
       if (__DEV__) {
-        console.log('[EphemerisService] Successfully fetched and cached positions');
+        console.log('[EphemerisService] Fetching from JPL Horizons...');
       }
-      
-      return result;
+
+      const positions = await fetchPositionsFromHorizons(hourlyDate);
+
+      if (positions) {
+        // Cache successful result
+        const result: PlanetPositions = {
+          timestamp: hourlyDate.getTime(),
+          dateISO,
+          planets: positions,
+          source: 'ephemeris',
+          expiresAt: hourlyDate.getTime() + CACHE_TTL_MS,
+        };
+
+        await cachePositions(cacheKey, result);
+
+        if (__DEV__) {
+          console.log('[EphemerisService] Successfully fetched and cached positions');
+        }
+
+        return result;
+      }
+
+      // Fallback to approx mode
+      if (__DEV__) {
+        console.warn('[EphemerisService] Falling back to approx mode');
+      }
+
+      return getApproxPositions(hourlyDate, dateISO);
+    })();
+
+    inflightPositions.set(cacheKey, promise);
+    try {
+      return await promise;
+    } finally {
+      inflightPositions.delete(cacheKey);
     }
-    
-    // Fallback to approx mode
-    if (__DEV__) {
-      console.warn('[EphemerisService] Falling back to approx mode');
-    }
-    
-    return getApproxPositions(hourlyDate, dateISO);
     
   } catch (error) {
     if (__DEV__) {
@@ -204,9 +222,50 @@ export async function getMoonEclipticLongitude(
       return cached;
     }
 
-    // If we're offline, don't even try Horizons — return & cache approx.
-    const netInfo = await NetInfo.fetch();
-    if (!netInfo.isConnected) {
+    const inflight = inflightMoon.get(cacheKey);
+    if (inflight) {
+      return await inflight;
+    }
+
+    const promise = (async () => {
+      // If we're offline, don't even try Horizons — return & cache approx.
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected) {
+        const approx: MoonLongitudeResult = {
+          timestamp: bucketedDate.getTime(),
+          dateISO,
+          longitude: getApproxPositions(bucketedDate, dateISO).planets.moon.longitude,
+          source: 'approx',
+          expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
+        };
+        await cacheMoonLongitude(cacheKey, approx);
+        return approx;
+      }
+
+      if (__DEV__) {
+        console.log('[EphemerisService] Fetching Moon longitude from JPL Horizons...');
+      }
+
+      // Reuse the same Horizons query logic, but only for the Moon.
+      const dateStr = bucketedDate.toISOString().split('.')[0].replace('T', ' ').slice(0, 16);
+      const position = await fetchSinglePlanetPosition('moon', HORIZONS_PLANET_CODES.moon, dateStr);
+
+      if (position && typeof position.longitude === 'number') {
+        const result: MoonLongitudeResult = {
+          timestamp: bucketedDate.getTime(),
+          dateISO,
+          longitude: position.longitude,
+          source: 'ephemeris',
+          expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
+        };
+        await cacheMoonLongitude(cacheKey, result);
+        return result;
+      }
+
+      if (__DEV__) {
+        console.warn('[EphemerisService] Moon longitude fetch failed; using approx');
+      }
+
       const approx: MoonLongitudeResult = {
         timestamp: bucketedDate.getTime(),
         dateISO,
@@ -216,41 +275,14 @@ export async function getMoonEclipticLongitude(
       };
       await cacheMoonLongitude(cacheKey, approx);
       return approx;
+    })();
+
+    inflightMoon.set(cacheKey, promise);
+    try {
+      return await promise;
+    } finally {
+      inflightMoon.delete(cacheKey);
     }
-
-    if (__DEV__) {
-      console.log('[EphemerisService] Fetching Moon longitude from JPL Horizons...');
-    }
-
-    // Reuse the same Horizons query logic, but only for the Moon.
-    const dateStr = bucketedDate.toISOString().split('.')[0].replace('T', ' ').slice(0, 16);
-    const position = await fetchSinglePlanetPosition('moon', HORIZONS_PLANET_CODES.moon, dateStr);
-
-    if (position && typeof position.longitude === 'number') {
-      const result: MoonLongitudeResult = {
-        timestamp: bucketedDate.getTime(),
-        dateISO,
-        longitude: position.longitude,
-        source: 'ephemeris',
-        expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
-      };
-      await cacheMoonLongitude(cacheKey, result);
-      return result;
-    }
-
-    if (__DEV__) {
-      console.warn('[EphemerisService] Moon longitude fetch failed; using approx');
-    }
-
-    const approx: MoonLongitudeResult = {
-      timestamp: bucketedDate.getTime(),
-      dateISO,
-      longitude: getApproxPositions(bucketedDate, dateISO).planets.moon.longitude,
-      source: 'approx',
-      expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
-    };
-    await cacheMoonLongitude(cacheKey, approx);
-    return approx;
   } catch (error) {
     if (__DEV__) {
       console.error('[EphemerisService] Moon longitude error:', error);

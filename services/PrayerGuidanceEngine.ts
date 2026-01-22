@@ -592,12 +592,13 @@ export class PrayerGuidanceEngine {
    */
   private static getDayRuler(date: Date): Planet {
     const dayNames: DayOfWeek[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const dayIndex = date.getDay(); // 0 = Sunday
-    const dayName = dayNames[dayIndex];
+    const dayIndexRaw = Number.isFinite(date?.getTime?.()) ? date.getDay() : 0; // 0 = Sunday
+    const dayIndex = Number.isInteger(dayIndexRaw) && dayIndexRaw >= 0 && dayIndexRaw < 7 ? dayIndexRaw : 0;
+    const dayName: DayOfWeek = dayNames[dayIndex] ?? 'Sunday';
     
     // First hour of the day determines the day's ruler (Chaldean order)
-    const sequence = PLANETARY_HOUR_SEQUENCE[dayName];
-    return sequence[0];
+    const sequence = PLANETARY_HOUR_SEQUENCE[dayName] ?? PLANETARY_HOUR_SEQUENCE.Sunday;
+    return sequence?.[0] ?? 'Sun';
   }
   
   /**
@@ -605,7 +606,9 @@ export class PrayerGuidanceEngine {
    */
   private static getDayName(date: Date): DayOfWeek {
     const dayNames: DayOfWeek[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    return dayNames[date.getDay()];
+    const dayIndexRaw = Number.isFinite(date?.getTime?.()) ? date.getDay() : 0;
+    const dayIndex = Number.isInteger(dayIndexRaw) && dayIndexRaw >= 0 && dayIndexRaw < 7 ? dayIndexRaw : 0;
+    return dayNames[dayIndex] ?? 'Sunday';
   }
 }
 

@@ -153,21 +153,6 @@ export function RealTimeDailyGuidance({
     if (!element) return '';
     return t(`elements.${element}`);
   };
-
-  
-  if (loading || !guidance) {
-    return (
-      <Pressable
-        style={styles.container}
-        onPress={handlePress}
-        android_ripple={{ color: 'rgba(255, 255, 255, 0.1)' }}
-      >
-        <View style={[styles.gradient, { backgroundColor: 'rgba(139, 115, 85, 0.08)' }]}>
-          <Text style={styles.loadingText}>Loading guidance...</Text>
-        </View>
-      </Pressable>
-    );
-  }
   
   // Get day ruler
   const now = new Date();
@@ -176,7 +161,7 @@ export function RealTimeDailyGuidance({
 
   // Use personalized timing quality from guidance (already considers user element)
   // Falls back to objective quality only if guidance somehow doesn't have it
-  const timingQuality = guidance.timingQuality || getObjectiveTimingQuality(dayRuler);
+  const timingQuality = guidance?.timingQuality || getObjectiveTimingQuality(dayRuler);
   const statusColor = getStatusColor(timingQuality);
   const statusLabel = getStatusLabel(timingQuality);
 

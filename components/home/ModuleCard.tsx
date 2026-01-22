@@ -116,6 +116,10 @@ const styles = StyleSheet.create({
     marginHorizontal: Spacing.screenPadding,
     marginVertical: Spacing.sm,
     borderRadius: Borders.radiusLg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: 'rgba(30, 20, 36, 0.65)',
+    overflow: 'hidden',
     ...Shadows.card,
   },
   gradientBackground: {
@@ -123,10 +127,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   glassOverlay: {
-    backgroundColor: 'rgba(45, 21, 21, 0.4)', // Semi-transparent dark burgundy
-    backdropFilter: 'blur(10px)', // Web only, gracefully degrades
     borderRadius: Borders.radiusLg,
-    borderWidth: 1,
+    borderWidth: 0, // Remove border since container now has it
     overflow: 'hidden',
   },
   accentBar: {

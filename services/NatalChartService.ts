@@ -130,6 +130,67 @@ function calculateLST(date: Date, longitude: number): number {
   return lst;
 }
 
+function getTimeZoneOffsetMs(date: Date, timeZone: string): number {
+  // Offset = (time in tz interpreted as UTC) - (actual UTC time)
+  // This is a common Intl-based technique that handles DST.
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+
+  const parts = dtf.formatToParts(date);
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+
+  const year = get('year');
+  const month = get('month');
+  const day = get('day');
+  const hour = get('hour');
+  const minute = get('minute');
+  const second = get('second');
+
+  const asUTC = Date.UTC(year, month - 1, day, hour, minute, second);
+  return asUTC - date.getTime();
+}
+
+function zonedLocalToUtcDate(dobISO: string, birthTime: string, timeZone: string): Date | null {
+  const [yRaw, mRaw, dRaw] = dobISO.split('-');
+  const [hhRaw, mmRaw] = birthTime.split(':');
+
+  const year = Number(yRaw);
+  const month = Number(mRaw);
+  const day = Number(dRaw);
+  const hours = Number(hhRaw);
+  const minutes = Number(mmRaw);
+
+  if (
+    !Number.isFinite(year) ||
+    !Number.isFinite(month) ||
+    !Number.isFinite(day) ||
+    !Number.isFinite(hours) ||
+    !Number.isFinite(minutes)
+  ) {
+    return null;
+  }
+
+  // First guess: interpret the local wall-clock time as UTC.
+  const localAsUTC = Date.UTC(year, month - 1, day, hours, minutes, 0);
+  let utc = new Date(localAsUTC);
+
+  // Refine using tz offset at that instant (do twice for DST boundaries).
+  for (let i = 0; i < 2; i++) {
+    const offset = getTimeZoneOffsetMs(utc, timeZone);
+    utc = new Date(localAsUTC - offset);
+  }
+
+  return utc;
+}
+
 /**
  * Calculate Ascendant (Rising Sign)
  * Based on LST and geographic latitude
@@ -137,13 +198,14 @@ function calculateLST(date: Date, longitude: number): number {
 export async function calculateAscendant(
   dobISO: string,
   birthTime: string,
-  location: UserLocation
+  location: UserLocation,
+  timeZone: string = 'UTC'
 ): Promise<PlanetInSign | null> {
   try {
-    // Parse birth datetime
-    const [hours, minutes] = birthTime.split(':').map(Number);
-    const date = new Date(`${dobISO}T00:00:00Z`);
-    date.setUTCHours(hours, minutes, 0, 0);
+    const date = zonedLocalToUtcDate(dobISO, birthTime, timeZone);
+    if (!date) {
+      return null;
+    }
     
     // Calculate LST
     const lst = calculateLST(date, location.longitude);
@@ -181,7 +243,59 @@ export async function calculateAscendant(
       degree
     };
   } catch (error) {
-    console.error('Error calculating ascendant:', error);
+    if (__DEV__) {
+      console.error('[NatalChartService] Error calculating ascendant:', error);
+    }
+    return null;
+  }
+}
+
+/**
+ * Synchronous ascendant calculation for use in profile derivation.
+ */
+export function calculateAscendantSync(
+  dobISO: string,
+  birthTime: string,
+  timeZone: string,
+  location: UserLocation
+): PlanetInSign | null {
+  try {
+    const date = zonedLocalToUtcDate(dobISO, birthTime, timeZone);
+    if (!date) {
+      return null;
+    }
+
+    const lst = calculateLST(date, location.longitude);
+    const latitude = location.latitude;
+
+    const obliquity = 23.4397;
+    const ramc = lst;
+
+    const ramcRad = (ramc * Math.PI) / 180;
+    const latRad = (latitude * Math.PI) / 180;
+    const obliquityRad = (obliquity * Math.PI) / 180;
+
+    const numerator = -Math.cos(ramcRad);
+    const denominator =
+      Math.sin(ramcRad) * Math.cos(obliquityRad) + Math.tan(latRad) * Math.sin(obliquityRad);
+
+    let ascendant = Math.atan2(numerator, denominator) * (180 / Math.PI);
+
+    if (ascendant < 0) ascendant += 360;
+
+    const burjIndex = Math.floor(ascendant / 30);
+    const degree = ascendant % 30;
+
+    return {
+      burjAr: BURJ_NAMES_AR[burjIndex],
+      burjEn: BURJ_NAMES_EN[burjIndex],
+      burjIndex,
+      degree,
+    };
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[NatalChartService] Error calculating ascendant (sync):', error);
+    }
     return null;
   }
 }
@@ -376,13 +490,14 @@ function interpretAspect(
 export async function generateNatalChart(
   dobISO: string,
   birthTime: string,
-  location: UserLocation
+  location: UserLocation,
+  timeZone: string = 'UTC'
 ): Promise<NatalChart | null> {
   try {
-    // Parse birth datetime
-    const [hours, minutes] = birthTime.split(':').map(Number);
-    const date = new Date(`${dobISO}T00:00:00Z`);
-    date.setUTCHours(hours, minutes, 0, 0);
+    const date = zonedLocalToUtcDate(dobISO, birthTime, timeZone);
+    if (!date) {
+      return null;
+    }
     
     // Get planetary positions from ephemeris
     const positions = await getPlanetPositions(date);
@@ -392,7 +507,7 @@ export async function generateNatalChart(
     }
     
     // Calculate Ascendant
-    const ascendant = await calculateAscendant(dobISO, birthTime, location);
+    const ascendant = await calculateAscendant(dobISO, birthTime, location, timeZone);
     if (!ascendant) {
       return null;
     }

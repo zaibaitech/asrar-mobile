@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Borders, DarkTheme, ElementAccents, Typography } from '@/constants/DarkTheme';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -153,9 +153,7 @@ const selectedTransit = useMemo(() => {
             // Slide A: Next Prayer
             <View key="prayer" style={[styles.widgetContent, { backgroundColor: 'rgba(16, 185, 129, 0.08)' }]}>
               <Text style={styles.widgetLabel} numberOfLines={1}>{t('home.nextPrayer')}</Text>
-              {prayerLoading ? (
-                <ActivityIndicator size="small" color="#10b981" />
-              ) : nextPrayer ? (
+              {nextPrayer ? (
                 <>
                   <Text style={styles.widgetPrimary} numberOfLines={1}>{nextPrayer.nameArabic}</Text>
                   <Text style={[styles.widgetTime, { color: '#10b981' }]} numberOfLines={1}>
@@ -212,7 +210,9 @@ const selectedTransit = useMemo(() => {
                   </View>
                 </>
               ) : (
-                <Text style={styles.widgetTertiary}>{t('common.loading')}</Text>
+                <Text style={styles.widgetTertiary} numberOfLines={2}>
+                  {t('home.tapToViewDetails') || 'Tap to view details'}
+                </Text>
               )}
             </View>
           ]}

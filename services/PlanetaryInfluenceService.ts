@@ -879,6 +879,53 @@ function getCollectiveSummary(planet: Planet, stage: DegreeStage, lang: AppLangu
 /**
  * Get personal relevance summary based on resonance and whether in user's sign
  */
+function getPlanetFunctionSentence(planet: Planet, lang: AppLanguage): string {
+  switch (planet) {
+    case 'Sun':
+      return lang === 'fr'
+        ? "Le Soleil gouverne l’autorité, la vitalité, la clarté et le sens."
+        : lang === 'ar'
+          ? 'الشمس تدل على السلطة والحيوية والوضوح والغاية.'
+          : 'The Sun governs authority, vitality, clarity, and purpose.';
+    case 'Moon':
+      return lang === 'fr'
+        ? "La Lune gouverne les humeurs, la mémoire, la protection et les rythmes du quotidien."
+        : lang === 'ar'
+          ? 'القمر يدل على المزاج والذاكرة والتغذية وإيقاع الحياة اليومية.'
+          : 'The Moon governs moods, memory, nourishment, and daily rhythms.';
+    case 'Mercury':
+      return lang === 'fr'
+        ? "Mercure gouverne la parole, les échanges, l’apprentissage et la circulation de l’information."
+        : lang === 'ar'
+          ? 'عطارد يدل على الكلام والتجارة والتعلّم وحركة المعلومات.'
+          : 'Mercury governs speech, trade, learning, and the movement of information.';
+    case 'Venus':
+      return lang === 'fr'
+        ? "Vénus gouverne l’harmonie, l’affection, la beauté et la douceur des relations."
+        : lang === 'ar'
+          ? 'الزهرة تدل على الانسجام والمودة والجمال وسهولة العلاقات.'
+          : 'Venus governs harmony, affection, beauty, and relational ease.';
+    case 'Mars':
+      return lang === 'fr'
+        ? "Mars gouverne l’élan, le conflit, le courage et l’action décisive."
+        : lang === 'ar'
+          ? 'المريخ يدل على الاندفاع والصراع والشجاعة والحسم في الفعل.'
+          : 'Mars governs drive, conflict, courage, and decisive action.';
+    case 'Jupiter':
+      return lang === 'fr'
+        ? "Jupiter gouverne la croissance, la sagesse, la générosité et l’expansion."
+        : lang === 'ar'
+          ? 'المشتري يدل على النمو والحكمة والكرم والاتساع النافع.'
+          : 'Jupiter governs growth, wisdom, generosity, and meaningful expansion.';
+    case 'Saturn':
+      return lang === 'fr'
+        ? "Saturne gouverne la structure, les limites, la responsabilité, le temps et l’endurance."
+        : lang === 'ar'
+          ? 'زحل يدل على البنية والحدود والمسؤولية والزمن والصبر.'
+          : 'Saturn governs structure, limits, responsibility, time, and endurance.';
+  }
+}
+
 function getPersonalSummary(
   planet: Planet,
   isInUserSign: boolean,
@@ -920,13 +967,15 @@ function getPersonalSummary(
               ? 'creates friction with your elemental nature'
               : 'has a neutral relationship with your elemental nature';
 
+  const planetFunction = getPlanetFunctionSentence(planet, lang);
+
   if (lang === 'fr') {
-    return `Ce transit ne vise pas directement votre signe, mais ${resonanceNote}. Vous le ressentez à travers l’environnement, les responsabilités et l’humeur collective.`;
+    return `Transit collectif : ${planetFunction} Pour vous, cela ${resonanceNote} — vous pouvez surtout le percevoir via l’environnement, les responsabilités et l’humeur collective.`;
   }
   if (lang === 'ar') {
-    return `هذا العبور لا يستهدف برجك مباشرة، لكنه ${resonanceNote}. تشعر به عبر البيئة والمسؤوليات والمزاج العام.`;
+    return `هذا عُبور ذو طابع عام: ${planetFunction} وبالنسبة لك، فهو ${resonanceNote} — وقد يظهر عبر البيئة والمسؤوليات والمزاج العام.`;
   }
-  return `This transit doesn't target your sign directly, but ${resonanceNote}. You feel it through environment, responsibilities, and collective mood.`;
+  return `Collective transit: ${planetFunction} For you, it ${resonanceNote} — you may notice it through environment, responsibilities, and collective mood.`;
 }
 
 // ============================================================================

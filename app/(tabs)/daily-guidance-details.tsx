@@ -91,6 +91,26 @@ export default function DailyGuidanceDetailsScreen() {
   const manazilBaseline = manazilBaselineIndex !== null
     ? getLunarMansionByIndex(manazilBaselineIndex)
     : null;
+
+  const ascendantBurj = profile?.derived?.ascendantBurj;
+  const ascendantElement = profile?.derived?.ascendantElement as Element | undefined;
+
+  function getElementRelationship(a?: Element, b?: Element): 'harmonious' | 'complementary' | 'transformative' | 'neutral' {
+    if (!a || !b) return 'neutral';
+    if (a === b) return 'harmonious';
+    const active = new Set<Element>(['fire', 'air']);
+    const receptive = new Set<Element>(['water', 'earth']);
+    if ((active.has(a) && active.has(b)) || (receptive.has(a) && receptive.has(b))) {
+      return 'complementary';
+    }
+    const oppositions: Record<Element, Element> = {
+      fire: 'water',
+      water: 'fire',
+      air: 'earth',
+      earth: 'air',
+    };
+    return oppositions[a] === b ? 'transformative' : 'neutral';
+  }
   
   return (
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
@@ -193,6 +213,33 @@ export default function DailyGuidanceDetailsScreen() {
               )}
             </View>
           </View>
+
+          {/* Ascendant Lens (Educational) */}
+          {ascendantBurj && ascendantElement && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('home.dailyGuidanceDetails.sections.ascendantLens')}</Text>
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="sparkles-outline" size={24} color={DarkTheme.accent} />
+                  <Text style={[styles.cardTitle, { color: DarkTheme.accent }]}>
+                    {t('home.dailyGuidanceDetails.ascendant.title')}
+                  </Text>
+                </View>
+                <Text style={styles.cardText}>
+                  {t('home.dailyGuidanceDetails.ascendant.summary', {
+                    sign: ascendantBurj,
+                    element: getElementLabel(ascendantElement).toLowerCase(),
+                  })}
+                </Text>
+                <Text style={styles.cardText}>
+                  {t(`home.dailyGuidanceDetails.ascendant.elementHints.${ascendantElement}`)}
+                </Text>
+                <Text style={styles.cardText}>
+                  {t(`home.dailyGuidanceDetails.ascendant.blend.${getElementRelationship(ascendantElement, dayElement)}`)}
+                </Text>
+              </View>
+            </View>
+          )}
           
           {/* PREMIUM: Best For Section - Personal action guidance */}
           {bestForKeys.length > 0 && (

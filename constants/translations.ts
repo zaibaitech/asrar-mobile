@@ -182,7 +182,7 @@ export const translations = {
         yourElement: "Your Element",
         resonanceLabel: "Resonance",
         guidanceLabel: "Guidance",
-        understandResonance: "Understand resonance →",
+        understandResonance: "View details →",
         favorable: "Favorable",
         balanced: "Balanced",
         delicate: "Delicate",
@@ -2101,7 +2101,25 @@ export const translations = {
       },
       showAll: "Show All",
       nextPrayer: "Next Prayer",
+          ascendantLens: "Ascendant Lens",
       nextPlanetHour: "Next Planet Hour",
+
+        ascendant: {
+          title: "Ascendant (Rising Sign)",
+          summary: "Your Ascendant is {sign} ({element} tone). It describes how you meet the day and how you initiate action.",
+          elementHints: {
+            fire: "Ascendant Fire: lead with courage, start cleanly, keep momentum — but avoid rushing.",
+            water: "Ascendant Water: lead with gentleness, intuition, and sincerity — but avoid absorbing everything.",
+            air: "Ascendant Air: lead with clarity, conversation, and learning — but avoid scattered attention.",
+            earth: "Ascendant Earth: lead with structure, patience, and completion — but avoid rigidity.",
+          },
+          blend: {
+            harmonious: "Today naturally supports your Ascendant tone — keep it simple and consistent.",
+            complementary: "Today complements your Ascendant tone — act steadily and communicate intentions.",
+            transformative: "Today challenges your Ascendant tone — slow down, choose one priority, and stay mindful.",
+            neutral: "Today is balanced with your Ascendant tone — let your intention guide your pace.",
+          },
+        },
       startsAt: "Starts at",
       todayBlessing: "Today's Blessing",
       tomorrow: "Tomorrow",
@@ -2214,6 +2232,69 @@ export const translations = {
           point2: "Communication may feel faster or more direct than your comfort zone.",
           point3: "Use your element strengths to balance this transit’s pace and tone.",
         },
+
+        context: {
+          title: {
+            personal: "Personal Transit",
+            collective: "Cosmic Weather",
+          },
+          desc: {
+            personal: "This planet is transiting your sign directly — its themes tend to land more personally in your choices and daily rhythm.",
+            collective: "Not in your sign — read this as collective weather. See below for what it emphasizes and how it can reach you.",
+          },
+        },
+
+        lens: {
+          badge: {
+            personal: "Personal transit lens",
+            collective: "Collective transit lens",
+          },
+          sections: {
+            about: "About this transit",
+            collective: "Collective influence",
+            resonance: "How it reaches you",
+            degree: "Degree phase",
+          },
+          collectiveTemplate: "When {{planet}} is in {{sign}}, it emphasizes {{theme}}. This is the shared “weather” that everyone experiences in different ways.",
+          resonanceBase: {
+            personal: "Because this is a personal transit (in your sign), these themes tend to land more directly in your choices and daily rhythm.",
+            collective: "Even if it’s not in your sign, you may feel it indirectly through external pressure, shifts in pace, added responsibility, or delayed outcomes.",
+          },
+          degreePhases: {
+            early: "Settling-in phase: the influence is establishing—avoid overly decisive moves.",
+            middle: "Stable phase: constructive alignment is more available—measure beats urgency.",
+            late: "Closing phase: focus on completion, not initiation—wrap up before restarting.",
+          },
+          planetFunction: {
+            sun: "The Sun governs authority, vitality, clarity, and purpose.",
+            moon: "The Moon governs moods, memory, nourishment, and the rhythms of daily life.",
+            mercury: "Mercury governs speech, trade, learning, and the movement of information.",
+            venus: "Venus governs harmony, affection, beauty, and the ease of relationships.",
+            mars: "Mars governs drive, conflict, courage, and decisive action.",
+            jupiter: "Jupiter governs growth, wisdom, generosity, and meaningful expansion.",
+            saturn: "Saturn governs structure, limits, responsibility, time, and endurance.",
+          },
+          signThemes: {
+            aries: "initiative, leadership, and courageous beginnings",
+            taurus: "stability, resources, and steady building",
+            gemini: "communication, learning, and quick exchange",
+            cancer: "home, protection, and emotional security",
+            leo: "visibility, authority, and creative confidence",
+            virgo: "details, health, and practical refinement",
+            libra: "balance, agreements, and relationship dynamics",
+            scorpio: "depth, boundaries, and transformative pressure",
+            sagittarius: "belief, exploration, and broader meaning",
+            capricorn: "duty, institutions, and long-term structure",
+            aquarius: "community, innovation, and collective systems",
+            pisces: "compassion, sensitivity, and dissolving old forms",
+          },
+          elementTails: {
+            water: "Water nature often absorbs this quietly rather than confrontationally.",
+            fire: "Fire nature tends to feel it as urgency—channel it into clean action.",
+            earth: "Earth nature tends to seek structure—steady routines help.",
+            air: "Air nature often feels it mentally—name priorities to reduce scatter.",
+          },
+        },
         daily: {
           title: "Today’s Guidance",
           morning: "This morning",
@@ -2308,6 +2389,90 @@ export const translations = {
               source: "Quranic command (33:56)",
             },
           },
+        },
+        // ─────────────────────────────────────────────────────────────────────
+        // SPIRITUAL PRACTICE (Degree-Based Classical Framework)
+        // Based on ʿIlm al-Asrār: Entry (0-10°), Strength (10-20°), Exit (20-30°)
+        // ─────────────────────────────────────────────────────────────────────
+        spiritual: {
+          title: "Spiritual Practice",
+          phaseLabel: {
+            entry: "Entering",
+            strength: "Active",
+            exit: "Exiting",
+          },
+          status: {
+            entry: "The influence is forming. Focus on purification, not action.",
+            strength: "This transit is at full strength. Spiritual work is supported.",
+            exit: "The influence is fading. Seal and protect, do not initiate.",
+          },
+          guidance: {
+            entry: "Focus on istighfār and general dhikr (lā ilāha illa Llāh). Avoid binding intentions or starting major spiritual works.",
+            strength: "Best time for focused dhikr and duʿāʾ. Spiritual focus: ${focusText}",
+            exit: "Seal what was started. Focus on protective dhikr, ṣalawāt, and gratitude. Avoid new spiritual initiatives.",
+          },
+          focus: {
+            sun: "Tawḥīd, purpose, and clarity of intention",
+            moon: "Emotional balance and intuition",
+            mercury: "Knowledge, speech, and learning",
+            venus: "Harmony, love, and beauty",
+            mars: "Courage, discipline, cutting obstacles",
+            jupiter: "Expansion, rizq, and wisdom",
+            saturn: "Patience, endurance, karmic repair",
+          },
+          avoid: {
+            sun: "Ego inflation, arrogance",
+            moon: "Decisions driven by mood",
+            mercury: "Gossip, overthinking",
+            venus: "Excess pleasure, attachment",
+            mars: "Anger, impulsiveness",
+            jupiter: "Arrogance, excess",
+            saturn: "Heavy works unless guided, despair",
+          },
+          recommendedDhikr: "Recommended Dhikr",
+          entryNote: "During entry phase, focus on general dhikr like lā ilāha illa Llāh",
+          exitNote: "During exit phase, focus on protective dhikr and ṣalawāt",
+          disclaimer: "For reflection, not ruling. Based on classical Islamic esoteric tradition.",
+        },
+        // ─────────────────────────────────────────────────────────────────────
+        // ENHANCED SPIRITUAL PRACTICE (Dhikr Tiers + Planetary Hour Timing)
+        // Classical ʿAdad system with timing optimization
+        // ─────────────────────────────────────────────────────────────────────
+        practice: {
+          title: "Spiritual Practice",
+          phase: {
+            entry: "Entering",
+            strength: "Active",
+            exit: "Exiting",
+          },
+          counts: {
+            title: "Recommended Count",
+            tier: {
+              quick: "Quick",
+              standard: "Standard",
+              deep: "Deep",
+            },
+            estimate: "~{minutes} min",
+          },
+          timing: {
+            title: "Best Time",
+            nextPlanetHour: "Next {planet} hour: {start}–{end}",
+            in: "in {time}",
+            tomorrow: "Tomorrow",
+            activeNow: "Active now until {end}",
+            unavailable: "Planetary hour data unavailable",
+          },
+          strength: {
+            peak: "Peak",
+            strong: "Strong",
+            supportive: "Supportive",
+            gentle: "Gentle",
+          },
+          fallback: {
+            title: "If you can't wait",
+            afterPrayer: "Do the Quick tier after the next prayer.",
+          },
+          disclaimer: "For reflection, not ruling. Based on classical Islamic esoteric tradition.",
         },
         history: {
           title: "Transit History",
@@ -2680,12 +2845,34 @@ export const translations = {
         subtitle: "Required for Divine Timing personalization",
         selectPlaceholder: "Select your date of birth",
       },
+
+      // Time of Birth (Optional)
+      birthTime: {
+        title: "Time of Birth (Optional)",
+        subtitle: "Used to calculate your Ascendant (Rising Sign)",
+        selectPlaceholder: "Select your birth time",
+        clear: "Clear time",
+      },
+
+      // Birth Location (Optional)
+      birthLocation: {
+        title: "Birth Location (Optional)",
+        subtitle: "Used to calculate your Ascendant (Rising Sign)",
+        label: "Birth Location",
+        placeholder: "City, Country (optional)",
+        latitude: "Latitude",
+        longitude: "Longitude",
+        editCoordinates: "Edit coordinates",
+        clear: "Clear birth location",
+        hint: "Enter coordinates for your birthplace, or use the locate icon to fill from your current position.",
+      },
       
       // Astrological Profile
       astro: {
         title: "Your Astrological Profile",
         sign: "Burj (Sign)",
         element: "Element",
+        ascendant: "Ascendant",
       },
       
       // Name Section
@@ -2708,11 +2895,12 @@ export const translations = {
       
       // Location
       location: {
-        title: "Location (Optional)",
-        subtitle: "For accurate prayer times and advanced astrological calculations",
-        label: "Location",
-        placeholder: "Enter location or use auto-detect",
-        autoDetect: "Tap the location icon to auto-detect",
+        title: "Current Location (Optional)",
+        subtitle: "For accurate prayer times and timing calculations",
+        label: "Current Location",
+        placeholder: "Search city or country",
+        autoDetect: "Type to search, or tap the location icon to auto-detect",
+        clear: "Clear current location",
       },
       
       // Data Privacy
@@ -8371,7 +8559,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         yourElement: "Votre élément",
         resonanceLabel: "Résonance",
         guidanceLabel: "Guidance",
-        understandResonance: "Comprendre la résonance →",
+        understandResonance: "Voir les détails →",
         favorable: "Favorable",
         balanced: "Équilibrée",
         delicate: "Délicate",
@@ -9908,6 +10096,24 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           manazil: "Manāzil (demeure lunaire)",
           bestFor: "Idéal pour",
           whyThis: "Pourquoi?",
+          ascendantLens: "Prisme de l’Ascendant",
+        },
+
+        ascendant: {
+          title: "Ascendant (signe levant)",
+          summary: "Votre Ascendant est {sign} (ton {element}). Il décrit votre manière d’entrer en action et d’aborder la journée.",
+          elementHints: {
+            fire: "Ascendant Feu : démarrez avec courage et élan — mais évitez de vous précipiter.",
+            water: "Ascendant Eau : avancez avec douceur et intuition — mais évitez d’absorber tout.",
+            air: "Ascendant Air : avancez par la clarté et la communication — mais évitez la dispersion.",
+            earth: "Ascendant Terre : avancez avec structure et patience — mais évitez la rigidité.",
+          },
+          blend: {
+            harmonious: "Aujourd’hui soutient naturellement votre ton d’Ascendant — restez simple et constant.",
+            complementary: "Aujourd’hui complète votre ton d’Ascendant — avancez posément et exprimez vos intentions.",
+            transformative: "Aujourd’hui met votre ton d’Ascendant à l’épreuve — ralentissez et choisissez une seule priorité.",
+            neutral: "Aujourd’hui est équilibré avec votre ton d’Ascendant — laissez votre intention régler le rythme.",
+          },
         },
         manazil: {
           title: "Votre signature lunaire",
@@ -10393,6 +10599,69 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           point2: "La communication peut sembler plus rapide ou directe.",
           point3: "Utilisez vos forces élémentaires pour équilibrer le rythme et le ton.",
         },
+
+        context: {
+          title: {
+            personal: "Transit Personnel",
+            collective: "Météo Cosmique",
+          },
+          desc: {
+            personal: "Cette planète traverse votre signe — ses thèmes tendent à se manifester plus personnellement dans vos choix et votre rythme quotidien.",
+            collective: "Pas dans votre signe — lisez-le comme une météo collective. Voir ci-dessous ce que cela met en avant et comment cela peut vous atteindre.",
+          },
+        },
+
+        lens: {
+          badge: {
+            personal: "Lecture du transit personnel",
+            collective: "Lecture du transit collectif",
+          },
+          sections: {
+            about: "À propos de ce transit",
+            collective: "Influence collective",
+            resonance: "Comment cela vous atteint",
+            degree: "Phase de degrés",
+          },
+          collectiveTemplate: "Quand {{planet}} est en {{sign}}, cela met en avant {{theme}}. C’est la “météo” collective que tout le monde ressent à sa manière.",
+          resonanceBase: {
+            personal: "Comme il s’agit d’un transit personnel (dans votre signe), ces thèmes ont tendance à se manifester plus directement dans vos choix et votre rythme.",
+            collective: "Même si ce n’est pas dans votre signe, vous pouvez le ressentir indirectement via une pression extérieure, un changement de rythme, plus de responsabilités ou des délais.",
+          },
+          degreePhases: {
+            early: "Phase d’installation : l’influence se met en place — évitez les décisions trop tranchées.",
+            middle: "Phase stable : une construction patiente est favorisée — mieux vaut la mesure que la précipitation.",
+            late: "Phase de clôture : privilégiez la finition plutôt que l’initiation — terminez avant de relancer.",
+          },
+          planetFunction: {
+            sun: "Le Soleil gouverne l’autorité, la vitalité, la clarté et le sens.",
+            moon: "La Lune gouverne les humeurs, la mémoire, la protection et les rythmes du quotidien.",
+            mercury: "Mercure gouverne la parole, les échanges, l’apprentissage et la circulation de l’information.",
+            venus: "Vénus gouverne l’harmonie, l’affection, la beauté et la douceur des relations.",
+            mars: "Mars gouverne l’élan, le conflit, le courage et l’action décisive.",
+            jupiter: "Jupiter gouverne la croissance, la sagesse, la générosité et l’expansion.",
+            saturn: "Saturne gouverne la structure, les limites, la responsabilité, le temps et l’endurance.",
+          },
+          signThemes: {
+            aries: "l’initiative, le leadership et les commencements courageux",
+            taurus: "la stabilité, les ressources et la construction patiente",
+            gemini: "la communication, l’apprentissage et les échanges rapides",
+            cancer: "le foyer, la protection et la sécurité émotionnelle",
+            leo: "la visibilité, l’autorité et la confiance créative",
+            virgo: "les détails, la santé et l’amélioration pratique",
+            libra: "l’équilibre, les accords et les dynamiques relationnelles",
+            scorpio: "la profondeur, les limites et la pression transformatrice",
+            sagittarius: "les croyances, l’exploration et le sens plus large",
+            capricorn: "le devoir, les institutions et la structure à long terme",
+            aquarius: "la communauté, l’innovation et les systèmes collectifs",
+            pisces: "la compassion, la sensibilité et la dissolution des anciennes formes",
+          },
+          elementTails: {
+            water: "La nature Eau l’absorbe souvent en silence plutôt que dans la confrontation.",
+            fire: "La nature Feu le ressent souvent comme une urgence — canalisez-la dans une action claire.",
+            earth: "La nature Terre cherche souvent la structure — les routines stables aident.",
+            air: "La nature Air le ressent souvent mentalement — clarifiez vos priorités pour éviter la dispersion.",
+          },
+        },
         daily: {
           title: "Conseils du Jour",
           morning: "Ce matin",
@@ -10487,6 +10756,87 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
               source: "Commandement coranique (33:56)",
             },
           },
+        },
+        // Pratique Spirituelle (Cadre Classique basé sur les Degrés)
+        spiritual: {
+          title: "Pratique Spirituelle",
+          phaseLabel: {
+            entry: "Entrée",
+            strength: "Actif",
+            exit: "Sortie",
+          },
+          status: {
+            entry: "L'influence se forme. Concentrez-vous sur la purification, pas l'action.",
+            strength: "Ce transit est à pleine puissance. Le travail spirituel est soutenu.",
+            exit: "L'influence s'estompe. Sceller et protéger, ne pas initier.",
+          },
+          guidance: {
+            entry: "Concentrez-vous sur l'istighfār et le dhikr général (lā ilāha illa Llāh). Évitez de lier des intentions ou de commencer des travaux spirituels majeurs.",
+            strength: "Meilleur moment pour le dhikr ciblé et le duʿāʾ. Focus spirituel : ${focusText}",
+            exit: "Scellez ce qui a été commencé. Concentrez-vous sur le dhikr protecteur, les ṣalawāt et la gratitude. Évitez les nouvelles initiatives spirituelles.",
+          },
+          focus: {
+            sun: "Tawḥīd, but et clarté d'intention",
+            moon: "Équilibre émotionnel et intuition",
+            mercury: "Connaissance, parole et apprentissage",
+            venus: "Harmonie, amour et beauté",
+            mars: "Courage, discipline, couper les obstacles",
+            jupiter: "Expansion, rizq et sagesse",
+            saturn: "Patience, endurance, réparation karmique",
+          },
+          avoid: {
+            sun: "Inflation de l'ego, arrogance",
+            moon: "Décisions dictées par l'humeur",
+            mercury: "Commérage, suranalyse",
+            venus: "Excès de plaisir, attachement",
+            mars: "Colère, impulsivité",
+            jupiter: "Arrogance, excès",
+            saturn: "Travaux lourds sans guidance, désespoir",
+          },
+          recommendedDhikr: "Dhikr Recommandé",
+          entryNote: "En phase d'entrée, concentrez-vous sur le dhikr général comme lā ilāha illa Llāh",
+          exitNote: "En phase de sortie, concentrez-vous sur le dhikr protecteur et les ṣalawāt",
+          disclaimer: "Pour réflexion, pas prescription. Basé sur la tradition ésotérique islamique classique.",
+        },
+        // ─────────────────────────────────────────────────────────────────────
+        // PRATIQUE SPIRITUELLE AMÉLIORÉE (Niveaux de Dhikr + Timing Heure Planétaire)
+        // Système classique ʿAdad avec optimisation du timing
+        // ─────────────────────────────────────────────────────────────────────
+        practice: {
+          title: "Pratique Spirituelle",
+          phase: {
+            entry: "Entrée",
+            strength: "Actif",
+            exit: "Sortie",
+          },
+          counts: {
+            title: "Nombre Recommandé",
+            tier: {
+              quick: "Rapide",
+              standard: "Standard",
+              deep: "Approfondi",
+            },
+            estimate: "~{minutes} min",
+          },
+          timing: {
+            title: "Meilleur Moment",
+            nextPlanetHour: "Prochaine heure de {planet} : {start}–{end}",
+            in: "dans {time}",
+            tomorrow: "Demain",
+            activeNow: "Actif maintenant jusqu'à {end}",
+            unavailable: "Données d'heure planétaire indisponibles",
+          },
+          strength: {
+            peak: "Pic",
+            strong: "Fort",
+            supportive: "Favorable",
+            gentle: "Doux",
+          },
+          fallback: {
+            title: "Si vous ne pouvez pas attendre",
+            afterPrayer: "Faites le niveau Rapide après la prochaine prière.",
+          },
+          disclaimer: "Pour réflexion, pas prescription. Basé sur la tradition ésotérique islamique classique.",
         },
         history: {
           title: "Historique du Transit",
@@ -10858,12 +11208,34 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         subtitle: "Requis pour la personnalisation du Timing Divin",
         selectPlaceholder: "Sélectionnez votre date de naissance",
       },
+
+      // Heure de naissance (optionnel)
+      birthTime: {
+        title: "Heure de naissance (optionnel)",
+        subtitle: "Utilisée pour calculer votre Ascendant (signe levant)",
+        selectPlaceholder: "Sélectionnez votre heure de naissance",
+        clear: "Effacer l'heure",
+      },
+
+      // Lieu de naissance (optionnel)
+      birthLocation: {
+        title: "Lieu de naissance (optionnel)",
+        subtitle: "Utilisé pour calculer votre Ascendant (signe levant)",
+        label: "Lieu de naissance",
+        placeholder: "Ville, Pays (optionnel)",
+        latitude: "Latitude",
+        longitude: "Longitude",
+        editCoordinates: "Modifier les coordonnées",
+        clear: "Effacer le lieu de naissance",
+        hint: "Entrez les coordonnées de votre lieu de naissance, ou utilisez l'icône de localisation pour remplir depuis votre position actuelle.",
+      },
       
       // Profil astrologique
       astro: {
         title: "Votre profil astrologique",
         sign: "Burj (signe)",
         element: "Élément",
+        ascendant: "Ascendant",
       },
       
       // Section nom
@@ -10886,11 +11258,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       
       // Localisation
       location: {
-        title: "Localisation (optionnel)",
-        subtitle: "Pour des heures de prière précises et des calculs astrologiques avancés",
-        label: "Localisation",
-        placeholder: "Entrez la localisation ou utilisez la détection automatique",
-        autoDetect: "Touchez l'icône pour détecter automatiquement",
+        title: "Localisation actuelle (optionnel)",
+        subtitle: "Pour des heures de prière précises et des calculs de timing",
+        label: "Localisation actuelle",
+        placeholder: "Rechercher une ville ou un pays",
+        autoDetect: "Tapez pour rechercher, ou touchez l'icône pour détecter automatiquement",
+        clear: "Effacer la localisation actuelle",
       },
       
       // Confidentialité des données
@@ -11992,6 +12365,58 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         personalYear:
           "Le thème principal et l'énergie de votre année en cours",
         personalMonth: "L'énergie mensuelle et le focus",
+
+        lens: {
+          badge: {
+            personal: "عدسة العبور الشخصي",
+            collective: "عدسة العبور العام",
+          },
+          sections: {
+            about: "عن هذا العبور",
+            collective: "الأثر العام",
+            resonance: "كيف يصل إليك",
+            degree: "مرحلة الدرجة",
+          },
+          collectiveTemplate: "عندما يكون {{planet}} في {{sign}}، يبرز معنى {{theme}}. هذا يصف “الطقس” العام الذي يلمسه الجميع بطرق مختلفة.",
+          resonanceBase: {
+            personal: "لأنه عبور شخصي (يمس برجك مباشرة)، تميل هذه المعاني إلى الظهور بشكل أوضح في قراراتك وإيقاعك اليومي.",
+            collective: "حتى لو لم يكن في برجك، قد تشعر به عبر ضغط خارجي، تغيّر في الإيقاع، مسؤوليات إضافية، أو تأخير في النتائج.",
+          },
+          degreePhases: {
+            early: "مرحلة التثبيت: الأثر يدخل ويتشكل — يُفضَّل تجنّب القرارات الحاسمة الآن.",
+            middle: "مرحلة مستقرة: يمكن البناء بهدوء — الانضباط أوضح نفعًا من العجلة.",
+            late: "مرحلة ختامية: ركّز على الإتمام لا البدء — أغلق الملفات قبل فتح أخرى.",
+          },
+          planetFunction: {
+            sun: "الشمس تدل على السلطة والحيوية والوضوح والغاية.",
+            moon: "القمر يدل على المزاج والذاكرة والتغذية وإيقاع الحياة اليومية.",
+            mercury: "عطارد يدل على الكلام والتجارة والتعلّم وحركة المعلومات.",
+            venus: "الزهرة تدل على الانسجام والمودة والجمال وسهولة العلاقات.",
+            mars: "المريخ يدل على الاندفاع والصراع والشجاعة والحسم في الفعل.",
+            jupiter: "المشتري يدل على النمو والحكمة والكرم والاتساع النافع.",
+            saturn: "زحل يدل على البنية والحدود والمسؤولية والزمن والصبر.",
+          },
+          signThemes: {
+            aries: "المبادرة والقيادة والبدايات الجريئة",
+            taurus: "الثبات والموارد والبناء المتدرّج",
+            gemini: "التواصل والتعلّم وسرعة التبادل",
+            cancer: "البيت والحماية والأمان العاطفي",
+            leo: "الظهور والهيبة والثقة الإبداعية",
+            virgo: "التفاصيل والصحة والتحسين العملي",
+            libra: "التوازن والاتفاقات وديناميات العلاقات",
+            scorpio: "العمق والحدود والضغط التحويلي",
+            sagittarius: "المعتقد والمعرفة والمعنى الأوسع",
+            capricorn: "الواجب والمؤسسات والبنية بعيدة المدى",
+            aquarius: "الجماعة والابتكار والأنظمة العامة",
+            pisces: "الرحمة والحساسية وتفكك الأشكال القديمة",
+          },
+          elementTails: {
+            water: "طبيعة الماء تمتص هذا غالبًا بهدوء لا بمواجهة.",
+            fire: "طبيعة النار تشعر به كعجلة — وجّهه إلى فعلٍ واضح.",
+            earth: "طبيعة التراب تميل إلى طلب البنية — تنفعها العادات الثابتة.",
+            air: "طبيعة الهواء تشعر به ذهنيًا — سمِّ الأولويات لتخفيف التشتت.",
+          },
+        },
       },
 
       // Améliorations Phase 1
@@ -16433,6 +16858,71 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           point3: "استخدم نقاط قوة عنصرك لموازنة إيقاع هذا العبور ونبرته.",
         },
 
+        context: {
+          title: {
+            personal: "عبور شخصي",
+            collective: "طقس كوني عام",
+          },
+          desc: {
+            personal: "هذا الكوكب يعبر برجك مباشرة — تميل معانيه إلى الظهور بشكل أكثر شخصية في قراراتك وإيقاعك اليومي.",
+            collective: "ليس في برجك — اقرأه كطقس عام. انظر أدناه: ماذا يبرز وكيف يصل إليك.",
+          },
+        },
+
+        lens: {
+          badge: {
+            personal: "عدسة العبور الشخصي",
+            collective: "عدسة العبور العام",
+          },
+          sections: {
+            about: "عن هذا العبور",
+            collective: "الأثر العام",
+            resonance: "كيف يصل إليك",
+            degree: "مرحلة الدرجة",
+          },
+          collectiveTemplate:
+            "عندما يكون {{planet}} في {{sign}}، يبرز معنى {{theme}}. هذا يصف “الطقس” العام الذي يلمسه الجميع بطرق مختلفة.",
+          resonanceBase: {
+            personal: "لأنه عبور شخصي (يمس برجك مباشرة)، تميل هذه المعاني إلى الظهور بشكل أوضح في قراراتك وإيقاعك اليومي.",
+            collective:
+              "حتى لو لم يكن في برجك، قد تشعر به عبر ضغط خارجي، تغيّر في الإيقاع، مسؤوليات إضافية، أو تأخير في النتائج.",
+          },
+          degreePhases: {
+            early: "مرحلة التثبيت: الأثر يدخل ويتشكل — يُفضَّل تجنّب القرارات الحاسمة الآن.",
+            middle: "مرحلة مستقرة: يمكن البناء بهدوء — الانضباط أوضح نفعًا من العجلة.",
+            late: "مرحلة ختامية: ركّز على الإتمام لا البدء — أغلق الملفات قبل فتح أخرى.",
+          },
+          planetFunction: {
+            sun: "الشمس تدل على السلطة والحيوية والوضوح والغاية.",
+            moon: "القمر يدل على المزاج والذاكرة والتغذية وإيقاع الحياة اليومية.",
+            mercury: "عطارد يدل على الكلام والتجارة والتعلّم وحركة المعلومات.",
+            venus: "الزهرة تدل على الانسجام والمودة والجمال وسهولة العلاقات.",
+            mars: "المريخ يدل على الاندفاع والصراع والشجاعة والحسم في الفعل.",
+            jupiter: "المشتري يدل على النمو والحكمة والكرم والاتساع النافع.",
+            saturn: "زحل يدل على البنية والحدود والمسؤولية والزمن والصبر.",
+          },
+          signThemes: {
+            aries: "المبادرة والقيادة والبدايات الجريئة",
+            taurus: "الثبات والموارد والبناء المتدرّج",
+            gemini: "التواصل والتعلّم وسرعة التبادل",
+            cancer: "البيت والحماية والأمان العاطفي",
+            leo: "الظهور والهيبة والثقة الإبداعية",
+            virgo: "التفاصيل والصحة والتحسين العملي",
+            libra: "التوازن والاتفاقات وديناميات العلاقات",
+            scorpio: "العمق والحدود والضغط التحويلي",
+            sagittarius: "المعتقد والمعرفة والمعنى الأوسع",
+            capricorn: "الواجب والمؤسسات والبنية بعيدة المدى",
+            aquarius: "الجماعة والابتكار والأنظمة العامة",
+            pisces: "الرحمة والحساسية وتفكك الأشكال القديمة",
+          },
+          elementTails: {
+            water: "طبيعة الماء تمتص هذا غالبًا بهدوء لا بمواجهة.",
+            fire: "طبيعة النار تشعر به كعجلة — وجّهه إلى فعلٍ واضح.",
+            earth: "طبيعة التراب تميل إلى طلب البنية — تنفعها العادات الثابتة.",
+            air: "طبيعة الهواء تشعر به ذهنيًا — سمِّ الأولويات لتخفيف التشتت.",
+          },
+        },
+
         daily: {
           title: "إرشاد اليوم",
           morning: "هذا الصباح",
@@ -16529,6 +17019,88 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
               source: "أمر قرآني (33:56)",
             },
           },
+        },
+
+        // الممارسة الروحية (الإطار الكلاسيكي القائم على الدرجات)
+        spiritual: {
+          title: "الممارسة الروحية",
+          phaseLabel: {
+            entry: "دخول",
+            strength: "فعّال",
+            exit: "خروج",
+          },
+          status: {
+            entry: "التأثير يتشكّل. ركّز على التطهير لا الفعل.",
+            strength: "هذا العبور في أوج قوته. العمل الروحي مدعوم.",
+            exit: "التأثير يتلاشى. اختم واحمِ، لا تبدأ جديدًا.",
+          },
+          guidance: {
+            entry: "ركّز على الاستغفار والذكر العام (لا إله إلا الله). تجنّب ربط النيات أو بدء أعمال روحية كبيرة.",
+            strength: "أفضل وقت للذكر المركّز والدعاء. التركيز الروحي: ${focusText}",
+            exit: "اختم ما بدأته. ركّز على الذكر الحامي والصلوات والشكر. تجنّب المبادرات الروحية الجديدة.",
+          },
+          focus: {
+            sun: "التوحيد والغاية ووضوح النية",
+            moon: "التوازن العاطفي والحدس",
+            mercury: "العلم والكلام والتعلّم",
+            venus: "الانسجام والمحبة والجمال",
+            mars: "الشجاعة والانضباط وإزالة العوائق",
+            jupiter: "التوسع والرزق والحكمة",
+            saturn: "الصبر والتحمل وإصلاح الأثر",
+          },
+          avoid: {
+            sun: "تضخم الأنا والغرور",
+            moon: "القرارات المبنية على المزاج",
+            mercury: "النميمة وكثرة التفكير",
+            venus: "الإفراط في الملذات والتعلق",
+            mars: "الغضب والتهور",
+            jupiter: "الكبر والإسراف",
+            saturn: "الأعمال الثقيلة دون إرشاد واليأس",
+          },
+          recommendedDhikr: "الذكر الموصى به",
+          entryNote: "في مرحلة الدخول، ركّز على الذكر العام مثل لا إله إلا الله",
+          exitNote: "في مرحلة الخروج، ركّز على الذكر الحامي والصلوات",
+          disclaimer: "للتأمل لا للفتوى. مبني على التراث الإسلامي الروحي الكلاسيكي.",
+        },
+        // ─────────────────────────────────────────────────────────────────────
+        // الممارسة الروحية المُحسّنة (مراتب الذكر + توقيت الساعة الفلكية)
+        // نظام العَدَد الكلاسيكي مع تحسين التوقيت
+        // ─────────────────────────────────────────────────────────────────────
+        practice: {
+          title: "الممارسة الروحية",
+          phase: {
+            entry: "دخول",
+            strength: "فعّال",
+            exit: "خروج",
+          },
+          counts: {
+            title: "العدد الموصى به",
+            tier: {
+              quick: "سريع",
+              standard: "معتدل",
+              deep: "عميق",
+            },
+            estimate: "~{minutes} دقيقة",
+          },
+          timing: {
+            title: "أفضل وقت",
+            nextPlanetHour: "ساعة {planet} القادمة: {start}–{end}",
+            in: "خلال {time}",
+            tomorrow: "غدًا",
+            activeNow: "نشط الآن حتى {end}",
+            unavailable: "بيانات الساعة الفلكية غير متاحة",
+          },
+          strength: {
+            peak: "ذروة",
+            strong: "قوي",
+            supportive: "مؤيد",
+            gentle: "لطيف",
+          },
+          fallback: {
+            title: "إن لم تستطع الانتظار",
+            afterPrayer: "أدِّ المرتبة السريعة بعد الصلاة القادمة.",
+          },
+          disclaimer: "للتأمل لا للفتوى. مبني على التراث الإسلامي الروحي الكلاسيكي.",
         },
 
         history: {
@@ -16965,7 +17537,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         yourElement: "عنصرك",
         resonanceLabel: "الرنين",
         guidanceLabel: "إرشاد",
-        understandResonance: "فهم الرنين →",
+        understandResonance: "عرض التفاصيل →",
         favorable: "ملائم",
         balanced: "متوازن",
         delicate: "لطيف",

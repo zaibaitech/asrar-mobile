@@ -24,7 +24,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -47,6 +46,7 @@ import {
 } from '../../services/api/prayerTimes';
 import { DailyGuidance, getDailyGuidance } from '../../services/DailyGuidanceService';
 import { getTodayBlessing } from '../../services/DayBlessingService';
+import { getBestLocation } from '../../services/LocationCacheService';
 import { getMomentAlignment, MomentAlignment } from '../../services/MomentAlignmentService';
 import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, type PlanetaryDayBoundaries, PlanetaryHourData } from '../../services/PlanetaryHoursService';
 
@@ -159,8 +159,9 @@ export default function HomeScreen() {
   // Get modules with translations
   const MODULES = useMemo(() => getModules(t), [t]);
   
-  // Real-time ticker for countdown updates
-  const now = useNowTicker(1000);
+  // Keep home screen light: update at 10s granularity (battery + stability).
+  // Detail screens can use 1s precision if needed.
+  const now = useNowTicker(10_000);
   
   const [dailyGuidance, setDailyGuidance] = useState<DailyGuidance | null>(null);
   const [momentAlignment, setMomentAlignment] = useState<MomentAlignment | null>(null);
@@ -173,7 +174,7 @@ export default function HomeScreen() {
   // Prayer times & planetary hours state
   const [nextPrayer, setNextPrayer] = useState<{ name: string; nameArabic: string; time: string } | null>(null);
   const [prayerCountdown, setPrayerCountdown] = useState('');
-  const [prayerLoading, setPrayerLoading] = useState(true);
+  const [prayerLoading, setPrayerLoading] = useState(false);
   const [planetaryData, setPlanetaryData] = useState<PlanetaryHourData | null>(null);
   const [prayerTimesData, setPrayerTimesData] = useState<any>(null);
   const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
@@ -181,6 +182,15 @@ export default function HomeScreen() {
 
   // Lower-frequency ticker for recomputing sunrise/sunset boundaries.
   const minuteNow = useNowTicker(60_000);
+
+  const hasRequestedLocationRef = React.useRef(false);
+  const nextPrayerRef = React.useRef<typeof nextPrayer>(null);
+  const lastPrayerLoadAtRef = React.useRef<number>(0);
+  const lastRefreshAtRef = React.useRef<number>(0);
+
+  useEffect(() => {
+    nextPrayerRef.current = nextPrayer;
+  }, [nextPrayer]);
   
   // Resolve correct planetary-day boundaries (handles pre-sunrise) once per minute.
   useEffect(() => {
@@ -236,19 +246,37 @@ export default function HomeScreen() {
   // Load prayer times
   const loadPrayerTimes = useCallback(async () => {
     try {
-      setPrayerLoading(true);
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      
-      if (status === 'granted') {
-        const location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
-        
-        const { latitude, longitude } = location.coords;
-        const data = await fetchPrayerTimes(latitude, longitude);
+      // Throttle: avoid multiple calls on mount + focus.
+      const nowMs = Date.now();
+      if (nowMs - lastPrayerLoadAtRef.current < 15_000) {
+        return;
+      }
+      lastPrayerLoadAtRef.current = nowMs;
+
+      // If we already have something to render, don't flip to a loading spinner.
+      if (!nextPrayerRef.current) {
+        setPrayerLoading(true);
+      }
+
+      // Prefer cached location (no prompts, instant).
+      const cached = await getBestLocation({ allowPrompt: false });
+      if (cached) {
+        const data = await fetchPrayerTimes(cached.latitude, cached.longitude);
         const next = getNextPrayer(data.timings);
         setNextPrayer(next);
-        setPrayerTimesData(data); // Store full prayer times data for planetary hours
+        setPrayerTimesData(data);
+      }
+
+      // If we still have no location and user hasn't been prompted yet, prompt once.
+      if (!cached && !hasRequestedLocationRef.current) {
+        hasRequestedLocationRef.current = true;
+        const prompted = await getBestLocation({ allowPrompt: true });
+        if (prompted) {
+          const data = await fetchPrayerTimes(prompted.latitude, prompted.longitude);
+          const next = getNextPrayer(data.timings);
+          setNextPrayer(next);
+          setPrayerTimesData(data);
+        }
       }
     } catch (error) {
       console.error('Error loading prayer times:', error);
@@ -259,6 +287,7 @@ export default function HomeScreen() {
   
   // Load today's blessing
   useEffect(() => {
+    // Initial load (best effort). Subsequent focus refresh is throttled below.
     loadDailyGuidance();
     loadMomentAlignment();
     loadPrayerTimes();
@@ -296,6 +325,13 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      const nowMs = Date.now();
+      // Avoid hammering services during fast tab switching.
+      if (nowMs - lastRefreshAtRef.current < 20_000) {
+        return;
+      }
+      lastRefreshAtRef.current = nowMs;
+
       loadDailyGuidance();
       loadMomentAlignment();
       loadPrayerTimes();
@@ -369,7 +405,7 @@ export default function HomeScreen() {
             colors={['rgba(139, 115, 85, 0.2)', 'rgba(139, 115, 85, 0.1)']}
             style={styles.profileBannerGradient}
           >
-            <Ionicons name="calendar" size={20} color={DarkTheme.accent} />
+            <Ionicons name="calendar" size={20} color={ElementAccents.earth.primary} />
             <View style={styles.profileBannerText}>
               <Text style={styles.profileBannerTitle}>Complete Your Profile</Text>
               <Text style={styles.profileBannerSubtitle}>
@@ -484,10 +520,10 @@ export default function HomeScreen() {
               >
                 <View style={[
                   styles.moduleCompactIcon,
-                  { borderColor: module.element === 'fire' ? ElementAccents.fire :
-                                 module.element === 'water' ? ElementAccents.water :
-                                 module.element === 'earth' ? ElementAccents.earth :
-                                 ElementAccents.air }
+                  { borderColor: module.element === 'fire' ? ElementAccents.fire.primary :
+                                 module.element === 'water' ? ElementAccents.water.primary :
+                                 module.element === 'earth' ? ElementAccents.earth.primary :
+                                 ElementAccents.air.primary }
                 ]}>
                   <Text style={styles.moduleCompactEmoji}>{module.icon}</Text>
                 </View>
@@ -524,10 +560,10 @@ export default function HomeScreen() {
               >
                 <View style={[
                   styles.moduleIcon,
-                  { borderColor: module.element === 'fire' ? ElementAccents.fire :
-                                 module.element === 'water' ? ElementAccents.water :
-                                 module.element === 'earth' ? ElementAccents.earth :
-                                 ElementAccents.air }
+                  { borderColor: module.element === 'fire' ? ElementAccents.fire.primary :
+                                 module.element === 'water' ? ElementAccents.water.primary :
+                                 module.element === 'earth' ? ElementAccents.earth.primary :
+                                 ElementAccents.air.primary }
                 ]}>
                   <Text style={styles.moduleIconEmoji}>{module.icon}</Text>
                 </View>

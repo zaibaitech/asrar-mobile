@@ -116,6 +116,21 @@ function calculateElementRelationship(
   return 'neutral';
 }
 
+function normalizePrayerTimeToHHMM(timeString: string): string {
+  if (!timeString) return '';
+  // Aladhan can return formats like:
+  // - "05:10"
+  // - "05:10:00"
+  // - "05:10 (EET)"
+  // - "05:10:00 (+03)"
+  const cleaned = String(timeString).replace(/\s*\([^)]*\)\s*/g, '').trim();
+  const parts = cleaned.split(':');
+  if (parts.length < 2) return '';
+  const hh = parts[0].padStart(2, '0');
+  const mm = parts[1].padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+
 /**
  * Setup Android notification channels with sound support
  * Required for sound to play in production Android builds
@@ -221,6 +236,7 @@ function androidChannelIdFromSettings(isFajr: boolean, settings: AdhanSettings):
 
 const SETTINGS_KEY = '@asrar_adhan_settings';
 const SCHEDULED_NOTIFICATIONS_KEY = '@asrar_scheduled_notifications';
+const ADHAN_DIAGNOSTICS_KEY = '@asrar_adhan_diagnostics';
 
 export interface AdhanSettings {
   enabled: boolean;
@@ -336,7 +352,7 @@ export async function schedulePrayerNotifications(
       return;
     }
 
-    // Cancel existing notifications
+    // Cancel existing prayer notifications
     await cancelAllPrayerNotifications();
 
     const scheduledIds: string[] = [];
@@ -355,6 +371,13 @@ export async function schedulePrayerNotifications(
 
       const prayerDate = parsePrayerTime(prayer.time, date);
       const now = new Date();
+
+      if (Number.isNaN(prayerDate.getTime())) {
+        if (__DEV__) {
+          console.warn('[AdhanNotificationService] Invalid prayer time:', { prayer: prayer.name, time: prayer.time });
+        }
+        continue;
+      }
 
       // Skip if prayer time has passed today
       if (prayerDate <= now) {
@@ -470,8 +493,35 @@ export async function schedulePrayerNotifications(
     // Save scheduled notification IDs
     await AsyncStorage.setItem(SCHEDULED_NOTIFICATIONS_KEY, JSON.stringify(scheduledIds));
 
+    // Store lightweight diagnostics for device verification.
+    await AsyncStorage.setItem(
+      ADHAN_DIAGNOSTICS_KEY,
+      JSON.stringify({
+        lastScheduledAt: new Date().toISOString(),
+        scheduledCount: scheduledIds.length,
+        timings: {
+          Fajr: timings.Fajr,
+          Dhuhr: timings.Dhuhr,
+          Asr: timings.Asr,
+          Maghrib: timings.Maghrib,
+          Isha: timings.Isha,
+        },
+      })
+    );
+
   } catch (error) {
     console.error('Failed to schedule prayer notifications:', error);
+    try {
+      await AsyncStorage.setItem(
+        ADHAN_DIAGNOSTICS_KEY,
+        JSON.stringify({
+          lastErrorAt: new Date().toISOString(),
+          error: error instanceof Error ? error.message : String(error),
+        })
+      );
+    } catch {
+      // ignore
+    }
   }
 }
 
@@ -481,9 +531,9 @@ export async function schedulePrayerNotifications(
 export async function cancelAllPrayerNotifications(): Promise<void> {
   try {
     await initNotifications();
-    // Get scheduled notification IDs
+    // Prefer canceling only the notifications we created.
     const saved = await AsyncStorage.getItem(SCHEDULED_NOTIFICATIONS_KEY);
-    
+
     if (saved) {
       const ids: string[] = JSON.parse(saved);
       for (const id of ids) {
@@ -491,8 +541,19 @@ export async function cancelAllPrayerNotifications(): Promise<void> {
       }
     }
 
-    // Clear all as fallback
-    await Notifications.cancelAllScheduledNotificationsAsync();
+    // Safety net: also cancel any scheduled notifications tagged as prayer.
+    try {
+      const all = await Notifications.getAllScheduledNotificationsAsync();
+      for (const n of all) {
+        const data = (n?.content?.data || {}) as Record<string, unknown>;
+        if (data.category === 'prayer') {
+          await Notifications.cancelScheduledNotificationAsync(n.identifier);
+        }
+      }
+    } catch {
+      // ignore
+    }
+
     await AsyncStorage.removeItem(SCHEDULED_NOTIFICATIONS_KEY);
   } catch (error) {
     console.error('Failed to cancel notifications:', error);
@@ -504,11 +565,69 @@ export async function cancelAllPrayerNotifications(): Promise<void> {
  */
 export async function getScheduledNotificationsCount(): Promise<number> {
   try {
+    await initNotifications();
     const notifications = await Notifications.getAllScheduledNotificationsAsync();
-    return notifications.length;
+    return notifications.filter((n: any) => (n?.content?.data as any)?.category === 'prayer').length;
   } catch (error) {
     console.error('Failed to get scheduled notifications:', error);
     return 0;
+  }
+}
+
+export async function getAdhanDiagnostics(): Promise<Record<string, unknown>> {
+  try {
+    await initNotifications();
+    const saved = await AsyncStorage.getItem(ADHAN_DIAGNOSTICS_KEY);
+    const permissions = await Notifications.getPermissionsAsync();
+    const prayerCount = await getScheduledNotificationsCount();
+    return {
+      ...(saved ? JSON.parse(saved) : {}),
+      permissionStatus: permissions.status,
+      scheduledPrayerNotifications: prayerCount,
+    };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+export async function scheduleTestPrayerNotification(delaySeconds: number = 10): Promise<string | null> {
+  try {
+    await initNotifications();
+    const hasPermission = await requestNotificationPermissions();
+    if (!hasPermission) return null;
+
+    const settings = await getAdhanSettings();
+    const androidChannelId = Platform.OS === 'android'
+      ? androidChannelIdFromSettings(false, settings)
+      : undefined;
+
+    const id = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Test Prayer Notification',
+        body: 'If you see this, scheduling works in this APK.',
+        sound: Platform.OS === 'ios' ? 'default' : undefined,
+        data: {
+          category: 'prayer',
+          type: 'test',
+          action: 'prayerGuidance',
+          prayer: 'Test',
+          prayerName: 'Test',
+        },
+      },
+      trigger: {
+        type: SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: Math.max(1, Math.floor(delaySeconds)),
+        repeats: false,
+        channelId: androidChannelId,
+      },
+    });
+
+    return id;
+  } catch (error) {
+    console.warn('Failed to schedule test prayer notification:', error);
+    return null;
   }
 }
 
@@ -516,7 +635,10 @@ export async function getScheduledNotificationsCount(): Promise<number> {
  * Parse prayer time string to Date object
  */
 function parsePrayerTime(timeStr: string, baseDate: Date = new Date()): Date {
-  const [hours, minutes] = timeStr.split(':').map(Number);
+  const hhmm = normalizePrayerTimeToHHMM(timeStr);
+  if (!hhmm) return new Date(NaN);
+  const [hours, minutes] = hhmm.split(':').map(Number);
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return new Date(NaN);
   const date = new Date(baseDate);
   date.setHours(hours, minutes, 0, 0);
   return date;

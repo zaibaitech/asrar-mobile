@@ -8,7 +8,7 @@
 import { Borders, DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { getLunarMansionByIndex, normalizeMansionIndex } from '@/data/lunarMansions';
+import { getCosmicLunarMansionForDate, getLunarMansionByIndex, normalizeMansionIndex } from '@/data/lunarMansions';
 import { calculateElementalHarmony } from '@/services/ElementalHarmonyService';
 import { getCurrentLunarMansion } from '@/services/LunarMansionService';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,7 +32,15 @@ export function ManazilWidget({
   const { t } = useLanguage();
   const { profile } = useProfile();
 
-  const [todayIndex, setTodayIndex] = React.useState<number | null>(null);
+  // Render instantly using deterministic local manzil.
+  // Then refresh with server/ephemeris-backed value in the background.
+  const [todayIndex, setTodayIndex] = React.useState<number | null>(() => {
+    try {
+      return getCosmicLunarMansionForDate(new Date()).index;
+    } catch {
+      return null;
+    }
+  });
   const [isRealTime, setIsRealTime] = React.useState(false);
 
   React.useEffect(() => {
@@ -135,11 +143,12 @@ export function ManazilWidget({
     router.push('/(tabs)/manazil');
   };
 
+  // If even the deterministic fallback failed, show a non-blocking placeholder (no spinner).
   if (!todayMansion) {
     return (
       <Pressable style={[styles.container, compact && styles.containerCompact]} onPress={handlePress}>
         <View style={[styles.gradient, { backgroundColor: 'rgba(165, 180, 252, 0.08)' }]}>
-          <Text style={styles.loadingText}>Loading mansion...</Text>
+          <Text style={styles.loadingText}>{t('common.loading')}</Text>
         </View>
       </Pressable>
     );
@@ -535,7 +544,7 @@ const styles = StyleSheet.create({
     color: DarkTheme.textTertiary,
   },
   ctaText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
     color: '#B481C4',
     flex: 1,

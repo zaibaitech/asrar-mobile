@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "files": [
+    "expo-env.d.ts",
+    "services/cache/RequestManager.ts",
+    "services/cache/PersistentCache.ts",
+    "services/LocationCacheService.ts",
+    "services/AppPrefetchService.ts",
+    "services/CosmicDataService.ts",
+    "services/EphemerisService.ts",
+    "services/TransitService.ts",
+    "hooks/useTransit.ts",
+    "components/AppErrorBoundary.tsx",
+    "components/home/ManazilWidget.tsx"
+  ],
+  "include": []
+}

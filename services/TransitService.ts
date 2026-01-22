@@ -10,6 +10,7 @@
  * Fallback: Static positions for current date if API unavailable
  */
 
+import { globalRequestManager } from '@/services/cache/RequestManager';
 import { PlanetPositions } from '@/types/divine-timing-personal';
 import {
     AllPlanetTransits,
@@ -30,6 +31,13 @@ const CACHE_KEYS = {
   TRANSITS: '@asrar_planet_transits_cache',
   LAST_UPDATE: '@asrar_transits_last_update',
 } as const;
+
+let memoryTransits: AllPlanetTransits | null = null;
+let inflightAll: Promise<AllPlanetTransits> | null = null;
+
+export function getTransitsFromMemory(): AllPlanetTransits | null {
+  return memoryTransits;
+}
 
 /**
  * Mapping from planet names to PlanetId for EphemerisService
@@ -99,6 +107,17 @@ const ZODIAC_ELEMENTS: Record<ZodiacSign, Element> = {
  */
 export async function getAllTransits(): Promise<AllPlanetTransits> {
   try {
+    if (memoryTransits) {
+      const lastUpdate = await getLastUpdateTime();
+      if (isCacheValid(lastUpdate)) {
+        return memoryTransits;
+      }
+    }
+
+    if (inflightAll) {
+      return inflightAll;
+    }
+
     // Check cache first
     const cached = await getCachedTransits();
     const lastUpdate = await getLastUpdateTime();
@@ -107,6 +126,7 @@ export async function getAllTransits(): Promise<AllPlanetTransits> {
       if (__DEV__) {
         console.log('[TransitService] Using cached transits');
       }
+      memoryTransits = cached;
       return cached;
     }
     
@@ -115,10 +135,21 @@ export async function getAllTransits(): Promise<AllPlanetTransits> {
       console.log('[TransitService] Fetching fresh transit data...');
     }
     
-    const fresh = await fetchTransitsFromEphemeris();
-    await cacheTransits(fresh);
-    
-    return fresh;
+    inflightAll = globalRequestManager.schedule(
+      async () => {
+        const fresh = await fetchTransitsFromEphemeris();
+        await cacheTransits(fresh);
+        memoryTransits = fresh;
+        return fresh;
+      },
+      {
+        key: 'transits.fetchAll',
+        dedupeInflight: true,
+        throttleMs: 5_000,
+      }
+    );
+
+    return await inflightAll;
     
   } catch (error) {
     if (__DEV__) {
@@ -127,9 +158,14 @@ export async function getAllTransits(): Promise<AllPlanetTransits> {
     
     // Fallback to cached data or static defaults
     const cached = await getCachedTransits();
-    if (cached) return cached;
+    if (cached) {
+      memoryTransits = cached;
+      return cached;
+    }
     
     return getFallbackTransits();
+  } finally {
+    inflightAll = null;
   }
 }
 
@@ -148,10 +184,17 @@ export async function refreshTransits(): Promise<AllPlanetTransits> {
   if (__DEV__) {
     console.log('[TransitService] Force refreshing transits...');
   }
-  
-  const fresh = await fetchTransitsFromEphemeris();
-  await cacheTransits(fresh);
-  
+
+  const fresh = await globalRequestManager.schedule(
+    async () => {
+      const data = await fetchTransitsFromEphemeris();
+      await cacheTransits(data);
+      memoryTransits = data;
+      return data;
+    },
+    { key: 'transits.forceRefresh', dedupeInflight: true, throttleMs: 5_000 }
+  );
+
   return fresh;
 }
 
@@ -282,6 +325,7 @@ function calculateNextRefresh(planet: Planet, now: Date): Date {
  */
 async function cacheTransits(transits: AllPlanetTransits): Promise<void> {
   try {
+    memoryTransits = transits;
     await AsyncStorage.setItem(CACHE_KEYS.TRANSITS, JSON.stringify(transits));
     await AsyncStorage.setItem(CACHE_KEYS.LAST_UPDATE, new Date().toISOString());
     

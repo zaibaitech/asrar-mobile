@@ -9,6 +9,39 @@
 import { UserLocation } from '@/types/user-profile';
 import * as Location from 'expo-location';
 
+export interface LocationSearchResult {
+  latitude: number;
+  longitude: number;
+  label: string;
+}
+
+const searchCache = new Map<string, { at: number; results: LocationSearchResult[] }>();
+const SEARCH_CACHE_TTL_MS = 10 * 60 * 1000;
+const SEARCH_CACHE_MAX = 50;
+
+function normalizeSearchQuery(q: string): string {
+  return q.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function buildAddressLabel(address: Location.LocationGeocodedAddress | undefined | null): string {
+  if (!address) return '';
+  const parts: string[] = [];
+  const cityish = address.city || address.subregion || address.region;
+  if (cityish) parts.push(cityish);
+  if (address.country) {
+    if (!parts.includes(address.country)) parts.push(address.country);
+  }
+  return parts.join(', ');
+}
+
+function setSearchCache(key: string, results: LocationSearchResult[]) {
+  if (searchCache.size >= SEARCH_CACHE_MAX) {
+    const firstKey = searchCache.keys().next().value as string | undefined;
+    if (firstKey) searchCache.delete(firstKey);
+  }
+  searchCache.set(key, { at: Date.now(), results });
+}
+
 // ============================================================================
 // LOCATION DETECTION
 // ============================================================================
@@ -155,6 +188,71 @@ export async function geocodeLocation(
       console.error('[LocationService] Geocode error:', error);
     }
     return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+  }
+}
+
+/**
+ * Search for locations (city/country) from a free-text query.
+ * Uses Expo's geocoding provider (platform dependent).
+ * Does not require GPS permission.
+ */
+export async function searchLocations(
+  query: string,
+  options?: { limit?: number }
+): Promise<LocationSearchResult[]> {
+  const normalized = normalizeSearchQuery(query);
+  if (normalized.length < 2) return [];
+
+  const cached = searchCache.get(normalized);
+  if (cached && Date.now() - cached.at < SEARCH_CACHE_TTL_MS) {
+    return cached.results;
+  }
+
+  try {
+    const limit = Math.max(1, Math.min(options?.limit ?? 6, 10));
+    const coords = await Location.geocodeAsync(query);
+
+    const sliced = coords.slice(0, limit);
+
+    const results = await Promise.all(
+      sliced.map(async (c): Promise<LocationSearchResult> => {
+        let label = `${c.latitude.toFixed(4)}, ${c.longitude.toFixed(4)}`;
+        try {
+          const addresses = await Location.reverseGeocodeAsync({
+            latitude: c.latitude,
+            longitude: c.longitude,
+          });
+          const addressLabel = buildAddressLabel(addresses?.[0]);
+          if (addressLabel) label = addressLabel;
+        } catch {
+          // ignore reverse geocode failures; coords label is fine
+        }
+        return {
+          latitude: c.latitude,
+          longitude: c.longitude,
+          label,
+        };
+      })
+    );
+
+    // De-dupe by label+rounded coords
+    const seen = new Set<string>();
+    const deduped: LocationSearchResult[] = [];
+    for (const r of results) {
+      const key = `${r.label}|${r.latitude.toFixed(4)}|${r.longitude.toFixed(4)}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        deduped.push(r);
+      }
+    }
+
+    setSearchCache(normalized, deduped);
+    return deduped;
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[LocationService] Search error:', error);
+    }
+    return [];
   }
 }
 

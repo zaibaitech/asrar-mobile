@@ -19,6 +19,7 @@ import {
     UserProfile,
 } from '@/types/user-profile';
 import { calculateHadadKabir, normalizeArabic } from '@/utils/coreCalculations';
+import { calculateAscendantSync } from './NatalChartService';
 
 // ============================================================================
 // BURJ (ZODIAC) SYSTEM
@@ -297,6 +298,20 @@ export function deriveAstrologicalData(
       const personal = calculateManazilPersonalFromNames(profile.nameAr, profile.motherName);
       if (typeof personal === 'number') {
         derived.manazilPersonal = personal;
+      }
+    }
+
+    // Ascendant (requires DOB + time + location + timezone)
+    // Prefer birthLocation if provided; fall back to current location for backward compatibility.
+    const ascendantLocation = profile.birthLocation ?? profile.location;
+    if (profile.dobISO && profile.birthTime && ascendantLocation && profile.timezone) {
+      const asc = calculateAscendantSync(profile.dobISO, profile.birthTime, profile.timezone, ascendantLocation);
+      if (asc) {
+        derived.ascendantBurj = asc.burjAr;
+        derived.ascendantBurjEn = asc.burjEn;
+        derived.ascendantBurjIndex = asc.burjIndex;
+        derived.ascendantDegree = asc.degree;
+        derived.ascendantElement = deriveElementFromBurj(asc.burjIndex);
       }
     }
 

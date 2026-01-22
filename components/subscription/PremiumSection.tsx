@@ -24,6 +24,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
+    StyleProp,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -49,7 +50,7 @@ interface PremiumSectionProps {
   /** Optional preview content to show blurred */
   previewContent?: React.ReactNode;
   /** Custom container style */
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   /** Whether to show a compact version */
   compact?: boolean;
   /** Custom CTA text */
@@ -212,7 +213,7 @@ interface InlineUpgradeBannerProps {
   featureId: PremiumFeatureId;
   message: string;
   icon?: string;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
 /**

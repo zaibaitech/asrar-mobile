@@ -12,6 +12,32 @@ import { calculatePlanetaryHours, Planet } from './PlanetaryHoursService';
 import { loadProfile } from './UserProfileStorage';
 import { getPrayerTimesForDate, type CalculationMethod } from './api/prayerTimes';
 
+function normalizeAdhanTimeToHHMM(timeString: string): string {
+  if (!timeString) return '00:00';
+  const cleaned = timeString.replace(/\s*\([^)]*\)\s*/, '').trim();
+  const parts = cleaned.split(':');
+  if (parts.length < 2) return '00:00';
+  const hours = parts[0].padStart(2, '0');
+  const minutes = parts[1].padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+function buildDateFromGregorianAndTime(gregorianDate: string, timeString: string): Date {
+  const hhmm = normalizeAdhanTimeToHHMM(timeString);
+  const [hours, minutes] = hhmm.split(':').map(Number);
+
+  const direct = new Date(`${gregorianDate}T${hhmm}:00`);
+  if (!Number.isNaN(direct.getTime())) return direct;
+
+  const base = new Date(`${gregorianDate}T00:00:00`);
+  if (!Number.isNaN(base.getTime()) && !Number.isNaN(hours) && !Number.isNaN(minutes)) {
+    base.setHours(hours, minutes, 0, 0);
+    return base;
+  }
+
+  return new Date();
+}
+
 export interface AsrarTimingSnapshot {
   /** Harmony score (0-1) representing timing quality */
   harmony: number;
@@ -58,9 +84,9 @@ export async function getAsrarTimingSnapshot(date: Date = new Date()): Promise<A
       throw new Error('Failed to get prayer times');
     }
     
-    // Parse times
-    const sunrise = new Date(prayerTimes.date.gregorian.date + 'T' + prayerTimes.timings.Sunrise);
-    const sunset = new Date(prayerTimes.date.gregorian.date + 'T' + prayerTimes.timings.Maghrib);
+    // Parse times (Aladhan can include seconds and/or timezone suffixes)
+    const sunrise = buildDateFromGregorianAndTime(prayerTimes.date.gregorian.date, prayerTimes.timings.Sunrise);
+    const sunset = buildDateFromGregorianAndTime(prayerTimes.date.gregorian.date, prayerTimes.timings.Maghrib);
     const nextDay = new Date(date);
     nextDay.setDate(nextDay.getDate() + 1);
     const nextDayTimes = await getPrayerTimesForDate(
@@ -70,15 +96,21 @@ export async function getAsrarTimingSnapshot(date: Date = new Date()): Promise<A
       3 as CalculationMethod
     );
     const nextSunrise = nextDayTimes 
-      ? new Date(nextDayTimes.date.gregorian.date + 'T' + nextDayTimes.timings.Sunrise)
+      ? buildDateFromGregorianAndTime(nextDayTimes.date.gregorian.date, nextDayTimes.timings.Sunrise)
       : new Date(sunrise.getTime() + 24 * 60 * 60 * 1000);
     
     // Calculate planetary hours
     const planetaryData = calculatePlanetaryHours(sunrise, sunset, nextSunrise, date);
     
+    // Guard against unexpected/invalid planetary hour output
+    const dayRulerPlanet = (planetaryData?.dayRulerPlanet ?? ('Sun' as Planet)) as Planet;
+    const currentHourPlanet = (planetaryData?.currentHour?.planet ?? dayRulerPlanet) as Planet;
+    const currentHourStartTime = planetaryData?.currentHour?.startTime ?? date;
+    const currentHourEndTime = planetaryData?.currentHour?.endTime ?? new Date(date.getTime() + 60 * 60 * 1000);
+
     // Get day element from day ruler
-    const dayElement = getPlanetElement(planetaryData.dayRulerPlanet);
-    const hourElement = getPlanetElement(planetaryData.currentHour.planet);
+    const dayElement = getPlanetElement(dayRulerPlanet);
+    const hourElement = getPlanetElement(currentHourPlanet);
     
     // Calculate harmony score
     let harmonyScore = 0.5; // Default neutral
@@ -129,10 +161,10 @@ export async function getAsrarTimingSnapshot(date: Date = new Date()): Promise<A
     return {
       harmony: harmonyScore,
       planetaryHour: {
-        ruler: planetaryData.currentHour.planet.toLowerCase(),
+        ruler: currentHourPlanet.toLowerCase(),
         element: hourElement.toLowerCase(),
-        startTime: planetaryData.currentHour.startTime,
-        endTime: planetaryData.currentHour.endTime,
+        startTime: currentHourStartTime,
+        endTime: currentHourEndTime,
       },
       dayElement: dayElement.toLowerCase(),
       islamicDay: {

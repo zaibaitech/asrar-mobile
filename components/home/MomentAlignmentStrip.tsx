@@ -119,7 +119,7 @@ export function MomentAlignmentStrip({
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.loadingText}>{t('common.loading')}</Text>
+        <Text style={styles.loadingText}>{t('home.tapToViewDetails') || 'Tap to view details'}</Text>
       </View>
     );
   }

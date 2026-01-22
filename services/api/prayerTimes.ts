@@ -6,10 +6,18 @@
  * - Fetches daily prayer times by coordinates
  * - Supports multiple calculation methods
  * - No API key required (free service)
- * - Caches results for 24 hours
- * - Enhanced: Weekly prefetch for offline capability
+ * - Monthly caching (prayer times change only 1-2 min/day)
+ * - Excellent offline support
+ * - Cross-device sync via Supabase
+ * 
+ * NOTE: This file now delegates to PrayerTimesCacheService for better
+ * performance. The old weekly prefetch logic is replaced with monthly caching.
  */
 
+import {
+    getPrayerTimesForDate as getMonthlyPrayerTimesForDate,
+    getTodayPrayerTimes,
+} from '@/services/PrayerTimesCacheService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -80,6 +88,9 @@ export type CalculationMethod =
 
 /**
  * Fetch prayer times from Aladhan API
+ * 
+ * Now delegates to PrayerTimesCacheService which implements monthly caching
+ * This provides ~99% reduction in API calls and excellent offline support
  */
 export async function fetchPrayerTimes(
   latitude: number,
@@ -87,75 +98,68 @@ export async function fetchPrayerTimes(
   method: CalculationMethod = 3 // Default: Muslim World League
 ): Promise<PrayerTimeResponse> {
   try {
-    // If we're offline, prefer cache (even if stale) over hard failure.
+    // Use new monthly cache service
+    const todayData = await getTodayPrayerTimes(latitude, longitude, method);
+    
+    if (!todayData) {
+      throw new Error('No prayer times available');
+    }
+    
+    return todayData;
+    
+  } catch (error) {
+    // Fallback to legacy cache if new system fails
+    console.warn('Monthly cache failed, trying legacy cache:', error);
+    
     const netInfo = await NetInfo.fetch();
-
-    // Check cache first
     const cached = await getCachedPrayerTimes(latitude, longitude, {
       allowExpired: !netInfo.isConnected,
     });
+    
     if (cached) {
+      console.log('Using legacy cache as fallback');
       return cached.data;
     }
-
-    // Build API URL
-    const timestamp = Math.floor(Date.now() / 1000);
-    const url = `${ALADHAN_API_BASE}/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
-
-    if (__DEV__) {
-      console.log('Fetching prayer times from Aladhan API:', url);
-    }
-
-    const response = await fetchWithTimeout(url, 12000);
     
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-    }
-
-    const json = await response.json();
-    
-    if (json.code !== 200 || !json.data) {
-      throw new Error('Invalid API response');
-    }
-
-    const prayerData: PrayerTimeResponse = json.data;
-
-    // Cache the results
-    await cachePrayerTimes(prayerData, latitude, longitude);
-
-    // Warm daily caches opportunistically (WiFi only) for better offline support.
-    // Fire-and-forget: any errors are logged inside prefetchPrayerTimes.
-    void prefetchPrayerTimes(latitude, longitude, method);
-
-    return prayerData;
-  } catch (error) {
-    // Retry once on transient network failure, then fall back to stale cache if available.
-    try {
-      const timestamp = Math.floor(Date.now() / 1000);
-      const url = `${ALADHAN_API_BASE}/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
-      const response = await fetchWithTimeout(url, 12000);
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-      }
-      const json = await response.json();
-      if (json.code !== 200 || !json.data) {
-        throw new Error('Invalid API response');
-      }
-      const prayerData: PrayerTimeResponse = json.data;
-      await cachePrayerTimes(prayerData, latitude, longitude);
-      void prefetchPrayerTimes(latitude, longitude, method);
-      return prayerData;
-    } catch (retryError) {
-      const fallback = await getCachedPrayerTimes(latitude, longitude, { allowExpired: true });
-      if (fallback) {
-        console.warn('Using stale cached prayer times due to network failure:', retryError);
-        return fallback.data;
-      }
-
-      console.error('Failed to fetch prayer times:', retryError);
-      throw retryError;
-    }
+    // Last resort: direct API call
+    console.warn('Both caches failed, making direct API call');
+    return await fetchDirectFromAPI(latitude, longitude, method);
   }
+}
+
+/**
+ * Direct API call (fallback only)
+ */
+async function fetchDirectFromAPI(
+  latitude: number,
+  longitude: number,
+  method: CalculationMethod
+): Promise<PrayerTimeResponse> {
+  const timestamp = Math.floor(Date.now() / 1000);
+  const url = `${ALADHAN_API_BASE}/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
+  
+  if (__DEV__) {
+    console.log('Direct API call:', url);
+  }
+  
+  const response = await fetchWithTimeout(url, 12000);
+  
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+  }
+  
+  const json = await response.json();
+  
+  if (json.code !== 200 || !json.data) {
+    throw new Error('Invalid API response');
+  }
+  
+  const prayerData: PrayerTimeResponse = json.data;
+  
+  // Cache for legacy system
+  await cachePrayerTimes(prayerData, latitude, longitude);
+  
+  return prayerData;
 }
 
 /**
@@ -237,6 +241,27 @@ async function cachePrayerTimes(
 /**
  * Get the next prayer time and name
  */
+/**
+ * Parse prayer time string to HH:MM format
+ * Handles formats like: "05:30", "05:30:45", "05:30 (EEST)"
+ */
+function parseTimeTo24Hour(timeString: string): string {
+  if (!timeString) return '00:00';
+  
+  // Remove timezone info in parentheses
+  const cleaned = timeString.replace(/\s*\([^)]*\)\s*/, '').trim();
+  
+  // Split by colon and take first two parts (HH:MM)
+  const parts = cleaned.split(':');
+  if (parts.length >= 2) {
+    const hours = parts[0].padStart(2, '0');
+    const minutes = parts[1].padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+  
+  return '00:00';
+}
+
 export function getNextPrayer(timings: PrayerTimings): {
   name: string;
   nameArabic: string;
@@ -246,12 +271,12 @@ export function getNextPrayer(timings: PrayerTimings): {
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   const prayers = [
-    { name: 'Fajr', nameArabic: 'الفجر', time: timings.Fajr },
-    { name: 'Sunrise', nameArabic: 'الشروق', time: timings.Sunrise },
-    { name: 'Dhuhr', nameArabic: 'الظهر', time: timings.Dhuhr },
-    { name: 'Asr', nameArabic: 'العصر', time: timings.Asr },
-    { name: 'Maghrib', nameArabic: 'المغرب', time: timings.Maghrib },
-    { name: 'Isha', nameArabic: 'العشاء', time: timings.Isha },
+    { name: 'Fajr', nameArabic: 'الفجر', time: parseTimeTo24Hour(timings.Fajr) },
+    { name: 'Sunrise', nameArabic: 'الشروق', time: parseTimeTo24Hour(timings.Sunrise) },
+    { name: 'Dhuhr', nameArabic: 'الظهر', time: parseTimeTo24Hour(timings.Dhuhr) },
+    { name: 'Asr', nameArabic: 'العصر', time: parseTimeTo24Hour(timings.Asr) },
+    { name: 'Maghrib', nameArabic: 'المغرب', time: parseTimeTo24Hour(timings.Maghrib) },
+    { name: 'Isha', nameArabic: 'العشاء', time: parseTimeTo24Hour(timings.Isha) },
   ];
 
   // Convert prayer times to minutes
@@ -286,8 +311,22 @@ export function getTimeUntilPrayer(prayerTime: string): {
   minutes: number;
   totalMinutes: number;
 } {
+  // Validate prayer time format
+  if (!prayerTime || typeof prayerTime !== 'string' || !prayerTime.includes(':')) {
+    console.warn('Invalid prayer time format:', prayerTime);
+    return { hours: 0, minutes: 0, totalMinutes: 0 };
+  }
+
+  // Parse the time to ensure HH:MM format
+  const cleanTime = parseTimeTo24Hour(prayerTime);
   const now = new Date();
-  const [prayerHours, prayerMinutes] = prayerTime.split(':').map(Number);
+  const [prayerHours, prayerMinutes] = cleanTime.split(':').map(Number);
+  
+  // Validate parsed values
+  if (isNaN(prayerHours) || isNaN(prayerMinutes)) {
+    console.warn('Failed to parse prayer time:', prayerTime);
+    return { hours: 0, minutes: 0, totalMinutes: 0 };
+  }
   
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const prayerTotalMinutes = prayerHours * 60 + prayerMinutes;
@@ -435,6 +474,12 @@ async function fetchAndCacheSingleDay(
  * @param date - Target date
  * @param latitude - Latitude
  * @param longitude - Longitude
+ * 
+ * Now uses monthly caching for better performance
+ * 
+ * @param date - Target date
+ * @param latitude - Latitude
+ * @param longitude - Longitude
  * @param method - Calculation method
  * @returns Prayer times for the specified date
  */
@@ -445,25 +490,29 @@ export async function getPrayerTimesForDate(
   method: CalculationMethod = 3
 ): Promise<PrayerTimeResponse | null> {
   try {
+    // Use new monthly cache service
+    const dateData = await getMonthlyPrayerTimesForDate(date, latitude, longitude, method);
+    
+    if (dateData) {
+      return dateData;
+    }
+    
+    // Fallback to legacy daily cache
     const dateKey = date.toISOString().split('T')[0];
     const cacheKey = `${CACHE_KEY_PREFIX}${dateKey}_${latitude.toFixed(2)}_${longitude.toFixed(2)}`;
     
-    // Check daily cache first
     const cached = await AsyncStorage.getItem(cacheKey);
     if (cached) {
       const cacheData: CachedPrayerData = JSON.parse(cached);
-      
-      // Check if still valid
       if (Date.now() - cacheData.timestamp < CACHE_DURATION) {
         return cacheData.data;
       }
     }
     
-    // Fetch if not cached
-    console.log(`Fetching prayer times for ${dateKey}...`);
+    // Last resort: fetch single day
+    console.log(`Fetching single day as fallback...`);
     await fetchAndCacheSingleDay(date, latitude, longitude, method, cacheKey);
     
-    // Read from cache
     const newCached = await AsyncStorage.getItem(cacheKey);
     if (newCached) {
       const cacheData: CachedPrayerData = JSON.parse(newCached);

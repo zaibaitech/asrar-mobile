@@ -49,16 +49,27 @@ export function PrayerTimesWidget() {
     const now = new Date();
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
+    const normalize = (timeString: string) => {
+      const cleaned = String(timeString || '').replace(/\s*\([^)]*\)\s*/g, '').trim();
+      const parts = cleaned.split(':');
+      if (parts.length < 2) return '';
+      const hh = parts[0].padStart(2, '0');
+      const mm = parts[1].padStart(2, '0');
+      return `${hh}:${mm}`;
+    };
+
     const prayers: Array<{ name: ObligatoryPrayerName; time: string }> = [
-      { name: 'Fajr', time: t.Fajr },
-      { name: 'Dhuhr', time: t.Dhuhr },
-      { name: 'Asr', time: t.Asr },
-      { name: 'Maghrib', time: t.Maghrib },
-      { name: 'Isha', time: t.Isha },
+      { name: 'Fajr', time: normalize(t.Fajr) },
+      { name: 'Dhuhr', time: normalize(t.Dhuhr) },
+      { name: 'Asr', time: normalize(t.Asr) },
+      { name: 'Maghrib', time: normalize(t.Maghrib) },
+      { name: 'Isha', time: normalize(t.Isha) },
     ];
 
     for (const prayer of prayers) {
+      if (!prayer.time) continue;
       const [hours, minutes] = prayer.time.split(':').map(Number);
+      if (isNaN(hours) || isNaN(minutes)) continue;
       const total = hours * 60 + minutes;
       if (total > currentMinutes) return prayer.name;
     }
@@ -84,11 +95,30 @@ export function PrayerTimesWidget() {
     if (state !== 'loaded' || !nextPrayer.time) return;
 
     const updateCountdown = () => {
-      const { hours, minutes } = getTimeUntilPrayer(nextPrayer.time);
+      const { hours, minutes, totalMinutes } = getTimeUntilPrayer(nextPrayer.time);
+      
+      if (__DEV__) {
+        console.log('Prayer countdown:', { 
+          prayer: nextPrayer.name, 
+          time: nextPrayer.time, 
+          hours, 
+          minutes, 
+          totalMinutes 
+        });
+      }
+      
+      // Validate the result to prevent showing "NaNm" or "0m"
+      if (isNaN(hours) || isNaN(minutes) || totalMinutes === 0) {
+        setCountdown('');
+        return;
+      }
+      
       if (hours > 0) {
         setCountdown(`${hours}h ${minutes}m`);
-      } else {
+      } else if (minutes > 0) {
         setCountdown(`${minutes}m`);
+      } else {
+        setCountdown('');
       }
     };
 

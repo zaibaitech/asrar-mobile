@@ -329,6 +329,36 @@ export function validateProfile(profile: UserProfile): ProfileValidationResult {
       }
     }
   }
+
+  // Birth time format validation (if provided)
+  if (profile.birthTime) {
+    const timeRegex = /^\d{2}:\d{2}$/;
+    if (!timeRegex.test(profile.birthTime)) {
+      errors.push({
+        field: 'birthTime',
+        message: 'Birth time must be in HH:mm format',
+      });
+    } else {
+      const [hhRaw, mmRaw] = profile.birthTime.split(':');
+      const hours = Number(hhRaw);
+      const minutes = Number(mmRaw);
+
+      const valid =
+        Number.isFinite(hours) &&
+        Number.isFinite(minutes) &&
+        hours >= 0 &&
+        hours <= 23 &&
+        minutes >= 0 &&
+        minutes <= 59;
+
+      if (!valid) {
+        errors.push({
+          field: 'birthTime',
+          message: 'Birth time must be a valid 24h time',
+        });
+      }
+    }
+  }
   
   // Location validation (if provided)
   if (profile.location) {
@@ -343,6 +373,23 @@ export function validateProfile(profile: UserProfile): ProfileValidationResult {
       errors.push({
         field: 'location',
         message: 'Longitude must be between -180 and 180',
+      });
+    }
+  }
+
+  // Birth location validation (if provided)
+  if (profile.birthLocation) {
+    if (profile.birthLocation.latitude < -90 || profile.birthLocation.latitude > 90) {
+      errors.push({
+        field: 'birthLocation',
+        message: 'Birth latitude must be between -90 and 90',
+      });
+    }
+
+    if (profile.birthLocation.longitude < -180 || profile.birthLocation.longitude > 180) {
+      errors.push({
+        field: 'birthLocation',
+        message: 'Birth longitude must be between -180 and 180',
       });
     }
   }

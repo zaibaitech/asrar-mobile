@@ -10,12 +10,14 @@ import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AnimatedSplash } from '@/components/AnimatedSplash';
+import { AppErrorBoundary } from '@/components/AppErrorBoundary';
 import { NotificationInitializer } from '@/components/NotificationInitializer';
 import { NotificationTapHandler } from '@/components/NotificationTapHandler';
 import { useColorScheme } from '@/components/useColorScheme';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ProfileProvider, useProfile } from '@/contexts/ProfileContext';
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
+import { prefetchCoreCaches } from '@/services/AppPrefetchService';
 import { handleAuthCallback } from '@/services/AuthService';
 import { getOnboardingCompleted } from '@/services/OnboardingService';
 
@@ -60,6 +62,12 @@ export default function RootLayout() {
 function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: { showAnimatedSplash: boolean; setShowAnimatedSplash: (val: boolean) => void }) {
   const colorScheme = useColorScheme();
 
+  // Best-effort prefetch so tabs/widgets can render instantly.
+  // Avoids repeated network bursts during transitions.
+  useEffect(() => {
+    void prefetchCoreCaches();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <ProfileProvider>
@@ -82,37 +90,39 @@ function RootLayoutContent({ showAnimatedSplash, setShowAnimatedSplash }: { show
       <DeepLinkHandler />
       <NotificationInitializer />
       <NotificationTapHandler />
-      <Stack>
-        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen 
-                name="compatibility" 
-                options={{ 
-                  headerShown: true,
-                  headerTitle: 'Compatibility Analysis',
-                  headerStyle: {
-                    backgroundColor: '#1A1625',
-                  },
-                  headerTintColor: '#fff',
-                  headerTitleStyle: {
-                    fontWeight: 'bold',
-                  },
-                }} 
-              />
-              <Stack.Screen 
-                name="dhikr-counter" 
-                options={{ headerShown: false }} 
-              />
-              <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-              <Stack.Screen name="email-verification" options={{ headerShown: false }} />
-              <Stack.Screen name="auth" options={{ headerShown: false }} />
-              <Stack.Screen name="reset-password" options={{ headerShown: false }} />
-              <Stack.Screen name="profile" options={{ headerShown: false }} />
-            </Stack>
-            {showAnimatedSplash && (
-              <AnimatedSplash onFinish={() => setShowAnimatedSplash(false)} />
-            )}
-          </>
+      <AppErrorBoundary>
+        <Stack>
+          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen 
+            name="compatibility" 
+            options={{ 
+              headerShown: true,
+              headerTitle: 'Compatibility Analysis',
+              headerStyle: {
+                backgroundColor: '#1A1625',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }} 
+          />
+          <Stack.Screen 
+            name="dhikr-counter" 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="email-verification" options={{ headerShown: false }} />
+          <Stack.Screen name="auth" options={{ headerShown: false }} />
+          <Stack.Screen name="reset-password" options={{ headerShown: false }} />
+          <Stack.Screen name="profile" options={{ headerShown: false }} />
+        </Stack>
+      </AppErrorBoundary>
+      {showAnimatedSplash && (
+        <AnimatedSplash onFinish={() => setShowAnimatedSplash(false)} />
+      )}
+    </>
   );
 }
 

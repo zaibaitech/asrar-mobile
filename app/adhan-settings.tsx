@@ -19,18 +19,30 @@ import { useLanguage } from '../contexts/LanguageContext';
 import {
     AdhanSettings,
     cancelAllPrayerNotifications,
+    getAdhanDiagnostics,
     getAdhanSettings,
+    getScheduledNotificationsCount,
     saveAdhanSettings,
+    scheduleTestPrayerNotification,
 } from '../services/AdhanNotificationService';
 
 export default function AdhanSettingsScreen() {
   const { t } = useLanguage();
   const [settings, setSettings] = useState<AdhanSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [scheduledCount, setScheduledCount] = useState<number>(0);
+  const [diagnostics, setDiagnostics] = useState<Record<string, unknown> | null>(null);
+  const [diagLoading, setDiagLoading] = useState(false);
 
   useEffect(() => {
     loadSettings();
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      void refreshDiagnostics();
+    }
+  }, [loading]);
 
   const loadSettings = async () => {
     try {
@@ -40,6 +52,20 @@ export default function AdhanSettingsScreen() {
       console.error('Failed to load settings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const refreshDiagnostics = async () => {
+    setDiagLoading(true);
+    try {
+      const [count, diag] = await Promise.all([
+        getScheduledNotificationsCount(),
+        getAdhanDiagnostics(),
+      ]);
+      setScheduledCount(count);
+      setDiagnostics(diag);
+    } finally {
+      setDiagLoading(false);
     }
   };
 
@@ -56,6 +82,7 @@ export default function AdhanSettingsScreen() {
     // If disabling notifications, cancel all
     if (key === 'enabled' && !value) {
       await cancelAllPrayerNotifications();
+      await refreshDiagnostics();
     }
   };
 
@@ -258,6 +285,63 @@ export default function AdhanSettingsScreen() {
           </View>
         )}
 
+        {/* Diagnostics */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Diagnostics</Text>
+          <Text style={styles.settingDescription}>
+            Use this to confirm notifications are scheduled in the installed APK (not Expo Go).
+          </Text>
+
+          <View style={{ height: Spacing.md }} />
+
+          <Text style={styles.settingTitle}>Scheduled prayer notifications: {scheduledCount}</Text>
+          <Text style={styles.settingDescription}>
+            Permission: {String(diagnostics?.permissionStatus ?? 'unknown')}
+          </Text>
+          {diagnostics?.lastScheduledAt ? (
+            <Text style={styles.settingDescription}>
+              Last schedule attempt: {String(diagnostics.lastScheduledAt)}
+            </Text>
+          ) : null}
+          {diagnostics?.lastErrorAt ? (
+            <Text style={[styles.settingDescription, { color: '#FCA5A5' }]}>
+              Last error: {String(diagnostics.lastErrorAt)} — {String(diagnostics.error ?? '')}
+            </Text>
+          ) : null}
+
+          <View style={{ height: Spacing.md }} />
+
+          <Pressable
+            style={[styles.diagButton, diagLoading && { opacity: 0.7 }]}
+            disabled={diagLoading}
+            onPress={() => refreshDiagnostics()}
+          >
+            <Text style={styles.diagButtonText}>Refresh</Text>
+          </Pressable>
+
+          <Pressable
+            style={[styles.diagButton, { backgroundColor: 'rgba(100, 181, 246, 0.25)' }, diagLoading && { opacity: 0.7 }]}
+            disabled={diagLoading}
+            onPress={async () => {
+              await scheduleTestPrayerNotification(10);
+              await refreshDiagnostics();
+            }}
+          >
+            <Text style={styles.diagButtonText}>Send test notification (10s)</Text>
+          </Pressable>
+
+          <Pressable
+            style={[styles.diagButton, { backgroundColor: 'rgba(239, 68, 68, 0.2)' }, diagLoading && { opacity: 0.7 }]}
+            disabled={diagLoading}
+            onPress={async () => {
+              await cancelAllPrayerNotifications();
+              await refreshDiagnostics();
+            }}
+          >
+            <Text style={styles.diagButtonText}>Cancel prayer notifications</Text>
+          </Pressable>
+        </View>
+
         <View style={{ height: 40 }} />
       </ScrollView>
     </LinearGradient>
@@ -368,5 +452,21 @@ const styles = StyleSheet.create({
   pickerOptionTextSelected: {
     color: '#ffffff',
     fontWeight: Typography.weightBold,
+  },
+
+  diagButton: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.18)',
+    marginTop: Spacing.sm,
+  },
+  diagButtonText: {
+    color: DarkTheme.textPrimary,
+    fontSize: Typography.label,
+    fontWeight: Typography.weightSemibold,
+    textAlign: 'center',
   },
 });

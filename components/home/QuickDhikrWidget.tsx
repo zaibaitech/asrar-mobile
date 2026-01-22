@@ -17,7 +17,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue
 } from 'react-native-reanimated';
-import { DarkTheme, Spacing, Typography } from '../../constants/DarkTheme';
+import { Borders, DarkTheme, Spacing, Typography } from '../../constants/DarkTheme';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const DHIKR_STORAGE_KEY = '@asrar_dhikr_count';
@@ -79,8 +79,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(45, 21, 21, 0.5)',
-    borderRadius: 16,
+    borderRadius: Borders.radiusLg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: 'rgba(30, 20, 36, 0.65)',
     padding: Spacing.md,
     position: 'relative',
     overflow: 'hidden',

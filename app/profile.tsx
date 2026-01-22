@@ -8,6 +8,7 @@
  * - Arabic name input (required for Name Destiny)
  * - Mother's name input (optional)
  * - Location picker (optional, for prayer times)
+ * - Birth location (optional, for Ascendant)
  * - Live preview of derived data (Burj, Element)
  * - Profile completion percentage
  * 
@@ -40,6 +41,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ArabicKeyboard from '@/components/istikhara/ArabicKeyboard';
+import LocationAutocomplete from '@/components/LocationAutocomplete';
 import NameAutocomplete from '@/components/NameAutocomplete';
 import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -49,6 +51,7 @@ import {
     getCurrentLocation,
     requestLocationPermission,
 } from '@/services/LocationService';
+import { calculateAscendantSync } from '@/services/NatalChartService';
 import {
     deriveBurjFromDOB,
     deriveElementFromBurj,
@@ -76,16 +79,43 @@ export default function ProfileScreen() {
   const [nameLatin, setNameLatin] = useState(profile.nameLatin || '');
   const [motherName, setMotherName] = useState(profile.motherName || '');
   const [dobISO, setDobISO] = useState(profile.dobISO || '');
+  const [birthTime, setBirthTime] = useState(profile.birthTime || '');
   
   // Date picker state
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(
     profile.dobISO ? new Date(profile.dobISO) : new Date()
   );
+
+  // Time picker state
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedTime, setSelectedTime] = useState(() => {
+    const base = new Date();
+    if (profile.birthTime) {
+      const [hhRaw, mmRaw] = profile.birthTime.split(':');
+      const hh = Number(hhRaw);
+      const mm = Number(mmRaw);
+      if (Number.isFinite(hh) && Number.isFinite(mm)) {
+        base.setHours(hh, mm, 0, 0);
+      }
+    }
+    return base;
+  });
   
-  // Location state
+  // Location state (current)
   const [locationLabel, setLocationLabel] = useState(profile.location?.label || '');
   const [loadingLocation, setLoadingLocation] = useState(false);
+
+  // Birth location state (manual)
+  const [birthLocationLabel, setBirthLocationLabel] = useState(profile.birthLocation?.label || '');
+  const [birthLatitude, setBirthLatitude] = useState(
+    profile.birthLocation ? String(profile.birthLocation.latitude) : ''
+  );
+  const [birthLongitude, setBirthLongitude] = useState(
+    profile.birthLocation ? String(profile.birthLocation.longitude) : ''
+  );
+  const [loadingBirthLocation, setLoadingBirthLocation] = useState(false);
+  const [showBirthCoordinates, setShowBirthCoordinates] = useState(false);
 
   // Arabic keyboard state
   const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -103,6 +133,7 @@ export default function ProfileScreen() {
   const [burjPreview, setBurjPreview] = useState<string | null>(null);
   const [elementPreview, setElementPreview] = useState<string | null>(null);
   const [planetPreview, setPlanetPreview] = useState<string | null>(null);
+  const [ascendantPreview, setAscendantPreview] = useState<string | null>(null);
   
   // ============================================================================
   // EFFECTS
@@ -135,7 +166,27 @@ export default function ProfileScreen() {
       setElementPreview(null);
       setPlanetPreview(null);
     }
-  }, [dobISO, profile.derived]);
+
+    // Ascendant preview (requires DOB + birthTime + location)
+    const lat = Number(birthLatitude);
+    const lon = Number(birthLongitude);
+    const previewBirthLocation =
+      Number.isFinite(lat) && Number.isFinite(lon)
+        ? {
+            latitude: lat,
+            longitude: lon,
+            label: birthLocationLabel || undefined,
+          }
+        : null;
+
+    const ascendantLocation = previewBirthLocation ?? profile.birthLocation ?? profile.location ?? null;
+    if (dobISO && birthTime && ascendantLocation) {
+      const asc = calculateAscendantSync(dobISO, birthTime, profile.timezone, ascendantLocation);
+      setAscendantPreview(asc?.burjAr || null);
+    } else {
+      setAscendantPreview(null);
+    }
+  }, [birthLatitude, birthLocationLabel, birthLongitude, birthTime, dobISO, profile.birthLocation, profile.location, profile.timezone, profile.derived]);
   
   // ============================================================================
   // HANDLERS
@@ -150,6 +201,19 @@ export default function ProfileScreen() {
       setSelectedDate(date);
       const isoString = date.toISOString().split('T')[0];
       setDobISO(isoString);
+    }
+  };
+
+  const handleTimeChange = (event: any, date?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowTimePicker(false);
+    }
+
+    if (date) {
+      setSelectedTime(date);
+      const hh = String(date.getHours()).padStart(2, '0');
+      const mm = String(date.getMinutes()).padStart(2, '0');
+      setBirthTime(`${hh}:${mm}`);
     }
   };
   
@@ -201,14 +265,79 @@ export default function ProfileScreen() {
       setLoadingLocation(false);
     }
   };
+
+  const handleGetBirthLocation = async () => {
+    try {
+      setLoadingBirthLocation(true);
+
+      const permission = await requestLocationPermission();
+      if (!permission.granted) {
+        Alert.alert(
+          'Location Permission',
+          'Location permission is required to auto-detect your birth location coordinates.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+
+      const { location, error } = await getCurrentLocation();
+      if (error || !location) {
+        Alert.alert('Location Error', error || 'Failed to get location', [{ text: 'OK' }]);
+        return;
+      }
+
+      setBirthLatitude(String(location.latitude));
+      setBirthLongitude(String(location.longitude));
+      setBirthLocationLabel(location.label || '');
+
+      Alert.alert(
+        'Birth Location Updated',
+        `Set to: ${location.label}`,
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      Alert.alert('Error', 'Failed to get birth location', [{ text: 'OK' }]);
+    } finally {
+      setLoadingBirthLocation(false);
+    }
+  };
   
   const handleSave = async () => {
     try {
+      const birthLabel = birthLocationLabel.trim();
+      const hasAnyBirthLocationInput =
+        birthLabel.length > 0 || birthLatitude.trim().length > 0 || birthLongitude.trim().length > 0;
+
+      let birthLocationUpdate:
+        | {
+            latitude: number;
+            longitude: number;
+            label?: string;
+          }
+        | undefined;
+
+      if (hasAnyBirthLocationInput) {
+        const lat = Number(birthLatitude);
+        const lon = Number(birthLongitude);
+        if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+          Alert.alert('Birth Location', 'Please enter valid numeric latitude and longitude.');
+          return;
+        }
+
+        birthLocationUpdate = {
+          latitude: lat,
+          longitude: lon,
+          label: birthLabel || undefined,
+        };
+      }
+
       await setProfile({
         nameAr: nameAr || undefined,
         nameLatin: nameLatin || undefined,
         motherName: motherName || undefined,
         dobISO: dobISO || undefined,
+        birthTime: birthTime || undefined,
+        birthLocation: birthLocationUpdate,
       });
 
       // If this screen was opened for initial profile completion,
@@ -265,9 +394,15 @@ export default function ProfileScreen() {
             setNameLatin('');
             setMotherName('');
             setDobISO('');
+            setBirthTime('');
+            setLocationLabel('');
+            setBirthLocationLabel('');
+            setBirthLatitude('');
+            setBirthLongitude('');
             setBurjPreview(null);
             setElementPreview(null);
             setPlanetPreview(null);
+            setAscendantPreview(null);
           },
         },
       ]
@@ -564,6 +699,55 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           )}
         </View>
+
+        {/* Time of Birth Section (Optional) */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('profile.birthTime.title')}</Text>
+          <Text style={styles.sectionDescription}>
+            {t('profile.birthTime.subtitle')}
+          </Text>
+
+          <TouchableOpacity
+            style={styles.dateButton}
+            onPress={() => setShowTimePicker(true)}
+          >
+            <Ionicons name="time-outline" size={20} color={DarkTheme.textSecondary} />
+            <Text style={styles.dateButtonText}>
+              {birthTime || t('profile.birthTime.selectPlaceholder')}
+            </Text>
+          </TouchableOpacity>
+
+          {!!birthTime && (
+            <TouchableOpacity
+              style={styles.dateConfirmButton}
+              onPress={() => {
+                setBirthTime('');
+                setAscendantPreview(null);
+              }}
+            >
+              <Text style={styles.dateConfirmText}>{t('profile.birthTime.clear')}</Text>
+            </TouchableOpacity>
+          )}
+
+          {showTimePicker && (
+            <DateTimePicker
+              value={selectedTime}
+              mode="time"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={handleTimeChange}
+              is24Hour
+            />
+          )}
+
+          {Platform.OS === 'ios' && showTimePicker && (
+            <TouchableOpacity
+              style={styles.dateConfirmButton}
+              onPress={() => setShowTimePicker(false)}
+            >
+              <Text style={styles.dateConfirmText}>Done</Text>
+            </TouchableOpacity>
+          )}
+        </View>
         
         {/* Derived Data Preview */}
         {burjPreview && (
@@ -584,6 +768,15 @@ export default function ProfileScreen() {
                 <Text style={styles.derivedValue}>{elementPreview}</Text>
               </View>
             </View>
+
+            {!!ascendantPreview && (
+              <View style={[styles.derivedRow, { marginTop: 12 }]}>
+                <View style={styles.derivedItem}>
+                  <Text style={styles.derivedLabel}>{t('profile.astro.ascendant')}</Text>
+                  <Text style={styles.derivedValue}>{ascendantPreview}</Text>
+                </View>
+              </View>
+            )}
           </LinearGradient>
         )}
         
@@ -669,6 +862,90 @@ export default function ProfileScreen() {
             />
           </View>
         </View>
+
+        {/* Birth Location Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('profile.birthLocation.title')}</Text>
+          <Text style={styles.sectionDescription}>{t('profile.birthLocation.subtitle')}</Text>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>{t('profile.birthLocation.label')}</Text>
+            <View style={styles.locationRow}>
+              <View style={styles.locationInput}>
+                <LocationAutocomplete
+                  value={birthLocationLabel}
+                  onChange={setBirthLocationLabel}
+                  onSelect={(loc) => {
+                    setBirthLocationLabel(loc.label);
+                    setBirthLatitude(String(loc.latitude));
+                    setBirthLongitude(String(loc.longitude));
+                    setShowBirthCoordinates(false);
+                  }}
+                  placeholder={t('profile.birthLocation.placeholder')}
+                />
+              </View>
+              <TouchableOpacity
+                style={styles.locationButton}
+                onPress={handleGetBirthLocation}
+                disabled={loadingBirthLocation}
+              >
+                {loadingBirthLocation ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Ionicons name="locate" size={20} color="#fff" />
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.locationActionsRow}>
+              <TouchableOpacity
+                onPress={() => setShowBirthCoordinates((v) => !v)}
+              >
+                <Text style={styles.clearInlineText}>
+                  {showBirthCoordinates
+                    ? t('common.buttons.collapse')
+                    : t('profile.birthLocation.editCoordinates')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {showBirthCoordinates ? (
+              <View style={styles.coordinateRow}>
+                <TextInput
+                  style={[styles.input, styles.coordinateInput]}
+                  value={birthLatitude}
+                  onChangeText={setBirthLatitude}
+                  placeholder={t('profile.birthLocation.latitude')}
+                  placeholderTextColor={DarkTheme.textSecondary}
+                  keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
+                />
+                <TextInput
+                  style={[styles.input, styles.coordinateInput]}
+                  value={birthLongitude}
+                  onChangeText={setBirthLongitude}
+                  placeholder={t('profile.birthLocation.longitude')}
+                  placeholderTextColor={DarkTheme.textSecondary}
+                  keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
+                />
+              </View>
+            ) : null}
+
+            <View style={styles.locationActionsRow}>
+              <TouchableOpacity
+                onPress={() => {
+                  setBirthLocationLabel('');
+                  setBirthLatitude('');
+                  setBirthLongitude('');
+                  setShowBirthCoordinates(false);
+                }}
+              >
+                <Text style={styles.clearInlineText}>{t('profile.birthLocation.clear')}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.inputHint}>{t('profile.birthLocation.hint')}</Text>
+          </View>
+        </View>
         
         {/* Location Section */}
         <View style={styles.section}>
@@ -680,14 +957,23 @@ export default function ProfileScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>{t('profile.location.label')}</Text>
             <View style={styles.locationRow}>
-              <TextInput
-                style={[styles.input, styles.locationInput]}
-                value={locationLabel}
-                onChangeText={setLocationLabel}
-                placeholder={t('profile.location.placeholder')}
-                placeholderTextColor={DarkTheme.textSecondary}
-                editable={false}
-              />
+              <View style={styles.locationInput}>
+                <LocationAutocomplete
+                  value={locationLabel}
+                  onChange={setLocationLabel}
+                  onSelect={async (loc) => {
+                    setLocationLabel(loc.label);
+                    await setProfile({
+                      location: {
+                        latitude: loc.latitude,
+                        longitude: loc.longitude,
+                        label: loc.label,
+                      },
+                    });
+                  }}
+                  placeholder={t('profile.location.placeholder')}
+                />
+              </View>
               <TouchableOpacity
                 style={styles.locationButton}
                 onPress={handleGetLocation}
@@ -700,9 +986,19 @@ export default function ProfileScreen() {
                 )}
               </TouchableOpacity>
             </View>
-            <Text style={styles.inputHint}>
-              {t('profile.location.autoDetect')}
-            </Text>
+
+            <View style={styles.locationActionsRow}>
+              <TouchableOpacity
+                onPress={async () => {
+                  setLocationLabel('');
+                  await setProfile({ location: undefined });
+                }}
+              >
+                <Text style={styles.clearInlineText}>{t('profile.location.clear')}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.inputHint}>{t('profile.location.autoDetect')}</Text>
           </View>
         </View>
         
@@ -1081,6 +1377,26 @@ const styles = StyleSheet.create({
   },
   locationInput: {
     flex: 1,
+  },
+  coordinateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 10,
+  },
+  coordinateInput: {
+    flex: 1,
+    paddingVertical: 14,
+  },
+  locationActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 10,
+  },
+  clearInlineText: {
+    fontSize: 12,
+    color: '#e0e7ff',
+    opacity: 0.9,
   },
   locationButton: {
     backgroundColor: '#8B7355',
