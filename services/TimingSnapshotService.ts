@@ -12,6 +12,32 @@ import { calculatePlanetaryHours, Planet } from './PlanetaryHoursService';
 import { loadProfile } from './UserProfileStorage';
 import { getPrayerTimesForDate, type CalculationMethod } from './api/prayerTimes';
 
+// Memoize profile reads to avoid repeated AsyncStorage work when scheduling many
+// notifications on app startup.
+let cachedProfile: Awaited<ReturnType<typeof loadProfile>> | null = null;
+let cachedProfileAtMs = 0;
+let inflightProfile: Promise<Awaited<ReturnType<typeof loadProfile>>> | null = null;
+const PROFILE_CACHE_TTL_MS = 60_000;
+
+async function getCachedProfile() {
+  const now = Date.now();
+  if (cachedProfile && now - cachedProfileAtMs < PROFILE_CACHE_TTL_MS) {
+    return cachedProfile;
+  }
+  if (inflightProfile) {
+    return inflightProfile;
+  }
+  inflightProfile = (async () => {
+    const profile = await loadProfile();
+    cachedProfile = profile;
+    cachedProfileAtMs = Date.now();
+    return profile;
+  })().finally(() => {
+    inflightProfile = null;
+  });
+  return inflightProfile;
+}
+
 function normalizeAdhanTimeToHHMM(timeString: string): string {
   if (!timeString) return '00:00';
   const cleaned = timeString.replace(/\s*\([^)]*\)\s*/, '').trim();
@@ -65,7 +91,7 @@ export interface AsrarTimingSnapshot {
 export async function getAsrarTimingSnapshot(date: Date = new Date()): Promise<AsrarTimingSnapshot> {
   try {
     // Get user profile for location
-    const profile = await loadProfile();
+    const profile = await getCachedProfile();
     const location = profile?.location || {
       latitude: 40.7128,
       longitude: -74.0060,

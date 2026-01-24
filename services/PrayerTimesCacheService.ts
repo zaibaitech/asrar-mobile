@@ -41,6 +41,14 @@ const CACHE_DURATION_DAYS = 30;
 const CACHE_DURATION_MS = CACHE_DURATION_DAYS * 24 * 60 * 60 * 1000;
 const LOCATION_CHANGE_THRESHOLD_KM = 5; // Refresh if location changes > 5km
 
+// In-memory cache + in-flight dedupe.
+// This prevents expensive repeated AsyncStorage/NetInfo work when many callers
+// ask for the same month in quick succession (e.g., notification scheduling).
+const memoryMonthlyCache = new Map<string, MonthlyPrayerData>();
+const inflightMonthlyRequests = new Map<string, Promise<MonthlyPrayerData | null>>();
+const loggedLocalCacheHits = new Set<string>();
+const loggedSupabaseCacheHits = new Set<string>();
+
 // Common locations to pre-cache (holy sites + major cities)
 export const COMMON_LOCATIONS = [
   { name: 'Makkah', latitude: 21.4225, longitude: 39.8262 },
@@ -157,76 +165,110 @@ export async function getMonthlyPrayerTimes(
   const year = targetDate.getFullYear();
   const month = targetDate.getMonth();
   const cacheKey = buildCacheKey(latitude, longitude, year, month);
-  
-  try {
-    // 1. Check local cache first (fastest)
-    const localCache = await getLocalCache(cacheKey, latitude, longitude);
-    if (localCache && !isCacheExpired(localCache)) {
-      if (__DEV__) console.log('✅ Using locally cached prayer times');
-      return localCache;
-    }
-    
-    // 2. Check Supabase cache (for cross-device sync)
-    const supabaseCache = await getSupabaseCache(latitude, longitude, year, month);
-    if (supabaseCache && !isCacheExpired(supabaseCache)) {
-      if (__DEV__) console.log('✅ Using Supabase cached prayer times');
-      // Store locally for faster future access
-      await setLocalCache(cacheKey, supabaseCache);
-      return supabaseCache;
-    }
-    
-    // 3. Check network connectivity
-    const netInfo = await NetInfo.fetch();
-    if (!netInfo.isConnected) {
-      // Return stale cache if available
-      if (localCache) {
-        console.warn('⚠️ Offline: Using stale local cache');
+
+  // Fast-path: memory cache
+  const memoryCache = memoryMonthlyCache.get(cacheKey);
+  if (memoryCache && !isCacheExpired(memoryCache)) {
+    return memoryCache;
+  }
+
+  // De-dupe concurrent requests for the same month.
+  const existing = inflightMonthlyRequests.get(cacheKey);
+  if (existing) {
+    return existing;
+  }
+
+  const requestPromise = (async (): Promise<MonthlyPrayerData | null> => {
+    try {
+      // 1. Check local cache first (fastest)
+      const localCache = await getLocalCache(cacheKey, latitude, longitude);
+      if (localCache && !isCacheExpired(localCache)) {
+        memoryMonthlyCache.set(cacheKey, localCache);
+        if (__DEV__ && !loggedLocalCacheHits.has(cacheKey)) {
+          console.log('✅ Using locally cached prayer times');
+          loggedLocalCacheHits.add(cacheKey);
+        }
         return localCache;
       }
-      if (supabaseCache) {
-        console.warn('⚠️ Offline: Using stale Supabase cache');
+
+      // 2. Check Supabase cache (for cross-device sync)
+      const supabaseCache = await getSupabaseCache(latitude, longitude, year, month);
+      if (supabaseCache && !isCacheExpired(supabaseCache)) {
+        memoryMonthlyCache.set(cacheKey, supabaseCache);
+        if (__DEV__ && !loggedSupabaseCacheHits.has(cacheKey)) {
+          console.log('✅ Using Supabase cached prayer times');
+          loggedSupabaseCacheHits.add(cacheKey);
+        }
+        // Store locally for faster future access
+        await setLocalCache(cacheKey, supabaseCache);
         return supabaseCache;
       }
-      console.error('❌ Offline and no cache available');
+
+      // 3. Check network connectivity
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected) {
+        // Return stale cache if available
+        if (localCache) {
+          console.warn('⚠️ Offline: Using stale local cache');
+          memoryMonthlyCache.set(cacheKey, localCache);
+          return localCache;
+        }
+        if (supabaseCache) {
+          console.warn('⚠️ Offline: Using stale Supabase cache');
+          memoryMonthlyCache.set(cacheKey, supabaseCache);
+          return supabaseCache;
+        }
+        console.error('❌ Offline and no cache available');
+        return null;
+      }
+
+      // 4. Fetch fresh data from API
+      console.log('🌐 Fetching fresh monthly prayer times...');
+      const freshData = await fetchMonthlyPrayerTimes(latitude, longitude, year, month, method);
+
+      if (!freshData) {
+        // Fall back to stale cache
+        const fallback = localCache || supabaseCache || null;
+        if (fallback) memoryMonthlyCache.set(cacheKey, fallback);
+        return fallback;
+      }
+
+      // 5. Store in both caches
+      await setLocalCache(cacheKey, freshData);
+      await setSupabaseCache(freshData);
+      memoryMonthlyCache.set(cacheKey, freshData);
+
+      // 6. Update last known location
+      await saveLastKnownLocation(latitude, longitude);
+
+      // 7. Prefetch next month if we're in the last week
+      const dayOfMonth = targetDate.getDate();
+      const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+      if (dayOfMonth >= lastDayOfMonth - 7) {
+        void prefetchNextMonth(latitude, longitude, method, targetDate);
+      }
+
+      return freshData;
+    } catch (error) {
+      console.error('Failed to get monthly prayer times:', error);
+
+      // Last resort: try any cached data
+      const fallback = await getLocalCache(cacheKey, latitude, longitude);
+      if (fallback) {
+        console.warn('Using fallback stale cache after error');
+        memoryMonthlyCache.set(cacheKey, fallback);
+        return fallback;
+      }
+
       return null;
     }
-    
-    // 4. Fetch fresh data from API
-    console.log('🌐 Fetching fresh monthly prayer times...');
-    const freshData = await fetchMonthlyPrayerTimes(latitude, longitude, year, month, method);
-    
-    if (!freshData) {
-      // Fall back to stale cache
-      return localCache || supabaseCache || null;
-    }
-    
-    // 5. Store in both caches
-    await setLocalCache(cacheKey, freshData);
-    await setSupabaseCache(freshData);
-    
-    // 6. Update last known location
-    await saveLastKnownLocation(latitude, longitude);
-    
-    // 7. Prefetch next month if we're in the last week
-    const dayOfMonth = targetDate.getDate();
-    const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
-    if (dayOfMonth >= lastDayOfMonth - 7) {
-      void prefetchNextMonth(latitude, longitude, method, targetDate);
-    }
-    
-    return freshData;
-    
-  } catch (error) {
-    console.error('Failed to get monthly prayer times:', error);
-    
-    // Last resort: try any cached data
-    const fallback = await getLocalCache(cacheKey, latitude, longitude);
-    if (fallback) {
-      console.warn('Using fallback stale cache after error');
-      return fallback;
-    }
-    
-    return null;
+  })();
+
+  inflightMonthlyRequests.set(cacheKey, requestPromise);
+  try {
+    return await requestPromise;
+  } finally {
+    inflightMonthlyRequests.delete(cacheKey);
   }
 }
 

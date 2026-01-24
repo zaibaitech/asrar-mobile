@@ -130,8 +130,9 @@ export async function getMoonLongitudeFromServer(
   }
 
   // Layer 3: Edge Function (database-backed, shared cache)
+  let data: CosmicDataResponse | null = null;
   try {
-    const data = await globalRequestManager.schedule(
+    data = await globalRequestManager.schedule(
       async () => {
         const url = `${SUPABASE_URL}${EDGE_FUNCTION_PATH}?type=moon&date=${date.toISOString()}`;
         
@@ -147,7 +148,10 @@ export async function getMoonLongitudeFromServer(
         });
 
         if (!response.ok) {
-          throw new Error(`Edge Function error: ${response.status}`);
+          const errorText = await response.text().catch(() => 'Unknown error');
+          console.warn(`[CosmicDataService] Edge Function returned ${response.status}: ${errorText}`);
+          // Return null instead of throwing to prevent uncaught promise errors
+          return null;
         }
 
         return (await response.json()) as CosmicDataResponse;
@@ -159,6 +163,11 @@ export async function getMoonLongitudeFromServer(
         throttleMs: 2_000,
       }
     );
+
+    // If fetch failed, data will be null
+    if (!data) {
+      throw new Error('Edge Function returned null');
+    }
 
     // Cache locally
     const cacheEntry: LocalCacheEntry<CosmicDataResponse> = {
@@ -177,20 +186,17 @@ export async function getMoonLongitudeFromServer(
     return formatResult(data, date);
 
   } catch (error) {
-    if (__DEV__) {
-      console.error('[CosmicDataService] Edge Function error:', error);
-    }
+    console.warn('[CosmicDataService] Edge Function failed, using fallback:', error instanceof Error ? error.message : String(error));
     
     // Fallback 1: Use stale cache if available (better than nothing)
     if (staleData) {
-      if (__DEV__) {
-        console.log('[CosmicDataService] Falling back to stale cache');
-      }
+      console.log('[CosmicDataService] Falling back to stale cache');
       memoryCache.moon = staleData;
       return formatResult(staleData.data, date);
     }
     
     // Fallback 2: Local approximation (last resort)
+    console.log('[CosmicDataService] Using local approximation');
     return getApproxMoonLongitude(date);
   }
 }
