@@ -44,6 +44,7 @@ import {
     getNextPrayer,
     getTimeUntilPrayer
 } from '../../services/api/prayerTimes';
+import { quickTimingCheck } from '../../services/AsrariyaTimingEngine';
 import { DailyGuidance, getDailyGuidance } from '../../services/DailyGuidanceService';
 import { getTodayBlessing } from '../../services/DayBlessingService';
 import { getBestLocation } from '../../services/LocationCacheService';
@@ -155,6 +156,11 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { profile, completionStatus } = useProfile();
   const hasProfileName = Boolean(profile?.nameAr || profile?.nameLatin);
+
+  const profileRef = React.useRef(profile);
+  useEffect(() => {
+    profileRef.current = profile;
+  }, [profile]);
   
   // Get modules with translations
   const MODULES = useMemo(() => getModules(t), [t]);
@@ -165,6 +171,7 @@ export default function HomeScreen() {
   
   const [dailyGuidance, setDailyGuidance] = useState<DailyGuidance | null>(null);
   const [momentAlignment, setMomentAlignment] = useState<MomentAlignment | null>(null);
+  const [momentTimingScore, setMomentTimingScore] = useState<number | null>(null);
   const [modulesExpanded, setModulesExpanded] = useState(false);
   
   // Rotation state for bottom cards
@@ -225,23 +232,44 @@ export default function HomeScreen() {
   
   // Load real-time daily energy / guidance
   const loadDailyGuidance = useCallback(async () => {
-    const guidance = await getDailyGuidance(profile);
+    const guidance = await getDailyGuidance(profileRef.current);
     setDailyGuidance(guidance);
-  }, [profile]);
+  }, []);
   
   // Load moment alignment
   const loadMomentAlignment = useCallback(async () => {
-    const lat = prayerTimesData?.meta?.latitude ?? profile.location?.latitude;
-    const lon = prayerTimesData?.meta?.longitude ?? profile.location?.longitude;
+    const currentProfile = profileRef.current;
+    const lat = prayerTimesData?.meta?.latitude ?? currentProfile.location?.latitude;
+    const lon = prayerTimesData?.meta?.longitude ?? currentProfile.location?.longitude;
     const alignment = await getMomentAlignment(
-      profile,
+      currentProfile,
       new Date(),
       typeof lat === 'number' && typeof lon === 'number'
         ? { location: { latitude: lat, longitude: lon } }
         : undefined
     );
     setMomentAlignment(alignment);
-  }, [profile, prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude]);
+  }, [prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude]);
+
+  // Single source of truth for the Moment Alignment badge/score.
+  // Uses the same Asrariya timing engine as the detail screen (category: 'general').
+  const loadMomentTiming = useCallback(async () => {
+    const currentProfile = profileRef.current;
+    const lat = prayerTimesData?.meta?.latitude ?? currentProfile.location?.latitude;
+    const lon = prayerTimesData?.meta?.longitude ?? currentProfile.location?.longitude;
+    const location =
+      typeof lat === 'number' && typeof lon === 'number'
+        ? { latitude: lat, longitude: lon }
+        : undefined;
+
+    try {
+      const quick = await quickTimingCheck(currentProfile, 'general', location);
+      setMomentTimingScore(quick.score);
+    } catch (error) {
+      console.error('Error loading moment timing:', error);
+      setMomentTimingScore(null);
+    }
+  }, [prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude]);
   
   // Load prayer times
   const loadPrayerTimes = useCallback(async () => {
@@ -290,6 +318,7 @@ export default function HomeScreen() {
     // Initial load (best effort). Subsequent focus refresh is throttled below.
     loadDailyGuidance();
     loadMomentAlignment();
+    loadMomentTiming();
     loadPrayerTimes();
     
     // Calculate tomorrow's blessing
@@ -334,9 +363,15 @@ export default function HomeScreen() {
 
       loadDailyGuidance();
       loadMomentAlignment();
+      loadMomentTiming();
       loadPrayerTimes();
-    }, [loadDailyGuidance, loadMomentAlignment, loadPrayerTimes])
+    }, [loadDailyGuidance, loadMomentAlignment, loadMomentTiming, loadPrayerTimes])
   );
+
+  // Refresh Moment Alignment timing on a low frequency ticker.
+  useEffect(() => {
+    loadMomentTiming();
+  }, [minuteNow, loadMomentTiming]);
 
   /**
    * Handle module card press - navigate to appropriate screen
@@ -461,14 +496,13 @@ export default function HomeScreen() {
         
         {/* Full-width Moment Alignment Strip with Element Pills */}
         <MomentAlignmentStrip
-          status={momentAlignment?.status}
-          statusLabel={momentAlignment ? t(momentAlignment.shortLabelKey) : undefined}
           zahirElement={momentAlignment?.zahirElement}
           timeElement={momentAlignment?.timeElement}
           loading={!momentAlignment && hasProfileName}
           hasProfileName={hasProfileName}
           t={t}
           planetaryData={planetaryData}
+          timingScore={momentTimingScore}
         />
         
         {/* 2. Action Pills - Inline Buttons */}

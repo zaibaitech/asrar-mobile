@@ -14,13 +14,13 @@ import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import {
-  BADGE_CONFIG,
-  getBadgeFromScore,
-  type AsrariyaTimingResult,
-  type UnifiedBadge,
+    BADGE_CONFIG,
+    getBadgeFromScore,
+    type AsrariyaTimingResult,
+    type UnifiedBadge,
 } from '@/services/AsrariyaTimingEngine';
-import { getAlignmentStatusForElements, getMomentAlignment, MomentAlignment } from '@/services/MomentAlignmentService';
-import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, type PlanetaryDayBoundaries, PlanetaryHourData } from '@/services/PlanetaryHoursService';
+import { getMomentAlignment, MomentAlignment } from '@/services/MomentAlignmentService';
+import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, PlanetaryHourData, type PlanetaryDayBoundaries } from '@/services/PlanetaryHoursService';
 import { fetchPrayerTimes } from '@/services/api/prayerTimes';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -53,6 +53,7 @@ export default function MomentAlignmentDetailScreen() {
   const [now, setNow] = useState(new Date());
   const [minuteNow, setMinuteNow] = useState(new Date());
   const alignmentInFlightRef = useRef(false);
+  const alignmentRef = useRef<MomentAlignment | null>(null);
   
   // Unified timing state - this is the single source of truth for badges
   const [timingResult, setTimingResult] = useState<AsrariyaTimingResult | null>(null);
@@ -63,10 +64,14 @@ export default function MomentAlignmentDetailScreen() {
     : 'MAINTAIN';
   const badgeConfig = BADGE_CONFIG[unifiedBadge];
 
+  useEffect(() => {
+    alignmentRef.current = alignment;
+  }, [alignment]);
+
   const loadAlignment = useCallback(async (options?: { silent?: boolean }) => {
     if (alignmentInFlightRef.current) return;
     alignmentInFlightRef.current = true;
-    const shouldShowLoading = !options?.silent && !alignment;
+    const shouldShowLoading = !options?.silent && !alignmentRef.current;
     if (shouldShowLoading) {
       setLoading(true);
     }
@@ -83,7 +88,7 @@ export default function MomentAlignmentDetailScreen() {
         setLoading(false);
       }
     }
-  }, [profile, coords, alignment]);
+  }, [profile, coords]);
 
   const loadPrayerTimes = useCallback(async () => {
     try {
@@ -340,7 +345,7 @@ export default function MomentAlignmentDetailScreen() {
               <Text style={[styles.statusPillText, { color: statusColor }]}
                 >
                 {timingResult 
-                  ? `${badgeConfig.icon} ${unifiedBadge}`
+                  ? `${badgeConfig.icon} ${t(badgeConfig.labelKey) || unifiedBadge}`
                   : t(alignment.shortLabelKey)}
               </Text>
             </View>
@@ -381,7 +386,7 @@ export default function MomentAlignmentDetailScreen() {
               <Text style={[styles.equationChipText, { color: statusColor }]}
                 >
                 {/* Use unified badge when timing available */}
-                {timingResult ? unifiedBadge : t(alignment.shortLabelKey)}
+                {timingResult ? (t(badgeConfig.labelKey) || unifiedBadge) : t(alignment.shortLabelKey)}
               </Text>
             </View>
           </View>
@@ -400,14 +405,7 @@ export default function MomentAlignmentDetailScreen() {
               >
               <Ionicons name="alert-circle-outline" size={16} color={DarkTheme.textTertiary} />
               <Text style={styles.windowInfoText}>
-                {t('home.nextPlanetHour')}: {t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`)} ({getElementLabel(planetaryData.nextHour.planetInfo.element)}) {t('momentDetail.timeline.in')} {formatTimeUntil(planetaryData.currentHour.endTime)} • {t(
-                  (() => {
-                    const status = getAlignmentStatusForElements(alignment.zahirElement, planetaryData.nextHour.planetInfo.element);
-                    if (status === 'ACT') return 'home.moment.status.act';
-                    if (status === 'MAINTAIN') return 'home.moment.status.maintain';
-                    return 'home.moment.status.hold';
-                  })()
-                )}
+                {t('home.nextPlanetHour')}: {t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`)} ({getElementLabel(planetaryData.nextHour.planetInfo.element)}) {t('momentDetail.timeline.in')} {formatTimeUntil(planetaryData.currentHour.endTime)}
               </Text>
             </View>
           )}
@@ -629,55 +627,59 @@ export default function MomentAlignmentDetailScreen() {
           </View>
         )}
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="information-circle-outline" size={20} color="#8B7355" />
-            <Text style={styles.sectionTitle}>{t('momentDetail.whyThisStatus')}</Text>
-          </View>
-          <View style={styles.sectionCard}>
-            {getReasonBullets(alignment.status).map((bullet, idx) => (
-              <View key={idx} style={styles.bulletRow}>
-                <Text style={styles.bulletDot}>•</Text>
-                <Text style={styles.bulletText}>{bullet}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* PREMIUM: Personal Guidance Section */}
-        <PremiumSection
-          featureId="personalGuidance"
-          title={t('premiumSections.personalGuidance.title')}
-          description={t('premiumSections.personalGuidance.description')}
-          icon="💡"
-        >
+        {!timingResult && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="bulb-outline" size={20} color="#8B7355" />
-              <Text style={styles.sectionTitle}>{t('momentDetail.guidanceTitle')}</Text>
+              <Ionicons name="information-circle-outline" size={20} color="#8B7355" />
+              <Text style={styles.sectionTitle}>{t('momentDetail.whyThisStatus')}</Text>
             </View>
-
-            <View style={[styles.guidanceBlock, styles.guidanceBest]}>
-              <Text style={styles.guidanceListTitle}>{t('momentDetail.bestNow')}</Text>
-              {getGuidanceLists(alignment.status).bestNow.map((item, idx) => (
+            <View style={styles.sectionCard}>
+              {getReasonBullets(alignment.status).map((bullet, idx) => (
                 <View key={idx} style={styles.bulletRow}>
-                  <Text style={[styles.bulletDot, { color: '#10b981' }]}>✓</Text>
-                  <Text style={styles.bulletText}>{item}</Text>
-                </View>
-              ))}
-            </View>
-
-            <View style={[styles.guidanceBlock, styles.guidanceAvoid]}>
-              <Text style={styles.guidanceListTitle}>{t('momentDetail.avoidNow')}</Text>
-              {getGuidanceLists(alignment.status).avoidNow.map((item, idx) => (
-                <View key={idx} style={styles.bulletRow}>
-                  <Text style={[styles.bulletDot, { color: '#94a3b8' }]}>○</Text>
-                  <Text style={styles.bulletText}>{item}</Text>
+                  <Text style={styles.bulletDot}>•</Text>
+                  <Text style={styles.bulletText}>{bullet}</Text>
                 </View>
               ))}
             </View>
           </View>
-        </PremiumSection>
+        )}
+
+        {/* PREMIUM: Legacy Personal Guidance (hidden when unified timing is available) */}
+        {!timingResult && (
+          <PremiumSection
+            featureId="personalGuidance"
+            title={t('premiumSections.personalGuidance.title')}
+            description={t('premiumSections.personalGuidance.description')}
+            icon="💡"
+          >
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Ionicons name="bulb-outline" size={20} color="#8B7355" />
+                <Text style={styles.sectionTitle}>{t('momentDetail.guidanceTitle')}</Text>
+              </View>
+
+              <View style={[styles.guidanceBlock, styles.guidanceBest]}>
+                <Text style={styles.guidanceListTitle}>{t('momentDetail.bestNow')}</Text>
+                {getGuidanceLists(alignment.status).bestNow.map((item, idx) => (
+                  <View key={idx} style={styles.bulletRow}>
+                    <Text style={[styles.bulletDot, { color: '#10b981' }]}>✓</Text>
+                    <Text style={styles.bulletText}>{item}</Text>
+                  </View>
+                ))}
+              </View>
+
+              <View style={[styles.guidanceBlock, styles.guidanceAvoid]}>
+                <Text style={styles.guidanceListTitle}>{t('momentDetail.avoidNow')}</Text>
+                {getGuidanceLists(alignment.status).avoidNow.map((item, idx) => (
+                  <View key={idx} style={styles.bulletRow}>
+                    <Text style={[styles.bulletDot, { color: '#94a3b8' }]}>○</Text>
+                    <Text style={styles.bulletText}>{item}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </PremiumSection>
+        )}
 
         <View style={styles.disclaimer}>
           <Ionicons name="shield-checkmark-outline" size={16} color={DarkTheme.textTertiary} />
@@ -1201,225 +1203,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#8B7355',
   },
 
-  // Window Info
-  windowInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    backgroundColor: 'rgba(139, 115, 85, 0.1)',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    borderRadius: 8,
-    marginBottom: Spacing.sm,
-  },
-  windowInfoText: {
-    fontSize: 13,
-    color: DarkTheme.textSecondary,
-    fontWeight: '500',
-  },
-  
-  // Timeline
-  timelineButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.xs,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    paddingVertical: Spacing.sm,
-    borderRadius: 8,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  timelineButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: DarkTheme.textSecondary,
-  },
-  timeline: {
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    padding: Spacing.md,
-    borderRadius: 12,
-    gap: Spacing.sm,
-    marginBottom: Spacing.md,
-  },
-  timelineTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: DarkTheme.textPrimary,
-    marginBottom: Spacing.xs,
-  },
-  timelineItem: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-    padding: Spacing.sm,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  timelineStatus: {
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 4,
-    borderRadius: 4,
-    alignSelf: 'flex-start',
-  },
-  timelineStatusText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#fff',
-    letterSpacing: 0.5,
-  },
-  timelineContent: {
-    flex: 1,
-    gap: Spacing.xs,
-  },
-  timelineHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  timelineDay: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: DarkTheme.textPrimary,
-  },
-  timelineDayName: {
-    fontSize: 12,
-    color: DarkTheme.textTertiary,
-  },
-  timelineElement: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-  },
-  timelineElementIcon: {
-    fontSize: 16,
-  },
-  timelineElementText: {
-    fontSize: 13,
-    color: DarkTheme.textSecondary,
-  },
-  timelineTime: {
-    fontSize: 12,
-    color: DarkTheme.textTertiary,
-    fontWeight: '500',
-  },
-  noWindows: {
-    fontSize: 13,
-    color: DarkTheme.textTertiary,
-    textAlign: 'center',
-    paddingVertical: Spacing.md,
-    fontStyle: 'italic',
-  },
-  
-  // Planetary Hours
-  planetaryHourCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    padding: Spacing.md,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
-    gap: Spacing.sm,
-    marginBottom: Spacing.sm,
-  },
-  progressBlock: {
-    marginTop: Spacing.sm,
-    gap: 6,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  progressLabel: {
-    fontSize: 12,
-    color: DarkTheme.textTertiary,
-    fontWeight: '600',
-  },
-  progressValue: {
-    fontSize: 13,
-    color: DarkTheme.textSecondary,
-    fontWeight: '600',
-  },
-  progressTrack: {
-    height: 8,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 999,
-    backgroundColor: '#8B7355',
-  },
-  planetaryHourHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  planetaryHourLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: DarkTheme.textTertiary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  hourBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-  },
-  hourBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-  planetaryHourContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-  },
-  planetSymbol: {
-    fontSize: 48,
-  },
-  planetInfo: {
-    flex: 1,
-    gap: Spacing.xs,
-  },
-  planetName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: DarkTheme.textPrimary,
-  },
-  planetArabic: {
-    fontSize: 14,
-    color: DarkTheme.textSecondary,
-  },
-  elementBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-  },
-  elementBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  timeRange: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-    paddingTop: Spacing.xs,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.05)',
-    flexWrap: 'wrap',
-  },
-  timeRangeText: {
-    fontSize: 13,
-    color: DarkTheme.textSecondary,
-    fontWeight: '500',
-  },
   countdown: {
     fontSize: 12,
     color: DarkTheme.textTertiary,

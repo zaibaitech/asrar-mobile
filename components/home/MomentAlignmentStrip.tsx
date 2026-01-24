@@ -11,53 +11,27 @@ import {
     Spacing,
     Typography,
 } from '@/constants/DarkTheme';
-import {
-    AlignmentStatus,
-    Element,
-    getAlignmentStatusForElements,
-} from '@/services/MomentAlignmentService';
+import { BADGE_CONFIG, convertLegacyStatus, getBadgeFromScore, type UnifiedBadge } from '@/services/AsrariyaTimingEngine';
+import { Element, getAlignmentStatusForElements } from '@/services/MomentAlignmentService';
 import { PlanetaryHourData } from '@/services/PlanetaryHoursService';
-import { PracticeTimingBadge, usePracticeTiming } from './PracticeTimingBadge';
 
 interface MomentAlignmentStripProps {
-  status?: AlignmentStatus;
-  statusLabel?: string;
   zahirElement?: Element;
   timeElement?: Element;
   loading?: boolean;
   hasProfileName?: boolean;
   t: (key: string) => string;
   planetaryData?: PlanetaryHourData | null;
+  /** Asrariya timing score (0-100) for the current moment */
+  timingScore?: number | null;
 }
 
-type StatusVisual = {
-  accent: string;
-  glow: string;
-  pillBackground: string;
-};
-
-const STATUS_THEME: Record<AlignmentStatus, StatusVisual> = {
-  ACT: {
-    accent: '#818CF8',
-    glow: 'rgba(129, 140, 248, 0.16)',
-    pillBackground: 'rgba(129, 140, 248, 0.25)',
-  },
-  MAINTAIN: {
-    accent: '#38BDF8',
-    glow: 'rgba(56, 189, 248, 0.16)',
-    pillBackground: 'rgba(56, 189, 248, 0.22)',
-  },
-  HOLD: {
-    accent: '#94A3B8',
-    glow: 'rgba(148, 163, 184, 0.14)',
-    pillBackground: 'rgba(148, 163, 184, 0.18)',
-  },
-};
-
-const DEFAULT_THEME: StatusVisual = {
-  accent: '#8B7355',
-  glow: 'rgba(139, 115, 85, 0.14)',
-  pillBackground: 'rgba(139, 115, 85, 0.18)',
+const FALLBACK_BADGE_LABEL: Record<UnifiedBadge, string> = {
+  OPTIMAL: 'Optimal',
+  ACT: 'Good Time',
+  MAINTAIN: 'Maintain',
+  CAREFUL: 'Careful',
+  HOLD: 'Hold',
 };
 
 function getElementLabel(element: Element | undefined, t: (key: string) => string) {
@@ -77,17 +51,22 @@ function formatCountdownShort(seconds: number): string {
 }
 
 export function MomentAlignmentStrip({
-  status,
-  statusLabel,
   zahirElement,
   timeElement,
   loading,
   hasProfileName,
   t,
   planetaryData,
+  timingScore,
 }: MomentAlignmentStripProps) {
   const router = useRouter();
-  const theme = status ? STATUS_THEME[status] : DEFAULT_THEME;
+
+  const unifiedBadge: UnifiedBadge | undefined =
+    typeof timingScore === 'number' ? getBadgeFromScore(timingScore) : undefined;
+  const badgeConfig = unifiedBadge ? BADGE_CONFIG[unifiedBadge] : undefined;
+  const badgeLabel = unifiedBadge
+    ? t(badgeConfig?.labelKey ?? '') || FALLBACK_BADGE_LABEL[unifiedBadge]
+    : undefined;
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -96,7 +75,6 @@ export function MomentAlignmentStrip({
     router.push({
       pathname: '/(tabs)/moment-alignment-detail',
       params: {
-        status: status || '',
         zahirElement: zahirElement || '',
         timeElement: timeElement || '',
         causeText: '',
@@ -156,19 +134,16 @@ export function MomentAlignmentStrip({
     if (!(seconds > 0 && seconds <= 10 * 60)) return null;
 
     const nextElement = planetaryData.nextHour.planetInfo.element;
-    const nextStatus = getAlignmentStatusForElements(zahirElement, nextElement);
-
-    const statusKey: Record<AlignmentStatus, string> = {
-      ACT: 'home.moment.status.act',
-      MAINTAIN: 'home.moment.status.maintain',
-      HOLD: 'home.moment.status.hold',
-    };
+    const legacyStatus = getAlignmentStatusForElements(zahirElement, nextElement);
+    const nextBadge = convertLegacyStatus(legacyStatus);
+    const nextConfig = BADGE_CONFIG[nextBadge];
+    const nextBadgeLabel = t(nextConfig.labelKey) || FALLBACK_BADGE_LABEL[nextBadge];
 
     return {
       seconds,
       nextElement,
-      nextStatus,
-      nextStatusLabel: t(statusKey[nextStatus]),
+      nextBadge,
+      nextBadgeLabel,
       nextPlanetLabel: t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`),
       nextPlanetArabic: planetaryData.nextHour.planetInfo.arabicName,
     };
@@ -186,12 +161,11 @@ export function MomentAlignmentStrip({
             {t('home.cards.momentAlignment.title')}
           </Text>
         </View>
-        <PracticeTimingBadge category="general" compact />
-        {statusLabel && (
-          <View style={[styles.statusChip, { borderColor: theme.accent, backgroundColor: theme.pillBackground }]}>
-            <View style={[styles.statusDot, { backgroundColor: theme.accent }]} />
-            <Text style={[styles.statusLabel, { color: theme.accent }]} numberOfLines={1}>
-              {statusLabel}
+        {unifiedBadge && badgeConfig && badgeLabel && (
+          <View style={[styles.statusChip, { borderColor: badgeConfig.color, backgroundColor: badgeConfig.bgColor }]}>
+            <View style={[styles.statusDot, { backgroundColor: badgeConfig.color }]} />
+            <Text style={[styles.statusLabel, { color: badgeConfig.color }]} numberOfLines={1}>
+              {badgeConfig.icon} {badgeLabel}{typeof timingScore === 'number' ? ` • ${Math.round(timingScore)}%` : ''}
             </Text>
           </View>
         )}
@@ -230,17 +204,21 @@ export function MomentAlignmentStrip({
           <Text style={styles.previewValue} numberOfLines={1} ellipsizeMode="tail">
             {nextHourPreview.nextPlanetLabel} ({nextHourPreview.nextPlanetArabic}) • {getElementLabel(nextHourPreview.nextElement, t)} • {formatCountdownShort(nextHourPreview.seconds)}
           </Text>
-          <View style={[styles.previewStatus, { borderColor: STATUS_THEME[nextHourPreview.nextStatus].accent, backgroundColor: STATUS_THEME[nextHourPreview.nextStatus].pillBackground }]}
+          <View
+            style={[
+              styles.previewStatus,
+              {
+                borderColor: BADGE_CONFIG[nextHourPreview.nextBadge].color,
+                backgroundColor: BADGE_CONFIG[nextHourPreview.nextBadge].bgColor,
+              },
+            ]}
           >
-            <Text style={[styles.previewStatusText, { color: STATUS_THEME[nextHourPreview.nextStatus].accent }]} numberOfLines={1}>
-              {nextHourPreview.nextStatusLabel}
+            <Text style={[styles.previewStatusText, { color: BADGE_CONFIG[nextHourPreview.nextBadge].color }]} numberOfLines={1}>
+              {BADGE_CONFIG[nextHourPreview.nextBadge].icon} {nextHourPreview.nextBadgeLabel}
             </Text>
           </View>
         </View>
       )}
-
-      {/* Asrariya Practice Timing Row */}
-      <MomentTimingRow t={t} />
 
       {/* CTA Button */}
       <Pressable 
@@ -256,77 +234,6 @@ export function MomentAlignmentStrip({
     </View>
   );
 }
-
-/**
- * Moment Timing Row
- * Shows personalized practice timing for manifestation (action-oriented practices)
- */
-const TIMING_META: Record<string, { icon: string; color: string }> = {
-  optimal: { icon: '✨', color: '#10b981' },
-  favorable: { icon: '🌟', color: '#60A5FA' },
-  moderate: { icon: '⚖️', color: '#f59e0b' },
-  challenging: { icon: '⚠️', color: '#f97316' },
-  avoid: { icon: '🚫', color: '#ef4444' },
-};
-
-function MomentTimingRow({ t }: { t: (key: string) => string }) {
-  const { timing, isLoading } = usePracticeTiming('manifestation'); // Moment alignment is about taking action
-  
-  if (isLoading || !timing) {
-    return null;
-  }
-  
-  const meta = TIMING_META[timing.level] || TIMING_META.moderate;
-  
-  return (
-    <View style={[momentTimingStyles.container, { borderColor: `${meta.color}25`, backgroundColor: `${meta.color}08` }]}>
-      <Text style={momentTimingStyles.icon}>{meta.icon}</Text>
-      <Text style={momentTimingStyles.label}>{t('asrariya.practices.manifestation') || 'Action'}</Text>
-      <View style={[momentTimingStyles.badge, { backgroundColor: `${meta.color}20`, borderColor: `${meta.color}40` }]}>
-        <Text style={[momentTimingStyles.badgeText, { color: meta.color }]}>
-          {t(`asrariya.timing.${timing.level}`) || timing.level}
-        </Text>
-      </View>
-      <Text style={momentTimingStyles.score}>{timing.score}%</Text>
-    </View>
-  );
-}
-
-const momentTimingStyles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  icon: {
-    fontSize: 11,
-  },
-  label: {
-    fontSize: 11,
-    color: DarkTheme.textSecondary,
-    fontWeight: '500' as any,
-  },
-  badge: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    marginLeft: 'auto',
-  },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: '600' as any,
-  },
-  score: {
-    fontSize: 10,
-    color: DarkTheme.textTertiary,
-    fontWeight: '500' as any,
-  },
-});
 
 const styles = StyleSheet.create({
   container: {

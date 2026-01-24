@@ -17,28 +17,24 @@ import { Borders, DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import {
-  analyzeTimingForPractice,
-  buildCurrentMoment,
-  findNextOptimalWindow,
-  getBadgeConfigFromLevel,
-  profileToSpiritualProfile,
-  type AsrariyaTimingResult,
-  type BadgeConfig,
-  type CurrentMoment,
-  type PracticeCategory,
-  type RecommendationLevel,
-  type UnifiedBadge,
-  type UserSpiritalProfile,
+    analyzeTimingForPractice,
+    buildCurrentMoment,
+    findNextOptimalWindow,
+    profileToSpiritualProfile,
+    type AsrariyaTimingResult,
+    type CurrentMoment,
+    type PracticeCategory,
+    type RecommendationLevel
 } from '@/services/AsrariyaTimingEngine';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 // ============================================================================
@@ -168,6 +164,17 @@ export function TimingAnalysisSection({
 }: TimingAnalysisSectionProps) {
   const { t, language } = useLanguage();
   const { profile } = useProfile();
+
+  const onAnalysisCompleteRef = useRef(onAnalysisComplete);
+  useEffect(() => {
+    onAnalysisCompleteRef.current = onAnalysisComplete;
+  }, [onAnalysisComplete]);
+
+  const stableLocation = useMemo(() => {
+    if (!location) return undefined;
+    if (typeof location.latitude !== 'number' || typeof location.longitude !== 'number') return undefined;
+    return { latitude: location.latitude, longitude: location.longitude };
+  }, [location?.latitude, location?.longitude]);
   
   const [result, setResult] = useState<AsrariyaTimingResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -193,24 +200,24 @@ export function TimingAnalysisSection({
       const spiritualProfile = profileToSpiritualProfile(profile);
       
       // Build or use provided moment
-      const currentMoment = providedMoment || await buildCurrentMoment(location);
+      const currentMoment = providedMoment || await buildCurrentMoment(stableLocation);
       
       // Run full analysis
       const analysisResult = await analyzeTimingForPractice(
         spiritualProfile,
         { category },
-        { location, moment: currentMoment }
+        { location: stableLocation, moment: currentMoment }
       );
       
       setResult(analysisResult);
-      onAnalysisComplete?.(analysisResult);
+      onAnalysisCompleteRef.current?.(analysisResult);
       
       // Find next optimal window if current is suboptimal
       if (analysisResult.overallScore < 60) {
         const next = await findNextOptimalWindow(
           spiritualProfile,
           { category },
-          { location, lookAheadHours: 12, minimumScore: 70 }
+          { location: stableLocation, lookAheadHours: 12, minimumScore: 70 }
         );
         if (next) {
           setNextWindow({ startTime: next.startTime, description: next.description });
@@ -222,7 +229,7 @@ export function TimingAnalysisSection({
     } finally {
       setLoading(false);
     }
-  }, [profile, providedMoment, location, category, onAnalysisComplete]);
+  }, [profile, providedMoment, stableLocation, category]);
 
   useEffect(() => {
     runAnalysis();
