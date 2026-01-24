@@ -3,6 +3,8 @@
  * ================================
  * Clean, focused display of today's lunar mansion with personal alignment
  * Matches Daily Energy widget design system exactly
+ * 
+ * Enhanced with Asrariya Timing Engine for personalized practice timing
  */
 
 import { Borders, DarkTheme, Spacing } from '@/constants/DarkTheme';
@@ -16,6 +18,7 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { PracticeTimingBadge, usePracticeTiming } from './PracticeTimingBadge';
 
 interface ManazilWidgetProps {
   compact?: boolean;
@@ -211,6 +214,11 @@ export function ManazilWidget({
             </View>
           </View>
 
+          {/* Asrariya Practice Timing */}
+          <View style={styles.asrariyaRow}>
+            <PracticeTimingBadge category="general" compact showScore={false} />
+          </View>
+
           {/* Primary info: label on top, value beneath */}
           <View style={styles.infoBlock}>
             <Text style={styles.infoLabel} numberOfLines={1}>
@@ -301,6 +309,9 @@ export function ManazilWidget({
                 : t('widgets.manazil.personalMissing')}
             </Text>
           </View>
+
+          {/* Asrariya Practice Timing */}
+          <ManazilTimingIndicator t={t} />
         </View>
 
         {/* Footer - EXACT match to Daily Energy */}
@@ -330,6 +341,75 @@ function getElementColor(element?: string): string {
     default: return '#64B5F6';
   }
 }
+
+/**
+ * Manazil Timing Indicator
+ * Shows personalized guidance timing based on current lunar mansion
+ */
+const TIMING_META: Record<string, { icon: string; color: string }> = {
+  optimal: { icon: '✨', color: '#10b981' },
+  favorable: { icon: '🌟', color: '#60A5FA' },
+  moderate: { icon: '⚖️', color: '#f59e0b' },
+  challenging: { icon: '⚠️', color: '#f97316' },
+  avoid: { icon: '🚫', color: '#ef4444' },
+};
+
+function ManazilTimingIndicator({ t }: { t: (key: string) => string }) {
+  const { timing, isLoading } = usePracticeTiming('guidance'); // Manazil is about guidance
+  
+  if (isLoading || !timing) {
+    return null;
+  }
+  
+  const meta = TIMING_META[timing.level] || TIMING_META.moderate;
+  
+  return (
+    <View style={[timingStyles.container, { borderColor: `${meta.color}30`, backgroundColor: `${meta.color}08` }]}>
+      <View style={timingStyles.row}>
+        <Text style={timingStyles.icon}>{meta.icon}</Text>
+        <Text style={timingStyles.label}>{t('asrariya.practices.guidance') || 'Guidance'}</Text>
+        <View style={[timingStyles.badge, { backgroundColor: `${meta.color}20`, borderColor: `${meta.color}40` }]}>
+          <Text style={[timingStyles.badgeText, { color: meta.color }]}>
+            {t(`asrariya.timing.${timing.level}`) || timing.level}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const timingStyles = StyleSheet.create({
+  container: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
+    marginTop: 4,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  icon: {
+    fontSize: 11,
+  },
+  label: {
+    fontSize: 10,
+    color: DarkTheme.textSecondary,
+    fontWeight: '500' as any,
+  },
+  badge: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    marginLeft: 'auto',
+  },
+  badgeText: {
+    fontSize: 9,
+    fontWeight: '600' as any,
+  },
+});
 
 const styles = StyleSheet.create({
   // Container - EXACT match
@@ -392,6 +472,11 @@ const styles = StyleSheet.create({
     color: DarkTheme.textPrimary,
     flexShrink: 1,
     minWidth: 0,
+  },
+
+  asrariyaRow: {
+    marginTop: 6,
+    alignSelf: 'flex-start',
   },
   windowBadge: {
     alignSelf: 'flex-start',

@@ -5,9 +5,16 @@ import { MysticalCorrespondencesCard } from '@/components/manazil/MysticalCorres
 import { PlanetaryHoursCard } from '@/components/manazil/PlanetaryHoursCard';
 import { SpiritualPracticesCard } from '@/components/manazil/SpiritualPracticesCard';
 import { PremiumSection } from '@/components/subscription/PremiumSection';
+import { TimingAnalysisSection } from '@/components/timing';
 import { Borders, DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
+import {
+  BADGE_CONFIG,
+  getBadgeFromScore,
+  type AsrariyaTimingResult,
+  type UnifiedBadge,
+} from '@/services/AsrariyaTimingEngine';
 import { getLunarMansionByIndex, normalizeMansionIndex } from '@/data/lunarMansions';
 import { getManazilGuidance, tr, type ManazilLanguage } from '@/data/manazilGuidance';
 import { getManzilPracticePack } from '@/data/manazilPractices';
@@ -439,6 +446,15 @@ export default function ManazilScreen() {
   const [todayIndex, setTodayIndex] = React.useState<number | null>(null);
   const [isRealTime, setIsRealTime] = React.useState(false);
   const [showSourceExplainer, setShowSourceExplainer] = React.useState(false);
+  
+  // Unified timing state - single source of truth for badges
+  const [timingResult, setTimingResult] = React.useState<AsrariyaTimingResult | null>(null);
+  
+  // Get unified badge from timing analysis
+  const unifiedBadge: UnifiedBadge = timingResult 
+    ? getBadgeFromScore(timingResult.overallScore) 
+    : 'MAINTAIN';
+  const badgeConfig = BADGE_CONFIG[unifiedBadge];
 
   React.useEffect(() => {
     let cancelled = false;
@@ -786,6 +802,22 @@ export default function ManazilScreen() {
               </PremiumSection>
             </View>
           ) : null}
+
+          {/* Asrariya Timing Analysis - Lunar Mansion Specific */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionTitle}>{t('asrariya.timingAnalysis') || 'Timing Analysis For You'}</Text>
+            </View>
+            <TimingAnalysisSection
+              context="manazil"
+              practiceCategory="spiritual"
+              location={
+                typeof profile?.location?.latitude === 'number' && typeof profile?.location?.longitude === 'number'
+                  ? { latitude: profile.location.latitude, longitude: profile.location.longitude }
+                  : undefined
+              }
+            />
+          </View>
 
           {/* Inner work */}
           {todayMansion && guidance && (

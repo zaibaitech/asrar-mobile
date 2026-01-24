@@ -17,6 +17,7 @@ import {
     getAlignmentStatusForElements,
 } from '@/services/MomentAlignmentService';
 import { PlanetaryHourData } from '@/services/PlanetaryHoursService';
+import { PracticeTimingBadge, usePracticeTiming } from './PracticeTimingBadge';
 
 interface MomentAlignmentStripProps {
   status?: AlignmentStatus;
@@ -185,6 +186,7 @@ export function MomentAlignmentStrip({
             {t('home.cards.momentAlignment.title')}
           </Text>
         </View>
+        <PracticeTimingBadge category="general" compact />
         {statusLabel && (
           <View style={[styles.statusChip, { borderColor: theme.accent, backgroundColor: theme.pillBackground }]}>
             <View style={[styles.statusDot, { backgroundColor: theme.accent }]} />
@@ -237,6 +239,9 @@ export function MomentAlignmentStrip({
         </View>
       )}
 
+      {/* Asrariya Practice Timing Row */}
+      <MomentTimingRow t={t} />
+
       {/* CTA Button */}
       <Pressable 
         style={styles.ctaButton}
@@ -251,6 +256,77 @@ export function MomentAlignmentStrip({
     </View>
   );
 }
+
+/**
+ * Moment Timing Row
+ * Shows personalized practice timing for manifestation (action-oriented practices)
+ */
+const TIMING_META: Record<string, { icon: string; color: string }> = {
+  optimal: { icon: '✨', color: '#10b981' },
+  favorable: { icon: '🌟', color: '#60A5FA' },
+  moderate: { icon: '⚖️', color: '#f59e0b' },
+  challenging: { icon: '⚠️', color: '#f97316' },
+  avoid: { icon: '🚫', color: '#ef4444' },
+};
+
+function MomentTimingRow({ t }: { t: (key: string) => string }) {
+  const { timing, isLoading } = usePracticeTiming('manifestation'); // Moment alignment is about taking action
+  
+  if (isLoading || !timing) {
+    return null;
+  }
+  
+  const meta = TIMING_META[timing.level] || TIMING_META.moderate;
+  
+  return (
+    <View style={[momentTimingStyles.container, { borderColor: `${meta.color}25`, backgroundColor: `${meta.color}08` }]}>
+      <Text style={momentTimingStyles.icon}>{meta.icon}</Text>
+      <Text style={momentTimingStyles.label}>{t('asrariya.practices.manifestation') || 'Action'}</Text>
+      <View style={[momentTimingStyles.badge, { backgroundColor: `${meta.color}20`, borderColor: `${meta.color}40` }]}>
+        <Text style={[momentTimingStyles.badgeText, { color: meta.color }]}>
+          {t(`asrariya.timing.${timing.level}`) || timing.level}
+        </Text>
+      </View>
+      <Text style={momentTimingStyles.score}>{timing.score}%</Text>
+    </View>
+  );
+}
+
+const momentTimingStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  icon: {
+    fontSize: 11,
+  },
+  label: {
+    fontSize: 11,
+    color: DarkTheme.textSecondary,
+    fontWeight: '500' as any,
+  },
+  badge: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    marginLeft: 'auto',
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '600' as any,
+  },
+  score: {
+    fontSize: 10,
+    color: DarkTheme.textTertiary,
+    fontWeight: '500' as any,
+  },
+});
 
 const styles = StyleSheet.create({
   container: {

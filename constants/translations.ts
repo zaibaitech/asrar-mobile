@@ -468,6 +468,10 @@ export const translations = {
         title: "Divine Timing",
         description: "Spiritual reflection tool for understanding timing and intention",
       },
+      asrariya: {
+        title: "Practice Timing",
+        description: "Find the optimal moments for your spiritual practices",
+      },
       prayerTimes: {
         title: "Prayer Times",
         description: "Daily prayer times based on your location",
@@ -3106,6 +3110,93 @@ export const translations = {
       sacredConnections: "Sacred connections and divine resonances in your numbers",
       totalOfAllLetters: "Total of all letter values",
       spiritOfTheCycle: "Spirit of the cycle",
+    },
+
+    // Asrariya Practice Timing
+    asrariya: {
+      title: "Practice Timing",
+      subtitle: "Find Your Optimal Spiritual Windows",
+      selectPractice: "Select a Practice",
+      currentTiming: "Current Timing Analysis",
+      noProfile: "Complete your profile to get personalized timing",
+      practices: {
+        protection: "Protection",
+        protectionDesc: "Shield yourself from spiritual and physical harm",
+        healing: "Healing",
+        healingDesc: "Restore body, mind, and soul to harmony",
+        manifestation: "Manifestation",
+        manifestationDesc: "Bring your intentions into reality",
+        guidance: "Guidance",
+        guidanceDesc: "Seek direction and clarity on your path",
+        gratitude: "Gratitude",
+        gratitudeDesc: "Express thankfulness and appreciation",
+        knowledge: "Knowledge",
+        knowledgeDesc: "Pursue learning and understanding",
+        provision: "Provision",
+        provisionDesc: "Seek sustenance and abundance",
+        general: "General Practice",
+        generalDesc: "Balanced spiritual development",
+      },
+      timing: {
+        optimal: "Optimal",
+        favorable: "Favorable",
+        moderate: "Moderate",
+        challenging: "Challenging",
+        avoid: "Avoid",
+      },
+      layers: {
+        element: "Element Compatibility",
+        planetary: "Planetary Resonance",
+        manazil: "Lunar Mansion",
+        practice: "Practice Alignment",
+      },
+      recommendation: "Recommendation",
+      overallScore: "Overall Score",
+      personalizedFor: "Personalized for your spiritual profile",
+      analyzing: "Analyzing timing...",
+      timingAnalysis: "Timing Analysis For You",
+      whyThisRating: "Why This Rating?",
+      whatThisMeans: "What This Means For You",
+      recommended: "Recommended Now",
+      cautions: "Be Mindful Of",
+      betterTiming: "Better Timing",
+    },
+    
+    // Unified Timing Badges
+    timing: {
+      compatible: "Compatible",
+      badges: {
+        optimal: {
+          label: "Optimal",
+          action: "Excellent time — proceed with confidence",
+          description: "This is one of your best windows. All factors align beautifully for your practice.",
+          hint: "Excellent alignment — proceed confidently",
+        },
+        act: {
+          label: "Good Time",
+          action: "Good time — proceed",
+          description: "Favorable conditions support your practice. Move forward with intention.",
+          hint: "Favorable conditions — act with intention",
+        },
+        maintain: {
+          label: "Maintain",
+          action: "Workable — stay mindful",
+          description: "This timing is workable but requires awareness. Some tension exists that can be navigated.",
+          hint: "Workable timing — maintain balance",
+        },
+        careful: {
+          label: "Careful",
+          action: "Challenging — proceed only if necessary",
+          description: "This isn't your natural time. If you must proceed, add grounding practices.",
+          hint: "Challenging energies — proceed carefully",
+        },
+        hold: {
+          label: "Hold",
+          action: "Best to wait — see alternatives",
+          description: "Strong opposing factors. Unless urgent, wait for a better window.",
+          hint: "Wait for better timing",
+        },
+      },
     },
 
     // Calculator
@@ -8845,6 +8936,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         title: "Timing Divin",
         description: "Outil de réflexion spirituelle pour comprendre le timing et l'intention",
       },
+      asrariya: {
+        title: "Timing des Pratiques",
+        description: "Trouvez les moments optimaux pour vos pratiques spirituelles",
+      },
       prayerTimes: {
         title: "Horaires de Prière",
         description: "Horaires de prière quotidiens basés sur votre localisation",
@@ -11465,6 +11560,93 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       sacredConnections: "Connexions sacrées et résonances divines dans vos nombres",
       totalOfAllLetters: "Total de toutes les valeurs des lettres",
       spiritOfTheCycle: "Esprit du cycle",
+    },
+
+    // Asrariya Practice Timing
+    asrariya: {
+      title: "Timing des Pratiques",
+      subtitle: "Trouvez Vos Fenêtres Spirituelles Optimales",
+      selectPractice: "Sélectionnez une Pratique",
+      currentTiming: "Analyse du Timing Actuel",
+      noProfile: "Complétez votre profil pour obtenir un timing personnalisé",
+      practices: {
+        protection: "Protection",
+        protectionDesc: "Protégez-vous des dangers spirituels et physiques",
+        healing: "Guérison",
+        healingDesc: "Restaurez l'harmonie du corps, de l'esprit et de l'âme",
+        manifestation: "Manifestation",
+        manifestationDesc: "Réalisez vos intentions",
+        guidance: "Guidance",
+        guidanceDesc: "Cherchez direction et clarté sur votre chemin",
+        gratitude: "Gratitude",
+        gratitudeDesc: "Exprimez reconnaissance et appréciation",
+        knowledge: "Connaissance",
+        knowledgeDesc: "Poursuivez l'apprentissage et la compréhension",
+        provision: "Provision",
+        provisionDesc: "Recherchez subsistance et abondance",
+        general: "Pratique Générale",
+        generalDesc: "Développement spirituel équilibré",
+      },
+      timing: {
+        optimal: "Optimal",
+        favorable: "Favorable",
+        moderate: "Modéré",
+        challenging: "Difficile",
+        avoid: "Éviter",
+      },
+      layers: {
+        element: "Compatibilité Élémentaire",
+        planetary: "Résonance Planétaire",
+        manazil: "Mansion Lunaire",
+        practice: "Alignement de Pratique",
+      },
+      recommendation: "Recommandation",
+      overallScore: "Score Global",
+      personalizedFor: "Personnalisé pour votre profil spirituel",
+      analyzing: "Analyse du timing...",
+      timingAnalysis: "Analyse du Timing Pour Vous",
+      whyThisRating: "Pourquoi Cette Évaluation ?",
+      whatThisMeans: "Ce Que Cela Signifie Pour Vous",
+      recommended: "Recommandé Maintenant",
+      cautions: "Soyez Attentif À",
+      betterTiming: "Meilleur Moment",
+    },
+    
+    // Unified Timing Badges
+    timing: {
+      compatible: "Compatible",
+      badges: {
+        optimal: {
+          label: "Optimal",
+          action: "Excellent moment — procédez avec confiance",
+          description: "C'est l'une de vos meilleures fenêtres. Tous les facteurs s'alignent magnifiquement.",
+          hint: "Excellent alignement — procédez avec confiance",
+        },
+        act: {
+          label: "Bon Moment",
+          action: "Bon moment — agissez",
+          description: "Des conditions favorables soutiennent votre pratique. Avancez avec intention.",
+          hint: "Conditions favorables — agissez avec intention",
+        },
+        maintain: {
+          label: "Maintenir",
+          action: "Praticable — restez attentif",
+          description: "Ce timing est praticable mais demande de l'attention. Une certaine tension existe.",
+          hint: "Timing praticable — maintenez l'équilibre",
+        },
+        careful: {
+          label: "Prudence",
+          action: "Difficile — procédez seulement si nécessaire",
+          description: "Ce n'est pas votre moment naturel. Si vous devez continuer, ajoutez des pratiques d'ancrage.",
+          hint: "Énergies difficiles — procédez avec prudence",
+        },
+        hold: {
+          label: "Attendre",
+          action: "Mieux vaut attendre — voir alternatives",
+          description: "Facteurs fortement opposés. Sauf urgence, attendez une meilleure fenêtre.",
+          hint: "Attendez un meilleur moment",
+        },
+      },
     },
 
     calculator: {
@@ -17142,6 +17324,93 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       validation: {
         missingNames: "يرجى إدخال كلا الاسمين للمتابعة",
         nameRequired: "الاسم مطلوب",
+      },
+    },
+    
+    // Asrariya Practice Timing
+    asrariya: {
+      title: "توقيت الممارسات",
+      subtitle: "اكتشف أفضل الأوقات لممارساتك الروحية",
+      selectPractice: "اختر الممارسة",
+      currentTiming: "تحليل التوقيت الحالي",
+      noProfile: "أكمل ملفك الشخصي للحصول على توقيت مُخصّص",
+      practices: {
+        protection: "الحماية",
+        protectionDesc: "احمِ نفسك من الأذى الروحي والجسدي",
+        healing: "الشفاء",
+        healingDesc: "استعد انسجام الجسد والعقل والروح",
+        manifestation: "التجلّي",
+        manifestationDesc: "حقّق نواياك",
+        guidance: "الهداية",
+        guidanceDesc: "اطلب التوجيه والوضوح في طريقك",
+        gratitude: "الشكر",
+        gratitudeDesc: "عبّر عن الامتنان والتقدير",
+        knowledge: "العلم",
+        knowledgeDesc: "اسعَ للتعلّم والفهم",
+        provision: "الرزق",
+        provisionDesc: "اطلب القوت والوفرة",
+        general: "ممارسة عامة",
+        generalDesc: "تطوّر روحي متوازن",
+      },
+      timing: {
+        optimal: "مثالي",
+        favorable: "مُناسب",
+        moderate: "معتدل",
+        challenging: "صعب",
+        avoid: "تجنّب",
+      },
+      layers: {
+        element: "توافق العنصر",
+        planetary: "الرنين الكوكبي",
+        manazil: "المنزل القمري",
+        practice: "توافق الممارسة",
+      },
+      recommendation: "التوصية",
+      overallScore: "الدرجة الإجمالية",
+      personalizedFor: "مُخصّص لملفك الروحي",
+      analyzing: "جارٍ تحليل التوقيت...",
+      timingAnalysis: "تحليل التوقيت لك",
+      whyThisRating: "لماذا هذا التقييم؟",
+      whatThisMeans: "ماذا يعني هذا لك",
+      recommended: "موصى به الآن",
+      cautions: "انتبه لـ",
+      betterTiming: "توقيت أفضل",
+    },
+    
+    // Unified Timing Badges
+    timing: {
+      compatible: "متوافق",
+      badges: {
+        optimal: {
+          label: "مثالي",
+          action: "وقت ممتاز — تقدّم بثقة",
+          description: "هذه من أفضل نوافذك. جميع العوامل تتناغم بشكل جميل.",
+          hint: "توافق ممتاز — تقدّم بثقة",
+        },
+        act: {
+          label: "وقت جيد",
+          action: "وقت جيد — تقدّم",
+          description: "الظروف المواتية تدعم ممارستك. تقدّم بنية صادقة.",
+          hint: "ظروف مواتية — تصرّف بنية",
+        },
+        maintain: {
+          label: "حافظ",
+          action: "قابل للتطبيق — ابقَ منتبهًا",
+          description: "هذا التوقيت قابل للتطبيق لكنه يتطلب وعيًا. يوجد بعض التوتر.",
+          hint: "توقيت قابل للتطبيق — حافظ على التوازن",
+        },
+        careful: {
+          label: "حذر",
+          action: "صعب — تقدّم فقط إذا لزم الأمر",
+          description: "هذا ليس وقتك الطبيعي. إذا كان لا بد من المتابعة، أضف ممارسات التأريض.",
+          hint: "طاقات صعبة — تقدّم بحذر",
+        },
+        hold: {
+          label: "توقف",
+          action: "الأفضل الانتظار — انظر البدائل",
+          description: "عوامل معارضة قوية. إلا في حالة الضرورة، انتظر نافذة أفضل.",
+          hint: "انتظر توقيتًا أفضل",
+        },
       },
     },
     

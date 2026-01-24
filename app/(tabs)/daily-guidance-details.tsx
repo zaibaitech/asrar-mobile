@@ -9,9 +9,16 @@
  */
 
 import { PremiumSection } from '@/components/subscription/PremiumSection';
+import { TimingAnalysisSection } from '@/components/timing';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
+import {
+  BADGE_CONFIG,
+  getBadgeFromScore,
+  type AsrariyaTimingResult,
+  type UnifiedBadge,
+} from '@/services/AsrariyaTimingEngine';
 import { getCosmicLunarMansionForDate, getLunarMansionByIndex, normalizeMansionIndex, type LunarMansion } from '@/data/lunarMansions';
 import { getManazilGuidance, tr } from '@/data/manazilGuidance';
 import { getCurrentLunarMansion } from '@/services/LunarMansionService';
@@ -742,7 +749,21 @@ export default function DailyGuidanceDetailsScreen() {
   const dayRuler = getDayRuler(now);
   const dayRulerInfo = getPlanetInfo(dayRuler);
   
+  // Unified timing state - single source of truth for badges
+  const [timingResult, setTimingResult] = React.useState<AsrariyaTimingResult | null>(null);
+  
+  // Get unified badge from timing analysis
+  const unifiedBadge: UnifiedBadge = timingResult 
+    ? getBadgeFromScore(timingResult.overallScore) 
+    : 'MAINTAIN';
+  const badgeConfig = BADGE_CONFIG[unifiedBadge];
+  
+  // Use unified badge color when timing result available, otherwise fallback to old logic
   function getStatusColor() {
+    if (timingResult) {
+      return badgeConfig.color;
+    }
+    // Fallback for old system (only used before timing loads)
     switch (timingQuality) {
       case 'favorable':
         return '#10b981';
@@ -756,6 +777,10 @@ export default function DailyGuidanceDetailsScreen() {
   }
   
   function getStatusLabel() {
+    // Use unified badge when timing result available
+    if (timingResult) {
+      return `${badgeConfig.icon} ${t(`timing.badges.${unifiedBadge.toLowerCase()}.label`) || unifiedBadge}`;
+    }
     return t(`home.dailyGuidanceDetails.window.${timingQuality}`);
   }
   
@@ -823,11 +848,23 @@ export default function DailyGuidanceDetailsScreen() {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-          {/* Status Badge */}
+          {/* Status Badge - Uses unified badge when timing loads */}
           <View style={[styles.statusBadge, { backgroundColor: `${statusColor}20`, borderColor: statusColor }]}>
             <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
             <Text style={[styles.statusText, { color: statusColor }]}>{getStatusLabel()}</Text>
+            {timingResult && (
+              <Text style={[styles.statusScore, { color: statusColor }]}>
+                {timingResult.overallScore}%
+              </Text>
+            )}
           </View>
+
+          {/* Asrariya Timing Analysis - Personalized */}
+          <TimingAnalysisSection
+            context="daily"
+            hideSections={['alternatives']}
+            onAnalysisComplete={setTimingResult}
+          />
           
           {/* Day Ruler Section */}
           <View style={styles.section}>
@@ -1056,6 +1093,11 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: Typography.h3,
     fontWeight: Typography.weightBold as any,
+  },
+  statusScore: {
+    fontSize: Typography.h2,
+    fontWeight: Typography.weightBold as any,
+    marginLeft: 'auto',
   },
   section: {
     gap: Spacing.md,

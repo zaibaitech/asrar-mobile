@@ -3,6 +3,8 @@
  * ==============================
  * Shows current day's spiritual timing guidance
  * Always displays real-time data (not dependent on check-ins)
+ * 
+ * Enhanced with Asrariya Timing Engine for personalized practice timing
  */
 
 import { Borders, DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
@@ -14,6 +16,7 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { usePracticeTiming } from '../home/PracticeTimingBadge';
 
 interface RealTimeDailyGuidanceProps {
   guidance: DailyGuidance | null;
@@ -276,6 +279,9 @@ export function RealTimeDailyGuidance({
             </View>
           )}
 
+          {/* Asrariya Practice Timing */}
+          <AsrariyaTimingIndicator compact={compact} t={t} />
+
         </View>
 
         {/* Footer (pinned) */}
@@ -292,6 +298,40 @@ export function RealTimeDailyGuidance({
         </View>
       </View>
     </Pressable>
+  );
+}
+
+function AsrariyaTimingIndicator({
+  compact,
+  t,
+}: {
+  compact: boolean;
+  t: (key: string) => string;
+}) {
+  const { timing, isLoading } = usePracticeTiming('general');
+  if (isLoading || !timing) return null;
+
+  const colorMap: Record<string, string> = {
+    optimal: '#10b981',
+    favorable: '#60A5FA',
+    moderate: '#f59e0b',
+    challenging: '#f97316',
+    avoid: '#ef4444',
+  };
+  const color = colorMap[timing.level] ?? '#64B5F6';
+
+  return (
+    <View style={[styles.asrariyaRow, compact && styles.asrariyaRowCompact, { borderColor: `${color}35`, backgroundColor: `${color}12` }]}>
+      <Text style={styles.asrariyaIcon}>🕰️</Text>
+      <Text style={styles.asrariyaLabel} numberOfLines={1}>
+        {t('asrariya.title')}
+      </Text>
+      <View style={[styles.asrariyaChip, { backgroundColor: `${color}18`, borderColor: `${color}35` }]}>
+        <Text style={[styles.asrariyaChipText, { color }]} numberOfLines={1}>
+          {timing.label}
+        </Text>
+      </View>
+    </View>
   );
 }
 
@@ -335,6 +375,39 @@ const styles = StyleSheet.create({
 
   body: {
     gap: 12,
+  },
+
+  asrariyaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  asrariyaRowCompact: {
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+  },
+  asrariyaIcon: {
+    fontSize: 12,
+  },
+  asrariyaLabel: {
+    flex: 1,
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: Typography.weightMedium as any,
+  },
+  asrariyaChip: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  asrariyaChipText: {
+    fontSize: 11,
+    fontWeight: Typography.weightSemibold as any,
   },
   
   // Header

@@ -9,9 +9,16 @@
  */
 
 import { PremiumSection } from '@/components/subscription/PremiumSection';
+import { TimingAnalysisSection } from '@/components/timing';
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
+import {
+  BADGE_CONFIG,
+  getBadgeFromScore,
+  type AsrariyaTimingResult,
+  type UnifiedBadge,
+} from '@/services/AsrariyaTimingEngine';
 import { getAlignmentStatusForElements, getMomentAlignment, MomentAlignment } from '@/services/MomentAlignmentService';
 import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, type PlanetaryDayBoundaries, PlanetaryHourData } from '@/services/PlanetaryHoursService';
 import { fetchPrayerTimes } from '@/services/api/prayerTimes';
@@ -46,6 +53,15 @@ export default function MomentAlignmentDetailScreen() {
   const [now, setNow] = useState(new Date());
   const [minuteNow, setMinuteNow] = useState(new Date());
   const alignmentInFlightRef = useRef(false);
+  
+  // Unified timing state - this is the single source of truth for badges
+  const [timingResult, setTimingResult] = useState<AsrariyaTimingResult | null>(null);
+  
+  // Get unified badge from timing analysis (single source of truth)
+  const unifiedBadge: UnifiedBadge = timingResult 
+    ? getBadgeFromScore(timingResult.overallScore) 
+    : 'MAINTAIN';
+  const badgeConfig = BADGE_CONFIG[unifiedBadge];
 
   const loadAlignment = useCallback(async (options?: { silent?: boolean }) => {
     if (alignmentInFlightRef.current) return;
@@ -138,14 +154,20 @@ export default function MomentAlignmentDetailScreen() {
     return () => clearInterval(interval);
   }, []);
 
+  // Use unified badge color when timing result available, otherwise fallback to old logic
   const getStatusColor = (status?: string) => {
+    // Prefer unified badge color from timing analysis
+    if (timingResult) {
+      return badgeConfig.color;
+    }
+    // Fallback for old system (only used before timing loads)
     switch (status) {
       case 'ACT':
         return '#10b981';
       case 'MAINTAIN':
-        return '#8B7355';
+        return '#f59e0b'; // Changed from brown to amber
       case 'HOLD':
-        return '#64748b';
+        return '#7C3AED'; // Changed from gray to purple
       default:
         return '#64B5F6';
     }
@@ -305,16 +327,36 @@ export default function MomentAlignmentDetailScreen() {
             </View>
             <View style={styles.summaryHeaderText}>
               <Text style={styles.summaryTitle}>{t('momentDetail.title')}</Text>
-              <Text style={styles.summarySubtitle}>{t(alignment.shortHintKey)}</Text>
+              {/* Show unified description based on timing analysis when available */}
+              <Text style={styles.summarySubtitle}>
+                {timingResult 
+                  ? t(`timing.badges.${unifiedBadge.toLowerCase()}.hint`) || timingResult.shortSummary
+                  : t(alignment.shortHintKey)}
+              </Text>
             </View>
+            {/* Unified badge - single source of truth */}
             <View style={[styles.statusPill, { backgroundColor: `${statusColor}20`, borderColor: statusColor }]}
               >
               <Text style={[styles.statusPillText, { color: statusColor }]}
                 >
-                {t(alignment.shortLabelKey)}
+                {timingResult 
+                  ? `${badgeConfig.icon} ${unifiedBadge}`
+                  : t(alignment.shortLabelKey)}
               </Text>
             </View>
           </View>
+
+          {/* Show score when timing analysis is available */}
+          {timingResult && (
+            <View style={styles.scoreDisplay}>
+              <Text style={[styles.scoreText, { color: statusColor }]}>
+                {timingResult.overallScore}%
+              </Text>
+              <Text style={styles.scoreLabel}>
+                {t('timing.compatible') || 'Compatible'}
+              </Text>
+            </View>
+          )}
 
           <View style={styles.summaryMetaRow}>
             <Text style={styles.timestampLabel}>{t('momentDetail.updated')}</Text>
@@ -338,7 +380,8 @@ export default function MomentAlignmentDetailScreen() {
               >
               <Text style={[styles.equationChipText, { color: statusColor }]}
                 >
-                {t(alignment.shortLabelKey)}
+                {/* Use unified badge when timing available */}
+                {timingResult ? unifiedBadge : t(alignment.shortLabelKey)}
               </Text>
             </View>
           </View>
@@ -447,6 +490,20 @@ export default function MomentAlignmentDetailScreen() {
               {t(`momentDetail.timeShort.${alignment.timeElement}`)}
             </Text>
           </View>
+        </View>
+
+        {/* Asrariya Timing Analysis - Personalized */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="analytics-outline" size={20} color="#8B7355" />
+            <Text style={styles.sectionTitle}>{t('asrariya.timingAnalysis') || 'Timing Analysis For You'}</Text>
+          </View>
+          <TimingAnalysisSection
+            context="moment"
+            location={coords ?? undefined}
+            compact
+            onAnalysisComplete={setTimingResult}
+          />
         </View>
 
         {planetaryData && (
@@ -741,6 +798,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: DarkTheme.textSecondary,
     marginTop: 2,
+  },
+  scoreDisplay: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: Spacing.sm,
+    marginTop: Spacing.xs,
+  },
+  scoreText: {
+    fontSize: 32,
+    fontWeight: '700',
+  },
+  scoreLabel: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    fontWeight: '500',
   },
   summaryMetaRow: {
     flexDirection: 'row',
