@@ -37,15 +37,37 @@ interface CareerTabAdvancedProps {
 
 export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
   const { language } = useLanguage();
-  const profile = result.burujProfile;
-  const career = profile.career;
-  const elementKey = profile.element.toLowerCase() as "fire" | "earth" | "air" | "water";
+  const profile = result?.burujProfile;
+  const career = profile?.career;
+  const elementKey = ((profile?.element ?? 'fire').toLowerCase() as "fire" | "earth" | "air" | "water");
   const colors = getElementColors(elementKey);
+
+  // DOB-based calculations (or other sources) may not include full career guidance.
+  // Avoid crashing the entire Results screen if this section is unavailable.
+  if (!profile || !career) {
+    return (
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <View style={[styles.iconContainer, { backgroundColor: colors.background }]}>
+            <Briefcase size={32} color={colors.accent} />
+          </View>
+          <Text style={styles.title}>
+            {language === 'en' ? 'Career & Vocation Guidance' : 'Orientation Professionnelle'}
+          </Text>
+          <Text style={styles.subtitle}>
+            {language === 'en'
+              ? 'Career guidance is not available for this calculation method.'
+              : 'Le guide de carrière n\'est pas disponible pour cette méthode de calcul.'}
+          </Text>
+        </View>
+      </ScrollView>
+    );
+  }
   
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
   const [isExporting, setIsExporting] = useState(false);
 
-  const categories = career.modern_recommended[language as 'en' | 'fr'] || [];
+  const categories = career?.modern_recommended?.[language as 'en' | 'fr'] || [];
 
   const toggleCategory = (index: number) => {
     const newExpanded = new Set(expandedCategories);
@@ -133,16 +155,16 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
         </head>
         <body>
           <h1>${language === 'en' ? 'Career & Vocation Guidance' : 'Orientation Professionnelle'}</h1>
-          <p><strong>${language === 'en' ? 'Element' : 'Élément'}:</strong> ${profile.element} ${profile.element_emoji}</p>
+          <p><strong>${language === 'en' ? 'Element' : 'Élément'}:</strong> ${profile.element ?? ''} ${profile.element_emoji ?? ''}</p>
           
           <h2>${language === 'en' ? 'Traditional Wisdom' : 'Sagesse Traditionnelle'}</h2>
-          <div class="quote">${career.traditional[language as 'en' | 'fr']}</div>
+          <div class="quote">${career?.traditional?.[language as 'en' | 'fr'] ?? career?.traditional?.en ?? ''}</div>
           
           <h2>${language === 'en' ? 'Recommended Career Fields' : 'Domaines Professionnels Recommandés'}</h2>
           ${categoriesHTML}
           
           <h2>${language === 'en' ? 'Guiding Principle' : 'Principe Directeur'}</h2>
-          <div class="quote">${career.principle[language as 'en' | 'fr']}</div>
+          <div class="quote">${career?.principle?.[language as 'en' | 'fr'] ?? career?.principle?.en ?? ''}</div>
         </body>
       </html>
     `;
@@ -203,7 +225,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
         
         <View style={styles.quoteContainer}>
           <Text style={styles.quote}>
-            "{career.traditional[language as 'en' | 'fr']}"
+            "{career?.traditional?.[language as 'en' | 'fr'] ?? career?.traditional?.en ?? ''}"
           </Text>
         </View>
         
@@ -350,7 +372,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
           </Text>
         </View>
         <Text style={styles.principleText}>
-          "{career.principle[language as 'en' | 'fr']}"
+          "{career?.principle?.[language as 'en' | 'fr'] ?? career?.principle?.en ?? ''}"
         </Text>
         <Text style={styles.principleNote}>
           {language === 'en' 
@@ -360,8 +382,8 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
       </View>
 
       {/* Fields to Avoid */}
-      {(career.avoid.traditional[language as 'en' | 'fr'] !== "None specified" && 
-        career.avoid.traditional[language as 'en' | 'fr'] !== "Aucun spécifié") && (
+      {((career?.avoid?.traditional?.[language as 'en' | 'fr'] ?? career?.avoid?.traditional?.en ?? "None specified") !== "None specified" && 
+        (career?.avoid?.traditional?.[language as 'en' | 'fr'] ?? career?.avoid?.traditional?.en ?? "Aucun spécifié") !== "Aucun spécifié") && (
         <View style={[styles.card, styles.avoidCard, {
           backgroundColor: `${colors.accent}33`,
           borderColor: `${colors.accent}33`,
@@ -388,7 +410,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
               📜 {language === 'en' ? 'Traditional Guidance:' : 'Guidance Traditionnelle:'}
             </Text>
             <Text style={styles.avoidQuote}>
-              "{career.avoid.traditional[language as 'en' | 'fr']}"
+              "{career?.avoid?.traditional?.[language as 'en' | 'fr'] ?? career?.avoid?.traditional?.en ?? ''}"
             </Text>
           </View>
 
@@ -397,7 +419,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
               🌍 {language === 'en' ? 'Modern Application:' : 'Application Moderne:'}
             </Text>
             <Text style={styles.avoidText}>
-              {career.avoid.modern[language as 'en' | 'fr']}
+              {career?.avoid?.modern?.[language as 'en' | 'fr'] ?? career?.avoid?.modern?.en ?? ''}
             </Text>
           </View>
 

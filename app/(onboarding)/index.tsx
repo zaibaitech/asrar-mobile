@@ -176,7 +176,6 @@ const StandardSlideContent = ({ item, isActive, t }: { item: OnboardingSlide; is
     <View style={styles.bulletsContainer}>
       {item.bulletsKey.map((key, idx) => <AnimatedBulletRow key={idx} text={t(key)} index={idx} isActive={isActive} />)}
     </View>
-    <Text style={styles.credibility}>{t(item.titleKey.replace('.title', '.credibility'))}</Text>
   </View>
 );
 
@@ -383,7 +382,6 @@ const styles = StyleSheet.create({
   bulletDot: { width: 5, height: 5, borderRadius: 2.5, marginTop: IS_SMALL_DEVICE ? 6 : 7 },
   bulletText: { fontSize: IS_SMALL_DEVICE ? 13 : 14, color: DarkTheme.textTertiary, lineHeight: IS_SMALL_DEVICE ? 18 : 20, flex: 1 },
   bulletTextBold: { fontWeight: '600', color: DarkTheme.textSecondary },
-  credibility: { fontSize: IS_SMALL_DEVICE ? 11 : 12, color: 'rgba(139,92,246,0.6)', textAlign: 'center', marginTop: 16, fontStyle: 'italic' },
 
   progressWrap: { alignItems: 'center', paddingVertical: IS_SMALL_DEVICE ? 8 : 12, gap: 6 },
   stepText: { fontSize: 11, color: DarkTheme.textTertiary, fontWeight: '500' },

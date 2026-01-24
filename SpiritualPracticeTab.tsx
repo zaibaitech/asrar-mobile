@@ -810,7 +810,6 @@ const styles = StyleSheet.create({
   smallCardTitle: {
     fontSize: 14,
     fontWeight: '600',
-    flex: 1,
   },
   angelArabic: {
     fontSize: 20,

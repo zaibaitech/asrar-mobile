@@ -9,6 +9,7 @@ export interface LunarMansion {
   nameArabic: string;
   nameTransliteration: string;
   nameEnglish: string;
+  nameFrench: string;
   element: 'fire' | 'water' | 'air' | 'earth';
 }
 
@@ -44,40 +45,40 @@ export function normalizeMansionIndex(raw?: number | null): number | null {
  */
 export const LUNAR_MANSIONS: LunarMansion[] = [
   // Fire Mansions (0-6)
-  { index: 0, nameArabic: 'الشرطان', nameTransliteration: 'Al-Sharatān', nameEnglish: 'The Two Signs', element: 'fire' },
-  { index: 1, nameArabic: 'البطين', nameTransliteration: 'Al-Buṭayn', nameEnglish: 'The Little Belly', element: 'earth' },
-  { index: 2, nameArabic: 'الثريا', nameTransliteration: 'Al-Thurayyā', nameEnglish: 'The Pleiades', element: 'air' },
-  { index: 3, nameArabic: 'الدبران', nameTransliteration: 'Al-Dabarān', nameEnglish: 'The Follower', element: 'water' },
-  { index: 4, nameArabic: 'الهقعة', nameTransliteration: 'Al-Haqʿah', nameEnglish: 'The White Spot', element: 'fire' },
-  { index: 5, nameArabic: 'الهنعة', nameTransliteration: 'Al-Hanʿah', nameEnglish: 'The Brand', element: 'earth' },
-  { index: 6, nameArabic: 'الذراع', nameTransliteration: 'Al-Dhirāʿ', nameEnglish: 'The Arm', element: 'air' },
+  { index: 0, nameArabic: 'الشرطان', nameTransliteration: 'Al-Sharatān', nameEnglish: 'The Two Signs', nameFrench: 'Les Deux Signes', element: 'fire' },
+  { index: 1, nameArabic: 'البطين', nameTransliteration: 'Al-Buṭayn', nameEnglish: 'The Little Belly', nameFrench: 'Le Petit Ventre', element: 'earth' },
+  { index: 2, nameArabic: 'الثريا', nameTransliteration: 'Al-Thurayyā', nameEnglish: 'The Pleiades', nameFrench: 'Les Pléiades', element: 'air' },
+  { index: 3, nameArabic: 'الدبران', nameTransliteration: 'Al-Dabarān', nameEnglish: 'The Follower', nameFrench: 'Le Suiveur', element: 'water' },
+  { index: 4, nameArabic: 'الهقعة', nameTransliteration: 'Al-Haqʿah', nameEnglish: 'The White Spot', nameFrench: 'La Tache Blanche', element: 'fire' },
+  { index: 5, nameArabic: 'الهنعة', nameTransliteration: 'Al-Hanʿah', nameEnglish: 'The Brand', nameFrench: 'La Marque', element: 'earth' },
+  { index: 6, nameArabic: 'الذراع', nameTransliteration: 'Al-Dhirāʿ', nameEnglish: 'The Arm', nameFrench: 'Le Bras', element: 'air' },
   
   // Earth Mansions (7-13)
-  { index: 7, nameArabic: 'النثرة', nameTransliteration: 'Al-Nathrah', nameEnglish: 'The Tip of the Nose', element: 'water' },
-  { index: 8, nameArabic: 'الطرف', nameTransliteration: 'Al-Ṭarf', nameEnglish: 'The Glance', element: 'fire' },
-  { index: 9, nameArabic: 'الجبهة', nameTransliteration: 'Al-Jabhah', nameEnglish: 'The Forehead', element: 'earth' },
-  { index: 10, nameArabic: 'الزبرة', nameTransliteration: 'Al-Zubrah', nameEnglish: 'The Mane', element: 'air' },
-  { index: 11, nameArabic: 'الصرفة', nameTransliteration: 'Al-Ṣarfah', nameEnglish: 'The Changer', element: 'fire' },
-  { index: 12, nameArabic: 'العواء', nameTransliteration: 'Al-ʿAwwāʾ', nameEnglish: 'The Barker', element: 'fire' },
-  { index: 13, nameArabic: 'السماك', nameTransliteration: 'Al-Simāk', nameEnglish: 'The Unarmed', element: 'earth' },
+  { index: 7, nameArabic: 'النثرة', nameTransliteration: 'Al-Nathrah', nameEnglish: 'The Tip of the Nose', nameFrench: 'Le Bout du Nez', element: 'water' },
+  { index: 8, nameArabic: 'الطرف', nameTransliteration: 'Al-Ṭarf', nameEnglish: 'The Glance', nameFrench: 'Le Regard', element: 'fire' },
+  { index: 9, nameArabic: 'الجبهة', nameTransliteration: 'Al-Jabhah', nameEnglish: 'The Forehead', nameFrench: 'Le Front', element: 'earth' },
+  { index: 10, nameArabic: 'الزبرة', nameTransliteration: 'Al-Zubrah', nameEnglish: 'The Mane', nameFrench: 'La Crinière', element: 'air' },
+  { index: 11, nameArabic: 'الصرفة', nameTransliteration: 'Al-Ṣarfah', nameEnglish: 'The Changer', nameFrench: 'Le Changeur', element: 'fire' },
+  { index: 12, nameArabic: 'العواء', nameTransliteration: 'Al-ʿAwwāʾ', nameEnglish: 'The Barker', nameFrench: 'L\'Aboyeur', element: 'fire' },
+  { index: 13, nameArabic: 'السماك', nameTransliteration: 'Al-Simāk', nameEnglish: 'The Unarmed', nameFrench: 'Le Désarmé', element: 'earth' },
   
   // Air Mansions (14-20)
-  { index: 14, nameArabic: 'الغفر', nameTransliteration: 'Al-Ghafr', nameEnglish: 'The Covering', element: 'air' },
-  { index: 15, nameArabic: 'الزبانى', nameTransliteration: 'Al-Zubānā', nameEnglish: 'The Claws', element: 'water' },
-  { index: 16, nameArabic: 'الإكليل', nameTransliteration: 'Al-Iklīl', nameEnglish: 'The Crown', element: 'fire' },
-  { index: 17, nameArabic: 'القلب', nameTransliteration: 'Al-Qalb', nameEnglish: 'The Heart', element: 'earth' },
-  { index: 18, nameArabic: 'الشولة', nameTransliteration: 'Al-Shawlah', nameEnglish: 'The Stinger', element: 'air' },
-  { index: 19, nameArabic: 'النعائم', nameTransliteration: 'Al-Naʿāʾim', nameEnglish: 'The Ostriches', element: 'water' },
-  { index: 20, nameArabic: 'البلدة', nameTransliteration: 'Al-Baldah', nameEnglish: 'The City', element: 'fire' },
+  { index: 14, nameArabic: 'الغفر', nameTransliteration: 'Al-Ghafr', nameEnglish: 'The Covering', nameFrench: 'Le Voile', element: 'air' },
+  { index: 15, nameArabic: 'الزبانى', nameTransliteration: 'Al-Zubānā', nameEnglish: 'The Claws', nameFrench: 'Les Pinces', element: 'water' },
+  { index: 16, nameArabic: 'الإكليل', nameTransliteration: 'Al-Iklīl', nameEnglish: 'The Crown', nameFrench: 'La Couronne', element: 'fire' },
+  { index: 17, nameArabic: 'القلب', nameTransliteration: 'Al-Qalb', nameEnglish: 'The Heart', nameFrench: 'Le Cœur', element: 'earth' },
+  { index: 18, nameArabic: 'الشولة', nameTransliteration: 'Al-Shawlah', nameEnglish: 'The Stinger', nameFrench: 'L\'Aiguillon', element: 'air' },
+  { index: 19, nameArabic: 'النعائم', nameTransliteration: 'Al-Naʿāʾim', nameEnglish: 'The Ostriches', nameFrench: 'Les Autruches', element: 'water' },
+  { index: 20, nameArabic: 'البلدة', nameTransliteration: 'Al-Baldah', nameEnglish: 'The City', nameFrench: 'La Cité', element: 'fire' },
   
   // Water Mansions (21-27)
-  { index: 21, nameArabic: 'سعد الذابح', nameTransliteration: 'Saʿd al-Dhābiḥ', nameEnglish: 'The Luck of the Slaughterer', element: 'earth' },
-  { index: 22, nameArabic: 'سعد بلع', nameTransliteration: 'Saʿd Bulaʿ', nameEnglish: 'The Luck of the Swallower', element: 'air' },
-  { index: 23, nameArabic: 'سعد السعود', nameTransliteration: 'Saʿd al-Suʿūd', nameEnglish: 'The Luck of Lucks', element: 'water' },
-  { index: 24, nameArabic: 'سعد الأخبية', nameTransliteration: 'Saʿd al-Akhbiyah', nameEnglish: 'The Luck of the Tents', element: 'fire' },
-  { index: 25, nameArabic: 'الفرغ المقدم', nameTransliteration: 'Al-Fargh al-Muqaddam', nameEnglish: 'The First Pourer', element: 'earth' },
-  { index: 26, nameArabic: 'الفرغ المؤخر', nameTransliteration: 'Al-Fargh al-Muʾakhkhar', nameEnglish: 'The Second Pourer', element: 'air' },
-  { index: 27, nameArabic: 'بطن الحوت', nameTransliteration: 'Baṭn al-Ḥūt', nameEnglish: 'The Belly of the Fish', element: 'water' },
+  { index: 21, nameArabic: 'سعد الذابح', nameTransliteration: 'Saʿd al-Dhābiḥ', nameEnglish: 'The Luck of the Slaughterer', nameFrench: 'La Fortune du Sacrificateur', element: 'earth' },
+  { index: 22, nameArabic: 'سعد بلع', nameTransliteration: 'Saʿd Bulaʿ', nameEnglish: 'The Luck of the Swallower', nameFrench: 'La Fortune de l\'Avaleur', element: 'air' },
+  { index: 23, nameArabic: 'سعد السعود', nameTransliteration: 'Saʿd al-Suʿūd', nameEnglish: 'The Luck of Lucks', nameFrench: 'La Fortune des Fortunes', element: 'water' },
+  { index: 24, nameArabic: 'سعد الأخبية', nameTransliteration: 'Saʿd al-Akhbiyah', nameEnglish: 'The Luck of the Tents', nameFrench: 'La Fortune des Tentes', element: 'fire' },
+  { index: 25, nameArabic: 'الفرغ المقدم', nameTransliteration: 'Al-Fargh al-Muqaddam', nameEnglish: 'The First Pourer', nameFrench: 'Le Premier Verseur', element: 'earth' },
+  { index: 26, nameArabic: 'الفرغ المؤخر', nameTransliteration: 'Al-Fargh al-Muʾakhkhar', nameEnglish: 'The Second Pourer', nameFrench: 'Le Second Verseur', element: 'air' },
+  { index: 27, nameArabic: 'بطن الحوت', nameTransliteration: 'Baṭn al-Ḥūt', nameEnglish: 'The Belly of the Fish', nameFrench: 'Le Ventre du Poisson', element: 'water' },
 ];
 
 if (__DEV__) {
@@ -124,7 +125,7 @@ export function getLunarMansionByIndex(index: number): LunarMansion | null {
 export function getLunarMansionName(
   index: number,
   language: 'en' | 'fr' | 'ar' = 'en',
-  format: 'full' | 'transliteration' | 'arabic' = 'full'
+  format: 'full' | 'transliteration' | 'arabic' | 'meaning' = 'full'
 ): string {
   const mansion = getLunarMansionByIndex(index);
   if (!mansion) return '';
@@ -137,12 +138,24 @@ export function getLunarMansionName(
     return mansion.nameTransliteration;
   }
   
+  if (format === 'meaning') {
+    // Return the translated meaning
+    if (language === 'fr') {
+      return mansion.nameFrench;
+    }
+    return mansion.nameEnglish;
+  }
+  
   // Full format
   if (language === 'ar') {
     return mansion.nameArabic;
   }
   
-  return `${mansion.nameTransliteration} (${mansion.nameArabic})`;
+  if (language === 'fr') {
+    return `${mansion.nameTransliteration} (${mansion.nameFrench})`;
+  }
+  
+  return `${mansion.nameTransliteration} (${mansion.nameEnglish})`;
 }
 
 /**

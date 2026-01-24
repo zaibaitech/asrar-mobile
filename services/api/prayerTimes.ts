@@ -288,7 +288,7 @@ export function getNextPrayer(timings: PrayerTimings): {
     };
   });
 
-  // Find next prayer
+  // Find next prayer that hasn't occurred yet today
   for (const prayer of prayerMinutes) {
     if (prayer.minutes > currentMinutes) {
       return {
@@ -299,7 +299,7 @@ export function getNextPrayer(timings: PrayerTimings): {
     }
   }
 
-  // If no prayer found today, return Fajr (tomorrow)
+  // All prayers have passed for today, return tomorrow's Fajr
   return prayers[0];
 }
 

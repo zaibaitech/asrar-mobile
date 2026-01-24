@@ -47,6 +47,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.zaibaitech.asrariya",
+      "versionCode": 1,
       "edgeToEdgeEnabled": true,
       "intentFilters": [
         {

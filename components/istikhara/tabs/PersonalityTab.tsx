@@ -43,9 +43,9 @@ interface PersonalityTrait {
 export default function PersonalityTab({ data, elementColor }: PersonalityTabProps) {
   const { language } = useLanguage();
   const profile = data.burujProfile;
-  const elementKey = profile.element.toLowerCase() as "fire" | "earth" | "air" | "water";
+  const elementKey = (profile.element?.toLowerCase() || 'fire') as "fire" | "earth" | "air" | "water";
   const accent = ElementAccents[elementKey];
-  const personality = profile.personality[language as 'en' | 'fr'];
+  const personality = profile.personality?.[language as 'en' | 'fr'] || profile.personality?.en;
 
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['temperament']));
 
@@ -125,7 +125,7 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
     },
   ];
 
-  const availableTraits = traits.filter(trait => (personality as any)[trait.key]);
+  const availableTraits = traits.filter(trait => personality && (personality as any)[trait.key]);
 
   return (
     <ScrollView 

@@ -94,7 +94,7 @@ export async function getDailyGuidanceForDate(
   }
   
   // Generate guidance message
-  const guidance = generateGuidanceMessage(dayElement, userElement, relationship, timingQuality);
+  const guidance = generateGuidanceMessage(date, dayElement, userElement, relationship, timingQuality);
   
   return {
     timingQuality,
@@ -155,6 +155,7 @@ function calculateElementRelationship(
  * Generate contextual guidance message
  */
 function generateGuidanceMessage(
+  date: Date,
   dayElement: 'fire' | 'water' | 'air' | 'earth',
   userElement?: 'fire' | 'water' | 'air' | 'earth',
   relationship?: 'harmonious' | 'complementary' | 'neutral' | 'transformative',
@@ -166,7 +167,7 @@ function generateGuidanceMessage(
   avoidKeys: string[];
   peakHoursKey?: string;
 } {
-  const dayOfWeek = new Date().getDay();
+  const dayOfWeek = date.getDay();
   const dayKeys = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const dayKey = dayKeys[dayOfWeek];
   

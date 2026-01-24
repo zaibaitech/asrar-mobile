@@ -94,6 +94,10 @@ export function DhikrCounter({
   onComplete 
 }: DhikrCounterProps) {
   const { language } = useLanguage();
+
+  // Guard against invalid targets (0/undefined/NaN) to prevent NaN% in UI.
+  // 33 is a common default tasbih cycle.
+  const normalizedTargetCount = Number.isFinite(targetCount) && targetCount > 0 ? targetCount : 33;
   
   // State management
   const [count, setCount] = useState(0);
@@ -129,7 +133,7 @@ export function DhikrCounter({
   // Load saved progress and history
   useEffect(() => {
     loadProgress();
-  }, [targetCount]);
+  }, [normalizedTargetCount]);
   
   const loadProgress = async () => {
     try {
@@ -138,7 +142,7 @@ export function DhikrCounter({
       
       if (savedProgress) {
         const progress = JSON.parse(savedProgress);
-        if (progress.targetCount === targetCount) {
+        if (progress.targetCount === normalizedTargetCount) {
           setCount(progress.count);
           setElapsedTime(progress.elapsedTime);
         }
@@ -162,7 +166,7 @@ export function DhikrCounter({
   const saveProgress = async () => {
     try {
       await AsyncStorage.setItem('dhikr-progress', JSON.stringify({
-        targetCount,
+        targetCount: normalizedTargetCount,
         count,
         elapsedTime
       }));
@@ -192,7 +196,7 @@ export function DhikrCounter({
   
   // Auto counting mode
   useEffect(() => {
-    if (countingMode === 'auto' && isActive && !isPaused && count < targetCount) {
+    if (countingMode === 'auto' && isActive && !isPaused && count < normalizedTargetCount) {
       autoCounterRef.current = setTimeout(() => {
         handleIncrement();
       }, autoSpeed) as unknown as NodeJS.Timeout;
@@ -206,7 +210,7 @@ export function DhikrCounter({
   }, [count, countingMode, isActive, isPaused, autoSpeed]);
   
   // Calculate progress
-  const progress = (count / targetCount) * 100;
+  const progress = normalizedTargetCount > 0 ? (count / normalizedTargetCount) * 100 : 0;
   const radius = 100;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
@@ -237,7 +241,7 @@ export function DhikrCounter({
   
   // Handle count increment
   const handleIncrement = () => {
-    if (count >= targetCount) return;
+    if (count >= normalizedTargetCount) return;
     
     // Start session on first count
     if (count === 0 && !sessionStartTime) {
@@ -252,7 +256,7 @@ export function DhikrCounter({
     setCount(newCount);
     
     // Check for completion
-    if (newCount === targetCount) {
+    if (newCount === normalizedTargetCount) {
       handleCompletion();
     }
   };

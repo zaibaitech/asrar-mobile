@@ -21,7 +21,7 @@ import { QuranResonanceCard } from '@/components/quran/QuranResonanceCard';
 import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { DivineResonanceCard } from '@/features/name-destiny/components';
+import { DivineResonanceCard, ZodiacStonesCard } from '@/features/name-destiny/components';
 import type { NameDestinyResult } from '@/features/name-destiny/types';
 import { InputType, UnderstandingLevel } from '@/features/name-destiny/types/enums';
 import { generateKeyTakeaways } from '@/features/name-destiny/utils/takeawayGenerator';
@@ -737,6 +737,27 @@ export default function ResultsScreen() {
             </View>
           </PremiumSection>
 
+          {/* PREMIUM: Zodiac Stones & Crystals */}
+          {result.burjIndex !== undefined && result.burjIndex !== null && (
+            <PremiumSection
+              featureId="spiritualGuidance"
+              title={language === 'en' ? 'Zodiac Stones & Crystals' : 
+                     language === 'fr' ? 'Pierres et Cristaux du Zodiaque' : 
+                     'أحجار وبلورات البرج'}
+              description={language === 'en' ? 'Beneficial stones that resonate with your zodiac energy' : 
+                          language === 'fr' ? 'Pierres bénéfiques qui résonnent avec l\'énergie de votre signe' : 
+                          'الأحجار المفيدة التي تتناغم مع طاقة برجك'}
+              icon="💎"
+            >
+              <View style={styles.section}>
+                <ZodiacStonesCard 
+                  burjIndex={result.burjIndex}
+                  elementType={elementType}
+                />
+              </View>
+            </PremiumSection>
+          )}
+
           {/* 10) Advanced/Classical Sections - LAST */}
           {showAdvanced && (
             <View style={styles.section}>
@@ -760,7 +781,7 @@ export default function ResultsScreen() {
                   <View style={styles.advancedRow}>
                     <Text style={styles.advancedLabel}>Burj Index:</Text>
                     <Text style={styles.advancedValue}>
-                      {result.burjIndex || 'N/A'}/12 → {result.burj?.en}
+                      {(result.burjIndex ?? 'N/A')}/12 → {result.burj?.en}
                     </Text>
                   </View>
                   <View style={styles.advancedRow}>

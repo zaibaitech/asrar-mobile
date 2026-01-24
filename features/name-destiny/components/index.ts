@@ -9,4 +9,5 @@ export { DivineResonanceCard } from './DivineResonanceCard';
 export { ElementChart } from './ElementChart';
 export { ResultsCard } from './ResultsCard';
 export { StatDisplay, StatGrid } from './StatDisplay';
+export { ZodiacStonesCard } from './ZodiacStonesCard';
 

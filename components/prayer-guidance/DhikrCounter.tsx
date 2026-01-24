@@ -22,25 +22,27 @@ export function DhikrCounter({ targetCount, onComplete, onCountChange }: DhikrCo
   const [count, setCount] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
-  
-  const progress = (count / targetCount) * 100;
+
+  // Prevent NaN/Infinity progress when targetCount is 0/undefined/NaN.
+  const normalizedTargetCount = Number.isFinite(targetCount) && targetCount > 0 ? targetCount : 33;
+  const progress = normalizedTargetCount > 0 ? (count / normalizedTargetCount) * 100 : 0;
   
   useEffect(() => {
-    if (count === targetCount && !isCompleted) {
+    if (count === normalizedTargetCount && !isCompleted) {
       setIsCompleted(true);
       if (hapticsEnabled) {
         void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
       onComplete?.();
     }
-  }, [count, targetCount, isCompleted, onComplete, hapticsEnabled]);
+  }, [count, normalizedTargetCount, isCompleted, onComplete, hapticsEnabled]);
   
   useEffect(() => {
     onCountChange?.(count);
   }, [count, onCountChange]);
   
   const handleIncrement = () => {
-    if (count < targetCount) {
+    if (count < normalizedTargetCount) {
       setCount((prev) => prev + 1);
       if (hapticsEnabled) {
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -79,7 +81,7 @@ export function DhikrCounter({ targetCount, onComplete, onCountChange }: DhikrCo
         <View style={styles.countContainer}>
           <Text style={styles.count}>{count}</Text>
           <Text style={styles.separator}>/</Text>
-          <Text style={styles.target}>{targetCount}</Text>
+          <Text style={styles.target}>{normalizedTargetCount}</Text>
         </View>
         <Text style={styles.percentage}>
           {t('prayerGuidance.ui.percentComplete', { percent: Math.round(progress) })}

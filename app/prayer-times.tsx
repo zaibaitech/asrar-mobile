@@ -146,6 +146,21 @@ export default function PrayerTimesScreen() {
     const now = new Date();
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
+    // Helper to parse time and remove timezone suffixes
+    const parseTime = (timeString: string): number => {
+      // Remove timezone info in parentheses (e.g., "20:15 (EST)" -> "20:15")
+      const cleaned = timeString.replace(/\s*\([^)]*\)\s*/, '').trim();
+      const [hours, minutes] = cleaned.split(':').map(Number);
+      
+      // Validate parsed values
+      if (isNaN(hours) || isNaN(minutes)) {
+        console.warn('Failed to parse prayer time:', timeString);
+        return -1; // Return invalid value
+      }
+      
+      return hours * 60 + minutes;
+    };
+
     const prayers = [
       { time: timings.Fajr },
       { time: timings.Dhuhr },
@@ -155,8 +170,7 @@ export default function PrayerTimesScreen() {
     ];
 
     const nextIndex = prayers.findIndex(prayer => {
-      const [hours, minutes] = prayer.time.split(':').map(Number);
-      const prayerMinutes = hours * 60 + minutes;
+      const prayerMinutes = parseTime(prayer.time);
       return prayerMinutes > currentMinutes;
     });
 
