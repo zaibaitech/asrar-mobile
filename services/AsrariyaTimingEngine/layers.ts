@@ -13,18 +13,16 @@
  */
 
 import type { Planet } from '@/services/PlanetaryHoursService';
-import type { LunarMansion } from '@/data/lunarMansions';
 import {
-  Element,
-  PlanetaryRuler,
-  UserSpiritalProfile,
-  CurrentMoment,
-  UserIntent,
-  PracticeCategory,
-  ElementCompatibilityResult,
-  PlanetaryResonanceResult,
-  ManazilAlignmentResult,
-  PracticeMappingResult,
+    CurrentMoment,
+    Element,
+    ElementCompatibilityResult,
+    ManazilAlignmentResult,
+    PlanetaryResonanceResult,
+    PracticeCategory,
+    PracticeMappingResult,
+    UserIntent,
+    UserSpiritalProfile
 } from './types';
 
 // ============================================================================
@@ -274,10 +272,10 @@ export function analyzeElementCompatibility(
   
   // Intent-based modifiers
   const practicePrefs = PRACTICE_ELEMENT_PREFERENCES[intent.category];
-  if (practicePrefs.preferred.includes(hourElement)) {
+  if (practicePrefs?.preferred.includes(hourElement)) {
     modifierScore += 10;
     modifierReason += `Current hour element supports ${intent.category} practice. `;
-  } else if (practicePrefs.avoid.includes(hourElement)) {
+  } else if (practicePrefs?.avoid.includes(hourElement)) {
     modifierScore -= 15;
     modifierReason += `Current hour element is challenging for ${intent.category}. `;
   }
@@ -413,10 +411,10 @@ export function analyzePlanetaryResonance(
   // Practice-based modifiers
   let practiceModifier = 0;
   const preferredPlanets = PRACTICE_PLANET_PREFERENCES[intent.category];
-  if (preferredPlanets.includes(hourPlanet)) {
+  if (preferredPlanets && preferredPlanets.includes(hourPlanet)) {
     practiceModifier = 15;
   }
-  if (preferredPlanets.includes(dayRuler)) {
+  if (preferredPlanets && preferredPlanets.includes(dayRuler)) {
     practiceModifier += 5;
   }
   
@@ -633,7 +631,7 @@ export function analyzePracticeMapping(
   
   // Check planetary hour preferences for practice
   const planetPrefs = PRACTICE_PLANET_PREFERENCES[intent.category];
-  if (planetPrefs.includes(moment.planetaryHourPlanet)) {
+  if (planetPrefs && planetPrefs.includes(moment.planetaryHourPlanet)) {
     score += 15;
     reasons.push(`${moment.planetaryHourPlanet} hour supports ${intent.category} work.`);
   }

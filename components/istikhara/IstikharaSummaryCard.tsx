@@ -4,6 +4,8 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
 import { ElementColors } from '../../constants/IstikharaColors';
+import { ZODIAC_SIGNS } from '../../constants/zodiacData';
+import { LUNAR_MANSIONS } from '../../data/lunarMansions';
 
 interface IstikharaSummaryCardProps {
   result: any;
@@ -24,6 +26,50 @@ function getElementName(element: string, language: 'en' | 'fr'): string {
     return elementMap[element.toLowerCase()] || element;
   }
   return element.charAt(0).toUpperCase() + element.slice(1);
+}
+
+// Helper function to get zodiac info by burj number
+function getZodiacInfo(burjNumber: number, language: 'en' | 'fr'): { name: string; nameAr: string } | null {
+  const zodiac = ZODIAC_SIGNS[burjNumber];
+  if (!zodiac) return null;
+  
+  return {
+    name: language === 'en' ? zodiac.nameEn : zodiac.nameFr,
+    nameAr: zodiac.nameAr,
+  };
+}
+
+// Helper function to get primary mansion info by burj number
+// Each zodiac sign (burj) corresponds to 2-3 lunar mansions
+// We show the first (primary) mansion for each zodiac
+function getMansionInfo(burjNumber: number, language: 'en' | 'fr'): { name: string; nameAr: string } | null {
+  // Map burj numbers (1-12) to primary mansion index
+  // Based on traditional Islamic astronomy where each zodiac spans ~2.33 mansions
+  const burjToMansionMap: Record<number, number> = {
+    1: 0,   // Aries → Al-Sharatān
+    2: 2,   // Taurus → Al-Thurayyā
+    3: 4,   // Gemini → Al-Haqʿah
+    4: 7,   // Cancer → Al-Nathrah
+    5: 9,   // Leo → Al-Jabhah
+    6: 11,  // Virgo → Al-Ṣarfah
+    7: 14,  // Libra → Al-Ghafr
+    8: 16,  // Scorpio → Al-Iklīl
+    9: 19,  // Sagittarius → Al-Naʿāʾim
+    10: 21, // Capricorn → Saʿd al-Dhābiḥ
+    11: 23, // Aquarius → Saʿd al-Suʿūd
+    12: 26, // Pisces → Al-Fargh al-Muʾakhkhar
+  };
+  
+  const mansionIndex = burjToMansionMap[burjNumber];
+  if (mansionIndex === undefined) return null;
+  
+  const mansion = LUNAR_MANSIONS[mansionIndex];
+  if (!mansion) return null;
+  
+  return {
+    name: language === 'en' ? mansion.nameEnglish : mansion.nameFrench,
+    nameAr: mansion.nameArabic,
+  };
 }
 
 export function IstikharaSummaryCard({ result, language = 'en' }: IstikharaSummaryCardProps) {
@@ -229,9 +275,41 @@ export function IstikharaSummaryCard({ result, language = 'en' }: IstikharaSumma
                   <Text style={[styles.statValue, { color: config.primarySolid }]}>
                     {result.burujRemainder}
                   </Text>
+                  
+                  {/* Zodiac Name */}
+                  {(() => {
+                    const zodiacInfo = getZodiacInfo(result.burujRemainder, language);
+                    return zodiacInfo ? (
+                      <>
+                        <Text style={styles.statZodiacName}>
+                          {zodiacInfo.name}
+                        </Text>
+                        <Text style={styles.statZodiacArabic}>
+                          {zodiacInfo.nameAr}
+                        </Text>
+                      </>
+                    ) : null;
+                  })()}
+                  
                   <Text style={styles.statLabel}>
                     {language === 'en' ? 'Burūj' : 'Burūj'}
                   </Text>
+                  
+                  {/* Mansion Name */}
+                  {(() => {
+                    const mansionInfo = getMansionInfo(result.burujRemainder, language);
+                    return mansionInfo ? (
+                      <>
+                        <Text style={styles.statMansionName}>
+                          {mansionInfo.name}
+                        </Text>
+                        <Text style={styles.statMansionArabic}>
+                          {mansionInfo.nameAr}
+                        </Text>
+                      </>
+                    ) : null;
+                  })()}
+                  
                   <Text style={styles.statSublabel}>
                     {language === 'en' ? 'Mansion' : 'Maison'}
                   </Text>
@@ -523,6 +601,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 2,
     overflow: 'hidden',
+    minHeight: 240,
   },
   statGradient: {
     padding: 12,
@@ -554,6 +633,30 @@ const styles = StyleSheet.create({
   statSublabel: {
     fontSize: 10,
     color: 'rgba(255, 255, 255, 0.7)',
+  },
+  statZodiacName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#ffffff',
+    marginBottom: 2,
+  },
+  statZodiacArabic: {
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginBottom: 8,
+    fontFamily: 'System',
+  },
+  statMansionName: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#ffffff',
+    marginTop: 8,
+    marginBottom: 2,
+  },
+  statMansionArabic: {
+    fontSize: 10,
+    color: 'rgba(255, 255, 255, 0.75)',
+    fontFamily: 'System',
   },
 
   // Blessed Day
