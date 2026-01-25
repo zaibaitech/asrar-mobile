@@ -25,6 +25,9 @@ import NetInfo from '@react-native-community/netinfo';
 const inflightPositions = new Map<string, Promise<PlanetPositions | null>>();
 const inflightMoon = new Map<string, Promise<MoonLongitudeResult>>();
 
+// Higher precision (5-minute bucket) positions for UI.
+const inflightPrecisePositions = new Map<string, Promise<PlanetPositions | null>>();
+
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
@@ -70,9 +73,17 @@ const MOON_CACHE_TTL_MS = MOON_CACHE_BUCKET_HOURS * 60 * 60 * 1000;
  */
 const STORAGE_KEYS = {
   CACHE_PREFIX: 'ephemeris.cache.',
+  PRECISE_CACHE_PREFIX: 'ephemeris.precise.cache.',
   MOON_CACHE_PREFIX: 'ephemeris.moon.cache.',
   LAST_FETCH: 'ephemeris.lastFetch',
 } as const;
+
+// Planet transit UI wants degrees that update frequently.
+// Bucket requests to avoid hitting Horizons excessively.
+const PRECISE_BUCKET_MINUTES = 5;
+// Keep this aligned with the transit UI refresh cadence.
+// Using a small buffer avoids edge cases around bucket boundaries.
+const PRECISE_CACHE_TTL_MS = 6 * 60 * 1000;
 
 export type MoonLongitudeResult = {
   timestamp: number;
@@ -194,6 +205,98 @@ export async function getPlanetPositions(
   }
 }
 
+type PlanetPositionWithSpeed = PlanetPosition & {
+  /** Approx ecliptic longitude speed in degrees/day (signed). */
+  speedDegPerDay?: number;
+};
+
+/**
+ * Get higher-precision planetary positions for UI (5-minute buckets).
+ *
+ * Unlike `getPlanetPositions`, this does NOT round to the hour.
+ * It also attempts to estimate longitude speed for retrograde detection.
+ * 
+ * Fallback chain:
+ * 1. Try high-precision Horizons (5-minute bucket)
+ * 2. Fall back to hourly-rounded Horizons if high-precision fails (always prefer real Horizons over approx)
+ * 3. Return null only if all real data sources fail
+ */
+export async function getPlanetPositionsPrecise(
+  date: Date,
+  timezone: string = 'UTC'
+): Promise<PlanetPositions | null> {
+  try {
+    const bucketedDate = bucketDateMinutes(date, PRECISE_BUCKET_MINUTES);
+
+    const dateISO = bucketedDate.toISOString().split('T')[0];
+    const minuteKey = bucketedDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+
+    const cacheKey = `${STORAGE_KEYS.PRECISE_CACHE_PREFIX}${minuteKey}_${timezone}`;
+    const cached = await getCachedPositions(cacheKey);
+    if (cached) {
+      if (__DEV__) {
+        console.log('[EphemerisService] Using cached precise positions');
+      }
+      return cached;
+    }
+
+    const inflight = inflightPrecisePositions.get(cacheKey);
+    if (inflight) {
+      return await inflight;
+    }
+
+    const promise = (async () => {
+      if (__DEV__) {
+        console.log('[EphemerisService] Fetching precise positions from JPL Horizons...');
+      }
+
+      const positions = await fetchPositionsFromHorizonsWithSpeed(bucketedDate);
+
+      if (positions) {
+        const result: PlanetPositions = {
+          timestamp: bucketedDate.getTime(),
+          dateISO,
+          planets: positions as any,
+          source: 'ephemeris',
+          expiresAt: bucketedDate.getTime() + PRECISE_CACHE_TTL_MS,
+        };
+        await cachePositions(cacheKey, result);
+        return result;
+      }
+
+      // Fallback to regular hourly-precision Horizons (it's still real ephemeris data)
+      if (__DEV__) {
+        console.warn('[EphemerisService] High-precision fetch failed; falling back to hourly Horizons');
+      }
+
+      const hourlyResult = await getPlanetPositions(bucketedDate, timezone);
+      if (hourlyResult && hourlyResult.source === 'ephemeris') {
+        // Cache this as our "precise" result so subsequent calls reuse it
+        await cachePositions(cacheKey, hourlyResult);
+        return hourlyResult;
+      }
+
+      // If hourly Horizons also failed, return null (do not serve approx data for transit UI)
+      if (__DEV__) {
+        console.warn('[EphemerisService] All real ephemeris sources failed; no data available');
+      }
+      return null;
+    })();
+
+    inflightPrecisePositions.set(cacheKey, promise);
+    try {
+      return await promise;
+    } finally {
+      inflightPrecisePositions.delete(cacheKey);
+    }
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[EphemerisService] Error fetching precise positions:', error);
+    }
+    return null;
+  }
+}
+
 /**
  * Get Moon ecliptic longitude only.
  *
@@ -247,8 +350,17 @@ export async function getMoonEclipticLongitude(
       }
 
       // Reuse the same Horizons query logic, but only for the Moon.
-      const dateStr = bucketedDate.toISOString().split('.')[0].replace('T', ' ').slice(0, 16);
-      const position = await fetchSinglePlanetPosition('moon', HORIZONS_PLANET_CODES.moon, dateStr);
+      const year = bucketedDate.getUTCFullYear();
+      const month = String(bucketedDate.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(bucketedDate.getUTCDate()).padStart(2, '0');
+      const hour = String(bucketedDate.getUTCHours()).padStart(2, '0');
+      const minute = String(bucketedDate.getUTCMinutes()).padStart(2, '0');
+      const dateStr = `'${year}-${month}-${day} ${hour}:${minute}'`;
+      const stopDate = new Date(bucketedDate.getTime() + 1 * 60 * 60 * 1000);
+      const stopHour = String(stopDate.getUTCHours()).padStart(2, '0');
+      const stopMinute = String(stopDate.getUTCMinutes()).padStart(2, '0');
+      const stopStr = `'${year}-${month}-${day} ${stopHour}:${stopMinute}'`;
+      const position = await fetchSinglePlanetPosition('moon', HORIZONS_PLANET_CODES.moon, dateStr, stopStr);
 
       if (position && typeof position.longitude === 'number') {
         const result: MoonLongitudeResult = {
@@ -321,15 +433,25 @@ async function fetchPositionsFromHorizons(
   try {
     const positions: Partial<Record<PlanetId, PlanetPosition>> = {};
     
-    // Format datetime for Horizons (YYYY-MM-DD HH:MM)
-    const dateStr = date.toISOString().split('.')[0].replace('T', ' ').slice(0, 16);
+    // Format datetime for Horizons API (with quotes, START < STOP)
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const hour = String(date.getUTCHours()).padStart(2, '0');
+    const minute = String(date.getUTCMinutes()).padStart(2, '0');
+    const dateStr = `'${year}-${month}-${day} ${hour}:${minute}'`;
+    const stopDate = new Date(date.getTime() + 1 * 60 * 60 * 1000);
+    const stopHour = String(stopDate.getUTCHours()).padStart(2, '0');
+    const stopMinute = String(stopDate.getUTCMinutes()).padStart(2, '0');
+    const stopStr = `'${year}-${month}-${day} ${stopHour}:${stopMinute}'`;
     
     // Fetch each planet sequentially (to avoid rate limits)
     for (const [planetId, horizonsCode] of Object.entries(HORIZONS_PLANET_CODES)) {
       const position = await fetchSinglePlanetPosition(
         planetId as PlanetId,
         horizonsCode,
-        dateStr
+        dateStr,
+        stopStr
       );
       
       if (position) {
@@ -356,23 +478,23 @@ async function fetchPositionsFromHorizons(
 async function fetchSinglePlanetPosition(
   planetId: PlanetId,
   horizonsCode: string,
-  dateStr: string
+  startTimeStr: string,
+  stopTimeStr: string
 ): Promise<PlanetPosition | null> {
   try {
     // Build Horizons API query
     // Reference: https://ssd-api.jpl.nasa.gov/doc/horizons.html
-    const params = new URLSearchParams({
-      format: 'text',
-      COMMAND: horizonsCode,
-      OBJ_DATA: 'NO',
-      MAKE_EPHEM: 'YES',
-      EPHEM_TYPE: 'OBSERVER',
-      CENTER: '500@399', // Geocentric (Earth center)
-      START_TIME: dateStr,
-      STOP_TIME: dateStr,
-      STEP_SIZE: '1h',
-      QUANTITIES: '31', // Observer ecliptic lon & lat
-    });
+    const params = new URLSearchParams();
+    params.append('format', 'text');
+    params.append('COMMAND', horizonsCode);
+    params.append('OBJ_DATA', 'NO');
+    params.append('MAKE_EPHEM', 'YES');
+    params.append('EPHEM_TYPE', 'OBSERVER');
+    params.append('CENTER', '500@399'); // Geocentric (Earth center)
+    params.append('START_TIME', startTimeStr);
+    params.append('STOP_TIME', stopTimeStr);
+    params.append('STEP_SIZE', '1h');
+    params.append('QUANTITIES', '31'); // Observer ecliptic lon & lat
     
     const url = `${JPL_HORIZONS_BASE_URL}?${params.toString()}`;
     
@@ -412,6 +534,110 @@ async function fetchSinglePlanetPosition(
   } catch (error) {
     if (__DEV__) {
       console.error(`[EphemerisService] Error fetching ${planetId}:`, error);
+    }
+    return null;
+  }
+}
+
+async function fetchPositionsFromHorizonsWithSpeed(
+  date: Date
+): Promise<Record<PlanetId, PlanetPositionWithSpeed> | null> {
+  try {
+    const positions: Partial<Record<PlanetId, PlanetPositionWithSpeed>> = {};
+
+    // Fetch each planet sequentially (to avoid rate limits)
+    for (const [planetId, horizonsCode] of Object.entries(HORIZONS_PLANET_CODES)) {
+      const stepHours = planetId === 'moon' ? 6 : 24;
+      const position = await fetchSinglePlanetPositionWithSpeed(
+        planetId as PlanetId,
+        horizonsCode,
+        date,
+        stepHours
+      );
+
+      if (position) {
+        positions[planetId as PlanetId] = position;
+      } else {
+        return null;
+      }
+    }
+
+    return positions as Record<PlanetId, PlanetPositionWithSpeed>;
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[EphemerisService] Horizons speed fetch error:', error);
+    }
+    return null;
+  }
+}
+
+async function fetchSinglePlanetPositionWithSpeed(
+  planetId: PlanetId,
+  horizonsCode: string,
+  startDate: Date,
+  stepHours: number
+): Promise<PlanetPositionWithSpeed | null> {
+  try {
+    const year = startDate.getUTCFullYear();
+    const month = String(startDate.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(startDate.getUTCDate()).padStart(2, '0');
+    const hour = String(startDate.getUTCHours()).padStart(2, '0');
+    const minute = String(startDate.getUTCMinutes()).padStart(2, '0');
+    const startStr = `'${year}-${month}-${day} ${hour}:${minute}'`;
+    
+    const stopDate = new Date(startDate);
+    stopDate.setHours(stopDate.getHours() + stepHours);
+    const stopHour = String(stopDate.getUTCHours()).padStart(2, '0');
+    const stopMinute = String(stopDate.getUTCMinutes()).padStart(2, '0');
+    const stopStr = `'${year}-${month}-${day} ${stopHour}:${stopMinute}'`;
+
+    const params = new URLSearchParams();
+    params.append('format', 'text');
+    params.append('COMMAND', horizonsCode);
+    params.append('OBJ_DATA', 'NO');
+    params.append('MAKE_EPHEM', 'YES');
+    params.append('EPHEM_TYPE', 'OBSERVER');
+    params.append('CENTER', '500@399');
+    params.append('START_TIME', startStr);
+    params.append('STOP_TIME', stopStr);
+    params.append('STEP_SIZE', `${stepHours}h`);
+    params.append('QUANTITIES', '31');
+
+    const url = `${JPL_HORIZONS_BASE_URL}?${params.toString()}`;
+    const response = await fetch(url, { headers: { Accept: 'application/json' } });
+
+    if (!response.ok) {
+      if (__DEV__) {
+        console.warn(`[EphemerisService] Horizons API error for ${planetId}: ${response.status}`);
+      }
+      return null;
+    }
+
+    const data = await response.text();
+    const longitudes = parseEclipticLongitudes(data, 2);
+    if (longitudes.length < 1) return null;
+
+    const longitude = longitudes[0];
+    const sign = Math.floor(longitude / 30);
+    const signDegree = longitude % 30;
+
+    let speedDegPerDay: number | undefined;
+    if (longitudes.length >= 2) {
+      const delta = normalizeSignedDeltaDeg(longitudes[1] - longitudes[0]);
+      const days = stepHours / 24;
+      speedDegPerDay = delta / days;
+    }
+
+    return {
+      planet: planetId,
+      longitude,
+      sign,
+      signDegree,
+      speedDegPerDay,
+    };
+  } catch (error) {
+    if (__DEV__) {
+      console.error(`[EphemerisService] Error fetching ${planetId} with speed:`, error);
     }
     return null;
   }
@@ -470,6 +696,58 @@ function parseEclipticLongitude(horizonsOutput: string): number | null {
     }
     return null;
   }
+}
+
+function parseEclipticLongitudes(horizonsOutput: string, maxCount: number = 2): number[] {
+  try {
+    const soeIndex = horizonsOutput.indexOf('$$SOE');
+    const eoeIndex = horizonsOutput.indexOf('$$EOE');
+
+    if (soeIndex === -1 || eoeIndex === -1) {
+      return [];
+    }
+
+    const dataSection = horizonsOutput.substring(soeIndex, eoeIndex);
+    const lines = dataSection
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .filter((line) => !line.includes('$$SOE'));
+
+    const out: number[] = [];
+    for (const line of lines) {
+      const parts = line.trim().split(/\s+/);
+      let lonValue: number | null = null;
+      for (let i = 2; i < parts.length; i++) {
+        const val = parseFloat(parts[i]);
+        if (!isNaN(val) && val >= 0 && val < 360) {
+          lonValue = val;
+          break;
+        }
+      }
+      if (lonValue === null) continue;
+      out.push(lonValue);
+      if (out.length >= maxCount) break;
+    }
+
+    return out;
+  } catch {
+    return [];
+  }
+}
+
+function bucketDateMinutes(date: Date, bucketMinutes: number): Date {
+  const out = new Date(date);
+  out.setSeconds(0, 0);
+  const mins = out.getMinutes();
+  const bucketed = Math.floor(mins / bucketMinutes) * bucketMinutes;
+  out.setMinutes(bucketed);
+  return out;
+}
+
+function normalizeSignedDeltaDeg(delta: number): number {
+  // Normalize to [-180, +180)
+  return ((delta + 540) % 360) - 180;
 }
 
 /**

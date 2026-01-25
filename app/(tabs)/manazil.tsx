@@ -5,7 +5,7 @@ import { MysticalCorrespondencesCard } from '@/components/manazil/MysticalCorres
 import { PlanetaryHoursCard } from '@/components/manazil/PlanetaryHoursCard';
 import { SpiritualPracticesCard } from '@/components/manazil/SpiritualPracticesCard';
 import { PremiumSection } from '@/components/subscription/PremiumSection';
-import { TimingAnalysisSection } from '@/components/timing';
+import { DailyPlanetaryAnalysisDisplay, TimingAnalysisSection } from '@/components/timing';
 import { Borders, DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -817,6 +817,9 @@ export default function ManazilScreen() {
               }
             />
           </View>
+
+          {/* Enhanced Planetary Strength Analysis */}
+          <DailyPlanetaryAnalysisDisplay expanded={true} />
 
           {/* Inner work */}
           {todayMansion && guidance && (

@@ -21,8 +21,11 @@ export interface LegacyPlanetTransitInfo {
   elementKey: Element;
   zodiacKey: ZodiacSign;
   zodiacSymbol: string;
+  longitude?: number;
   signDegree?: number;
   signMinute?: number;
+  isRetrograde?: boolean;
+  speedDegPerDay?: number;
   transitStartDate?: Date;
   transitEndDate?: Date;
   source?: 'ephemeris' | 'cached' | 'fallback';
@@ -64,8 +67,11 @@ export function adaptTransitToLegacyFormat(
     elementKey: transit.element,
     zodiacKey: transit.sign,
     zodiacSymbol: zodiacInfo.symbol,
+    longitude: transit.longitude,
     signDegree: transit.signDegree,
     signMinute: transit.signMinute,
+    isRetrograde: transit.isRetrograde,
+    speedDegPerDay: transit.speedDegPerDay,
     transitStartDate: transit.transitStartDate,
     transitEndDate: transit.transitEndDate,
     source: transit.source,

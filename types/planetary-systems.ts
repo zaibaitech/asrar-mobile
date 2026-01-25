@@ -46,6 +46,9 @@ export interface PlanetTransit {
   
   /** Element of the zodiac sign (fire/earth/air/water) */
   element: Element;
+
+  /** Ecliptic longitude in degrees (0-360). Useful for re-mapping to different zodiacs. */
+  longitude?: number;
   
   // ---- Ephemeris Data (optional) ----
   

@@ -10,17 +10,18 @@
 
 import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { TimingAnalysisSection } from '@/components/timing';
+import { DailyPlanetaryAnalysisDisplay } from '@/components/timing/DailyPlanetaryAnalysisDisplay';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import {
-  BADGE_CONFIG,
-  getBadgeFromScore,
-  type AsrariyaTimingResult,
-  type UnifiedBadge,
-} from '@/services/AsrariyaTimingEngine';
 import { getCosmicLunarMansionForDate, getLunarMansionByIndex, normalizeMansionIndex, type LunarMansion } from '@/data/lunarMansions';
 import { getManazilGuidance, tr } from '@/data/manazilGuidance';
+import {
+    BADGE_CONFIG,
+    getBadgeFromScore,
+    type AsrariyaTimingResult,
+    type UnifiedBadge,
+} from '@/services/AsrariyaTimingEngine';
 import { getCurrentLunarMansion } from '@/services/LunarMansionService';
 import { getDayRuler, getPlanetInfo } from '@/services/PlanetaryHoursService';
 import { Ionicons } from '@expo/vector-icons';
@@ -865,6 +866,9 @@ export default function DailyGuidanceDetailsScreen() {
             hideSections={['alternatives']}
             onAnalysisComplete={setTimingResult}
           />
+
+          {/* Enhanced Planetary Strength Analysis */}
+          <DailyPlanetaryAnalysisDisplay expanded={true} />
           
           {/* Day Ruler Section */}
           <View style={styles.section}>

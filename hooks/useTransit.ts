@@ -54,6 +54,11 @@ export function usePlanetTransit(planet: Planet): UsePlanetTransitResult {
       setError(null);
       
       const data = await getTransit(planet);
+      if (!data) {
+        setTransit(null);
+        setError('No real-time transit data available');
+        return;
+      }
       setTransit(data);
       
     } catch (err) {
@@ -72,6 +77,11 @@ export function usePlanetTransit(planet: Planet): UsePlanetTransitResult {
       setError(null);
       
       const fresh = await refreshTransits();
+      if (!fresh) {
+        setTransit(null);
+        setError('No real-time transit data available');
+        return;
+      }
       setTransit(fresh[planet]);
       
     } catch (err) {
@@ -139,6 +149,11 @@ export function useAllTransits(): UseAllTransitsResult {
       setError(null);
       
       const data = await getAllTransits();
+      if (!data) {
+        setTransits(null);
+        setError('No real-time transit data available');
+        return;
+      }
       setTransits(data);
       
     } catch (err) {
@@ -157,6 +172,11 @@ export function useAllTransits(): UseAllTransitsResult {
       setError(null);
       
       const fresh = await refreshTransits();
+      if (!fresh) {
+        setTransits(null);
+        setError('No real-time transit data available');
+        return;
+      }
       setTransits(fresh);
       
     } catch (err) {

@@ -10,6 +10,7 @@
 
 import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { TimingAnalysisSection } from '@/components/timing';
+import { PlanetaryStrengthAnalysis } from '@/components/timing/PlanetaryStrengthAnalysis';
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -21,6 +22,7 @@ import {
 } from '@/services/AsrariyaTimingEngine';
 import { getMomentAlignment, MomentAlignment } from '@/services/MomentAlignmentService';
 import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, PlanetaryHourData, type PlanetaryDayBoundaries } from '@/services/PlanetaryHoursService';
+import { getAllTransits } from '@/services/TransitService';
 import { fetchPrayerTimes } from '@/services/api/prayerTimes';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -52,6 +54,7 @@ export default function MomentAlignmentDetailScreen() {
   const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
   const [now, setNow] = useState(new Date());
   const [minuteNow, setMinuteNow] = useState(new Date());
+  const [transits, setTransits] = useState<any>(null);
   const alignmentInFlightRef = useRef(false);
   const alignmentRef = useRef<MomentAlignment | null>(null);
   
@@ -144,6 +147,22 @@ export default function MomentAlignmentDetailScreen() {
       console.error('Error calculating planetary hours:', error);
     }
   }, [planetaryBoundaries, now]);
+
+  // Fetch planetary transits for strength analysis
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const allTransits = await getAllTransits(minuteNow);
+        if (!cancelled) setTransits(allTransits);
+      } catch (error) {
+        console.error('Error fetching planetary transits:', error);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [minuteNow]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -503,6 +522,24 @@ export default function MomentAlignmentDetailScreen() {
             onAnalysisComplete={setTimingResult}
           />
         </View>
+
+        {/* Planetary Strength Analysis */}
+        {transits && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="flash-outline" size={20} color="#8B7355" />
+              <Text style={styles.sectionTitle}>{t('timing.planetaryStrength')}</Text>
+            </View>
+            {Object.entries(transits).map(([planetKey, transit]: [string, any]) => (
+              <PlanetaryStrengthAnalysis
+                key={planetKey}
+                planet={planetKey as any}
+                transit={transit}
+                compact
+              />
+            ))}
+          </View>
+        )}
 
         {planetaryData && (
           <View style={styles.section}>

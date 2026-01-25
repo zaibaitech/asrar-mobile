@@ -21,7 +21,9 @@ import { getAllTransits, getTransit } from '@/services/TransitService';
 import type { AllPlanetTransits, PlanetTransit } from '@/types/planetary-systems';
 import { adaptTransitToLegacyFormat, type LegacyPlanetTransitInfo } from '@/utils/transitAdapters';
 import { formatZodiacWithArabic, resolveUserZodiacKey } from '@/utils/translationHelpers';
+import { mapLongitudeToZodiac, type ZodiacSystem } from '@/utils/zodiacSystem';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -30,6 +32,7 @@ import {
     Animated,
     LayoutAnimation,
     Platform,
+    RefreshControl,
     SafeAreaView,
     ScrollView,
     StyleProp,
@@ -897,6 +900,31 @@ export default function PlanetTransitDetailsScreen() {
   );
   const [refreshing, setRefreshing] = useState(false);
 
+  const ZODIAC_SYSTEM_KEY = '@asrar_zodiac_system';
+  const [zodiacSystem, setZodiacSystem] = useState<ZodiacSystem>('tropical');
+
+  useEffect(() => {
+    const loadPreference = async () => {
+      try {
+        const stored = await AsyncStorage.getItem(ZODIAC_SYSTEM_KEY);
+        if (stored === 'sidereal_lahiri' || stored === 'tropical') {
+          setZodiacSystem(stored);
+        }
+      } catch {
+        // ignore
+      }
+    };
+    void loadPreference();
+  }, []);
+
+  const persistZodiacSystem = useCallback(async (value: ZodiacSystem) => {
+    try {
+      await AsyncStorage.setItem(ZODIAC_SYSTEM_KEY, value);
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // ─────────────────────────────────────────────────────────────────────────────
   // BUG FIX: Sync transitState when route params change (clicking different planet)
   // useState only uses initial value; we must explicitly update when payload changes
@@ -986,20 +1014,40 @@ export default function PlanetTransitDetailsScreen() {
     setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const transitData = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
+  const transitDataRaw = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
   const isLegacyTransit = (data: LegacyPlanetTransitInfo | PlanetTransitInfo | null): data is LegacyPlanetTransitInfo =>
     !!data && 'signDegree' in data;
 
+  const transitData = useMemo(() => {
+    if (detailsType !== 'transit') return transitDataRaw;
+    if (!transitDataRaw) return transitDataRaw;
+    if (zodiacSystem === 'tropical') return transitDataRaw;
+    if (!isLegacyTransit(transitDataRaw)) return transitDataRaw;
+
+    const longitude = (transitDataRaw as LegacyPlanetTransitInfo).longitude;
+    if (typeof longitude !== 'number') return transitDataRaw;
+    const dateForMapping = transitDataRaw.updatedAt ? new Date(transitDataRaw.updatedAt as any) : new Date();
+    const mapped = mapLongitudeToZodiac(longitude, dateForMapping, zodiacSystem);
+
+    return {
+      ...transitDataRaw,
+      zodiacKey: mapped.sign,
+      zodiacSymbol: ZODIAC_DATA[mapped.sign as ZodiacKey]?.symbol ?? transitDataRaw.zodiacSymbol,
+      elementKey: mapped.element,
+      signDegree: mapped.signDegree,
+      signMinute: mapped.signMinute,
+      // Keep longitude as system-adjusted longitude
+      longitude: mapped.longitude,
+    };
+  }, [detailsType, transitDataRaw, zodiacSystem]);
+
   const contextElement: Element | null = useMemo(() => {
     if (detailsType === 'transit') {
-      const transit = transitState ?? transitPayload;
-      // Try elementKey first, fallback to deriving from zodiacKey
-      return (transit?.elementKey as Element | undefined) ?? 
-             getElementFromZodiacKey(transit?.zodiacKey) ?? 
-             null;
+      const transit = transitData as any;
+      return (transit?.elementKey as Element | undefined) ?? getElementFromZodiacKey(transit?.zodiacKey) ?? null;
     }
     return (nextDayPayload?.element as Element | undefined) ?? null;
-  }, [detailsType, transitState, transitPayload, nextDayPayload]);
+  }, [detailsType, transitData, nextDayPayload]);
 
   const userElement = (profile.derived?.element as Element | undefined) ?? null;
   const safeUserElement = userElement ?? 'earth';
@@ -1026,51 +1074,78 @@ export default function PlanetTransitDetailsScreen() {
   }, []);
 
   const countdownText = useMemo(() => {
-    if (detailsType !== 'transit' || !(transitState ?? transitPayload)?.nextHourStartTime) return null;
-    const next = new Date((transitState ?? transitPayload)?.nextHourStartTime as any);
+    if (detailsType !== 'transit' || !(transitDataRaw as any)?.nextHourStartTime) return null;
+    const next = new Date((transitDataRaw as any)?.nextHourStartTime as any);
     const diffSeconds = Math.floor((next.getTime() - now.getTime()) / 1000);
     return formatCountdown(diffSeconds);
-  }, [detailsType, transitState, transitPayload, now]);
+  }, [detailsType, transitDataRaw, now]);
 
   const signProgress = useMemo(() => {
-    const data = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
+    const data = transitData as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
     if (!isLegacyTransit(data) || typeof data.signDegree !== 'number') return null;
     const degree = data.signDegree + (data.signMinute ?? 0) / 60;
     const percent = Math.min(100, Math.max(0, (degree / 30) * 100));
     const degreeLabel = `${Math.floor(degree)}° ${String(data.signMinute ?? 0).padStart(2, '0')}′`;
     return { percent, degreeLabel };
-  }, [transitState, transitPayload]);
+  }, [transitData]);
 
 
   const updatedAtLabel = useMemo(() => {
-    const data = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
+    const data = transitData as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
     if (!data?.updatedAt) return '—';
     const updatedAt = new Date(data.updatedAt as any);
     return formatDateTime(updatedAt, language);
-  }, [transitState, transitPayload, language]);
+  }, [transitData, language]);
 
   const sourceLabel = useMemo(() => {
-    const data = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
+    const data = transitData as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
     const source = (data as any)?.source as LegacyPlanetTransitInfo['source'] | undefined;
     if (source === 'ephemeris') return t('screens.planetTransit.dataSource.api');
     if (source === 'cached') return t('screens.planetTransit.dataSource.cached');
-    if (source === 'fallback') return t('screens.planetTransit.dataSource.cached');
+    if (source === 'fallback') {
+      return language === 'ar'
+        ? 'تقريب (غير موثوق)'
+        : language === 'fr'
+          ? 'Approximation (non fiable)'
+          : 'Approximation (unreliable)';
+    }
     return t('common.unknown');
-  }, [transitState, transitPayload, t]);
+  }, [transitData, t, language]);
 
-  const handleRefresh = async () => {
-    if (detailsType !== 'transit') return;
-    const planetKey = (transitState ?? transitPayload)?.planetKey;
+  const handleRefresh = useCallback(async () => {
+    if (detailsType !== 'transit' || refreshing) return;
+    const planetKey = (transitData as any)?.planetKey;
     const planet = mapPlanetKeyToPlanet(planetKey);
     if (!planet) return;
+
     try {
       setRefreshing(true);
-      const fresh = await getTransit(planet);
-      setTransitState(adaptTransitToLegacyFormat(fresh));
+      const [fresh, transits] = await Promise.all([getTransit(planet), getAllTransits()]);
+      if (transits) {
+        setAllTransits(transits);
+      }
+
+      if (fresh) {
+        const legacy = adaptTransitToLegacyFormat(fresh);
+        setTransitState(legacy);
+      }
+    } catch (error) {
+      if (__DEV__) {
+        console.error('[PlanetTransitDetails] Refresh failed:', error);
+      }
     } finally {
       setRefreshing(false);
     }
-  };
+  }, [detailsType, refreshing, transitData]);
+
+  // Auto-refresh to match TransitService UI freshness (5 minutes)
+  useEffect(() => {
+    if (detailsType !== 'transit') return;
+    const interval = setInterval(() => {
+      void handleRefresh();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [detailsType, handleRefresh]);
 
   const title = detailsType === 'transit' ? t('screens.planetTransit.title') : t('home.planetTransitDetails.title');
   
@@ -1099,7 +1174,7 @@ export default function PlanetTransitDetailsScreen() {
       : t('home.planetTransitDetails.sections.tomorrowRuler');
 
   const transitDates = useMemo(() => {
-    const data = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
+    const data = transitData as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
     if (!data) return { start: null, end: null, estimated: true };
     const start = isLegacyTransit(data) && data.transitStartDate ? new Date(data.transitStartDate as any) : null;
     const end = isLegacyTransit(data) && data.transitEndDate ? new Date(data.transitEndDate as any) : null;
@@ -1109,7 +1184,7 @@ export default function PlanetTransitDetailsScreen() {
     const percent = signProgress?.percent ?? 0;
     const fallback = estimateTransitDates(planet, now, percent);
     return { start: fallback.start, end: fallback.end, estimated: true };
-  }, [transitState, transitPayload, signProgress, now]);
+  }, [transitData, signProgress, now]);
 
   const durationStats = useMemo(() => {
     if (!transitDates.start || !transitDates.end) return null;
@@ -1136,7 +1211,7 @@ export default function PlanetTransitDetailsScreen() {
   // ─────────────────────────────────────────────────────────────────────────────
   const spiritualGuidance = useMemo<SpiritualGuidance | null>(() => {
     if (detailsType !== 'transit') return null;
-    const data = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
+    const data = transitData as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
     if (!data || !isLegacyTransit(data)) return null;
     
     const degree = data.signDegree ?? 0;
@@ -1157,7 +1232,7 @@ export default function PlanetTransitDetailsScreen() {
       phase,
       ...planetData,
     };
-  }, [detailsType, transitState, transitPayload, t, tSafe, planetaryHourData, planetaryBoundaries, now]);
+  }, [detailsType, transitData, t, tSafe, planetaryHourData, planetaryBoundaries, now]);
   
   // Update selected tier when recommended tier changes
   useEffect(() => {
@@ -1281,7 +1356,7 @@ export default function PlanetTransitDetailsScreen() {
   const { label: avoidLabel, body: avoidBody } = useMemo(() => splitLabeledText(avoidText), [avoidText]);
 
   const historyDates = useMemo(() => {
-    const data = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
+    const data = transitData as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
     const planet = mapPlanetKeyToPlanet(data?.planetKey) ?? 'Sun';
     const avgDays = AVG_DAYS_PER_SIGN[planet] ?? 30;
     if (!transitDates.start || !transitDates.end) return null;
@@ -1290,8 +1365,35 @@ export default function PlanetTransitDetailsScreen() {
     const nextStart = new Date(transitDates.end.getTime());
     const nextEnd = new Date(transitDates.end.getTime() + avgDays * DAY_MS);
     return { prevStart, prevEnd, nextStart, nextEnd };
-  }, [transitDates, transitState, transitPayload]);
-  const adjacent = getAdjacentSigns((transitState ?? transitPayload)?.zodiacKey as any);
+  }, [transitDates, transitData]);
+  const adjacent = getAdjacentSigns((transitData as any)?.zodiacKey as any);
+
+  const allTransitsDisplay = useMemo<AllPlanetTransits | null>(() => {
+    if (!allTransits) return null;
+    if (zodiacSystem === 'tropical') return allTransits;
+
+    const mapped: Partial<AllPlanetTransits> = {};
+    for (const [planetKey, transitInfo] of Object.entries(allTransits) as Array<[string, PlanetTransit]>) {
+      const longitude = transitInfo.longitude;
+      if (typeof longitude !== 'number') {
+        (mapped as any)[planetKey] = transitInfo;
+        continue;
+      }
+      const dateForMapping = transitInfo.lastUpdated ? new Date(transitInfo.lastUpdated as any) : new Date();
+      const m = mapLongitudeToZodiac(longitude, dateForMapping, zodiacSystem);
+      (mapped as any)[planetKey] = {
+        ...transitInfo,
+        // Keep original tropical longitude so we can remap again safely.
+        longitude: transitInfo.longitude,
+        sign: m.sign,
+        signArabic: m.signArabic,
+        element: m.element,
+        signDegree: m.signDegree,
+        signMinute: m.signMinute,
+      } satisfies PlanetTransit;
+    }
+    return mapped as AllPlanetTransits;
+  }, [allTransits, zodiacSystem]);
 
   const influenceTypeLabel = useMemo(() => {
     const labels = {
@@ -1370,7 +1472,7 @@ export default function PlanetTransitDetailsScreen() {
   // Calculate personalized planetary influence
   const personalizedInfluence: PersonalizedInfluence | null = useMemo(() => {
     if (detailsType !== 'transit') return null;
-    const data = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
+    const data = transitData as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
     if (!data) return null;
     
     const planet = mapPlanetKeyToPlanet(data.planetKey);
@@ -1390,7 +1492,7 @@ export default function PlanetTransitDetailsScreen() {
       isPersonalTransit,
       language as any
     );
-  }, [detailsType, transitState, transitPayload, contextElement, userElement, isPersonalTransit, language]);
+  }, [detailsType, transitData, contextElement, userElement, isPersonalTransit, language]);
 
   useEffect(() => {
     Animated.timing(orbScale, {
@@ -1467,6 +1569,17 @@ export default function PlanetTransitDetailsScreen() {
         style={styles.scrollView} 
         contentContainerStyle={styles.scrollContent} 
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          detailsType === 'transit' ? (
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor="#FFFFFF"
+              colors={[accent.primary]}
+              progressBackgroundColor="rgba(20, 20, 35, 1)"
+            />
+          ) : undefined
+        }
       >
         {detailsType === 'transit' && transitData ? (
           <>
@@ -1485,6 +1598,14 @@ export default function PlanetTransitDetailsScreen() {
                 </View>
                 <Text style={styles.planetNameHero}>{transitData.planetName}</Text>
                 <Text style={styles.planetArabicHero}>{transitData.planetNameAr}</Text>
+                {(transitData as any)?.isRetrograde ? (
+                  <View style={styles.retrogradePill}>
+                    <Text style={styles.retrogradePillText}>℞</Text>
+                    <Text style={styles.retrogradePillText}>
+                      {language === 'ar' ? 'تراجع' : language === 'fr' ? 'Rétrograde' : 'Retrograde'}
+                    </Text>
+                  </View>
+                ) : null}
               </GlassCard>
 
               <View style={styles.connectorContainer}>
@@ -1512,6 +1633,48 @@ export default function PlanetTransitDetailsScreen() {
                   <Text style={[styles.elementText, { color: accent.primary }]}> 
                     {tSafe(`common.elements.${contextElement}`, toTitleCase(contextElement ?? 'earth')).toUpperCase()} SIGN
                   </Text>
+                </View>
+
+                <View style={styles.zodiacSystemRow}>
+                  <Text style={styles.zodiacSystemLabel}>
+                    {language === 'ar' ? 'نظام البروج' : language === 'fr' ? 'Zodiaque' : 'Zodiac'}
+                  </Text>
+                  <View style={styles.zodiacSystemToggle}>
+                    <TouchableOpacity
+                      style={[styles.zodiacSystemOption, zodiacSystem === 'tropical' && styles.zodiacSystemOptionActive]}
+                      onPress={() => {
+                        setZodiacSystem('tropical');
+                        void persistZodiacSystem('tropical');
+                      }}
+                      accessibilityRole="button"
+                    >
+                      <Text
+                        style={[styles.zodiacSystemOptionText, zodiacSystem === 'tropical' && styles.zodiacSystemOptionTextActive]}
+                      >
+                        {language === 'fr' ? 'Tropical' : language === 'ar' ? 'استوائي' : 'Tropical'}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.zodiacSystemOption,
+                        zodiacSystem === 'sidereal_lahiri' && styles.zodiacSystemOptionActive,
+                      ]}
+                      onPress={() => {
+                        setZodiacSystem('sidereal_lahiri');
+                        void persistZodiacSystem('sidereal_lahiri');
+                      }}
+                      accessibilityRole="button"
+                    >
+                      <Text
+                        style={[
+                          styles.zodiacSystemOptionText,
+                          zodiacSystem === 'sidereal_lahiri' && styles.zodiacSystemOptionTextActive,
+                        ]}
+                      >
+                        {language === 'fr' ? 'Sidéreal (Lahiri)' : language === 'ar' ? 'نجمي (لاهيري)' : 'Sidereal (Lahiri)'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </GlassCard>
             </View>
@@ -2705,7 +2868,7 @@ export default function PlanetTransitDetailsScreen() {
         )}
 
         {/* All Planet Transits Section */}
-        {detailsType === 'transit' && allTransits && (
+        {detailsType === 'transit' && allTransitsDisplay && (
           <GlassCard style={styles.allTransitsCard}>
             <View style={styles.cardHeader}>
               <Ionicons name="planet" size={20} color="#9FA9B3" />
@@ -2722,7 +2885,7 @@ export default function PlanetTransitDetailsScreen() {
             </Text>
             
             <View style={styles.allTransitsGrid}>
-              {Object.entries(allTransits).map(([planetKey, transitInfo]: [string, PlanetTransit]) => {
+              {Object.entries(allTransitsDisplay).map(([planetKey, transitInfo]: [string, PlanetTransit]) => {
                 const planetName = planetKey.charAt(0).toUpperCase() + planetKey.slice(1);
                 const zodiacData = ZODIAC_DATA[transitInfo.sign as ZodiacKey];
                 const planetGrad = getPlanetGradient(planetKey);
@@ -2777,6 +2940,12 @@ export default function PlanetTransitDetailsScreen() {
                         ? (tSafe(`planets.${planetKey}Arabic`, planetName))
                         : planetName}
                     </Text>
+
+                    {transitInfo.isRetrograde ? (
+                      <Text style={styles.miniRetrograde}>
+                        ℞ {language === 'fr' ? 'Rétrograde' : language === 'ar' ? 'تراجع' : 'Retrograde'}
+                      </Text>
+                    ) : null}
                     
                     <View style={[styles.miniZodiacBadge, { backgroundColor: elementAcc.glow }]}>
                       <Text style={styles.miniZodiacSymbol}>{zodiacData?.symbol || '✦'}</Text>
@@ -2957,6 +3126,24 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: 'rgba(255,255,255,0.7)',
   },
+  retrogradePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255, 107, 53, 0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 107, 53, 0.25)',
+  },
+  retrogradePillText: {
+    fontSize: 12,
+    color: '#FFD1C2',
+    fontWeight: '700',
+    letterSpacing: 0.2,
+  },
   connectorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -3025,6 +3212,42 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: Typography.weightBold,
     letterSpacing: 1,
+  },
+  zodiacSystemRow: {
+    marginTop: 12,
+    width: '100%',
+  },
+  zodiacSystemLabel: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    marginBottom: 8,
+  },
+  zodiacSystemToggle: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 12,
+    padding: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+  },
+  zodiacSystemOption: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  zodiacSystemOptionActive: {
+    backgroundColor: 'rgba(255,255,255,0.14)',
+  },
+  zodiacSystemOptionText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: '700',
+  },
+  zodiacSystemOptionTextActive: {
+    color: '#FFFFFF',
   },
   infoStrip: {
     gap: Spacing.xs,
@@ -3923,6 +4146,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: Typography.weightSemibold,
     color: DarkTheme.textPrimary,
+    textAlign: 'center',
+  },
+  miniRetrograde: {
+    fontSize: 10,
+    color: 'rgba(255, 209, 194, 0.92)',
+    fontWeight: '700',
+    marginTop: 4,
+    marginBottom: 6,
     textAlign: 'center',
   },
   miniZodiacBadge: {

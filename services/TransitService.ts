@@ -6,8 +6,8 @@
  * This is separate from planetary hours (which change every 60-90 minutes).
  * 
  * Data Source: NASA JPL Horizons via EphemerisService
- * Cache Strategy: 6-24 hours depending on planet speed
- * Fallback: Static positions for current date if API unavailable
+ * Cache Strategy: ~5 minutes for UI freshness
+ * Fallback: Use last-known cached data; do NOT guess positions.
  */
 
 import { globalRequestManager } from '@/services/cache/RequestManager';
@@ -15,11 +15,10 @@ import { PlanetPositions } from '@/types/divine-timing-personal';
 import {
     AllPlanetTransits,
     PlanetTransit,
-    TRANSIT_REFRESH_INTERVALS,
     ZodiacSign
 } from '@/types/planetary-systems';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getPlanetPositions } from './EphemerisService';
+import { getPlanetPositionsPrecise } from './EphemerisService';
 import { Element } from './MomentAlignmentService';
 import { Planet } from './PlanetaryHoursService';
 
@@ -97,6 +96,12 @@ const ZODIAC_ELEMENTS: Record<ZodiacSign, Element> = {
   pisces: 'water',
 };
 
+// Planet transit UI: refresh often enough that degrees don't look static.
+const UI_REFRESH_MS = 5 * 60 * 1000;
+
+// Users should never see guessed/approximate transit positions.
+const ALLOW_APPROX_FALLBACK = false;
+
 // ============================================================================
 // MAIN SERVICE
 // ============================================================================
@@ -105,12 +110,12 @@ const ZODIAC_ELEMENTS: Record<ZodiacSign, Element> = {
  * Get current transits for all planets
  * Returns cached data if fresh, otherwise fetches new data
  */
-export async function getAllTransits(): Promise<AllPlanetTransits> {
+export async function getAllTransits(): Promise<AllPlanetTransits | null> {
   try {
     if (memoryTransits) {
       const lastUpdate = await getLastUpdateTime();
       if (isCacheValid(lastUpdate)) {
-        return memoryTransits;
+        return markAsCached(memoryTransits);
       }
     }
 
@@ -126,8 +131,9 @@ export async function getAllTransits(): Promise<AllPlanetTransits> {
       if (__DEV__) {
         console.log('[TransitService] Using cached transits');
       }
-      memoryTransits = cached;
-      return cached;
+      const out = markAsCached(cached);
+      memoryTransits = out;
+      return out;
     }
     
     // Fetch fresh data
@@ -138,6 +144,7 @@ export async function getAllTransits(): Promise<AllPlanetTransits> {
     inflightAll = globalRequestManager.schedule(
       async () => {
         const fresh = await fetchTransitsFromEphemeris();
+        if (!fresh) return null;
         await cacheTransits(fresh);
         memoryTransits = fresh;
         return fresh;
@@ -149,21 +156,36 @@ export async function getAllTransits(): Promise<AllPlanetTransits> {
       }
     );
 
-    return await inflightAll;
+    const result = await inflightAll;
+    if (result) return result;
+
+    const cachedAfter = await getCachedTransits();
+    if (cachedAfter) {
+      const out = markAsCached(cachedAfter);
+      memoryTransits = out;
+      return out;
+    }
+
+    return null;
     
   } catch (error) {
     if (__DEV__) {
       console.error('[TransitService] Error getting transits:', error);
     }
     
-    // Fallback to cached data or static defaults
+    // Fallback to cached data (even if stale). Do NOT guess positions.
     const cached = await getCachedTransits();
     if (cached) {
-      memoryTransits = cached;
-      return cached;
+      const out = markAsCached(cached);
+      memoryTransits = out;
+      return out;
     }
-    
-    return getFallbackTransits();
+
+    if (ALLOW_APPROX_FALLBACK) {
+      return getFallbackTransits();
+    }
+
+    return null;
   } finally {
     inflightAll = null;
   }
@@ -172,15 +194,15 @@ export async function getAllTransits(): Promise<AllPlanetTransits> {
 /**
  * Get transit for a specific planet
  */
-export async function getTransit(planet: Planet): Promise<PlanetTransit> {
+export async function getTransit(planet: Planet): Promise<PlanetTransit | null> {
   const allTransits = await getAllTransits();
-  return allTransits[planet];
+  return allTransits ? allTransits[planet] : null;
 }
 
 /**
  * Force refresh transits (user action or background update)
  */
-export async function refreshTransits(): Promise<AllPlanetTransits> {
+export async function refreshTransits(): Promise<AllPlanetTransits | null> {
   if (__DEV__) {
     console.log('[TransitService] Force refreshing transits...');
   }
@@ -188,6 +210,7 @@ export async function refreshTransits(): Promise<AllPlanetTransits> {
   const fresh = await globalRequestManager.schedule(
     async () => {
       const data = await fetchTransitsFromEphemeris();
+      if (!data) return null;
       await cacheTransits(data);
       memoryTransits = data;
       return data;
@@ -205,18 +228,18 @@ export async function refreshTransits(): Promise<AllPlanetTransits> {
 /**
  * Fetch transits from ephemeris source (NASA JPL Horizons)
  */
-async function fetchTransitsFromEphemeris(): Promise<AllPlanetTransits> {
+async function fetchTransitsFromEphemeris(): Promise<AllPlanetTransits | null> {
   try {
     const now = new Date();
     
-    // Get planetary positions from EphemerisService
-    const positions = await getPlanetPositions(now);
+    // Get higher-precision planetary positions from EphemerisService
+    const positions = await getPlanetPositionsPrecise(now);
     
     if (!positions) {
       if (__DEV__) {
-        console.warn('[TransitService] No ephemeris data available, using fallback');
+        console.warn('[TransitService] No ephemeris data available');
       }
-      return getFallbackTransits();
+      return null;
     }
     
     // Convert positions to transits
@@ -232,9 +255,24 @@ async function fetchTransitsFromEphemeris(): Promise<AllPlanetTransits> {
     if (__DEV__) {
       console.error('[TransitService] Ephemeris fetch error:', error);
     }
-    
-    return getFallbackTransits();
+
+    if (ALLOW_APPROX_FALLBACK) {
+      return getFallbackTransits();
+    }
+
+    return null;
   }
+}
+
+function markAsCached(transits: AllPlanetTransits): AllPlanetTransits {
+  const out: Partial<AllPlanetTransits> = {};
+  for (const [planet, transit] of Object.entries(transits) as Array<[Planet, PlanetTransit]>) {
+    out[planet] = {
+      ...transit,
+      source: 'cached',
+    };
+  }
+  return out as AllPlanetTransits;
 }
 
 /**
@@ -261,21 +299,29 @@ function parseEphemerisData(
       continue;
     }
     
-    const sign = ZODIAC_SIGNS[position.sign];
-    const signDegree = Math.floor(position.signDegree);
-    const signMinute = Math.floor((position.signDegree % 1) * 60);
+    const longitude = typeof (position as any).longitude === 'number' ? (position as any).longitude : 0;
+    const normalized = ((longitude % 360) + 360) % 360;
+    const signIndex = Math.floor(normalized / 30);
+    const sign = ZODIAC_SIGNS[signIndex];
+    const signDegFloat = normalized % 30;
+    const signDegree = Math.floor(signDegFloat);
+    const signMinute = Math.floor((signDegFloat % 1) * 60);
     const signDegreeFloat = signDegree + signMinute / 60;
     const windowEstimate = estimateTransitWindow(planet, now, signDegreeFloat);
+
+    const speedDegPerDay = typeof (position as any).speedDegPerDay === 'number' ? (position as any).speedDegPerDay : undefined;
+    const isRetrograde = typeof speedDegPerDay === 'number' ? speedDegPerDay < 0 : undefined;
     
     transits[planet] = {
       planet,
       sign,
       signArabic: ZODIAC_SIGNS_ARABIC[sign],
       element: ZODIAC_ELEMENTS[sign],
+      longitude: normalized,
       signDegree,
       signMinute,
-      isRetrograde: false, // TODO: Implement retrograde detection
-      speedDegPerDay: undefined, // TODO: Calculate from consecutive positions
+      isRetrograde,
+      speedDegPerDay,
       transitStartDate: windowEstimate.start,
       transitEndDate: windowEstimate.end,
       lastUpdated: now,
@@ -312,8 +358,7 @@ function estimateTransitWindow(planet: Planet, now: Date, signDegreeFloat: numbe
  * Calculate when next refresh should happen for a planet
  */
 function calculateNextRefresh(planet: Planet, now: Date): Date {
-  const interval = TRANSIT_REFRESH_INTERVALS[planet] || TRANSIT_REFRESH_INTERVALS.Jupiter;
-  return new Date(now.getTime() + interval);
+  return new Date(now.getTime() + UI_REFRESH_MS);
 }
 
 // ============================================================================
@@ -384,8 +429,8 @@ function isCacheValid(lastUpdate: Date | null): boolean {
   const now = new Date();
   const age = now.getTime() - lastUpdate.getTime();
   
-  // Use most aggressive refresh interval (Moon: 6 hours)
-  const maxAge = TRANSIT_REFRESH_INTERVALS.Moon;
+  // Real-time UI refresh window.
+  const maxAge = UI_REFRESH_MS;
   
   return age < maxAge;
 }
@@ -412,21 +457,28 @@ async function getLastUpdateTime(): Promise<Date | null> {
  */
 function getFallbackTransits(): AllPlanetTransits {
   const now = new Date();
-  
+
+  // Very rough mean longitude approximations.
+  // These are only used if Horizons is unavailable.
+  const daysSinceEpoch = Math.floor(now.getTime() / (1000 * 60 * 60 * 24));
+  const meanLon: Record<Planet, number> = {
+    Sun: (280.0 + daysSinceEpoch * 0.9856) % 360,
+    Moon: (218.0 + daysSinceEpoch * 13.176) % 360,
+    Mercury: (252.0 + daysSinceEpoch * 4.092) % 360,
+    Venus: (181.0 + daysSinceEpoch * 1.602) % 360,
+    Mars: (355.0 + daysSinceEpoch * 0.524) % 360,
+    Jupiter: (34.0 + daysSinceEpoch * 0.083) % 360,
+    Saturn: (50.0 + daysSinceEpoch * 0.033) % 360,
+  };
+
   return {
-    Sun: createFallbackTransit('Sun', 'capricorn', now), // Jan 2026
-    Moon: createFallbackTransit('Moon', 'cancer', now),  // Approximate
-    Mercury: createFallbackTransit('Mercury', 'capricorn', now),
-    Venus: createFallbackTransit('Venus', 'pisces', now),
-    Mars: createFallbackTransit('Mars', 'cancer', now),
-    Jupiter: createFallbackTransit('Jupiter', 'gemini', now, {
-      transitStartDate: new Date('2024-05-25'),
-      transitEndDate: new Date('2025-06-09'),
-    }),
-    Saturn: createFallbackTransit('Saturn', 'pisces', now, {
-      transitStartDate: new Date('2023-03-07'),
-      transitEndDate: new Date('2025-05-24'),
-    }),
+    Sun: createFallbackTransitFromLongitude('Sun', meanLon.Sun, now),
+    Moon: createFallbackTransitFromLongitude('Moon', meanLon.Moon, now),
+    Mercury: createFallbackTransitFromLongitude('Mercury', meanLon.Mercury, now),
+    Venus: createFallbackTransitFromLongitude('Venus', meanLon.Venus, now),
+    Mars: createFallbackTransitFromLongitude('Mars', meanLon.Mars, now),
+    Jupiter: createFallbackTransitFromLongitude('Jupiter', meanLon.Jupiter, now),
+    Saturn: createFallbackTransitFromLongitude('Saturn', meanLon.Saturn, now),
   };
 }
 
@@ -451,6 +503,34 @@ function createFallbackTransit(
     nextRefreshDue: calculateNextRefresh(planet, now),
     source: 'fallback',
     ...timeline,
+  };
+}
+
+function createFallbackTransitFromLongitude(
+  planet: Planet,
+  longitude: number,
+  now: Date
+): PlanetTransit {
+  const normalized = ((longitude % 360) + 360) % 360;
+  const signIndex = Math.floor(normalized / 30);
+  const sign = ZODIAC_SIGNS[signIndex];
+  const signDegFloat = normalized % 30;
+  const signDegree = Math.floor(signDegFloat);
+  const signMinute = Math.floor((signDegFloat % 1) * 60);
+  const windowEstimate = estimateTransitWindow(planet, now, signDegree + signMinute / 60);
+  return {
+    planet,
+    sign,
+    signArabic: ZODIAC_SIGNS_ARABIC[sign],
+    element: ZODIAC_ELEMENTS[sign],
+    longitude: normalized,
+    signDegree,
+    signMinute,
+    transitStartDate: windowEstimate.start,
+    transitEndDate: windowEstimate.end,
+    lastUpdated: now,
+    nextRefreshDue: calculateNextRefresh(planet, now),
+    source: 'fallback',
   };
 }
 
