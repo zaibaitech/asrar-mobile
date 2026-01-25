@@ -23,7 +23,6 @@
     "types/**/*.tsx",
     "utils/**/*.ts",
     "utils/**/*.tsx",
-    ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ],
   "exclude": [
@@ -34,11 +33,17 @@
     "scripts/**",
     "supabase/**",
     "tools/**",
+    ".expo/types/**",
     "**/*.test.ts",
     "**/*.test.tsx",
     "test-*.ts",
     "test-*.tsx",
     "CACHE_INTEGRATION_EXAMPLES.tsx",
-    "PRAYER_GUIDANCE_USAGE_EXAMPLES.tsx"
+    "PRAYER_GUIDANCE_USAGE_EXAMPLES.tsx",
+    "**/*.example.ts",
+    "**/*.example.tsx",
+    "**/*Examples.tsx",
+    "**/*-old.ts",
+    "**/*-old.tsx"
   ]
 }

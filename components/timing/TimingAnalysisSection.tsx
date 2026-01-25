@@ -178,21 +178,59 @@ export function TimingAnalysisSection({
   
   const [result, setResult] = useState<AsrariyaTimingResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [errorKey, setErrorKey] = useState<'unableToCalculateTiming' | null>(null);
   // Default to expanded for better UX - users should see reasoning immediately
   const [expandedSection, setExpandedSection] = useState<string | null>('breakdown');
   const [nextWindow, setNextWindow] = useState<{ startTime: Date; description: string } | null>(null);
 
+  const resultRef = useRef<AsrariyaTimingResult | null>(null);
+  useEffect(() => {
+    resultRef.current = result;
+  }, [result]);
+
+  const analysisInFlightRef = useRef(false);
+
   const category = practiceCategory || CONTEXT_TO_CATEGORY[context];
   const lang = (language || 'en') as 'en' | 'fr' | 'ar';
+
+  const headerTitle = useMemo(() => {
+    const labels = {
+      daily: { en: 'Daily Overview', fr: 'Aperçu du jour', ar: 'نظرة يومية' },
+      manazil: { en: 'Timing Analysis', fr: 'Analyse du timing', ar: 'تحليل التوقيت' },
+      moment: { en: 'Timing Analysis', fr: 'Analyse du timing', ar: 'تحليل التوقيت' },
+      transit: { en: 'Timing Analysis', fr: 'Analyse du timing', ar: 'تحليل التوقيت' },
+      general: { en: 'Timing Analysis', fr: 'Analyse du timing', ar: 'تحليل التوقيت' },
+    } as const;
+    return labels[context][lang];
+  }, [context, lang]);
+
+  const actionLabelOverride = useMemo(() => {
+    const labels = {
+      proceed: { en: null, fr: null, ar: null },
+      'proceed-with-care': { en: 'Proceed Mindfully', fr: 'Avancer avec attention', ar: 'تابع بوعي' },
+      modify: { en: 'Adjust Practice', fr: 'Ajuster la pratique', ar: 'عدّل الممارسة' },
+      wait: { en: 'Wait if Possible', fr: 'Attendre si possible', ar: 'انتظر إن أمكن' },
+    } as const;
+    return labels;
+  }, []);
 
   const runAnalysis = useCallback(async () => {
     if (!profile) {
       setLoading(false);
+      setRefreshing(false);
       return;
     }
 
-    setLoading(true);
+    if (analysisInFlightRef.current) return;
+    analysisInFlightRef.current = true;
+
+    const shouldBlockUI = !resultRef.current;
+    if (shouldBlockUI) {
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+    }
     setErrorKey(null);
 
     try {
@@ -200,7 +238,18 @@ export function TimingAnalysisSection({
       const spiritualProfile = profileToSpiritualProfile(profile);
       
       // Build or use provided moment
-      const currentMoment = providedMoment || await buildCurrentMoment(stableLocation);
+      const builtMoment = providedMoment || await buildCurrentMoment(stableLocation);
+      // Daily context should not mix "Daily" title with hourly-only analysis.
+      // We intentionally analyze the day ruler as a day-level overview.
+      const currentMoment: CurrentMoment =
+        context === 'daily' && !providedMoment
+          ? {
+              ...builtMoment,
+              planetaryHourPlanet: builtMoment.dayRuler,
+              planetaryHourElement: builtMoment.dayElement,
+              planetaryHourRemainingSeconds: 0,
+            }
+          : builtMoment;
       
       // Run full analysis
       const analysisResult = await analyzeTimingForPractice(
@@ -227,7 +276,12 @@ export function TimingAnalysisSection({
       console.error('[TimingAnalysis] Error:', err);
       setErrorKey('unableToCalculateTiming');
     } finally {
-      setLoading(false);
+      analysisInFlightRef.current = false;
+      if (shouldBlockUI) {
+        setLoading(false);
+      } else {
+        setRefreshing(false);
+      }
     }
   }, [profile, providedMoment, stableLocation, category, lang]);
 
@@ -277,6 +331,8 @@ export function TimingAnalysisSection({
   }
 
   const levelConfig = LEVEL_CONFIG[result.level];
+  const actionOverride = actionLabelOverride[result.action]?.[lang] ?? null;
+  const displayLevelLabel = actionOverride || levelConfig.label[lang];
 
   return (
     <View style={styles.container}>
@@ -290,10 +346,10 @@ export function TimingAnalysisSection({
             <Text style={styles.scoreIcon}>{levelConfig.icon}</Text>
             <View style={styles.scoreTextContainer}>
               <Text style={styles.sectionTitle}>
-                {t('asrariya.timingAnalysis')}
+                {headerTitle}
               </Text>
               <Text style={[styles.levelLabel, { color: levelConfig.color }]}>
-                {levelConfig.label[lang]}
+                {displayLevelLabel}
               </Text>
             </View>
           </View>
@@ -317,7 +373,9 @@ export function TimingAnalysisSection({
         </View>
 
         {/* Short Summary */}
-          <Text style={styles.summaryText}>{result.shortSummary}</Text>
+          <Text style={styles.summaryText}>
+            {result.action === 'proceed-with-care' ? (lang === 'fr' ? 'Quelques signaux demandent de la prudence.' : lang === 'ar' ? 'بعض الإشارات تتطلب الحذر.' : 'Some signals suggest extra care.') : result.shortSummary}
+          </Text>
       </LinearGradient>
 
       {/* Layer Breakdown */}

@@ -87,10 +87,11 @@ export default function DailyGuidanceScreen() {
         dayElement: dailyGuidance?.dayElement || 'fire',
         userElement: dailyGuidance?.userElement,
         relationship: dailyGuidance?.relationship || 'neutral',
-        message: dailyGuidance?.message || 'Balanced energies today',
-        bestFor: Array.isArray(dailyGuidance?.bestFor) ? dailyGuidance.bestFor : [],
-        avoid: Array.isArray(dailyGuidance?.avoid) ? dailyGuidance.avoid : [],
-        peakHours: dailyGuidance?.peakHours,
+        messageKey: dailyGuidance?.messageKey || 'dailyGuidance.messages.neutral',
+        messageParams: dailyGuidance?.messageParams,
+        bestForKeys: Array.isArray(dailyGuidance?.bestForKeys) ? dailyGuidance.bestForKeys : [],
+        avoidKeys: Array.isArray(dailyGuidance?.avoidKeys) ? dailyGuidance.avoidKeys : [],
+        peakHoursKey: dailyGuidance?.peakHoursKey,
       };
       
       setGuidance(normalizedGuidance);
@@ -111,7 +112,7 @@ export default function DailyGuidanceScreen() {
     } finally {
       setLoading(false);
     }
-  }, [profile]);
+  }, [normalizedMansionIndex, profile]);
   
   useEffect(() => {
     loadGuidance();
@@ -208,6 +209,10 @@ export default function DailyGuidanceScreen() {
   
   const statusColor = getStatusColor(guidance.timingQuality);
   const dayOfWeek = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+  const messageText = t(guidance.messageKey, guidance.messageParams as any);
+  const bestFor = (guidance.bestForKeys || []).map((key) => t(key));
+  const avoid = (guidance.avoidKeys || []).map((key) => t(key));
+  const peakHoursText = guidance.peakHoursKey ? t(guidance.peakHoursKey) : '';
   
   return (
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
@@ -242,7 +247,7 @@ export default function DailyGuidanceScreen() {
               </Text>
             </View>
           </View>
-          <Text style={styles.heroMessage}>{guidance.message}</Text>
+          <Text style={styles.heroMessage}>{messageText}</Text>
         </LinearGradient>
         
         {/* Element Harmony Card */}
@@ -349,12 +354,12 @@ export default function DailyGuidanceScreen() {
           </View>
           
           {/* Best For */}
-          {Array.isArray(guidance?.bestFor) && guidance.bestFor.length > 0 && (
+          {bestFor.length > 0 && (
             <View style={styles.recommendationSection}>
               <Text style={styles.recommendationSectionTitle}>
                 {t('dailyGuidance.bestFor')}
               </Text>
-              {guidance.bestFor.map((item, index) => (
+              {bestFor.map((item, index) => (
                 <View key={index} style={styles.recommendationRow}>
                   <Text style={[styles.bulletIcon, { color: '#10b981' }]}>✓</Text>
                   <Text style={styles.recommendationText}>{item}</Text>
@@ -364,12 +369,12 @@ export default function DailyGuidanceScreen() {
           )}
           
           {/* Avoid */}
-          {Array.isArray(guidance?.avoid) && guidance.avoid.length > 0 && (
+          {avoid.length > 0 && (
             <View style={styles.recommendationSection}>
               <Text style={styles.recommendationSectionTitle}>
                 {t('dailyGuidance.avoid')}
               </Text>
-              {guidance.avoid.map((item, index) => (
+              {avoid.map((item, index) => (
                 <View key={index} style={styles.recommendationRow}>
                   <Text style={[styles.bulletIcon, { color: '#94a3b8' }]}>○</Text>
                   <Text style={styles.recommendationText}>{item}</Text>
@@ -380,7 +385,7 @@ export default function DailyGuidanceScreen() {
         </View>
         
         {/* Peak Hours */}
-        {guidance.peakHours && (
+        {!!peakHoursText && (
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Ionicons name="time-outline" size={20} color={statusColor} />
@@ -388,7 +393,7 @@ export default function DailyGuidanceScreen() {
             </View>
             <View style={[styles.peakHoursContent, { backgroundColor: `${statusColor}10` }]}>
               <Text style={[styles.peakHoursText, { color: statusColor }]}>
-                {guidance.peakHours}
+                {peakHoursText}
               </Text>
             </View>
           </View>

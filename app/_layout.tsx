@@ -20,6 +20,7 @@ import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 import { prefetchCoreCaches } from '@/services/AppPrefetchService';
 import { handleAuthCallback } from '@/services/AuthService';
 import { getOnboardingCompleted } from '@/services/OnboardingService';
+import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -32,7 +33,9 @@ export const unstable_settings = {
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync().catch(() => {
+  // best-effort; ignore
+});
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -48,7 +51,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      void SplashScreen.hideAsync().catch(() => {
+        // best-effort; ignore
+      });
     }
   }, [loaded]);
 
@@ -61,6 +66,10 @@ export default function RootLayout() {
 
 function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: { showAnimatedSplash: boolean; setShowAnimatedSplash: (val: boolean) => void }) {
   const colorScheme = useColorScheme();
+
+  useEffect(() => {
+    installGlobalErrorHandlers();
+  }, []);
 
   // Best-effort prefetch so tabs/widgets can render instantly.
   // Avoids repeated network bursts during transitions.
@@ -85,44 +94,42 @@ function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: { showAnim
 
 function RootLayoutContent({ showAnimatedSplash, setShowAnimatedSplash }: { showAnimatedSplash: boolean; setShowAnimatedSplash: (val: boolean) => void }) {
   return (
-    <>
+    <AppErrorBoundary>
       <OnboardingGate />
       <DeepLinkHandler />
       <NotificationInitializer />
       <NotificationTapHandler />
-      <AppErrorBoundary>
-        <Stack>
-          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen 
-            name="compatibility" 
-            options={{ 
-              headerShown: true,
-              headerTitle: 'Compatibility Analysis',
-              headerStyle: {
-                backgroundColor: '#1A1625',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }} 
-          />
-          <Stack.Screen 
-            name="dhikr-counter" 
-            options={{ headerShown: false }} 
-          />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="email-verification" options={{ headerShown: false }} />
-          <Stack.Screen name="auth" options={{ headerShown: false }} />
-          <Stack.Screen name="reset-password" options={{ headerShown: false }} />
-          <Stack.Screen name="profile" options={{ headerShown: false }} />
-        </Stack>
-      </AppErrorBoundary>
+      <Stack>
+        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="compatibility" 
+          options={{ 
+            headerShown: true,
+            headerTitle: 'Compatibility Analysis',
+            headerStyle: {
+              backgroundColor: '#1A1625',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }} 
+        />
+        <Stack.Screen 
+          name="dhikr-counter" 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="email-verification" options={{ headerShown: false }} />
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+        <Stack.Screen name="reset-password" options={{ headerShown: false }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
+      </Stack>
       {showAnimatedSplash && (
         <AnimatedSplash onFinish={() => setShowAnimatedSplash(false)} />
       )}
-    </>
+    </AppErrorBoundary>
   );
 }
 
@@ -165,61 +172,61 @@ function DeepLinkHandler() {
   // Deep link handler for email verification
   useEffect(() => {
     const handleDeepLink = async (event: { url: string }) => {
-      const { path, queryParams } = Linking.parse(event.url);
+      try {
+        const { path, queryParams } = Linking.parse(event.url);
 
-      console.log('📱 Deep link received:', event.url);
-      console.log('📱 Path:', path);
-      console.log('📱 Query params:', queryParams);
+        console.log('📱 Deep link received:', event.url);
+        console.log('📱 Path:', path);
+        console.log('📱 Query params:', queryParams);
 
-      // Check if it's auth callback
-      if (path === 'auth/callback' || path?.includes('auth/callback')) {
-        const { access_token, refresh_token, type, error, error_description } = queryParams as {
-          access_token?: string;
-          refresh_token?: string;
-          type?: string;
-          error?: string;
-          error_description?: string;
-        };
+        // Check if it's auth callback
+        if (path === 'auth/callback' || path?.includes('auth/callback')) {
+          const { access_token, refresh_token, type, error, error_description } = (queryParams || {}) as {
+            access_token?: string;
+            refresh_token?: string;
+            type?: string;
+            error?: string;
+            error_description?: string;
+          };
 
-        // Handle errors from email verification
-        if (error) {
-          console.error('❌ Auth callback error:', error, error_description);
-          Alert.alert(
-            'Verification Failed',
-            error_description || error,
-            [{ text: 'OK', onPress: () => router.replace('/auth') }]
-          );
-          return;
-        }
-
-        if (type === 'recovery' && access_token && refresh_token) {
-          // Password reset flow - keep user in app
-          const result = await handleAuthCallback({
-            access_token,
-            refresh_token,
-            type,
-            error,
-            error_description,
-            expires_in: (queryParams as any)?.expires_in,
-            token_type: (queryParams as any)?.token_type,
-          });
-
-          if (result.error) {
+          // Handle errors from email verification
+          if (error) {
+            console.error('❌ Auth callback error:', error, error_description);
             Alert.alert(
-              'Reset Link Invalid',
-              result.error.message,
+              'Verification Failed',
+              error_description || error,
               [{ text: 'OK', onPress: () => router.replace('/auth') }]
             );
             return;
           }
 
-          await setProfile({ mode: 'account' });
-          router.replace('/reset-password');
-          return;
-        }
+          if (type === 'recovery' && access_token && refresh_token) {
+            // Password reset flow - keep user in app
+            const result = await handleAuthCallback({
+              access_token,
+              refresh_token,
+              type,
+              error,
+              error_description,
+              expires_in: (queryParams as any)?.expires_in,
+              token_type: (queryParams as any)?.token_type,
+            });
 
-        if (type === 'signup' && access_token && refresh_token) {
-          try {
+            if (result.error) {
+              Alert.alert(
+                'Reset Link Invalid',
+                result.error.message,
+                [{ text: 'OK', onPress: () => router.replace('/auth') }]
+              );
+              return;
+            }
+
+            await setProfile({ mode: 'account' });
+            router.replace('/reset-password');
+            return;
+          }
+
+          if (type === 'signup' && access_token && refresh_token) {
             console.log('✅ Email verified! Processing...');
             
             // Update profile to account mode
@@ -253,16 +260,15 @@ function DeepLinkHandler() {
                 ]
               );
             }
-            
-          } catch (error) {
-            console.error('❌ Verification processing failed:', error);
-            Alert.alert(
-              'Error',
-              'Verification failed. Please try signing in manually.',
-              [{ text: 'OK', onPress: () => router.replace('/auth') }]
-            );
           }
         }
+      } catch (error) {
+        console.error('❌ Deep link handler failed:', error);
+        Alert.alert(
+          'Link Error',
+          'We could not open that link. Please try again from inside the app.',
+          [{ text: 'OK', onPress: () => router.replace('/(tabs)') }]
+        );
       }
     };
 
@@ -270,11 +276,15 @@ function DeepLinkHandler() {
     const subscription = Linking.addEventListener('url', handleDeepLink);
 
     // Check if app was opened via deep link
-    Linking.getInitialURL().then((url) => {
-      if (url) {
-        handleDeepLink({ url });
-      }
-    });
+    Linking.getInitialURL()
+      .then((url) => {
+        if (url) {
+          void handleDeepLink({ url });
+        }
+      })
+      .catch(() => {
+        // ignore
+      });
 
     return () => subscription.remove();
   }, [profile, setProfile, router]);

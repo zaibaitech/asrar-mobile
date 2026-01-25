@@ -139,6 +139,69 @@ function PersonPersonResultView({ result, language }: { result: PersonPersonComp
 function PersonDivineNameResultView({ result, language }: { result: PersonDivineNameCompatibility; language: 'en' | 'ar' }) {
   const { person, divineName, evaluation, nameAction, manifestationGuidance } = result;
 
+  const nameActionExplanation = (() => {
+    const elementLabel = (el: 'fire' | 'water' | 'air' | 'earth') => {
+      const labels = {
+        en: { fire: 'Fire', water: 'Water', air: 'Air', earth: 'Earth' },
+        ar: { fire: 'النار', water: 'الماء', air: 'الهواء', earth: 'الأرض' }
+      } as const;
+      return labels[language][el];
+    };
+
+    const effectText = {
+      en: {
+        strengthens: 'This Name tends to strengthen your core qualities.',
+        stabilizes: 'This Name tends to stabilize and balance your path.',
+        tempers: 'This Name tends to temper excess and soften intensity.',
+        challenges: 'This Name may challenge you to grow through contrast.'
+      },
+      ar: {
+        strengthens: 'يميل هذا الاسم إلى تقوية صفاتك الأساسية.',
+        stabilizes: 'يميل هذا الاسم إلى تثبيت مسارك وتحقيق التوازن.',
+        tempers: 'يميل هذا الاسم إلى تهذيب الزيادة وتلطيف الشدة.',
+        challenges: 'قد يتحداك هذا الاسم للنمو عبر الاختلاف.'
+      }
+    } as const;
+
+    const elementText =
+      language === 'en'
+        ? `Your element is ${elementLabel(nameAction.personElement)} and this Name’s element is ${elementLabel(nameAction.nameElement)}.`
+        : `عنصرك هو ${elementLabel(nameAction.personElement)} وعنصر هذا الاسم هو ${elementLabel(nameAction.nameElement)}.`;
+
+    return `${effectText[language][nameAction.effect]} ${elementText}`;
+  })();
+
+  const manifestationExplanation = (() => {
+    const labels = {
+      en: {
+        fast: 'fast',
+        delayed: 'delayed',
+        subtle: 'subtle',
+        gradual: 'gradual',
+        hidden: 'hidden'
+      },
+      ar: {
+        fast: 'سريعة',
+        delayed: 'متأخرة',
+        subtle: 'لطيفة',
+        gradual: 'تدريجية',
+        hidden: 'خفية'
+      }
+    } as const;
+
+    const speedText =
+      language === 'en'
+        ? `Manifestation tends to be ${labels.en[manifestationGuidance.speed]}.`
+        : `يميل الظهور إلى أن يكون ${labels.ar[manifestationGuidance.speed]}.`;
+
+    const modeText =
+      language === 'en'
+        ? `Mode of action: ${manifestationGuidance.modeOfAction === 'fast' ? 'fast' : manifestationGuidance.modeOfAction === 'gradual' ? labels.en.gradual : labels.en.hidden}.`
+        : `طريقة التأثير: ${manifestationGuidance.modeOfAction === 'fast' ? labels.ar.fast : manifestationGuidance.modeOfAction === 'gradual' ? labels.ar.gradual : labels.ar.hidden}.`;
+
+    return `${speedText} ${modeText}`;
+  })();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
@@ -174,7 +237,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
           {nameAction.effect.charAt(0).toUpperCase() + nameAction.effect.slice(1)}
         </Text>
         <Text style={styles.actionExplanation}>
-          {language === 'en' ? nameAction.explanation.en : nameAction.explanation.ar}
+          {nameActionExplanation}
         </Text>
       </View>
 
@@ -188,7 +251,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
           {manifestationGuidance.speed.charAt(0).toUpperCase() + manifestationGuidance.speed.slice(1)}
         </Text>
         <Text style={styles.manifestationReason}>
-          {language === 'en' ? manifestationGuidance.reason.en : manifestationGuidance.reason.ar}
+          {manifestationExplanation}
         </Text>
       </View>
 

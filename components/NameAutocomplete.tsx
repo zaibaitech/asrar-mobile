@@ -32,7 +32,7 @@ interface NameAutocompleteProps {
   /** Show helper text */
   showHelper?: boolean;
   /** Language for helper text */
-  language?: 'en' | 'ar';
+  language?: 'en' | 'fr' | 'ar';
 }
 
 export default function NameAutocomplete({

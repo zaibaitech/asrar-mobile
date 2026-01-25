@@ -19,6 +19,7 @@ import {
     ElementCompatibilityResult,
     ManazilAlignmentResult,
     PlanetaryResonanceResult,
+    PlanetaryRuler,
     PracticeCategory,
     PracticeMappingResult,
     UserIntent,
@@ -126,52 +127,144 @@ const PLANET_ZODIAC_RULERSHIP: Record<Planet, number[]> = {
 };
 
 /**
- * Planetary friendships (classical astrology)
+ * Planetary friendships (classical Islamic astrology)
+ * Used for user ruler ↔ day/hour planet resonance.
  */
 const PLANETARY_FRIENDSHIPS: Record<string, 'friend' | 'neutral' | 'enemy'> = {
+  // Sun
   'sun-moon': 'friend',
   'sun-mars': 'friend',
   'sun-jupiter': 'friend',
-  'sun-saturn': 'enemy',
-  'sun-venus': 'neutral',
   'sun-mercury': 'neutral',
+  'sun-venus': 'enemy',
+  'sun-saturn': 'enemy',
+
+  // Moon
   'moon-sun': 'friend',
   'moon-mercury': 'friend',
-  'moon-jupiter': 'friend',
   'moon-mars': 'neutral',
+  'moon-jupiter': 'neutral',
   'moon-venus': 'neutral',
   'moon-saturn': 'neutral',
+
+  // Mars
   'mars-sun': 'friend',
   'mars-moon': 'friend',
   'mars-jupiter': 'friend',
   'mars-venus': 'neutral',
   'mars-saturn': 'neutral',
   'mars-mercury': 'enemy',
+
+  // Mercury
   'mercury-sun': 'friend',
   'mercury-venus': 'friend',
+  'mercury-mars': 'neutral',
   'mercury-jupiter': 'neutral',
   'mercury-saturn': 'neutral',
-  'mercury-mars': 'enemy',
   'mercury-moon': 'enemy',
+
+  // Jupiter
   'jupiter-sun': 'friend',
   'jupiter-moon': 'friend',
   'jupiter-mars': 'friend',
-  'jupiter-mercury': 'neutral',
   'jupiter-saturn': 'neutral',
+  'jupiter-mercury': 'enemy',
   'jupiter-venus': 'enemy',
+
+  // Venus
   'venus-mercury': 'friend',
   'venus-saturn': 'friend',
   'venus-mars': 'neutral',
-  'venus-jupiter': 'enemy',
+  'venus-jupiter': 'neutral',
   'venus-sun': 'enemy',
-  'venus-moon': 'neutral',
+  'venus-moon': 'enemy',
+
+  // Saturn
   'saturn-mercury': 'friend',
   'saturn-venus': 'friend',
   'saturn-jupiter': 'neutral',
-  'saturn-mars': 'neutral',
   'saturn-sun': 'enemy',
   'saturn-moon': 'enemy',
+  'saturn-mars': 'enemy',
 };
+
+const PLANET_RULER_KEYS: Record<Planet, PlanetaryRuler> = {
+  Sun: 'sun',
+  Moon: 'moon',
+  Mercury: 'mercury',
+  Venus: 'venus',
+  Mars: 'mars',
+  Jupiter: 'jupiter',
+  Saturn: 'saturn',
+};
+
+const PLANETARY_COMPATIBILITY_SCORES: Record<string, number> = {
+  // Friend (70–75)
+  'sun-moon': 72,
+  'sun-mars': 72,
+  'sun-jupiter': 72,
+  'moon-sun': 72,
+  'moon-mercury': 72,
+  'mars-sun': 72,
+  'mars-moon': 72,
+  'mars-jupiter': 72,
+  'mercury-sun': 72,
+  'mercury-venus': 72,
+  'jupiter-sun': 72,
+  'jupiter-moon': 72,
+  'jupiter-mars': 72,
+  'venus-mercury': 72,
+  'venus-saturn': 72,
+  'saturn-mercury': 72,
+  'saturn-venus': 72,
+
+  // Neutral (50–55)
+  'sun-mercury': 50,
+  'moon-mars': 52,
+  'moon-jupiter': 52,
+  'moon-venus': 52,
+  'moon-saturn': 52,
+  'mars-venus': 50,
+  'mars-saturn': 50,
+  'mercury-mars': 50,
+  'mercury-jupiter': 50,
+  'mercury-saturn': 50,
+  'jupiter-saturn': 50,
+  'venus-mars': 50,
+  'venus-jupiter': 50,
+
+  // Enemy (30–40)
+  'sun-venus': 35,
+  'sun-saturn': 35,
+  'mars-mercury': 35,
+  'mercury-moon': 35,
+  'jupiter-mercury': 38,
+  'jupiter-venus': 38,
+  'venus-sun': 35,
+  'venus-moon': 35,
+  'saturn-sun': 35,
+  'saturn-moon': 35,
+  'saturn-mars': 35,
+};
+
+function getRulerCompatibilityScore(userPlanet: PlanetaryRuler, other: PlanetaryRuler): number {
+  if (userPlanet === other) return 90;
+
+  const key = `${userPlanet}-${other}`;
+  if (typeof PLANETARY_COMPATIBILITY_SCORES[key] === 'number') {
+    return PLANETARY_COMPATIBILITY_SCORES[key] as number;
+  }
+
+  const friendship = getPlanetaryFriendship(userPlanet, other);
+  switch (friendship) {
+    case 'friend':
+      return 72;
+    case 'enemy':
+      return 35;
+    default:
+      return 52;
+  }
+}
 
 /**
  * Practice categories and their preferred elements
@@ -512,7 +605,7 @@ export function analyzePlanetaryResonance(
   intent: UserIntent
 ): PlanetaryResonanceResult {
   const category = normalizePracticeCategory(intent?.category);
-  const userPlanet = user.rulingPlanet || 'sun';
+  const userPlanet = (user.rulingPlanet || 'sun') as PlanetaryRuler;
   const dayRuler = moment.dayRuler;
   const hourPlanet = moment.planetaryHourPlanet;
   
@@ -522,37 +615,21 @@ export function analyzePlanetaryResonance(
   // Check if user's ruling planet matches planetary hour
   const planetaryHourMatch = hourPlanet.toLowerCase() === userPlanet;
   
+  const dayRulerKey = PLANET_RULER_KEYS[dayRuler];
+  const hourPlanetKey = PLANET_RULER_KEYS[hourPlanet];
+
   // Calculate day ruler score
-  let dayRulerScore = 50; // Base neutral
-  if (dayRulerMatch) {
-    dayRulerScore = 100;
-  } else {
-    // Check friendship relationship
-    const friendship = getPlanetaryFriendship(userPlanet, dayRuler.toLowerCase());
-    switch (friendship) {
-      case 'friend': dayRulerScore = 75; break;
-      case 'neutral': dayRulerScore = 50; break;
-      case 'enemy': dayRulerScore = 30; break;
-    }
-  }
-  
+  const dayRulerScore = getRulerCompatibilityScore(userPlanet, dayRulerKey);
+
   // Calculate planetary hour score (more important)
-  let planetaryHourScore = 50;
-  if (planetaryHourMatch) {
-    planetaryHourScore = 100;
-  } else {
-    const friendship = getPlanetaryFriendship(userPlanet, hourPlanet.toLowerCase());
-    switch (friendship) {
-      case 'friend': planetaryHourScore = 75; break;
-      case 'neutral': planetaryHourScore = 50; break;
-      case 'enemy': planetaryHourScore = 25; break;
-    }
-  }
+  const planetaryHourScore = getRulerCompatibilityScore(userPlanet, hourPlanetKey);
   
   // Practice-based modifiers
   let practiceModifier = 0;
   const preferredPlanets = PRACTICE_PLANET_PREFERENCES[category] ?? PRACTICE_PLANET_PREFERENCES.general;
-  const practiceAligned = preferredPlanets.includes(hourPlanet);
+  // Don't claim "ideal for your chosen practice" if the user's planetary compatibility is low.
+  const rawPracticeAligned = preferredPlanets.includes(hourPlanet);
+  const practiceAligned = rawPracticeAligned && planetaryHourScore >= 60;
 
   if (practiceAligned) {
     practiceModifier = 15;
@@ -625,24 +702,38 @@ function generatePlanetaryReasoning(
   practiceAligned: boolean
 ): string {
   const parts: string[] = [];
+  const userP = (userPlanet || 'sun').toLowerCase() as PlanetaryRuler;
+  const hourKey = PLANET_RULER_KEYS[hourPlanet];
+  const dayKey = PLANET_RULER_KEYS[dayRuler];
+  const hourScore = getRulerCompatibilityScore(userP, hourKey);
+  const dayScore = getRulerCompatibilityScore(userP, dayKey);
+  const isDayInfluence = dayRuler === hourPlanet;
   
   if (hourMatch) {
-    parts.push(`The current planetary hour (${hourPlanet}) perfectly matches your ruling planet — amplifying your spiritual strength.`);
+    parts.push(
+      isDayInfluence
+        ? `Today's ruler (${dayRuler}) perfectly matches your ruling planet — amplifying your spiritual strength.`
+        : `The current planetary hour (${hourPlanet}) perfectly matches your ruling planet — amplifying your spiritual strength.`
+    );
   } else if (dayMatch) {
     parts.push(`Today's ruler (${dayRuler}) resonates with your planetary nature.`);
   } else {
-    const friendship = getPlanetaryFriendship(userPlanet, hourPlanet.toLowerCase());
-    if (friendship === 'friend') {
-      parts.push(`${hourPlanet} hour is friendly to your ${userPlanet} nature.`);
-    } else if (friendship === 'enemy') {
-      parts.push(`${hourPlanet} hour creates tension with your ${userPlanet} nature — proceed with awareness.`);
+    if (hourScore >= 70) {
+      parts.push(`${isDayInfluence ? `Today's ${dayRuler} influence` : `${hourPlanet} hour`} is friendly to your ${userPlanet} nature.`);
+    } else if (hourScore <= 45) {
+      parts.push(`${isDayInfluence ? `Today's ${dayRuler} influence` : `${hourPlanet} hour`} is challenging for your ${userPlanet} nature — proceed with awareness.`);
     } else {
-      parts.push(`${hourPlanet} hour has neutral relationship with your ${userPlanet} nature.`);
+      parts.push(`${isDayInfluence ? `Today's ${dayRuler} influence` : `${hourPlanet} hour`} is neutral for your ${userPlanet} nature.`);
     }
   }
   
   if (practiceAligned) {
     parts.push('Current planetary hour is ideal for your chosen practice.');
+  }
+
+  // Subtle clarification for "daily" contexts where day and hour can differ.
+  if (!dayMatch && !hourMatch && dayScore >= 70 && hourScore <= 45) {
+    parts.push(`Note: the day ruler (${dayRuler}) is supportive, but the current hour (${hourPlanet}) is challenging.`);
   }
   
   return parts.join(' ');
@@ -658,19 +749,25 @@ function generatePlanetaryReasoningFr(
 ): string {
   const parts: string[] = [];
   const userP = userPlanet.toLowerCase();
+  const userKey = userP as PlanetaryRuler;
+  const hourScore = getRulerCompatibilityScore(userKey, PLANET_RULER_KEYS[hourPlanet]);
+  const isDayInfluence = dayRuler === hourPlanet;
 
   if (hourMatch) {
-    parts.push(`L’heure planétaire actuelle (${PLANET_LABELS[hourPlanet].fr}) correspond à votre planète dominante — cela amplifie votre force spirituelle.`);
+    parts.push(
+      isDayInfluence
+        ? `Le maître du jour (${PLANET_LABELS[dayRuler].fr}) correspond à votre planète dominante — cela amplifie votre force spirituelle.`
+        : `L’heure planétaire actuelle (${PLANET_LABELS[hourPlanet].fr}) correspond à votre planète dominante — cela amplifie votre force spirituelle.`
+    );
   } else if (dayMatch) {
     parts.push(`Le maître du jour (${PLANET_LABELS[dayRuler].fr}) résonne avec votre nature planétaire.`);
   } else {
-    const friendship = getPlanetaryFriendship(userP, hourPlanet.toLowerCase());
-    if (friendship === 'friend') {
-      parts.push(`L’heure de ${PLANET_LABELS[hourPlanet].fr} est favorable à votre nature ${userP}.`);
-    } else if (friendship === 'enemy') {
-      parts.push(`L’heure de ${PLANET_LABELS[hourPlanet].fr} crée une tension avec votre nature ${userP} — avancez avec conscience.`);
+    if (hourScore >= 70) {
+      parts.push(`${isDayInfluence ? `L’influence de ${PLANET_LABELS[dayRuler].fr} aujourd’hui` : `L’heure de ${PLANET_LABELS[hourPlanet].fr}`} est favorable à votre nature ${userP}.`);
+    } else if (hourScore <= 45) {
+      parts.push(`${isDayInfluence ? `L’influence de ${PLANET_LABELS[dayRuler].fr} aujourd’hui` : `L’heure de ${PLANET_LABELS[hourPlanet].fr}`} est difficile pour votre nature ${userP} — avancez avec conscience.`);
     } else {
-      parts.push(`L’heure de ${PLANET_LABELS[hourPlanet].fr} a une relation neutre avec votre nature ${userP}.`);
+      parts.push(`${isDayInfluence ? `L’influence de ${PLANET_LABELS[dayRuler].fr} aujourd’hui` : `L’heure de ${PLANET_LABELS[hourPlanet].fr}`} est neutre pour votre nature ${userP}.`);
     }
   }
 
@@ -691,19 +788,25 @@ function generatePlanetaryReasoningAr(
 ): string {
   const parts: string[] = [];
   const userP = userPlanet.toLowerCase();
+  const userKey = userP as PlanetaryRuler;
+  const hourScore = getRulerCompatibilityScore(userKey, PLANET_RULER_KEYS[hourPlanet]);
+  const isDayInfluence = dayRuler === hourPlanet;
 
   if (hourMatch) {
-    parts.push(`الساعة الكوكبية الحالية (${PLANET_LABELS[hourPlanet].ar}) تطابق كوكبك الحاكم — ما يعزز قوتك الروحية.`);
+    parts.push(
+      isDayInfluence
+        ? `حاكم اليوم (${PLANET_LABELS[dayRuler].ar}) يطابق كوكبك الحاكم — ما يعزز قوتك الروحية.`
+        : `الساعة الكوكبية الحالية (${PLANET_LABELS[hourPlanet].ar}) تطابق كوكبك الحاكم — ما يعزز قوتك الروحية.`
+    );
   } else if (dayMatch) {
     parts.push(`حاكم اليوم (${PLANET_LABELS[dayRuler].ar}) ينسجم مع طبيعتك الكوكبية.`);
   } else {
-    const friendship = getPlanetaryFriendship(userP, hourPlanet.toLowerCase());
-    if (friendship === 'friend') {
-      parts.push(`ساعة ${PLANET_LABELS[hourPlanet].ar} داعمة لطبيعتك (${userP}).`);
-    } else if (friendship === 'enemy') {
-      parts.push(`ساعة ${PLANET_LABELS[hourPlanet].ar} تُحدث توترًا مع طبيعتك (${userP}) — تابع بوعي.`);
+    if (hourScore >= 70) {
+      parts.push(`${isDayInfluence ? `تأثير ${PLANET_LABELS[dayRuler].ar} اليوم` : `ساعة ${PLANET_LABELS[hourPlanet].ar}`} مناسبة لطبيعتك (${userP}).`);
+    } else if (hourScore <= 45) {
+      parts.push(`${isDayInfluence ? `تأثير ${PLANET_LABELS[dayRuler].ar} اليوم` : `ساعة ${PLANET_LABELS[hourPlanet].ar}`} صعبة لطبيعتك (${userP}) — تابع بوعي.`);
     } else {
-      parts.push(`ساعة ${PLANET_LABELS[hourPlanet].ar} علاقتها محايدة مع طبيعتك (${userP}).`);
+      parts.push(`${isDayInfluence ? `تأثير ${PLANET_LABELS[dayRuler].ar} اليوم` : `ساعة ${PLANET_LABELS[hourPlanet].ar}`} محايدة لطبيعتك (${userP}).`);
     }
   }
 

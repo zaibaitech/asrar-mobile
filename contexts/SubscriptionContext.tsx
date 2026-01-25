@@ -42,8 +42,8 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 const ADMIN_EMAILS_RAW = process.env.EXPO_PUBLIC_ADMIN_EMAILS || '';
 const ADMIN_EMAILS = ADMIN_EMAILS_RAW
   .split(',')
-  .map(email => email.trim().toLowerCase())
-  .filter(email => email.length > 0);
+  .map((email: string) => email.trim().toLowerCase())
+  .filter((email: string) => email.length > 0);
 
 // ============================================================================
 // TYPES
