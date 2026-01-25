@@ -244,9 +244,38 @@ function generateEnhancements(
   user: UserSpiritalProfile,
   moment: CurrentMoment,
   intent: UserIntent,
-  layers: AsrariyaTimingResult['layers']
+  layers: AsrariyaTimingResult['layers'],
+  language: 'en' | 'fr' | 'ar' = 'en'
 ): TimingEnhancement[] {
   const enhancements: TimingEnhancement[] = [];
+
+  const planetLabel = (planet: Planet, lang: 'en' | 'fr' | 'ar') => {
+    if (lang === 'fr') {
+      const map: Record<Planet, string> = {
+        Sun: 'Soleil',
+        Moon: 'Lune',
+        Mars: 'Mars',
+        Mercury: 'Mercure',
+        Jupiter: 'Jupiter',
+        Venus: 'Vénus',
+        Saturn: 'Saturne',
+      };
+      return map[planet];
+    }
+    if (lang === 'ar') {
+      const map: Record<Planet, string> = {
+        Sun: 'الشمس',
+        Moon: 'القمر',
+        Mars: 'المريخ',
+        Mercury: 'عطارد',
+        Jupiter: 'المشتري',
+        Venus: 'الزهرة',
+        Saturn: 'زحل',
+      };
+      return map[planet];
+    }
+    return planet;
+  };
   
   // Time-based enhancement
   if (moment.planetaryHourRemainingSeconds > 0) {
@@ -255,17 +284,39 @@ function generateEnhancements(
       enhancements.push({
         type: 'timing',
         text: `Current ${moment.planetaryHourPlanet} hour continues for ${mins} minutes`,
+        textFr: `L'heure de ${planetLabel(moment.planetaryHourPlanet, 'fr')} continue pendant ${mins} minutes`,
+        textAr: `تستمر ساعة ${planetLabel(moment.planetaryHourPlanet, 'ar')} لمدة ${mins} دقيقة`,
         icon: '⏰',
       });
     }
   }
   
   // Direction enhancement based on element
-  const directionByElement: Record<Element, { direction: string; icon: string }> = {
-    fire: { direction: 'Face East for solar/fire energy', icon: '🌅' },
-    air: { direction: 'Face North for clarity and wisdom', icon: '🧭' },
-    water: { direction: 'Face West for emotional depth', icon: '🌊' },
-    earth: { direction: 'Face South for grounding', icon: '🏔️' },
+  const directionByElement: Record<Element, { icon: string; en: string; fr: string; ar: string }> = {
+    fire: {
+      icon: '🌅',
+      en: 'Face East for solar/fire energy',
+      fr: "Tournez-vous vers l'Est pour l'énergie solaire/feu",
+      ar: 'اتجه نحو الشرق لطاقة الشمس/النار',
+    },
+    air: {
+      icon: '🧭',
+      en: 'Face North for clarity and wisdom',
+      fr: 'Tournez-vous vers le Nord pour la clarté et la sagesse',
+      ar: 'اتجه نحو الشمال للوضوح والحكمة',
+    },
+    water: {
+      icon: '🌊',
+      en: 'Face West for emotional depth',
+      fr: "Tournez-vous vers l'Ouest pour la profondeur émotionnelle",
+      ar: 'اتجه نحو الغرب للعمق العاطفي',
+    },
+    earth: {
+      icon: '🏔️',
+      en: 'Face South for grounding',
+      fr: 'Tournez-vous vers le Sud pour vous ancrer',
+      ar: 'اتجه نحو الجنوب للتأريض والثبات',
+    },
   };
   
   const preferredElement = intent.category === 'protection' ? 'fire' : 
@@ -275,7 +326,9 @@ function generateEnhancements(
     const dir = directionByElement[preferredElement];
     enhancements.push({
       type: 'direction',
-      text: dir.direction,
+      text: dir.en,
+      textFr: dir.fr,
+      textAr: dir.ar,
       icon: dir.icon,
     });
   }
@@ -285,6 +338,7 @@ function generateEnhancements(
     enhancements.push({
       type: 'dhikr',
       text: 'Begin with 3x Ayat al-Kursi for foundation',
+      textFr: 'Commencez par 3x Ayat al-Kursi pour établir une base',
       textAr: 'ابدأ بثلاث مرات آية الكرسي',
       icon: '📿',
     });
@@ -292,6 +346,7 @@ function generateEnhancements(
     enhancements.push({
       type: 'dhikr',
       text: 'Include Ya Shafi (The Healer) in your practice',
+      textFr: 'Ajoutez Ya Shafi (Le Guérisseur) à votre pratique',
       textAr: 'أضف يا شافي إلى ذكرك',
       icon: '💚',
     });
@@ -304,20 +359,39 @@ function generateEnhancements(
     water: 'Moonstone deepens emotional work',
     earth: 'Black tourmaline for grounding and protection',
   };
+
+  const stoneByElementFr: Record<Element, string> = {
+    fire: 'Tenez une cornaline ou un grenat pour amplifier',
+    air: 'Le quartz clair renforce la clarté mentale',
+    water: 'La pierre de lune approfondit le travail émotionnel',
+    earth: 'La tourmaline noire pour l’ancrage et la protection',
+  };
+
+  const stoneByElementAr: Record<Element, string> = {
+    fire: 'أمسك العقيق الأحمر أو الرمان للتقوية',
+    air: 'الكوارتز الشفاف يعزز صفاء الذهن',
+    water: 'حجر القمر يعمّق العمل العاطفي',
+    earth: 'التورمالين الأسود للتأريض والحماية',
+  };
   
   if (layers.elementCompatibility.score >= 60) {
     enhancements.push({
       type: 'stone',
       text: stoneByElement[user.element],
+      textFr: stoneByElementFr[user.element],
+      textAr: stoneByElementAr[user.element],
       icon: '💎',
     });
   }
   
   // Ayah reference based on manazil
   if (moment.currentManazilData) {
+    const manzilName = moment.currentManazilData.nameTransliteration;
     enhancements.push({
       type: 'ayah',
-      text: `Reflect on Surah appropriate to ${moment.currentManazilData.nameTransliteration}`,
+      text: `Reflect on a Surah appropriate to ${manzilName}`,
+      textFr: `Réfléchissez à une sourate appropriée à ${manzilName}`,
+      textAr: `تأمل في سورة مناسبة لـ ${manzilName}`,
       icon: '📖',
     });
   }
@@ -330,23 +404,42 @@ function generateEnhancements(
  */
 function generateCautions(
   layers: AsrariyaTimingResult['layers'],
-  intent: UserIntent
+  intent: UserIntent,
+  language: 'en' | 'fr' | 'ar' = 'en'
 ): string[] {
   const cautions: string[] = [];
   
   // Element tension caution
   if (layers.elementCompatibility.relationship === 'tension') {
-    cautions.push('Elemental tension present — maintain inner balance and don\'t force outcomes.');
+    cautions.push(
+      language === 'fr'
+        ? 'Tension élémentaire — gardez l’équilibre intérieur et ne forcez pas les résultats.'
+        : language === 'ar'
+          ? 'هناك توتر عنصري — حافظ على توازنك الداخلي ولا تُجبر النتائج.'
+          : 'Elemental tension present — maintain inner balance and don\'t force outcomes.'
+    );
   }
   
   // Planetary tension caution
   if (layers.planetaryResonance.score < 40) {
-    cautions.push('Planetary conditions are challenging — shorter, focused practice recommended.');
+    cautions.push(
+      language === 'fr'
+        ? 'Les conditions planétaires sont difficiles — privilégiez une pratique plus courte et concentrée.'
+        : language === 'ar'
+          ? 'الظروف الكوكبية صعبة — يُنصح بممارسة أقصر وأكثر تركيزًا.'
+          : 'Planetary conditions are challenging — shorter, focused practice recommended.'
+    );
   }
   
   // Manazil caution
   if (layers.manazilAlignment.themeCompatibility === 'cautious') {
-    cautions.push('Current lunar mansion suggests gentler approach to this practice.');
+    cautions.push(
+      language === 'fr'
+        ? 'Le manzil actuel suggère une approche plus douce pour cette pratique.'
+        : language === 'ar'
+          ? 'المنزل القمري الحالي يوصي بنهج ألطف لهذه الممارسة.'
+          : 'Current lunar mansion suggests gentler approach to this practice.'
+    );
   }
   
   // Practice-specific cautions
@@ -364,26 +457,57 @@ function synthesizeReasoning(
   layers: AsrariyaTimingResult['layers'],
   level: RecommendationLevel,
   user: UserSpiritalProfile,
-  intent: UserIntent
+  intent: UserIntent,
+  language: 'en' | 'fr' | 'ar' = 'en'
 ): string {
   const parts: string[] = [];
   
   // Lead with overall assessment
   switch (level) {
     case 'highly-favorable':
-      parts.push('Excellent timing for your practice!');
+      parts.push(
+        language === 'fr'
+          ? 'Excellent timing pour votre pratique !'
+          : language === 'ar'
+            ? 'توقيت ممتاز لممارستك!'
+            : 'Excellent timing for your practice!'
+      );
       break;
     case 'favorable':
-      parts.push('Good timing for your practice.');
+      parts.push(
+        language === 'fr'
+          ? 'Bon timing pour votre pratique.'
+          : language === 'ar'
+            ? 'توقيت جيد لممارستك.'
+            : 'Good timing for your practice.'
+      );
       break;
     case 'moderate':
-      parts.push('Moderate conditions for practice.');
+      parts.push(
+        language === 'fr'
+          ? 'Conditions modérées pour la pratique.'
+          : language === 'ar'
+            ? 'ظروف متوسطة للممارسة.'
+            : 'Moderate conditions for practice.'
+      );
       break;
     case 'cautious':
-      parts.push('Timing suggests proceeding with care.');
+      parts.push(
+        language === 'fr'
+          ? 'Le timing suggère d’avancer avec prudence.'
+          : language === 'ar'
+            ? 'التوقيت يوصي بالتقدّم بحذر.'
+            : 'Timing suggests proceeding with care.'
+      );
       break;
     case 'challenging':
-      parts.push('Challenging timing — consider waiting for better alignment.');
+      parts.push(
+        language === 'fr'
+          ? 'Timing difficile — envisagez d’attendre un meilleur alignement.'
+          : language === 'ar'
+            ? 'توقيت صعب — فكّر في الانتظار حتى يتحسن الانسجام.'
+            : 'Challenging timing — consider waiting for better alignment.'
+      );
       break;
   }
   
@@ -392,14 +516,34 @@ function synthesizeReasoning(
   const [strongestKey, strongest] = sortedLayers[0];
   
   if (strongest.score >= 70) {
-    parts.push(strongest.reasoning);
+    const strongestReason =
+      language === 'fr'
+        ? strongest.reasoningFr || strongest.reasoning
+        : language === 'ar'
+          ? strongest.reasoningAr || strongest.reasoning
+          : strongest.reasoning;
+    parts.push(strongestReason);
   }
   
   // Add any notable warnings
   const [, weakest] = sortedLayers[sortedLayers.length - 1];
   if (weakest.score < 40 && weakest.reasoning) {
     // Abbreviate the warning
-    parts.push('Note: ' + weakest.reasoning.split('.')[0] + '.');
+    const weakestReason =
+      language === 'fr'
+        ? weakest.reasoningFr || weakest.reasoning
+        : language === 'ar'
+          ? weakest.reasoningAr || weakest.reasoning
+          : weakest.reasoning;
+
+    const notePrefix =
+      language === 'fr'
+        ? 'Note : '
+        : language === 'ar'
+          ? 'ملاحظة: '
+          : 'Note: ';
+
+    parts.push(notePrefix + weakestReason.split('.')[0] + '.');
   }
   
   return parts.join(' ');
@@ -410,19 +554,20 @@ function synthesizeReasoning(
  */
 function generateShortSummary(
   level: RecommendationLevel,
-  action: ActionRecommendation
+  action: ActionRecommendation,
+  language: 'en' | 'fr' | 'ar' = 'en'
 ): string {
   switch (level) {
     case 'highly-favorable':
-      return 'Excellent Time';
+      return language === 'fr' ? 'Excellent moment' : language === 'ar' ? 'وقت ممتاز' : 'Excellent Time';
     case 'favorable':
-      return 'Good Time';
+      return language === 'fr' ? 'Bon Moment' : language === 'ar' ? 'وقت جيد' : 'Good Time';
     case 'moderate':
-      return 'Proceed Mindfully';
+      return language === 'fr' ? 'Avancer avec attention' : language === 'ar' ? 'تابع بوعي' : 'Proceed Mindfully';
     case 'cautious':
-      return 'Wait if Possible';
+      return language === 'fr' ? 'Attendre si possible' : language === 'ar' ? 'انتظر إن أمكن' : 'Wait if Possible';
     case 'challenging':
-      return 'Not Ideal';
+      return language === 'fr' ? 'Pas Idéal' : language === 'ar' ? 'غير مناسب' : 'Not Ideal';
   }
 }
 
@@ -443,6 +588,7 @@ export async function analyzeTimingForPractice(
     location?: { latitude: number; longitude: number };
     config?: Partial<AsrariyaEngineConfig>;
     moment?: CurrentMoment; // Allow passing pre-built moment for testing
+    language?: 'en' | 'fr' | 'ar';
   }
 ): Promise<AsrariyaTimingResult> {
   // Convert profile if needed
@@ -472,6 +618,8 @@ export async function analyzeTimingForPractice(
     manazilAlignment,
     practiceMapping,
   };
+
+  const language = options?.language ?? 'en';
   
   // Calculate weighted overall score
   const overallScore = Math.round(
@@ -487,12 +635,12 @@ export async function analyzeTimingForPractice(
   const confidence = calculateConfidence(layers);
   
   // Generate synthesized reasoning
-  const reasoning = synthesizeReasoning(layers, level, user, intent);
-  const shortSummary = generateShortSummary(level, action);
+  const reasoning = synthesizeReasoning(layers, level, user, intent, language);
+  const shortSummary = generateShortSummary(level, action, language);
   
   // Generate enhancements and cautions
-  const enhancements = generateEnhancements(user, moment, intent, layers);
-  const cautions = generateCautions(layers, intent);
+  const enhancements = generateEnhancements(user, moment, intent, layers, language);
+  const cautions = generateCautions(layers, intent, language);
   
   // Calculate optimal window end (if in favorable window)
   let optimalWindowEnd: Date | undefined;
@@ -508,6 +656,8 @@ export async function analyzeTimingForPractice(
     action,
     confidence,
     reasoning,
+    reasoningFr: language === 'fr' ? reasoning : undefined,
+    reasoningAr: language === 'ar' ? reasoning : undefined,
     shortSummary,
     layers,
     enhancements,
@@ -524,7 +674,8 @@ export async function analyzeTimingForPractice(
 export async function quickTimingCheck(
   userProfile: UserProfile | UserSpiritalProfile,
   category: PracticeCategory,
-  location?: { latitude: number; longitude: number }
+  location?: { latitude: number; longitude: number },
+  language: 'en' | 'fr' | 'ar' = 'en'
 ): Promise<{
   isGoodTime: boolean;
   summary: string;
@@ -533,7 +684,7 @@ export async function quickTimingCheck(
   const result = await analyzeTimingForPractice(
     userProfile,
     { category },
-    { location }
+    { location, language }
   );
   
   return {
@@ -553,10 +704,12 @@ export async function findNextOptimalWindow(
     location?: { latitude: number; longitude: number };
     lookAheadHours?: number;
     minimumScore?: number;
+    language?: 'en' | 'fr' | 'ar';
   }
 ): Promise<AlternativeTiming | null> {
   const lookAhead = options?.lookAheadHours || 24;
   const minScore = options?.minimumScore || 70;
+  const language = options?.language ?? 'en';
   
   const user: UserSpiritalProfile = 'mode' in userProfile
     ? profileToSpiritualProfile(userProfile)
@@ -573,6 +726,7 @@ export async function findNextOptimalWindow(
     const result = await analyzeTimingForPractice(user, intent, {
       location: options?.location,
       moment,
+      language,
     });
     
     if (result.overallScore >= minScore) {
@@ -583,7 +737,12 @@ export async function findNextOptimalWindow(
         startTime: checkTime,
         endTime,
         expectedScore: result.overallScore,
-        description: `${result.level} timing at ${checkTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+        description:
+          language === 'fr'
+            ? `Timing ${result.level} à ${checkTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+            : language === 'ar'
+              ? `توقيت ${result.level} عند ${checkTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+              : `${result.level} timing at ${checkTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
       };
     }
   }

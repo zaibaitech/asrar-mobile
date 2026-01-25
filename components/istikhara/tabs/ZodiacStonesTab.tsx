@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import Svg, { Circle, Defs, Path, Pattern, Rect } from 'react-native-svg';
 import { getElementColors } from '../../../constants/ElementColors';
 import {
     createPlaceholderStoneData,
@@ -30,6 +31,52 @@ import type { IstikharaCalculationResult } from '../../../services/istikhara/typ
 
 interface ZodiacStonesTabProps {
   result: IstikharaCalculationResult;
+}
+
+function withAlpha(color: string, alpha01: number): string {
+  const alpha = Math.max(0, Math.min(1, alpha01));
+  if (typeof color !== 'string' || !color.startsWith('#')) return color;
+
+  const hex = color.slice(1);
+  const normalized = hex.length === 3
+    ? hex.split('').map(c => c + c).join('')
+    : hex.length === 6
+      ? hex
+      : null;
+  if (!normalized) return color;
+
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function IslamicPatternOverlay({ opacity = 0.06 }: { opacity?: number }) {
+  return (
+    <Svg pointerEvents="none" width="100%" height="100%" style={StyleSheet.absoluteFill}>
+      <Defs>
+        <Pattern id="geom" patternUnits="userSpaceOnUse" width="48" height="48">
+          <Path
+            d="M24 6 L28 20 L42 24 L28 28 L24 42 L20 28 L6 24 L20 20 Z"
+            fill={`rgba(255, 255, 255, ${opacity})`}
+          />
+          <Circle cx="24" cy="24" r="2.2" fill={`rgba(255, 255, 255, ${opacity + 0.01})`} />
+        </Pattern>
+      </Defs>
+      <Rect x="0" y="0" width="100%" height="100%" fill="url(#geom)" />
+    </Svg>
+  );
+}
+
+function PatternCard({ children, style }: { children: React.ReactNode; style?: any }) {
+  return (
+    <View style={[styles.patternCard, style]}>
+      <View pointerEvents="none" style={styles.patternLayer}>
+        <IslamicPatternOverlay />
+      </View>
+      {children}
+    </View>
+  );
 }
 
 export default function ZodiacStonesTab({ result }: ZodiacStonesTabProps) {
@@ -58,6 +105,13 @@ export default function ZodiacStonesTab({ result }: ZodiacStonesTabProps) {
   const elementKey = zodiacData.element.toLowerCase() as 'fire' | 'earth' | 'air' | 'water';
   const colors = getElementColors(elementKey);
   const gradient = getElementGradient(elementKey);
+  const accentColor = colors.accent;
+
+  const sectionSurface = {
+    backgroundColor: withAlpha(accentColor, 0.12),
+    borderColor: withAlpha(accentColor, 0.22),
+    shadowColor: accentColor,
+  };
 
   // Ensure every stone has enhanced data (real data or safe placeholder)
   const stones: EnhancedStoneData[] = zodiacData.stones.map((stone) => {
@@ -101,14 +155,14 @@ export default function ZodiacStonesTab({ result }: ZodiacStonesTabProps) {
 
       {/* Stones Section */}
       <View style={styles.stonesSection}>
-        <View style={[styles.sectionHeader, { backgroundColor: `${colors.accent}22` }]}>
-          <Gem size={20} color={colors.accent} />
-          <Text style={[styles.sectionTitle, { color: colors.accent }]}>
+        <PatternCard style={[styles.sectionHeader, sectionSurface]}>
+          <Gem size={20} color={accentColor} />
+          <Text style={[styles.sectionTitle, { color: accentColor }]}>
             {language === 'en' ? '💎 Beneficial Stones & Crystals' :
              language === 'fr' ? '💎 Pierres et Cristaux Bénéfiques' :
              '💎 الأحجار والبلورات المفيدة'}
           </Text>
-        </View>
+        </PatternCard>
 
         <Text style={styles.stonesDescription}>
           {language === 'en' ? 'These stones resonate with your zodiac energy. Tap any stone to learn more about its properties and how to use it.' :
@@ -127,7 +181,7 @@ export default function ZodiacStonesTab({ result }: ZodiacStonesTabProps) {
               key={stone.id}
               stone={stone}
               zodiacSign={zodiacData.zodiacSign}
-              accentColor={colors.accent}
+              accentColor={accentColor}
               onPress={() => handleStonePress(stone)}
             />
           ))}
@@ -146,25 +200,36 @@ export default function ZodiacStonesTab({ result }: ZodiacStonesTabProps) {
       <ShoppingResources element={elementKey} />
 
       {/* Usage Guide Section */}
-      <TouchableOpacity 
-        style={[styles.usageHeader, { backgroundColor: `${colors.accent}22` }]}
-        onPress={toggleUsageGuide}
-      >
-        <View style={styles.usageHeaderLeft}>
-          <Info size={20} color={colors.accent} />
-          <Text style={[styles.usageTitle, { color: colors.accent }]}>
-            {language === 'en' ? 'How to Use These Stones' : 
-             language === 'fr' ? 'Comment Utiliser Ces Pierres' : 
-             'كيفية استخدام هذه الأحجار'}
+      <PatternCard style={[styles.usageHeaderCard, sectionSurface]}>
+        <TouchableOpacity 
+          style={styles.usageHeaderTouch}
+          onPress={toggleUsageGuide}
+          activeOpacity={0.8}
+        >
+          <View style={styles.usageHeaderLeft}>
+            <Info size={20} color={accentColor} />
+            <Text style={[styles.usageTitle, { color: accentColor }]}>
+              {language === 'en' ? 'How to Use These Stones' : 
+               language === 'fr' ? 'Comment Utiliser Ces Pierres' : 
+               'كيفية استخدام هذه الأحجار'}
+            </Text>
+          </View>
+          <Text style={[styles.usageToggle, { color: accentColor }]}>
+            {showUsageGuide ? '−' : '+'}
           </Text>
-        </View>
-        <Text style={[styles.usageToggle, { color: colors.accent }]}>
-          {showUsageGuide ? '−' : '+'}
-        </Text>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </PatternCard>
 
       {showUsageGuide && (
-        <View style={styles.usageContent}>
+        <PatternCard
+          style={[
+            styles.usageContent,
+            {
+              backgroundColor: 'rgba(0,0,0,0.16)',
+              borderColor: withAlpha(accentColor, 0.16),
+            },
+          ]}
+        >
           <View style={styles.usageItem}>
             <Text style={styles.usageBullet}>•</Text>
             <Text style={styles.usageText}>
@@ -200,7 +265,7 @@ export default function ZodiacStonesTab({ result }: ZodiacStonesTabProps) {
                'وضعها في مساحة المعيشة أو منطقة الصلاة'}
             </Text>
           </View>
-        </View>
+        </PatternCard>
       )}
 
       {/* Bottom Spacing */}
@@ -223,7 +288,7 @@ export default function ZodiacStonesTab({ result }: ZodiacStonesTabProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f1419',
+    backgroundColor: '#0B1020',
   },
   scrollContent: {
     paddingBottom: 32,
@@ -244,6 +309,15 @@ const styles = StyleSheet.create({
     margin: 16,
   },
 
+  patternCard: {
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  patternLayer: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.55,
+  },
+
   // Stones Section
   stonesSection: {
     marginHorizontal: 16,
@@ -255,6 +329,11 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 10,
     marginBottom: 8,
+    borderWidth: 1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
   },
   sectionTitle: {
     fontSize: 16,
@@ -286,14 +365,21 @@ const styles = StyleSheet.create({
   },
 
   // Usage Guide
-  usageHeader: {
+  usageHeaderCard: {
+    marginHorizontal: 16,
+    marginBottom: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  usageHeaderTouch: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    marginHorizontal: 16,
-    marginBottom: 8,
-    borderRadius: 12,
   },
   usageHeaderLeft: {
     flexDirection: 'row',
@@ -312,8 +398,8 @@ const styles = StyleSheet.create({
   usageContent: {
     marginHorizontal: 16,
     padding: 16,
-    backgroundColor: '#1a1f26',
     borderRadius: 12,
+    borderWidth: 1,
     marginBottom: 16,
   },
   usageItem: {

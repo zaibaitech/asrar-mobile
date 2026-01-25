@@ -14,6 +14,24 @@ import {
     Text,
     View
 } from 'react-native';
+import Svg, { Circle, Defs, Path, Pattern, Rect } from 'react-native-svg';
+
+function IslamicPatternOverlay({ opacity = 0.05 }: { opacity?: number }) {
+  return (
+    <Svg pointerEvents="none" width="100%" height="100%" style={StyleSheet.absoluteFill}>
+      <Defs>
+        <Pattern id="geom" patternUnits="userSpaceOnUse" width="48" height="48">
+          <Path
+            d="M24 6 L28 20 L42 24 L28 28 L24 42 L20 28 L6 24 L20 20 Z"
+            fill={`rgba(255, 255, 255, ${opacity})`}
+          />
+          <Circle cx="24" cy="24" r="2.2" fill={`rgba(255, 255, 255, ${opacity + 0.01})`} />
+        </Pattern>
+      </Defs>
+      <Rect x="0" y="0" width="100%" height="100%" fill="url(#geom)" />
+    </Svg>
+  );
+}
 
 interface RichStoneCardProps {
   stone: EnhancedStoneData;
@@ -65,10 +83,24 @@ export function RichStoneCard({ stone, zodiacSign, accentColor, onPress }: RichS
         pressed && styles.cardPressed
       ]}
     >
+      {/* Glass base + subtle Islamic geometric overlay */}
+      <LinearGradient
+        colors={[
+          hexToRgba(accentColor, 0.14),
+          'rgba(255,255,255,0.06)',
+          'rgba(0,0,0,0.22)',
+        ]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+      />
+      <View pointerEvents="none" style={styles.patternOverlay}>
+        <IslamicPatternOverlay />
+      </View>
+
       {/* Dark image area + subtle stone icon */}
-      <View style={styles.imageContainer}>
-        <View style={[styles.iconCircle, { borderColor: hexToRgba(accentColor, 0.22) }]}
-        >
+      <View style={[styles.imageContainer, { borderBottomColor: hexToRgba(accentColor, 0.14) }]}>
+        <View style={[styles.iconCircle, { borderColor: hexToRgba(accentColor, 0.22) }]}>
           <LinearGradient
             colors={visual.colors}
             start={{ x: 0, y: 0 }}
@@ -107,7 +139,10 @@ export function RichStoneCard({ stone, zodiacSign, accentColor, onPress }: RichS
               key={index}
               style={[
                 styles.propertyPill,
-                { backgroundColor: `${accentColor}22`, borderColor: `${accentColor}55` }
+                {
+                  backgroundColor: hexToRgba(accentColor, 0.12),
+                  borderColor: hexToRgba(accentColor, 0.22),
+                }
               ]}
             >
               <Text style={[styles.propertyText, { color: accentColor }]} numberOfLines={1}>
@@ -125,7 +160,7 @@ export function RichStoneCard({ stone, zodiacSign, accentColor, onPress }: RichS
         )}
         
         {/* Tap to learn more */}
-        <View style={[styles.learnMore, { backgroundColor: `${accentColor}15` }]}>
+        <View style={[styles.learnMore, { backgroundColor: hexToRgba(accentColor, 0.10), borderColor: hexToRgba(accentColor, 0.18) }]}>
           <Sparkles size={14} color={accentColor} />
           <Text style={[styles.learnMoreText, { color: accentColor }]}>
             {language === 'en' ? 'Tap to learn more' :
@@ -143,7 +178,7 @@ const styles = StyleSheet.create({
     width: 180,
     marginRight: 12,
     borderRadius: 16,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#0B1020',
     borderWidth: 1.5,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -156,12 +191,18 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     transform: [{ scale: 0.98 }],
   },
+  patternOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.55,
+  },
   imageContainer: {
     height: 140,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-    backgroundColor: '#0f172a',
+    backgroundColor: 'rgba(0,0,0,0.22)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   iconCircle: {
     width: 84,
@@ -238,6 +279,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 10,
     borderRadius: 8,
+    borderWidth: 1,
   },
   learnMoreText: {
     fontSize: 12,

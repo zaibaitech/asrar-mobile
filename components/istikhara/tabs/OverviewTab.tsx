@@ -1,7 +1,9 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Svg, { Circle, Defs, Path, Pattern, Rect } from 'react-native-svg';
 import { PremiumSection } from '../../../components/subscription/PremiumSection';
-import { ElementAccents, Spacing } from '../../../constants/DarkTheme';
+import { Spacing } from '../../../constants/DarkTheme';
+import { ElementColors } from '../../../constants/IstikharaColors';
 import { getElementBackgroundColors, getZodiacSign } from '../../../constants/zodiacData';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { IstikharaData } from '../../../types/istikhara';
@@ -23,36 +25,70 @@ function getElementNameFr(element: string): string {
   return elementMap[element.toLowerCase()] || element;
 }
 
+function IslamicPatternOverlay({ opacity = 0.06 }: { opacity?: number }) {
+  return (
+    <Svg pointerEvents="none" width="100%" height="100%" style={StyleSheet.absoluteFill}>
+      <Defs>
+        <Pattern id="geom" patternUnits="userSpaceOnUse" width="48" height="48">
+          <Path
+            d="M24 6 L28 20 L42 24 L28 28 L24 42 L20 28 L6 24 L20 20 Z"
+            fill={`rgba(255, 255, 255, ${opacity})`}
+          />
+          <Circle cx="24" cy="24" r="2.2" fill={`rgba(255, 255, 255, ${opacity + 0.01})`} />
+        </Pattern>
+      </Defs>
+      <Rect x="0" y="0" width="100%" height="100%" fill="url(#geom)" />
+    </Svg>
+  );
+}
+
+function PatternCard({
+  children,
+  style,
+}: {
+  children: React.ReactNode;
+  style?: any;
+}) {
+  return (
+    <View style={[styles.patternCard, style]}>
+      <View pointerEvents="none" style={styles.patternLayer}>
+        <IslamicPatternOverlay />
+      </View>
+      {children}
+    </View>
+  );
+}
+
 export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
   const { t, language } = useLanguage();
   const { burujProfile, personTotal, motherTotal, combinedTotal, repetitionCount, burujRemainder } = data;
   const zodiacSign = getZodiacSign(burujRemainder);
   const elementColors = getElementBackgroundColors(burujProfile.element);
   const elementKey = burujProfile.element.toLowerCase() as "fire" | "earth" | "air" | "water";
-  const accent = ElementAccents[elementKey];
+  const accentColor = elementColor || ElementColors[elementKey]?.primarySolid || '#93c5fd';
   const [showDetails, setShowDetails] = React.useState(false);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Summary Card at Top */}
-      <IstikharaSummaryCard result={data} language={language} />
+      <IstikharaSummaryCard result={data} language={language} accentColor={accentColor} />
       
       <View style={styles.content}>
         {/* Core Spiritual Pattern - Matches Overview Style */}
-        <View style={[styles.coreInsightCard, {
-          backgroundColor: `${accent.primary}15`,
-          borderColor: `${accent.primary}33`,
-          shadowColor: accent.primary,
+        <PatternCard style={[styles.coreInsightCard, {
+          backgroundColor: `${accentColor}15`,
+          borderColor: `${accentColor}33`,
+          shadowColor: accentColor,
         }]}>
           <View style={styles.coreInsightHeader}>
             <View style={[styles.coreInsightIconContainer, {
-              backgroundColor: `${accent.primary}26`,
-              borderColor: `${accent.primary}4D`,
+              backgroundColor: `${accentColor}26`,
+              borderColor: `${accentColor}4D`,
             }]}>
               <Text style={styles.coreInsightIcon}>{zodiacSign?.symbol.split(' ')[0] || '♈️'}</Text>
             </View>
             <View style={styles.coreInsightTitleContainer}>
-              <Text style={[styles.coreInsightLabel, { color: accent.primary }]}>
+              <Text style={[styles.coreInsightLabel, { color: accentColor }]}>
                 {t('istikhara.overview.spiritualPattern').toUpperCase()}
               </Text>
               <Text style={styles.coreInsightValue}>{zodiacSign?.nameEn || 'Unknown'} · {language === 'fr' ? getElementNameFr(burujProfile.element) : burujProfile.element.charAt(0).toUpperCase() + burujProfile.element.slice(1)}</Text>
@@ -62,7 +98,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           <Text style={styles.coreInsightDescription}>
             {language === 'fr' ? zodiacSign?.spiritualQualityFr : zodiacSign?.spiritualQuality || 'N/A'}
           </Text>
-        </View>
+        </PatternCard>
 
         {/* Core Spiritual Attributes - 3 Compact Cards */}
         <View style={styles.supportingSignsSection}>
@@ -70,41 +106,41 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           
           <View style={styles.supportingSignsGrid}>
             {/* Element */}
-            <View style={[styles.signCard, {
-              backgroundColor: `${accent.primary}33`,
-              borderColor: `${accent.primary}33`,
-              shadowColor: accent.primary,
+            <PatternCard style={[styles.signCard, {
+              backgroundColor: `${accentColor}33`,
+              borderColor: `${accentColor}33`,
+              shadowColor: accentColor,
             }]}>
               <Text style={styles.signIcon}>{burujProfile.element_emoji}</Text>
-              <Text style={[styles.signLabel, { color: accent.primary }]}>{t('istikhara.overview.element').toUpperCase()}</Text>
+              <Text style={[styles.signLabel, { color: accentColor }]}>{t('istikhara.overview.element').toUpperCase()}</Text>
               <Text style={styles.signValue}>
                 {language === 'fr' ? getElementNameFr(burujProfile.element) : burujProfile.element.charAt(0).toUpperCase() + burujProfile.element.slice(1)}
               </Text>
-            </View>
+            </PatternCard>
 
             {/* Ruler */}
-            <View style={[styles.signCard, {
-              backgroundColor: `${accent.primary}33`,
-              borderColor: `${accent.primary}33`,
-              shadowColor: accent.primary,
+            <PatternCard style={[styles.signCard, {
+              backgroundColor: `${accentColor}33`,
+              borderColor: `${accentColor}33`,
+              shadowColor: accentColor,
             }]}>
               <Text style={styles.signIcon}>⭐</Text>
-              <Text style={[styles.signLabel, { color: accent.primary }]}>{t('istikhara.overview.ruler').toUpperCase()}</Text>
+              <Text style={[styles.signLabel, { color: accentColor }]}>{t('istikhara.overview.ruler').toUpperCase()}</Text>
               <Text style={styles.signValue}>
                 {language === 'fr' ? zodiacSign?.planetaryRuler.fr : zodiacSign?.planetaryRuler.en || 'N/A'}
               </Text>
-            </View>
+            </PatternCard>
 
             {/* Quality */}
-            <View style={[styles.signCard, {
-              backgroundColor: `${accent.primary}33`,
-              borderColor: `${accent.primary}33`,
-              shadowColor: accent.primary,
+            <PatternCard style={[styles.signCard, {
+              backgroundColor: `${accentColor}33`,
+              borderColor: `${accentColor}33`,
+              shadowColor: accentColor,
             }]}>
               <Text style={styles.signIcon}>🌙</Text>
-              <Text style={[styles.signLabel, { color: accent.primary }]}>{t('istikhara.overview.quality').toUpperCase()}</Text>
+              <Text style={[styles.signLabel, { color: accentColor }]}>{t('istikhara.overview.quality').toUpperCase()}</Text>
               <Text style={styles.signValue}>{language === 'fr' ? zodiacSign?.modalityFr : zodiacSign?.modality || 'N/A'}</Text>
-            </View>
+            </PatternCard>
           </View>
         </View>
 
@@ -112,59 +148,59 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
         <View style={styles.keyInsightsSection}>
           <Text style={styles.keyInsightsTitle}>Key Insights</Text>
           
-          <View style={[styles.insightCard, {
-            backgroundColor: `${accent.primary}33`,
-            borderColor: `${accent.primary}33`,
-            shadowColor: accent.primary,
+          <PatternCard style={[styles.insightCard, {
+            backgroundColor: `${accentColor}33`,
+            borderColor: `${accentColor}33`,
+            shadowColor: accentColor,
           }]}>
             <View style={[styles.insightIcon, {
-              backgroundColor: `${accent.primary}26`,
+              backgroundColor: `${accentColor}26`,
             }]}>
               <Text style={styles.insightIconText}>📿</Text>
             </View>
             <View style={styles.insightContent}>
-              <Text style={[styles.insightLabel, { color: accent.primary }]}>Practice Focus</Text>
+              <Text style={[styles.insightLabel, { color: accentColor }]}>Practice Focus</Text>
               <Text style={styles.insightText}>
                 Recite Divine Names {repetitionCount} times for spiritual alignment
               </Text>
             </View>
-          </View>
+          </PatternCard>
           
-          <View style={[styles.insightCard, {
-            backgroundColor: `${accent.primary}33`,
-            borderColor: `${accent.primary}33`,
-            shadowColor: accent.primary,
+          <PatternCard style={[styles.insightCard, {
+            backgroundColor: `${accentColor}33`,
+            borderColor: `${accentColor}33`,
+            shadowColor: accentColor,
           }]}>
             <View style={[styles.insightIcon, {
-              backgroundColor: `${accent.primary}26`,
+              backgroundColor: `${accentColor}26`,
             }]}>
               <Text style={styles.insightIconText}>{burujProfile.element_emoji}</Text>
             </View>
             <View style={styles.insightContent}>
-              <Text style={[styles.insightLabel, { color: accent.primary }]}>Elemental Advice</Text>
+              <Text style={[styles.insightLabel, { color: accentColor }]}>Elemental Advice</Text>
               <Text style={styles.insightText}>
                 Embrace {language === 'fr' ? getElementNameFr(burujProfile.element).toLowerCase() : burujProfile.element.toLowerCase()} qualities through mindful presence
               </Text>
             </View>
-          </View>
+          </PatternCard>
           
-          <View style={[styles.insightCard, {
-            backgroundColor: `${accent.primary}33`,
-            borderColor: `${accent.primary}33`,
-            shadowColor: accent.primary,
+          <PatternCard style={[styles.insightCard, {
+            backgroundColor: `${accentColor}33`,
+            borderColor: `${accentColor}33`,
+            shadowColor: accentColor,
           }]}>
             <View style={[styles.insightIcon, {
-              backgroundColor: `${accent.primary}26`,
+              backgroundColor: `${accentColor}26`,
             }]}>
               <Text style={styles.insightIconText}>🧭</Text>
             </View>
             <View style={styles.insightContent}>
-              <Text style={[styles.insightLabel, { color: accent.primary }]}>Path Guidance</Text>
+              <Text style={[styles.insightLabel, { color: accentColor }]}>Path Guidance</Text>
               <Text style={styles.insightText}>
                 Contemplate {zodiacSign?.nameEn} wisdom in moments of decision
               </Text>
             </View>
-          </View>
+          </PatternCard>
         </View>
 
         {/* Collapsible Spiritual Details - Premium */}
@@ -176,8 +212,8 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
         >
           <TouchableOpacity
             style={[styles.detailsToggle, {
-              backgroundColor: `${accent.primary}26`,
-              borderColor: `${accent.primary}33`,
+              backgroundColor: `${accentColor}26`,
+              borderColor: `${accentColor}33`,
             }]}
             onPress={() => setShowDetails(!showDetails)}
             activeOpacity={0.7}
@@ -188,16 +224,16 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
                 {showDetails ? t('istikhara.overview.hideDetails') : t('istikhara.overview.showDetails')}
               </Text>
             </View>
-            <Text style={[styles.detailsToggleChevron, { color: accent.primary }]}>{showDetails ? '▼' : '▶'}</Text>
+            <Text style={[styles.detailsToggleChevron, { color: accentColor }]}>{showDetails ? '▼' : '▶'}</Text>
           </TouchableOpacity>
 
         {showDetails && (
-          <View style={[styles.detailsSection, {
-            backgroundColor: `${accent.primary}33`,
-            borderColor: `${accent.primary}33`,
+          <PatternCard style={[styles.detailsSection, {
+            backgroundColor: `${accentColor}33`,
+            borderColor: `${accentColor}33`,
           }]}>
             {/* Spiritual Practice */}
-            <Text style={[styles.detailSectionTitle, { color: accent.primary }]}>
+            <Text style={[styles.detailSectionTitle, { color: accentColor }]}> 
               {language === 'en' ? 'SPIRITUAL PRACTICE' : 'PRATIQUE SPIRITUELLE'}
             </Text>
             
@@ -206,30 +242,30 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
               <View style={styles.practiceCard}>
                 <View style={styles.practiceHeader}>
                   <Text style={styles.practiceIcon}>✨</Text>
-                  <Text style={[styles.practiceTitle, { color: accent.primary }]}>
+                  <Text style={[styles.practiceTitle, { color: accentColor }]}>
                     {language === 'en' ? 'Divine Names' : 'Noms Divins'}
                   </Text>
                 </View>
                 <Text style={styles.practiceArabic}>{burujProfile.spiritual_practice.divine_names.arabic}</Text>
-                <Text style={styles.practiceTransliteration}>{burujProfile.spiritual_practice.divine_names.transliteration}</Text>
+                <Text style={[styles.practiceTransliteration, { color: accentColor }]}>{burujProfile.spiritual_practice.divine_names.transliteration}</Text>
                 <Text style={styles.practiceTranslation}>
                   {burujProfile.spiritual_practice.divine_names.translation[language as 'en' | 'fr']}
                 </Text>
-                <View style={[styles.practiceCount, { backgroundColor: `${accent.primary}1A` }]}>
+                <View style={[styles.practiceCount, { backgroundColor: `${accentColor}1A` }]}> 
                   <Text style={styles.practiceCountLabel}>{language === 'en' ? 'Recite' : 'Réciter'}</Text>
-                  <Text style={[styles.practiceCountValue, { color: accent.primary }]}>{repetitionCount}×</Text>
+                  <Text style={[styles.practiceCountValue, { color: accentColor }]}>{repetitionCount}×</Text>
                 </View>
               </View>
             )}
 
-            <View style={[styles.detailDivider, { backgroundColor: `${accent.primary}26` }]} />
+            <View style={[styles.detailDivider, { backgroundColor: `${accentColor}26` }]} />
 
             {/* Practice Night */}
             {burujProfile.spiritual_practice?.practice_night && (
               <View style={styles.practiceCard}>
                 <View style={styles.practiceHeader}>
                   <Text style={styles.practiceIcon}>🌙</Text>
-                  <Text style={[styles.practiceTitle, { color: accent.primary }]}>
+                  <Text style={[styles.practiceTitle, { color: accentColor }]}>
                     {language === 'en' ? 'Practice Night' : 'Nuit de Pratique'}
                   </Text>
                 </View>
@@ -244,55 +280,55 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
               </View>
             )}
 
-            <View style={[styles.detailDivider, { backgroundColor: `${accent.primary}26` }]} />
+            <View style={[styles.detailDivider, { backgroundColor: `${accentColor}26` }]} />
 
             {/* Spiritual Guardians */}
-            <Text style={[styles.detailSectionTitle, { color: accent.primary }]}>
+            <Text style={[styles.detailSectionTitle, { color: accentColor }]}>
               {language === 'en' ? 'SPIRITUAL GUARDIANS' : 'GARDIENS SPIRITUELS'}
             </Text>
             
             <View style={styles.guardiansGrid}>
               {/* Angel */}
               {burujProfile.spiritual_practice?.angel && (
-                <View style={[styles.guardianCard, { borderColor: `${accent.primary}26` }]}>
+                <PatternCard style={[styles.guardianCard, { borderColor: `${accentColor}26` }]}>
                   <Text style={styles.guardianIcon}>👼</Text>
-                  <Text style={[styles.guardianLabel, { color: accent.primary }]}>{language === 'en' ? 'Angel' : 'Ange'}</Text>
+                  <Text style={[styles.guardianLabel, { color: accentColor }]}>{language === 'en' ? 'Angel' : 'Ange'}</Text>
                   <Text style={styles.guardianArabic}>{burujProfile.spiritual_practice.angel.arabic}</Text>
-                  <Text style={styles.guardianName}>{burujProfile.spiritual_practice.angel.transliteration}</Text>
-                </View>
+                  <Text style={[styles.guardianName, { color: accentColor }]}>{burujProfile.spiritual_practice.angel.transliteration}</Text>
+                </PatternCard>
               )}
 
               {/* Jinn */}
               {burujProfile.spiritual_practice?.jinn && (
-                <View style={[styles.guardianCard, { borderColor: `${accent.primary}26` }]}>
+                <PatternCard style={[styles.guardianCard, { borderColor: `${accentColor}26` }]}>
                   <Text style={styles.guardianIcon}>🔮</Text>
-                  <Text style={[styles.guardianLabel, { color: accent.primary }]}>{language === 'en' ? 'Jinn King' : 'Roi Jinn'}</Text>
+                  <Text style={[styles.guardianLabel, { color: accentColor }]}>{language === 'en' ? 'Jinn King' : 'Roi Jinn'}</Text>
                   <Text style={styles.guardianArabic}>{burujProfile.spiritual_practice.jinn.arabic}</Text>
-                  <Text style={styles.guardianName}>{burujProfile.spiritual_practice.jinn.transliteration}</Text>
-                </View>
+                  <Text style={[styles.guardianName, { color: accentColor }]}>{burujProfile.spiritual_practice.jinn.transliteration}</Text>
+                </PatternCard>
               )}
             </View>
 
-            <View style={[styles.detailDivider, { backgroundColor: `${accent.primary}26` }]} />
+            <View style={[styles.detailDivider, { backgroundColor: `${accentColor}26` }]} />
 
             {/* Quranic Verse */}
             {burujProfile.spiritual_practice?.quranic_verse && (
               <View style={styles.practiceCard}>
                 <View style={styles.practiceHeader}>
                   <Text style={styles.practiceIcon}>📖</Text>
-                  <Text style={[styles.practiceTitle, { color: accent.primary }]}>
+                  <Text style={[styles.practiceTitle, { color: accentColor }]}>
                     {language === 'en' ? 'Quranic Connection' : 'Connexion Coranique'}
                   </Text>
                 </View>
-                <Text style={[styles.verseReference, { color: accent.primary }]}>{burujProfile.spiritual_practice.quranic_verse.reference}</Text>
+                <Text style={[styles.verseReference, { color: accentColor }]}>{burujProfile.spiritual_practice.quranic_verse.reference}</Text>
                 <Text style={styles.practiceArabic}>{burujProfile.spiritual_practice.quranic_verse.arabic}</Text>
-                <Text style={styles.practiceTransliteration}>{burujProfile.spiritual_practice.quranic_verse.transliteration}</Text>
+                <Text style={[styles.practiceTransliteration, { color: accentColor }]}>{burujProfile.spiritual_practice.quranic_verse.transliteration}</Text>
                 <Text style={styles.practiceTranslation}>
                   {burujProfile.spiritual_practice.quranic_verse.translation[language as 'en' | 'fr']}
                 </Text>
               </View>
             )}
-          </View>
+          </PatternCard>
         )}
         </PremiumSection>
       </View>
@@ -308,12 +344,21 @@ const styles = StyleSheet.create({
   content: {
     padding: Spacing.lg,
   },
+  patternCard: {
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  patternLayer: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.55,
+  },
   // Core Insight Card - Matches Blue Overview
   coreInsightCard: {
     borderRadius: 16,
     borderWidth: 1,
     padding: Spacing.xl,
     marginBottom: Spacing.lg,
+    overflow: 'hidden',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
@@ -375,6 +420,7 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     alignItems: 'center',
     borderWidth: 1,
+    overflow: 'hidden',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -413,6 +459,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
     flexDirection: 'row',
     alignItems: 'flex-start',
+    overflow: 'hidden',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
@@ -474,6 +521,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: Spacing.xl,
     marginBottom: Spacing.lg,
+    overflow: 'hidden',
   },
   detailSectionTitle: {
     fontSize: 14,
@@ -556,7 +604,7 @@ const styles = StyleSheet.create({
   },
   practiceTransliteration: {
     fontSize: 16,
-    color: '#93c5fd',
+    color: 'rgba(255, 255, 255, 0.78)',
     marginBottom: Spacing.sm,
     fontStyle: 'italic',
   },
@@ -611,6 +659,7 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     alignItems: 'center',
     borderWidth: 1,
+    overflow: 'hidden',
   },
   guardianIcon: {
     fontSize: 28,
@@ -630,7 +679,7 @@ const styles = StyleSheet.create({
   },
   guardianName: {
     fontSize: 12,
-    color: '#93c5fd',
+    color: 'rgba(255, 255, 255, 0.78)',
     textAlign: 'center',
   },
 });

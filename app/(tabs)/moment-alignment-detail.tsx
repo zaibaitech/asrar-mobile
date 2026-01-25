@@ -494,7 +494,7 @@ export default function MomentAlignmentDetailScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="analytics-outline" size={20} color="#8B7355" />
-            <Text style={styles.sectionTitle}>{t('asrariya.timingAnalysis') || 'Timing Analysis For You'}</Text>
+            <Text style={styles.sectionTitle}>{t('asrariya.timingAnalysis')}</Text>
           </View>
           <TimingAnalysisSection
             context="moment"
@@ -516,7 +516,7 @@ export default function MomentAlignmentDetailScreen() {
                 <Text style={styles.planetaryHourLabel}>{t('planetaryHours.currentHour')}</Text>
                 <View style={[styles.hourBadge, { backgroundColor: 'rgba(139, 115, 85, 0.15)' }]}>
                   <Text style={[styles.hourBadgeText, { color: '#8B7355' }]}>
-                    Hour #{planetaryData.currentHour.hourNumber}
+                    {t('planetaryHours.hourNumber', { number: planetaryData.currentHour.hourNumber })}
                   </Text>
                 </View>
               </View>
@@ -563,7 +563,7 @@ export default function MomentAlignmentDetailScreen() {
                   >
                   <Text style={[styles.hourBadgeText, { color: '#64B5F6' }]}
                     >
-                    Hour #{planetaryData.nextHour.hourNumber}
+                    {t('planetaryHours.hourNumber', { number: planetaryData.nextHour.hourNumber })}
                   </Text>
                 </View>
               </View>
@@ -593,12 +593,12 @@ export default function MomentAlignmentDetailScreen() {
               <View style={[styles.planetaryHourCard, { backgroundColor: 'rgba(255, 255, 255, 0.015)' }]}
                 >
                 <View style={styles.planetaryHourHeader}>
-                  <Text style={styles.planetaryHourLabel}>Hour After Next</Text>
+                  <Text style={styles.planetaryHourLabel}>{t('planetaryHours.hourAfterNext')}</Text>
                   <View style={[styles.hourBadge, { backgroundColor: 'rgba(148, 163, 184, 0.15)' }]}
                     >
                     <Text style={[styles.hourBadgeText, { color: '#94a3b8' }]}
                       >
-                      Hour #{planetaryData.afterNextHour.hourNumber}
+                      {t('planetaryHours.hourNumber', { number: planetaryData.afterNextHour.hourNumber })}
                     </Text>
                   </View>
                 </View>

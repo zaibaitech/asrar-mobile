@@ -176,6 +176,7 @@ export const translations = {
         title: "Manazil",
         badge: "Your Resonance",
         completeProfile: "Complete profile",
+        advancedPractices: "Advanced practices",
         todaysMansion: "Today's Mansion",
         yourMansion: "Your Mansion",
         dailyElement: "Daily Element",
@@ -209,6 +210,7 @@ export const translations = {
         todayApprox: "≈ Manazil today (approx): {name}",
         personal: "Your Baseline Mansion: {name}",
         personalMissing: "🧿 Your Manazil: complete profile",
+        personalizedFor: "Personalized for",
         resonance: {
           harmonious: "Resonance: strongly aligned",
           supportive: "Resonance: supportive",
@@ -563,6 +565,9 @@ export const translations = {
         learnMore: "Learn More",
         collapse: "Show Less",
       },
+      retry: "Retry",
+      on: "ON",
+      off: "OFF",
       calculate: "Calculate",
       clear: "Clear",
       submit: "Submit",
@@ -3155,6 +3160,11 @@ export const translations = {
       personalizedFor: "Personalized for your spiritual profile",
       analyzing: "Analyzing timing...",
       timingAnalysis: "Timing Analysis For You",
+      optimalUntil: "Optimal window until",
+      errors: {
+        unableToCalculateTiming: "Unable to calculate timing",
+        unableToLoadAnalysis: "Unable to load analysis",
+      },
       whyThisRating: "Why This Rating?",
       whatThisMeans: "What This Means For You",
       recommended: "Recommended Now",
@@ -5590,6 +5600,8 @@ export const translations = {
     planetaryHours: {
       title: "Planetary Hours",
       currentHour: "Current Planetary Hour",
+      hourAfterNext: "Hour After Next",
+      hourNumber: "Hour #{number}",
       planet: "Planet",
       startTime: "Start Time",
       endTime: "End Time",
@@ -8206,6 +8218,28 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           career: "Career Guidance",
           blessedDay: "Blessed Day",
           spiritual: "Spiritual Practice",
+          health: "Health",
+        },
+      },
+
+      // Health Awareness Tab
+      health: {
+        title: "Health Awareness",
+        subtitle: "Traditional wisdom for your spiritual nature (not medical advice)",
+        sections: {
+          watchOutFor: "⚠️ Watch Out For",
+          thingsToAvoid: "🚫 Things to Avoid",
+          foodsThatHelpYou: "🍎 Foods That Help You",
+          spiritualProtection: "🛡️ Spiritual Protection",
+          westAfricanTraditions: "🌍 West African Traditions",
+        },
+        disclaimer: "💡 This is traditional spiritual guidance, not medical advice. For health concerns, consult a qualified clinician.",
+        empty: {
+          title: "Health Awareness",
+          text: "No data is available for this sign yet.",
+        },
+        a11y: {
+          toggle: "Expand or collapse health awareness",
         },
       },
       
@@ -8644,6 +8678,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         title: "Manazil",
         badge: "Votre Résonance",
         completeProfile: "Compléter le profil",
+        advancedPractices: "Pratiques avancées",
         todaysMansion: "Demeure du jour",
         yourMansion: "Votre demeure",
         dailyElement: "Élément du jour",
@@ -8677,6 +8712,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         todayApprox: "≈ Manazil du jour (approx.) : {name}",
         personal: "Votre Demeure de Base : {name}",
         personalMissing: "🧿 Votre Manazil : complétez le profil",
+        personalizedFor: "Personnalisé pour",
         resonance: {
           harmonious: "Résonance : fortement alignée",
           supportive: "Résonance : favorable",
@@ -9030,6 +9066,9 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         learnMore: "En Savoir Plus",
         collapse: "Afficher Moins",
       },
+      retry: "Réessayer",
+      on: "OUI",
+      off: "NON",
       calculate: "Calculer",
       clear: "Effacer",
       submit: "Soumettre",
@@ -11605,6 +11644,11 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       personalizedFor: "Personnalisé pour votre profil spirituel",
       analyzing: "Analyse du timing...",
       timingAnalysis: "Analyse du Timing Pour Vous",
+      optimalUntil: "Fenêtre optimale jusqu'à",
+      errors: {
+        unableToCalculateTiming: "Impossible de calculer le timing",
+        unableToLoadAnalysis: "Impossible de charger l'analyse",
+      },
       whyThisRating: "Pourquoi Cette Évaluation ?",
       whatThisMeans: "Ce Que Cela Signifie Pour Vous",
       recommended: "Recommandé Maintenant",
@@ -14207,6 +14251,8 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
     planetaryHours: {
       title: "Heures Planétaires",
       currentHour: "Heure Planétaire Actuelle",
+      hourAfterNext: "Heure après la suivante",
+      hourNumber: "Heure #{number}",
       planet: "Planète",
       startTime: "Heure de Début",
       endTime: "Heure de Fin",
@@ -16620,6 +16666,28 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           career: "Guidance Professionnelle",
           blessedDay: "Jour Béni",
           spiritual: "Pratique Spirituelle",
+          health: "Santé",
+        },
+      },
+
+      // Onglet Vigilance santé
+      health: {
+        title: "Vigilance santé",
+        subtitle: "Sagesse traditionnelle pour ta nature spirituelle (pas un avis médical)",
+        sections: {
+          watchOutFor: "⚠️ Points d'attention",
+          thingsToAvoid: "🚫 Choses à éviter",
+          foodsThatHelpYou: "🍎 Aliments qui t'aident",
+          spiritualProtection: "🛡️ Protection spirituelle",
+          westAfricanTraditions: "🌍 Traditions ouest-africaines",
+        },
+        disclaimer: "💡 Ceci est une guidance spirituelle traditionnelle, pas un avis médical. En cas de souci de santé, consultez un professionnel qualifié.",
+        empty: {
+          title: "Vigilance santé",
+          text: "Aucune donnée n'est disponible pour ce signe pour l'instant.",
+        },
+        a11y: {
+          toggle: "Développer ou réduire la section vigilance santé",
         },
       },
       
@@ -16885,6 +16953,9 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       },
 
       loading: "جارٍ التحميل...",
+      retry: "إعادة المحاولة",
+      on: "تشغيل",
+      off: "إيقاف",
       unknown: "—",
       element: "العنصر",
       you: "أنت",
@@ -16895,6 +16966,28 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         fire: "نار",
         water: "ماء",
         earth: "أرض",
+      },
+    },
+
+    planetaryHours: {
+      title: "الساعات الكوكبية",
+      currentHour: "الساعة الكوكبية الحالية",
+      hourAfterNext: "الساعة بعد التالية",
+      hourNumber: "الساعة رقم {number}",
+      planet: "الكوكب",
+      startTime: "وقت البداية",
+      endTime: "وقت النهاية",
+      dayHours: "ساعات النهار",
+      nightHours: "ساعات الليل",
+
+      planets: {
+        sun: "الشمس",
+        moon: "القمر",
+        mars: "المريخ",
+        mercury: "عطارد",
+        jupiter: "المشتري",
+        venus: "الزهرة",
+        saturn: "زحل",
       },
     },
 
@@ -17325,6 +17418,39 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         missingNames: "يرجى إدخال كلا الاسمين للمتابعة",
         nameRequired: "الاسم مطلوب",
       },
+
+      // نتائج "مَن أنا"
+      results: {
+        tabs: {
+          overview: "نظرة عامة",
+          personality: "الشخصية",
+          career: "المهنة",
+          blessedDay: "اليوم المبارك",
+          spiritual: "الممارسة الروحية",
+          health: "الصحة",
+        },
+      },
+
+      // تبويب التنبيه الصحي
+      health: {
+        title: "التنبيه الصحي",
+        subtitle: "حكمة تقليدية لطبيعتك الروحية (ليست نصيحة طبية)",
+        sections: {
+          watchOutFor: "⚠️ انتبه لـ",
+          thingsToAvoid: "🚫 تجنّب",
+          foodsThatHelpYou: "🍎 أطعمة نافعة لك",
+          spiritualProtection: "🛡️ حماية روحية",
+          westAfricanTraditions: "🌍 تقاليد غرب إفريقيا",
+        },
+        disclaimer: "💡 هذه إرشادات روحية تقليدية وليست نصيحة طبية. للمشكلات الصحية استشر مختصًا مؤهلًا.",
+        empty: {
+          title: "التنبيه الصحي",
+          text: "لا توجد بيانات لهذا البرج بعد.",
+        },
+        a11y: {
+          toggle: "توسيع أو طي قسم التنبيه الصحي",
+        },
+      },
     },
     
     // Asrariya Practice Timing
@@ -17370,6 +17496,11 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       personalizedFor: "مُخصّص لملفك الروحي",
       analyzing: "جارٍ تحليل التوقيت...",
       timingAnalysis: "تحليل التوقيت لك",
+      optimalUntil: "النافذة المثالية حتى",
+      errors: {
+        unableToCalculateTiming: "تعذّر حساب التوقيت",
+        unableToLoadAnalysis: "تعذّر تحميل التحليل",
+      },
       whyThisRating: "لماذا هذا التقييم؟",
       whatThisMeans: "ماذا يعني هذا لك",
       recommended: "موصى به الآن",
@@ -17800,6 +17931,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         title: "المنازل",
         badge: "رنينك",
         completeProfile: "أكمل الملف",
+        advancedPractices: "ممارسات متقدمة",
         todaysMansion: "منزلة اليوم",
         yourMansion: "منزلتك",
         dailyElement: "عنصر اليوم",
@@ -17833,6 +17965,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         todayApprox: "≈ منازل اليوم (تقريبي): {name}",
         personal: "منزل أساسك: {name}",
         personalMissing: "🧿 منزلك: أكمل الملف الشخصي",
+        personalizedFor: "مُخصّص لـ",
         resonance: {
           harmonious: "التوافق: قوي",
           supportive: "التوافق: داعم",

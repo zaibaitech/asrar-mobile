@@ -178,7 +178,7 @@ export function TimingAnalysisSection({
   
   const [result, setResult] = useState<AsrariyaTimingResult | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [errorKey, setErrorKey] = useState<'unableToCalculateTiming' | null>(null);
   // Default to expanded for better UX - users should see reasoning immediately
   const [expandedSection, setExpandedSection] = useState<string | null>('breakdown');
   const [nextWindow, setNextWindow] = useState<{ startTime: Date; description: string } | null>(null);
@@ -193,7 +193,7 @@ export function TimingAnalysisSection({
     }
 
     setLoading(true);
-    setError(null);
+    setErrorKey(null);
 
     try {
       // Build spiritual profile from user profile
@@ -206,7 +206,7 @@ export function TimingAnalysisSection({
       const analysisResult = await analyzeTimingForPractice(
         spiritualProfile,
         { category },
-        { location: stableLocation, moment: currentMoment }
+        { location: stableLocation, moment: currentMoment, language: lang }
       );
       
       setResult(analysisResult);
@@ -217,7 +217,7 @@ export function TimingAnalysisSection({
         const next = await findNextOptimalWindow(
           spiritualProfile,
           { category },
-          { location: stableLocation, lookAheadHours: 12, minimumScore: 70 }
+          { location: stableLocation, lookAheadHours: 12, minimumScore: 70, language: lang }
         );
         if (next) {
           setNextWindow({ startTime: next.startTime, description: next.description });
@@ -225,11 +225,11 @@ export function TimingAnalysisSection({
       }
     } catch (err) {
       console.error('[TimingAnalysis] Error:', err);
-      setError('Unable to calculate timing');
+      setErrorKey('unableToCalculateTiming');
     } finally {
       setLoading(false);
     }
-  }, [profile, providedMoment, stableLocation, category]);
+  }, [profile, providedMoment, stableLocation, category, lang]);
 
   useEffect(() => {
     runAnalysis();
@@ -241,7 +241,7 @@ export function TimingAnalysisSection({
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="small" color="#8B7355" />
         <Text style={styles.loadingText}>
-          {t('asrariya.analyzing') || 'Analyzing timing...'}
+          {t('asrariya.analyzing')}
         </Text>
       </View>
     );
@@ -253,20 +253,24 @@ export function TimingAnalysisSection({
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyIcon}>👤</Text>
         <Text style={styles.emptyText}>
-          {t('asrariya.noProfile') || 'Complete your profile for personalized timing analysis'}
+          {t('asrariya.noProfile')}
         </Text>
       </View>
     );
   }
 
   // Error state
-  if (error || !result) {
+  if (errorKey || !result) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorIcon}>⚠️</Text>
-        <Text style={styles.errorText}>{error || 'Unable to load analysis'}</Text>
+        <Text style={styles.errorText}>
+          {errorKey
+            ? t(`asrariya.errors.${errorKey}`)
+            : t('asrariya.errors.unableToLoadAnalysis')}
+        </Text>
         <TouchableOpacity onPress={runAnalysis} style={styles.retryButton}>
-          <Text style={styles.retryText}>{t('common.retry') || 'Retry'}</Text>
+          <Text style={styles.retryText}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -286,7 +290,7 @@ export function TimingAnalysisSection({
             <Text style={styles.scoreIcon}>{levelConfig.icon}</Text>
             <View style={styles.scoreTextContainer}>
               <Text style={styles.sectionTitle}>
-                {t('asrariya.timingAnalysis') || 'Timing Analysis For You'}
+                {t('asrariya.timingAnalysis')}
               </Text>
               <Text style={[styles.levelLabel, { color: levelConfig.color }]}>
                 {levelConfig.label[lang]}
@@ -313,7 +317,7 @@ export function TimingAnalysisSection({
         </View>
 
         {/* Short Summary */}
-        <Text style={styles.summaryText}>{result.shortSummary}</Text>
+          <Text style={styles.summaryText}>{result.shortSummary}</Text>
       </LinearGradient>
 
       {/* Layer Breakdown */}
@@ -326,7 +330,7 @@ export function TimingAnalysisSection({
             <View style={styles.sectionHeaderLeft}>
               <Ionicons name="analytics-outline" size={18} color="#8B7355" />
               <Text style={styles.sectionHeaderText}>
-                {t('asrariya.whyThisRating') || 'Why This Rating?'}
+                {t('asrariya.whyThisRating')}
               </Text>
             </View>
             <Ionicons 
@@ -349,7 +353,11 @@ export function TimingAnalysisSection({
                       <View style={styles.layerTextContainer}>
                         <Text style={styles.layerName}>{layerLabel[lang]}</Text>
                         <Text style={styles.layerReasoning} numberOfLines={2}>
-                          {layer.reasoning}
+                          {lang === 'ar'
+                            ? (layer.reasoningAr || layer.reasoning)
+                            : lang === 'fr'
+                              ? (layer.reasoningFr || layer.reasoning)
+                              : layer.reasoning}
                         </Text>
                       </View>
                     </View>
@@ -380,7 +388,7 @@ export function TimingAnalysisSection({
           <View style={styles.guidanceHeader}>
             <Text style={styles.guidanceIcon}>🎯</Text>
             <Text style={styles.guidanceTitle}>
-              {t('asrariya.whatThisMeans') || 'What This Means For You'}
+              {t('asrariya.whatThisMeans')}
             </Text>
           </View>
           <Text style={styles.reasoningText}>{result.reasoning}</Text>
@@ -391,7 +399,7 @@ export function TimingAnalysisSection({
             {result.enhancements.length > 0 && !hideSections.includes('enhancements') && (
               <View style={styles.actionList}>
                 <Text style={styles.actionListTitle}>
-                  ✅ {t('asrariya.recommended') || 'Recommended Now'}
+                  ✅ {t('asrariya.recommended')}
                 </Text>
                 {result.enhancements.slice(0, 4).map((enh, idx) => (
                   <View key={idx} style={styles.actionItem}>
@@ -409,7 +417,7 @@ export function TimingAnalysisSection({
             {result.cautions.length > 0 && (
               <View style={styles.actionList}>
                 <Text style={[styles.actionListTitle, { color: '#f97316' }]}>
-                  ⚠️ {t('asrariya.cautions') || 'Be Mindful Of'}
+                  ⚠️ {t('asrariya.cautions')}
                 </Text>
                 {result.cautions.slice(0, 3).map((caution, idx) => (
                   <View key={idx} style={styles.actionItem}>
@@ -431,7 +439,7 @@ export function TimingAnalysisSection({
           <View style={styles.alternativeHeader}>
             <Ionicons name="time-outline" size={18} color="#60A5FA" />
             <Text style={styles.alternativeTitle}>
-              {t('asrariya.betterTiming') || 'Better Timing Available'}
+              {t('asrariya.betterTiming')}
             </Text>
           </View>
           <Text style={styles.alternativeText}>
@@ -449,7 +457,7 @@ export function TimingAnalysisSection({
           <View style={styles.windowHeader}>
             <Ionicons name="hourglass-outline" size={16} color="#10b981" />
             <Text style={styles.windowText}>
-              {t('asrariya.optimalUntil') || 'Optimal window until'}{' '}
+              {t('asrariya.optimalUntil')}{' '}
               <Text style={styles.windowTime}>
                 {result.optimalWindowEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </Text>

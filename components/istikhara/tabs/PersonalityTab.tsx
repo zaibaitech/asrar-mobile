@@ -22,7 +22,10 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { DarkTheme, ElementAccents, Spacing, Typography } from "../../../constants/DarkTheme";
+import Svg, { Circle, Defs, Path, Pattern, Rect } from 'react-native-svg';
+import { Spacing, Typography } from "../../../constants/DarkTheme";
+import { ElementColors } from '../../../constants/IstikharaColors';
+import { getZodiacSign } from '../../../constants/zodiacData';
 import { useLanguage } from "../../../contexts/LanguageContext";
 import type { IstikharaData } from "../../../types/istikhara";
 
@@ -40,11 +43,44 @@ interface PersonalityTrait {
   color: string;
 }
 
+function IslamicPatternOverlay({ opacity = 0.06 }: { opacity?: number }) {
+  return (
+    <Svg pointerEvents="none" width="100%" height="100%" style={StyleSheet.absoluteFill}>
+      <Defs>
+        <Pattern id="geom" patternUnits="userSpaceOnUse" width="48" height="48">
+          <Path
+            d="M24 6 L28 20 L42 24 L28 28 L24 42 L20 28 L6 24 L20 20 Z"
+            fill={`rgba(255, 255, 255, ${opacity})`}
+          />
+          <Circle cx="24" cy="24" r="2.2" fill={`rgba(255, 255, 255, ${opacity + 0.01})`} />
+        </Pattern>
+      </Defs>
+      <Rect x="0" y="0" width="100%" height="100%" fill="url(#geom)" />
+    </Svg>
+  );
+}
+
+function PatternCard({ children, style }: { children: React.ReactNode; style?: any }) {
+  return (
+    <View style={[styles.patternCard, style]}>
+      <View pointerEvents="none" style={styles.patternLayer}>
+        <IslamicPatternOverlay />
+      </View>
+      {children}
+    </View>
+  );
+}
+
 export default function PersonalityTab({ data, elementColor }: PersonalityTabProps) {
   const { language } = useLanguage();
   const profile = data.burujProfile;
   const elementKey = (profile.element?.toLowerCase() || 'fire') as "fire" | "earth" | "air" | "water";
-  const accent = ElementAccents[elementKey];
+  const accentColor = elementColor || ElementColors[elementKey]?.primarySolid || '#93c5fd';
+  const borderColor = `${accentColor}33`;
+  const cardBg = `${accentColor}14`;
+  const cardBgStrong = `${accentColor}1F`;
+  const glowBg = `${accentColor}1A`;
+  const zodiac = getZodiacSign(data.burujRemainder);
   const personality = profile.personality?.[language as 'en' | 'fr'] || profile.personality?.en;
 
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['temperament']));
@@ -65,63 +101,63 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
   const traits: PersonalityTrait[] = [
     {
       key: 'temperament',
-      icon: <Brain size={24} color={accent.primary} />,
+      icon: <Brain size={24} color={accentColor} />,
       label: language === 'en' ? 'Temperament' : 'Tempérament',
-      color: accent.primary,
+      color: accentColor,
     },
     {
       key: 'communication',
-      icon: <MessageCircle size={24} color={accent.primary} />,
+      icon: <MessageCircle size={24} color={accentColor} />,
       label: language === 'en' ? 'Communication Style' : 'Style de Communication',
-      color: accent.primary,
+      color: accentColor,
     },
     {
       key: 'anger',
-      icon: <AlertCircle size={24} color={accent.primary} />,
+      icon: <AlertCircle size={24} color={accentColor} />,
       label: language === 'en' ? 'Anger Expression' : 'Expression de la Colère',
-      color: accent.primary,
+      color: accentColor,
     },
     {
       key: 'social_loved',
-      icon: <Heart size={24} color={accent.primary} />,
+      icon: <Heart size={24} color={accentColor} />,
       label: language === 'en' ? 'Social Strengths' : 'Forces Sociales',
-      color: accent.primary,
+      color: accentColor,
     },
     {
       key: 'social_challenge',
-      icon: <Users size={24} color={accent.primary} />,
+      icon: <Users size={24} color={accentColor} />,
       label: language === 'en' ? 'Relationship Dynamics' : 'Dynamiques Relationnelles',
-      color: accent.primary,
+      color: accentColor,
     },
     {
       key: 'social_attraction',
-      icon: <Star size={24} color={accent.primary} />,
+      icon: <Star size={24} color={accentColor} />,
       label: language === 'en' ? 'Natural Magnetism' : 'Magnétisme Naturel',
-      color: accent.primary,
+      color: accentColor,
     },
     {
       key: 'dreams',
-      icon: <Eye size={24} color={accent.primary} />,
+      icon: <Eye size={24} color={accentColor} />,
       label: language === 'en' ? 'Dream Patterns' : 'Motifs de Rêve',
-      color: accent.primary,
+      color: accentColor,
     },
     {
       key: 'life_blessing',
-      icon: <Shield size={24} color={accent.primary} />,
+      icon: <Shield size={24} color={accentColor} />,
       label: language === 'en' ? 'Life Blessings' : 'Bénédictions de Vie',
-      color: accent.primary,
+      color: accentColor,
     },
     {
       key: 'divine_support',
-      icon: <Sparkles size={24} color={accent.primary} />,
+      icon: <Sparkles size={24} color={accentColor} />,
       label: language === 'en' ? 'Divine Support' : 'Soutien Divin',
-      color: accent.primary,
+      color: accentColor,
     },
     {
       key: 'challenge',
-      icon: <TrendingUp size={24} color={accent.primary} />,
+      icon: <TrendingUp size={24} color={accentColor} />,
       label: language === 'en' ? 'Life Challenges' : 'Défis de Vie',
-      color: accent.primary,
+      color: accentColor,
     },
   ];
 
@@ -146,31 +182,36 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
       </View>
 
       {/* Element Badge - Compact, not full gradient */}
-      <View style={[styles.elementBadge, { 
-        borderColor: `${accent.primary}33`, 
-        backgroundColor: `${accent.primary}33`,
-        shadowColor: accent.primary 
+      <PatternCard style={[styles.elementBadge, {
+        borderColor,
+        backgroundColor: cardBg,
+        shadowColor: accentColor,
       }]}>
         <Text style={styles.elementEmoji}>{profile.element_emoji}</Text>
         <View style={styles.elementInfo}>
-          <Text style={[styles.elementText, { color: accent.primary }]}>
+          <Text style={[styles.elementText, { color: accentColor }]}>
             {profile.element.charAt(0).toUpperCase() + profile.element.slice(1)} Element
           </Text>
           <Text style={styles.elementNumber}>
             {language === 'en' ? 'Elemental Number' : 'Numéro Élémentaire'}: {profile.element_number}
           </Text>
+          {!!zodiac && (
+            <Text style={styles.elementZodiacLine}>
+              {language === 'en' ? 'Burūj' : 'Burūj'}: {language === 'fr' ? zodiac.nameFr : zodiac.nameEn} · {zodiac.planetaryRuler?.[language as 'en' | 'fr'] || zodiac.planetaryRuler?.en}
+            </Text>
+          )}
         </View>
-      </View>
+      </PatternCard>
 
       {/* About Profile - Dark card with accent header */}
-      <View style={[styles.summaryCard, { 
-        borderColor: `${accent.primary}33`, 
-        backgroundColor: `${accent.primary}33`,
-        shadowColor: accent.primary 
+      <PatternCard style={[styles.summaryCard, {
+        borderColor,
+        backgroundColor: cardBgStrong,
+        shadowColor: accentColor,
       }]}>
         <View style={styles.summaryHeader}>
-          <Info size={20} color={accent.primary} />
-          <Text style={[styles.summaryTitle, { color: DarkTheme.textPrimary }]}>
+          <Info size={20} color={accentColor} />
+          <Text style={styles.summaryTitle}>
             {language === 'en' ? 'About This Profile' : 'À Propos de ce Profil'}
           </Text>
         </View>
@@ -179,7 +220,7 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
             ? `Your ${profile.element} nature reveals ${availableTraits.length} key aspects of your personality. Each trait offers insights into your character, relationships, and life path.`
             : `Votre nature ${profile.element} révèle ${availableTraits.length} aspects clés de votre personnalité. Chaque trait offre des aperçus sur votre caractère, vos relations et votre chemin de vie.`}
         </Text>
-      </View>
+      </PatternCard>
 
       {/* Personality Traits - Dark with accent icons */}
       {availableTraits.map((trait, index) => {
@@ -187,12 +228,12 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
         const content = (personality as any)[trait.key];
         
         return (
-          <View
+          <PatternCard
             key={trait.key}
             style={[styles.traitCard, { 
-              borderColor: `${accent.primary}33`, 
-              backgroundColor: `${accent.primary}33`,
-              shadowColor: accent.primary 
+              borderColor,
+              backgroundColor: 'rgba(0,0,0,0.16)',
+              shadowColor: accentColor,
             }]}
           >
             <TouchableOpacity
@@ -201,7 +242,7 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
               activeOpacity={0.7}
             >
               <View style={styles.traitTitleRow}>
-                <View style={[styles.traitIcon, { backgroundColor: `${accent.primary}26` }]}>
+                <View style={[styles.traitIcon, { backgroundColor: `${accentColor}1F`, borderColor: `${accentColor}2E` }]}>
                   {trait.icon}
                 </View>
                 <View style={styles.traitTitleContainer}>
@@ -214,9 +255,9 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
                 </View>
               </View>
               {isExpanded ? (
-                <ChevronUp size={20} color={accent.primary} />
+                <ChevronUp size={20} color={accentColor} />
               ) : (
-                <ChevronDown size={20} color={accent.primary} />
+                <ChevronDown size={20} color={accentColor} />
               )}
             </TouchableOpacity>
 
@@ -227,11 +268,11 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
                 {/* Special styling for specific traits */}
                 {trait.key === 'life_blessing' && (
                   <View style={[styles.blessingBadge, { 
-                    backgroundColor: accent.glow, 
-                    borderColor: accent.primary 
+                    backgroundColor: glowBg,
+                    borderColor: `${accentColor}40`,
                   }]}>
-                    <Shield size={16} color={accent.primary} />
-                    <Text style={[styles.blessingText, { color: accent.primary }]}>
+                    <Shield size={16} color={accentColor} />
+                    <Text style={[styles.blessingText, { color: accentColor }]}>
                       {language === 'en' ? 'Divine Blessing' : 'Bénédiction Divine'}
                     </Text>
                   </View>
@@ -239,18 +280,18 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
                 
                 {trait.key === 'challenge' && (
                   <View style={[styles.challengeBadge, { 
-                    backgroundColor: accent.glow, 
-                    borderColor: accent.primary 
+                    backgroundColor: glowBg,
+                    borderColor: `${accentColor}40`,
                   }]}>
-                    <AlertCircle size={16} color={accent.primary} />
-                    <Text style={[styles.challengeText, { color: accent.primary }]}>
+                    <AlertCircle size={16} color={accentColor} />
+                    <Text style={[styles.challengeText, { color: accentColor }]}>
                       {language === 'en' ? 'Area for Growth' : 'Zone de Croissance'}
                     </Text>
                   </View>
                 )}
               </View>
             )}
-          </View>
+          </PatternCard>
         );
       })}
 
@@ -268,6 +309,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0B1020',
+  },
+  patternCard: {
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  patternLayer: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.55,
   },
   scrollContent: {
     padding: Spacing.screenPadding,
@@ -317,6 +366,11 @@ const styles = StyleSheet.create({
   elementNumber: {
     fontSize: Typography.label,
     color: '#cbd5e1',
+  },
+  elementZodiacLine: {
+    marginTop: 6,
+    fontSize: Typography.caption,
+    color: '#94a3b8',
   },
   summaryCard: {
     padding: Spacing.xl,
@@ -373,6 +427,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
   },
   traitTitleContainer: {
     flex: 1,

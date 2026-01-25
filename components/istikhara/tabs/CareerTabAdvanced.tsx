@@ -25,6 +25,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
+import Svg, { Circle, Defs, Path, Pattern, Rect } from 'react-native-svg';
 import { getElementColors } from "../../../constants/ElementColors";
 import { useLanguage } from "../../../contexts/LanguageContext";
 import type { IstikharaCalculationResult } from "../../../services/istikhara/types";
@@ -35,12 +36,70 @@ interface CareerTabAdvancedProps {
   result: IstikharaCalculationResult;
 }
 
+function withAlpha(color: string, alpha01: number): string {
+  const alpha = Math.max(0, Math.min(1, alpha01));
+  if (typeof color !== 'string' || !color.startsWith('#')) return color;
+
+  const hex = color.slice(1);
+  const normalized = hex.length === 3
+    ? hex.split('').map(c => c + c).join('')
+    : hex.length === 6
+      ? hex
+      : null;
+  if (!normalized) return color;
+
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function IslamicPatternOverlay({ opacity = 0.06 }: { opacity?: number }) {
+  return (
+    <Svg pointerEvents="none" width="100%" height="100%" style={StyleSheet.absoluteFill}>
+      <Defs>
+        <Pattern id="geom" patternUnits="userSpaceOnUse" width="48" height="48">
+          <Path
+            d="M24 6 L28 20 L42 24 L28 28 L24 42 L20 28 L6 24 L20 20 Z"
+            fill={`rgba(255, 255, 255, ${opacity})`}
+          />
+          <Circle cx="24" cy="24" r="2.2" fill={`rgba(255, 255, 255, ${opacity + 0.01})`} />
+        </Pattern>
+      </Defs>
+      <Rect x="0" y="0" width="100%" height="100%" fill="url(#geom)" />
+    </Svg>
+  );
+}
+
+function PatternCard({ children, style }: { children: React.ReactNode; style?: any }) {
+  return (
+    <View style={[styles.patternCard, style]}>
+      <View pointerEvents="none" style={styles.patternLayer}>
+        <IslamicPatternOverlay />
+      </View>
+      {children}
+    </View>
+  );
+}
+
 export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
   const { language } = useLanguage();
   const profile = result?.burujProfile;
   const career = profile?.career;
   const elementKey = ((profile?.element ?? 'fire').toLowerCase() as "fire" | "earth" | "air" | "water");
   const colors = getElementColors(elementKey);
+  const accentColor = colors.accent;
+
+  const cardSurface = {
+    backgroundColor: withAlpha(accentColor, 0.14),
+    borderColor: withAlpha(accentColor, 0.20),
+    shadowColor: accentColor,
+  };
+  const badgeSurface = {
+    backgroundColor: withAlpha(accentColor, 0.12),
+    borderColor: withAlpha(accentColor, 0.22),
+    shadowColor: accentColor,
+  };
 
   // DOB-based calculations (or other sources) may not include full career guidance.
   // Avoid crashing the entire Results screen if this section is unavailable.
@@ -182,7 +241,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
       {/* Header */}
       <View style={styles.header}>
         <View style={[styles.iconContainer, { backgroundColor: colors.background }]}>
-          <Briefcase size={32} color={colors.accent} />
+          <Briefcase size={32} color={accentColor} />
         </View>
         <Text style={styles.title}>
           {language === 'en' ? 'Career & Vocation Guidance' : 'Orientation Professionnelle'}
@@ -194,60 +253,48 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
         </Text>
         
         {/* Element Badge */}
-        <View style={[styles.elementBadge, { 
-          backgroundColor: `${colors.accent}33`,
-          borderColor: `${colors.accent}33`,
-          shadowColor: colors.accent
-        }]}>
+        <PatternCard style={[styles.elementBadge, badgeSurface]}>
           <Text style={styles.elementEmoji}>{profile.element_emoji}</Text>
-          <Text style={[styles.elementText, { color: colors.accent }]}>
+          <Text style={[styles.elementText, { color: accentColor }]}>
             {profile.element} {language === 'en' ? 'Element' : 'Élément'}
           </Text>
-        </View>
+        </PatternCard>
       </View>
 
       {/* Traditional Guidance */}
-      <View style={[styles.card, { 
-        backgroundColor: `${colors.accent}33`,
-        borderColor: `${colors.accent}33`,
-        shadowColor: colors.accent
-      }]}>
+      <PatternCard style={[styles.card, cardSurface]}>
         <View style={styles.cardHeader}>
-          <View style={[styles.cardIcon, { backgroundColor: `${colors.accent}26` }]}>
+          <View style={[styles.cardIcon, { backgroundColor: withAlpha(accentColor, 0.15) }]}>
             <Text style={styles.emoji}>📜</Text>
           </View>
           <View style={styles.cardHeaderText}>
-            <Text style={[styles.cardTitle, { color: colors.accent }]}>
+            <Text style={[styles.cardTitle, { color: accentColor }]}>
               {language === 'en' ? 'Traditional Wisdom' : 'Sagesse Traditionnelle'}
             </Text>
           </View>
         </View>
         
-        <View style={styles.quoteContainer}>
+        <View style={[styles.quoteContainer, { borderLeftColor: withAlpha(accentColor, 0.55) }]}>
           <Text style={styles.quote}>
             "{career?.traditional?.[language as 'en' | 'fr'] ?? career?.traditional?.en ?? ''}"
           </Text>
         </View>
         
-        <View style={[styles.divider, { backgroundColor: `${colors.accent}26` }]} />
+        <View style={[styles.divider, { backgroundColor: withAlpha(accentColor, 0.16) }]} />
         <Text style={styles.quoteLabel}>
           {language === 'en' ? 'Traditional Islamic Guidance' : 'Guidance Islamique Traditionnelle'}
         </Text>
-      </View>
+      </PatternCard>
 
       {/* Special Blessing Notice */}
       {hasSpecialBlessing && (
-        <View style={[styles.card, styles.blessingCard, {
-          backgroundColor: `${colors.accent}33`,
-          borderColor: `${colors.accent}33`,
-          shadowColor: colors.accent
-        }]}>
+        <PatternCard style={[styles.card, styles.blessingCard, cardSurface]}>
           <View style={styles.cardHeader}>
-            <View style={[styles.blessingIcon, { backgroundColor: `${colors.accent}26` }]}>
-              <Sparkles size={24} color={colors.accent} />
+            <View style={[styles.blessingIcon, { backgroundColor: withAlpha(accentColor, 0.15) }]}>
+              <Sparkles size={24} color={accentColor} />
             </View>
             <View style={styles.cardHeaderText}>
-              <Text style={[styles.blessingTitle, { color: colors.accent }]}>
+              <Text style={[styles.blessingTitle, { color: accentColor }] }>
                 ✨ {language === 'en' ? 'Special Spiritual Blessing' : 'Bénédiction Spirituelle Spéciale'}
               </Text>
             </View>
@@ -257,31 +304,31 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
               ? 'Despite being a Water element, you receive special blessings from Earth industries. This unique gift allows you to thrive in both water-related AND earth-based careers.'
               : 'Bien que vous soyez un élément Eau, vous recevez des bénédictions spéciales des industries terrestres. Ce don unique vous permet de prospérer dans les carrières liées à l\'eau ET terrestres.'}
           </Text>
-        </View>
+        </PatternCard>
       )}
 
       {/* Control Buttons */}
       <View style={styles.controls}>
         <View style={styles.controlsHeader}>
-          <TrendingUp size={20} color={colors.accent} />
+          <TrendingUp size={20} color={accentColor} />
           <Text style={styles.controlsTitle}>
             {language === 'en' ? 'Recommended Career Fields' : 'Domaines Professionnels'}
           </Text>
         </View>
         <View style={styles.controlButtons}>
           <TouchableOpacity
-            style={[styles.controlButton, { backgroundColor: colors.background }]}
+            style={[styles.controlButton, { backgroundColor: withAlpha(accentColor, 0.10), borderColor: withAlpha(accentColor, 0.18) }]}
             onPress={expandAll}
           >
-            <Text style={[styles.controlButtonText, { color: colors.accent }]}>
+            <Text style={[styles.controlButtonText, { color: accentColor }]}>
               {language === 'en' ? 'Expand All' : 'Tout Développer'}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.controlButton}
+            style={[styles.controlButton, { backgroundColor: withAlpha(accentColor, 0.08), borderColor: withAlpha(accentColor, 0.14) }]}
             onPress={collapseAll}
           >
-            <Text style={styles.controlButtonText}>
+            <Text style={[styles.controlButtonText, { color: 'rgba(255,255,255,0.78)' }]}>
               {language === 'en' ? 'Collapse All' : 'Tout Réduire'}
             </Text>
           </TouchableOpacity>
@@ -295,13 +342,9 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
             const isExpanded = expandedCategories.has(index);
             
             return (
-              <View
+              <PatternCard
                 key={index}
-                style={[styles.categoryCard, { 
-                  backgroundColor: `${colors.accent}33`,
-                  borderColor: `${colors.accent}33`,
-                  shadowColor: colors.accent
-                }]}
+                style={[styles.categoryCard, cardSurface]}
               >
                 <TouchableOpacity
                   style={styles.categoryHeader}
@@ -317,57 +360,53 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
                       </Text>
                     </View>
                   </View>
-                  <View style={[styles.chevronContainer, { backgroundColor: `${colors.accent}26` }]}>
+                  <View style={[styles.chevronContainer, { backgroundColor: withAlpha(accentColor, 0.15) }]}>
                     {isExpanded ? (
-                      <ChevronUp size={20} color={colors.accent} />
+                      <ChevronUp size={20} color={accentColor} />
                     ) : (
-                      <ChevronDown size={20} color={colors.accent} />
+                      <ChevronDown size={20} color={accentColor} />
                     )}
                   </View>
                 </TouchableOpacity>
 
                 {isExpanded && (
                   <View style={styles.categoryItems}>
-                    <View style={styles.itemsDivider} />
+                    <View style={[styles.itemsDivider, { backgroundColor: withAlpha(accentColor, 0.18) }]} />
                     {category.items.map((item, itemIndex) => (
                       <View key={itemIndex} style={styles.careerItem}>
-                        <CheckCircle size={16} color={colors.accent} />
+                        <CheckCircle size={16} color={accentColor} />
                         <Text style={styles.careerItemText}>{item}</Text>
                       </View>
                     ))}
-                    <View style={styles.itemsFooter}>
+                    <View style={[styles.itemsFooter, { borderTopColor: withAlpha(accentColor, 0.12) }]}>
                       <Text style={styles.itemsFooterText}>
                         {category.items.length} {language === 'en' ? 'career paths in this category' : 'parcours dans cette catégorie'}
                       </Text>
                     </View>
                   </View>
                 )}
-              </View>
+              </PatternCard>
             );
           })
         ) : (
-          <View style={styles.emptyState}>
+          <PatternCard style={[styles.emptyState, { backgroundColor: withAlpha(accentColor, 0.10), borderColor: withAlpha(accentColor, 0.16) }]}>
             <MessageCircle size={48} color="rgba(255,255,255,0.3)" />
             <Text style={styles.emptyStateText}>
               {language === 'en' 
                 ? 'Career guidance data is being compiled for your profile' 
                 : 'Les données sont en cours de compilation pour votre profil'}
             </Text>
-          </View>
+          </PatternCard>
         )}
       </View>
 
       {/* Guiding Principle */}
-      <View style={[styles.card, { 
-        backgroundColor: `${colors.accent}33`,
-        borderColor: `${colors.accent}33`,
-        shadowColor: colors.accent
-      }]}>
+      <PatternCard style={[styles.card, cardSurface]}>
         <View style={styles.cardHeader}>
-          <View style={[styles.cardIcon, { backgroundColor: `${colors.accent}26` }]}>
+          <View style={[styles.cardIcon, { backgroundColor: withAlpha(accentColor, 0.15) }]}>
             <Text style={styles.emoji}>💡</Text>
           </View>
-          <Text style={[styles.cardTitle, { color: colors.accent }]}>
+          <Text style={[styles.cardTitle, { color: accentColor }]}>
             {language === 'en' ? 'Guiding Principle' : 'Principe Directeur'}
           </Text>
         </View>
@@ -379,22 +418,18 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
             ? 'Let this principle guide your career decisions and professional journey.'
             : 'Laissez ce principe guider vos décisions de carrière et votre parcours professionnel.'}
         </Text>
-      </View>
+          </PatternCard>
 
       {/* Fields to Avoid */}
       {((career?.avoid?.traditional?.[language as 'en' | 'fr'] ?? career?.avoid?.traditional?.en ?? "None specified") !== "None specified" && 
         (career?.avoid?.traditional?.[language as 'en' | 'fr'] ?? career?.avoid?.traditional?.en ?? "Aucun spécifié") !== "Aucun spécifié") && (
-        <View style={[styles.card, styles.avoidCard, {
-          backgroundColor: `${colors.accent}33`,
-          borderColor: `${colors.accent}33`,
-          shadowColor: colors.accent
-        }]}>
+        <PatternCard style={[styles.card, styles.avoidCard, cardSurface]}>
           <View style={styles.cardHeader}>
-            <View style={[styles.warningIcon, { backgroundColor: `${colors.accent}26` }]}>
-              <AlertTriangle size={24} color={colors.accent} />
+            <View style={[styles.warningIcon, { backgroundColor: withAlpha(accentColor, 0.15) }]}>
+              <AlertTriangle size={24} color={accentColor} />
             </View>
             <View style={styles.cardHeaderText}>
-              <Text style={[styles.avoidTitle, { color: colors.accent }]}>
+              <Text style={[styles.avoidTitle, { color: accentColor }]}>
                 {language === 'en' ? 'Fields to Consider Carefully' : 'Domaines à Considérer Attentivement'}
               </Text>
               <Text style={styles.avoidSubtitle}>
@@ -406,7 +441,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
           </View>
 
           <View style={styles.avoidSection}>
-            <Text style={styles.avoidSectionTitle}>
+            <Text style={[styles.avoidSectionTitle, { color: accentColor }]}>
               📜 {language === 'en' ? 'Traditional Guidance:' : 'Guidance Traditionnelle:'}
             </Text>
             <Text style={styles.avoidQuote}>
@@ -415,7 +450,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
           </View>
 
           <View style={styles.avoidSection}>
-            <Text style={styles.avoidSectionTitle}>
+            <Text style={[styles.avoidSectionTitle, { color: accentColor }]}>
               🌍 {language === 'en' ? 'Modern Application:' : 'Application Moderne:'}
             </Text>
             <Text style={styles.avoidText}>
@@ -431,94 +466,114 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
                 : 'Concentrez vos efforts sur les domaines recommandés ci-dessus pour des résultats optimaux.'}
             </Text>
           </View>
-        </View>
+        </PatternCard>
       )}
 
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={[styles.actionButton, { borderColor: colors.border }]}
-          onPress={handleExportPDF}
-          disabled={isExporting}
-        >
-          <LinearGradient
-            colors={colors.primary}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.actionButtonGradient}
+        <PatternCard style={[styles.actionButtonCard, { borderColor: withAlpha(accentColor, 0.22), backgroundColor: withAlpha(accentColor, 0.14), shadowColor: accentColor }]}>
+          <TouchableOpacity
+            style={styles.actionButtonTouch}
+            onPress={handleExportPDF}
+            disabled={isExporting}
+            activeOpacity={0.85}
           >
+            <LinearGradient
+              colors={[withAlpha(accentColor, 0.22), 'rgba(255,255,255,0.05)', 'rgba(0,0,0,0.18)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={StyleSheet.absoluteFillObject}
+            />
             {isExporting ? (
-              <Text style={styles.actionButtonText}>
-                {language === 'en' ? 'Generating...' : 'Génération...'}
+              <Text style={styles.actionButtonTextMuted}>
+                {language === 'en' ? 'Generating…' : 'Génération…'}
               </Text>
             ) : (
               <>
-                <Download size={20} color="#FFF" />
+                <Download size={20} color={accentColor} />
                 <Text style={styles.actionButtonText}>
                   {language === 'en' ? 'Download PDF' : 'Télécharger PDF'}
                 </Text>
               </>
             )}
-          </LinearGradient>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </PatternCard>
 
-        <TouchableOpacity style={styles.actionButtonSecondary} onPress={handleShare}>
-          <Share2 size={20} color="#FFF" />
-          <Text style={styles.actionButtonText}>
-            {language === 'en' ? 'Share' : 'Partager'}
-          </Text>
-        </TouchableOpacity>
+        <PatternCard style={[styles.actionButtonCard, { borderColor: withAlpha(accentColor, 0.18), backgroundColor: withAlpha(accentColor, 0.10), shadowColor: accentColor }]}>
+          <TouchableOpacity style={styles.actionButtonTouch} onPress={handleShare} activeOpacity={0.85}>
+            <Share2 size={20} color={accentColor} />
+            <Text style={styles.actionButtonText}>
+              {language === 'en' ? 'Share' : 'Partager'}
+            </Text>
+          </TouchableOpacity>
+        </PatternCard>
       </View>
 
       {/* Statistics */}
       <View style={styles.stats}>
-        <LinearGradient
-          colors={colors.primary}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.statCard, { borderColor: colors.border }]}
+        <PatternCard
+          style={[
+            styles.statCard,
+            {
+              borderColor: withAlpha(accentColor, 0.20),
+              backgroundColor: withAlpha(accentColor, 0.12),
+              shadowColor: accentColor,
+            },
+          ]}
         >
           <Text style={styles.statValue}>{categories?.length || 0}</Text>
           <Text style={styles.statLabel}>
             {language === 'en' ? 'Career Fields' : 'Domaines'}
           </Text>
-        </LinearGradient>
+        </PatternCard>
 
-        <LinearGradient
-          colors={colors.primary}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.statCard, { borderColor: colors.border }]}
+        <PatternCard
+          style={[
+            styles.statCard,
+            {
+              borderColor: withAlpha(accentColor, 0.20),
+              backgroundColor: withAlpha(accentColor, 0.12),
+              shadowColor: accentColor,
+            },
+          ]}
         >
           <Text style={styles.statValue}>{totalOpportunities}</Text>
           <Text style={styles.statLabel}>
             {language === 'en' ? 'Opportunities' : 'Opportunités'}
           </Text>
-        </LinearGradient>
+        </PatternCard>
 
-        <LinearGradient
-          colors={colors.primary}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.statCard, { borderColor: colors.border }]}
+        <PatternCard
+          style={[
+            styles.statCard,
+            {
+              borderColor: withAlpha(accentColor, 0.20),
+              backgroundColor: withAlpha(accentColor, 0.12),
+              shadowColor: accentColor,
+            },
+          ]}
         >
           <Text style={styles.statEmoji}>{profile.element_emoji}</Text>
           <Text style={styles.statLabel}>
             {language === 'en' ? 'Your Element' : 'Votre Élément'}
           </Text>
-        </LinearGradient>
+        </PatternCard>
 
-        <LinearGradient
-          colors={colors.primary}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.statCard, { borderColor: colors.border }]}
+        <PatternCard
+          style={[
+            styles.statCard,
+            {
+              borderColor: withAlpha(accentColor, 0.20),
+              backgroundColor: withAlpha(accentColor, 0.12),
+              shadowColor: accentColor,
+            },
+          ]}
         >
           <Text style={styles.statEmoji}>✨</Text>
           <Text style={styles.statLabel}>
             {language === 'en' ? 'Aligned Path' : 'Voie Alignée'}
           </Text>
-        </LinearGradient>
+        </PatternCard>
       </View>
     </ScrollView>
   );
@@ -529,6 +584,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0B1020',
     padding: 16,
+  },
+  patternCard: {
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  patternLayer: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.55,
   },
   header: {
     alignItems: 'center',
@@ -564,6 +627,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 24,
     borderWidth: 2,
+    overflow: 'hidden',
   },
   elementEmoji: {
     fontSize: 24,
@@ -846,29 +910,29 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 24,
   },
-  actionButton: {
-    borderRadius: 12,
+  actionButtonCard: {
+    borderRadius: 14,
+    borderWidth: 1,
     overflow: 'hidden',
-    borderWidth: 2,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    elevation: 8,
   },
-  actionButtonGradient: {
+  actionButtonTouch: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
     paddingVertical: 16,
-  },
-  actionButtonSecondary: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    backgroundColor: 'rgba(30, 58, 138, 0.4)',
-    paddingVertical: 16,
-    borderRadius: 12,
   },
   actionButtonText: {
     color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  actionButtonTextMuted: {
+    color: 'rgba(255,255,255,0.85)',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -881,11 +945,14 @@ const styles = StyleSheet.create({
   statCard: {
     width: (width - 44) / 2,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
     alignItems: 'center',
-    backgroundColor: 'rgba(30, 58, 138, 0.2)',
-    borderColor: 'rgba(96, 165, 250, 0.2)',
+    overflow: 'hidden',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.14,
+    shadowRadius: 18,
+    elevation: 6,
   },
   statValue: {
     fontSize: 32,

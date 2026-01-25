@@ -9,16 +9,16 @@ import { TimingAnalysisSection } from '@/components/timing';
 import { Borders, DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import {
-  BADGE_CONFIG,
-  getBadgeFromScore,
-  type AsrariyaTimingResult,
-  type UnifiedBadge,
-} from '@/services/AsrariyaTimingEngine';
 import { getLunarMansionByIndex, normalizeMansionIndex } from '@/data/lunarMansions';
 import { getManazilGuidance, tr, type ManazilLanguage } from '@/data/manazilGuidance';
 import { getManzilPracticePack } from '@/data/manazilPractices';
 import { useManazilPracticeTracking } from '@/hooks/useManazilPracticeTracking';
+import {
+    BADGE_CONFIG,
+    getBadgeFromScore,
+    type AsrariyaTimingResult,
+    type UnifiedBadge,
+} from '@/services/AsrariyaTimingEngine';
 import { calculateElementalHarmony } from '@/services/ElementalHarmonyService';
 import { getCurrentLunarMansion } from '@/services/LunarMansionService';
 import { Ionicons } from '@expo/vector-icons';
@@ -575,7 +575,7 @@ export default function ManazilScreen() {
                 style={styles.learnMoreBtn}
                 onPress={() => setShowSourceExplainer(true)}
               >
-                <Ionicons name="help-circle-outline" size={18} color={DarkTheme.accent} />
+                <Ionicons name="help-circle-outline" size={18} color={accent} />
               </TouchableOpacity>
             </View>
             <View style={[styles.heroCard, { borderColor: `${accent}35` }]}> 
@@ -649,7 +649,7 @@ export default function ManazilScreen() {
                   >
                     <Ionicons name={tracking.advancedMode ? 'sparkles' : 'sparkles-outline'} size={16} color={accent} />
                     <Text style={styles.advancedToggleText}>
-                      Advanced practices: {tracking.advancedMode ? 'ON' : 'OFF'}
+                      {t('widgets.manazil.advancedPractices')}: {tracking.advancedMode ? t('common.on') : t('common.off')}
                     </Text>
                   </Pressable>
                 </>
@@ -770,7 +770,7 @@ export default function ManazilScreen() {
               <Text style={styles.sectionTitle}>{labels.practice}</Text>
               {personalMansion ? (
                 <Text style={styles.metaText}>
-                  Personalized for: {practiceMansion.nameTransliteration} ({practiceMansion.nameArabic})
+                  {t('widgets.manazil.personalizedFor')}: {practiceMansion.nameTransliteration} ({practiceMansion.nameArabic})
                 </Text>
               ) : null}
               <PremiumSection
@@ -806,11 +806,10 @@ export default function ManazilScreen() {
           {/* Asrariya Timing Analysis - Lunar Mansion Specific */}
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>{t('asrariya.timingAnalysis') || 'Timing Analysis For You'}</Text>
+              <Text style={styles.sectionTitle}>{t('asrariya.timingAnalysis')}</Text>
             </View>
             <TimingAnalysisSection
               context="manazil"
-              practiceCategory="spiritual"
               location={
                 typeof profile?.location?.latitude === 'number' && typeof profile?.location?.longitude === 'number'
                   ? { latitude: profile.location.latitude, longitude: profile.location.longitude }

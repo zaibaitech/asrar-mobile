@@ -25,6 +25,59 @@ import {
     UserSpiritalProfile
 } from './types';
 
+const PRACTICE_CATEGORY_VALUES: PracticeCategory[] = [
+  'protection',
+  'healing',
+  'manifestation',
+  'guidance',
+  'gratitude',
+  'repentance',
+  'knowledge',
+  'provision',
+  'relationship',
+  'general',
+];
+
+function normalizePracticeCategory(category: unknown): PracticeCategory {
+  if (typeof category !== 'string') {
+    return 'general';
+  }
+
+  return (PRACTICE_CATEGORY_VALUES as readonly string[]).includes(category)
+    ? (category as PracticeCategory)
+    : 'general';
+}
+
+const ELEMENT_LABELS: Record<Element, { en: string; fr: string; ar: string }> = {
+  fire: { en: 'Fire', fr: 'Feu', ar: 'نار' },
+  water: { en: 'Water', fr: 'Eau', ar: 'ماء' },
+  air: { en: 'Air', fr: 'Air', ar: 'هواء' },
+  earth: { en: 'Earth', fr: 'Terre', ar: 'أرض' },
+};
+
+const PRACTICE_CATEGORY_LABELS: Record<PracticeCategory, { en: string; fr: string; ar: string }> = {
+  protection: { en: 'protection', fr: 'protection', ar: 'الحماية' },
+  healing: { en: 'healing', fr: 'guérison', ar: 'الشفاء' },
+  manifestation: { en: 'manifestation', fr: 'manifestation', ar: 'التجلّي' },
+  guidance: { en: 'guidance', fr: 'guidance', ar: 'الإرشاد' },
+  gratitude: { en: 'gratitude', fr: 'gratitude', ar: 'الشكر' },
+  repentance: { en: 'repentance', fr: 'repentir', ar: 'التوبة' },
+  knowledge: { en: 'knowledge', fr: 'connaissance', ar: 'المعرفة' },
+  provision: { en: 'provision', fr: 'subsistance', ar: 'الرزق' },
+  relationship: { en: 'relationships', fr: 'relations', ar: 'العلاقات' },
+  general: { en: 'general', fr: 'général', ar: 'عام' },
+};
+
+const PLANET_LABELS: Record<Planet, { en: string; fr: string; ar: string }> = {
+  Sun: { en: 'Sun', fr: 'Soleil', ar: 'الشمس' },
+  Moon: { en: 'Moon', fr: 'Lune', ar: 'القمر' },
+  Mars: { en: 'Mars', fr: 'Mars', ar: 'المريخ' },
+  Mercury: { en: 'Mercury', fr: 'Mercure', ar: 'عطارد' },
+  Jupiter: { en: 'Jupiter', fr: 'Jupiter', ar: 'المشتري' },
+  Venus: { en: 'Venus', fr: 'Vénus', ar: 'الزهرة' },
+  Saturn: { en: 'Saturn', fr: 'Saturne', ar: 'زحل' },
+};
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -238,6 +291,7 @@ export function analyzeElementCompatibility(
   moment: CurrentMoment,
   intent: UserIntent
 ): ElementCompatibilityResult {
+  const category = normalizePracticeCategory(intent?.category);
   const userElement = user.element;
   const dayElement = moment.dayElement;
   const hourElement = moment.planetaryHourElement;
@@ -254,11 +308,15 @@ export function analyzeElementCompatibility(
   // Modifiers based on zodiac rulership
   let modifierScore = 0;
   let modifierReason = '';
+  let modifierReasonFr = '';
+  let modifierReasonAr = '';
   
   // If user's ruling planet matches day ruler, boost score
   if (user.rulingPlanet && moment.dayRuler.toLowerCase() === user.rulingPlanet) {
     modifierScore += 15;
     modifierReason = 'Your ruling planet aligns with the day ruler. ';
+    modifierReasonFr = 'Votre planète dominante est alignée avec le maître du jour. ';
+    modifierReasonAr = 'كوكبك الحاكم متوافق مع حاكم اليوم. ';
   }
   
   // If user's burj element matches their name element (internal harmony)
@@ -267,17 +325,23 @@ export function analyzeElementCompatibility(
     if (burjElement === userElement) {
       modifierScore += 10;
       modifierReason += 'Internal elemental harmony is strong. ';
+      modifierReasonFr += 'L’harmonie élémentaire intérieure est forte. ';
+      modifierReasonAr += 'الانسجام العنصري الداخلي قوي. ';
     }
   }
   
   // Intent-based modifiers
-  const practicePrefs = PRACTICE_ELEMENT_PREFERENCES[intent.category];
+  const practicePrefs = PRACTICE_ELEMENT_PREFERENCES[category];
   if (practicePrefs?.preferred.includes(hourElement)) {
     modifierScore += 10;
-    modifierReason += `Current hour element supports ${intent.category} practice. `;
+    modifierReason += `Current hour element supports ${category} practice. `;
+    modifierReasonFr += `L’élément de l’heure actuelle soutient la pratique de ${PRACTICE_CATEGORY_LABELS[category].fr}. `;
+    modifierReasonAr += `عنصر الساعة الحالية يدعم ممارسة ${PRACTICE_CATEGORY_LABELS[category].ar}. `;
   } else if (practicePrefs?.avoid.includes(hourElement)) {
     modifierScore -= 15;
-    modifierReason += `Current hour element is challenging for ${intent.category}. `;
+    modifierReason += `Current hour element is challenging for ${category}. `;
+    modifierReasonFr += `L’élément de l’heure actuelle est difficile pour ${PRACTICE_CATEGORY_LABELS[category].fr}. `;
+    modifierReasonAr += `عنصر الساعة الحالية مُتعب/صعب لممارسة ${PRACTICE_CATEGORY_LABELS[category].ar}. `;
   }
   
   const finalScore = Math.min(100, Math.max(0, baseScore + modifierScore));
@@ -293,10 +357,28 @@ export function analyzeElementCompatibility(
     primaryRelation,
     modifierReason
   );
+
+  const reasoningFr = generateElementReasoningFr(
+    userElement,
+    dayElement,
+    hourElement,
+    primaryRelation,
+    modifierReasonFr
+  );
+
+  const reasoningAr = generateElementReasoningAr(
+    userElement,
+    dayElement,
+    hourElement,
+    primaryRelation,
+    modifierReasonAr
+  );
   
   return {
     score: finalScore,
     reasoning,
+    reasoningFr,
+    reasoningAr,
     userElement,
     momentElement: hourElement,
     relationship: primaryRelation,
@@ -359,6 +441,64 @@ function generateElementReasoning(
   return modifiers ? `${base} ${modifiers}` : base;
 }
 
+function generateElementReasoningFr(
+  userEl: Element,
+  dayEl: Element,
+  hourEl: Element,
+  relationship: string,
+  modifiers: string
+): string {
+  const user = ELEMENT_LABELS[userEl].fr;
+  const hour = ELEMENT_LABELS[hourEl].fr;
+
+  let base = '';
+  switch (relationship) {
+    case 'same':
+      base = `Alignement élémentaire parfait ! Votre nature ${user} s’harmonise avec l’énergie ${hour} actuelle.`;
+      break;
+    case 'complementary':
+      base = `Flux élémentaire favorable. Votre élément ${user} complète l’énergie ${hour} actuelle.`;
+      break;
+    case 'neutral':
+      base = `Conditions élémentaires neutres. Votre nature ${user} peut travailler avec l’énergie ${hour} actuelle avec conscience.`;
+      break;
+    case 'tension':
+      base = `Tension élémentaire présente. Votre nature ${user} rencontre l’énergie ${hour} — avancez avec équilibre.`;
+      break;
+  }
+
+  return modifiers ? `${base} ${modifiers}` : base;
+}
+
+function generateElementReasoningAr(
+  userEl: Element,
+  dayEl: Element,
+  hourEl: Element,
+  relationship: string,
+  modifiers: string
+): string {
+  const user = ELEMENT_LABELS[userEl].ar;
+  const hour = ELEMENT_LABELS[hourEl].ar;
+
+  let base = '';
+  switch (relationship) {
+    case 'same':
+      base = `تناغم عنصري كامل! طبيعتك (${user}) منسجمة مع طاقة (${hour}) الحالية.`;
+      break;
+    case 'complementary':
+      base = `تدفق عنصري داعم. عنصر (${user}) يُكمل طاقة (${hour}) الحالية.`;
+      break;
+    case 'neutral':
+      base = `ظروف عنصرية محايدة. يمكن لطبيعتك (${user}) أن تعمل مع طاقة (${hour}) الحالية مع الوعي.`;
+      break;
+    case 'tension':
+      base = `هناك توتر عنصري. طبيعتك (${user}) تواجه طاقة (${hour}) — تابع بتوازن.`;
+      break;
+  }
+
+  return modifiers ? `${base} ${modifiers}` : base;
+}
+
 // ============================================================================
 // LAYER 2: PLANETARY RESONANCE
 // ============================================================================
@@ -371,6 +511,7 @@ export function analyzePlanetaryResonance(
   moment: CurrentMoment,
   intent: UserIntent
 ): PlanetaryResonanceResult {
+  const category = normalizePracticeCategory(intent?.category);
   const userPlanet = user.rulingPlanet || 'sun';
   const dayRuler = moment.dayRuler;
   const hourPlanet = moment.planetaryHourPlanet;
@@ -410,11 +551,13 @@ export function analyzePlanetaryResonance(
   
   // Practice-based modifiers
   let practiceModifier = 0;
-  const preferredPlanets = PRACTICE_PLANET_PREFERENCES[intent.category];
-  if (preferredPlanets && preferredPlanets.includes(hourPlanet)) {
+  const preferredPlanets = PRACTICE_PLANET_PREFERENCES[category] ?? PRACTICE_PLANET_PREFERENCES.general;
+  const practiceAligned = preferredPlanets.includes(hourPlanet);
+
+  if (practiceAligned) {
     practiceModifier = 15;
   }
-  if (preferredPlanets && preferredPlanets.includes(dayRuler)) {
+  if (preferredPlanets.includes(dayRuler)) {
     practiceModifier += 5;
   }
   
@@ -429,12 +572,32 @@ export function analyzePlanetaryResonance(
     hourPlanet,
     dayRulerMatch,
     planetaryHourMatch,
-    preferredPlanets.includes(hourPlanet)
+    practiceAligned
+  );
+
+  const reasoningFr = generatePlanetaryReasoningFr(
+    userPlanet,
+    dayRuler,
+    hourPlanet,
+    dayRulerMatch,
+    planetaryHourMatch,
+    practiceAligned
+  );
+
+  const reasoningAr = generatePlanetaryReasoningAr(
+    userPlanet,
+    dayRuler,
+    hourPlanet,
+    dayRulerMatch,
+    planetaryHourMatch,
+    practiceAligned
   );
   
   return {
     score: finalScore,
     reasoning,
+    reasoningFr,
+    reasoningAr,
     dayRulerScore,
     planetaryHourScore,
     dayRulerMatch,
@@ -485,6 +648,72 @@ function generatePlanetaryReasoning(
   return parts.join(' ');
 }
 
+function generatePlanetaryReasoningFr(
+  userPlanet: string,
+  dayRuler: Planet,
+  hourPlanet: Planet,
+  dayMatch: boolean,
+  hourMatch: boolean,
+  practiceAligned: boolean
+): string {
+  const parts: string[] = [];
+  const userP = userPlanet.toLowerCase();
+
+  if (hourMatch) {
+    parts.push(`L’heure planétaire actuelle (${PLANET_LABELS[hourPlanet].fr}) correspond à votre planète dominante — cela amplifie votre force spirituelle.`);
+  } else if (dayMatch) {
+    parts.push(`Le maître du jour (${PLANET_LABELS[dayRuler].fr}) résonne avec votre nature planétaire.`);
+  } else {
+    const friendship = getPlanetaryFriendship(userP, hourPlanet.toLowerCase());
+    if (friendship === 'friend') {
+      parts.push(`L’heure de ${PLANET_LABELS[hourPlanet].fr} est favorable à votre nature ${userP}.`);
+    } else if (friendship === 'enemy') {
+      parts.push(`L’heure de ${PLANET_LABELS[hourPlanet].fr} crée une tension avec votre nature ${userP} — avancez avec conscience.`);
+    } else {
+      parts.push(`L’heure de ${PLANET_LABELS[hourPlanet].fr} a une relation neutre avec votre nature ${userP}.`);
+    }
+  }
+
+  if (practiceAligned) {
+    parts.push('L’heure planétaire actuelle est idéale pour votre pratique.');
+  }
+
+  return parts.join(' ');
+}
+
+function generatePlanetaryReasoningAr(
+  userPlanet: string,
+  dayRuler: Planet,
+  hourPlanet: Planet,
+  dayMatch: boolean,
+  hourMatch: boolean,
+  practiceAligned: boolean
+): string {
+  const parts: string[] = [];
+  const userP = userPlanet.toLowerCase();
+
+  if (hourMatch) {
+    parts.push(`الساعة الكوكبية الحالية (${PLANET_LABELS[hourPlanet].ar}) تطابق كوكبك الحاكم — ما يعزز قوتك الروحية.`);
+  } else if (dayMatch) {
+    parts.push(`حاكم اليوم (${PLANET_LABELS[dayRuler].ar}) ينسجم مع طبيعتك الكوكبية.`);
+  } else {
+    const friendship = getPlanetaryFriendship(userP, hourPlanet.toLowerCase());
+    if (friendship === 'friend') {
+      parts.push(`ساعة ${PLANET_LABELS[hourPlanet].ar} داعمة لطبيعتك (${userP}).`);
+    } else if (friendship === 'enemy') {
+      parts.push(`ساعة ${PLANET_LABELS[hourPlanet].ar} تُحدث توترًا مع طبيعتك (${userP}) — تابع بوعي.`);
+    } else {
+      parts.push(`ساعة ${PLANET_LABELS[hourPlanet].ar} علاقتها محايدة مع طبيعتك (${userP}).`);
+    }
+  }
+
+  if (practiceAligned) {
+    parts.push('الساعة الكوكبية الحالية مناسبة لممارستك.');
+  }
+
+  return parts.join(' ');
+}
+
 // ============================================================================
 // LAYER 3: MANAZIL ALIGNMENT
 // ============================================================================
@@ -497,6 +726,7 @@ export function analyzeManazilAlignment(
   moment: CurrentMoment,
   intent: UserIntent
 ): ManazilAlignmentResult {
+  const category = normalizePracticeCategory(intent?.category);
   const personalManazil = user.personalManazil;
   const currentManazil = moment.currentManazil;
   const currentMansionData = moment.currentManazilData;
@@ -505,6 +735,8 @@ export function analyzeManazilAlignment(
   let elementMatch = false;
   let themeCompatibility: 'favorable' | 'neutral' | 'cautious' = 'neutral';
   const reasons: string[] = [];
+  const reasonsFr: string[] = [];
+  const reasonsAr: string[] = [];
   
   // If we have the mansion data, check element match
   if (currentMansionData) {
@@ -516,14 +748,20 @@ export function analyzeManazilAlignment(
     if (elementMatch) {
       score += 20;
       reasons.push(`Current lunar mansion (${currentMansionData.nameTransliteration}) shares your ${userElement} element.`);
+      reasonsFr.push(`Le manzil actuel (${currentMansionData.nameTransliteration}) partage votre élément ${ELEMENT_LABELS[userElement].fr}.`);
+      reasonsAr.push(`المنزل القمري الحالي (${currentMansionData.nameTransliteration}) يشاركك عنصر ${ELEMENT_LABELS[userElement].ar}.`);
     } else {
       const relation = ELEMENT_RELATIONSHIPS[userElement][mansionElement];
       if (relation.type === 'complementary') {
         score += 10;
         reasons.push(`${currentMansionData.nameTransliteration} (${mansionElement}) complements your ${userElement} nature.`);
+        reasonsFr.push(`${currentMansionData.nameTransliteration} (${ELEMENT_LABELS[mansionElement].fr}) complète votre nature ${ELEMENT_LABELS[userElement].fr}.`);
+        reasonsAr.push(`${currentMansionData.nameTransliteration} (${ELEMENT_LABELS[mansionElement].ar}) يُكمل طبيعتك (${ELEMENT_LABELS[userElement].ar}).`);
       } else if (relation.type === 'tension') {
         score -= 10;
         reasons.push(`${currentMansionData.nameTransliteration} (${mansionElement}) creates tension with your ${userElement} nature.`);
+        reasonsFr.push(`${currentMansionData.nameTransliteration} (${ELEMENT_LABELS[mansionElement].fr}) crée une tension avec votre nature ${ELEMENT_LABELS[userElement].fr}.`);
+        reasonsAr.push(`${currentMansionData.nameTransliteration} (${ELEMENT_LABELS[mansionElement].ar}) يسبب توترًا مع طبيعتك (${ELEMENT_LABELS[userElement].ar}).`);
       }
     }
   }
@@ -531,14 +769,18 @@ export function analyzeManazilAlignment(
   // Check practice compatibility with current manazil
   const manazilCompat = MANAZIL_PRACTICE_COMPATIBILITY[currentManazil];
   if (manazilCompat) {
-    if (manazilCompat.favorable.includes(intent.category)) {
+    if (manazilCompat.favorable.includes(category)) {
       themeCompatibility = 'favorable';
       score += 20;
-      reasons.push(`This lunar mansion favors ${intent.category} practices.`);
-    } else if (manazilCompat.cautious.includes(intent.category)) {
+      reasons.push(`This lunar mansion favors ${category} practices.`);
+      reasonsFr.push(`Ce manzil favorise les pratiques de ${PRACTICE_CATEGORY_LABELS[category].fr}.`);
+      reasonsAr.push(`هذا المنزل القمري يُفضّل ممارسات ${PRACTICE_CATEGORY_LABELS[category].ar}.`);
+    } else if (manazilCompat.cautious.includes(category)) {
       themeCompatibility = 'cautious';
       score -= 15;
-      reasons.push(`This lunar mansion suggests caution for ${intent.category} practices.`);
+      reasons.push(`This lunar mansion suggests caution for ${category} practices.`);
+      reasonsFr.push(`Ce manzil suggère la prudence pour les pratiques de ${PRACTICE_CATEGORY_LABELS[category].fr}.`);
+      reasonsAr.push(`هذا المنزل القمري يدعو للحذر في ممارسات ${PRACTICE_CATEGORY_LABELS[category].ar}.`);
     }
   }
   
@@ -546,6 +788,8 @@ export function analyzeManazilAlignment(
   if (currentManazil === 23) { // Saʿd al-Suʿūd - The Luck of Lucks
     score += 15;
     reasons.push('Currently in Saʿd al-Suʿūd — the most auspicious lunar mansion for all spiritual work!');
+    reasonsFr.push('Vous êtes dans Saʿd al-Suʿūd — le manzil le plus auspice pour tout travail spirituel !');
+    reasonsAr.push('أنت الآن في سعد السعود — أكثر المنازل القمرية بركةً لكل عمل روحي!');
   }
   
   // Personal mansion resonance (if available)
@@ -553,6 +797,8 @@ export function analyzeManazilAlignment(
     if (personalManazil === currentManazil) {
       score += 25;
       reasons.push('The Moon is in YOUR personal lunar mansion — a powerful time for personal practice.');
+      reasonsFr.push('La Lune est dans VOTRE manzil personnel — un moment puissant pour votre pratique.');
+      reasonsAr.push('القمر في منزلك الشخصي — وقت قوي لممارسة شخصية.');
     } else {
       // Check element match between personal and current manazil
       const personalMansionElement = getManazilElement(personalManazil);
@@ -560,15 +806,23 @@ export function analyzeManazilAlignment(
       if (personalMansionElement === currentMansionElement) {
         score += 10;
         reasons.push('Personal and current lunar mansions share the same element.');
+        reasonsFr.push('Le manzil personnel et le manzil actuel partagent le même élément.');
+        reasonsAr.push('منزلك الشخصي والمنزل الحالي يشتركان في نفس العنصر.');
       }
     }
   }
   
   const finalScore = Math.min(100, Math.max(0, score));
+
+  const fallbackEn = 'Lunar mansion conditions are neutral for your practice.';
+  const fallbackFr = 'Les conditions du manzil sont neutres pour votre pratique.';
+  const fallbackAr = 'ظروف المنزل القمري محايدة لممارستك.';
   
   return {
     score: finalScore,
-    reasoning: reasons.join(' ') || 'Lunar mansion conditions are neutral for your practice.',
+    reasoning: reasons.join(' ') || fallbackEn,
+    reasoningFr: reasonsFr.join(' ') || fallbackFr,
+    reasoningAr: reasonsAr.join(' ') || fallbackAr,
     personalManazil,
     currentManazil,
     elementMatch,
@@ -605,35 +859,44 @@ export function analyzePracticeMapping(
   moment: CurrentMoment,
   intent: UserIntent
 ): PracticeMappingResult {
+  const category = normalizePracticeCategory(intent?.category);
   let score = 60; // Base for general practices
   const adjustments: string[] = [];
   const alternatives: string[] = [];
   const reasons: string[] = [];
+  const reasonsFr: string[] = [];
+  const reasonsAr: string[] = [];
   
   // Check element preferences for practice
-  const elementPrefs = PRACTICE_ELEMENT_PREFERENCES[intent.category];
+  const elementPrefs = PRACTICE_ELEMENT_PREFERENCES[category] ?? PRACTICE_ELEMENT_PREFERENCES.general;
   const hourElement = moment.planetaryHourElement;
   
   if (elementPrefs.preferred.includes(hourElement)) {
     score += 20;
-    reasons.push(`${hourElement.charAt(0).toUpperCase() + hourElement.slice(1)} hour element ideal for ${intent.category}.`);
+    reasons.push(`${hourElement.charAt(0).toUpperCase() + hourElement.slice(1)} hour element ideal for ${category}.`);
+    reasonsFr.push(`L’élément de l’heure (${ELEMENT_LABELS[hourElement].fr}) est idéal pour ${PRACTICE_CATEGORY_LABELS[category].fr}.`);
+    reasonsAr.push(`عنصر الساعة (${ELEMENT_LABELS[hourElement].ar}) مثالي لممارسة ${PRACTICE_CATEGORY_LABELS[category].ar}.`);
   } else if (elementPrefs.avoid.includes(hourElement)) {
     score -= 20;
-    reasons.push(`${hourElement.charAt(0).toUpperCase() + hourElement.slice(1)} hour element is challenging for ${intent.category}.`);
+    reasons.push(`${hourElement.charAt(0).toUpperCase() + hourElement.slice(1)} hour element is challenging for ${category}.`);
+    reasonsFr.push(`L’élément de l’heure (${ELEMENT_LABELS[hourElement].fr}) est difficile pour ${PRACTICE_CATEGORY_LABELS[category].fr}.`);
+    reasonsAr.push(`عنصر الساعة (${ELEMENT_LABELS[hourElement].ar}) صعب لممارسة ${PRACTICE_CATEGORY_LABELS[category].ar}.`);
     
     // Suggest adjustment
-    if (intent.category === 'protection' && hourElement === 'water') {
+    if (category === 'protection' && hourElement === 'water') {
       adjustments.push('Add grounding practices (Ayat al-Kursi) to strengthen protection.');
-    } else if (intent.category === 'healing' && hourElement === 'fire') {
+    } else if (category === 'healing' && hourElement === 'fire') {
       adjustments.push('Include cooling dhikr (Ya Latif, Ya Salam) to balance intensity.');
     }
   }
   
   // Check planetary hour preferences for practice
-  const planetPrefs = PRACTICE_PLANET_PREFERENCES[intent.category];
-  if (planetPrefs && planetPrefs.includes(moment.planetaryHourPlanet)) {
+  const planetPrefs = PRACTICE_PLANET_PREFERENCES[category] ?? PRACTICE_PLANET_PREFERENCES.general;
+  if (planetPrefs.includes(moment.planetaryHourPlanet)) {
     score += 15;
-    reasons.push(`${moment.planetaryHourPlanet} hour supports ${intent.category} work.`);
+    reasons.push(`${moment.planetaryHourPlanet} hour supports ${category} work.`);
+    reasonsFr.push(`L’heure de ${PLANET_LABELS[moment.planetaryHourPlanet].fr} soutient la pratique de ${PRACTICE_CATEGORY_LABELS[category].fr}.`);
+    reasonsAr.push(`ساعة ${PLANET_LABELS[moment.planetaryHourPlanet].ar} تدعم ممارسة ${PRACTICE_CATEGORY_LABELS[category].ar}.`);
   }
   
   // Intensity adjustments
@@ -651,6 +914,8 @@ export function analyzePracticeMapping(
     if (nameAdjustment.bonus) {
       score += nameAdjustment.bonus;
       reasons.push(nameAdjustment.reason);
+      if (nameAdjustment.reasonFr) reasonsFr.push(nameAdjustment.reasonFr);
+      if (nameAdjustment.reasonAr) reasonsAr.push(nameAdjustment.reasonAr);
     } else if (nameAdjustment.penalty) {
       score -= nameAdjustment.penalty;
       adjustments.push(nameAdjustment.reason);
@@ -659,21 +924,29 @@ export function analyzePracticeMapping(
   
   // Moon phase considerations for certain practices
   if (moment.moonPhase) {
-    if (intent.category === 'manifestation' && moment.moonPhase.includes('waning')) {
+    if (category === 'manifestation' && moment.moonPhase.includes('waning')) {
       score -= 10;
       adjustments.push('Waning moon — focus on release rather than manifestation.');
-    } else if (intent.category === 'repentance' && moment.moonPhase.includes('waning')) {
+    } else if (category === 'repentance' && moment.moonPhase.includes('waning')) {
       score += 10;
       reasons.push('Waning moon supports letting go and purification.');
+      reasonsFr.push('La lune décroissante soutient le lâcher-prise et la purification.');
+      reasonsAr.push('القمر المتناقص يدعم التخلّص والتنقية.');
     }
   }
   
   const finalScore = Math.min(100, Math.max(0, score));
   const suitable = finalScore >= 50;
+
+  const fallbackEn = 'Standard timing for this practice.';
+  const fallbackFr = 'Timing standard pour cette pratique.';
+  const fallbackAr = 'توقيت اعتيادي لهذه الممارسة.';
   
   return {
     score: finalScore,
-    reasoning: reasons.join(' ') || 'Standard timing for this practice.',
+    reasoning: reasons.join(' ') || fallbackEn,
+    reasoningFr: reasonsFr.join(' ') || fallbackFr,
+    reasoningAr: reasonsAr.join(' ') || fallbackAr,
     suitable,
     adjustments,
     alternatives: alternatives.length > 0 ? alternatives : undefined,
@@ -689,7 +962,7 @@ export function analyzePracticeMapping(
 function checkDivineNameTiming(
   divineName: string,
   moment: CurrentMoment
-): { bonus?: number; penalty?: number; reason: string } {
+): { bonus?: number; penalty?: number; reason: string; reasonFr?: string; reasonAr?: string } {
   // Map Divine Names to favorable planetary hours
   const nameHourMap: Record<string, { planets: Planet[]; element?: Element }> = {
     'Ya Qawiyy': { planets: ['Mars', 'Sun'], element: 'fire' },
@@ -711,6 +984,8 @@ function checkDivineNameTiming(
     return {
       bonus: 15,
       reason: `${divineName} resonates perfectly with current ${moment.planetaryHourPlanet} hour.`,
+      reasonFr: `${divineName} résonne parfaitement avec l’heure de ${PLANET_LABELS[moment.planetaryHourPlanet].fr}.`,
+      reasonAr: `${divineName} ينسجم تمامًا مع ساعة ${PLANET_LABELS[moment.planetaryHourPlanet].ar} الحالية.`,
     };
   }
   
@@ -718,6 +993,8 @@ function checkDivineNameTiming(
     return {
       bonus: 10,
       reason: `${divineName}'s elemental quality aligns with current timing.`,
+      reasonFr: `La qualité élémentaire de ${divineName} s’aligne avec le timing actuel.`,
+      reasonAr: `الصفة العنصرية لـ ${divineName} متوافقة مع التوقيت الحالي.`,
     };
   }
   

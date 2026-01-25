@@ -357,7 +357,11 @@ export async function scheduleNotification(
   title: string,
   body: string,
   triggerDate: Date,
-  data?: any
+  data?: any,
+  options?: {
+    ignoreQuietHours?: boolean;
+    ignoreCategoryToggle?: boolean;
+  }
 ): Promise<string | null> {
   await initializeNotifications();
   
@@ -367,13 +371,15 @@ export async function scheduleNotification(
   }
   
   // Check if category is enabled
-  const enabled = await isCategoryEnabled(category);
-  if (!enabled) {
-    return null;
+  if (!options?.ignoreCategoryToggle) {
+    const enabled = await isCategoryEnabled(category);
+    if (!enabled) {
+      return null;
+    }
   }
   
   // Check quiet hours (except for prayer notifications)
-  if (category !== NotificationCategory.PRAYER) {
+  if (category !== NotificationCategory.PRAYER && !options?.ignoreQuietHours) {
     const isQuiet = await isQuietHour(triggerDate);
     if (isQuiet) {
       console.log(`Skipping notification during quiet hours: ${title}`);

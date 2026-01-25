@@ -21,7 +21,9 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { Borders, DarkTheme, ElementAccents, Spacing, Typography } from "../../../constants/DarkTheme";
+import Svg, { Circle, Defs, Path, Pattern, Rect } from 'react-native-svg';
+import { Borders, DarkTheme, Spacing, Typography } from "../../../constants/DarkTheme";
+import { getElementColors } from '../../../constants/ElementColors';
 import { useLanguage } from "../../../contexts/LanguageContext";
 import type { IstikharaData } from "../../../types/istikhara";
 
@@ -30,6 +32,52 @@ const { width } = Dimensions.get('window');
 interface BlessedDayTabProps {
   data: IstikharaData;
   elementColor: string;
+}
+
+function withAlpha(color: string, alpha01: number): string {
+  const alpha = Math.max(0, Math.min(1, alpha01));
+  if (typeof color !== 'string' || !color.startsWith('#')) return color;
+
+  const hex = color.slice(1);
+  const normalized = hex.length === 3
+    ? hex.split('').map(c => c + c).join('')
+    : hex.length === 6
+      ? hex
+      : null;
+  if (!normalized) return color;
+
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function IslamicPatternOverlay({ opacity = 0.06 }: { opacity?: number }) {
+  return (
+    <Svg pointerEvents="none" width="100%" height="100%" style={StyleSheet.absoluteFill}>
+      <Defs>
+        <Pattern id="geom" patternUnits="userSpaceOnUse" width="48" height="48">
+          <Path
+            d="M24 6 L28 20 L42 24 L28 28 L24 42 L20 28 L6 24 L20 20 Z"
+            fill={`rgba(255, 255, 255, ${opacity})`}
+          />
+          <Circle cx="24" cy="24" r="2.2" fill={`rgba(255, 255, 255, ${opacity + 0.01})`} />
+        </Pattern>
+      </Defs>
+      <Rect x="0" y="0" width="100%" height="100%" fill="url(#geom)" />
+    </Svg>
+  );
+}
+
+function PatternCard({ children, style }: { children: React.ReactNode; style?: any }) {
+  return (
+    <View style={[styles.patternCard, style]}>
+      <View pointerEvents="none" style={styles.patternLayer}>
+        <IslamicPatternOverlay />
+      </View>
+      {children}
+    </View>
+  );
 }
 
 const DAYS_OF_WEEK = [
@@ -46,8 +94,20 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
   const { language } = useLanguage();
   const profile = data.burujProfile;
   const elementKey = profile.element.toLowerCase() as "fire" | "earth" | "air" | "water";
-  const accent = ElementAccents[elementKey];
+  const colors = getElementColors(elementKey);
+  const accentColor = elementColor || colors.accent;
   const blessedDay = profile.blessed_day;
+
+  const cardSurface = {
+    backgroundColor: withAlpha(accentColor, 0.14),
+    borderColor: withAlpha(accentColor, 0.20),
+    shadowColor: accentColor,
+  };
+  const raisedSurface = {
+    backgroundColor: withAlpha(accentColor, 0.16),
+    borderColor: withAlpha(accentColor, 0.22),
+    shadowColor: accentColor,
+  };
 
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['tips']));
 
@@ -87,18 +147,14 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
       </View>
 
       {/* Main Day Display - Dark Card with Accent Highlights */}
-      <View style={[styles.mainDayCard, { 
-        borderColor: `${accent.primary}33`, 
-        backgroundColor: `${accent.primary}33`,
-        shadowColor: accent.primary 
-      }]}>
-        <View style={[styles.iconCircle, { backgroundColor: `${accent.primary}26`, borderColor: accent.primary }]}>
+      <PatternCard style={[styles.mainDayCard, raisedSurface]}>
+        <View style={[styles.iconCircle, { backgroundColor: withAlpha(accentColor, 0.15), borderColor: withAlpha(accentColor, 0.65) }]}>
           <Text style={styles.dayEmoji}>
             {dayIndex >= 0 ? DAYS_OF_WEEK[dayIndex].emoji : '📅'}
           </Text>
         </View>
         
-        <Text style={[styles.dayName, { color: accent.primary }]}>
+        <Text style={[styles.dayName, { color: accentColor }]}>
           {blessedDay.day[language as 'en' | 'fr']}
         </Text>
         
@@ -109,22 +165,18 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
         </Text>
         
         {blessedDay.day_number !== null && (
-          <View style={[styles.dayNumberBadge, { backgroundColor: `${accent.primary}26`, borderColor: accent.primary }]}>
-            <Text style={[styles.dayNumberText, { color: accent.primary }]}>
+          <View style={[styles.dayNumberBadge, { backgroundColor: withAlpha(accentColor, 0.12), borderColor: withAlpha(accentColor, 0.55) }]}>
+            <Text style={[styles.dayNumberText, { color: accentColor }]}>
               {language === 'en' ? 'Day' : 'Jour'} #{blessedDay.day_number}
             </Text>
           </View>
         )}
-      </View>
+      </PatternCard>
 
       {/* Weekly Overview - Dark Card with Colored Day Icons */}
-      <View style={[styles.card, { 
-        borderColor: `${accent.primary}33`, 
-        backgroundColor: `${accent.primary}33`,
-        shadowColor: accent.primary 
-      }]}>
+      <PatternCard style={[styles.card, cardSurface]}>
         <View style={styles.cardHeader}>
-          <Sun size={20} color={accent.primary} />
+          <Sun size={20} color={accentColor} />
           <Text style={styles.cardTitle}>
             {language === 'en' ? 'Weekly Overview' : 'Aperçu Hebdomadaire'}
           </Text>
@@ -137,10 +189,10 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
                 key={idx}
                 style={[
                   styles.dayPill,
-                  { backgroundColor: DarkTheme.cardBackgroundAlt },
+                  { backgroundColor: withAlpha(accentColor, 0.08), borderColor: withAlpha(accentColor, 0.12), borderWidth: 1 },
                   isBlessed && { 
-                    backgroundColor: accent.glow,
-                    borderColor: accent.primary,
+                    backgroundColor: withAlpha(accentColor, 0.16),
+                    borderColor: withAlpha(accentColor, 0.55),
                     borderWidth: 2,
                   },
                 ]}
@@ -149,7 +201,7 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
                 <Text
                   style={[
                     styles.dayPillText,
-                    isBlessed && { color: accent.primary, fontWeight: '700' },
+                    isBlessed && { color: accentColor, fontWeight: '700' },
                   ]}
                 >
                   {day[language as 'en' | 'fr'].substring(0, 3)}
@@ -158,13 +210,13 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
             );
           })}
         </View>
-      </View>
+      </PatternCard>
 
       {/* Best Activities Section */}
       {blessedDay.best_for[language as 'en' | 'fr'].length > 0 && (
-        <View style={[styles.card, { borderColor: accent.primary, borderLeftWidth: Borders.accent, borderLeftColor: accent.primary }]}>
+        <PatternCard style={[styles.card, cardSurface, { borderLeftWidth: Borders.accent, borderLeftColor: accentColor }]}>
           <View style={styles.cardHeader}>
-            <CheckCircle size={20} color={accent.primary} />
+            <CheckCircle size={20} color={accentColor} />
             <Text style={styles.cardTitle}>
               {language === 'en' ? 'Best Activities' : 'Meilleures Activités'}
             </Text>
@@ -177,45 +229,37 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
           <View style={styles.activitiesList}>
             {blessedDay.best_for[language as 'en' | 'fr'].map((activity, index) => (
               <View key={index} style={styles.activityItem}>
-                <View style={[styles.activityBullet, { backgroundColor: accent.primary }]} />
+                <View style={[styles.activityBullet, { backgroundColor: accentColor }]} />
                 <Text style={styles.activityText}>{activity}</Text>
               </View>
             ))}
           </View>
-        </View>
+        </PatternCard>
       )}
 
       {/* Special Notes */}
       {blessedDay.special_notes && blessedDay.special_notes[language as 'en' | 'fr'].length > 0 && (
-        <View style={[styles.card, { 
-          borderColor: `${accent.primary}33`, 
-          backgroundColor: `${accent.primary}33`,
-          shadowColor: accent.primary 
-        }]}>
+        <PatternCard style={[styles.card, cardSurface]}>
           <View style={styles.cardHeader}>
-            <Star size={20} color={accent.primary} />
+            <Star size={20} color={accentColor} />
             <Text style={styles.cardTitle}>
               {language === 'en' ? 'Spiritual Significance' : 'Signification Spirituelle'}
             </Text>
           </View>
           {blessedDay.special_notes[language as 'en' | 'fr'].map((note, index) => (
             <View key={index} style={styles.noteItem}>
-              <Star size={14} color={accent.primary} />
+              <Star size={14} color={accentColor} />
               <Text style={styles.noteText}>{note}</Text>
             </View>
           ))}
-        </View>
+        </PatternCard>
       )}
 
       {/* Associated Prophet */}
       {blessedDay.associated_prophet && (
-        <View style={[styles.card, { 
-          borderColor: `${accent.primary}33`, 
-          backgroundColor: `${accent.primary}33`,
-          shadowColor: accent.primary 
-        }]}>
+        <PatternCard style={[styles.card, cardSurface]}>
           <View style={styles.cardHeader}>
-            <Sparkles size={20} color={accent.primary} />
+            <Sparkles size={20} color={accentColor} />
             <Text style={styles.cardTitle}>
               {language === 'en' ? 'Associated Prophet' : 'Prophète Associé'}
             </Text>
@@ -226,7 +270,7 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
               {blessedDay.associated_prophet[language as 'en' | 'fr']}
             </Text>
           </View>
-        </View>
+        </PatternCard>
       )}
 
       {/* Practical Tips */}
@@ -234,26 +278,26 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
         activeOpacity={0.9}
         onPress={() => toggleSection('tips')}
       >
-        <View style={[styles.card, { borderColor: accent.primary }]}>
+        <PatternCard style={[styles.card, cardSurface]}>
           <View style={styles.collapsibleHeader}>
             <View style={styles.cardHeader}>
-              <Lightbulb size={20} color={accent.primary} />
+              <Lightbulb size={20} color={accentColor} />
               <Text style={styles.cardTitle}>
                 {language === 'en' ? 'Practical Tips' : 'Conseils Pratiques'}
               </Text>
             </View>
             {expandedSections.has('tips') ? (
-              <ChevronUp size={20} color={accent.primary} />
+              <ChevronUp size={20} color={accentColor} />
             ) : (
-              <ChevronDown size={20} color={accent.primary} />
+              <ChevronDown size={20} color={accentColor} />
             )}
           </View>
 
           {expandedSections.has('tips') && (
             <View style={styles.tipsContent}>
-              <View style={[styles.tipCard, { backgroundColor: DarkTheme.cardBackgroundAlt }]}>
+              <View style={[styles.tipCard, { backgroundColor: withAlpha(accentColor, 0.08), borderColor: withAlpha(accentColor, 0.14), borderWidth: 1 }]}>
                 <View style={styles.tipHeader}>
-                  <Target size={16} color={accent.primary} />
+                  <Target size={16} color={accentColor} />
                   <Text style={styles.tipTitle}>
                     {language === 'en' ? 'Pro Tip' : 'Conseil Pro'}
                   </Text>
@@ -265,9 +309,9 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
                 </Text>
               </View>
 
-              <View style={[styles.tipCard, { backgroundColor: DarkTheme.cardBackgroundAlt }]}>
+              <View style={[styles.tipCard, { backgroundColor: withAlpha(accentColor, 0.08), borderColor: withAlpha(accentColor, 0.14), borderWidth: 1 }]}>
                 <View style={styles.tipHeader}>
-                  <TrendingUp size={16} color={accent.primary} />
+                  <TrendingUp size={16} color={accentColor} />
                   <Text style={styles.tipTitle}>
                     {language === 'en' ? 'Weekly Planning' : 'Planification Hebdomadaire'}
                   </Text>
@@ -279,9 +323,9 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
                 </Text>
               </View>
 
-              <View style={[styles.tipCard, { backgroundColor: DarkTheme.cardBackgroundAlt }]}>
+              <View style={[styles.tipCard, { backgroundColor: withAlpha(accentColor, 0.08), borderColor: withAlpha(accentColor, 0.14), borderWidth: 1 }]}>
                 <View style={styles.tipHeader}>
-                  <Heart size={16} color={accent.primary} />
+                  <Heart size={16} color={accentColor} />
                   <Text style={styles.tipTitle}>
                     {language === 'en' ? 'Element Alignment' : 'Alignement Élémentaire'}
                   </Text>
@@ -294,14 +338,14 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
               </View>
             </View>
           )}
-        </View>
+        </PatternCard>
       </TouchableOpacity>
 
       {/* Note or Temporary Suggestion */}
       {(blessedDay.note || blessedDay.temporary_suggestion) && (
-        <View style={[styles.card, { borderColor: accent.secondary, borderLeftWidth: Borders.accent, borderLeftColor: accent.secondary }]}>
+        <PatternCard style={[styles.card, { ...cardSurface, borderLeftWidth: Borders.accent, borderLeftColor: accentColor }]}>
           <View style={styles.cardHeader}>
-            <Info size={20} color={accent.secondary} />
+            <Info size={20} color={accentColor} />
             <Text style={[styles.cardTitle, { color: DarkTheme.textPrimary }]}>
               {language === 'en' ? 'Important Note' : 'Note Importante'}
             </Text>
@@ -309,7 +353,7 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
           <Text style={styles.noteInfoText}>
             {(blessedDay.note || blessedDay.temporary_suggestion)?.[language as 'en' | 'fr']}
           </Text>
-        </View>
+        </PatternCard>
       )}
 
       {/* Bottom Spacing */}
@@ -322,6 +366,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0B1020',
+  },
+  patternCard: {
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  patternLayer: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.55,
   },
   scrollContent: {
     padding: Spacing.screenPadding,
@@ -355,6 +407,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 16,
     elevation: 8,
+    overflow: 'hidden',
   },
   iconCircle: {
     width: 80,
@@ -398,6 +451,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 6,
+    overflow: 'hidden',
   },
   cardHeader: {
     flexDirection: 'row',
