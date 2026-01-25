@@ -57,8 +57,12 @@ export function useDailyPlanetaryAnalysis(): UseDailyAnalysisResult {
         Saturn: transits.Saturn,
       };
 
-      // Analyze planetary positions
-      const analysisResult = analyzeDailyPlanets(planetPositions, transits.Sun);
+      // Analyze planetary positions (includes day ruling planet)
+      const analysisResult = analyzeDailyPlanets(
+        planetPositions,
+        transits.Sun,
+        new Date() // Pass current date for day ruler calculation
+      );
 
       setAnalysis(analysisResult);
       setDailyScore(calculateDailyPlanetaryScore(analysisResult));

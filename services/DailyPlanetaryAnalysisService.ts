@@ -13,11 +13,18 @@ import {
     calculateEnhancedPlanetaryPower,
     type EnhancedPlanetaryPower,
 } from '@/services/PlanetaryStrengthService';
+import { getDayRulingPlanet } from '@/services/DayRulingPlanetService';
 import type { PlanetTransit, ZodiacSign } from '@/types/planetary-systems';
 
 export interface DailyPlanetaryAnalysis {
   /** All planets and their power analysis */
   planets: Record<Planet, EnhancedPlanetaryPower>;
+  
+  /** Today's ruling planet (based on day of week) */
+  dayRulingPlanet: Planet;
+  
+  /** Today's ruling planet strength */
+  dayRulingStrength: number;
   
   /** Best planet for general work */
   bestForGeneralWork: Planet | null;
@@ -37,11 +44,12 @@ export interface DailyPlanetaryAnalysis {
 
 /**
  * Analyze all planetary positions for the current moment
- * Returns comprehensive strength analysis
+ * Returns comprehensive strength analysis including day ruling planet
  */
 export function analyzeDailyPlanets(
   planetPositions: Record<Planet, PlanetTransit | null>,
-  sunPosition: PlanetTransit | null
+  sunPosition: PlanetTransit | null,
+  date: Date = new Date()
 ): DailyPlanetaryAnalysis {
   if (!sunPosition) {
     throw new Error('Sun position required for planetary analysis');
@@ -53,6 +61,9 @@ export function analyzeDailyPlanets(
   const recommendedPlanets: (Planet | null)[] = [null, null];
   let bestScore = -1;
   let spiritualScore = -1;
+
+  // Get today's ruling planet
+  const dayRulingPlanet = getDayRulingPlanet(date);
 
   // Analyze each planet
   const planets: Planet[] = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'];
@@ -101,16 +112,23 @@ export function analyzeDailyPlanets(
     }
   }
 
+  // Get day ruling planet strength
+  const dayRulingStrength = analysis[dayRulingPlanet]?.finalPower || 50;
+
   // Generate practice recommendations
   const practiceRecommendations = generatePracticeRecommendations(
     analysis,
     recommendedPlanets[0],
     recommendedPlanets[1],
-    planetsToAvoid
+    planetsToAvoid,
+    dayRulingPlanet,
+    dayRulingStrength
   );
 
   return {
     planets: analysis,
+    dayRulingPlanet,
+    dayRulingStrength,
     bestForGeneralWork: recommendedPlanets[0] || null,
     bestForSpiritualWork: recommendedPlanets[1] || null,
     planetsToAvoid,
@@ -126,11 +144,32 @@ function generatePracticeRecommendations(
   planets: Record<Planet, EnhancedPlanetaryPower>,
   bestGeneral: Planet | null,
   bestSpiritual: Planet | null,
-  avoid: Planet[]
+  avoid: Planet[],
+  dayRulingPlanet: Planet,
+  dayRulingStrength: number
 ): string[] {
   const recommendations: string[] = [];
 
-  // Recommendation 1: Best planet for work
+  // Recommendation 1: Day ruler status
+  if (dayRulingStrength >= 70) {
+    recommendations.push(
+      `${dayRulingPlanet} (today's ruler) is strong at ${dayRulingStrength}% - excellent day overall`
+    );
+  } else if (dayRulingStrength >= 50) {
+    recommendations.push(
+      `${dayRulingPlanet} (today's ruler) at ${dayRulingStrength}% - decent day with good support`
+    );
+  } else if (dayRulingStrength >= 30) {
+    recommendations.push(
+      `${dayRulingPlanet} (today's ruler) weak at ${dayRulingStrength}% - proceed with caution`
+    );
+  } else {
+    recommendations.push(
+      `${dayRulingPlanet} (today's ruler) very weak at ${dayRulingStrength}% - challenging day, focus on small tasks`
+    );
+  }
+
+  // Recommendation 2: Best planet for work
   if (bestGeneral) {
     const power = planets[bestGeneral];
     if (power.finalPower >= 60) {
@@ -140,7 +179,7 @@ function generatePracticeRecommendations(
     }
   }
 
-  // Recommendation 2: Best planet for reflection
+  // Recommendation 3: Best planet for reflection
   if (bestSpiritual && bestSpiritual !== bestGeneral) {
     const power = planets[bestSpiritual];
     if (power.finalPower >= 50) {
@@ -150,20 +189,18 @@ function generatePracticeRecommendations(
     }
   }
 
-  // Recommendation 3: Planets to avoid
+  // Recommendation 4: Planets to avoid
   if (avoid.length > 0) {
     const avoidList = avoid.slice(0, 2).join(', ');
     recommendations.push(`Avoid ${avoidList} hours - weak planetary positions`);
   }
 
-  // Recommendation 4: Special timing
-  if (bestGeneral === 'Sun') {
-    recommendations.push('Excellent day for major initiatives - use Sun hours');
-  } else if (bestGeneral === 'Moon') {
-    recommendations.push('Strong lunar influence - good for emotional/relational work');
+  // Recommendation 5: Day ruler advantage
+  if (bestGeneral === dayRulingPlanet && dayRulingStrength >= 60) {
+    recommendations.push('🌟 Today\'s ruler is the strongest planet - use its hours first');
   }
 
-  // Recommendation 5: Time-specific guidance
+  // Recommendation 6: Time-specific guidance
   if (planets.Mercury && planets.Mercury.finalPower > 70) {
     recommendations.push('Strong Mercury - excellent for communication/study today');
   }
