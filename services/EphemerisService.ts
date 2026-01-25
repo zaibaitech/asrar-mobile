@@ -8,7 +8,7 @@
  * 
  * Privacy: Positions are astronomical facts (not personal data)
  * Caching: 24-hour cache per datetime hour to minimize API calls
- * Fallback: Approx mode with planetary day/hour only (no positions)
+ * Fallback: Embedded ephemeris data + synthetic positions (always works)
  * 
  * @see https://ssd-api.jpl.nasa.gov/doc/horizons.html
  */
@@ -19,6 +19,10 @@ import {
     PlanetPosition,
     PlanetPositions,
 } from '@/types/divine-timing-personal';
+import {
+    generateSyntheticPositions,
+    getCachedEphemerisData,
+} from '@/services/EphemerisDataCache';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -146,6 +150,23 @@ export async function getPlanetPositions(
       return cached;
     }
 
+    // Try embedded ephemeris data BEFORE network
+    const embeddedData = getCachedEphemerisData(dateISO);
+    if (embeddedData) {
+      if (__DEV__) {
+        console.log('[EphemerisService] Using embedded ephemeris data');
+      }
+      const result: PlanetPositions = {
+        timestamp: hourlyDate.getTime(),
+        dateISO,
+        planets: embeddedData,
+        source: 'ephemeris',
+        expiresAt: hourlyDate.getTime() + CACHE_TTL_MS,
+      };
+      await cachePositions(cacheKey, result);
+      return result;
+    }
+
     // Inflight dedupe: avoid multiple concurrent Horizons requests for same hour.
     const inflight = inflightPositions.get(cacheKey);
     if (inflight) {
@@ -153,38 +174,44 @@ export async function getPlanetPositions(
     }
     
     const promise = (async () => {
-      // Fetch from JPL Horizons
-      if (__DEV__) {
-        console.log('[EphemerisService] Fetching from JPL Horizons...');
-      }
-
-      const positions = await fetchPositionsFromHorizons(hourlyDate);
-
-      if (positions) {
-        // Cache successful result
-        const result: PlanetPositions = {
-          timestamp: hourlyDate.getTime(),
-          dateISO,
-          planets: positions,
-          source: 'ephemeris',
-          expiresAt: hourlyDate.getTime() + CACHE_TTL_MS,
-        };
-
-        await cachePositions(cacheKey, result);
-
+      // Try JPL Horizons if network available
+      const netInfo = await NetInfo.fetch();
+      if (netInfo.isConnected) {
         if (__DEV__) {
-          console.log('[EphemerisService] Successfully fetched and cached positions');
+          console.log('[EphemerisService] Network connected, fetching from JPL Horizons...');
         }
 
-        return result;
+        const positions = await fetchPositionsFromHorizons(hourlyDate);
+        if (positions) {
+          const result: PlanetPositions = {
+            timestamp: hourlyDate.getTime(),
+            dateISO,
+            planets: positions,
+            source: 'ephemeris',
+            expiresAt: hourlyDate.getTime() + CACHE_TTL_MS,
+          };
+          await cachePositions(cacheKey, result);
+          if (__DEV__) {
+            console.log('[EphemerisService] Successfully fetched and cached positions from Horizons');
+          }
+          return result;
+        }
       }
 
-      // Fallback to approx mode
+      // Use synthetic positions (always works)
       if (__DEV__) {
-        console.warn('[EphemerisService] Falling back to approx mode');
+        console.log('[EphemerisService] Using synthetic positions (mathematical model)');
       }
-
-      return getApproxPositions(hourlyDate, dateISO);
+      const syntheticPositions = generateSyntheticPositions(hourlyDate);
+      const result: PlanetPositions = {
+        timestamp: hourlyDate.getTime(),
+        dateISO,
+        planets: syntheticPositions,
+        source: 'synthetic',
+        expiresAt: hourlyDate.getTime() + CACHE_TTL_MS,
+      };
+      await cachePositions(cacheKey, result);
+      return result;
     })();
 
     inflightPositions.set(cacheKey, promise);
@@ -325,68 +352,76 @@ export async function getMoonEclipticLongitude(
       return cached;
     }
 
+    // Try embedded ephemeris data first
+    const embeddedData = getCachedEphemerisData(dateISO);
+    if (embeddedData?.moon) {
+      const result: MoonLongitudeResult = {
+        timestamp: bucketedDate.getTime(),
+        dateISO,
+        longitude: embeddedData.moon.longitude,
+        source: 'ephemeris',
+        expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
+      };
+      await cacheMoonLongitude(cacheKey, result);
+      if (__DEV__) {
+        console.log('[EphemerisService] Using embedded Moon data');
+      }
+      return result;
+    }
+
     const inflight = inflightMoon.get(cacheKey);
     if (inflight) {
       return await inflight;
     }
 
     const promise = (async () => {
-      // If we're offline, don't even try Horizons — return & cache approx.
+      // Try network fetch first
       const netInfo = await NetInfo.fetch();
-      if (!netInfo.isConnected) {
-        const approx: MoonLongitudeResult = {
-          timestamp: bucketedDate.getTime(),
-          dateISO,
-          longitude: getApproxPositions(bucketedDate, dateISO).planets.moon.longitude,
-          source: 'approx',
-          expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
-        };
-        await cacheMoonLongitude(cacheKey, approx);
-        return approx;
+      if (netInfo.isConnected) {
+        if (__DEV__) {
+          console.log('[EphemerisService] Fetching Moon longitude from JPL Horizons...');
+        }
+
+        // Reuse the same Horizons query logic, but only for the Moon.
+        const year = bucketedDate.getUTCFullYear();
+        const month = String(bucketedDate.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(bucketedDate.getUTCDate()).padStart(2, '0');
+        const hour = String(bucketedDate.getUTCHours()).padStart(2, '0');
+        const minute = String(bucketedDate.getUTCMinutes()).padStart(2, '0');
+        const dateStr = `'${year}-${month}-${day} ${hour}:${minute}'`;
+        const stopDate = new Date(bucketedDate.getTime() + 1 * 60 * 60 * 1000);
+        const stopHour = String(stopDate.getUTCHours()).padStart(2, '0');
+        const stopMinute = String(stopDate.getUTCMinutes()).padStart(2, '0');
+        const stopStr = `'${year}-${month}-${day} ${stopHour}:${stopMinute}'`;
+        const position = await fetchSinglePlanetPosition('moon', HORIZONS_PLANET_CODES.moon, dateStr, stopStr);
+
+        if (position && typeof position.longitude === 'number') {
+          const result: MoonLongitudeResult = {
+            timestamp: bucketedDate.getTime(),
+            dateISO,
+            longitude: position.longitude,
+            source: 'ephemeris',
+            expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
+          };
+          await cacheMoonLongitude(cacheKey, result);
+          return result;
+        }
       }
 
+      // Use synthetic position (always works)
       if (__DEV__) {
-        console.log('[EphemerisService] Fetching Moon longitude from JPL Horizons...');
+        console.log('[EphemerisService] Using synthetic Moon position');
       }
-
-      // Reuse the same Horizons query logic, but only for the Moon.
-      const year = bucketedDate.getUTCFullYear();
-      const month = String(bucketedDate.getUTCMonth() + 1).padStart(2, '0');
-      const day = String(bucketedDate.getUTCDate()).padStart(2, '0');
-      const hour = String(bucketedDate.getUTCHours()).padStart(2, '0');
-      const minute = String(bucketedDate.getUTCMinutes()).padStart(2, '0');
-      const dateStr = `'${year}-${month}-${day} ${hour}:${minute}'`;
-      const stopDate = new Date(bucketedDate.getTime() + 1 * 60 * 60 * 1000);
-      const stopHour = String(stopDate.getUTCHours()).padStart(2, '0');
-      const stopMinute = String(stopDate.getUTCMinutes()).padStart(2, '0');
-      const stopStr = `'${year}-${month}-${day} ${stopHour}:${stopMinute}'`;
-      const position = await fetchSinglePlanetPosition('moon', HORIZONS_PLANET_CODES.moon, dateStr, stopStr);
-
-      if (position && typeof position.longitude === 'number') {
-        const result: MoonLongitudeResult = {
-          timestamp: bucketedDate.getTime(),
-          dateISO,
-          longitude: position.longitude,
-          source: 'ephemeris',
-          expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
-        };
-        await cacheMoonLongitude(cacheKey, result);
-        return result;
-      }
-
-      if (__DEV__) {
-        console.warn('[EphemerisService] Moon longitude fetch failed; using approx');
-      }
-
-      const approx: MoonLongitudeResult = {
+      const syntheticPositions = generateSyntheticPositions(bucketedDate);
+      const synthetic: MoonLongitudeResult = {
         timestamp: bucketedDate.getTime(),
         dateISO,
-        longitude: getApproxPositions(bucketedDate, dateISO).planets.moon.longitude,
-        source: 'approx',
+        longitude: syntheticPositions.moon.longitude,
+        source: 'synthetic',
         expiresAt: bucketedDate.getTime() + MOON_CACHE_TTL_MS,
       };
-      await cacheMoonLongitude(cacheKey, approx);
-      return approx;
+      await cacheMoonLongitude(cacheKey, synthetic);
+      return synthetic;
     })();
 
     inflightMoon.set(cacheKey, promise);
@@ -498,25 +533,50 @@ async function fetchSinglePlanetPosition(
     
     const url = `${JPL_HORIZONS_BASE_URL}?${params.toString()}`;
     
-    const response = await fetch(url, {
+    if (__DEV__) {
+      console.log(`[EphemerisService] Fetching ${planetId} from: ${JPL_HORIZONS_BASE_URL}`);
+    }
+
+    // Create a timeout promise (30 seconds)
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Horizons API timeout (30s)')), 30000)
+    );
+
+    const fetchPromise = fetch(url, {
       headers: {
         'Accept': 'application/json',
       },
+      timeout: 30000,
     });
+
+    const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
     
     if (!response.ok) {
       if (__DEV__) {
-        console.warn(`[EphemerisService] Horizons API error for ${planetId}: ${response.status}`);
+        console.warn(`[EphemerisService] Horizons API error for ${planetId}: HTTP ${response.status}`);
       }
       return null;
     }
     
     const data = await response.text();
     
+    if (__DEV__ && !data) {
+      console.warn(`[EphemerisService] Empty response from Horizons for ${planetId}`);
+      return null;
+    }
+
+    if (__DEV__) {
+      console.log(`[EphemerisService] Received ${data.length} bytes from Horizons for ${planetId}`);
+    }
+    
     // Parse ecliptic longitude from response
     const longitude = parseEclipticLongitude(data);
     
     if (longitude === null) {
+      if (__DEV__) {
+        console.warn(`[EphemerisService] Failed to parse longitude from response for ${planetId}`);
+        console.warn(`[EphemerisService] Response preview: ${data.substring(0, 200)}`);
+      }
       return null;
     }
     
@@ -532,8 +592,9 @@ async function fetchSinglePlanetPosition(
     };
     
   } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
     if (__DEV__) {
-      console.error(`[EphemerisService] Error fetching ${planetId}:`, error);
+      console.error(`[EphemerisService] Error fetching ${planetId}: ${errorMsg}`, error);
     }
     return null;
   }
@@ -659,6 +720,9 @@ function parseEclipticLongitude(horizonsOutput: string): number | null {
     const eoeIndex = horizonsOutput.indexOf('$$EOE');
     
     if (soeIndex === -1 || eoeIndex === -1) {
+      if (__DEV__) {
+        console.warn('[EphemerisService] Missing $$SOE or $$EOE markers in Horizons response');
+      }
       return null;
     }
     
@@ -669,12 +733,23 @@ function parseEclipticLongitude(horizonsOutput: string): number | null {
     const dataLine = lines.find(line => !line.includes('$$SOE'));
     
     if (!dataLine) {
+      if (__DEV__) {
+        console.warn('[EphemerisService] No data lines found between $$SOE and $$EOE');
+      }
       return null;
+    }
+
+    if (__DEV__) {
+      console.log(`[EphemerisService] Parsing line: ${dataLine.substring(0, 100)}`);
     }
     
     // Parse columns (format depends on QUANTITIES parameter)
     // For QUANTITIES=31, columns are: Date, ObsEclLon, ObsEclLat
     const parts = dataLine.trim().split(/\s+/);
+
+    if (__DEV__) {
+      console.log(`[EphemerisService] Found ${parts.length} parts: ${parts.slice(0, 5).join(', ')}`);
+    }
     
     // Date is first (YYYY-MMM-DD HH:MM), then longitude
     // Find the first numeric value after the date
@@ -684,6 +759,9 @@ function parseEclipticLongitude(horizonsOutput: string): number | null {
       const val = parseFloat(parts[i]);
       if (!isNaN(val) && val >= 0 && val < 360) {
         lonValue = val;
+        if (__DEV__) {
+          console.log(`[EphemerisService] Parsed longitude: ${lonValue} at index ${i}`);
+        }
         break;
       }
     }
@@ -691,8 +769,9 @@ function parseEclipticLongitude(horizonsOutput: string): number | null {
     return lonValue;
     
   } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
     if (__DEV__) {
-      console.error('[EphemerisService] Parse error:', error);
+      console.error('[EphemerisService] Parse error:', errorMsg);
     }
     return null;
   }
