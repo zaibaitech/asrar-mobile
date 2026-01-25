@@ -10,6 +10,7 @@ import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyPlanetaryAnalysis } from '@/hooks/useDailyPlanetaryAnalysis';
 import type { Planet } from '@/services/PlanetaryHoursService';
+import { getDayRulerImpactOnDailyScore } from '@/services/DayRulingPlanetService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
@@ -95,6 +96,35 @@ export function DailyPlanetaryAnalysisDisplay({
           </View>
         )}
 
+        {/* Day Ruling Planet (Compact) */}
+        {analysis.dayRulingPlanet && analysis.dayRulingStrength !== undefined && (
+          (() => {
+            const rulerStrength = analysis.dayRulingStrength;
+            const impact = getDayRulerImpactOnDailyScore(rulerStrength);
+            const isPositive = impact >= 0;
+            const impactColor = isPositive ? '#10b981' : '#ef4444';
+
+            return (
+              <View style={styles.compactRulerRow}>
+                <View style={styles.compactRulerInfo}>
+                  <Text style={styles.compactRulerLabel}>Ruler:</Text>
+                  <Text style={styles.compactRulerPlanet}>{analysis.dayRulingPlanet}</Text>
+                </View>
+                <View style={styles.compactRulerStrength}>
+                  <Text style={[styles.compactRulerValue, { color: getScoreColor(rulerStrength) }]}>
+                    {rulerStrength.toFixed(0)}%
+                  </Text>
+                </View>
+                <View style={[styles.compactRulerImpact, { backgroundColor: impactColor + '20' }]}>
+                  <Text style={[styles.compactImpactText, { color: impactColor }]}>
+                    {isPositive ? '+' : ''}{impact}
+                  </Text>
+                </View>
+              </View>
+            );
+          })()
+        )}
+
         {/* Best Planets */}
         {(bestGeneral || bestSpiritual) && (
           <View style={styles.bestPlanetsRow}>
@@ -151,6 +181,75 @@ export function DailyPlanetaryAnalysisDisplay({
           </Text>
           <Text style={styles.scoreCardHint}>Average of all planetary strengths</Text>
         </LinearGradient>
+      )}
+
+      {/* Day Ruling Planet Strength */}
+      {analysis.dayRulingPlanet && analysis.dayRulingStrength !== undefined && (
+        (() => {
+          const rulerStrength = analysis.dayRulingStrength;
+          const impact = getDayRulerImpactOnDailyScore(rulerStrength);
+          const isPositive = impact >= 0;
+          const impactColor = isPositive ? '#10b981' : '#ef4444';
+          
+          let quality: string;
+          if (rulerStrength >= 80) quality = 'Excellent';
+          else if (rulerStrength >= 60) quality = 'Good';
+          else if (rulerStrength >= 40) quality = 'Moderate';
+          else if (rulerStrength >= 20) quality = 'Weak';
+          else quality = 'Very Weak';
+
+          return (
+            <LinearGradient
+              colors={['#8B735520', '#8B735508']}
+              style={styles.rulerCard}
+            >
+              <View style={styles.rulerHeader}>
+                <Text style={styles.rulerLabel}>Today's Ruler:</Text>
+                <Text style={styles.rulerPlanet}>{analysis.dayRulingPlanet}</Text>
+              </View>
+              
+              <View style={styles.rulerStrengthRow}>
+                <View style={styles.rulerStrengthBar}>
+                  <View
+                    style={[
+                      styles.rulerStrengthFill,
+                      { width: `${rulerStrength}%`, backgroundColor: getScoreColor(rulerStrength) },
+                    ]}
+                  />
+                </View>
+                <Text style={[styles.rulerStrengthValue, { color: getScoreColor(rulerStrength) }]}>
+                  {rulerStrength.toFixed(0)}%
+                </Text>
+              </View>
+
+              <View style={styles.rulerDetailsRow}>
+                <View style={styles.rulerQuality}>
+                  <Text style={styles.rulerQualityLabel}>Quality:</Text>
+                  <Text style={styles.rulerQualityValue}>{quality}</Text>
+                </View>
+                
+                <View style={[styles.rulerImpact, { borderLeftColor: impactColor }]}>
+                  <Text style={styles.rulerImpactLabel}>Impact on Daily Energy:</Text>
+                  <Text style={[styles.rulerImpactValue, { color: impactColor }]}>
+                    {isPositive ? '+' : ''}{impact} points
+                  </Text>
+                </View>
+              </View>
+
+              <Text style={styles.rulerExplanation}>
+                {rulerStrength >= 80
+                  ? `Strong ${analysis.dayRulingPlanet} energy today - excellent time for major work`
+                  : rulerStrength >= 60
+                    ? `Good ${analysis.dayRulingPlanet} energy - favorable conditions`
+                    : rulerStrength >= 40
+                      ? `Moderate ${analysis.dayRulingPlanet} energy - proceed with caution`
+                      : rulerStrength >= 20
+                        ? `Weak ${analysis.dayRulingPlanet} energy - avoid major decisions`
+                        : `Very weak ${analysis.dayRulingPlanet} energy - plan for another time`}
+              </Text>
+            </LinearGradient>
+          );
+        })()
       )}
 
       {/* Best Hours Summary */}
@@ -406,6 +505,48 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
 
+  // Compact Ruler
+  compactRulerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
+    paddingVertical: Spacing.xs,
+    backgroundColor: '#8B735510',
+    borderRadius: 6,
+  },
+  compactRulerInfo: {
+    flex: 1,
+  },
+  compactRulerLabel: {
+    color: DarkTheme.textTertiary,
+    fontSize: 9,
+  },
+  compactRulerPlanet: {
+    color: '#8B7355',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  compactRulerStrength: {
+    alignItems: 'center',
+  },
+  compactRulerValue: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  compactRulerImpact: {
+    paddingHorizontal: Spacing.xs,
+    paddingVertical: 2,
+    borderRadius: 4,
+    minWidth: 30,
+    alignItems: 'center',
+  },
+  compactImpactText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+
   // Expanded mode
   scoreCard: {
     borderRadius: 12,
@@ -425,6 +566,95 @@ const styles = StyleSheet.create({
   scoreCardHint: {
     color: DarkTheme.textTertiary,
     fontSize: 11,
+  },
+
+  // Day Ruler Card
+  rulerCard: {
+    borderRadius: 12,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+    borderLeftWidth: 4,
+    borderLeftColor: '#8B7355',
+  },
+  rulerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.sm,
+  },
+  rulerLabel: {
+    color: DarkTheme.textSecondary,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  rulerPlanet: {
+    color: '#8B7355',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  
+  rulerStrengthRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  rulerStrengthBar: {
+    flex: 1,
+    height: 8,
+    backgroundColor: '#ffffff20',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  rulerStrengthFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  rulerStrengthValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    minWidth: 40,
+    textAlign: 'right',
+  },
+
+  rulerDetailsRow: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  rulerQuality: {
+    flex: 1,
+  },
+  rulerQualityLabel: {
+    color: DarkTheme.textTertiary,
+    fontSize: 10,
+    marginBottom: 2,
+  },
+  rulerQualityValue: {
+    color: DarkTheme.textPrimary,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
+  rulerImpact: {
+    flex: 1,
+    paddingLeft: Spacing.sm,
+    borderLeftWidth: 2,
+  },
+  rulerImpactLabel: {
+    color: DarkTheme.textTertiary,
+    fontSize: 10,
+    marginBottom: 2,
+  },
+  rulerImpactValue: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+
+  rulerExplanation: {
+    color: DarkTheme.textSecondary,
+    fontSize: 11,
+    lineHeight: 16,
   },
 
   bestHoursCard: {
