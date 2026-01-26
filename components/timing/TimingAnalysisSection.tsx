@@ -178,84 +178,35 @@ export function TimingAnalysisSection({
   
   const [result, setResult] = useState<AsrariyaTimingResult | null>(null);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [errorKey, setErrorKey] = useState<'unableToCalculateTiming' | null>(null);
+  const [error, setError] = useState<string | null>(null);
   // Default to expanded for better UX - users should see reasoning immediately
   const [expandedSection, setExpandedSection] = useState<string | null>('breakdown');
   const [nextWindow, setNextWindow] = useState<{ startTime: Date; description: string } | null>(null);
 
-  const resultRef = useRef<AsrariyaTimingResult | null>(null);
-  useEffect(() => {
-    resultRef.current = result;
-  }, [result]);
-
-  const analysisInFlightRef = useRef(false);
-
   const category = practiceCategory || CONTEXT_TO_CATEGORY[context];
   const lang = (language || 'en') as 'en' | 'fr' | 'ar';
-
-  const headerTitle = useMemo(() => {
-    const labels = {
-      daily: { en: 'Daily Overview', fr: 'Aperçu du jour', ar: 'نظرة يومية' },
-      manazil: { en: 'Timing Analysis', fr: 'Analyse du timing', ar: 'تحليل التوقيت' },
-      moment: { en: 'Timing Analysis', fr: 'Analyse du timing', ar: 'تحليل التوقيت' },
-      transit: { en: 'Timing Analysis', fr: 'Analyse du timing', ar: 'تحليل التوقيت' },
-      general: { en: 'Timing Analysis', fr: 'Analyse du timing', ar: 'تحليل التوقيت' },
-    } as const;
-    return labels[context][lang];
-  }, [context, lang]);
-
-  const actionLabelOverride = useMemo(() => {
-    const labels = {
-      proceed: { en: null, fr: null, ar: null },
-      'proceed-with-care': { en: 'Proceed Mindfully', fr: 'Avancer avec attention', ar: 'تابع بوعي' },
-      modify: { en: 'Adjust Practice', fr: 'Ajuster la pratique', ar: 'عدّل الممارسة' },
-      wait: { en: 'Wait if Possible', fr: 'Attendre si possible', ar: 'انتظر إن أمكن' },
-    } as const;
-    return labels;
-  }, []);
 
   const runAnalysis = useCallback(async () => {
     if (!profile) {
       setLoading(false);
-      setRefreshing(false);
       return;
     }
 
-    if (analysisInFlightRef.current) return;
-    analysisInFlightRef.current = true;
-
-    const shouldBlockUI = !resultRef.current;
-    if (shouldBlockUI) {
-      setLoading(true);
-    } else {
-      setRefreshing(true);
-    }
-    setErrorKey(null);
+    setLoading(true);
+    setError(null);
 
     try {
       // Build spiritual profile from user profile
       const spiritualProfile = profileToSpiritualProfile(profile);
       
       // Build or use provided moment
-      const builtMoment = providedMoment || await buildCurrentMoment(stableLocation);
-      // Daily context should not mix "Daily" title with hourly-only analysis.
-      // We intentionally analyze the day ruler as a day-level overview.
-      const currentMoment: CurrentMoment =
-        context === 'daily' && !providedMoment
-          ? {
-              ...builtMoment,
-              planetaryHourPlanet: builtMoment.dayRuler,
-              planetaryHourElement: builtMoment.dayElement,
-              planetaryHourRemainingSeconds: 0,
-            }
-          : builtMoment;
+      const currentMoment = providedMoment || await buildCurrentMoment(stableLocation);
       
       // Run full analysis
       const analysisResult = await analyzeTimingForPractice(
         spiritualProfile,
         { category },
-        { location: stableLocation, moment: currentMoment, language: lang }
+        { location: stableLocation, moment: currentMoment }
       );
       
       setResult(analysisResult);
@@ -266,7 +217,7 @@ export function TimingAnalysisSection({
         const next = await findNextOptimalWindow(
           spiritualProfile,
           { category },
-          { location: stableLocation, lookAheadHours: 12, minimumScore: 70, language: lang }
+          { location: stableLocation, lookAheadHours: 12, minimumScore: 70 }
         );
         if (next) {
           setNextWindow({ startTime: next.startTime, description: next.description });
@@ -274,16 +225,11 @@ export function TimingAnalysisSection({
       }
     } catch (err) {
       console.error('[TimingAnalysis] Error:', err);
-      setErrorKey('unableToCalculateTiming');
+      setError('Unable to calculate timing');
     } finally {
-      analysisInFlightRef.current = false;
-      if (shouldBlockUI) {
-        setLoading(false);
-      } else {
-        setRefreshing(false);
-      }
+      setLoading(false);
     }
-  }, [profile, providedMoment, stableLocation, category, lang]);
+  }, [profile, providedMoment, stableLocation, category]);
 
   useEffect(() => {
     runAnalysis();
@@ -295,7 +241,7 @@ export function TimingAnalysisSection({
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="small" color="#8B7355" />
         <Text style={styles.loadingText}>
-          {t('asrariya.analyzing')}
+          {t('asrariya.analyzing') || 'Analyzing timing...'}
         </Text>
       </View>
     );
@@ -307,32 +253,26 @@ export function TimingAnalysisSection({
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyIcon}>👤</Text>
         <Text style={styles.emptyText}>
-          {t('asrariya.noProfile')}
+          {t('asrariya.noProfile') || 'Complete your profile for personalized timing analysis'}
         </Text>
       </View>
     );
   }
 
   // Error state
-  if (errorKey || !result) {
+  if (error || !result) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorIcon}>⚠️</Text>
-        <Text style={styles.errorText}>
-          {errorKey
-            ? t(`asrariya.errors.${errorKey}`)
-            : t('asrariya.errors.unableToLoadAnalysis')}
-        </Text>
+        <Text style={styles.errorText}>{error || 'Unable to load analysis'}</Text>
         <TouchableOpacity onPress={runAnalysis} style={styles.retryButton}>
-          <Text style={styles.retryText}>{t('common.retry')}</Text>
+          <Text style={styles.retryText}>{t('common.retry') || 'Retry'}</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   const levelConfig = LEVEL_CONFIG[result.level];
-  const actionOverride = actionLabelOverride[result.action]?.[lang] ?? null;
-  const displayLevelLabel = actionOverride || levelConfig.label[lang];
 
   return (
     <View style={styles.container}>
@@ -346,10 +286,10 @@ export function TimingAnalysisSection({
             <Text style={styles.scoreIcon}>{levelConfig.icon}</Text>
             <View style={styles.scoreTextContainer}>
               <Text style={styles.sectionTitle}>
-                {headerTitle}
+                {t('asrariya.timingAnalysis') || 'Timing Analysis For You'}
               </Text>
               <Text style={[styles.levelLabel, { color: levelConfig.color }]}>
-                {displayLevelLabel}
+                {levelConfig.label[lang]}
               </Text>
             </View>
           </View>
@@ -373,9 +313,7 @@ export function TimingAnalysisSection({
         </View>
 
         {/* Short Summary */}
-          <Text style={styles.summaryText}>
-            {result.action === 'proceed-with-care' ? (lang === 'fr' ? 'Quelques signaux demandent de la prudence.' : lang === 'ar' ? 'بعض الإشارات تتطلب الحذر.' : 'Some signals suggest extra care.') : result.shortSummary}
-          </Text>
+        <Text style={styles.summaryText}>{result.shortSummary}</Text>
       </LinearGradient>
 
       {/* Layer Breakdown */}
@@ -388,7 +326,7 @@ export function TimingAnalysisSection({
             <View style={styles.sectionHeaderLeft}>
               <Ionicons name="analytics-outline" size={18} color="#8B7355" />
               <Text style={styles.sectionHeaderText}>
-                {t('asrariya.whyThisRating')}
+                {t('asrariya.whyThisRating') || 'Why This Rating?'}
               </Text>
             </View>
             <Ionicons 
@@ -411,11 +349,7 @@ export function TimingAnalysisSection({
                       <View style={styles.layerTextContainer}>
                         <Text style={styles.layerName}>{layerLabel[lang]}</Text>
                         <Text style={styles.layerReasoning} numberOfLines={2}>
-                          {lang === 'ar'
-                            ? (layer.reasoningAr || layer.reasoning)
-                            : lang === 'fr'
-                              ? (layer.reasoningFr || layer.reasoning)
-                              : layer.reasoning}
+                          {layer.reasoning}
                         </Text>
                       </View>
                     </View>
@@ -446,7 +380,7 @@ export function TimingAnalysisSection({
           <View style={styles.guidanceHeader}>
             <Text style={styles.guidanceIcon}>🎯</Text>
             <Text style={styles.guidanceTitle}>
-              {t('asrariya.whatThisMeans')}
+              {t('asrariya.whatThisMeans') || 'What This Means For You'}
             </Text>
           </View>
           <Text style={styles.reasoningText}>{result.reasoning}</Text>
@@ -457,7 +391,7 @@ export function TimingAnalysisSection({
             {result.enhancements.length > 0 && !hideSections.includes('enhancements') && (
               <View style={styles.actionList}>
                 <Text style={styles.actionListTitle}>
-                  ✅ {t('asrariya.recommended')}
+                  ✅ {t('asrariya.recommended') || 'Recommended Now'}
                 </Text>
                 {result.enhancements.slice(0, 4).map((enh, idx) => (
                   <View key={idx} style={styles.actionItem}>
@@ -475,7 +409,7 @@ export function TimingAnalysisSection({
             {result.cautions.length > 0 && (
               <View style={styles.actionList}>
                 <Text style={[styles.actionListTitle, { color: '#f97316' }]}>
-                  ⚠️ {t('asrariya.cautions')}
+                  ⚠️ {t('asrariya.cautions') || 'Be Mindful Of'}
                 </Text>
                 {result.cautions.slice(0, 3).map((caution, idx) => (
                   <View key={idx} style={styles.actionItem}>
@@ -497,7 +431,7 @@ export function TimingAnalysisSection({
           <View style={styles.alternativeHeader}>
             <Ionicons name="time-outline" size={18} color="#60A5FA" />
             <Text style={styles.alternativeTitle}>
-              {t('asrariya.betterTiming')}
+              {t('asrariya.betterTiming') || 'Better Timing Available'}
             </Text>
           </View>
           <Text style={styles.alternativeText}>
@@ -515,7 +449,7 @@ export function TimingAnalysisSection({
           <View style={styles.windowHeader}>
             <Ionicons name="hourglass-outline" size={16} color="#10b981" />
             <Text style={styles.windowText}>
-              {t('asrariya.optimalUntil')}{' '}
+              {t('asrariya.optimalUntil') || 'Optimal window until'}{' '}
               <Text style={styles.windowTime}>
                 {result.optimalWindowEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </Text>
