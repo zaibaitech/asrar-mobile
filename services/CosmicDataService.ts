@@ -18,8 +18,8 @@
  */
 
 import { globalRequestManager } from '@/services/cache/RequestManager';
+import { moonDataCache } from '@/services/cache/CacheManager';
 import { MoonLongitudeResult } from '@/services/EphemerisService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ============================================================================
 // CONFIGURATION
@@ -169,7 +169,7 @@ export async function getMoonLongitudeFromServer(
       throw new Error('Edge Function returned null');
     }
 
-    // Cache locally
+    // Cache locally using production cache manager
     const cacheEntry: LocalCacheEntry<CosmicDataResponse> = {
       data,
       cachedAt: Date.now(),
@@ -177,21 +177,17 @@ export async function getMoonLongitudeFromServer(
     };
 
     memoryCache.moon = cacheEntry;
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.MOON_CACHE, JSON.stringify(cacheEntry));
-    } catch (cacheError) {
-      // Handle disk full by keeping data in memory only
-      const errorMsg = (cacheError as any)?.message || '';
-      if (errorMsg.includes('SQLITE_FULL') || errorMsg.includes('disk is full')) {
-        if (__DEV__) {
-          console.warn('[CosmicDataService] Disk full, keeping Moon data in memory only');
-        }
-        // Data is already in memory cache, so continue without persistence
-      } else {
-        if (__DEV__) {
-          console.error('[CosmicDataService] Moon cache write error:', cacheError);
-        }
-      }
+    
+    // Try to persist, but continue if storage is full
+    const success = await moonDataCache.set(
+      `moon_${date.toISOString()}`,
+      cacheEntry,
+      LOCAL_CACHE_TTL_MS,
+      'high'
+    );
+    
+    if (!success && __DEV__) {
+      console.warn('[CosmicDataService] Moon cache write failed (storage may be full), using memory only');
     }
 
     if (__DEV__) {

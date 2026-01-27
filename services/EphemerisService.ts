@@ -24,6 +24,7 @@ import {
     PlanetPositions,
 } from '@/types/divine-timing-personal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ephemerisCache } from '@/services/cache/CacheManager';
 import NetInfo from '@react-native-community/netinfo';
 
 const inflightPositions = new Map<string, Promise<PlanetPositions | null>>();
@@ -896,37 +897,25 @@ async function getCachedPositions(cacheKey: string): Promise<PlanetPositions | n
 }
 
 /**
- * Cache planetary positions with disk full handling
+ * Cache planetary positions with graceful fallback
  */
 async function cachePositions(cacheKey: string, positions: PlanetPositions): Promise<void> {
   try {
-    await AsyncStorage.setItem(cacheKey, JSON.stringify(positions));
-  } catch (error) {
-    // Handle disk full error by clearing old cache and retrying
-    const errorMsg = (error as any)?.message || '';
-    if (errorMsg.includes('SQLITE_FULL') || errorMsg.includes('disk is full')) {
-      try {
-        if (__DEV__) {
-          console.warn('[EphemerisService] Disk full, clearing cache and retrying...');
-        }
-        // Clear this cache key and retry
-        await AsyncStorage.removeItem(cacheKey);
-        // Retry write with cleared space
-        await AsyncStorage.setItem(cacheKey, JSON.stringify(positions));
-        if (__DEV__) {
-          console.log('[EphemerisService] Cache retry successful after clearing');
-        }
-      } catch (retryError) {
-        if (__DEV__) {
-          console.error('[EphemerisService] Cache retry failed, data will be recalculated:', retryError);
-        }
-        // If cache fails, data is recalculated on next request - still functional
-      }
-    } else {
-      if (__DEV__) {
-        console.error('[EphemerisService] Cache write error:', error);
-      }
+    const success = await ephemerisCache.set(
+      cacheKey,
+      positions,
+      30 * 60 * 1000, // 30 min TTL
+      'high'
+    );
+    
+    if (!success && __DEV__) {
+      console.warn('[EphemerisService] Ephemeris cache write failed, using memory only');
     }
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[EphemerisService] Cache error:', error);
+    }
+    // Continue without caching - data is still usable
   }
 }
 
