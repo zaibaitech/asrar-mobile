@@ -114,7 +114,7 @@ const ALLOW_APPROX_FALLBACK = false;
 export async function getAllTransits(): Promise<AllPlanetTransits | null> {
   try {
     if (memoryTransits) {
-      const lastUpdate = await getLastUpdateTime();
+      const lastUpdate = getLastUpdatedFromTransits(memoryTransits);
       if (isCacheValid(lastUpdate)) {
         if (__DEV__) {
           console.log('[TransitService] ✓ Using memory cache');
@@ -132,7 +132,7 @@ export async function getAllTransits(): Promise<AllPlanetTransits | null> {
 
     // Check cache first
     const cached = await getCachedTransits();
-    const lastUpdate = await getLastUpdateTime();
+    const lastUpdate = getLastUpdatedFromTransits(cached);
     
     if (cached && isCacheValid(lastUpdate)) {
       if (__DEV__) {
@@ -462,16 +462,18 @@ function isCacheValid(lastUpdate: Date | null): boolean {
   return isValid;
 }
 
-/**
- * Get last update time from cache
- */
-async function getLastUpdateTime(): Promise<Date | null> {
-  try {
-    const timestamp = await AsyncStorage.getItem(CACHE_KEYS.LAST_UPDATE);
-    return timestamp ? new Date(timestamp) : null;
-  } catch {
-    return null;
-  }
+function getLastUpdatedFromTransits(transits: AllPlanetTransits | null): Date | null {
+  if (!transits) return null;
+  // Any planet's `lastUpdated` is acceptable since all are generated together.
+  const candidate =
+    transits.Sun ??
+    transits.Moon ??
+    transits.Mercury ??
+    transits.Venus ??
+    transits.Mars ??
+    transits.Jupiter ??
+    transits.Saturn;
+  return candidate?.lastUpdated ?? null;
 }
 
 // ============================================================================
@@ -597,7 +599,8 @@ export function detectInvalidTransitChange(
  */
 export async function clearTransitCache(): Promise<void> {
   try {
-    await AsyncStorage.multiRemove([CACHE_KEYS.TRANSITS, CACHE_KEYS.LAST_UPDATE]);
+    await transitsCache.clear();
+    memoryTransits = null;
     
     if (__DEV__) {
       console.log('[TransitService] Cleared transit cache');

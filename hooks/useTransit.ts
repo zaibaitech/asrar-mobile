@@ -143,7 +143,7 @@ export function useAllTransits(): UseAllTransitsResult {
   const loadTransits = useCallback(async () => {
     try {
       // Only show loading if we have nothing to render yet.
-      if (!transits) {
+      if (!getTransitsFromMemory()) {
         setLoading(true);
       }
       setError(null);
@@ -164,7 +164,7 @@ export function useAllTransits(): UseAllTransitsResult {
     } finally {
       setLoading(false);
     }
-  }, [transits]);
+  }, []);
   
   const refresh = useCallback(async () => {
     try {
