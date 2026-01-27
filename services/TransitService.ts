@@ -10,8 +10,8 @@
  * Fallback: Use last-known cached data; do NOT guess positions.
  */
 
-import { globalRequestManager } from '@/services/cache/RequestManager';
 import { transitsCache } from '@/services/cache/CacheManager';
+import { globalRequestManager } from '@/services/cache/RequestManager';
 import { PlanetPositions } from '@/types/divine-timing-personal';
 import {
     AllPlanetTransits,

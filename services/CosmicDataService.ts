@@ -17,8 +17,8 @@
  * - 1000 users × 10s = 0 Horizons calls during normal operation
  */
 
-import { globalRequestManager } from '@/services/cache/RequestManager';
 import { moonDataCache } from '@/services/cache/CacheManager';
+import { globalRequestManager } from '@/services/cache/RequestManager';
 import { MoonLongitudeResult } from '@/services/EphemerisService';
 
 // ============================================================================

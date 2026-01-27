@@ -13,6 +13,7 @@
  * @see https://ssd-api.jpl.nasa.gov/doc/horizons.html
  */
 
+import { ephemerisCache } from '@/services/cache/CacheManager';
 import {
     generateSyntheticPositions,
     getCachedEphemerisData,
@@ -24,7 +25,6 @@ import {
     PlanetPositions,
 } from '@/types/divine-timing-personal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ephemerisCache } from '@/services/cache/CacheManager';
 import NetInfo from '@react-native-community/netinfo';
 
 const inflightPositions = new Map<string, Promise<PlanetPositions | null>>();
