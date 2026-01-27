@@ -116,11 +116,17 @@ export async function getAllTransits(): Promise<AllPlanetTransits | null> {
     if (memoryTransits) {
       const lastUpdate = await getLastUpdateTime();
       if (isCacheValid(lastUpdate)) {
+        if (__DEV__) {
+          console.log('[TransitService] ✓ Using memory cache');
+        }
         return markAsCached(memoryTransits);
       }
     }
 
     if (inflightAll) {
+      if (__DEV__) {
+        console.log('[TransitService] ⏳ Waiting for in-flight request...');
+      }
       return inflightAll;
     }
 
@@ -130,7 +136,7 @@ export async function getAllTransits(): Promise<AllPlanetTransits | null> {
     
     if (cached && isCacheValid(lastUpdate)) {
       if (__DEV__) {
-        console.log('[TransitService] Using cached transits');
+        console.log('[TransitService] ✓ Using disk cache');
       }
       const out = markAsCached(cached);
       memoryTransits = out;
@@ -139,7 +145,8 @@ export async function getAllTransits(): Promise<AllPlanetTransits | null> {
     
     // Fetch fresh data
     if (__DEV__) {
-      console.log('[TransitService] Fetching fresh transit data...');
+      const age = lastUpdate ? Date.now() - lastUpdate.getTime() : null;
+      console.log('[TransitService] 🔄 Fetching fresh transit data... (cache age: ' + (age ? age + 'ms' : 'none') + ')');
     }
     
     inflightAll = globalRequestManager.schedule(
@@ -434,7 +441,12 @@ async function getCachedTransits(): Promise<AllPlanetTransits | null> {
  * Check if cache is still valid
  */
 function isCacheValid(lastUpdate: Date | null): boolean {
-  if (!lastUpdate) return false;
+  if (!lastUpdate) {
+    if (__DEV__) {
+      console.log('[TransitService] Cache invalid: no lastUpdate');
+    }
+    return false;
+  }
   
   const now = new Date();
   const age = now.getTime() - lastUpdate.getTime();
@@ -442,7 +454,12 @@ function isCacheValid(lastUpdate: Date | null): boolean {
   // Real-time UI refresh window.
   const maxAge = UI_REFRESH_MS;
   
-  return age < maxAge;
+  const isValid = age < maxAge;
+  if (__DEV__ && !isValid) {
+    console.log(`[TransitService] Cache invalid: age ${age}ms > max ${maxAge}ms`);
+  }
+  
+  return isValid;
 }
 
 /**

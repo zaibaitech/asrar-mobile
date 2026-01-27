@@ -15,8 +15,8 @@ import DailyEnergyCard from '@/components/timing/DailyEnergyCard';
 import { DailyPlanetaryAnalysisDisplay } from '@/components/timing/DailyPlanetaryAnalysisDisplay';
 import MoonDayHarmonyCard from '@/components/timing/MoonDayHarmonyCard';
 import MoonPhaseHeaderCard from '@/components/timing/MoonPhaseHeaderCard';
-import TimingGuidanceCard from '@/components/timing/TimingGuidanceCard';
 import TodayDetailsCard from '@/components/timing/TodayDetailsCard';
+import TimingGuidanceCard from '@/components/timing/TimingGuidanceCard';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -721,9 +721,6 @@ export default function DailyGuidanceDetailsScreen() {
   // Get daily planetary analysis with moon phase data
   const { analysis: dailyAnalysis, loading: analysisLoading } = useDailyPlanetaryAnalysis();
   
-  // Capture Asrāriya Timing Engine result for unified scoring
-  const [timingResult, setTimingResult] = useState<{ overallScore: number } | null>(null);
-  
   const [bestForExpanded, setBestForExpanded] = useState(true);
   
   // Parse params
@@ -740,8 +737,7 @@ export default function DailyGuidanceDetailsScreen() {
   const dayKeys = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const dayKey = dayKeys[dayOfWeek];
   const dayName = t(`home.dailyGuidanceDetails.days.${dayKey}`);
-  const dateLocale = language === 'fr' ? 'fr-FR' : language === 'ar' ? 'ar' : 'en-US';
-  const date = now.toLocaleDateString(dateLocale, { month: 'long', day: 'numeric', year: 'numeric' });
+  const date = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
   // Ensure interpolated params contain human-readable values.
   // (The guidance service may provide a translation key for "day" since it doesn't have access to `t`.)
@@ -757,17 +753,11 @@ export default function DailyGuidanceDetailsScreen() {
   const dayRuler = getDayRuler(now);
   const dayRulerInfo = getPlanetInfo(dayRuler);
   
-  // CRITICAL FIX: Use Asrāriya Timing Engine as single source of truth
-  // Prioritizes timingResult (57% - Asrāriya comprehensive analysis)
-  // Falls back to dailyAnalysis (51% - simple weighted calculation) if timing not ready
-  // This ensures ALL displays show the same percentage (57% Good Time in blue)
+  // CRITICAL FIX: Single source of truth for daily energy score
+  // Use dailyAnalysis.dailyScore throughout (weighted calculation: 50% day ruler + 30% moon + 20% others)
+  // This replaces the old TimingAnalysisSection which was showing a different percentage
   
   function getDailyEnergyScore(): number {
-    // Prioritize Asrāriya Timing Engine result (more comprehensive, branded methodology)
-    if (timingResult?.overallScore) {
-      return timingResult.overallScore;
-    }
-    // Fallback to daily planetary analysis while timing engine loads
     return dailyAnalysis?.dailyScore || 0;
   }
   
@@ -781,10 +771,10 @@ export default function DailyGuidanceDetailsScreen() {
   
   function getStatusLabel() {
     const score = getDailyEnergyScore();
-    if (score >= 70) return t('home.dailyGuidanceDetails.status.excellent');
-    if (score >= 55) return t('home.dailyGuidanceDetails.status.good');
-    if (score >= 40) return t('home.dailyGuidanceDetails.status.moderate');
-    return t('home.dailyGuidanceDetails.status.proceedMindfully');
+    if (score >= 70) return '✨ Excellent Timing';
+    if (score >= 55) return '🌟 Good Timing';
+    if (score >= 40) return '⚠️ Moderate Timing';
+    return '🔄 Proceed Mindfully';
   }
   
   function getElementIcon(element: Element) {
@@ -878,29 +868,18 @@ export default function DailyGuidanceDetailsScreen() {
           {/* SECTION 3: DAILY ENERGY (Overall Weighted Score with Breakdown) */}
           {dailyAnalysis && (
             <DailyEnergyCard 
-              score={getDailyEnergyScore()}
+              score={dailyAnalysis.dailyScore || 0}
               breakdown={dailyAnalysis.scoreBreakdown}
             />
           )}
 
-          {/* PRIMARY TIMING ANALYSIS: Asrariya Timing Engine (Personalized) */}
+          {/* Asrariya Timing Analysis - Personalized */}
           <TimingAnalysisSection
             context="daily"
             hideSections={['alternatives']}
-            onAnalysisComplete={(result) => setTimingResult({ overallScore: result.overallScore })}
           />
 
-          {/* SUPPLEMENTARY ANALYSIS: Classical Planetary Strength (Astronomical) */}
-          {/* This shows the raw strength of planets based on their current zodiac positions */}
-          {/* Different from Asrāriya score - measures position-based strength, not timing suitability */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              🌍 {t('home.dailyGuidanceDetails.sections.planetaryStrength') || 'Astronomical Planetary Status'}
-            </Text>
-            <Text style={styles.sectionSubtitle}>
-              Real-time planetary positions and strength • Based on current astronomical data
-            </Text>
-          </View>
+          {/* Enhanced Planetary Strength Analysis */}
           <DailyPlanetaryAnalysisDisplay expanded={true} />
           
           {/* SECTION 4: TODAY'S DETAILS (Day ruler, element, quality) */}

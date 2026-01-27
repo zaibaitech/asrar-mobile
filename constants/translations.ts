@@ -1841,18 +1841,6 @@ export const translations = {
       // Daily Guidance Details Screen
       dailyGuidanceDetails: {
         title: "Daily Energy",
-        status: {
-          excellent: "✨ Excellent Timing",
-          good: "🌟 Good Timing",
-          moderate: "⚠️ Moderate Timing",
-          proceedMindfully: "🔄 Proceed Mindfully",
-        },
-        dailyEnergyCard: {
-          title: "Daily Energy",
-          weightedCalculation: "Weighted Calculation",
-          otherPlanets: "Other Planets",
-          total: "Total",
-        },
         sections: {
           dayRuler: "Day Ruler",
           dailyWindow: "Daily Window",
@@ -1860,7 +1848,6 @@ export const translations = {
           manazil: "Manazil (Lunar Mansion)",
           bestFor: "Best For",
           whyThis: "Why This?",
-          planetaryStrength: "Astronomical Planetary Status",
         },
         manazil: {
           title: "Your lunar baseline",
@@ -8896,114 +8883,6 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         },
       },
     },
-
-    // Moon Phase System
-    moon: {
-      phases: {
-        new: "New Moon",
-        waxing_crescent: "Waxing Crescent",
-        first_quarter: "First Quarter",
-        waxing_gibbous: "Waxing Gibbous",
-        full: "Full Moon",
-        waning_gibbous: "Waning Gibbous",
-        last_quarter: "Last Quarter",
-        waning_crescent: "Waning Crescent",
-      },
-
-      phasesArabic: {
-        new: "المحاق",
-        waxing_crescent: "الهلال المتزايد",
-        first_quarter: "التربيع الأول",
-        waxing_gibbous: "الأحدب المتزايد",
-        full: "البدر",
-        waning_gibbous: "الأحدب المتناقص",
-        last_quarter: "التربيع الثاني",
-        waning_crescent: "الهلال المتناقص",
-      },
-
-      new: {
-        title: "Time for Rest & Intention",
-        description: "Like the darkest hour before dawn, this is a time for quiet reflection, setting intentions, and preparing for the cycle ahead. Conserve your energy.",
-      },
-
-      waxing_crescent: {
-        title: "Time for New Beginnings",
-        description: "Like a seed breaking through soil, this is when intentions become visible. The Moon's growing light supports starting projects, planting seeds, and building momentum.",
-      },
-
-      first_quarter: {
-        title: "Time for Action & Growth",
-        description: "The Moon is half-illuminated and energy is rising. This is the time to take decisive action, overcome obstacles, and push your projects forward with confidence.",
-      },
-
-      waxing_gibbous: {
-        title: "Time for Refinement",
-        description: "Nearly full, the Moon's light illuminates what needs adjustment. Perfect for refining your work, making improvements, and preparing for completion.",
-      },
-
-      full: {
-        title: "Time for Culmination",
-        description: "Like a tree heavy with ripe fruit, this is the peak of manifestation. Celebrate achievements, complete major milestones, and make important announcements.",
-      },
-
-      waning_gibbous: {
-        title: "Time for Gratitude & Sharing",
-        description: "The light begins to decrease. This is the time to share what you've created, express gratitude for what's been received, and begin releasing what no longer serves.",
-      },
-
-      last_quarter: {
-        title: "Time for Release & Clearing",
-        description: "Half the light remains. Actively release what's holding you back, clear away obstacles, break old patterns, and make space for the new cycle ahead.",
-      },
-
-      waning_crescent: {
-        title: "Time for Completion & Surrender",
-        description: "The final sliver of light. Finish what remains, tie up loose ends, practice forgiveness, and prepare for the rest period ahead. Let go with grace.",
-      },
-
-      harmony: {
-        waxing_active: "Perfect alignment! The Moon's growing light beautifully matches {dayRuler}'s active energy. Excellent timing for launching projects and taking initiative.",
-        waxing_active_rec: "This is ideal timing for bold action, starting ventures, and making your mark.",
-
-        waning_reflective: "Perfect alignment! The Moon's decreasing light harmonizes with {dayRuler}'s reflective nature. Excellent timing for completion and inner work.",
-        waning_reflective_rec: "Focus on finishing projects, releasing what's done, and inner spiritual practices.",
-
-        waxing_reflective: "Mixed timing. The waxing Moon wants to build, but {dayRuler} calls for reflection. Choose your actions carefully.",
-        waxing_reflective_rec: "Start inner-focused or gentle projects. Avoid aggressive outward action.",
-
-        waning_active: "Mixed timing. The waning Moon wants to release, but {dayRuler} calls for action. Navigate this tension wisely.",
-        waning_active_rec: "Focus on completing active projects rather than starting new ones.",
-
-        neutral: "Moderate alignment. The Moon and {dayRuler} create balanced conditions.",
-        neutral_rec: "Proceed with awareness. Both starting and completing are possible with care.",
-      },
-
-      ui: {
-        lunarTiming: "Lunar Timing",
-        moonPhase: "Moon Phase",
-        lunarDay: "Lunar Day",
-        dayOfMonth: "Day {day} of 30",
-        moonPower: "Moon Power",
-        waxing: "Waxing (Growing)",
-        waning: "Waning (Decreasing)",
-        rest: "Rest",
-        learnMore: "Learn More",
-        fullGuide: "Full Lunar Guide",
-        moonDayHarmony: "Moon-Day Harmony",
-        perfectAlignment: "Perfect Alignment",
-        goodAlignment: "Good Alignment",
-        neutralAlignment: "Neutral Alignment",
-        challengingAlignment: "Challenging Alignment",
-        suitableFor: "Best For",
-        notSuitableFor: "Avoid",
-        whyThisMatters: "Why This Matters",
-        traditionalWisdom: "Traditional Wisdom",
-        practicalExample: "Practical Example",
-        spiritualGuidance: "Spiritual Guidance",
-        explanation: "Explanation",
-        recommendation: "Recommendation",
-      },
-    },
   },
 
   fr: {
@@ -10819,18 +10698,6 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       // Daily Guidance Details Screen  
       dailyGuidanceDetails: {
         title: "Énergie du Jour",
-        status: {
-          excellent: "✨ Timing excellent",
-          good: "🌟 Bon timing",
-          moderate: "⚠️ Timing modéré",
-          proceedMindfully: "🔄 Procédez avec attention",
-        },
-        dailyEnergyCard: {
-          title: "Énergie du jour",
-          weightedCalculation: "Calcul pondéré",
-          otherPlanets: "Autres planètes",
-          total: "Total",
-        },
         sections: {
           dayRuler: "Planète du jour",
           dailyWindow: "Fenêtre quotidienne",
@@ -10839,7 +10706,6 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           bestFor: "Idéal pour",
           whyThis: "Pourquoi?",
           ascendantLens: "Prisme de l’Ascendant",
-          planetaryStrength: "État planétaire astronomique",
         },
 
         ascendant: {
@@ -17942,114 +17808,6 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         },
       },
     },
-
-    // Système des phases lunaires
-    moon: {
-      phases: {
-        new: "Nouvelle Lune",
-        waxing_crescent: "Premier croissant",
-        first_quarter: "Premier quartier",
-        waxing_gibbous: "Gibbeuse croissante",
-        full: "Pleine Lune",
-        waning_gibbous: "Gibbeuse décroissante",
-        last_quarter: "Dernier quartier",
-        waning_crescent: "Dernier croissant",
-      },
-
-      phasesArabic: {
-        new: "المحاق",
-        waxing_crescent: "الهلال المتزايد",
-        first_quarter: "التربيع الأول",
-        waxing_gibbous: "الأحدب المتزايد",
-        full: "البدر",
-        waning_gibbous: "الأحدب المتناقص",
-        last_quarter: "التربيع الثاني",
-        waning_crescent: "الهلال المتناقص",
-      },
-
-      new: {
-        title: "Temps de repos et d’intention",
-        description: "Comme l’heure la plus sombre avant l’aube, c’est un moment de calme, de réflexion et de mise en intention. Préparez le cycle à venir et économisez votre énergie.",
-      },
-
-      waxing_crescent: {
-        title: "Temps de nouveaux départs",
-        description: "Comme une graine qui perce la terre, vos intentions commencent à se manifester. La lumière croissante soutient les commencements, les semences et l’élan.",
-      },
-
-      first_quarter: {
-        title: "Temps d’action et de croissance",
-        description: "La Lune est à moitié illuminée et l’énergie monte. C’est le moment d’agir avec décision, de surmonter les obstacles et d’avancer avec confiance.",
-      },
-
-      waxing_gibbous: {
-        title: "Temps d’affinement",
-        description: "Presque pleine, la Lune révèle ce qui demande un ajustement. Idéal pour améliorer, corriger et préparer l’achèvement.",
-      },
-
-      full: {
-        title: "Temps d’aboutissement",
-        description: "Comme un arbre chargé de fruits mûrs, c’est le pic de manifestation. Célébrez, finalisez des étapes majeures et partagez ce qui est prêt.",
-      },
-
-      waning_gibbous: {
-        title: "Temps de gratitude et de partage",
-        description: "La lumière commence à décroître. Partagez ce que vous avez créé, remerciez pour ce qui a été reçu et commencez à relâcher ce qui ne sert plus.",
-      },
-
-      last_quarter: {
-        title: "Temps de lâcher-prise et de purification",
-        description: "Il reste la moitié de la lumière. Relâchez activement ce qui bloque, clarifiez les obstacles, rompez les anciens schémas et faites de la place pour le nouveau.",
-      },
-
-      waning_crescent: {
-        title: "Temps d’achèvement et d’abandon",
-        description: "Dernier filet de lumière. Terminez ce qui reste, bouclez les détails, pratiquez le pardon et préparez le repos. Lâchez avec grâce.",
-      },
-
-      harmony: {
-        waxing_active: "Alignement parfait ! La lumière croissante de la Lune soutient l’énergie active de {dayRuler}. Excellent moment pour lancer et prendre l’initiative.",
-        waxing_active_rec: "Moment idéal pour une action claire, démarrer et poser des actes concrets.",
-
-        waning_reflective: "Alignement parfait ! La lumière décroissante de la Lune harmonise la nature réfléchie de {dayRuler}. Excellent moment pour finir et revenir à l’intérieur.",
-        waning_reflective_rec: "Concentrez-vous sur l’achèvement, le relâchement et les pratiques spirituelles.",
-
-        waxing_reflective: "Timing mixte. La Lune croissante veut construire, mais {dayRuler} appelle à la réflexion. Choisissez vos actions avec soin.",
-        waxing_reflective_rec: "Démarrez des projets doux ou intérieurs. Évitez l’action agressive vers l’extérieur.",
-
-        waning_active: "Timing mixte. La Lune décroissante veut relâcher, mais {dayRuler} appelle à l’action. Naviguez cette tension avec sagesse.",
-        waning_active_rec: "Misez sur la finalisation de projets plutôt que sur de nouveaux départs.",
-
-        neutral: "Alignement modéré. La Lune et {dayRuler} créent des conditions équilibrées.",
-        neutral_rec: "Avancez avec conscience. Commencer et terminer sont possibles avec attention.",
-      },
-
-      ui: {
-        lunarTiming: "Timing lunaire",
-        moonPhase: "Phase lunaire",
-        lunarDay: "Jour lunaire",
-        dayOfMonth: "Jour {day} sur 30",
-        moonPower: "Puissance lunaire",
-        waxing: "Croissante",
-        waning: "Décroissante",
-        rest: "Repos",
-        learnMore: "En savoir plus",
-        fullGuide: "Guide lunaire complet",
-        moonDayHarmony: "Harmonie Lune-Jour",
-        perfectAlignment: "Alignement parfait",
-        goodAlignment: "Bon alignement",
-        neutralAlignment: "Alignement neutre",
-        challengingAlignment: "Alignement difficile",
-        suitableFor: "Idéal pour",
-        notSuitableFor: "À éviter",
-        whyThisMatters: "Pourquoi c’est important",
-        traditionalWisdom: "Sagesse traditionnelle",
-        practicalExample: "Exemple concret",
-        spiritualGuidance: "Guidance spirituelle",
-        explanation: "Explication",
-        recommendation: "Recommandation",
-      },
-    },
   },
   ar: {
         // Moment Alignment Screen (Hourly)
@@ -19451,19 +19209,19 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       },
       
       harmony: {
-        waxing_active: "Perfect alignment! The Moon's growing light beautifully matches {dayRuler}'s active energy. Excellent timing for launching projects and taking initiative.",
+        waxing_active: "Perfect alignment! The Moon's growing light beautifully matches {{dayRuler}}'s active energy. Excellent timing for launching projects and taking initiative.",
         waxing_active_rec: "This is ideal timing for bold action, starting ventures, and making your mark.",
         
-        waning_reflective: "Perfect alignment! The Moon's decreasing light harmonizes with {dayRuler}'s reflective nature. Excellent timing for completion and inner work.",
+        waning_reflective: "Perfect alignment! The Moon's decreasing light harmonizes with {{dayRuler}}'s reflective nature. Excellent timing for completion and inner work.",
         waning_reflective_rec: "Focus on finishing projects, releasing what's done, and inner spiritual practices.",
         
-        waxing_reflective: "Mixed timing. The waxing Moon wants to build, but {dayRuler} calls for reflection. Choose your actions carefully.",
+        waxing_reflective: "Mixed timing. The waxing Moon wants to build, but {{dayRuler}} calls for reflection. Choose your actions carefully.",
         waxing_reflective_rec: "Start inner-focused or gentle projects. Avoid aggressive outward action.",
         
-        waning_active: "Mixed timing. The waning Moon wants to release, but {dayRuler} calls for action. Navigate this tension wisely.",
+        waning_active: "Mixed timing. The waning Moon wants to release, but {{dayRuler}} calls for action. Navigate this tension wisely.",
         waning_active_rec: "Focus on completing active projects rather than starting new ones.",
         
-        neutral: "Moderate alignment. The Moon and {dayRuler} create balanced conditions.",
+        neutral: "Moderate alignment. The Moon and {{dayRuler}} create balanced conditions.",
         neutral_rec: "Proceed with awareness. Both starting and completing are possible with care.",
       },
       
@@ -19471,7 +19229,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         lunarTiming: "Lunar Timing",
         moonPhase: "Moon Phase",
         lunarDay: "Lunar Day",
-        dayOfMonth: "Day {day} of 30",
+        dayOfMonth: "Day {{day}} of 30",
         moonPower: "Moon Power",
         waxing: "Waxing (Growing)",
         waning: "Waning (Decreasing)",
