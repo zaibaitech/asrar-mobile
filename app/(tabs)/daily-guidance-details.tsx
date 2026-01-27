@@ -15,8 +15,8 @@ import DailyEnergyCard from '@/components/timing/DailyEnergyCard';
 import { DailyPlanetaryAnalysisDisplay } from '@/components/timing/DailyPlanetaryAnalysisDisplay';
 import MoonDayHarmonyCard from '@/components/timing/MoonDayHarmonyCard';
 import MoonPhaseHeaderCard from '@/components/timing/MoonPhaseHeaderCard';
-import TodayDetailsCard from '@/components/timing/TodayDetailsCard';
 import TimingGuidanceCard from '@/components/timing/TimingGuidanceCard';
+import TodayDetailsCard from '@/components/timing/TodayDetailsCard';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -737,7 +737,8 @@ export default function DailyGuidanceDetailsScreen() {
   const dayKeys = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const dayKey = dayKeys[dayOfWeek];
   const dayName = t(`home.dailyGuidanceDetails.days.${dayKey}`);
-  const date = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const dateLocale = language === 'fr' ? 'fr-FR' : language === 'ar' ? 'ar' : 'en-US';
+  const date = now.toLocaleDateString(dateLocale, { month: 'long', day: 'numeric', year: 'numeric' });
 
   // Ensure interpolated params contain human-readable values.
   // (The guidance service may provide a translation key for "day" since it doesn't have access to `t`.)
@@ -771,10 +772,10 @@ export default function DailyGuidanceDetailsScreen() {
   
   function getStatusLabel() {
     const score = getDailyEnergyScore();
-    if (score >= 70) return '✨ Excellent Timing';
-    if (score >= 55) return '🌟 Good Timing';
-    if (score >= 40) return '⚠️ Moderate Timing';
-    return '🔄 Proceed Mindfully';
+    if (score >= 70) return t('home.dailyGuidanceDetails.status.excellent');
+    if (score >= 55) return t('home.dailyGuidanceDetails.status.good');
+    if (score >= 40) return t('home.dailyGuidanceDetails.status.moderate');
+    return t('home.dailyGuidanceDetails.status.proceedMindfully');
   }
   
   function getElementIcon(element: Element) {

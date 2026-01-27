@@ -65,11 +65,14 @@ export default function MoonDayHarmonyCard({
       </View>
       
       {/* Explanation */}
-      <Text style={styles.explanation}>{explanation}</Text>
+      <View style={styles.explanationBox}>
+        <Text style={styles.explanationLabel}>📝 {t('moon.ui.explanation')}</Text>
+        <Text style={styles.explanation}>{explanation}</Text>
+      </View>
       
       {/* Recommendation */}
       <View style={styles.recommendationBox}>
-        <Text style={styles.recommendationLabel}>💡 Recommendation</Text>
+        <Text style={styles.recommendationLabel}>💡 {t('moon.ui.recommendation')}</Text>
         <Text style={styles.recommendation}>{recommendation}</Text>
       </View>
     </View>
@@ -117,7 +120,18 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.9)',
     fontSize: 14,
     lineHeight: 20,
+    marginBottom: 0,
+  },
+
+  explanationBox: {
     marginBottom: 16,
+  },
+
+  explanationLabel: {
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 6,
   },
   
   recommendationBox: {

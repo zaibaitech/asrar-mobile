@@ -28,20 +28,20 @@ export default function MoonPhaseHeaderCard({
     : moonPhase.phaseNameTranslated.en;
   
   // Get power quality translation key
-  const getPowerQualityKey = () => {
+  const getPowerQualityLabel = () => {
     switch (moonPhase.powerQuality) {
       case 'Excellent':
-        return 'Excellent';
+        return t('common.quality.excellent');
       case 'Good':
-        return 'Good';
+        return t('common.quality.good');
       case 'Moderate':
-        return 'Moderate';
+        return t('common.quality.moderate');
       case 'Weak':
-        return 'Weak';
+        return t('common.quality.weak');
       case 'Rest':
-        return 'Rest';
+        return t('moon.ui.rest');
       default:
-        return 'Moderate';
+        return t('common.quality.moderate');
     }
   };
   
@@ -125,7 +125,7 @@ export default function MoonPhaseHeaderCard({
           <View style={styles.statItem}>
             <Text style={styles.statLabel}>{t('moon.ui.moonPower')}</Text>
             <Text style={styles.statValue}>
-              {moonPhase.moonPower}% ({getPowerQualityKey()})
+              {moonPhase.moonPower}% ({getPowerQualityLabel()})
             </Text>
           </View>
         </View>

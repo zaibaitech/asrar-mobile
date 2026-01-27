@@ -22,6 +22,30 @@ export default function MoonPhaseEducationalModal({
   onClose,
 }: MoonPhaseEducationalModalProps) {
   const { t } = useLanguage();
+
+  const suitableCategory = moonPhase.suitable?.categoryKey
+    ? t(moonPhase.suitable.categoryKey)
+    : moonPhase.suitable?.category;
+
+  const suitableActivities = moonPhase.suitable?.activitiesKeys?.length
+    ? moonPhase.suitable.activitiesKeys.map((key) => t(key))
+    : moonPhase.suitable?.activities;
+
+  const spiritualPractices = moonPhase.suitable?.spiritualPracticesKeys?.length
+    ? moonPhase.suitable.spiritualPracticesKeys.map((key) => t(key))
+    : moonPhase.suitable?.spiritualPractices;
+
+  const notSuitableCategory = moonPhase.notSuitable?.categoryKey
+    ? t(moonPhase.notSuitable.categoryKey)
+    : moonPhase.notSuitable?.category;
+
+  const notSuitableActivities = moonPhase.notSuitable?.activitiesKeys?.length
+    ? moonPhase.notSuitable.activitiesKeys.map((key) => t(key))
+    : moonPhase.notSuitable?.activities;
+
+  const notSuitableReason = moonPhase.notSuitable?.reasonKey
+    ? t(moonPhase.notSuitable.reasonKey)
+    : moonPhase.notSuitable?.reason;
   
   return (
     <Modal
@@ -59,8 +83,10 @@ export default function MoonPhaseEducationalModal({
                 <Text style={styles.sectionTitle}>
                   ✅ {t('moon.ui.suitableFor')}
                 </Text>
-                <Text style={styles.categoryText}>{moonPhase.suitable.category}</Text>
-                {moonPhase.suitable.activities.map((activity, index) => (
+                {!!suitableCategory && (
+                  <Text style={styles.categoryText}>{suitableCategory}</Text>
+                )}
+                {suitableActivities?.map((activity, index) => (
                   <Text key={`activity-${index}`} style={styles.bulletItem}>
                     • {activity}
                   </Text>
@@ -74,7 +100,7 @@ export default function MoonPhaseEducationalModal({
                 <Text style={styles.sectionTitle}>
                   🕌 {t('moon.ui.spiritualGuidance')}
                 </Text>
-                {moonPhase.suitable.spiritualPractices.map((practice, index) => (
+                {spiritualPractices?.map((practice, index) => (
                   <Text key={`practice-${index}`} style={styles.bulletItem}>
                     • {practice}
                   </Text>
@@ -88,15 +114,17 @@ export default function MoonPhaseEducationalModal({
                 <Text style={styles.sectionTitle}>
                   ❌ {t('moon.ui.notSuitableFor')}
                 </Text>
-                <Text style={styles.categoryText}>{moonPhase.notSuitable.category}</Text>
-                {moonPhase.notSuitable.activities.map((activity, index) => (
+                {!!notSuitableCategory && (
+                  <Text style={styles.categoryText}>{notSuitableCategory}</Text>
+                )}
+                {notSuitableActivities?.map((activity, index) => (
                   <Text key={`not-${index}`} style={styles.bulletItem}>
                     • {activity}
                   </Text>
                 ))}
                 <View style={styles.reasonBox}>
                   <Text style={styles.reasonText}>
-                    {moonPhase.notSuitable.reason}
+                    {notSuitableReason}
                   </Text>
                 </View>
               </View>

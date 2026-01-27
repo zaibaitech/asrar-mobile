@@ -11,13 +11,13 @@
  * - Element power
  */
 
-import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { DarkTheme } from '@/constants/DarkTheme';
 import { translations } from '@/constants/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import type { Planet } from '@/services/PlanetaryHoursService';
 import type { ElementalTone } from '@/types/divine-timing';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 interface TodayDetailsCardProps {
   dayRuler: Planet;
@@ -61,6 +61,9 @@ export default function TodayDetailsCard({
   const lang = language as 'en' | 'fr' | 'ar';
   const t = translations[lang];
 
+  const planetKey = dayRuler.toLowerCase();
+  const planetLabel = (t as any).planets?.[planetKey] ?? dayRuler;
+
   return (
     <View style={styles.card}>
       <Text style={styles.sectionLabel}>{t.notifications.timing.todaysDetails} 📅</Text>
@@ -72,7 +75,7 @@ export default function TodayDetailsCard({
           <View style={styles.detailValueContainer}>
             <Text style={styles.detailEmoji}>{getPlanetEmoji(dayRuler)}</Text>
             <View style={styles.detailValueText}>
-              <Text style={styles.detailValue}>{dayRuler}</Text>
+              <Text style={styles.detailValue}>{planetLabel}</Text>
               <Text style={styles.detailPower}>{dayRulerPower}%</Text>
             </View>
           </View>

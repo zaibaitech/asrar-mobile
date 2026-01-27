@@ -28,11 +28,10 @@ export default function DailyEnergyCard({
   
   // Get quality label and color
   const getQuality = (score: number) => {
-    if (score >= 80) return { label: 'Excellent', color: '#10B981' };
-    if (score >= 60) return { label: 'Good', color: '#3B82F6' };
-    if (score >= 40) return { label: 'Moderate', color: '#F59E0B' };
-    if (score >= 20) return { label: 'Weak', color: '#EF4444' };
-    return { label: 'Very Weak', color: '#DC2626' };
+    if (score >= 80) return { label: t('common.quality.excellent'), color: '#10B981' };
+    if (score >= 60) return { label: t('common.quality.good'), color: '#3B82F6' };
+    if (score >= 40) return { label: t('common.quality.moderate'), color: '#F59E0B' };
+    return { label: t('common.quality.weak'), color: '#EF4444' };
   };
   
   const quality = getQuality(score);
@@ -47,7 +46,7 @@ export default function DailyEnergyCard({
     <View style={[styles.card, { borderColor: quality.color }]}>
       {/* Main Score */}
       <View style={styles.scoreContainer}>
-        <Text style={styles.label}>Daily Energy</Text>
+        <Text style={styles.label}>{t('home.dailyGuidanceDetails.dailyEnergyCard.title')}</Text>
         <Text style={[styles.scoreNumber, { color: quality.color }]}>
           {score}%
         </Text>
@@ -64,7 +63,7 @@ export default function DailyEnergyCard({
             onPress={() => setShowBreakdown(!showBreakdown)}
           >
             <Text style={styles.breakdownToggleText}>
-              {showBreakdown ? '▼' : '▶'} Weighted Calculation
+              {showBreakdown ? '▼' : '▶'} {t('home.dailyGuidanceDetails.dailyEnergyCard.weightedCalculation')}
             </Text>
           </TouchableOpacity>
           
@@ -72,7 +71,7 @@ export default function DailyEnergyCard({
             <View style={styles.breakdown}>
               <View style={styles.breakdownRow}>
                 <Text style={styles.breakdownLabel}>
-                  {getPlanetName(breakdown.dayRuler)} (Day Ruler):
+                  {getPlanetName(breakdown.dayRuler)} ({t('notifications.timing.dayRuler')}):
                 </Text>
                 <Text style={styles.breakdownValue}>
                   {breakdown.dayRulerPower}% × 50% = {breakdown.dayRulerContribution}
@@ -90,7 +89,7 @@ export default function DailyEnergyCard({
               
               <View style={styles.breakdownRow}>
                 <Text style={styles.breakdownLabel}>
-                  Other Planets:
+                  {t('home.dailyGuidanceDetails.dailyEnergyCard.otherPlanets')}:
                 </Text>
                 <Text style={styles.breakdownValue}>
                   {breakdown.othersPower}% × 20% = {breakdown.othersContribution}
@@ -99,7 +98,7 @@ export default function DailyEnergyCard({
               
               <View style={[styles.breakdownRow, styles.totalRow]}>
                 <Text style={styles.totalLabel}>
-                  Total:
+                  {t('home.dailyGuidanceDetails.dailyEnergyCard.total')}:
                 </Text>
                 <Text style={[styles.totalValue, { color: quality.color }]}>
                   {breakdown.totalScore}%

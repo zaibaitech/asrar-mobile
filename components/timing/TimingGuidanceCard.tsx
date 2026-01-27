@@ -12,13 +12,12 @@
  * - Clear suggestion for user action
  */
 
-import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { DarkTheme } from '@/constants/DarkTheme';
 import { translations } from '@/constants/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Ionicons } from '@expo/vector-icons';
+import type { Planet } from '@/services/PlanetaryHoursService';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import type { Planet } from '@/services/PlanetaryHoursService';
 
 interface PlanetaryHour {
   planet: Planet;
@@ -88,6 +87,11 @@ export default function TimingGuidanceCard({
   const lang = language as 'en' | 'fr' | 'ar';
   const t = translations[lang];
 
+  const getPlanetLabel = (planet: Planet): string => {
+    const key = planet.toLowerCase();
+    return (t as any).planets?.[key] ?? planet;
+  };
+
   if (!currentHour) {
     return null;
   }
@@ -106,7 +110,7 @@ export default function TimingGuidanceCard({
       <View style={styles.currentHourContainer}>
         <View style={styles.currentHourHeader}>
           <Text style={styles.planetEmoji}>{getPlanetEmoji(currentHour.planet)}</Text>
-          <Text style={styles.currentHourTitle}>{currentHour.planet}</Text>
+          <Text style={styles.currentHourTitle}>{getPlanetLabel(currentHour.planet)}</Text>
         </View>
 
         <View
@@ -136,7 +140,7 @@ export default function TimingGuidanceCard({
 
           <View style={styles.nextBestContent}>
             <Text style={styles.nextBestPlanet}>
-              {getPlanetEmoji(nextBestHour.planet)} {nextBestHour.planet}
+              {getPlanetEmoji(nextBestHour.planet)} {getPlanetLabel(nextBestHour.planet)}
             </Text>
             <Text style={styles.nextBestTime}>
               {nextBestHour.startsAt} ({t.notifications.timing.inHours} {nextBestHour.hoursUntil}h)
