@@ -883,14 +883,24 @@ export default function DailyGuidanceDetailsScreen() {
             />
           )}
 
-          {/* Asrariya Timing Analysis - Personalized */}
+          {/* PRIMARY TIMING ANALYSIS: Asrariya Timing Engine (Personalized) */}
           <TimingAnalysisSection
             context="daily"
             hideSections={['alternatives']}
             onAnalysisComplete={(result) => setTimingResult({ overallScore: result.overallScore })}
           />
 
-          {/* Enhanced Planetary Strength Analysis */}
+          {/* SUPPLEMENTARY ANALYSIS: Classical Planetary Strength (Astronomical) */}
+          {/* This shows the raw strength of planets based on their current zodiac positions */}
+          {/* Different from Asrāriya score - measures position-based strength, not timing suitability */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              🌍 {t('home.dailyGuidanceDetails.sections.planetaryStrength') || 'Astronomical Planetary Status'}
+            </Text>
+            <Text style={styles.sectionSubtitle}>
+              Real-time planetary positions and strength • Based on current astronomical data
+            </Text>
+          </View>
           <DailyPlanetaryAnalysisDisplay expanded={true} />
           
           {/* SECTION 4: TODAY'S DETAILS (Day ruler, element, quality) */}

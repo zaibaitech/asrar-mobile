@@ -1860,6 +1860,7 @@ export const translations = {
           manazil: "Manazil (Lunar Mansion)",
           bestFor: "Best For",
           whyThis: "Why This?",
+          planetaryStrength: "Astronomical Planetary Status",
         },
         manazil: {
           title: "Your lunar baseline",
@@ -10838,6 +10839,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           bestFor: "Idéal pour",
           whyThis: "Pourquoi?",
           ascendantLens: "Prisme de l’Ascendant",
+          planetaryStrength: "État planétaire astronomique",
         },
 
         ascendant: {
