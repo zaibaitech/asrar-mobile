@@ -721,6 +721,9 @@ export default function DailyGuidanceDetailsScreen() {
   // Get daily planetary analysis with moon phase data
   const { analysis: dailyAnalysis, loading: analysisLoading } = useDailyPlanetaryAnalysis();
   
+  // Capture Asrāriya Timing Engine result for unified scoring
+  const [timingResult, setTimingResult] = useState<{ overallScore: number } | null>(null);
+  
   const [bestForExpanded, setBestForExpanded] = useState(true);
   
   // Parse params
@@ -754,11 +757,17 @@ export default function DailyGuidanceDetailsScreen() {
   const dayRuler = getDayRuler(now);
   const dayRulerInfo = getPlanetInfo(dayRuler);
   
-  // CRITICAL FIX: Single source of truth for daily energy score
-  // Use dailyAnalysis.dailyScore throughout (weighted calculation: 50% day ruler + 30% moon + 20% others)
-  // This replaces the old TimingAnalysisSection which was showing a different percentage
+  // CRITICAL FIX: Use Asrāriya Timing Engine as single source of truth
+  // Prioritizes timingResult (57% - Asrāriya comprehensive analysis)
+  // Falls back to dailyAnalysis (51% - simple weighted calculation) if timing not ready
+  // This ensures ALL displays show the same percentage (57% Good Time in blue)
   
   function getDailyEnergyScore(): number {
+    // Prioritize Asrāriya Timing Engine result (more comprehensive, branded methodology)
+    if (timingResult?.overallScore) {
+      return timingResult.overallScore;
+    }
+    // Fallback to daily planetary analysis while timing engine loads
     return dailyAnalysis?.dailyScore || 0;
   }
   
@@ -878,6 +887,7 @@ export default function DailyGuidanceDetailsScreen() {
           <TimingAnalysisSection
             context="daily"
             hideSections={['alternatives']}
+            onAnalysisComplete={(result) => setTimingResult({ overallScore: result.overallScore })}
           />
 
           {/* Enhanced Planetary Strength Analysis */}
