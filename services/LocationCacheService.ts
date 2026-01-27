@@ -66,6 +66,29 @@ export async function getBestLocation(options?: {
         }
       }
 
+      // If the OS has a recent fix, prefer that over forcing a new GPS read.
+      // This avoids intermittent failures when GPS is slow/unavailable (indoors, cold start, etc.).
+      try {
+        const lastKnown = await Location.getLastKnownPositionAsync();
+        if (lastKnown?.coords) {
+          const ts = typeof lastKnown.timestamp === 'number' ? lastKnown.timestamp : Date.now();
+          const fromOs: CachedLocation = {
+            latitude: lastKnown.coords.latitude,
+            longitude: lastKnown.coords.longitude,
+            accuracy: lastKnown.coords.accuracy ?? undefined,
+            timestamp: ts,
+          };
+
+          // If it's within the requested max age, accept immediately.
+          if (Date.now() - fromOs.timestamp < maxAgeMs) {
+            await setLastKnownLocation(fromOs);
+            return fromOs;
+          }
+        }
+      } catch {
+        // ignore and fall through to fresh position
+      }
+
       const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const fresh: CachedLocation = {
         latitude: position.coords.latitude,

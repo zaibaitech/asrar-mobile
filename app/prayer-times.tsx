@@ -11,6 +11,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
+import { getBestLocation } from '@/services/LocationCacheService';
 import { Stack, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -191,22 +192,21 @@ export default function PrayerTimesScreen() {
         setState('loading');
       }
 
-      // Request location permission
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      
-      if (status !== 'granted') {
-        if (!isBackgroundRefresh) {
-          setState('permission-denied');
+      // Get best-effort location (cached fallback) to avoid intermittent GPS failures.
+      const locationResult = await getBestLocation({ allowPrompt: true });
+      if (!locationResult) {
+        const perm = await Location.getForegroundPermissionsAsync();
+        if (perm.status !== 'granted') {
+          if (!isBackgroundRefresh) setState('permission-denied');
+          return;
         }
+
+        // Permissions granted but no location available (e.g., GPS temporarily unavailable).
+        if (!isBackgroundRefresh) setState('error');
         return;
       }
 
-      // Get current location
-      const locationResult = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-
-      const { latitude, longitude } = locationResult.coords;
+      const { latitude, longitude } = locationResult;
       const newLocation = { latitude, longitude };
       setLocation(newLocation);
 

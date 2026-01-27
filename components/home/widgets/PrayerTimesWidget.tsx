@@ -11,6 +11,7 @@
  */
 
 import * as Location from 'expo-location';
+import { getBestLocation } from '@/services/LocationCacheService';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -132,23 +133,21 @@ export function PrayerTimesWidget() {
     try {
       setState('loading');
 
-      // Request location permission
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      
-      if (status !== 'granted') {
-        if (__DEV__) {
-          console.log('Location permission denied');
+      // Best-effort: use cached location when GPS is temporarily unavailable.
+      const best = await getBestLocation({ allowPrompt: true });
+      if (!best) {
+        const perm = await Location.getForegroundPermissionsAsync();
+        if (perm.status !== 'granted') {
+          if (__DEV__) console.log('Location permission denied');
+          setState('permission-denied');
+          return;
         }
-        setState('permission-denied');
+
+        setState('error');
         return;
       }
 
-      // Get current location
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-
-      const { latitude, longitude } = location.coords;
+      const { latitude, longitude } = best;
       if (__DEV__) {
         console.log('Location:', latitude, longitude);
       }

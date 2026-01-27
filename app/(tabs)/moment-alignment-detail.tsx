@@ -23,7 +23,7 @@ import { getMomentAlignment, MomentAlignment } from '@/services/MomentAlignmentS
 import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, PlanetaryHourData, type PlanetaryDayBoundaries } from '@/services/PlanetaryHoursService';
 import { fetchPrayerTimes } from '@/services/api/prayerTimes';
 import { Ionicons } from '@expo/vector-icons';
-import * as Location from 'expo-location';
+import { getBestLocation } from '@/services/LocationCacheService';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -92,18 +92,12 @@ export default function MomentAlignmentDetailScreen() {
 
   const loadPrayerTimes = useCallback(async () => {
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-
-      if (status === 'granted') {
-        const location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
-
-        const { latitude, longitude } = location.coords;
-        setCoords({ latitude, longitude });
-        const data = await fetchPrayerTimes(latitude, longitude);
-        setPrayerTimesData(data);
-      }
+      const best = await getBestLocation({ allowPrompt: true });
+      if (!best) return;
+      const { latitude, longitude } = best;
+      setCoords({ latitude, longitude });
+      const data = await fetchPrayerTimes(latitude, longitude);
+      setPrayerTimesData(data);
     } catch (error) {
       console.error('Error loading prayer times:', error);
     }
