@@ -26,6 +26,8 @@ import {
 } from '@/types/divine-timing-personal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
+import { BACKEND_FEATURE_FLAGS } from '@/config/featureFlags';
+import { fetchMultipleEphemerisFromEdgeFunction, EphemerisResponse } from '@/services/EdgeFunctionClient';
 
 const inflightPositions = new Map<string, Promise<PlanetPositions | null>>();
 const inflightMoon = new Map<string, Promise<MoonLongitudeResult>>();
@@ -147,8 +149,68 @@ export async function getPlanetPositions(
     const hourKey = hourlyDate.toISOString().split(':')[0];
     const cacheKey = `${STORAGE_KEYS.CACHE_PREFIX}${hourKey}_${timezone}`;
 
-    // PRIORITY 1: Try JPL Horizons first (real-time data)
+    // PRIORITY 0: Try Edge Function (cached database + NASA fallback)
     const netInfo = await NetInfo.fetch();
+    if (netInfo.isConnected && BACKEND_FEATURE_FLAGS.USE_EPHEMERIS_EDGE_FUNCTION) {
+      try {
+        if (__DEV__) {
+          console.log('[EphemerisService] Fetching from Edge Function...');
+        }
+
+        const planets: PlanetId[] = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn'];
+        const edgeResults = await fetchMultipleEphemerisFromEdgeFunction(
+          hourlyDate,
+          planets,
+          timezone
+        );
+
+        // Convert Edge Function response to PlanetPositions format
+        const planetPositions: Record<PlanetId, PlanetPosition> = {};
+        
+        for (const planet of planets) {
+          const data = edgeResults[planet];
+          if (data) {
+            const sign = Math.floor(data.longitude / 30);
+            const signDegree = data.longitude % 30;
+            
+            planetPositions[planet] = {
+              planet,
+              longitude: data.longitude,
+              sign,
+              signDegree,
+            };
+          }
+        }
+
+        if (Object.keys(planetPositions).length === planets.length) {
+          const result: PlanetPositions = {
+            timestamp: hourlyDate.getTime(),
+            dateISO,
+            planets: planetPositions,
+            source: 'ephemeris',
+            expiresAt: hourlyDate.getTime() + CACHE_TTL_MS,
+          };
+          
+          await cachePositions(cacheKey, result);
+          
+          if (__DEV__) {
+            console.log('[EphemerisService] ✓ Edge Function data received successfully');
+          }
+          
+          return result;
+        }
+      } catch (error) {
+        if (__DEV__) {
+          console.warn('[EphemerisService] Edge Function failed, falling back to direct NASA:', error);
+        }
+        
+        if (!BACKEND_FEATURE_FLAGS.ENABLE_FALLBACK) {
+          throw error;
+        }
+      }
+    }
+
+    // PRIORITY 1: Try JPL Horizons direct (fallback or feature flag disabled)
     if (netInfo.isConnected) {
       // Check if we have a non-expired cached result from JPL
       const cached = await getCachedPositions(cacheKey);
