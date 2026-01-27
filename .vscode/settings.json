@@ -5,5 +5,13 @@
     "source.sortMembers": "explicit"
   },
   "python-envs.defaultEnvManager": "ms-python.python:system",
-  "python-envs.pythonProjects": []
+  "python-envs.pythonProjects": [],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "deno.enable": false,
+  "deno.enablePaths": [
+    "supabase/functions"
+  ],
+  "files.associations": {
+    "supabase/functions/**/*.ts": "typescript"
+  }
 }
