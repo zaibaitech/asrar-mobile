@@ -878,7 +878,7 @@ export default function DailyGuidanceDetailsScreen() {
           {/* SECTION 3: DAILY ENERGY (Overall Weighted Score with Breakdown) */}
           {dailyAnalysis && (
             <DailyEnergyCard 
-              score={dailyAnalysis.dailyScore || 0}
+              score={getDailyEnergyScore()}
               breakdown={dailyAnalysis.scoreBreakdown}
             />
           )}
