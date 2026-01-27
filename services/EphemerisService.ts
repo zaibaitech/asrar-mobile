@@ -896,14 +896,36 @@ async function getCachedPositions(cacheKey: string): Promise<PlanetPositions | n
 }
 
 /**
- * Cache planetary positions
+ * Cache planetary positions with disk full handling
  */
 async function cachePositions(cacheKey: string, positions: PlanetPositions): Promise<void> {
   try {
     await AsyncStorage.setItem(cacheKey, JSON.stringify(positions));
   } catch (error) {
-    if (__DEV__) {
-      console.error('[EphemerisService] Cache write error:', error);
+    // Handle disk full error by clearing old cache and retrying
+    const errorMsg = (error as any)?.message || '';
+    if (errorMsg.includes('SQLITE_FULL') || errorMsg.includes('disk is full')) {
+      try {
+        if (__DEV__) {
+          console.warn('[EphemerisService] Disk full, clearing cache and retrying...');
+        }
+        // Clear this cache key and retry
+        await AsyncStorage.removeItem(cacheKey);
+        // Retry write with cleared space
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(positions));
+        if (__DEV__) {
+          console.log('[EphemerisService] Cache retry successful after clearing');
+        }
+      } catch (retryError) {
+        if (__DEV__) {
+          console.error('[EphemerisService] Cache retry failed, data will be recalculated:', retryError);
+        }
+        // If cache fails, data is recalculated on next request - still functional
+      }
+    } else {
+      if (__DEV__) {
+        console.error('[EphemerisService] Cache write error:', error);
+      }
     }
   }
 }
@@ -1065,8 +1087,30 @@ async function cacheMoonLongitude(cacheKey: string, result: MoonLongitudeResult)
   try {
     await AsyncStorage.setItem(cacheKey, JSON.stringify(result));
   } catch (error) {
-    if (__DEV__) {
-      console.error('[EphemerisService] Moon cache write error:', error);
+    // Handle disk full error by clearing old cache and retrying
+    const errorMsg = (error as any)?.message || '';
+    if (errorMsg.includes('SQLITE_FULL') || errorMsg.includes('disk is full')) {
+      try {
+        if (__DEV__) {
+          console.warn('[EphemerisService] Disk full, clearing moon cache and retrying...');
+        }
+        // Clear this moon cache key and retry
+        await AsyncStorage.removeItem(cacheKey);
+        // Retry write with cleared space
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(result));
+        if (__DEV__) {
+          console.log('[EphemerisService] Moon cache retry successful after clearing');
+        }
+      } catch (retryError) {
+        if (__DEV__) {
+          console.error('[EphemerisService] Moon cache retry failed, will recalculate:', retryError);
+        }
+        // If cache fails, moon longitude is recalculated on next request - still functional
+      }
+    } else {
+      if (__DEV__) {
+        console.error('[EphemerisService] Moon cache write error:', error);
+      }
     }
   }
 }

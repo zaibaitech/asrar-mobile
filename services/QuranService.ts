@@ -126,7 +126,13 @@ async function cacheSurah(
     };
     await AsyncStorage.setItem(key, JSON.stringify(cacheData));
   } catch (error) {
-    console.error('Error caching surah:', error);
+    const errorMsg = (error as any)?.message || '';
+    if (errorMsg.includes('SQLITE_FULL') || errorMsg.includes('disk is full')) {
+      console.warn('Surah cache failed: disk full, continuing without caching');
+      // Continue without caching
+    } else {
+      console.error('Error caching surah:', error);
+    }
   }
 }
 

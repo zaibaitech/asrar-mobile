@@ -127,7 +127,13 @@ export default function PrayerTimesScreen() {
         AsyncStorage.setItem(CACHE_KEYS.LAST_FETCH, Date.now().toString()),
       ]);
     } catch (error) {
-      console.error('Failed to save cache:', error);
+      const errorMsg = (error as any)?.message || '';
+      if (errorMsg.includes('SQLITE_FULL') || errorMsg.includes('disk is full')) {
+        console.warn('Failed to save cache: disk full, continuing with memory only');
+        // Continue without persisting - app still works
+      } else {
+        console.error('Failed to save cache:', error);
+      }
     }
   };
 

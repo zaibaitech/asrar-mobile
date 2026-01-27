@@ -177,7 +177,22 @@ export async function getMoonLongitudeFromServer(
     };
 
     memoryCache.moon = cacheEntry;
-    await AsyncStorage.setItem(STORAGE_KEYS.MOON_CACHE, JSON.stringify(cacheEntry));
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.MOON_CACHE, JSON.stringify(cacheEntry));
+    } catch (cacheError) {
+      // Handle disk full by keeping data in memory only
+      const errorMsg = (cacheError as any)?.message || '';
+      if (errorMsg.includes('SQLITE_FULL') || errorMsg.includes('disk is full')) {
+        if (__DEV__) {
+          console.warn('[CosmicDataService] Disk full, keeping Moon data in memory only');
+        }
+        // Data is already in memory cache, so continue without persistence
+      } else {
+        if (__DEV__) {
+          console.error('[CosmicDataService] Moon cache write error:', cacheError);
+        }
+      }
+    }
 
     if (__DEV__) {
       console.log('[CosmicDataService] Edge Function response:', data.source);

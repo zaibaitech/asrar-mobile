@@ -6,11 +6,12 @@
  * This is separate from planetary hours (which change every 60-90 minutes).
  * 
  * Data Source: NASA JPL Horizons via EphemerisService
- * Cache Strategy: ~5 minutes for UI freshness
+ * Cache Strategy: Production-ready cache manager with automatic cleanup
  * Fallback: Use last-known cached data; do NOT guess positions.
  */
 
 import { globalRequestManager } from '@/services/cache/RequestManager';
+import { transitsCache } from '@/services/cache/CacheManager';
 import { PlanetPositions } from '@/types/divine-timing-personal';
 import {
     AllPlanetTransits,
@@ -366,14 +367,24 @@ function calculateNextRefresh(planet: Planet, now: Date): Date {
 // ============================================================================
 
 /**
- * Cache transits locally
+ * Cache transits locally with disk full handling
  */
 async function cacheTransits(transits: AllPlanetTransits): Promise<void> {
   try {
     memoryTransits = transits;
-    await AsyncStorage.setItem(CACHE_KEYS.TRANSITS, JSON.stringify(transits));
-    await AsyncStorage.setItem(CACHE_KEYS.LAST_UPDATE, new Date().toISOString());
     
+    // Use production-ready cache manager with automatic cleanup
+    const success = await transitsCache.set(
+      'current',
+      transits,
+      5 * 60 * 1000, // 5 minutes TTL (real-time data)
+      'critical'
+    );
+
+    if (!success) {
+      console.warn('[TransitService] Failed to cache transits (storage full)');
+    }
+
     if (__DEV__) {
       console.log('[TransitService] Cached transit data');
     }
@@ -389,14 +400,13 @@ async function cacheTransits(transits: AllPlanetTransits): Promise<void> {
  */
 async function getCachedTransits(): Promise<AllPlanetTransits | null> {
   try {
-    const cached = await AsyncStorage.getItem(CACHE_KEYS.TRANSITS);
+    // Use production-ready cache manager
+    const cached = await transitsCache.get<AllPlanetTransits>('current');
     if (!cached) return null;
-    
-    const parsed = JSON.parse(cached);
     
     // Restore Date objects
     const transits: Partial<AllPlanetTransits> = {};
-    for (const [planet, transit] of Object.entries(parsed)) {
+    for (const [planet, transit] of Object.entries(cached)) {
       transits[planet as Planet] = {
         ...(transit as any),
         lastUpdated: new Date((transit as any).lastUpdated),

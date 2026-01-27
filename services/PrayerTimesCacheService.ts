@@ -377,7 +377,13 @@ async function setLocalCache(cacheKey: string, data: MonthlyPrayerData): Promise
     await AsyncStorage.setItem(cacheKey, JSON.stringify(data));
     if (__DEV__) console.log('Monthly prayer times cached locally');
   } catch (error) {
-    console.error('Failed to set local cache:', error);
+    const errorMsg = (error as any)?.message || '';
+    if (errorMsg.includes('SQLITE_FULL') || errorMsg.includes('disk is full')) {
+      if (__DEV__) console.warn('Failed to cache: disk full, continuing without persistence');
+      // Continue without cache - app still works
+    } else {
+      console.error('Failed to set local cache:', error);
+    }
   }
 }
 

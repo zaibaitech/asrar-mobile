@@ -536,7 +536,17 @@ export async function preCalculateDailyPlanetaryHours(
     };
     
     // Cache it
-    await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    try {
+      await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    } catch (cacheError) {
+      const errorMsg = (cacheError as any)?.message || '';
+      if (errorMsg.includes('SQLITE_FULL') || errorMsg.includes('disk is full')) {
+        console.warn('[PlanetaryHoursService] Disk full, keeping data in memory only');
+        // Continue without persistence - data is still available
+      } else {
+        console.error('[PlanetaryHoursService] Cache write error:', cacheError);
+      }
+    }
     
     return cacheData;
     

@@ -234,7 +234,13 @@ async function cachePrayerTimes(
       console.log('Prayer times cached successfully');
     }
   } catch (error) {
-    console.error('Failed to cache prayer times:', error);
+    const errorMsg = (error as any)?.message || '';
+    if (errorMsg.includes('SQLITE_FULL') || errorMsg.includes('disk is full')) {
+      if (__DEV__) console.warn('Cache failed: disk full, continuing without caching');
+      // Continue without caching
+    } else {
+      console.error('Failed to cache prayer times:', error);
+    }
   }
 }
 
@@ -460,7 +466,17 @@ async function fetchAndCacheSingleDay(
       longitude,
     };
     
-    await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    try {
+      await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    } catch (cacheError) {
+      const errorMsg = (cacheError as any)?.message || '';
+      if (errorMsg.includes('SQLITE_FULL') || errorMsg.includes('disk is full')) {
+        console.warn('Cache write failed: disk full, continuing without caching');
+        // Continue without caching - app still works
+      } else {
+        console.error('Failed to cache prayer times:', cacheError);
+      }
+    }
     
   } catch (error) {
     console.error(`Failed to fetch prayer times for ${date.toISOString()}:`, error);
