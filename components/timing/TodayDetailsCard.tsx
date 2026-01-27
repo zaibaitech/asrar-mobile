@@ -11,13 +11,13 @@
  * - Element power
  */
 
-import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { DarkTheme } from '@/constants/DarkTheme';
 import { translations } from '@/constants/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import type { Planet } from '@/services/PlanetaryHoursService';
 import type { ElementalTone } from '@/types/divine-timing';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 interface TodayDetailsCardProps {
   dayRuler: Planet;

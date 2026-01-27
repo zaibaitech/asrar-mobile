@@ -18,7 +18,6 @@ import {
     PlanetTransit,
     ZodiacSign
 } from '@/types/planetary-systems';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getPlanetPositionsPrecise } from './EphemerisService';
 import { Element } from './MomentAlignmentService';
 import { Planet } from './PlanetaryHoursService';

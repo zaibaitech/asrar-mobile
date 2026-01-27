@@ -11,10 +11,9 @@
  * - Overall guidance
  */
 
-import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { DarkTheme } from '@/constants/DarkTheme';
 import { translations } from '@/constants/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 

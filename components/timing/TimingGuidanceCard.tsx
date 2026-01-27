@@ -12,13 +12,12 @@
  * - Clear suggestion for user action
  */
 
-import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { DarkTheme } from '@/constants/DarkTheme';
 import { translations } from '@/constants/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Ionicons } from '@expo/vector-icons';
+import type { Planet } from '@/services/PlanetaryHoursService';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import type { Planet } from '@/services/PlanetaryHoursService';
 
 interface PlanetaryHour {
   planet: Planet;
