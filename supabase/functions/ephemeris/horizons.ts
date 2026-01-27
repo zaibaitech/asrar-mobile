@@ -36,7 +36,13 @@ export async function fetchFromHorizons(
     START_TIME: startTime,
     STOP_TIME: stopTime,
     STEP_SIZE: '1h',
-    QUANTITIES: '1,31', // Astrometric RA/DEC, ecliptic lon/lat, distance
+    // Horizons API is picky about values containing spaces/commas.
+    // - START_TIME/STOP_TIME must be quoted when they contain a space
+    // - QUANTITIES must be quoted when specifying a comma-separated list
+    // We request:
+    // - 31: observer ecliptic lon/lat (ObsEcLon, ObsEcLat)
+    // - 20: observer range (delta) + range rate (deldot)
+    QUANTITIES: "'31,20'",
     CSV_FORMAT: 'YES',
     OBJ_DATA: 'NO',
   });
@@ -67,10 +73,25 @@ export async function fetchFromHorizons(
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const text = await response.text();
+      const rawText = await response.text();
+
+      // The Horizons API sometimes returns JSON containing a `result` field.
+      // It can also return plain text for certain errors.
+      let resultText = rawText;
+      const trimmed = rawText.trim();
+      if (trimmed.startsWith('{') && trimmed.includes('"result"')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (parsed && typeof parsed.result === 'string') {
+            resultText = parsed.result;
+          }
+        } catch {
+          // Fall through and try parsing as plain text.
+        }
+      }
 
       // Parse the response
-      const position = parseHorizonsResponse(text, planet);
+      const position = parseHorizonsResponse(resultText, planet);
 
       if (!position) {
         throw new Error('Failed to parse Horizons response');
@@ -122,38 +143,47 @@ function parseHorizonsResponse(
       return null;
     }
 
-    // Parse CSV data line (format: Date, RA, DEC, etc.)
-    const dataLine = lines[0].trim();
-    const parts = dataLine.split(',').map((p) => p.trim());
+    // Parse CSV data lines.
+    // With QUANTITIES='31,20' + CSV_FORMAT=YES the data rows look like:
+    //   2026-Jan-27 20:00, , , 307.8938620,  0.0001820,  0.98477684311114,  0.1951613,
+    // Columns (0-based):
+    // 0: Date (e.g., 2026-Jan-27 20:00)
+    // 1: (blank)
+    // 2: (blank)
+    // 3: ObsEcLon (deg)
+    // 4: ObsEcLat (deg)
+    // 5: delta (AU)
+    // 6: deldot (AU/day)
+    const line0 = lines[0].trim();
+    const parts0 = line0.split(',').map((p) => p.trim());
 
-    // Extract ecliptic coordinates
-    // The exact column indices depend on QUANTITIES parameter
-    // For QUANTITIES='1,31', we get:
-    // Date, RA, DEC, Azimuth, Elevation, ..., ObsEcLon, ObsEcLat, ...
+    console.log(`[Horizons] Parsing ${planet}: ${parts0.length} columns`);
 
-    // Parse ecliptic longitude and latitude
-    let longitude = 0;
-    let latitude = 0;
-    let distance = 0;
-    let speed = 0;
+    const longitude0 = parts0[3] ? parseFloat(parts0[3]) : NaN;
+    const latitude0 = parts0[4] ? parseFloat(parts0[4]) : NaN;
+    const distance = parts0[5] ? parseFloat(parts0[5]) : 1.0;
 
-    // Extract from the response text (format varies, need to parse carefully)
-    // For now, use regex to extract key values
-    const lonMatch = text.match(/ObsEcLon[^\d]+([\d.]+)/);
-    const latMatch = text.match(/ObsEcLat[^\d]+([\d.]+)/);
-    const distMatch = text.match(/delta[^\d]+([\d.]+)/i);
-
-    if (lonMatch) longitude = parseFloat(lonMatch[1]);
-    if (latMatch) latitude = parseFloat(latMatch[1]);
-    if (distMatch) distance = parseFloat(distMatch[1]);
-
-    // Alternative: Parse from CSV if available
-    if (parts.length >= 8) {
-      // Typical format: Date, RA, DEC, ..., EcLon(6), EcLat(7), Dist(8)
-      if (!lonMatch && parts[6]) longitude = parseFloat(parts[6]);
-      if (!latMatch && parts[7]) latitude = parseFloat(parts[7]);
-      if (!distMatch && parts[8]) distance = parseFloat(parts[8]);
+    if (Number.isNaN(longitude0) || Number.isNaN(latitude0)) {
+      console.error('[Horizons] Failed to parse coordinates:', { parts0, line0 });
+      return null;
     }
+
+    // Compute approximate angular speed (deg/day) from the next hourly row when available.
+    let speed = 0;
+    if (lines.length > 1) {
+      const line1 = lines[1].trim();
+      const parts1 = line1.split(',').map((p) => p.trim());
+      const longitude1 = parts1[3] ? parseFloat(parts1[3]) : NaN;
+      if (!Number.isNaN(longitude1)) {
+        const delta = ((longitude1 - longitude0 + 540) % 360) - 180; // shortest path
+        speed = delta * 24; // 1 hour step -> deg/day
+      }
+    }
+
+    const longitude = longitude0;
+    const latitude = latitude0;
+
+    console.log(`[Horizons] ${planet}: lon=${longitude}, lat=${latitude}, dist=${distance}, speed=${speed}`);
 
     // Calculate zodiac sign and degree
     const { sign, degree } = getZodiacSign(longitude);
@@ -188,7 +218,8 @@ function formatHorizonsDate(date: Date): string {
   const hour = String(date.getUTCHours()).padStart(2, '0');
   const minute = String(date.getUTCMinutes()).padStart(2, '0');
 
-  return `${year}-${month}-${day} ${hour}:${minute}`;
+  // Horizons requires quoting when the date contains a space.
+  return `'${year}-${month}-${day} ${hour}:${minute}'`;
 }
 
 /**

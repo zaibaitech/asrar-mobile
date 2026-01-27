@@ -14,7 +14,7 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { fetchFromDatabase, storeInDatabase, logMetric, roundToHour } from './cache.ts';
+import { fetchFromDatabase, logMetric, roundToHour, storeInDatabase } from './cache.ts';
 import { fetchFromHorizons } from './horizons.ts';
 import type { EphemerisRequest, EphemerisResponse } from './types.ts';
 
