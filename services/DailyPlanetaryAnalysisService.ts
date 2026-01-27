@@ -8,12 +8,14 @@
  * This is used to improve the Daily Energy screen accuracy
  */
 
+import { getDayRulingPlanet } from '@/services/DayRulingPlanetService';
+import { analyzeMoonDayHarmony, analyzeMoonPhase, type MoonDayHarmony, type MoonPhaseAnalysis } from '@/services/MoonPhaseService';
 import type { Planet } from '@/services/PlanetaryHoursService';
 import {
     calculateEnhancedPlanetaryPower,
     type EnhancedPlanetaryPower,
 } from '@/services/PlanetaryStrengthService';
-import { getDayRulingPlanet } from '@/services/DayRulingPlanetService';
+import type { ElementalTone } from '@/types/divine-timing';
 import type { PlanetTransit, ZodiacSign } from '@/types/planetary-systems';
 
 export interface DailyPlanetaryAnalysis {
@@ -40,6 +42,33 @@ export interface DailyPlanetaryAnalysis {
   
   /** Recommendations for daily practice */
   practiceRecommendations: string[];
+  
+  /** Moon phase analysis (Phase 1 integration) */
+  moonPhase?: MoonPhaseAnalysis;
+  
+  /** Moon-Day harmony analysis (Phase 1 integration) */
+  moonDayHarmony?: MoonDayHarmony;
+  
+  /** Today's date */
+  date?: Date;
+  
+  /** Daily element (for theming) */
+  dayElement?: ElementalTone;
+  
+  /** Weighted daily energy score (Phase 1) */
+  dailyScore?: number;
+  
+  /** Score breakdown for UI display (Phase 1) */
+  scoreBreakdown?: {
+    dayRuler: Planet;
+    dayRulerPower: number;
+    dayRulerContribution: number;
+    moonPower: number;
+    moonContribution: number;
+    othersPower: number;
+    othersContribution: number;
+    totalScore: number;
+  };
 }
 
 /**
@@ -125,6 +154,37 @@ export function analyzeDailyPlanets(
     dayRulingStrength
   );
 
+  // NEW (Phase 1): Analyze Moon phase
+  const moonData = planetPositions['Moon'];
+  let moonPhase: MoonPhaseAnalysis | undefined;
+  let moonDayHarmony: MoonDayHarmony | undefined;
+
+  if (moonData && sunPosition) {
+    try {
+      // Calculate moon illumination from lunar day
+      // Simple approximation: sin(lunarDay * pi / 29.5)
+      const lunarDay = calculateLunarDay(date);
+      const moonIllumination = calculateMoonIllumination(lunarDay);
+      
+      moonPhase = analyzeMoonPhase(
+        moonIllumination,
+        sunPosition.longitude || 0,
+        moonData.longitude || 0,
+        date
+      );
+
+      // Analyze harmony between moon phase and day ruler
+      const dayElement = getDayElement(dayRulingPlanet);
+      moonDayHarmony = analyzeMoonDayHarmony(
+        moonPhase,
+        dayRulingPlanet,
+        dayElement
+      );
+    } catch (err) {
+      console.warn('Failed to analyze moon phase:', err);
+    }
+  }
+
   return {
     planets: analysis,
     dayRulingPlanet,
@@ -134,6 +194,8 @@ export function analyzeDailyPlanets(
     planetsToAvoid,
     criticalWarnings: criticalWarnings.slice(0, 3), // Limit to 3 critical warnings
     practiceRecommendations,
+    moonPhase,
+    moonDayHarmony,
   };
 }
 
@@ -213,25 +275,105 @@ function generatePracticeRecommendations(
 }
 
 /**
- * Calculate daily planetary score for overall energy
- * Used to improve the "Daily Energy" percentage
+ * Calculate daily planetary score with classical weighting
+ * 
+ * Weighting system (classical Islamic astrology):
+ * - Day Ruling Planet: 50% (primary influence)
+ * - Moon: 30% (always important for timing)
+ * - Other planets: 20% (supporting context)
+ * 
+ * This reflects traditional teaching that the day ruler
+ * dominates the day's energy, with Moon as secondary timing factor.
+ * 
+ * @param analysis - Complete planetary analysis
+ * @param currentDate - Current date to determine day ruler
+ * @returns Weighted planetary score (0-100)
  */
 export function calculateDailyPlanetaryScore(
-  analysis: DailyPlanetaryAnalysis
+  analysis: DailyPlanetaryAnalysis,
+  currentDate: Date = new Date()
 ): number {
-  // Average of all non-weak planets
-  let total = 0;
-  let count = 0;
-
+  // Get day ruler based on day of week (already in analysis)
+  const dayRuler = analysis.dayRulingPlanet;
+  const dayRulerPower = analysis.planets[dayRuler].finalPower;
+  
+  // Get Moon power (always important for timing)
+  const moonPower = analysis.planets['Moon'].finalPower;
+  
+  // Calculate average of OTHER planets (excluding day ruler and Moon)
+  let otherTotal = 0;
+  let otherCount = 0;
+  
   for (const planet of Object.keys(analysis.planets) as Planet[]) {
+    if (planet === dayRuler || planet === 'Moon') {
+      continue; // Skip - already counted separately
+    }
+    
     const power = analysis.planets[planet].finalPower;
-    if (power >= 30) {
-      total += power;
-      count += 1;
+    if (power >= 30) { // Only include non-weak planets
+      otherTotal += power;
+      otherCount += 1;
     }
   }
+  
+  const otherAverage = otherCount > 0 ? otherTotal / otherCount : 40;
+  
+  // Apply classical weights
+  const weightedScore = 
+    (dayRulerPower * 0.5) +   // Day ruler: 50%
+    (moonPower * 0.3) +        // Moon: 30%
+    (otherAverage * 0.2);      // Others: 20%
+  
+  return Math.round(weightedScore);
+}
 
-  return count > 0 ? Math.round(total / count) : 40;
+/**
+ * Get breakdown of how daily score was calculated
+ * Useful for displaying to users
+ */
+export function getDailyScoreBreakdown(
+  analysis: DailyPlanetaryAnalysis,
+  currentDate: Date = new Date()
+): {
+  dayRuler: Planet;
+  dayRulerPower: number;
+  dayRulerContribution: number;
+  moonPower: number;
+  moonContribution: number;
+  othersPower: number;
+  othersContribution: number;
+  totalScore: number;
+} {
+  const dayRuler = analysis.dayRulingPlanet;
+  const dayRulerPower = analysis.planets[dayRuler].finalPower;
+  const moonPower = analysis.planets['Moon'].finalPower;
+  
+  let otherTotal = 0;
+  let otherCount = 0;
+  
+  for (const planet of Object.keys(analysis.planets) as Planet[]) {
+    if (planet === dayRuler || planet === 'Moon') continue;
+    const power = analysis.planets[planet].finalPower;
+    if (power >= 30) {
+      otherTotal += power;
+      otherCount += 1;
+    }
+  }
+  
+  const othersPower = otherCount > 0 ? otherTotal / otherCount : 40;
+  
+  return {
+    dayRuler,
+    dayRulerPower,
+    dayRulerContribution: Math.round(dayRulerPower * 0.5),
+    moonPower,
+    moonContribution: Math.round(moonPower * 0.3),
+    othersPower: Math.round(othersPower),
+    othersContribution: Math.round(othersPower * 0.2),
+    totalScore: Math.round(
+      (dayRulerPower * 0.5) + (moonPower * 0.3) + (othersPower * 0.2)
+    ),
+  };
 }
 
 /**
@@ -250,4 +392,62 @@ export function findBestHoursToday(
     planet,
     quality: power >= 70 ? 'excellent' : power >= 50 ? 'good' : 'moderate',
   }));
+}
+
+/**
+ * Get elemental tone for a day ruling planet
+ * Used for moon-day harmony analysis
+ */
+function getDayElement(dayRuler: Planet): ElementalTone {
+  const elementMap: Record<Planet, ElementalTone> = {
+    'Sun': 'fire',
+    'Moon': 'water',
+    'Mercury': 'air',
+    'Venus': 'water',
+    'Mars': 'fire',
+    'Jupiter': 'fire',
+    'Saturn': 'earth',
+  };
+  
+  return elementMap[dayRuler] || 'earth';
+}
+
+/**
+ * Calculate lunar day (1-30) from date
+ * Uses synodic month length of 29.53 days
+ */
+function calculateLunarDay(date: Date): number {
+  const referenceNewMoon = new Date('2000-01-06T18:14:00Z').getTime();
+  const synodicMonth = 29.53058867;
+  
+  const currentTime = date.getTime();
+  const daysSinceReference = (currentTime - referenceNewMoon) / (1000 * 60 * 60 * 24);
+  
+  const lunarDay = (daysSinceReference % synodicMonth) + 1;
+  
+  return Math.floor(lunarDay);
+}
+
+/**
+ * Calculate moon illumination percentage from lunar day
+ * Approximates the illumination using sine wave
+ */
+function calculateMoonIllumination(lunarDay: number): number {
+  // Waxing: Days 1-14.75 go from 0% to 100%
+  // Full: Days 14.75-15.25 stay at 100%
+  // Waning: Days 15.25-29.53 go from 100% back to 0%
+  
+  const synodicMonth = 29.53058867;
+  const normalizedDay = (lunarDay % synodicMonth);
+  
+  if (normalizedDay < 14.75) {
+    // Waxing: 0% to 100%
+    return (normalizedDay / 14.75) * 100;
+  } else if (normalizedDay < 15.25) {
+    // Full moon
+    return 100;
+  } else {
+    // Waning: 100% back to 0%
+    return Math.max(0, ((synodicMonth - normalizedDay) / 14.28) * 100);
+  }
 }

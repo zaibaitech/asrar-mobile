@@ -14,15 +14,15 @@
  */
 
 import {
+    generateSyntheticPositions,
+    getCachedEphemerisData,
+} from '@/services/EphemerisDataCache';
+import {
     MoonPhase,
     PlanetId,
     PlanetPosition,
     PlanetPositions,
 } from '@/types/divine-timing-personal';
-import {
-    generateSyntheticPositions,
-    getCachedEphemerisData,
-} from '@/services/EphemerisDataCache';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -124,6 +124,11 @@ interface ParsedEphemerisLine {
 /**
  * Get planetary positions for a specific datetime
  * 
+ * PRIORITY ORDER (for real-time accuracy):
+ * 1. JPL Horizons API (real astronomical data - primary)
+ * 2. Embedded ephemeris cache (verified data for offline)
+ * 3. Synthetic mathematical model (fallback)
+ * 
  * @param date - Date to calculate positions for
  * @param timezone - IANA timezone (e.g., 'America/New_York')
  * @returns Planetary positions or null on failure
@@ -139,46 +144,32 @@ export async function getPlanetPositions(
     
     const dateISO = hourlyDate.toISOString().split('T')[0];
     const hourKey = hourlyDate.toISOString().split(':')[0];
-    
-    // Check cache first
     const cacheKey = `${STORAGE_KEYS.CACHE_PREFIX}${hourKey}_${timezone}`;
-    const cached = await getCachedPositions(cacheKey);
-    if (cached) {
-      if (__DEV__) {
-        console.log('[EphemerisService] Using cached positions');
-      }
-      return cached;
-    }
 
-    // Try embedded ephemeris data BEFORE network
-    const embeddedData = getCachedEphemerisData(dateISO);
-    if (embeddedData) {
-      if (__DEV__) {
-        console.log('[EphemerisService] Using embedded ephemeris data');
-      }
-      const result: PlanetPositions = {
-        timestamp: hourlyDate.getTime(),
-        dateISO,
-        planets: embeddedData,
-        source: 'ephemeris',
-        expiresAt: hourlyDate.getTime() + CACHE_TTL_MS,
-      };
-      await cachePositions(cacheKey, result);
-      return result;
-    }
-
-    // Inflight dedupe: avoid multiple concurrent Horizons requests for same hour.
-    const inflight = inflightPositions.get(cacheKey);
-    if (inflight) {
-      return await inflight;
-    }
-    
-    const promise = (async () => {
-      // Try JPL Horizons if network available
-      const netInfo = await NetInfo.fetch();
-      if (netInfo.isConnected) {
+    // PRIORITY 1: Try JPL Horizons first (real-time data)
+    const netInfo = await NetInfo.fetch();
+    if (netInfo.isConnected) {
+      // Check if we have a non-expired cached result from JPL
+      const cached = await getCachedPositions(cacheKey);
+      if (cached && cached.source === 'ephemeris' && cached.expiresAt > Date.now()) {
         if (__DEV__) {
-          console.log('[EphemerisService] Network connected, fetching from JPL Horizons...');
+          console.log('[EphemerisService] Using fresh cached JPL positions');
+        }
+        return cached;
+      }
+
+      // Inflight dedupe: avoid multiple concurrent Horizons requests for same hour
+      const inflight = inflightPositions.get(cacheKey);
+      if (inflight) {
+        if (__DEV__) {
+          console.log('[EphemerisService] Waiting for inflight JPL request');
+        }
+        return await inflight;
+      }
+      
+      const promise = (async () => {
+        if (__DEV__) {
+          console.log(`[EphemerisService] Fetching real-time positions from JPL Horizons for ${dateISO}...`);
         }
 
         const positions = await fetchPositionsFromHorizons(hourlyDate);
@@ -192,41 +183,64 @@ export async function getPlanetPositions(
           };
           await cachePositions(cacheKey, result);
           if (__DEV__) {
-            console.log('[EphemerisService] Successfully fetched and cached positions from Horizons');
+            console.log('[EphemerisService] ✓ JPL Horizons data cached successfully');
           }
           return result;
         }
-      }
 
-      // Use synthetic positions (always works)
-      if (__DEV__) {
-        console.log('[EphemerisService] Using synthetic positions (mathematical model)');
+        if (__DEV__) {
+          console.warn('[EphemerisService] JPL Horizons fetch failed, trying fallbacks');
+        }
+        return null;
+      })();
+
+      inflightPositions.set(cacheKey, promise);
+      try {
+        const result = await promise;
+        if (result) return result;
+      } finally {
+        inflightPositions.delete(cacheKey);
       }
-      const syntheticPositions = generateSyntheticPositions(hourlyDate);
+    }
+
+    // PRIORITY 2: Try embedded ephemeris data (verified for 2026)
+    const embeddedData = getCachedEphemerisData(dateISO);
+    if (embeddedData) {
+      if (__DEV__) {
+        console.log(`[EphemerisService] Using embedded ephemeris data for ${dateISO}`);
+      }
       const result: PlanetPositions = {
         timestamp: hourlyDate.getTime(),
         dateISO,
-        planets: syntheticPositions,
-        source: 'synthetic',
+        planets: embeddedData,
+        source: 'ephemeris',
         expiresAt: hourlyDate.getTime() + CACHE_TTL_MS,
       };
       await cachePositions(cacheKey, result);
       return result;
-    })();
-
-    inflightPositions.set(cacheKey, promise);
-    try {
-      return await promise;
-    } finally {
-      inflightPositions.delete(cacheKey);
     }
+
+    // PRIORITY 3: Use synthetic positions as last resort (mathematical model)
+    if (__DEV__) {
+      console.log('[EphemerisService] Using synthetic positions (mathematical approximation)');
+    }
+    const syntheticPositions = generateSyntheticPositions(hourlyDate);
+    const result: PlanetPositions = {
+      timestamp: hourlyDate.getTime(),
+      dateISO,
+      planets: syntheticPositions,
+      source: 'synthetic',
+      expiresAt: hourlyDate.getTime() + CACHE_TTL_MS,
+    };
+    await cachePositions(cacheKey, result);
+    return result;
     
   } catch (error) {
     if (__DEV__) {
       console.error('[EphemerisService] Error fetching positions:', error);
     }
     
-    // Return approx positions as fallback
+    // Final fallback: approx positions
     const dateISO = date.toISOString().split('T')[0];
     return getApproxPositions(date, dateISO);
   }
@@ -238,15 +252,17 @@ type PlanetPositionWithSpeed = PlanetPosition & {
 };
 
 /**
- * Get higher-precision planetary positions for UI (5-minute buckets).
+ * Get higher-precision planetary positions for real-time transit UI (5-minute buckets).
  *
+ * This is the PRIMARY function for live transit display.
+ * 
+ * PRIORITY ORDER (for real-time accuracy):
+ * 1. JPL Horizons API with speed calculation (real astronomical data - FRESH)
+ * 2. Hourly-rounded JPL Horizons (still real data, slightly less precise)
+ * 3. Return null (do NOT serve synthetic data for real-time transit display)
+ * 
  * Unlike `getPlanetPositions`, this does NOT round to the hour.
  * It also attempts to estimate longitude speed for retrograde detection.
- * 
- * Fallback chain:
- * 1. Try high-precision Horizons (5-minute bucket)
- * 2. Fall back to hourly-rounded Horizons if high-precision fails (always prefer real Horizons over approx)
- * 3. Return null only if all real data sources fail
  */
 export async function getPlanetPositionsPrecise(
   date: Date,
@@ -257,24 +273,38 @@ export async function getPlanetPositionsPrecise(
 
     const dateISO = bucketedDate.toISOString().split('T')[0];
     const minuteKey = bucketedDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-
     const cacheKey = `${STORAGE_KEYS.PRECISE_CACHE_PREFIX}${minuteKey}_${timezone}`;
+
+    // Check for fresh cached JPL data (only use if not expired)
     const cached = await getCachedPositions(cacheKey);
-    if (cached) {
+    if (cached && cached.source === 'ephemeris' && cached.expiresAt > Date.now()) {
       if (__DEV__) {
-        console.log('[EphemerisService] Using cached precise positions');
+        console.log('[EphemerisService] Using fresh cached JPL precise positions');
       }
       return cached;
     }
 
+    // Dedupe: avoid multiple concurrent requests
     const inflight = inflightPrecisePositions.get(cacheKey);
     if (inflight) {
+      if (__DEV__) {
+        console.log('[EphemerisService] Waiting for inflight precise positions...');
+      }
       return await inflight;
     }
 
     const promise = (async () => {
+      // Try to get network connectivity
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected) {
+        if (__DEV__) {
+          console.warn('[EphemerisService] No network - cannot fetch real-time transit data');
+        }
+        return null;
+      }
+
       if (__DEV__) {
-        console.log('[EphemerisService] Fetching precise positions from JPL Horizons...');
+        console.log('[EphemerisService] Fetching REAL-TIME precise positions from JPL Horizons...');
       }
 
       const positions = await fetchPositionsFromHorizonsWithSpeed(bucketedDate);
@@ -288,24 +318,30 @@ export async function getPlanetPositionsPrecise(
           expiresAt: bucketedDate.getTime() + PRECISE_CACHE_TTL_MS,
         };
         await cachePositions(cacheKey, result);
+        if (__DEV__) {
+          console.log('[EphemerisService] ✓ Real-time JPL data cached for transit display');
+        }
         return result;
       }
 
-      // Fallback to regular hourly-precision Horizons (it's still real ephemeris data)
+      // Fallback to regular hourly-precision JPL (still real data)
       if (__DEV__) {
-        console.warn('[EphemerisService] High-precision fetch failed; falling back to hourly Horizons');
+        console.warn('[EphemerisService] High-precision failed; falling back to hourly Horizons');
       }
 
       const hourlyResult = await getPlanetPositions(bucketedDate, timezone);
       if (hourlyResult && hourlyResult.source === 'ephemeris') {
-        // Cache this as our "precise" result so subsequent calls reuse it
+        // Cache this as our "precise" result
         await cachePositions(cacheKey, hourlyResult);
+        if (__DEV__) {
+          console.log('[EphemerisService] Using hourly JPL data for transit display');
+        }
         return hourlyResult;
       }
 
-      // If hourly Horizons also failed, return null (do not serve approx data for transit UI)
+      // DO NOT serve synthetic data for real-time transit display
       if (__DEV__) {
-        console.warn('[EphemerisService] All real ephemeris sources failed; no data available');
+        console.error('[EphemerisService] Could not fetch real ephemeris data for real-time display');
       }
       return null;
     })();

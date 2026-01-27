@@ -43,6 +43,70 @@ export const translations = {
       levelFull: "FULL",
     },
 
+    // Manazil Screen (Detail)
+    manazilScreen: {
+      currentMoonPosition: "Current Moon Position",
+      liveIndicator: "🔴 LIVE - Updates in real-time",
+      moonStrength: "Moon Strength",
+      mansion: "Mansion",
+      quality: "Quality",
+      changesEvery: "Changes every ~2.4 days",
+      cosmicDialogueTitle: "🌌 Cosmic Dialogue",
+      mansionWisdomTitle: "🏛️ Mansion Wisdom",
+      fromYourName: "From your name: {name}",
+      staticNeverChanges: "Static - never changes",
+      needTimingGuidanceTitle: "⏰ Need Timing Analysis?",
+      needTimingGuidanceSubtitle: "Check these screens for spiritual timing:",
+      dailyEnergyLinkTitle: "Daily Energy",
+      dailyEnergyLinkSubtitle: "See the overall timing for today.",
+      momentAlignmentLinkTitle: "Moment Alignment",
+      momentAlignmentLinkSubtitle: "See timing for right now (hour-by-hour).",
+      timingGuidanceNote: "Scores update every few minutes.",
+      elementalStatus: {
+        harmonious: "Harmonious",
+        balanced: "Balanced",
+        tension: "Tension",
+        bothAre: "Both are {element} — naturally supportive.",
+        proceedMindfully: "{element1} and {element2} create contrast — proceed mindfully.",
+        neutralEnergy: "{element1} and {element2} are different but not opposed — adaptable energy.",
+      },
+      relationship: {
+        title: "Mansion Relationship",
+        subtitle: "How today's Moon element interacts with your personal mansion.",
+        yourEssence: "Your essence",
+        currentMoon: "Current Moon",
+        howToNavigate: "How to navigate today",
+        bestCompatibility: "Best compatibility",
+        whenMoonIn: "When the Moon is in {element}, your personal mansion is especially supported.",
+        nextMoon: "Next {element} Moon: {relativeTime} ({date})",
+        today: "today",
+        tomorrow: "tomorrow",
+        inDays: "in {count} days",
+        nextWeek: "next week",
+        inWeeks: "in {count} weeks",
+        inMonths: "in {count} months",
+        tips: {
+          harmonious1: "Amplify your natural gifts",
+          harmonious2: "Trust your spiritual instincts",
+          harmonious3: "Work with your element's strengths",
+          balanced1: "Work with both energies consciously",
+          balanced2: "Find the bridge between elements",
+          balanced3: "Let balance be your teacher",
+          tension1: "Move gently and stay present",
+          tension2: "Choose one simple, grounded next step",
+          tension3: "Prioritize calm, clarity, and intention",
+        },
+      },
+      personalMessage: {
+        title: "Personal Message",
+        subtitle: "For your personal mansion: {name}",
+        forYourNature: "For your {element} nature",
+        messageHarmonious: "Today's {moonElement} Moon harmonizes with your {personalElement} essence. Your natural gifts are amplified — trust your instincts and work with your strengths.",
+        messageTension: "Today's {moonElement} Moon creates dynamic tension with your {personalElement} nature. This isn't bad — it's growth through balance. Move mindfully and stay present.",
+        messageBalanced: "Today's {moonElement} Moon brings neutral energy to your {personalElement} essence. This creates space for conscious choice — you can lean into either energy as needed.",
+      },
+    },
+
     notifications: {
       harmony: {
         favorableTitle: "🌟 Favorable Window",
@@ -55,6 +119,27 @@ export const translations = {
         delicateBody: "A delicate hour is beginning. Move gently and stay mindful. {planet} hour • {element}.{personalNote}",
       },
       timing: {
+        // New component translations (TimingGuidanceCard, TodayDetailsCard, CollapsibleEducationalSection)
+        currentTiming: "Current Timing",
+        hour: "Hour",
+        endsAt: "Ends at",
+        nextBestHour: "Next Best Hour",
+        inHours: "in",
+        expectedQuality: "Expected Quality",
+        suggestion: "Suggestion",
+        proceedNow: "Proceed now",
+        waitForBetter: "Wait for better timing if possible",
+        excellentTiming: "Excellent timing right now!",
+        todaysDetails: "Today's Details",
+        dayRuler: "Day Ruler",
+        element: "Element",
+        quality: "Quality",
+        whyThisTiming: "Why This Timing?",
+        elementHarmony: "Element Harmony",
+        momentAlignment: "Moment Alignment",
+        planetaryResonance: "Planetary Resonance",
+        whatThisMeans: "What This Means",
+        // Legacy translations
         harmonyHigh: "highly favorable energies",
         harmonyBalanced: "balanced energies with potential for growth",
         harmonyReflective: "reflective energies, good for inner work",
@@ -564,6 +649,7 @@ export const translations = {
       buttons: {
         learnMore: "Learn More",
         collapse: "Show Less",
+        tapToLearn: "Tap to learn more",
       },
       retry: "Retry",
       on: "ON",
@@ -618,6 +704,13 @@ export const translations = {
         fire: "Fire",
         water: "Water",
         earth: "Earth",
+      },
+      // Quality levels (TimingGuidanceCard)
+      quality: {
+        excellent: "Excellent",
+        good: "Good",
+        moderate: "Moderate",
+        weak: "Weak",
       },
     },
     
@@ -992,6 +1085,10 @@ export const translations = {
           ruhaniFocus: "Spiritual Focus",
           ruhaniFocusDesc: "What this planet traditionally supports",
           cautions: "Spiritual Cautions",
+
+        currentHour: {
+          endsIn: "تنتهي خلال {minutes}د",
+        },
           cautionsDesc: "What to be mindful of",
           timing: "Timing Windows",
           resonance: "Personal Resonance",
@@ -2135,6 +2232,119 @@ export const translations = {
       tapToSetLocation: "Tap to set location",
     },
 
+    // Daily Energy (shared keys)
+    dailyEnergy: {
+      planets: {
+        sun: "Sun",
+        moon: "Moon",
+        mercury: "Mercury",
+        venus: "Venus",
+        mars: "Mars",
+        jupiter: "Jupiter",
+        saturn: "Saturn",
+      },
+      planetaryStrength: {
+        title: "Planetary Strength",
+        dataUnavailableTitle: "Data unavailable",
+        unableToLoadData: "Unable to load planetary strength data right now.",
+        todaysEnergy: "Today's energy",
+        rulerLabel: "Ruler",
+        bestWork: "Best for work",
+        bestReflection: "Best for reflection",
+        watchOut: "Watch out",
+        todaysOverallEnergy: "Today's overall energy",
+        averageOfAll: "Average of all planets",
+        todaysRuler: "Today's ruler",
+        quality: "Quality",
+        impactOnDaily: "Impact on today",
+        points: "{value} pts",
+        recommendedHours: "Recommended hours",
+        detailedAnalysis: "Detailed analysis",
+        degreeStrength: "Degree strength",
+        dignityLabel: "Dignity",
+        qualities: {
+          excellent: "Excellent",
+          good: "Good",
+          moderate: "Moderate",
+        },
+        rulerAdvice: {
+          veryStrong: "{planet} is strongly supported today — act with clarity and confidence.",
+          strong: "{planet} supports steady progress today — move forward with intention.",
+          moderate: "{planet} is balanced today — keep steps simple and consistent.",
+          weak: "{planet} is under strain today — slow down and simplify commitments.",
+          veryWeak: "{planet} is challenged today — prioritize protection, patience, and smaller aims.",
+        },
+      },
+      guidance: {
+        title: "Recommendations",
+        cautions: "Cautions",
+        useStrongHours: "Use {planet} strong hours ({percent}%) for important work.",
+        useStrongHoursSpiritual: "Use {planet} strong hours ({percent}%) for spiritual practice.",
+        avoidWeakHours: "Avoid {planet} and {planet2} hours when possible.",
+      },
+      breakdown: {
+        todaysRuler: {
+          degreeEarly: "Early degree ({degree}°): influence still forming.",
+          degreeGaining: "Gaining strength ({degree}°): momentum building.",
+          degreePeak: "Peak strength ({degree}°): strongest expression.",
+          degreeWeakening: "Weakening ({degree}°): focus on completion.",
+          dignityOwn: "Domicile: steady and reliable.",
+          dignityExalted: "Exalted: supported and elevated.",
+          dignityDetriment: "Detriment: friction and mixed results.",
+          dignityFall: "Fall: muted — go gently.",
+          dignityNeutral: "Neutral: balanced tone.",
+          combust: "Combust: weakened by proximity to the Sun.",
+          beams: "Under the beams: reduced clarity.",
+          clear: "Clear: not affected by the Sun.",
+          retrograde: "Retrograde: better for review and inner work.",
+        },
+      },
+    },
+
+    // Planetary Strength Analysis (detailed cards)
+    planetaryStrengthAnalysis: {
+      labels: {
+        power: "Power",
+        calculationBreakdown: "Calculation breakdown",
+        degree: "Degree",
+        dignity: "Dignity",
+        combustion: "Sun proximity",
+      },
+      statuses: {
+        degreeWeak: "Weak",
+        degreeModerate: "Moderate",
+        degreeStrong: "Strong",
+        degreeWeakening: "Weakening",
+        dignityDomicile: "Domicile",
+        dignityExalted: "Exalted",
+        dignityDetriment: "Detriment",
+        dignityFall: "Fall",
+        dignityNeutral: "Neutral",
+        combustionClear: "Clear",
+        combustionBeams: "Under beams",
+        combustionCombust: "Combust",
+      },
+      formula: {
+        retrograde: "Retrograde modifier: {percent}% of normal power",
+        finalPower: "Final power: {value}%",
+      },
+      cards: {
+        degreePosition: "Degree position",
+        essentialDignity: "Essential dignity",
+        sunProximity: "Sun proximity",
+        retrogradeMotion: "Retrograde motion",
+      },
+      sections: {
+        challengesTitle: "Challenges",
+        recommendationsTitle: "Recommendations",
+      },
+      suitability: {
+        outerWork: "Outer work",
+        innerWork: "Inner work",
+        limitedOuterWork: "Limited outer work",
+      },
+    },
+
     // Screens
     screens: {
       // Planet Transit Screen (System 1 - Long-term)
@@ -2143,6 +2353,10 @@ export const translations = {
         headerSubtitle: "Long-term",
         explanation: "Shows where a planet is in the zodiac — its long-term position that changes over weeks, months, or years.",
         personalizedNote: "Personalized to your elemental nature",
+        summary: {
+          bestNow: "Strongest now",
+          weakNow: "Weakest now",
+        },
         
         currentTransit: "Current Transit",
         timeScale: "Long-term (weeks/months)",
@@ -2232,6 +2446,115 @@ export const translations = {
             early: "Early (0-10°)",
             middle: "Middle (10-20°)",
             late: "Late (20-30°)",
+          },
+        },
+        dignity: {
+          title: "Dignity Analysis",
+          state: "State",
+          baseModifier: "Base modifier",
+          degreeModifier: "Degree modifier",
+          finalStrength: "Final strength",
+          whatThisMeans: "What this means",
+          suitableFor: "Suitable for",
+          avoid: "Avoid",
+          betterTiming: "Better timing",
+          states: {
+            sharaf: "Exalted (Sharaf)",
+            bayt: "Domicile (Bayt)",
+            qubul: "Neutral (Qubūl)",
+            wabal: "Detriment (Wabāl)",
+            hubut: "Fall (Hubūṭ)",
+          },
+          explanations: {
+            sharaf: "This planet is in a sign where its qualities are elevated and supported, making actions more effective and outcomes clearer.",
+            bayt: "This planet is in its home sign, where its nature expresses smoothly and reliably.",
+            qubul: "This placement is balanced: neither strongly supported nor strongly challenged.",
+            wabal: "This placement can create friction or mixed results; move with care and simplify commitments.",
+            hubut: "This placement tends to feel heavy or blocked; timing, patience, and gentler goals help.",
+          },
+        },
+        dignityGuidance: {
+          generic: {
+            sharaf: {
+              whatThisMeans: "With {planet} exalted in {sign}, momentum is supportive. Act with clarity and good intention.",
+              suitableFor: {
+                1: "Leadership and visibility",
+                2: "Important conversations and commitments",
+                3: "Launching initiatives and setting direction",
+              },
+              avoid: {
+                1: "Overconfidence or rushing without consultation",
+                2: "Forcing outcomes or escalating conflicts",
+              },
+              betterTiming: {
+                1: "Act during supportive hours and keep intentions clean",
+                2: "Choose clear, bounded commitments",
+              },
+            },
+            bayt: {
+              whatThisMeans: "With {planet} in its domicile in {sign}, its influence is steady and reliable. Build consistently.",
+              suitableFor: {
+                1: "Sustained work and disciplined effort",
+                2: "Routines and long‑term plans",
+                3: "Organizing and strengthening foundations",
+              },
+              avoid: {
+                1: "Assuming everything will work without structure",
+                2: "Overloading your schedule",
+              },
+              betterTiming: {
+                1: "Small consistent steps over big pushes",
+                2: "Follow a plan and track progress",
+              },
+            },
+            qubul: {
+              whatThisMeans: "With {planet} neutral in {sign}, outcomes depend more on choices than conditions. Keep intentions clean and steps simple.",
+              suitableFor: {
+                1: "Everyday tasks and maintenance",
+                2: "Testing ideas before committing fully",
+                3: "Reflection and calibration",
+              },
+              avoid: {
+                1: "Expecting a dramatic push from the sky",
+                2: "Overcomplicating decisions",
+              },
+              betterTiming: {
+                1: "Clarify priorities first, then act",
+                2: "Move with a measured pace",
+              },
+            },
+            wabal: {
+              whatThisMeans: "With {planet} in detriment in {sign}, there may be friction. Progress is possible with restraint and boundaries.",
+              suitableFor: {
+                1: "Reviewing, simplifying, and reducing load",
+                2: "Low‑stakes planning and gentle corrections",
+                3: "Inner work and patience‑based goals",
+              },
+              avoid: {
+                1: "High‑pressure decisions or irreversible commitments",
+                2: "Escalating conflicts or forcing outcomes",
+              },
+              betterTiming: {
+                1: "Wait for clearer signals before major moves",
+                2: "Reduce commitments and keep boundaries",
+              },
+            },
+            hubut: {
+              whatThisMeans: "With {planet} in fall in {sign}, energy can feel muted. Choose smaller aims and protect your attention.",
+              suitableFor: {
+                1: "Rest, recovery, and restoration",
+                2: "Rebuilding confidence through small wins",
+                3: "Prayer, grounding, and steady routines",
+              },
+              avoid: {
+                1: "Overextending or demanding quick results",
+                2: "Starting heavy burdens without support",
+              },
+              betterTiming: {
+                1: "Postpone launches and negotiations when possible",
+                2: "Focus on essentials and let time do its work",
+              },
+            },
           },
         },
         personalized: {
@@ -2508,6 +2831,12 @@ export const translations = {
           planetIn: "{{planet}} is in {{sign}} ({{signArabic}})",
           viewDetails: "View full transit details",
         },
+
+        currentHourPlanet: {
+          title: "Current Hour Planet",
+          subtitle: "Ruling this moment",
+          viewAllPlanets: "View All 7 Planets",
+        },
       },
     },
 
@@ -2569,6 +2898,18 @@ export const translations = {
       bestNow: "Better for:",
       avoidNow: "Avoid for now:",
       disclaimer: "For reflection only • Not a ruling",
+
+      authenticTiming: {
+        title: "Authentic Timing",
+        hourRuler: "Hour Ruler Strength",
+        elemental: "Elemental Relationship",
+        opening: "{planet} hour guidance (reflection-focused).",
+        nextHour: "Next hour: {planet} begins in {minutes}m.",
+      },
+
+      currentHour: {
+        endsIn: "Ends in {minutes}m",
+      },
       
       // Timeline
       timeline: {
@@ -3160,12 +3501,25 @@ export const translations = {
       personalizedFor: "Personalized for your spiritual profile",
       analyzing: "Analyzing timing...",
       timingAnalysis: "Timing Analysis For You",
+      overallTimingQualityTitle: "OVERALL TIMING QUALITY",
+      overallTimingQualityHint: "Combines all spiritual factors for this moment",
       optimalUntil: "Optimal window until",
       errors: {
         unableToCalculateTiming: "Unable to calculate timing",
         unableToLoadAnalysis: "Unable to load analysis",
       },
       whyThisRating: "Why This Rating?",
+      breakdown: {
+        rulingPlanetStrength: "Ruling Planet Strength",
+        rulingPlanetStrengthDesc: "Your ruling planet's compatibility with today's ruler (30% of planetary resonance, factored into overall score)",
+        todaysRulerTitle: "Today's Ruler ({planet})",
+        todaysRulerFallback: "Today's ruler",
+        todaysRulerStrong: "{planet}{arabic} is very strong today. Excellent overall day energy for all {planet}-related activities.",
+        todaysRulerGood: "{planet}{arabic} has good strength today. Favorable day energy for {planet} work.",
+        todaysRulerModerate: "{planet}{arabic} has moderate strength today. Proceed with awareness for {planet} activities.",
+        todaysRulerWeak: "{planet}{arabic} is weak today. Consider alternative days for major {planet} work.",
+        todaysRulerVeryWeak: "{planet}{arabic} is very weak today. Avoid major {planet} decisions or work.",
+      },
       whatThisMeans: "What This Means For You",
       recommended: "Recommended Now",
       cautions: "Be Mindful Of",
@@ -3175,9 +3529,37 @@ export const translations = {
     // Unified Timing Badges
     timing: {
       compatible: "Compatible",
+      ratings: {
+        excellent: "EXCELLENT TIME",
+        good: "GOOD TIME",
+        moderate: "PROCEED MINDFULLY",
+        weak: "PROCEED WITH CAUTION",
+        unfavorable: "UNFAVORABLE TIME",
+      },
+
+      shortDescriptions: {
+        veryStrong: "Very strong {planet} hour",
+        strong: "Strong {planet} hour",
+        moderate: "Moderate {planet} hour",
+        weak: "Weak {planet} hour",
+        veryWeak: "Very weak {planet} hour",
+
+        perfectAlignment: "Perfect alignment",
+        supportiveFlow: "Supportive flow",
+        neutral: "Neutral energy",
+        minorTension: "Minor elemental tension",
+      },
+
+      guidance: {
+        recommended: "Recommended:",
+        goodFor: "Good for:",
+        approach: "Approach:",
+        avoid: "Avoid:",
+        betterTiming: "Better timing:",
+      },
       badges: {
         optimal: {
-          label: "Optimal",
+          label: "Excellent Time",
           action: "Excellent time — proceed with confidence",
           description: "This is one of your best windows. All factors align beautifully for your practice.",
           hint: "Excellent alignment — proceed confidently",
@@ -3189,19 +3571,19 @@ export const translations = {
           hint: "Favorable conditions — act with intention",
         },
         maintain: {
-          label: "Maintain",
+          label: "Proceed Mindfully",
           action: "Workable — stay mindful",
           description: "This timing is workable but requires awareness. Some tension exists that can be navigated.",
           hint: "Workable timing — maintain balance",
         },
         careful: {
-          label: "Careful",
+          label: "Proceed with Caution",
           action: "Challenging — proceed only if necessary",
           description: "This isn't your natural time. If you must proceed, add grounding practices.",
           hint: "Challenging energies — proceed carefully",
         },
         hold: {
-          label: "Hold",
+          label: "Unfavorable Time",
           action: "Best to wait — see alternatives",
           description: "Strong opposing factors. Unless urgent, wait for a better window.",
           hint: "Wait for better timing",
@@ -8545,6 +8927,70 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       levelFull: "COMPLET",
     },
 
+    // Écran Manazil (détail)
+    manazilScreen: {
+      currentMoonPosition: "Position lunaire actuelle",
+      liveIndicator: "🔴 EN DIRECT - Mise à jour en temps réel",
+      moonStrength: "Force de la Lune",
+      mansion: "Mansion",
+      quality: "Qualité",
+      changesEvery: "Change environ tous les ~2,4 jours",
+      cosmicDialogueTitle: "🌌 Dialogue cosmique",
+      mansionWisdomTitle: "🏛️ Sagesse de la demeure",
+      fromYourName: "D'après votre nom : {name}",
+      staticNeverChanges: "Statique - ne change jamais",
+      needTimingGuidanceTitle: "⏰ Besoin d'analyse du timing ?",
+      needTimingGuidanceSubtitle: "Consultez ces écrans pour le timing spirituel :",
+      dailyEnergyLinkTitle: "Énergie du jour",
+      dailyEnergyLinkSubtitle: "Voir le timing global pour aujourd'hui.",
+      momentAlignmentLinkTitle: "Alignement du moment",
+      momentAlignmentLinkSubtitle: "Voir le timing pour l'instant présent (heure par heure).",
+      timingGuidanceNote: "Les scores se mettent à jour toutes les quelques minutes.",
+      elementalStatus: {
+        harmonious: "Harmonie",
+        balanced: "Équilibré",
+        tension: "Tension",
+        bothAre: "Les deux sont {element} — énergie naturellement soutenante.",
+        proceedMindfully: "{element1} et {element2} créent un contraste — avancez avec attention.",
+        neutralEnergy: "{element1} et {element2} sont différents sans être opposés — énergie adaptable.",
+      },
+      relationship: {
+        title: "Relation entre demeures",
+        subtitle: "Comment l'élément lunaire du moment interagit avec votre demeure personnelle.",
+        yourEssence: "Votre essence",
+        currentMoon: "Lune actuelle",
+        howToNavigate: "Comment naviguer aujourd'hui",
+        bestCompatibility: "Meilleure compatibilité",
+        whenMoonIn: "Quand la Lune est en {element}, votre demeure personnelle est particulièrement soutenue.",
+        nextMoon: "Prochaine Lune en {element} : {relativeTime} ({date})",
+        today: "aujourd'hui",
+        tomorrow: "demain",
+        inDays: "dans {count} jours",
+        nextWeek: "la semaine prochaine",
+        inWeeks: "dans {count} semaines",
+        inMonths: "dans {count} mois",
+        tips: {
+          harmonious1: "Amplifiez vos dons naturels",
+          harmonious2: "Faites confiance à votre intuition",
+          harmonious3: "Travaillez avec les forces de votre élément",
+          balanced1: "Travaillez avec les deux énergies consciemment",
+          balanced2: "Trouvez le pont entre les éléments",
+          balanced3: "Laissez l'équilibre vous guider",
+          tension1: "Avancez doucement et restez présent",
+          tension2: "Choisissez une prochaine étape simple et ancrée",
+          tension3: "Priorisez le calme, la clarté et l'intention",
+        },
+      },
+      personalMessage: {
+        title: "Message personnel",
+        subtitle: "Pour votre demeure personnelle : {name}",
+        forYourNature: "Pour votre nature {element}",
+        messageHarmonious: "La Lune {moonElement} d'aujourd'hui s'harmonise avec votre essence {personalElement}. Vos dons naturels sont amplifiés — faites confiance à votre intuition.",
+        messageTension: "La Lune {moonElement} d'aujourd'hui crée une tension dynamique avec votre nature {personalElement}. Ce n'est pas négatif — c'est une croissance par l'équilibre. Avancez avec présence.",
+        messageBalanced: "La Lune {moonElement} d'aujourd'hui apporte une énergie neutre à votre essence {personalElement}. Cela ouvre un espace de choix conscient — adaptez-vous selon le besoin.",
+      },
+    },
+
     notifications: {
       harmony: {
         favorableTitle: "🌟 Début d'une heure favorable",
@@ -8557,6 +9003,27 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         delicateBody: "Une heure délicate commence. Avancez avec douceur et présence. Heure de {planet} • {element}.{personalNote}",
       },
       timing: {
+        // New component translations (TimingGuidanceCard, TodayDetailsCard, CollapsibleEducationalSection)
+        currentTiming: "Timing Actuel",
+        hour: "Heure",
+        endsAt: "Se termine à",
+        nextBestHour: "Prochaine Meilleure Heure",
+        inHours: "dans",
+        expectedQuality: "Qualité attendue",
+        suggestion: "Suggestion",
+        proceedNow: "Procédez maintenant",
+        waitForBetter: "Attendez un meilleur timing si possible",
+        excellentTiming: "Excellent timing maintenant!",
+        todaysDetails: "Détails du jour",
+        dayRuler: "Maître du jour",
+        element: "Élément",
+        quality: "Qualité",
+        whyThisTiming: "Pourquoi ce timing?",
+        elementHarmony: "Harmonie élémentaire",
+        momentAlignment: "Alignement du moment",
+        planetaryResonance: "Résonance planétaire",
+        whatThisMeans: "Que cela signifie",
+        // Legacy translations
         harmonyHigh: "des énergies très favorables",
         harmonyBalanced: "des énergies équilibrées, propices à l'évolution",
         harmonyReflective: "des énergies introspectives, idéales pour le travail intérieur",
@@ -9065,6 +9532,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       buttons: {
         learnMore: "En Savoir Plus",
         collapse: "Afficher Moins",
+        tapToLearn: "Appuyez pour en savoir plus",
       },
       retry: "Réessayer",
       on: "OUI",
@@ -9120,6 +9588,13 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         fire: "Feu",
         water: "Eau",
         earth: "Terre",
+      },
+      // Quality levels (TimingGuidanceCard)
+      quality: {
+        excellent: "Excellent",
+        good: "Bon",
+        moderate: "Modéré",
+        weak: "Faible",
       },
     },
     
@@ -10627,6 +11102,119 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       tapToSetLocation: "Appuyez pour définir l'emplacement",
     },
 
+    // Énergie du Jour (clés partagées)
+    dailyEnergy: {
+      planets: {
+        sun: "Soleil",
+        moon: "Lune",
+        mercury: "Mercure",
+        venus: "Vénus",
+        mars: "Mars",
+        jupiter: "Jupiter",
+        saturn: "Saturne",
+      },
+      planetaryStrength: {
+        title: "Force planétaire",
+        dataUnavailableTitle: "Données indisponibles",
+        unableToLoadData: "Impossible de charger la force planétaire pour le moment.",
+        todaysEnergy: "Énergie du jour",
+        rulerLabel: "Maître",
+        bestWork: "Idéal pour le travail",
+        bestReflection: "Idéal pour la réflexion",
+        watchOut: "À surveiller",
+        todaysOverallEnergy: "Énergie globale du jour",
+        averageOfAll: "Moyenne de toutes les planètes",
+        todaysRuler: "Maître du jour",
+        quality: "Qualité",
+        impactOnDaily: "Impact sur la journée",
+        points: "{value} pts",
+        recommendedHours: "Heures recommandées",
+        detailedAnalysis: "Analyse détaillée",
+        degreeStrength: "Force du degré",
+        dignityLabel: "Dignité",
+        qualities: {
+          excellent: "Excellente",
+          good: "Bonne",
+          moderate: "Modérée",
+        },
+        rulerAdvice: {
+          veryStrong: "{planet} est fortement soutenu aujourd’hui — agissez avec clarté et confiance.",
+          strong: "{planet} soutient un progrès régulier — avancez avec intention.",
+          moderate: "{planet} est équilibré aujourd’hui — restez simple et constant.",
+          weak: "{planet} est sous tension aujourd’hui — ralentissez et simplifiez.",
+          veryWeak: "{planet} est fortement challengé aujourd’hui — privilégiez la patience et de petits objectifs.",
+        },
+      },
+      guidance: {
+        title: "Recommandations",
+        cautions: "Prudences",
+        useStrongHours: "Utilisez les heures fortes de {planet} ({percent}%) pour les tâches importantes.",
+        useStrongHoursSpiritual: "Utilisez les heures fortes de {planet} ({percent}%) pour la pratique spirituelle.",
+        avoidWeakHours: "Évitez les heures de {planet} et {planet2} si possible.",
+      },
+      breakdown: {
+        todaysRuler: {
+          degreeEarly: "Début ({degree}°) : l’influence se forme encore.",
+          degreeGaining: "En montée ({degree}°) : l’élan se construit.",
+          degreePeak: "Sommet ({degree}°) : expression la plus forte.",
+          degreeWeakening: "En baisse ({degree}°) : privilégiez la finalisation.",
+          dignityOwn: "Domicile : stable et fiable.",
+          dignityExalted: "Exaltation : soutenu et élevé.",
+          dignityDetriment: "Exil : friction et résultats mixtes.",
+          dignityFall: "Chute : énergie atténuée — allez doucement.",
+          dignityNeutral: "Neutre : ton équilibré.",
+          combust: "Combustion : affaibli par la proximité du Soleil.",
+          beams: "Sous les rayons : clarté réduite.",
+          clear: "Clair : non affecté par le Soleil.",
+          retrograde: "Rétrograde : mieux pour révision et travail intérieur.",
+        },
+      },
+    },
+
+    // Analyse de force planétaire
+    planetaryStrengthAnalysis: {
+      labels: {
+        power: "Puissance",
+        calculationBreakdown: "Détail du calcul",
+        degree: "Degré",
+        dignity: "Dignité",
+        combustion: "Proximité du Soleil",
+      },
+      statuses: {
+        degreeWeak: "Faible",
+        degreeModerate: "Modérée",
+        degreeStrong: "Forte",
+        degreeWeakening: "En baisse",
+        dignityDomicile: "Domicile",
+        dignityExalted: "Exaltation",
+        dignityDetriment: "Exil",
+        dignityFall: "Chute",
+        dignityNeutral: "Neutre",
+        combustionClear: "Clair",
+        combustionBeams: "Sous les rayons",
+        combustionCombust: "Combustion",
+      },
+      formula: {
+        retrograde: "Modificateur rétrograde : {percent}% de la puissance normale",
+        finalPower: "Puissance finale : {value}%",
+      },
+      cards: {
+        degreePosition: "Position en degré",
+        essentialDignity: "Dignité essentielle",
+        sunProximity: "Proximité du Soleil",
+        retrogradeMotion: "Mouvement rétrograde",
+      },
+      sections: {
+        challengesTitle: "Défis",
+        recommendationsTitle: "Recommandations",
+      },
+      suitability: {
+        outerWork: "Travail extérieur",
+        innerWork: "Travail intérieur",
+        limitedOuterWork: "Travail extérieur limité",
+      },
+    },
+
     // Écrans
     screens: {
       // Écran de Transit Planétaire (Système 1 - Long terme)
@@ -10635,6 +11223,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         headerSubtitle: "Long terme",
         explanation: "Indique où se trouve une planète dans le zodiaque — sa position à long terme qui change sur des semaines, des mois ou des années.",
         personalizedNote: "Personnalisé à votre nature élémentaire",
+        summary: {
+          bestNow: "Les plus fortes maintenant",
+          weakNow: "Les plus faibles maintenant",
+        },
         
         currentTransit: "Transit Actuel",
         timeScale: "Long terme (semaines/mois)",
@@ -10724,6 +11316,115 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             early: "Début (0-10°)",
             middle: "Milieu (10-20°)",
             late: "Fin (20-30°)",
+          },
+        },
+        dignity: {
+          title: "Analyse de dignité",
+          state: "État",
+          baseModifier: "Modificateur de base",
+          degreeModifier: "Modificateur du degré",
+          finalStrength: "Force finale",
+          whatThisMeans: "Ce que cela signifie",
+          suitableFor: "Favorable pour",
+          avoid: "À éviter",
+          betterTiming: "Meilleur timing",
+          states: {
+            sharaf: "Exaltation (Sharaf)",
+            bayt: "Domicile (Bayt)",
+            qubul: "Neutre (Qubūl)",
+            wabal: "Exil (Wabāl)",
+            hubut: "Chute (Hubūṭ)",
+          },
+          explanations: {
+            sharaf: "La planète est exaltée : ses qualités sont élevées et soutenues, rendant l’action plus efficace.",
+            bayt: "La planète est en domicile : son influence s’exprime avec stabilité et fiabilité.",
+            qubul: "Placement neutre : ni fortement soutenu, ni fortement contrarié.",
+            wabal: "Placement difficile : friction possible, avancez avec prudence et limites claires.",
+            hubut: "Chute : énergie atténuée ; patience et objectifs plus doux aident.",
+          },
+        },
+        dignityGuidance: {
+          generic: {
+            sharaf: {
+              whatThisMeans: "Avec {planet} exalté en {sign}, l’élan est favorable. Agissez avec clarté et intention.",
+              suitableFor: {
+                1: "Leadership et visibilité",
+                2: "Conversations et engagements importants",
+                3: "Lancer des initiatives",
+              },
+              avoid: {
+                1: "Excès de confiance ou précipitation",
+                2: "Forcer les résultats",
+              },
+              betterTiming: {
+                1: "Agissez quand l’esprit est clair et l’intention propre",
+                2: "Choisissez des engagements délimités",
+              },
+            },
+            bayt: {
+              whatThisMeans: "Avec {planet} en domicile en {sign}, l’influence est stable. Construisez dans la durée.",
+              suitableFor: {
+                1: "Travail soutenu et discipline",
+                2: "Routines et plans à long terme",
+                3: "Organisation et consolidation",
+              },
+              avoid: {
+                1: "Manquer de structure",
+                2: "Surcharger l’agenda",
+              },
+              betterTiming: {
+                1: "Petits pas constants",
+                2: "Suivre un plan et mesurer les progrès",
+              },
+            },
+            qubul: {
+              whatThisMeans: "Avec {planet} neutre en {sign}, les résultats dépendent surtout des choix. Restez simple.",
+              suitableFor: {
+                1: "Tâches quotidiennes",
+                2: "Tester avant de s’engager",
+                3: "Réflexion et ajustements",
+              },
+              avoid: {
+                1: "Attendre un grand “push”",
+                2: "Complexifier les décisions",
+              },
+              betterTiming: {
+                1: "Clarifier les priorités d’abord",
+                2: "Avancer à un rythme mesuré",
+              },
+            },
+            wabal: {
+              whatThisMeans: "Avec {planet} en exil en {sign}, la friction est possible. Progressez avec retenue et limites.",
+              suitableFor: {
+                1: "Revoir et simplifier",
+                2: "Planifier sans enjeu majeur",
+                3: "Travail intérieur et patience",
+              },
+              avoid: {
+                1: "Décisions sous pression",
+                2: "Escalader les conflits",
+              },
+              betterTiming: {
+                1: "Attendre des signaux plus clairs",
+                2: "Réduire les engagements",
+              },
+            },
+            hubut: {
+              whatThisMeans: "Avec {planet} en chute en {sign}, l’énergie peut être faible. Visez petit et protégez l’attention.",
+              suitableFor: {
+                1: "Repos et récupération",
+                2: "Petites victoires",
+                3: "Prière et routines",
+              },
+              avoid: {
+                1: "Se surmener",
+                2: "Exiger des résultats rapides",
+              },
+              betterTiming: {
+                1: "Reporter les lancements si possible",
+                2: "Se concentrer sur l’essentiel",
+              },
+            },
           },
         },
         personalized: {
@@ -10997,6 +11698,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           planetIn: "{{planet}} est en {{sign}} ({{signArabic}})",
           viewDetails: "Voir les détails complets du transit",
         },
+
+        currentHourPlanet: {
+          title: "Planète de l’Heure Actuelle",
+          subtitle: "Règne sur ce moment",
+          viewAllPlanets: "Voir les 7 planètes",
+        },
       },
     },
 
@@ -11058,6 +11765,18 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       bestNow: "Favorable pour :",
       avoidNow: "Éviter pour l'instant :",
       disclaimer: "Pour réflexion seulement • Pas une règle",
+
+      authenticTiming: {
+        title: "Timing Authentique",
+        hourRuler: "Force du maître de l'heure",
+        elemental: "Relation élémentaire",
+        opening: "Conseils pour l'heure de {planet} (réflexion seulement).",
+        nextHour: "Prochaine heure : {planet} commence dans {minutes}m.",
+      },
+
+      currentHour: {
+        endsIn: "Se termine dans {minutes}m",
+      },
       
       // Timeline
       timeline: {
@@ -11644,12 +12363,25 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       personalizedFor: "Personnalisé pour votre profil spirituel",
       analyzing: "Analyse du timing...",
       timingAnalysis: "Analyse du Timing Pour Vous",
+      overallTimingQualityTitle: "QUALITÉ GLOBALE DU TIMING",
+      overallTimingQualityHint: "Combine tous les facteurs spirituels pour ce moment",
       optimalUntil: "Fenêtre optimale jusqu'à",
       errors: {
         unableToCalculateTiming: "Impossible de calculer le timing",
         unableToLoadAnalysis: "Impossible de charger l'analyse",
       },
       whyThisRating: "Pourquoi Cette Évaluation ?",
+      breakdown: {
+        rulingPlanetStrength: "Force de la planète gouvernante",
+        rulingPlanetStrengthDesc: "La compatibilité entre votre planète gouvernante et le maître du jour (30% de la résonance planétaire, intégrée au score global)",
+        todaysRulerTitle: "Maître du jour ({planet})",
+        todaysRulerFallback: "Maître du jour",
+        todaysRulerStrong: "{planet}{arabic} est très forte aujourd'hui. Excellente énergie globale pour toutes les activités liées à {planet}.",
+        todaysRulerGood: "{planet}{arabic} a une bonne force aujourd'hui. Énergie favorable pour le travail de {planet}.",
+        todaysRulerModerate: "{planet}{arabic} a une force modérée aujourd'hui. Procédez avec attention pour les activités de {planet}.",
+        todaysRulerWeak: "{planet}{arabic} est faible aujourd'hui. Envisagez d'autres jours pour un travail majeur de {planet}.",
+        todaysRulerVeryWeak: "{planet}{arabic} est très faible aujourd'hui. Évitez les décisions ou travaux majeurs de {planet}.",
+      },
       whatThisMeans: "Ce Que Cela Signifie Pour Vous",
       recommended: "Recommandé Maintenant",
       cautions: "Soyez Attentif À",
@@ -11659,9 +12391,37 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
     // Unified Timing Badges
     timing: {
       compatible: "Compatible",
+      ratings: {
+        excellent: "MOMENT EXCELLENT",
+        good: "BON MOMENT",
+        moderate: "PROCÉDEZ AVEC ATTENTION",
+        weak: "PROCÉDEZ AVEC PRUDENCE",
+        unfavorable: "MOMENT DÉFAVORABLE",
+      },
+
+      shortDescriptions: {
+        veryStrong: "Heure de {planet} très forte",
+        strong: "Heure de {planet} forte",
+        moderate: "Heure de {planet} modérée",
+        weak: "Heure de {planet} faible",
+        veryWeak: "Heure de {planet} très faible",
+
+        perfectAlignment: "Alignement parfait",
+        supportiveFlow: "Flux favorable",
+        neutral: "Énergie neutre",
+        minorTension: "Légère tension élémentaire",
+      },
+
+      guidance: {
+        recommended: "Recommandé :",
+        goodFor: "Bon pour :",
+        approach: "Approche :",
+        avoid: "À éviter :",
+        betterTiming: "Meilleur timing :",
+      },
       badges: {
         optimal: {
-          label: "Optimal",
+          label: "Moment Excellent",
           action: "Excellent moment — procédez avec confiance",
           description: "C'est l'une de vos meilleures fenêtres. Tous les facteurs s'alignent magnifiquement.",
           hint: "Excellent alignement — procédez avec confiance",
@@ -11673,19 +12433,19 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           hint: "Conditions favorables — agissez avec intention",
         },
         maintain: {
-          label: "Maintenir",
+          label: "Procédez avec Attention",
           action: "Praticable — restez attentif",
           description: "Ce timing est praticable mais demande de l'attention. Une certaine tension existe.",
           hint: "Timing praticable — maintenez l'équilibre",
         },
         careful: {
-          label: "Prudence",
+          label: "Procédez avec Prudence",
           action: "Difficile — procédez seulement si nécessaire",
           description: "Ce n'est pas votre moment naturel. Si vous devez continuer, ajoutez des pratiques d'ancrage.",
           hint: "Énergies difficiles — procédez avec prudence",
         },
         hold: {
-          label: "Attendre",
+          label: "Moment Défavorable",
           action: "Mieux vaut attendre — voir alternatives",
           description: "Facteurs fortement opposés. Sauf urgence, attendez une meilleure fenêtre.",
           hint: "Attendez un meilleur moment",
@@ -14426,6 +15186,118 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         meaning: "Assistance Divine",
         quality: "Coopération, Équilibre, Diplomatie",
         shadow: "Indécision, Dépendance, Évitement des conflits",
+
+      // الطاقة اليومية (مفاتيح مشتركة)
+      dailyEnergy: {
+        planets: {
+          sun: "الشمس",
+          moon: "القمر",
+          mercury: "عطارد",
+          venus: "الزهرة",
+          mars: "المريخ",
+          jupiter: "المشتري",
+          saturn: "زحل",
+        },
+        planetaryStrength: {
+          title: "قوة الكواكب",
+          dataUnavailableTitle: "البيانات غير متاحة",
+          unableToLoadData: "تعذّر تحميل بيانات قوة الكواكب الآن.",
+          todaysEnergy: "طاقة اليوم",
+          rulerLabel: "الحاكم",
+          bestWork: "الأفضل للعمل",
+          bestReflection: "الأفضل للتأمل",
+          watchOut: "تنبيه",
+          todaysOverallEnergy: "طاقة اليوم العامة",
+          averageOfAll: "متوسط جميع الكواكب",
+          todaysRuler: "حاكم اليوم",
+          quality: "الجودة",
+          impactOnDaily: "الأثر على اليوم",
+          points: "{value} نقطة",
+          recommendedHours: "الساعات الموصى بها",
+          detailedAnalysis: "تحليل مفصّل",
+          degreeStrength: "قوة الدرجة",
+          dignityLabel: "المنزلة",
+          qualities: {
+            excellent: "ممتاز",
+            good: "جيد",
+            moderate: "متوسط",
+          },
+          rulerAdvice: {
+            veryStrong: "{planet} مدعوم بقوة اليوم — تصرّف بوضوح وثقة.",
+            strong: "{planet} يدعم تقدّمًا ثابتًا — تقدّم بنية واضحة.",
+            moderate: "{planet} متوازن اليوم — أبقِ الخطوات بسيطة.",
+            weak: "{planet} تحت ضغط — هدّئ الوتيرة وقلّل الالتزامات.",
+            veryWeak: "{planet} مُتعب اليوم — قدّم الصبر والحماية وأهدافًا أصغر.",
+          },
+        },
+        guidance: {
+          title: "توصيات",
+          cautions: "محاذير",
+          useStrongHours: "استعمل ساعات {planet} القوية ({percent}%) للأمور المهمة.",
+          useStrongHoursSpiritual: "استعمل ساعات {planet} القوية ({percent}%) للعمل الروحي.",
+          avoidWeakHours: "تجنّب ساعات {planet} و{planet2} إن أمكن.",
+        },
+        breakdown: {
+          todaysRuler: {
+            degreeEarly: "بداية الدرجة ({degree}°): التأثير ما زال يتشكل.",
+            degreeGaining: "يزداد قوة ({degree}°): الزخم يبنى.",
+            degreePeak: "قمة القوة ({degree}°): أقوى تعبير.",
+            degreeWeakening: "يتراجع ({degree}°): ركّز على الإتمام.",
+            dignityOwn: "بيت: ثابت وموثوق.",
+            dignityExalted: "شرف: مدعوم ومُعزَّز.",
+            dignityDetriment: "وبال: احتكاك ونتائج مختلطة.",
+            dignityFall: "هبوط: طاقة خافتة — كن لطيفًا.",
+            dignityNeutral: "قبول: توازن.",
+            combust: "احتراق: يضعف لقربه من الشمس.",
+            beams: "تحت الشعاع: وضوح أقل.",
+            clear: "سليم: غير متأثر بالشمس.",
+            retrograde: "تراجع: أنسب للمراجعة والعمل الداخلي.",
+          },
+        },
+      },
+
+      planetaryStrengthAnalysis: {
+        labels: {
+          power: "القوة",
+          calculationBreakdown: "تفصيل الحساب",
+          degree: "الدرجة",
+          dignity: "المنزلة",
+          combustion: "قرب الشمس",
+        },
+        statuses: {
+          degreeWeak: "ضعيف",
+          degreeModerate: "متوسط",
+          degreeStrong: "قوي",
+          degreeWeakening: "يتراجع",
+          dignityDomicile: "بيت",
+          dignityExalted: "شرف",
+          dignityDetriment: "وبال",
+          dignityFall: "هبوط",
+          dignityNeutral: "قبول",
+          combustionClear: "سليم",
+          combustionBeams: "تحت الشعاع",
+          combustionCombust: "احتراق",
+        },
+        formula: {
+          retrograde: "معامل التراجع: {percent}% من القوة المعتادة",
+          finalPower: "القوة النهائية: {value}%",
+        },
+        cards: {
+          degreePosition: "موضع الدرجة",
+          essentialDignity: "المنزلة الأساسية",
+          sunProximity: "قرب الشمس",
+          retrogradeMotion: "حركة التراجع",
+        },
+        sections: {
+          challengesTitle: "التحديات",
+          recommendationsTitle: "التوصيات",
+        },
+        suitability: {
+          outerWork: "عمل خارجي",
+          innerWork: "عمل داخلي",
+          limitedOuterWork: "عمل خارجي محدود",
+        },
+      },
         practice: "Recherchez l'harmonie dans les relations. Réfléchissez : « Deux valent mieux qu'un. »",
         verse: "Entraidez-vous dans la justice (5:2)",
         practical: "Construisez des partenariats, médiez les conflits, créez l'équilibre. Bon pour le travail d'équipe."
@@ -16938,6 +17810,15 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     },
   },
   ar: {
+        // Moment Alignment Screen (Hourly)
+        momentAlignment: {
+          currentHourPlanet: {
+            title: "كوكب الساعة الحالية",
+            subtitle: "يحكم هذه اللحظة",
+            viewAllPlanets: "عرض الكواكب السبعة",
+          },
+        },
+
     // Minimal Arabic translations. Any missing keys fall back to EN automatically.
     nav: {
       home: "الرئيسية",
@@ -16950,6 +17831,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       buttons: {
         learnMore: "اعرف المزيد",
         collapse: "إظهار أقل",
+        tapToLearn: "اضغط لمعرفة المزيد",
       },
 
       loading: "جارٍ التحميل...",
@@ -16966,6 +17848,102 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         fire: "نار",
         water: "ماء",
         earth: "أرض",
+      },
+      // Quality levels (TimingGuidanceCard)
+      quality: {
+        excellent: "ممتاز",
+        good: "جيد",
+        moderate: "معتدل",
+        weak: "ضعيف",
+      },
+    },
+
+    // شاشة المنازل (التفاصيل)
+    manazilScreen: {
+      currentMoonPosition: "موقع القمر الحالي",
+      liveIndicator: "🔴 مباشر - تحديث فوري",
+      moonStrength: "قوة القمر",
+      mansion: "المنزلة",
+      quality: "الجودة",
+      changesEvery: "يتغير كل ~2.4 يوم",
+      cosmicDialogueTitle: "🌌 حوار كوني",
+      mansionWisdomTitle: "🏛️ حكمة المنزلة",
+      fromYourName: "من اسمك: {name}",
+      staticNeverChanges: "ثابت - لا يتغير أبداً",
+      needTimingGuidanceTitle: "⏰ تحتاج تحليل التوقيت؟",
+      needTimingGuidanceSubtitle: "اطّلع على هذه الشاشات للتوقيت الروحي:",
+      dailyEnergyLinkTitle: "طاقة اليوم",
+      dailyEnergyLinkSubtitle: "اعرض التوقيت العام لليوم.",
+      momentAlignmentLinkTitle: "محاذاة اللحظة",
+      momentAlignmentLinkSubtitle: "اعرض التوقيت لهذه اللحظة (ساعة بساعة).",
+      timingGuidanceNote: "تتحدّث الدرجات كل بضع دقائق.",
+      elementalStatus: {
+        harmonious: "انسجام",
+        balanced: "توازن",
+        tension: "توتر",
+        bothAre: "كلاهما {element} — طاقة داعمة طبيعيًا.",
+        proceedMindfully: "{element1} و{element2} بينهما تباين — سر بوعي.",
+        neutralEnergy: "{element1} و{element2} مختلفان دون تعارض — طاقة مرنة.",
+      },
+      relationship: {
+        title: "علاقة المنازل",
+        subtitle: "كيف يتفاعل عنصر القمر الحالي مع منزلك الشخصي.",
+        yourEssence: "جوهرك",
+        currentMoon: "القمر الحالي",
+        howToNavigate: "كيف تتعامل اليوم",
+        bestCompatibility: "أفضل توافق",
+        whenMoonIn: "عندما يكون القمر في {element} تكون منزلك الشخصي مدعومة بشكل خاص.",
+        nextMoon: "القمر التالي في {element}: {relativeTime} ({date})",
+        today: "اليوم",
+        tomorrow: "غداً",
+        inDays: "بعد {count} أيام",
+        nextWeek: "الأسبوع القادم",
+        inWeeks: "بعد {count} أسابيع",
+        inMonths: "بعد {count} أشهر",
+        tips: {
+          harmonious1: "ضاعف مواهبك الطبيعية",
+          harmonious2: "ثق بحدسك الروحي",
+          harmonious3: "اعمل مع نقاط قوة عنصرك",
+          balanced1: "اعمل مع الطاقتين بوعي",
+          balanced2: "ابحث عن الجسر بين العنصرين",
+          balanced3: "دع التوازن يكون معلّمك",
+          tension1: "تحرّك بلطف وابق حاضرًا",
+          tension2: "اختر خطوة تالية بسيطة ومُؤسَّسة",
+          tension3: "قدّم الهدوء والوضوح والنية",
+        },
+      },
+      personalMessage: {
+        title: "رسالة شخصية",
+        subtitle: "لمنزلك الشخصي: {name}",
+        forYourNature: "لطبيعتك {element}",
+        messageHarmonious: "قمر {moonElement} اليوم ينسجم مع جوهرك {personalElement}. تُضخَّم مواهبك الطبيعية — ثق بحدسك واعمل مع نقاط قوتك.",
+        messageTension: "قمر {moonElement} اليوم يخلق توترًا بنّاءً مع طبيعتك {personalElement}. ليس سيئًا — إنه نمو عبر التوازن. تحرّك بوعي وابق حاضرًا.",
+        messageBalanced: "قمر {moonElement} اليوم يجلب طاقة محايدة إلى جوهرك {personalElement}. يفتح ذلك مساحة لاختيار واعٍ — يمكنك الميل لأي طاقة بحسب الحاجة.",
+      },
+    },
+
+    notifications: {
+      // Timing section for notifications and cards (TimingGuidanceCard, TodayDetailsCard, CollapsibleEducationalSection)
+      timing: {
+        currentTiming: "التوقيت الحالي",
+        hour: "الساعة",
+        endsAt: "ينتهي في",
+        nextBestHour: "الساعة الأفضل التالية",
+        inHours: "في",
+        expectedQuality: "الجودة المتوقعة",
+        suggestion: "الاقتراح",
+        proceedNow: "تابع الآن",
+        waitForBetter: "انتظر توقيتًا أفضل إن أمكن",
+        excellentTiming: "توقيت ممتاز الآن!",
+        todaysDetails: "تفاصيل اليوم",
+        dayRuler: "حاكم اليوم",
+        element: "العنصر",
+        quality: "الجودة",
+        whyThisTiming: "لماذا هذا التوقيت؟",
+        elementHarmony: "الانسجام العنصري",
+        momentAlignment: "محاذاة اللحظة",
+        planetaryResonance: "الرنين الكوكبي",
+        whatThisMeans: "ما يعني هذا",
       },
     },
 
@@ -17029,6 +18007,10 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         headerSubtitle: "طويل المدى",
         explanation: "يعرض موقع الكوكب في الأبراج — وهو موضع طويل المدى يتغير خلال أسابيع أو أشهر أو سنوات.",
         personalizedNote: "مُخصّص حسب طبيعتك العنصرية",
+        summary: {
+          bestNow: "الأقوى الآن",
+          weakNow: "الأضعف الآن",
+        },
 
         currentTransit: "العبور الحالي",
         timeScale: "طويل المدى (أسابيع/أشهر)",
@@ -17122,6 +18104,115 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
             early: "بداية (0–10°)",
             middle: "وسط (10–20°)",
             late: "نهاية (20–30°)",
+          },
+        },
+        dignity: {
+          title: "تحليل منزلة الكوكب",
+          state: "الحالة",
+          baseModifier: "المعامل الأساسي",
+          degreeModifier: "معامل الدرجة",
+          finalStrength: "القوة النهائية",
+          whatThisMeans: "ماذا يعني هذا",
+          suitableFor: "مناسب لـ",
+          avoid: "تجنّب",
+          betterTiming: "توقيت أفضل",
+          states: {
+            sharaf: "شرف",
+            bayt: "بيت",
+            qubul: "قبول",
+            wabal: "وبال",
+            hubut: "هبوط",
+          },
+          explanations: {
+            sharaf: "الكوكب في شرفه: صفاته مُعزَّزة ومدعومة.",
+            bayt: "الكوكب في بيته: تأثيره أكثر ثباتًا وموثوقية.",
+            qubul: "قبول: وضع متوازن لا يدعم ولا يعارض بقوة.",
+            wabal: "وبال: قد يظهر احتكاك أو نتائج مختلطة؛ امضِ بحذر.",
+            hubut: "هبوط: قد تبدو الطاقة أثقل؛ الصبر وأهداف أصغر تساعد.",
+          },
+        },
+        dignityGuidance: {
+          generic: {
+            sharaf: {
+              whatThisMeans: "مع {planet} في الشرف داخل {sign}، الزخم داعم. تصرّف بوضوح وحسن نية.",
+              suitableFor: {
+                1: "القيادة والظهور",
+                2: "محادثات وقرارات مهمة",
+                3: "بدء مبادرات وتحديد اتجاه",
+              },
+              avoid: {
+                1: "الاندفاع أو الثقة الزائدة",
+                2: "فرض النتائج أو تصعيد الخلاف",
+              },
+              betterTiming: {
+                1: "اختر وضوحًا وحدودًا للالتزامات",
+                2: "حافظ على النية النظيفة والخطوة الثابتة",
+              },
+            },
+            bayt: {
+              whatThisMeans: "مع {planet} في البيت داخل {sign}، التأثير ثابت. ابنِ باستمرار.",
+              suitableFor: {
+                1: "عمل منتظم وانضباط",
+                2: "روتين وخطط بعيدة المدى",
+                3: "تنظيم وتقوية الأسس",
+              },
+              avoid: {
+                1: "غياب الهيكلة",
+                2: "تحميل النفس فوق الطاقة",
+              },
+              betterTiming: {
+                1: "خطوات صغيرة مستمرة",
+                2: "التزم بخطة وتتبّع التقدّم",
+              },
+            },
+            qubul: {
+              whatThisMeans: "مع {planet} في القبول داخل {sign}، النتيجة تعتمد على الاختيارات. ابقِ الأمور بسيطة.",
+              suitableFor: {
+                1: "مهام يومية وصيانة",
+                2: "اختبار قبل الالتزام",
+                3: "مراجعة وضبط",
+              },
+              avoid: {
+                1: "انتظار دفعة كبيرة دون عمل",
+                2: "تعقيد القرارات",
+              },
+              betterTiming: {
+                1: "وضّح الأولويات أولًا",
+                2: "تحرّك بوتيرة متزنة",
+              },
+            },
+            wabal: {
+              whatThisMeans: "مع {planet} في الوبال داخل {sign}، قد تظهر صعوبة. تقدّم بضبط وحدود.",
+              suitableFor: {
+                1: "مراجعة وتخفيف الحمل",
+                2: "تخطيط منخفض المخاطر",
+                3: "عمل داخلي وصبر",
+              },
+              avoid: {
+                1: "قرارات تحت ضغط",
+                2: "تصعيد النزاعات",
+              },
+              betterTiming: {
+                1: "انتظر إشارات أوضح",
+                2: "قلّل الالتزامات",
+              },
+            },
+            hubut: {
+              whatThisMeans: "مع {planet} في الهبوط داخل {sign}، قد تخفت الطاقة. اختر أهدافًا أصغر واحمِ انتباهك.",
+              suitableFor: {
+                1: "راحة وتعافٍ",
+                2: "انتصارات صغيرة",
+                3: "دعاء وروتين",
+              },
+              avoid: {
+                1: "الإرهاق",
+                2: "طلب نتائج سريعة",
+              },
+              betterTiming: {
+                1: "أجّل البدايات إن أمكن",
+                2: "ركّز على الضروري",
+              },
+            },
           },
         },
 
@@ -17496,12 +18587,25 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       personalizedFor: "مُخصّص لملفك الروحي",
       analyzing: "جارٍ تحليل التوقيت...",
       timingAnalysis: "تحليل التوقيت لك",
+      overallTimingQualityTitle: "جودة التوقيت الإجمالية",
+      overallTimingQualityHint: "يجمع كل العوامل الروحية لهذه اللحظة",
       optimalUntil: "النافذة المثالية حتى",
       errors: {
         unableToCalculateTiming: "تعذّر حساب التوقيت",
         unableToLoadAnalysis: "تعذّر تحميل التحليل",
       },
       whyThisRating: "لماذا هذا التقييم؟",
+      breakdown: {
+        rulingPlanetStrength: "قوة كوكب الحاكم",
+        rulingPlanetStrengthDesc: "توافق كوكبك الحاكم مع حاكم اليوم (30% من الرنين الكوكبي، مدرج في النسبة المئوية الإجمالية)",
+        todaysRulerTitle: "حاكم اليوم ({planet})",
+        todaysRulerFallback: "حاكم اليوم",
+        todaysRulerStrong: "{planet}{arabic} قوي جدًا اليوم. طاقة يوم ممتازة لكل ما يتعلق بـ {planet}.",
+        todaysRulerGood: "{planet}{arabic} قوي اليوم. طاقة يوم مناسبة لأعمال {planet}.",
+        todaysRulerModerate: "{planet}{arabic} قوته متوسطة اليوم. تابع بوعي في أنشطة {planet}.",
+        todaysRulerWeak: "{planet}{arabic} ضعيف اليوم. فكّر في أيام أخرى لأعمال {planet} الكبيرة.",
+        todaysRulerVeryWeak: "{planet}{arabic} ضعيف جدًا اليوم. تجنّب القرارات أو الأعمال الكبيرة المرتبطة بـ {planet}.",
+      },
       whatThisMeans: "ماذا يعني هذا لك",
       recommended: "موصى به الآن",
       cautions: "انتبه لـ",
@@ -17511,9 +18615,37 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     // Unified Timing Badges
     timing: {
       compatible: "متوافق",
+      ratings: {
+        excellent: "وقت ممتاز",
+        good: "وقت جيد",
+        moderate: "تابع بوعي",
+        weak: "تابع بحذر",
+        unfavorable: "وقت غير مناسب",
+      },
+
+      shortDescriptions: {
+        veryStrong: "ساعة {planet} قوية جدًا",
+        strong: "ساعة {planet} قوية",
+        moderate: "ساعة {planet} متوسطة",
+        weak: "ساعة {planet} ضعيفة",
+        veryWeak: "ساعة {planet} ضعيفة جدًا",
+
+        perfectAlignment: "انسجام تام",
+        supportiveFlow: "تدفق داعم",
+        neutral: "طاقة محايدة",
+        minorTension: "توتر عنصري طفيف",
+      },
+
+      guidance: {
+        recommended: "موصى به:",
+        goodFor: "مناسب لـ:",
+        approach: "النهج:",
+        avoid: "تجنب:",
+        betterTiming: "توقيت أفضل:",
+      },
       badges: {
         optimal: {
-          label: "مثالي",
+          label: "وقت ممتاز",
           action: "وقت ممتاز — تقدّم بثقة",
           description: "هذه من أفضل نوافذك. جميع العوامل تتناغم بشكل جميل.",
           hint: "توافق ممتاز — تقدّم بثقة",
@@ -17525,19 +18657,19 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           hint: "ظروف مواتية — تصرّف بنية",
         },
         maintain: {
-          label: "حافظ",
+          label: "تابع بوعي",
           action: "قابل للتطبيق — ابقَ منتبهًا",
           description: "هذا التوقيت قابل للتطبيق لكنه يتطلب وعيًا. يوجد بعض التوتر.",
           hint: "توقيت قابل للتطبيق — حافظ على التوازن",
         },
         careful: {
-          label: "حذر",
+          label: "تابع بحذر",
           action: "صعب — تقدّم فقط إذا لزم الأمر",
           description: "هذا ليس وقتك الطبيعي. إذا كان لا بد من المتابعة، أضف ممارسات التأريض.",
           hint: "طاقات صعبة — تقدّم بحذر",
         },
         hold: {
-          label: "توقف",
+          label: "وقت غير مناسب",
           action: "الأفضل الانتظار — انظر البدائل",
           description: "عوامل معارضة قوية. إلا في حالة الضرورة، انتظر نافذة أفضل.",
           hint: "انتظر توقيتًا أفضل",
@@ -17891,6 +19023,13 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     },
 
     momentDetail: {
+      authenticTiming: {
+        title: "التوقيت الأصيل",
+        hourRuler: "قوة حاكم الساعة",
+        elemental: "العلاقة العنصرية",
+        opening: "إرشاد ساعة {planet} (للتأمل).",
+        nextHour: "الساعة التالية: يبدأ {planet} بعد {minutes} د.",
+      },
       timeline: {
         in: "بعد",
       },
@@ -18002,6 +19141,111 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         },
         compactAdvice: "اغتنم الفرص المتوافقة",
         cta: "عرض التفاصيل →",
+      },
+    },
+    
+    // Moon Phase System
+    moon: {
+      phases: {
+        new: "New Moon",
+        waxing_crescent: "Waxing Crescent",
+        first_quarter: "First Quarter",
+        waxing_gibbous: "Waxing Gibbous",
+        full: "Full Moon",
+        waning_gibbous: "Waning Gibbous",
+        last_quarter: "Last Quarter",
+        waning_crescent: "Waning Crescent",
+      },
+      
+      phasesArabic: {
+        new: "المحاق",
+        waxing_crescent: "الهلال المتزايد",
+        first_quarter: "التربيع الأول",
+        waxing_gibbous: "الأحدب المتزايد",
+        full: "البدر",
+        waning_gibbous: "الأحدب المتناقص",
+        last_quarter: "التربيع الثاني",
+        waning_crescent: "الهلال المتناقص",
+      },
+      
+      new: {
+        title: "Time for Rest & Intention",
+        description: "Like the darkest hour before dawn, this is a time for quiet reflection, setting intentions, and preparing for the cycle ahead. Conserve your energy.",
+      },
+      
+      waxing_crescent: {
+        title: "Time for New Beginnings",
+        description: "Like a seed breaking through soil, this is when intentions become visible. The Moon's growing light supports starting projects, planting seeds, and building momentum.",
+      },
+      
+      first_quarter: {
+        title: "Time for Action & Growth",
+        description: "The Moon is half-illuminated and energy is rising. This is the time to take decisive action, overcome obstacles, and push your projects forward with confidence.",
+      },
+      
+      waxing_gibbous: {
+        title: "Time for Refinement",
+        description: "Nearly full, the Moon's light illuminates what needs adjustment. Perfect for refining your work, making improvements, and preparing for completion.",
+      },
+      
+      full: {
+        title: "Time for Culmination",
+        description: "Like a tree heavy with ripe fruit, this is the peak of manifestation. Celebrate achievements, complete major milestones, and make important announcements.",
+      },
+      
+      waning_gibbous: {
+        title: "Time for Gratitude & Sharing",
+        description: "The light begins to decrease. This is the time to share what you've created, express gratitude for what's been received, and begin releasing what no longer serves.",
+      },
+      
+      last_quarter: {
+        title: "Time for Release & Clearing",
+        description: "Half the light remains. Actively release what's holding you back, clear away obstacles, break old patterns, and make space for the new cycle ahead.",
+      },
+      
+      waning_crescent: {
+        title: "Time for Completion & Surrender",
+        description: "The final sliver of light. Finish what remains, tie up loose ends, practice forgiveness, and prepare for the rest period ahead. Let go with grace.",
+      },
+      
+      harmony: {
+        waxing_active: "Perfect alignment! The Moon's growing light beautifully matches {{dayRuler}}'s active energy. Excellent timing for launching projects and taking initiative.",
+        waxing_active_rec: "This is ideal timing for bold action, starting ventures, and making your mark.",
+        
+        waning_reflective: "Perfect alignment! The Moon's decreasing light harmonizes with {{dayRuler}}'s reflective nature. Excellent timing for completion and inner work.",
+        waning_reflective_rec: "Focus on finishing projects, releasing what's done, and inner spiritual practices.",
+        
+        waxing_reflective: "Mixed timing. The waxing Moon wants to build, but {{dayRuler}} calls for reflection. Choose your actions carefully.",
+        waxing_reflective_rec: "Start inner-focused or gentle projects. Avoid aggressive outward action.",
+        
+        waning_active: "Mixed timing. The waning Moon wants to release, but {{dayRuler}} calls for action. Navigate this tension wisely.",
+        waning_active_rec: "Focus on completing active projects rather than starting new ones.",
+        
+        neutral: "Moderate alignment. The Moon and {{dayRuler}} create balanced conditions.",
+        neutral_rec: "Proceed with awareness. Both starting and completing are possible with care.",
+      },
+      
+      ui: {
+        lunarTiming: "Lunar Timing",
+        moonPhase: "Moon Phase",
+        lunarDay: "Lunar Day",
+        dayOfMonth: "Day {{day}} of 30",
+        moonPower: "Moon Power",
+        waxing: "Waxing (Growing)",
+        waning: "Waning (Decreasing)",
+        learnMore: "Learn More",
+        fullGuide: "Full Lunar Guide",
+        moonDayHarmony: "Moon-Day Harmony",
+        perfectAlignment: "Perfect Alignment",
+        goodAlignment: "Good Alignment",
+        neutralAlignment: "Neutral Alignment",
+        challengingAlignment: "Challenging Alignment",
+        suitableFor: "Best For",
+        notSuitableFor: "Avoid",
+        whyThisMatters: "Why This Matters",
+        traditionalWisdom: "Traditional Wisdom",
+        practicalExample: "Practical Example",
+        spiritualGuidance: "Spiritual Guidance",
       },
     },
   },

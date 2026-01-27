@@ -10,18 +10,19 @@
 
 import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { TimingAnalysisSection } from '@/components/timing';
+import CollapsibleEducationalSection from '@/components/timing/CollapsibleEducationalSection';
+import DailyEnergyCard from '@/components/timing/DailyEnergyCard';
 import { DailyPlanetaryAnalysisDisplay } from '@/components/timing/DailyPlanetaryAnalysisDisplay';
+import MoonDayHarmonyCard from '@/components/timing/MoonDayHarmonyCard';
+import MoonPhaseHeaderCard from '@/components/timing/MoonPhaseHeaderCard';
+import TodayDetailsCard from '@/components/timing/TodayDetailsCard';
+import TimingGuidanceCard from '@/components/timing/TimingGuidanceCard';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { getCosmicLunarMansionForDate, getLunarMansionByIndex, normalizeMansionIndex, type LunarMansion } from '@/data/lunarMansions';
 import { getManazilGuidance, tr } from '@/data/manazilGuidance';
-import {
-    BADGE_CONFIG,
-    getBadgeFromScore,
-    type AsrariyaTimingResult,
-    type UnifiedBadge,
-} from '@/services/AsrariyaTimingEngine';
+import { useDailyPlanetaryAnalysis } from '@/hooks/useDailyPlanetaryAnalysis';
 import { getCurrentLunarMansion } from '@/services/LunarMansionService';
 import { getDayRuler, getPlanetInfo } from '@/services/PlanetaryHoursService';
 import { Ionicons } from '@expo/vector-icons';
@@ -717,8 +718,10 @@ export default function DailyGuidanceDetailsScreen() {
   const { profile } = useProfile();
   const params = useLocalSearchParams();
   
+  // Get daily planetary analysis with moon phase data
+  const { analysis: dailyAnalysis, loading: analysisLoading } = useDailyPlanetaryAnalysis();
+  
   const [bestForExpanded, setBestForExpanded] = useState(true);
-  const [whyThisExpanded, setWhyThisExpanded] = useState(false);
   
   // Parse params
   const timingQuality = (params.timingQuality as TimingQuality) || 'neutral';
@@ -750,39 +753,28 @@ export default function DailyGuidanceDetailsScreen() {
   const dayRuler = getDayRuler(now);
   const dayRulerInfo = getPlanetInfo(dayRuler);
   
-  // Unified timing state - single source of truth for badges
-  const [timingResult, setTimingResult] = React.useState<AsrariyaTimingResult | null>(null);
+  // CRITICAL FIX: Single source of truth for daily energy score
+  // Use dailyAnalysis.dailyScore throughout (weighted calculation: 50% day ruler + 30% moon + 20% others)
+  // This replaces the old TimingAnalysisSection which was showing a different percentage
   
-  // Get unified badge from timing analysis
-  const unifiedBadge: UnifiedBadge = timingResult 
-    ? getBadgeFromScore(timingResult.overallScore) 
-    : 'MAINTAIN';
-  const badgeConfig = BADGE_CONFIG[unifiedBadge];
+  function getDailyEnergyScore(): number {
+    return dailyAnalysis?.dailyScore || 0;
+  }
   
-  // Use unified badge color when timing result available, otherwise fallback to old logic
   function getStatusColor() {
-    if (timingResult) {
-      return badgeConfig.color;
-    }
-    // Fallback for old system (only used before timing loads)
-    switch (timingQuality) {
-      case 'favorable':
-        return '#10b981';
-      case 'transformative':
-        return '#f59e0b';
-      case 'delicate':
-        return '#ef4444';
-      default:
-        return '#64B5F6';
-    }
+    const score = getDailyEnergyScore();
+    if (score >= 70) return '#10b981';      // Excellent (Green)
+    if (score >= 55) return '#3B82F6';      // Good (Blue)
+    if (score >= 40) return '#F59E0B';      // Moderate (Amber)
+    return '#EF4444';                        // Weak (Red)
   }
   
   function getStatusLabel() {
-    // Use unified badge when timing result available
-    if (timingResult) {
-      return `${badgeConfig.icon} ${t(`timing.badges.${unifiedBadge.toLowerCase()}.label`) || unifiedBadge}`;
-    }
-    return t(`home.dailyGuidanceDetails.window.${timingQuality}`);
+    const score = getDailyEnergyScore();
+    if (score >= 70) return '✨ Excellent Timing';
+    if (score >= 55) return '🌟 Good Timing';
+    if (score >= 40) return '⚠️ Moderate Timing';
+    return '🔄 Proceed Mindfully';
   }
   
   function getElementIcon(element: Element) {
@@ -849,66 +841,58 @@ export default function DailyGuidanceDetailsScreen() {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-          {/* Status Badge - Uses unified badge when timing loads */}
+          {/* Status Badge - Shows Daily Energy Score (Weighted: 50% day ruler + 30% moon + 20% others) */}
           <View style={[styles.statusBadge, { backgroundColor: `${statusColor}20`, borderColor: statusColor }]}>
             <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
             <Text style={[styles.statusText, { color: statusColor }]}>{getStatusLabel()}</Text>
-            {timingResult && (
+            {dailyAnalysis && (
               <Text style={[styles.statusScore, { color: statusColor }]}>
-                {timingResult.overallScore}%
+                {getDailyEnergyScore()}%
               </Text>
             )}
           </View>
+
+          {/* SECTION 1: MOON PHASE (Primary Layer - Moved to top) */}
+          {dailyAnalysis?.moonPhase && (
+            <MoonPhaseHeaderCard moonPhase={dailyAnalysis.moonPhase} isExpanded={true} />
+          )}
+          
+          {/* SECTION 2: MOON-DAY HARMONY (Synthesis) */}
+          {dailyAnalysis?.moonDayHarmony && (
+            <MoonDayHarmonyCard 
+              harmony={dailyAnalysis.moonDayHarmony}
+              dayRuler={dailyAnalysis.dayRulingPlanet}
+            />
+          )}
+          
+          {/* SECTION 3: DAILY ENERGY (Overall Weighted Score with Breakdown) */}
+          {dailyAnalysis && (
+            <DailyEnergyCard 
+              score={dailyAnalysis.dailyScore || 0}
+              breakdown={dailyAnalysis.scoreBreakdown}
+            />
+          )}
 
           {/* Asrariya Timing Analysis - Personalized */}
           <TimingAnalysisSection
             context="daily"
             hideSections={['alternatives']}
-            onAnalysisComplete={setTimingResult}
           />
 
           {/* Enhanced Planetary Strength Analysis */}
           <DailyPlanetaryAnalysisDisplay expanded={true} />
           
-          {/* Day Ruler Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('home.dailyGuidanceDetails.sections.dayRuler')}</Text>
-            <View style={styles.planetCard}>
-              <Text style={styles.planetSymbol}>{dayRulerInfo.symbol}</Text>
-              <View style={styles.planetInfo}>
-                <Text style={styles.planetName}>{dayRuler}</Text>
-                <Text style={styles.planetArabic}>{dayRulerInfo.arabicName}</Text>
-                <Text style={styles.planetElement}>
-                  {getElementIcon(dayRulerInfo.element)} {t('home.dailyGuidanceDetails.elementText', { element: getElementLabel(dayRulerInfo.element) })}
-                </Text>
-              </View>
-            </View>
-            <Text style={styles.explainerText}>
-              {t('home.dailyGuidanceDetails.dayRulerText', { 
-                planet: dayRuler, 
-                element: getElementLabel(dayRulerInfo.element).toLowerCase() 
-              })}
-            </Text>
-          </View>
+          {/* SECTION 4: TODAY'S DETAILS (Day ruler, element, quality) */}
+          <TodayDetailsCard
+            dayRuler={dayRuler}
+            dayRulerPower={dayRulerInfo.power || 50}
+            element={dayElement}
+            elementIcon={getElementIcon(dayElement)}
+            dayQuality={t('home.dailyGuidanceDetails.dayQuality')}
+          />
           
-          {/* Daily Window Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('home.dailyGuidanceDetails.sections.dailyWindow')}</Text>
-            <View style={styles.card}>
-              <View style={styles.cardHeader}>
-                <Ionicons name="compass-outline" size={24} color={statusColor} />
-                <Text style={[styles.cardTitle, { color: statusColor }]}>{getStatusLabel()}</Text>
-              </View>
-              <Text style={styles.cardText}>
-                {t(`home.dailyGuidanceDetails.windowDescription.${timingQuality}`)}
-              </Text>
-              {messageKey && (
-                <Text style={styles.cardText}>
-                  {t(messageKey, resolvedMessageParams)}
-                </Text>
-              )}
-            </View>
-          </View>
+          {/* SECTION 5: TIMING GUIDANCE (Planetary hour quality) */}
+          <TimingGuidanceCard />
 
           {/* Manazil (Lunar Mansion) Section - Enhanced */}
           <ManazilSection
@@ -982,28 +966,15 @@ export default function DailyGuidanceDetailsScreen() {
           )}
           
           {/* Why This? Section - FREE (Educational) */}
-          <View style={styles.section}>
-            <TouchableOpacity 
-              style={styles.expandableHeader}
-              onPress={() => setWhyThisExpanded(!whyThisExpanded)}
-            >
-              <Text style={styles.sectionTitle}>💡 {t('home.dailyGuidanceDetails.sections.whyThis')}</Text>
-              <Ionicons 
-                name={whyThisExpanded ? 'chevron-up' : 'chevron-down'} 
-                size={20} 
-                color={DarkTheme.textSecondary}
-              />
-            </TouchableOpacity>
-            {whyThisExpanded && (
-              <View style={styles.card}>
-                <Text style={styles.cardText}>
-                  • {t('home.dailyGuidanceDetails.whyThisContent.line1', { day: dayName, planet: dayRuler })}{'\n\n'}
-                  • {t('home.dailyGuidanceDetails.whyThisContent.line2', { element: getElementLabel(dayElement).toLowerCase(), planet: dayRuler })}{'\n\n'}
-                  • {t('home.dailyGuidanceDetails.whyThisContent.line4')}
-                </Text>
-              </View>
-            )}
-          </View>
+          {/* Why This Timing? - Collapsible Educational Section */}
+          <CollapsibleEducationalSection
+            whyThisTiming={{
+              elementHarmony: t('home.dailyGuidanceDetails.whyThisContent.line1', { day: dayName, planet: dayRuler }),
+              momentAlignment: t('home.dailyGuidanceDetails.whyThisContent.line2', { element: getElementLabel(dayElement).toLowerCase(), planet: dayRuler }),
+              planetaryResonance: '',
+              guidance: t('home.dailyGuidanceDetails.whyThisContent.line4'),
+            }}
+          />
           
           {/* Footer Disclaimer */}
           <View style={styles.disclaimer}>

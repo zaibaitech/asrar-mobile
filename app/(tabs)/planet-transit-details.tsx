@@ -16,6 +16,7 @@ import {
     getPersonalizedInfluence,
     type PersonalizedInfluence
 } from '@/services/PlanetaryInfluenceService';
+import { calculateEnhancedPlanetaryPower } from '@/services/PlanetaryStrengthService';
 import { ZODIAC_DATA, type PlanetTransitInfo, type ZodiacSign as ZodiacKey } from '@/services/PlanetTransitService';
 import { getAllTransits, getTransit } from '@/services/TransitService';
 import type { AllPlanetTransits, PlanetTransit } from '@/types/planetary-systems';
@@ -47,7 +48,7 @@ import Svg, { Circle } from 'react-native-svg';
 
 type DetailsType = 'transit' | 'nextDay';
 
-type ExpandableSection = 'duration' | 'personalized' | 'guidance';
+type ExpandableSection = 'duration' | 'personalized' | 'guidance' | 'dignity';
 
 type NextDayPayload = {
   dayName: string;
@@ -941,6 +942,7 @@ export default function PlanetTransitDetailsScreen() {
     duration: true,
     personalized: true,
     guidance: false,
+    dignity: false,
   });
   
   // Fetch all planet transits for the comprehensive view
@@ -1012,6 +1014,51 @@ export default function PlanetTransitDetailsScreen() {
   const toggleSection = (section: ExpandableSection) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  type DignityStateCode = 'sharaf' | 'bayt' | 'qubul' | 'wabal' | 'hubut';
+  const DIGNITY_AR_SHORT: Record<DignityStateCode, string> = {
+    sharaf: 'شرف',
+    bayt: 'بيت',
+    qubul: 'قبول',
+    wabal: 'وبال',
+    hubut: 'هبوط',
+  };
+
+  const getDignityStateFromStatus = (
+    status: 'Domicile' | 'Exalted' | 'Detriment' | 'Fall' | 'Neutral'
+  ): DignityStateCode => {
+    if (status === 'Exalted') return 'sharaf';
+    if (status === 'Domicile') return 'bayt';
+    if (status === 'Detriment') return 'wabal';
+    if (status === 'Fall') return 'hubut';
+    return 'qubul';
+  };
+
+  const getStrengthColor = (strength: number): string => {
+    if (strength >= 90) return '#4CAF50';
+    if (strength >= 70) return '#8BC34A';
+    if (strength >= 50) return '#FFC107';
+    if (strength >= 30) return '#FF9800';
+    return '#F44336';
+  };
+
+  const getStrengthQualityKey = (strength: number): 'excellent' | 'good' | 'moderate' | 'weak' | 'veryWeak' => {
+    if (strength >= 90) return 'excellent';
+    if (strength >= 70) return 'good';
+    if (strength >= 50) return 'moderate';
+    if (strength >= 30) return 'weak';
+    return 'veryWeak';
+  };
+
+  const collectNumberedList = (baseKey: string, max = 10): string[] => {
+    const items: string[] = [];
+    for (let i = 1; i <= max; i++) {
+      const item = tSafe(`${baseKey}.${i}`, '');
+      if (!item) break;
+      items.push(item);
+    }
+    return items;
   };
 
   const transitDataRaw = (transitState ?? transitPayload) as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
@@ -1088,6 +1135,26 @@ export default function PlanetTransitDetailsScreen() {
     const degreeLabel = `${Math.floor(degree)}° ${String(data.signMinute ?? 0).padStart(2, '0')}′`;
     return { percent, degreeLabel };
   }, [transitData]);
+
+  const enhancedPower = useMemo(() => {
+    if (detailsType !== 'transit') return null;
+    const data = transitData as LegacyPlanetTransitInfo | PlanetTransitInfo | null;
+    const planet = mapPlanetKeyToPlanet((data as any)?.planetKey);
+    const sign = (data as any)?.zodiacKey as any;
+    if (!planet || !sign) return null;
+
+    const degree =
+      typeof (data as any)?.signDegree === 'number'
+        ? (data as any).signDegree + ((data as any).signMinute ?? 0) / 60
+        : 0;
+
+    const longitude = typeof (data as any)?.longitude === 'number' ? (data as any).longitude : 0;
+    const sunLongitudeCandidate = typeof allTransits?.Sun?.longitude === 'number' ? allTransits.Sun.longitude : undefined;
+    const sunLongitude = typeof sunLongitudeCandidate === 'number' ? sunLongitudeCandidate : planet === 'Sun' ? longitude : 0;
+    const isRetrograde = !!(data as any)?.isRetrograde;
+
+    return calculateEnhancedPlanetaryPower(planet, sign, degree, longitude, sunLongitude, isRetrograde);
+  }, [detailsType, transitData, allTransits]);
 
 
   const updatedAtLabel = useMemo(() => {
@@ -1395,6 +1462,49 @@ export default function PlanetTransitDetailsScreen() {
     return mapped as AllPlanetTransits;
   }, [allTransits, zodiacSystem]);
 
+  const allTransitsStrengthSummary = useMemo(() => {
+    if (detailsType !== 'transit' || !allTransitsDisplay) return null;
+
+    const sunLongitudeCandidate =
+      typeof (allTransitsDisplay as any)?.Sun?.longitude === 'number'
+        ? (allTransitsDisplay as any).Sun.longitude
+        : typeof (allTransitsDisplay as any)?.sun?.longitude === 'number'
+          ? (allTransitsDisplay as any).sun.longitude
+          : undefined;
+    const fallbackSunLongitude = typeof sunLongitudeCandidate === 'number' ? sunLongitudeCandidate : 0;
+
+    const items = (Object.entries(allTransitsDisplay) as Array<[string, PlanetTransit]> )
+      .map(([planetKey, transitInfo]) => {
+        const planet = mapPlanetKeyToPlanet(planetKey);
+        const sign = (transitInfo as any)?.sign as any;
+        const longitude = (transitInfo as any)?.longitude;
+        if (!planet || !sign || typeof longitude !== 'number') return null;
+
+        const degree =
+          typeof (transitInfo as any)?.signDegree === 'number'
+            ? (transitInfo as any).signDegree + ((transitInfo as any).signMinute ?? 0) / 60
+            : ((longitude % 30) + 30) % 30;
+
+        const isRetrograde = !!(transitInfo as any)?.isRetrograde;
+        const sunLongitude = planet === 'Sun' ? longitude : fallbackSunLongitude;
+
+        const enhanced = calculateEnhancedPlanetaryPower(planet, sign, degree, longitude, sunLongitude, isRetrograde);
+        return {
+          planetKey,
+          planet,
+          finalPower: enhanced.finalPower,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => !!item)
+      .sort((a, b) => b.finalPower - a.finalPower);
+
+    if (!items.length) return null;
+
+    const best = items.slice(0, 3);
+    const weak = items.slice(-3).reverse();
+    return { best, weak };
+  }, [detailsType, allTransitsDisplay]);
+
   const influenceTypeLabel = useMemo(() => {
     const labels = {
       en: { universal: 'Universal', personal: 'Personal', immediate: 'Immediate' },
@@ -1598,6 +1708,35 @@ export default function PlanetTransitDetailsScreen() {
                 </View>
                 <Text style={styles.planetNameHero}>{transitData.planetName}</Text>
                 <Text style={styles.planetArabicHero}>{transitData.planetNameAr}</Text>
+
+                {enhancedPower ? (
+                  <View style={styles.powerStrip}>
+                    <View style={styles.powerTrack}>
+                      <View
+                        style={[
+                          styles.powerFill,
+                          {
+                            width: `${Math.min(100, Math.max(0, enhancedPower.finalPower))}%`,
+                            backgroundColor: getStrengthColor(enhancedPower.finalPower),
+                          },
+                        ]}
+                      />
+                    </View>
+                    <View style={styles.powerMetaRow}>
+                      <Text style={styles.powerMetaLabel}>{t('screens.planetTransit.dignity.finalStrength')}:</Text>
+                      <Text style={[styles.powerMetaValue, { color: getStrengthColor(enhancedPower.finalPower) }]}>
+                        {enhancedPower.finalPower}%
+                      </Text>
+                      <View style={[styles.powerQualityPill, { borderColor: `${getStrengthColor(enhancedPower.finalPower)}55` }]}
+                      >
+                        <Text style={[styles.powerQualityText, { color: getStrengthColor(enhancedPower.finalPower) }]}>
+                          {t(`dailyEnergy.planetaryStrength.qualities.${getStrengthQualityKey(enhancedPower.finalPower)}`)}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                ) : null}
+
                 {(transitData as any)?.isRetrograde ? (
                   <View style={styles.retrogradePill}>
                     <Text style={styles.retrogradePillText}>℞</Text>
@@ -1923,6 +2062,144 @@ export default function PlanetTransitDetailsScreen() {
                     </View>
                   </View>
                 </View>
+              </GlassCard>
+            ) : null}
+
+            {enhancedPower ? (
+              <GlassCard style={styles.dignityCard}>
+                <TouchableOpacity style={styles.expandableHeader} onPress={() => toggleSection('dignity')}>
+                  <View style={styles.cardHeader}>
+                    <Ionicons name="analytics" size={18} color={accent.primary} />
+                    <Text style={styles.cardTitle}>{t('screens.planetTransit.dignity.title')}</Text>
+                  </View>
+                  <Ionicons
+                    name={expandedSections.dignity ? 'chevron-up' : 'chevron-down'}
+                    size={18}
+                    color={DarkTheme.textSecondary}
+                  />
+                </TouchableOpacity>
+
+                {expandedSections.dignity ? (
+                  <View style={styles.dignityContent}>
+                    {(() => {
+                      const state = getDignityStateFromStatus(enhancedPower.dignityInfo.status);
+                      const planetKey = enhancedPower.planet.toLowerCase();
+                      const dignityLabel = t(`screens.planetTransit.dignity.states.${state}`);
+                      const guidanceBase = `screens.planetTransit.dignityGuidance.${planetKey}.${state}`;
+                      const fallbackBase = `screens.planetTransit.dignityGuidance.generic.${state}`;
+
+                      const whatThisMeans =
+                        tSafe(`${guidanceBase}.whatThisMeans`, '') ||
+                        tSafe(`${fallbackBase}.whatThisMeans`, '', {
+                          planet: (transitData as any)?.planetName ?? enhancedPower.planet,
+                          sign: (transitData as any)?.zodiacKey ? t(`zodiac.${(transitData as any)?.zodiacKey}`) : String(enhancedPower.sign),
+                        });
+
+                      const suitableForPrimary = collectNumberedList(`${guidanceBase}.suitableFor`);
+                      const suitableFor = suitableForPrimary.length
+                        ? suitableForPrimary
+                        : collectNumberedList(`${fallbackBase}.suitableFor`);
+
+                      const avoidPrimary = collectNumberedList(`${guidanceBase}.avoid`);
+                      const avoid = avoidPrimary.length
+                        ? avoidPrimary
+                        : collectNumberedList(`${fallbackBase}.avoid`);
+
+                      const betterTimingPrimary = collectNumberedList(`${guidanceBase}.betterTiming`);
+                      const betterTiming = betterTimingPrimary.length
+                        ? betterTimingPrimary
+                        : collectNumberedList(`${fallbackBase}.betterTiming`);
+
+                      return (
+                        <>
+                          <View style={styles.dignityRow}>
+                            <Text style={styles.dignityLabel}>{t('screens.planetTransit.dignity.state')}:</Text>
+                            <View style={[styles.dignityBadge, { borderColor: `${accent.primary}40` }]}
+                            >
+                              <Text style={[styles.dignityBadgeText, { color: accent.primary }]}
+                              >
+                                {dignityLabel} ({DIGNITY_AR_SHORT[state]})
+                              </Text>
+                            </View>
+                          </View>
+
+                          <Text style={styles.dignityExplanation}>
+                            {tSafe(
+                              `screens.planetTransit.dignity.explanations.${state}`,
+                              enhancedPower.dignityInfo.description,
+                              {
+                                planet: (transitData as any)?.planetName ?? enhancedPower.planet,
+                                sign: (transitData as any)?.zodiacKey
+                                  ? t(`zodiac.${(transitData as any)?.zodiacKey}`)
+                                  : String(enhancedPower.sign),
+                              }
+                            )}
+                          </Text>
+
+                          <View style={styles.dignityStatsGrid}>
+                            <View style={styles.dignityStat}>
+                              <Text style={styles.dignityStatLabel}>{t('screens.planetTransit.dignity.baseModifier')}</Text>
+                              <Text style={styles.dignityStatValue}>×{enhancedPower.dignityInfo.modifier.toFixed(1)}</Text>
+                            </View>
+                            <View style={styles.dignityStat}>
+                              <Text style={styles.dignityStatLabel}>{t('screens.planetTransit.dignity.degreeModifier')}</Text>
+                              <Text style={styles.dignityStatValue}>×{enhancedPower.degreeInfo.strength.toFixed(1)}</Text>
+                            </View>
+                            <View style={styles.dignityStat}>
+                              <Text style={styles.dignityStatLabel}>{t('screens.planetTransit.dignity.finalStrength')}</Text>
+                              <Text style={[styles.dignityStatValue, { color: getStrengthColor(enhancedPower.finalPower) }]}>
+                                {enhancedPower.finalPower}%
+                              </Text>
+                            </View>
+                          </View>
+
+                          {whatThisMeans ? (
+                            <View style={styles.dignitySection}>
+                              <Text style={styles.dignitySectionTitle}>⚠️ {t('screens.planetTransit.dignity.whatThisMeans')}</Text>
+                              <Text style={styles.dignityBodyText}>{whatThisMeans}</Text>
+                            </View>
+                          ) : null}
+
+                          {suitableFor.length > 0 ? (
+                            <View style={styles.dignitySection}>
+                              <Text style={styles.dignitySectionTitle}>✅ {t('screens.planetTransit.dignity.suitableFor')}</Text>
+                              {suitableFor.map((item, idx) => (
+                                <View key={idx} style={styles.dignityBulletRow}>
+                                  <Text style={styles.dignityBullet}>•</Text>
+                                  <Text style={styles.dignityBulletText}>{item}</Text>
+                                </View>
+                              ))}
+                            </View>
+                          ) : null}
+
+                          {avoid.length > 0 ? (
+                            <View style={styles.dignitySection}>
+                              <Text style={styles.dignitySectionTitle}>❌ {t('screens.planetTransit.dignity.avoid')}</Text>
+                              {avoid.map((item, idx) => (
+                                <View key={idx} style={styles.dignityBulletRow}>
+                                  <Text style={styles.dignityBullet}>•</Text>
+                                  <Text style={styles.dignityBulletText}>{item}</Text>
+                                </View>
+                              ))}
+                            </View>
+                          ) : null}
+
+                          {betterTiming.length > 0 ? (
+                            <View style={styles.dignitySection}>
+                              <Text style={styles.dignitySectionTitle}>💡 {t('screens.planetTransit.dignity.betterTiming')}</Text>
+                              {betterTiming.map((item, idx) => (
+                                <View key={idx} style={styles.dignityBulletRow}>
+                                  <Text style={styles.dignityBullet}>•</Text>
+                                  <Text style={styles.dignityBulletText}>{item}</Text>
+                                </View>
+                              ))}
+                            </View>
+                          ) : null}
+                        </>
+                      );
+                    })()}
+                  </View>
+                ) : null}
               </GlassCard>
             ) : null}
 
@@ -2883,6 +3160,49 @@ export default function PlanetTransitDetailsScreen() {
                 ? 'Position actuelle de toutes les planètes dans les signes'
                 : 'Current position of all planets in the zodiac signs'}
             </Text>
+
+            {allTransitsStrengthSummary ? (
+              <View style={styles.allTransitsSummary}>
+                <View style={styles.allTransitsSummaryCol}>
+                  <Text style={styles.allTransitsSummaryTitle}>{t('screens.planetTransit.summary.bestNow')}</Text>
+                  {allTransitsStrengthSummary.best.map((item) => {
+                    const planetName = item.planetKey.charAt(0).toUpperCase() + item.planetKey.slice(1);
+                    const color = getStrengthColor(item.finalPower);
+                    return (
+                      <View key={item.planetKey} style={styles.allTransitsSummaryItem}>
+                        <Text style={styles.allTransitsSummaryPlanet} numberOfLines={1}>
+                          {language === 'ar' ? tSafe(`planets.${item.planetKey}Arabic`, planetName) : planetName}
+                        </Text>
+                        <View style={[styles.allTransitsSummaryBadge, { borderColor: `${color}40` }]}>
+                          <Text style={[styles.allTransitsSummaryBadgeText, { color }]}>
+                            {item.finalPower}%
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+                <View style={styles.allTransitsSummaryCol}>
+                  <Text style={styles.allTransitsSummaryTitle}>{t('screens.planetTransit.summary.weakNow')}</Text>
+                  {allTransitsStrengthSummary.weak.map((item) => {
+                    const planetName = item.planetKey.charAt(0).toUpperCase() + item.planetKey.slice(1);
+                    const color = getStrengthColor(item.finalPower);
+                    return (
+                      <View key={item.planetKey} style={styles.allTransitsSummaryItem}>
+                        <Text style={styles.allTransitsSummaryPlanet} numberOfLines={1}>
+                          {language === 'ar' ? tSafe(`planets.${item.planetKey}Arabic`, planetName) : planetName}
+                        </Text>
+                        <View style={[styles.allTransitsSummaryBadge, { borderColor: `${color}40` }]}>
+                          <Text style={[styles.allTransitsSummaryBadgeText, { color }]}>
+                            {item.finalPower}%
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+            ) : null}
             
             <View style={styles.allTransitsGrid}>
               {Object.entries(allTransitsDisplay).map(([planetKey, transitInfo]: [string, PlanetTransit]) => {
@@ -3125,6 +3445,50 @@ const styles = StyleSheet.create({
   planetArabicHero: {
     fontSize: 17,
     color: 'rgba(255,255,255,0.7)',
+  },
+
+  // Planetary strength strip (percent + quality)
+  powerStrip: {
+    width: '100%',
+    marginTop: Spacing.md,
+    gap: 8,
+  },
+  powerTrack: {
+    height: 10,
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
+  powerFill: {
+    height: '100%',
+    borderRadius: 999,
+  },
+  powerMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  powerMetaLabel: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+    fontWeight: Typography.weightMedium,
+  },
+  powerMetaValue: {
+    fontSize: 13,
+    fontWeight: Typography.weightBold,
+  },
+  powerQualityPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  powerQualityText: {
+    fontSize: 11,
+    fontWeight: Typography.weightSemibold,
   },
   retrogradePill: {
     flexDirection: 'row',
@@ -3465,6 +3829,93 @@ const styles = StyleSheet.create({
   },
   degreeCard: {
     gap: Spacing.md,
+  },
+  dignityCard: {
+    gap: Spacing.md,
+  },
+  dignityContent: {
+    gap: Spacing.md,
+  },
+  dignityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+  },
+  dignityLabel: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    fontWeight: Typography.weightMedium,
+  },
+  dignityBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  dignityBadgeText: {
+    fontSize: 12,
+    fontWeight: Typography.weightBold,
+  },
+  dignityExplanation: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+  },
+  dignityStatsGrid: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  dignityStat: {
+    flex: 1,
+    padding: Spacing.sm,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+    gap: 4,
+  },
+  dignityStatLabel: {
+    fontSize: 10,
+    color: DarkTheme.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+    fontWeight: Typography.weightMedium,
+  },
+  dignityStatValue: {
+    fontSize: 14,
+    color: DarkTheme.textPrimary,
+    fontWeight: Typography.weightBold,
+  },
+  dignitySection: {
+    gap: 8,
+  },
+  dignitySectionTitle: {
+    fontSize: 13,
+    color: DarkTheme.textPrimary,
+    fontWeight: Typography.weightSemibold,
+  },
+  dignityBodyText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+  },
+  dignityBulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  dignityBullet: {
+    marginTop: 2,
+    fontSize: 14,
+    color: DarkTheme.textTertiary,
+  },
+  dignityBulletText: {
+    flex: 1,
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
   },
   degreeContent: {
     alignItems: 'center',
@@ -4094,6 +4545,49 @@ const styles = StyleSheet.create({
   },
   allTransitsCard: {
     gap: Spacing.md,
+  },
+  allTransitsSummary: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+  },
+  allTransitsSummaryCol: {
+    flex: 1,
+    gap: 8,
+    padding: Spacing.sm,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  allTransitsSummaryTitle: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+    fontWeight: Typography.weightSemibold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  allTransitsSummaryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+  },
+  allTransitsSummaryPlanet: {
+    flex: 1,
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontWeight: Typography.weightMedium,
+  },
+  allTransitsSummaryBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  allTransitsSummaryBadgeText: {
+    fontSize: 12,
+    fontWeight: Typography.weightBold,
   },
   allTransitsGrid: {
     flexDirection: 'row',

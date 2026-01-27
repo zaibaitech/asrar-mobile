@@ -143,7 +143,10 @@ export function ManazilWidget({
     try {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {}
-    router.push('/(tabs)/manazil');
+    router.push({
+      pathname: '/(tabs)/manazil',
+      params: { scrollToTop: String(Date.now()) },
+    });
   };
 
   // If even the deterministic fallback failed, show a non-blocking placeholder (no spinner).

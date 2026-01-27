@@ -9,8 +9,8 @@
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyPlanetaryAnalysis } from '@/hooks/useDailyPlanetaryAnalysis';
-import type { Planet } from '@/services/PlanetaryHoursService';
 import { getDayRulerImpactOnDailyScore } from '@/services/DayRulingPlanetService';
+import type { Planet } from '@/services/PlanetaryHoursService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
@@ -26,6 +26,9 @@ import {
 export interface DailyPlanetaryAnalysisDisplayProps {
   /** Show compact or expanded view */
   expanded?: boolean;
+
+  /** Optional override for Moon strength percentage (0-100). */
+  moonStrengthOverride?: number;
 }
 
 /**
@@ -33,19 +36,107 @@ export interface DailyPlanetaryAnalysisDisplayProps {
  */
 export function DailyPlanetaryAnalysisDisplay({
   expanded = false,
+  moonStrengthOverride,
 }: DailyPlanetaryAnalysisDisplayProps) {
   const { t } = useLanguage();
-  const { analysis, dailyScore, bestHours, loading, error, refresh } =
+  const { analysis: rawAnalysis, dailyScore, bestHours, loading, error, refresh } =
     useDailyPlanetaryAnalysis();
 
+  const analysis = React.useMemo(() => {
+    if (!rawAnalysis) return null;
+    if (typeof moonStrengthOverride !== 'number' || Number.isNaN(moonStrengthOverride)) {
+      return rawAnalysis;
+    }
+
+    const moon = rawAnalysis.planets?.Moon;
+    if (!moon) return rawAnalysis;
+
+    const clampedMoon = Math.max(0, Math.min(100, Math.round(moonStrengthOverride)));
+
+    return {
+      ...rawAnalysis,
+      planets: {
+        ...rawAnalysis.planets,
+        Moon: {
+          ...moon,
+          finalPower: clampedMoon,
+        },
+      },
+    };
+  }, [rawAnalysis, moonStrengthOverride]);
+
   const [expandedPlanet, setExpandedPlanet] = React.useState<Planet | null>(null);
+
+  const getQualityKeyFromStrength = (
+    strength: number
+  ): 'excellent' | 'good' | 'moderate' | 'weak' | 'veryWeak' => {
+    if (strength >= 80) return 'excellent';
+    if (strength >= 60) return 'good';
+    if (strength >= 40) return 'moderate';
+    if (strength >= 20) return 'weak';
+    return 'veryWeak';
+  };
+
+  const getLocalizedPlanetName = (planet: string) => {
+    const key = planet.toLowerCase();
+    const translated = t(`dailyEnergy.planets.${key}`);
+    return translated || planet;
+  };
+
+  const getLocalizedQualityLabel = (strength: number) => {
+    const key = getQualityKeyFromStrength(strength);
+    return t(`dailyEnergy.planetaryStrength.qualities.${key}`);
+  };
+
+  const getLocalizedBestHourQuality = (quality: 'excellent' | 'good' | 'moderate') => {
+    if (quality === 'excellent') return t('dailyEnergy.planetaryStrength.qualities.excellent');
+    if (quality === 'good') return t('dailyEnergy.planetaryStrength.qualities.good');
+    return t('dailyEnergy.planetaryStrength.qualities.moderate');
+  };
+
+  const getLocalizedDignityStatus = (status: string) => {
+    const keyMap: Record<string, string> = {
+      Domicile: 'dignityDomicile',
+      Exalted: 'dignityExalted',
+      Detriment: 'dignityDetriment',
+      Fall: 'dignityFall',
+      Neutral: 'dignityNeutral',
+    };
+
+    const key = keyMap[status];
+    return key ? t(`planetaryStrengthAnalysis.statuses.${key}`) : status;
+  };
+
+  const getLocalizedPlanetWarnings = (planetData: any): string[] => {
+    const warnings: string[] = [];
+
+    const degree: number = typeof planetData?.degree === 'number' ? planetData.degree : 0;
+    const degreeQuality: string | undefined = planetData?.degreeInfo?.quality;
+    if (degreeQuality === 'Weak') {
+      warnings.push(t('dailyEnergy.breakdown.todaysRuler.degreeEarly', { degree: degree.toFixed(1) }));
+    }
+
+    const dignityStatus: string | undefined = planetData?.dignityInfo?.status;
+    if (dignityStatus === 'Fall') warnings.push(t('dailyEnergy.breakdown.todaysRuler.dignityFall'));
+    if (dignityStatus === 'Detriment') warnings.push(t('dailyEnergy.breakdown.todaysRuler.dignityDetriment'));
+
+    const combustionStatus: string | undefined = planetData?.combustionInfo?.status;
+    if (combustionStatus === 'combust') warnings.push(t('dailyEnergy.breakdown.todaysRuler.combust'));
+    if (combustionStatus === 'beams') warnings.push(t('dailyEnergy.breakdown.todaysRuler.beams'));
+
+    if (planetData?.retrogradeInfo?.suitable?.outer === false) {
+      warnings.push(t('dailyEnergy.breakdown.todaysRuler.retrograde'));
+    }
+
+    return warnings;
+  };
 
   if (loading) {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
           <Ionicons name="planet-outline" size={20} color="#8B7355" />
-          <Text style={styles.title}>Planetary Strength Today</Text>
+          <Text style={styles.title}>{t('dailyEnergy.planetaryStrength.title')}</Text>
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="small" color="#8B7355" />
@@ -59,18 +150,92 @@ export function DailyPlanetaryAnalysisDisplay({
       <View style={styles.container}>
         <View style={styles.header}>
           <Ionicons name="alert-circle-outline" size={20} color="#ef4444" />
-          <Text style={styles.title}>Planetary Data Unavailable</Text>
+          <Text style={styles.title}>{t('dailyEnergy.planetaryStrength.dataUnavailableTitle')}</Text>
         </View>
-        <Text style={styles.errorText}>{error?.message || 'Unable to load planetary data'}</Text>
+        <Text style={styles.errorText}>{t('dailyEnergy.planetaryStrength.unableToLoadData')}</Text>
         <TouchableOpacity onPress={refresh} style={styles.retryButton}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+          <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
-  const criticalWarnings = analysis.criticalWarnings || [];
-  const recommendations = analysis.practiceRecommendations || [];
+  const localizedRecommendations: string[] = (() => {
+    const recs: string[] = [];
+
+    // Day ruler guidance
+    if (analysis.dayRulingPlanet && typeof analysis.dayRulingStrength === 'number') {
+      const key = getQualityKeyFromStrength(analysis.dayRulingStrength);
+      const adviceKeyMap: Record<string, string> = {
+        excellent: 'veryStrong',
+        good: 'strong',
+        moderate: 'moderate',
+        weak: 'weak',
+        veryWeak: 'veryWeak',
+      };
+
+      const adviceKey = adviceKeyMap[key];
+      if (adviceKey) {
+        recs.push(
+          t(`dailyEnergy.planetaryStrength.rulerAdvice.${adviceKey}`, {
+            planet: getLocalizedPlanetName(analysis.dayRulingPlanet),
+          })
+        );
+      }
+    }
+
+    // Best planets
+    if (analysis.bestForGeneralWork) {
+      const power = analysis.planets?.[analysis.bestForGeneralWork]?.finalPower;
+      if (typeof power === 'number') {
+        recs.push(
+          t('dailyEnergy.guidance.useStrongHours', {
+            planet: getLocalizedPlanetName(analysis.bestForGeneralWork),
+            percent: power,
+          })
+        );
+      }
+    }
+
+    if (analysis.bestForSpiritualWork && analysis.bestForSpiritualWork !== analysis.bestForGeneralWork) {
+      const power = analysis.planets?.[analysis.bestForSpiritualWork]?.finalPower;
+      if (typeof power === 'number') {
+        recs.push(
+          t('dailyEnergy.guidance.useStrongHoursSpiritual', {
+            planet: getLocalizedPlanetName(analysis.bestForSpiritualWork),
+            percent: power,
+          })
+        );
+      }
+    }
+
+    // Avoid planets
+    if (analysis.planetsToAvoid?.length) {
+      const [p1, p2] = analysis.planetsToAvoid;
+      if (p1 && p2) {
+        recs.push(
+          t('dailyEnergy.guidance.avoidWeakHours', {
+            planet: getLocalizedPlanetName(p1),
+            planet2: getLocalizedPlanetName(p2),
+          })
+        );
+      }
+    }
+
+    return recs;
+  })();
+
+  const localizedCriticalWarnings: string[] = (() => {
+    const warnings: string[] = [];
+    const planets = Object.keys(analysis.planets || {}) as Planet[];
+    for (const planet of planets) {
+      const planetData = analysis.planets[planet];
+      if (!planetData) continue;
+      const w = getLocalizedPlanetWarnings(planetData);
+      w.forEach((msg) => warnings.push(`${getLocalizedPlanetName(planet)}: ${msg}`));
+    }
+    return warnings.slice(0, 3);
+  })();
   const bestGeneral = analysis.bestForGeneralWork;
   const bestSpiritual = analysis.bestForSpiritualWork;
   const planets = Object.keys(analysis.planets) as Planet[];
@@ -81,13 +246,13 @@ export function DailyPlanetaryAnalysisDisplay({
       <View style={styles.compactContainer}>
         <View style={styles.header}>
           <Ionicons name="planet-outline" size={20} color="#8B7355" />
-          <Text style={styles.title}>Planetary Strength</Text>
+          <Text style={styles.title}>{t('dailyEnergy.planetaryStrength.title')}</Text>
         </View>
 
         {/* Daily Score */}
         {dailyScore !== null && (
           <View style={styles.scoreRow}>
-            <Text style={styles.scoreLabel}>Today's Energy:</Text>
+            <Text style={styles.scoreLabel}>{t('dailyEnergy.planetaryStrength.todaysEnergy')}:</Text>
             <View style={[styles.scoreBadge, { backgroundColor: getScoreColor(dailyScore) + '20' }]}>
               <Text style={[styles.scoreValue, { color: getScoreColor(dailyScore) }]}>
                 {dailyScore}%
@@ -107,8 +272,8 @@ export function DailyPlanetaryAnalysisDisplay({
             return (
               <View style={styles.compactRulerRow}>
                 <View style={styles.compactRulerInfo}>
-                  <Text style={styles.compactRulerLabel}>Ruler:</Text>
-                  <Text style={styles.compactRulerPlanet}>{analysis.dayRulingPlanet}</Text>
+                  <Text style={styles.compactRulerLabel}>{t('dailyEnergy.planetaryStrength.rulerLabel')}:</Text>
+                  <Text style={styles.compactRulerPlanet}>{getLocalizedPlanetName(analysis.dayRulingPlanet)}</Text>
                 </View>
                 <View style={styles.compactRulerStrength}>
                   <Text style={[styles.compactRulerValue, { color: getScoreColor(rulerStrength) }]}>
@@ -130,24 +295,24 @@ export function DailyPlanetaryAnalysisDisplay({
           <View style={styles.bestPlanetsRow}>
             {bestGeneral && (
               <View style={styles.bestPlanetTag}>
-                <Text style={styles.bestPlanetLabel}>Best Work:</Text>
-                <Text style={styles.bestPlanetName}>{bestGeneral}</Text>
+                <Text style={styles.bestPlanetLabel}>{t('dailyEnergy.planetaryStrength.bestWork')}:</Text>
+                <Text style={styles.bestPlanetName}>{getLocalizedPlanetName(bestGeneral)}</Text>
               </View>
             )}
             {bestSpiritual && bestSpiritual !== bestGeneral && (
               <View style={styles.bestPlanetTag}>
-                <Text style={styles.bestPlanetLabel}>Best Reflection:</Text>
-                <Text style={styles.bestPlanetName}>{bestSpiritual}</Text>
+                <Text style={styles.bestPlanetLabel}>{t('dailyEnergy.planetaryStrength.bestReflection')}:</Text>
+                <Text style={styles.bestPlanetName}>{getLocalizedPlanetName(bestSpiritual)}</Text>
               </View>
             )}
           </View>
         )}
 
         {/* Critical Warnings */}
-        {criticalWarnings.length > 0 && (
+        {localizedCriticalWarnings.length > 0 && (
           <View style={styles.warningBox}>
-            <Text style={styles.warningTitle}>⚠️ Watch Out</Text>
-            {criticalWarnings.slice(0, 2).map((warning, idx) => (
+            <Text style={styles.warningTitle}>⚠️ {t('dailyEnergy.planetaryStrength.watchOut')}</Text>
+            {localizedCriticalWarnings.slice(0, 2).map((warning, idx) => (
               <Text key={idx} style={styles.warningText}>
                 • {warning.substring(0, 60)}...
               </Text>
@@ -163,7 +328,7 @@ export function DailyPlanetaryAnalysisDisplay({
     <View style={styles.container}>
       <View style={styles.header}>
         <Ionicons name="planet-outline" size={20} color="#8B7355" />
-        <Text style={styles.title}>Planetary Strength Analysis</Text>
+        <Text style={styles.title}>{t('dailyEnergy.planetaryStrength.title')}</Text>
         <TouchableOpacity onPress={refresh}>
           <Ionicons name="refresh-outline" size={18} color={DarkTheme.textSecondary} />
         </TouchableOpacity>
@@ -175,11 +340,11 @@ export function DailyPlanetaryAnalysisDisplay({
           colors={[`${getScoreColor(dailyScore)}20`, `${getScoreColor(dailyScore)}08`]}
           style={styles.scoreCard}
         >
-          <Text style={styles.scoreCardLabel}>Today's Overall Energy</Text>
+          <Text style={styles.scoreCardLabel}>{t('dailyEnergy.planetaryStrength.todaysOverallEnergy')}</Text>
           <Text style={[styles.scoreCardValue, { color: getScoreColor(dailyScore) }]}>
             {dailyScore}%
           </Text>
-          <Text style={styles.scoreCardHint}>Average of all planetary strengths</Text>
+          <Text style={styles.scoreCardHint}>{t('dailyEnergy.planetaryStrength.averageOfAll')}</Text>
         </LinearGradient>
       )}
 
@@ -192,11 +357,7 @@ export function DailyPlanetaryAnalysisDisplay({
           const impactColor = isPositive ? '#10b981' : '#ef4444';
           
           let quality: string;
-          if (rulerStrength >= 80) quality = 'Excellent';
-          else if (rulerStrength >= 60) quality = 'Good';
-          else if (rulerStrength >= 40) quality = 'Moderate';
-          else if (rulerStrength >= 20) quality = 'Weak';
-          else quality = 'Very Weak';
+          quality = getLocalizedQualityLabel(rulerStrength);
 
           return (
             <LinearGradient
@@ -204,8 +365,8 @@ export function DailyPlanetaryAnalysisDisplay({
               style={styles.rulerCard}
             >
               <View style={styles.rulerHeader}>
-                <Text style={styles.rulerLabel}>Today's Ruler:</Text>
-                <Text style={styles.rulerPlanet}>{analysis.dayRulingPlanet}</Text>
+                <Text style={styles.rulerLabel}>{t('dailyEnergy.planetaryStrength.todaysRuler')}:</Text>
+                <Text style={styles.rulerPlanet}>{getLocalizedPlanetName(analysis.dayRulingPlanet)}</Text>
               </View>
               
               <View style={styles.rulerStrengthRow}>
@@ -224,28 +385,35 @@ export function DailyPlanetaryAnalysisDisplay({
 
               <View style={styles.rulerDetailsRow}>
                 <View style={styles.rulerQuality}>
-                  <Text style={styles.rulerQualityLabel}>Quality:</Text>
+                  <Text style={styles.rulerQualityLabel}>{t('dailyEnergy.planetaryStrength.quality')}:</Text>
                   <Text style={styles.rulerQualityValue}>{quality}</Text>
                 </View>
                 
                 <View style={[styles.rulerImpact, { borderLeftColor: impactColor }]}>
-                  <Text style={styles.rulerImpactLabel}>Impact on Daily Energy:</Text>
+                  <Text style={styles.rulerImpactLabel}>{t('dailyEnergy.planetaryStrength.impactOnDaily')}:</Text>
                   <Text style={[styles.rulerImpactValue, { color: impactColor }]}>
-                    {isPositive ? '+' : ''}{impact} points
+                    {t('dailyEnergy.planetaryStrength.points', { value: `${isPositive ? '+' : ''}${impact}` })}
                   </Text>
                 </View>
               </View>
 
               <Text style={styles.rulerExplanation}>
-                {rulerStrength >= 80
-                  ? `Strong ${analysis.dayRulingPlanet} energy today - excellent time for major work`
-                  : rulerStrength >= 60
-                    ? `Good ${analysis.dayRulingPlanet} energy - favorable conditions`
-                    : rulerStrength >= 40
-                      ? `Moderate ${analysis.dayRulingPlanet} energy - proceed with caution`
-                      : rulerStrength >= 20
-                        ? `Weak ${analysis.dayRulingPlanet} energy - avoid major decisions`
-                        : `Very weak ${analysis.dayRulingPlanet} energy - plan for another time`}
+                {(() => {
+                  const key = getQualityKeyFromStrength(rulerStrength);
+                  const adviceKeyMap: Record<string, string> = {
+                    excellent: 'veryStrong',
+                    good: 'strong',
+                    moderate: 'moderate',
+                    weak: 'weak',
+                    veryWeak: 'veryWeak',
+                  };
+                  const adviceKey = adviceKeyMap[key];
+                  return adviceKey
+                    ? t(`dailyEnergy.planetaryStrength.rulerAdvice.${adviceKey}`, {
+                        planet: getLocalizedPlanetName(analysis.dayRulingPlanet),
+                      })
+                    : '';
+                })()}
               </Text>
             </LinearGradient>
           );
@@ -255,12 +423,12 @@ export function DailyPlanetaryAnalysisDisplay({
       {/* Best Hours Summary */}
       {bestHours && bestHours.length > 0 && (
         <View style={styles.bestHoursCard}>
-          <Text style={styles.bestHoursTitle}>⏰ Recommended Planetary Hours</Text>
+          <Text style={styles.bestHoursTitle}>⏰ {t('dailyEnergy.planetaryStrength.recommendedHours')}</Text>
           <FlatList
             data={bestHours.slice(0, 5)}
             renderItem={({ item }) => (
               <View style={styles.bestHourRow}>
-                <Text style={styles.bestHourPlanet}>{item.planet}</Text>
+                <Text style={styles.bestHourPlanet}>{getLocalizedPlanetName(item.planet)}</Text>
                 <View
                   style={[
                     styles.bestHourQuality,
@@ -287,7 +455,7 @@ export function DailyPlanetaryAnalysisDisplay({
                       },
                     ]}
                   >
-                    {item.quality.charAt(0).toUpperCase() + item.quality.slice(1)}
+                    {getLocalizedBestHourQuality(item.quality)}
                   </Text>
                 </View>
               </View>
@@ -298,11 +466,11 @@ export function DailyPlanetaryAnalysisDisplay({
       )}
 
       {/* Recommendations */}
-      {recommendations.length > 0 && (
+      {localizedRecommendations.length > 0 && (
         <View style={styles.recommendationsCard}>
-          <Text style={styles.recommendationsTitle}>✅ Today's Guidance</Text>
+          <Text style={styles.recommendationsTitle}>✅ {t('dailyEnergy.guidance.title')}</Text>
           <FlatList
-            data={recommendations}
+            data={localizedRecommendations}
             renderItem={({ item }) => (
               <Text style={styles.recommendationItem}>• {item}</Text>
             )}
@@ -312,11 +480,11 @@ export function DailyPlanetaryAnalysisDisplay({
       )}
 
       {/* Critical Warnings */}
-      {criticalWarnings.length > 0 && (
+      {localizedCriticalWarnings.length > 0 && (
         <View style={styles.criticalCard}>
-          <Text style={styles.criticalTitle}>⚠️ Cautions</Text>
+          <Text style={styles.criticalTitle}>⚠️ {t('dailyEnergy.guidance.cautions')}</Text>
           <FlatList
-            data={criticalWarnings}
+            data={localizedCriticalWarnings}
             renderItem={({ item }) => (
               <Text style={styles.criticalItem}>{item}</Text>
             )}
@@ -326,7 +494,7 @@ export function DailyPlanetaryAnalysisDisplay({
       )}
 
       {/* Detailed Planet Analysis */}
-      <Text style={styles.sectionTitle}>Detailed Planet Analysis</Text>
+      <Text style={styles.sectionTitle}>{t('dailyEnergy.planetaryStrength.detailedAnalysis')}</Text>
       <FlatList
         data={planets}
         renderItem={({ item: planet }) => {
@@ -343,7 +511,7 @@ export function DailyPlanetaryAnalysisDisplay({
             >
               <View style={styles.planetCardHeader}>
                 <View style={styles.planetCardLeft}>
-                  <Text style={styles.planetCardName}>{planet}</Text>
+                  <Text style={styles.planetCardName}>{getLocalizedPlanetName(planet)}</Text>
                   <Text style={styles.planetCardPosition}>
                     {planetData.degree.toFixed(1)}° {planetData.sign}
                   </Text>
@@ -368,14 +536,14 @@ export function DailyPlanetaryAnalysisDisplay({
               {isExpanded && (
                 <View style={styles.planetCardDetails}>
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Degree Strength:</Text>
+                    <Text style={styles.detailLabel}>{t('dailyEnergy.planetaryStrength.degreeStrength')}:</Text>
                     <Text style={styles.detailValue}>{Math.round(planetData.degreeInfo.strength * 100)}%</Text>
                   </View>
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Dignity:</Text>
-                    <Text style={styles.detailValue}>{planetData.dignityInfo.status}</Text>
+                    <Text style={styles.detailLabel}>{t('dailyEnergy.planetaryStrength.dignityLabel')}:</Text>
+                    <Text style={styles.detailValue}>{getLocalizedDignityStatus(planetData.dignityInfo.status)}</Text>
                   </View>
-                  {planetData.warnings.map((w, idx) => (
+                  {getLocalizedPlanetWarnings(planetData).map((w, idx) => (
                     <Text key={idx} style={styles.detailWarning}>⚠️ {w}</Text>
                   ))}
                 </View>

@@ -28,6 +28,8 @@ import {
     preCalculateDailyPlanetaryHours,
     type Planet,
 } from './PlanetaryHoursService';
+import { analyzeCosmicQuality, type CosmicQuality } from './CosmicQualityService';
+import { getPlanetaryCondition, type PlanetaryCondition } from './PlanetaryConditionService';
 
 export type Element = ElementType;
 export type AlignmentStatus = 'ACT' | 'MAINTAIN' | 'HOLD';
@@ -71,6 +73,19 @@ export interface MomentAlignment {
   
   /** Next optimal windows (next 24 hours) */
   nextWindows?: TimeWindow[];
+  
+  /** TIER 1: Objective cosmic quality (universal - same for all users) */
+  cosmicQuality?: CosmicQuality;
+  
+  /** Current hour ruler planetary condition */
+  hourRulerCondition?: PlanetaryCondition;
+  
+  /** Enhanced status reasoning (multi-language) */
+  reasoning?: {
+    en: string;
+    ar: string;
+    fr: string;
+  };
 }
 
 /**
@@ -350,8 +365,41 @@ export async function getMomentAlignment(
     }
   }
   
-  // Compute alignment status
+  // ========================================
+  // TIER 1: OBJECTIVE COSMIC QUALITY
+  // ========================================
+  // Analyze cosmic conditions independent of user
+  let cosmicQuality: CosmicQuality | undefined;
+  let hourRulerCondition: PlanetaryCondition | undefined;
+  
+  if (location?.latitude != null && location?.longitude != null) {
+    try {
+      cosmicQuality = await analyzeCosmicQuality(now, {
+        latitude: location.latitude,
+        longitude: location.longitude,
+      });
+      
+      // Get detailed hour ruler condition
+      if (cosmicQuality?.hourRuler?.planet) {
+        hourRulerCondition = cosmicQuality.hourRuler.condition;
+      }
+    } catch (error) {
+      console.warn('[MomentAlignment] Failed to analyze cosmic quality:', error);
+      // Continue without cosmic quality data (graceful degradation)
+    }
+  }
+  
+  // Compute alignment status (basic elemental matching)
   const status = computeAlignmentStatus(zahirElement, timeElement);
+  
+  // ========================================
+  // ENHANCED STATUS OVERRIDE LOGIC
+  // ========================================
+  // If cosmic quality indicates forbidden moment, override status to HOLD
+  let finalStatus = status;
+  if (cosmicQuality?.ruling === 'forbidden') {
+    finalStatus = 'HOLD';
+  }
   
   // Map status to i18n keys
   const labelKeys: Record<AlignmentStatus, string> = {
@@ -366,19 +414,124 @@ export async function getMomentAlignment(
     HOLD: 'home.moment.hint.hold',
   };
   
-  // Get next hour transition (current window end)
-  // currentWindowEnd / nextWindows already resolved above (accurate when location exists)
+  // ========================================
+  // GENERATE ENHANCED REASONING
+  // ========================================
+  const reasoning = generateEnhancedReasoning(
+    zahirElement,
+    timeElement,
+    finalStatus,
+    cosmicQuality,
+    hourRulerCondition
+  );
   
   return {
     zahirElement,
     timeElement,
-    status,
-    shortLabelKey: labelKeys[status],
-    shortHintKey: hintKeys[status],
+    status: finalStatus,
+    shortLabelKey: labelKeys[finalStatus],
+    shortHintKey: hintKeys[finalStatus],
     updatedAt: now.toISOString(),
     currentWindowEnd,
     nextWindows,
+    cosmicQuality,
+    hourRulerCondition,
+    reasoning,
   };
+}
+
+/**
+ * Generate enhanced multi-language reasoning combining elemental + cosmic analysis
+ */
+function generateEnhancedReasoning(
+  zahirElement: Element,
+  timeElement: Element,
+  status: AlignmentStatus,
+  cosmicQuality?: CosmicQuality,
+  hourRulerCondition?: PlanetaryCondition
+): { en: string; ar: string; fr: string } {
+  // Base reasoning from elemental matching
+  const elementalMatch = zahirElement === timeElement ? 'perfect' : 
+    (status === 'MAINTAIN' ? 'supportive' : 'challenging');
+  
+  const baseEn = `Your ${zahirElement} nature with ${timeElement} hour: ${elementalMatch} alignment.`;
+  const baseAr = `طبيعتك (${getElementArabic(zahirElement)}) مع ساعة (${getElementArabic(timeElement)}): توافق ${getAlignmentArabic(elementalMatch)}.`;
+  const baseFr = `Votre nature ${getElementFrench(zahirElement)} avec heure ${getElementFrench(timeElement)}: alignement ${getAlignmentFrench(elementalMatch)}.`;
+  
+  // If no cosmic data, return base reasoning
+  if (!cosmicQuality) {
+    return { en: baseEn, ar: baseAr, fr: baseFr };
+  }
+  
+  // Enhanced reasoning with cosmic quality
+  const cosmicEn = ` Cosmic quality: ${cosmicQuality.ruling}${hourRulerCondition ? ` (${hourRulerCondition.ruling})` : ''}.`;
+  const cosmicAr = ` الجودة الكونية: ${getCosmicRulingArabic(cosmicQuality.ruling)}${hourRulerCondition ? ` (${hourRulerCondition.summary.ar.split('.')[0]})` : ''}.`;
+  const cosmicFr = ` Qualité cosmique: ${getCosmicRulingFrench(cosmicQuality.ruling)}${hourRulerCondition ? ` (${hourRulerCondition.ruling})` : ''}.`;
+  
+  return {
+    en: baseEn + cosmicEn,
+    ar: baseAr + cosmicAr,
+    fr: baseFr + cosmicFr,
+  };
+}
+
+// Helper functions for translations
+function getElementArabic(element: Element): string {
+  const map: Record<Element, string> = {
+    fire: 'نار',
+    earth: 'تراب',
+    air: 'هواء',
+    water: 'ماء',
+  };
+  return map[element] || element;
+}
+
+function getElementFrench(element: Element): string {
+  const map: Record<Element, string> = {
+    fire: 'Feu',
+    earth: 'Terre',
+    air: 'Air',
+    water: 'Eau',
+  };
+  return map[element] || element;
+}
+
+function getAlignmentArabic(alignment: string): string {
+  const map: Record<string, string> = {
+    perfect: 'مثالي',
+    supportive: 'داعم',
+    challenging: 'صعب',
+  };
+  return map[alignment] || alignment;
+}
+
+function getAlignmentFrench(alignment: string): string {
+  const map: Record<string, string> = {
+    perfect: 'parfait',
+    supportive: 'favorable',
+    challenging: 'difficile',
+  };
+  return map[alignment] || alignment;
+}
+
+function getCosmicRulingArabic(ruling: string): string {
+  const map: Record<string, string> = {
+    baraka: 'مبارك',
+    neutral: 'عادي',
+    makruh: 'مكروه',
+    forbidden: 'محظور',
+  };
+  return map[ruling] || ruling;
+}
+
+function getCosmicRulingFrench(ruling: string): string {
+  const map: Record<string, string> = {
+    baraka: 'béni',
+    neutral: 'neutre',
+    makruh: 'déconseillé',
+    forbidden: 'interdit',
+  };
+  return map[ruling] || ruling;
 }
 
 /**

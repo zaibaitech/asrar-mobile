@@ -56,7 +56,7 @@ export function PlanetaryStrengthAnalysis({
   isRetrograde: isRetrogradeProp,
   compact = false,
 }: PlanetaryStrengthAnalysisProps) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   // Extract data from transit or individual props
   const planet = (planetProp || transit?.planet) as Planet;
@@ -81,6 +81,102 @@ export function PlanetaryStrengthAnalysis({
   const powerColor = getPowerColor(analysis.finalPower);
   const isWeak = analysis.finalPower < 50;
 
+  const getLocalizedPlanetName = (p: string) => {
+    const key = p.toLowerCase();
+    const translated = t(`dailyEnergy.planets.${key}`);
+    return translated || p;
+  };
+
+  const getLocalizedDegreeQuality = (quality: string) => {
+    const keyMap: Record<string, string> = {
+      Weak: 'degreeWeak',
+      Moderate: 'degreeModerate',
+      Strong: 'degreeStrong',
+      Weakening: 'degreeWeakening',
+    };
+    const key = keyMap[quality];
+    return key ? t(`planetaryStrengthAnalysis.statuses.${key}`) : quality;
+  };
+
+  const getLocalizedDignityStatus = (status: string) => {
+    const keyMap: Record<string, string> = {
+      Domicile: 'dignityDomicile',
+      Exalted: 'dignityExalted',
+      Detriment: 'dignityDetriment',
+      Fall: 'dignityFall',
+      Neutral: 'dignityNeutral',
+    };
+    const key = keyMap[status];
+    return key ? t(`planetaryStrengthAnalysis.statuses.${key}`) : status;
+  };
+
+  const getLocalizedCombustionStatus = (status: string) => {
+    const keyMap: Record<string, string> = {
+      clear: 'combustionClear',
+      beams: 'combustionBeams',
+      combust: 'combustionCombust',
+    };
+    const key = keyMap[status];
+    return key ? t(`planetaryStrengthAnalysis.statuses.${key}`) : status;
+  };
+
+  const localizedDegreeDescription = (() => {
+    const q = analysis.degreeInfo.quality;
+    if (q === 'Weak') return t('dailyEnergy.breakdown.todaysRuler.degreeEarly', { degree: degree.toFixed(1) });
+    if (q === 'Moderate') return t('dailyEnergy.breakdown.todaysRuler.degreeGaining', { degree: degree.toFixed(1) });
+    if (q === 'Strong') return t('dailyEnergy.breakdown.todaysRuler.degreePeak', { degree: degree.toFixed(1) });
+    if (q === 'Weakening') return t('dailyEnergy.breakdown.todaysRuler.degreeWeakening', { degree: degree.toFixed(1) });
+    return analysis.degreeInfo.description;
+  })();
+
+  const localizedDignityDescription = (() => {
+    const s = analysis.dignityInfo.status;
+    if (s === 'Domicile') return t('dailyEnergy.breakdown.todaysRuler.dignityOwn');
+    if (s === 'Exalted') return t('dailyEnergy.breakdown.todaysRuler.dignityExalted');
+    if (s === 'Detriment') return t('dailyEnergy.breakdown.todaysRuler.dignityDetriment');
+    if (s === 'Fall') return t('dailyEnergy.breakdown.todaysRuler.dignityFall');
+    if (s === 'Neutral') return t('dailyEnergy.breakdown.todaysRuler.dignityNeutral');
+    return analysis.dignityInfo.description;
+  })();
+
+  const localizedCombustionDescription = (() => {
+    const s = analysis.combustionInfo.status;
+    if (s === 'combust') return t('dailyEnergy.breakdown.todaysRuler.combust');
+    if (s === 'beams') return t('dailyEnergy.breakdown.todaysRuler.beams');
+    if (s === 'clear') return t('dailyEnergy.breakdown.todaysRuler.clear');
+    return analysis.combustionInfo.description;
+  })();
+
+  const localizedRetrogradeDescription = isRetrograde
+    ? t('dailyEnergy.breakdown.todaysRuler.retrograde')
+    : analysis.retrogradeInfo.description;
+
+  const localizedWarnings: string[] = (() => {
+    const w: string[] = [];
+    if (analysis.degreeInfo.quality === 'Weak') w.push(t('dailyEnergy.breakdown.todaysRuler.degreeEarly', { degree: degree.toFixed(1) }));
+    if (analysis.dignityInfo.status === 'Fall') w.push(t('dailyEnergy.breakdown.todaysRuler.dignityFall'));
+    if (analysis.dignityInfo.status === 'Detriment') w.push(t('dailyEnergy.breakdown.todaysRuler.dignityDetriment'));
+    if (analysis.combustionInfo.status === 'combust') w.push(t('dailyEnergy.breakdown.todaysRuler.combust'));
+    if (analysis.combustionInfo.status === 'beams') w.push(t('dailyEnergy.breakdown.todaysRuler.beams'));
+    if (isRetrograde) w.push(t('dailyEnergy.breakdown.todaysRuler.retrograde'));
+    return w;
+  })();
+
+  const localizedRecommendations: string[] = (() => {
+    const recs: string[] = [];
+    if (analysis.degreeInfo.quality === 'Strong') {
+      recs.push(t('dailyEnergy.breakdown.todaysRuler.degreePeak', { degree: degree.toFixed(1) }));
+    } else if (analysis.degreeInfo.quality === 'Moderate') {
+      recs.push(t('dailyEnergy.breakdown.todaysRuler.degreeGaining', { degree: degree.toFixed(1) }));
+    }
+
+    if (analysis.dignityInfo.status === 'Exalted') recs.push(t('dailyEnergy.breakdown.todaysRuler.dignityExalted'));
+    if (analysis.dignityInfo.status === 'Domicile') recs.push(t('dailyEnergy.breakdown.todaysRuler.dignityOwn'));
+
+    if (isRetrograde) recs.push(t('planetaryStrengthAnalysis.suitability.innerWork'));
+    return recs;
+  })();
+
   if (compact) {
     return (
       <View style={styles.compactContainer}>
@@ -91,13 +187,13 @@ export function PlanetaryStrengthAnalysis({
             </Text>
           </View>
           <Text style={styles.compactLabel}>
-            {planet} @ {degree.toFixed(1)}° {sign}
+            {getLocalizedPlanetName(planet)} @ {degree.toFixed(1)}° {sign}
           </Text>
         </View>
 
-        {analysis.warnings.length > 0 && (
+        {localizedWarnings.length > 0 && (
           <View style={styles.compactWarnings}>
-            {analysis.warnings.slice(0, 2).map((warning, idx) => (
+            {localizedWarnings.slice(0, 2).map((warning, idx) => (
               <Text key={idx} style={styles.warningText}>
                 • {warning}
               </Text>
@@ -114,7 +210,7 @@ export function PlanetaryStrengthAnalysis({
       <View style={styles.header}>
         <View>
           <Text style={styles.planetName}>
-            {planet} {isRetrograde && '℞'}
+            {getLocalizedPlanetName(planet)} {isRetrograde && '℞'}
           </Text>
           <Text style={styles.position}>
             {degree.toFixed(1)}° {sign}
@@ -125,7 +221,7 @@ export function PlanetaryStrengthAnalysis({
           style={[styles.powerCard, { borderColor: powerColor }]}
         >
           <Text style={[styles.powerLabel, { color: powerColor }]}>
-            POWER
+            {t('planetaryStrengthAnalysis.labels.power')}
           </Text>
           <Text style={[styles.powerValue, { color: powerColor }]}>
             {analysis.finalPower}%
@@ -135,52 +231,66 @@ export function PlanetaryStrengthAnalysis({
 
       {/* Formula Breakdown */}
       <View style={styles.formulaCard}>
-        <Text style={styles.formulaTitle}>Calculation Breakdown</Text>
+        <Text style={styles.formulaTitle}>{t('planetaryStrengthAnalysis.labels.calculationBreakdown')}</Text>
         <View style={styles.formulaRow}>
-          <FactorBadge label="Degree" value={analysis.degreeInfo.quality} score={analysis.degreeStrength * 100} />
+          <FactorBadge label={t('planetaryStrengthAnalysis.labels.degree')} value={getLocalizedDegreeQuality(analysis.degreeInfo.quality)} score={analysis.degreeStrength * 100} />
           <Text style={styles.times}>×</Text>
-          <FactorBadge label="Dignity" value={analysis.dignityInfo.status} score={analysis.dignityModifier * 100} />
+          <FactorBadge label={t('planetaryStrengthAnalysis.labels.dignity')} value={getLocalizedDignityStatus(analysis.dignityInfo.status)} score={analysis.dignityModifier * 100} />
           <Text style={styles.times}>×</Text>
-          <FactorBadge label="Combustion" value={analysis.combustionInfo.status} score={analysis.combustionModifier * 100} />
+          <FactorBadge label={t('planetaryStrengthAnalysis.labels.combustion')} value={getLocalizedCombustionStatus(analysis.combustionInfo.status)} score={analysis.combustionModifier * 100} />
         </View>
 
         {isRetrograde && (
           <View style={[styles.formulaRow, { marginTop: Spacing.xs }]}>
             <Text style={styles.formulaText}>
-              × Retrograde ({analysis.retrogradeModifier * 100}%)
+              {t('planetaryStrengthAnalysis.formula.retrograde', {
+                percent: Math.round(analysis.retrogradeModifier * 100),
+              })}
             </Text>
           </View>
         )}
 
         <View style={[styles.formulaRow, { marginTop: Spacing.sm, paddingTop: Spacing.sm, borderTopWidth: 1, borderTopColor: DarkTheme.textTertiary }]}>
           <Text style={styles.formulaText}>
-            = {analysis.finalPower}% Final Power
+            {t('planetaryStrengthAnalysis.formula.finalPower', { value: analysis.finalPower })}
           </Text>
         </View>
       </View>
 
       {/* Degree Strength Detail */}
       <AnalysisCard
-        title="Degree Position"
+        title={t('planetaryStrengthAnalysis.cards.degreePosition')}
         icon="📍"
-        analysis={analysis.degreeInfo}
+        analysis={{
+          ...analysis.degreeInfo,
+          quality: getLocalizedDegreeQuality(analysis.degreeInfo.quality),
+          description: localizedDegreeDescription,
+        }}
         color={getDegreeColor(analysis.degreeInfo.quality)}
       />
 
       {/* Essential Dignity Detail */}
       <AnalysisCard
-        title="Essential Dignity"
+        title={t('planetaryStrengthAnalysis.cards.essentialDignity')}
         icon="♔"
-        analysis={analysis.dignityInfo}
+        analysis={{
+          ...analysis.dignityInfo,
+          status: getLocalizedDignityStatus(analysis.dignityInfo.status),
+          description: localizedDignityDescription,
+        }}
         color={getDignityColor(analysis.dignityInfo.status)}
       />
 
       {/* Combustion Detail */}
       {!['Sun', 'Moon'].includes(planet) && (
         <AnalysisCard
-          title="Sun Proximity"
+          title={t('planetaryStrengthAnalysis.cards.sunProximity')}
           icon="☀️"
-          analysis={analysis.combustionInfo}
+          analysis={{
+            ...analysis.combustionInfo,
+            status: getLocalizedCombustionStatus(analysis.combustionInfo.status),
+            description: localizedCombustionDescription,
+          }}
           color={analysis.combustionInfo.isCombust ? '#ef4444' : '#8b7355'}
         />
       )}
@@ -191,22 +301,22 @@ export function PlanetaryStrengthAnalysis({
           <View style={styles.retrogradeHeader}>
             <Text style={styles.retrogradeIcon}>℞</Text>
             <View>
-              <Text style={styles.retrogradeTitle}>Retrograde Motion</Text>
-              <Text style={styles.retrogradeSubtitle}>Limited for outer work</Text>
+              <Text style={styles.retrogradeTitle}>{t('planetaryStrengthAnalysis.cards.retrogradeMotion')}</Text>
+              <Text style={styles.retrogradeSubtitle}>{t('planetaryStrengthAnalysis.suitability.limitedOuterWork')}</Text>
             </View>
           </View>
           <Text style={styles.retrogradeDescription}>
-            {analysis.retrogradeInfo.description}
+            {localizedRetrogradeDescription}
           </Text>
         </View>
       )}
 
       {/* Warnings */}
-      {analysis.warnings.length > 0 && (
+      {localizedWarnings.length > 0 && (
         <View style={styles.warningsContainer}>
-          <Text style={styles.warningsTitle}>⚠️ Challenges</Text>
+          <Text style={styles.warningsTitle}>{t('planetaryStrengthAnalysis.sections.challengesTitle')}</Text>
           <FlatList
-            data={analysis.warnings}
+            data={localizedWarnings}
             renderItem={({ item }) => (
               <Text style={styles.warningItem}>• {item}</Text>
             )}
@@ -216,11 +326,11 @@ export function PlanetaryStrengthAnalysis({
       )}
 
       {/* Recommendations */}
-      {analysis.recommendations.length > 0 && (
+      {localizedRecommendations.length > 0 && (
         <View style={styles.recommendationsContainer}>
-          <Text style={styles.recommendationsTitle}>✅ Recommendations</Text>
+          <Text style={styles.recommendationsTitle}>{t('planetaryStrengthAnalysis.sections.recommendationsTitle')}</Text>
           <FlatList
-            data={analysis.recommendations}
+            data={localizedRecommendations}
             renderItem={({ item }) => (
               <Text style={styles.recommendationItem}>• {item}</Text>
             )}
@@ -235,13 +345,13 @@ export function PlanetaryStrengthAnalysis({
           <Text style={styles.suitabilityIcon}>
             {analysis.suitability.outer ? '✓' : '✗'}
           </Text>
-          <Text style={styles.suitabilityLabel}>Outer Work (Material/External)</Text>
+          <Text style={styles.suitabilityLabel}>{t('planetaryStrengthAnalysis.suitability.outerWork')}</Text>
         </View>
         <View style={[styles.suitabilityRow, { opacity: analysis.suitability.inner ? 1 : 0.5 }]}>
           <Text style={styles.suitabilityIcon}>
             {analysis.suitability.inner ? '✓' : '✗'}
           </Text>
-          <Text style={styles.suitabilityLabel}>Inner Work (Spiritual/Reflection)</Text>
+          <Text style={styles.suitabilityLabel}>{t('planetaryStrengthAnalysis.suitability.innerWork')}</Text>
         </View>
       </View>
     </View>

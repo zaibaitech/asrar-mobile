@@ -8,12 +8,12 @@
  * 
  * This ensures NO contradictions between different parts of the UI.
  * 
- * Badge Hierarchy:
- * - OPTIMAL (75%+): Excellent time, proceed with confidence
- * - ACT (55-74%): Good time, proceed 
- * - MAINTAIN (40-54%): Workable, stay mindful
- * - CAREFUL (25-39%): Challenging, proceed only if needed
- * - HOLD (0-24%): Best to wait
+ * Badge Hierarchy (matches Daily Energy thresholds):
+ * - OPTIMAL (75%+): Excellent time
+ * - ACT (60-74%): Good time
+ * - MAINTAIN (45-59%): Proceed mindfully
+ * - CAREFUL (30-44%): Proceed with caution
+ * - HOLD (0-29%): Unfavorable time
  */
 
 import type { RecommendationLevel } from './types';
@@ -90,10 +90,10 @@ export const BADGE_CONFIG: Record<UnifiedBadge, Omit<BadgeConfig, 'badge'>> = {
 
 export const SCORE_THRESHOLDS = {
   OPTIMAL: 75,    // 75-100%
-  ACT: 55,        // 55-74%
-  MAINTAIN: 40,   // 40-54%
-  CAREFUL: 25,    // 25-39%
-  HOLD: 0,        // 0-24%
+  ACT: 60,        // 60-74%
+  MAINTAIN: 45,   // 45-59%
+  CAREFUL: 30,    // 30-44%
+  HOLD: 0,        // 0-29%
 } as const;
 
 // ============================================================================

@@ -5,31 +5,24 @@ import { MysticalCorrespondencesCard } from '@/components/manazil/MysticalCorres
 import { PlanetaryHoursCard } from '@/components/manazil/PlanetaryHoursCard';
 import { SpiritualPracticesCard } from '@/components/manazil/SpiritualPracticesCard';
 import { PremiumSection } from '@/components/subscription/PremiumSection';
-import { DailyPlanetaryAnalysisDisplay, TimingAnalysisSection } from '@/components/timing';
 import { Borders, DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { getLunarMansionByIndex, normalizeMansionIndex } from '@/data/lunarMansions';
+import { getCosmicLunarMansionForDate, getLunarMansionByIndex, normalizeMansionIndex } from '@/data/lunarMansions';
 import { getManazilGuidance, tr, type ManazilLanguage } from '@/data/manazilGuidance';
 import { getManzilPracticePack } from '@/data/manazilPractices';
+import { useDailyPlanetaryAnalysis } from '@/hooks/useDailyPlanetaryAnalysis';
 import { useManazilPracticeTracking } from '@/hooks/useManazilPracticeTracking';
-import {
-    BADGE_CONFIG,
-    getBadgeFromScore,
-    type AsrariyaTimingResult,
-    type UnifiedBadge,
-} from '@/services/AsrariyaTimingEngine';
-import { calculateElementalHarmony } from '@/services/ElementalHarmonyService';
+import { analyzeTimingForPractice, buildCurrentMoment, profileToSpiritualProfile, quickTimingCheck } from '@/services/AsrariyaTimingEngine';
 import { getCurrentLunarMansion } from '@/services/LunarMansionService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import { Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Element = 'fire' | 'water' | 'air' | 'earth';
-type ResonanceLevel = 'supportive' | 'harmonious' | 'neutral' | 'challenging' | 'transformative';
 
 // ============================================
 // MANAZIL SOURCE DIFFERENTIATION SYSTEM
@@ -54,44 +47,44 @@ const MANAZIL_SOURCES: Record<ManazilSourceType, ManazilSourceConfig> = {
     badgeColor: '#3b82f6',
     badgeTextColor: '#ffffff',
     label: {
-      en: "Current Moon Position",
-      fr: "Position lunaire actuelle",
-      ar: "موقع القمر الحالي"
+      en: 'Current Moon Position',
+      fr: 'Position lunaire actuelle',
+      ar: 'موقع القمر الحالي',
     },
     shortLabel: {
-      en: "LIVE",
-      fr: "EN DIRECT",
-      ar: "مباشر"
+      en: 'LIVE',
+      fr: 'EN DIRECT',
+      ar: 'مباشر',
     },
     description: {
-      en: "The lunar mansion where the Moon is right now. Changes every ~2.4 days as the Moon travels through the 28 mansions.",
-      fr: "La demeure lunaire où se trouve la Lune en ce moment. Change environ tous les 2,4 jours.",
-      ar: "المنزلة القمرية التي يتواجد فيها القمر الآن. تتغير كل ~2.4 يوم"
+      en: 'The lunar mansion where the Moon is right now. Changes every ~2.4 days as the Moon travels through the 28 mansions.',
+      fr: 'La demeure lunaire où se trouve la Lune en ce moment. Change environ tous les 2,4 jours.',
+      ar: 'المنزلة القمرية التي يتواجد فيها القمر الآن. تتغير كل ~2.4 يوم',
     },
-    nature: 'dynamic'
+    nature: 'dynamic',
   },
   FROM_NAME: {
     id: 'FROM_NAME',
-    icon: '📝',
+    icon: '🔤',
     badgeColor: '#8b5cf6',
     badgeTextColor: '#ffffff',
     label: {
-      en: "Personal Mansion (Name)",
-      fr: "Demeure personnelle (Nom)",
-      ar: "منزلة شخصية (الاسم)"
+      en: 'From Your Name',
+      fr: 'De votre nom',
+      ar: 'من اسمك',
     },
     shortLabel: {
-      en: "PERSONAL",
-      fr: "PERSONNEL",
-      ar: "شخصي"
+      en: 'STATIC',
+      fr: 'STATIQUE',
+      ar: 'ثابت',
     },
     description: {
-      en: "Your personal lunar mansion calculated from your Arabic name using traditional Abjad numerology. This is your spiritual signature that never changes.",
-      fr: "Votre demeure lunaire personnelle calculée à partir de votre nom en utilisant la numérologie Abjad traditionnelle.",
-      ar: "منزلتك القمرية الشخصية محسوبة من اسمك العربي باستخدام حساب الأبجد التقليدي"
+      en: 'Your personal lunar mansion, calculated from your name. This never changes unless your name changes.',
+      fr: 'Votre demeure lunaire personnelle, calculée à partir de votre nom. Ne change jamais sauf si votre nom change.',
+      ar: 'منزلتك القمرية الشخصية محسوبة من اسمك. لا تتغير أبداً إلا إذا تغير اسمك.',
     },
-    nature: 'static'
-  }
+    nature: 'static',
+  },
 };
 
 // ============================================
@@ -227,78 +220,42 @@ function ManazilSourceExplainer({ visible, onClose, language }: ManazilSourceExp
 }
 
 // ============================================
-// ALIGNMENT INSIGHT COMPONENT
+// PERSONAL MESSAGE CARD
 // ============================================
-interface AlignmentInsightProps {
+interface PersonalMessageCardProps {
   todayMansion: ReturnType<typeof getLunarMansionByIndex>;
   personalMansion: ReturnType<typeof getLunarMansionByIndex>;
-  language: ManazilLanguage;
+  t: (key: string, params?: Record<string, any>) => string;
 }
 
-function AlignmentInsight({ todayMansion, personalMansion, language }: AlignmentInsightProps) {
+function PersonalMessageCard({ todayMansion, personalMansion, t }: PersonalMessageCardProps) {
   if (!todayMansion || !personalMansion) return null;
-  
-  const isAligned = todayMansion.index === personalMansion.index;
-  const sameElement = todayMansion.element === personalMansion.element;
-  
-  const getInsight = () => {
-    if (isAligned) {
-      return {
-        icon: '✨',
-        color: '#10b981',
-        title: {
-          en: "Perfect Alignment!",
-          fr: "Alignement parfait !",
-          ar: "توافق تام!"
-        },
-        message: {
-          en: "The Moon is in your personal mansion today! This is a rare and powerful time for inner work, meditation, and connecting with your deepest intentions.",
-          fr: "La Lune est dans votre demeure personnelle aujourd'hui ! C'est un moment rare et puissant pour le travail intérieur.",
-          ar: "القمر في منزلتك الشخصية اليوم! هذا وقت نادر وقوي للعمل الداخلي والتأمل."
-        }
-      };
-    } else if (sameElement) {
-      return {
-        icon: '🌟',
-        color: '#8b5cf6',
-        title: {
-          en: "Elemental Harmony",
-          fr: "Harmonie élémentaire",
-          ar: "انسجام عنصري"
-        },
-        message: {
-          en: `Both mansions share the ${todayMansion.element} element. You'll feel naturally attuned to today's cosmic energies.`,
-          fr: `Les deux demeures partagent l'élément ${todayMansion.element}. Vous vous sentirez naturellement en harmonie.`,
-          ar: `كلا المنزلتين تشتركان في عنصر ${todayMansion.element}. ستشعر بالتناغم الطبيعي.`
-        }
-      };
-    } else {
-      return {
-        icon: '🔄',
-        color: '#3b82f6',
-        title: {
-          en: "Cosmic Dialogue",
-          fr: "Dialogue cosmique",
-          ar: "حوار كوني"
-        },
-        message: {
-          en: `Today's ${todayMansion.element} Moon interacts with your ${personalMansion.element} nature. Notice how these energies blend in your experience.`,
-          fr: `La Lune ${todayMansion.element} d'aujourd'hui interagit avec votre nature ${personalMansion.element}.`,
-          ar: `قمر ${todayMansion.element} اليوم يتفاعل مع طبيعتك ${personalMansion.element}.`
-        }
-      };
-    }
-  };
-  
-  const insight = getInsight();
-  
+
+  const status = getMansionElementalStatus(
+    personalMansion.element as Element,
+    todayMansion.element as Element,
+    t
+  );
+
+  const title = t('manazilScreen.personalMessage.title');
+
+  const moonElement = t(`common.elements.${todayMansion.element}`);
+  const personalElement = t(`common.elements.${personalMansion.element}`);
+  const subtitle = t('manazilScreen.personalMessage.forYourNature', { element: personalElement });
+  const message =
+    status.status === 'harmonious'
+      ? t('manazilScreen.personalMessage.messageHarmonious', { moonElement, personalElement })
+      : status.status === 'tension'
+        ? t('manazilScreen.personalMessage.messageTension', { moonElement, personalElement })
+        : t('manazilScreen.personalMessage.messageBalanced', { moonElement, personalElement });
+
   return (
-    <View style={[styles.alignmentCard, { borderColor: `${insight.color}40` }]}>
-      <View style={styles.alignmentHeader}>
-        <Text style={styles.alignmentIcon}>{insight.icon}</Text>
-        <Text style={[styles.alignmentTitle, { color: insight.color }]}>{insight.title[language]}</Text>
+    <View style={[styles.personalMessageCard, { borderColor: `${status.color}40` }]}>
+      <View style={styles.personalMessageHeader}>
+        <Text style={styles.personalMessageTitle}>💬 {title}</Text>
       </View>
-      <Text style={styles.alignmentMessage}>{insight.message[language]}</Text>
+      <Text style={styles.personalMessageSubtitle}>{subtitle}</Text>
+      <Text style={styles.personalMessageText}>{message}</Text>
     </View>
   );
 }
@@ -325,7 +282,7 @@ const LABELS: Record<
 > = {
   en: {
     title: 'Manāzil',
-    todayGate: "Tonight's Moon",
+    todayGate: 'Current Moon Position',
     youInGate: 'Your Alignment',
     yourPersonalMansion: 'Your Personal Mansion',
     meaning: 'Meaning',
@@ -342,7 +299,7 @@ const LABELS: Record<
   },
   fr: {
     title: 'Manāzil',
-    todayGate: 'La Lune ce soir',
+    todayGate: 'Position lunaire actuelle',
     youInGate: 'Votre alignement',
     yourPersonalMansion: 'Votre demeure personnelle',
     meaning: 'Sens',
@@ -359,7 +316,7 @@ const LABELS: Record<
   },
   ar: {
     title: 'المنازل',
-    todayGate: 'قمر الليلة',
+    todayGate: 'موقع القمر الحالي',
     youInGate: 'توافقك',
     yourPersonalMansion: 'منزلتك الشخصية',
     meaning: 'المعنى',
@@ -386,43 +343,110 @@ function getElementIcon(element: Element) {
   return icons[element];
 }
 
-function computeResonance(params: {
-  todayIndex: number | null;
-  todayElement: Element | null;
-  personalIndex: number | null;
-  personalElement: Element | null;
-}): ResonanceLevel {
-  const { todayIndex, todayElement, personalIndex, personalElement } = params;
+function getMansionElementalStatus(
+  personalElement: Element,
+  currentElement: Element,
+  t: (key: string, params?: Record<string, any>) => string
+): {
+  status: 'harmonious' | 'balanced' | 'tension';
+  color: string;
+  icon: string;
+  label: string;
+  description: string;
+} {
+  if (personalElement === currentElement) {
+    return {
+      status: 'harmonious',
+      color: '#4CAF50',
+      icon: '✅',
+      label: t('manazilScreen.elementalStatus.harmonious'),
+      description: t('manazilScreen.elementalStatus.bothAre', { element: t(`common.elements.${personalElement}`) }),
+    };
+  }
 
-  if (todayIndex === null || personalIndex === null || !todayElement || !personalElement) return 'neutral';
-  if (todayIndex === personalIndex) return 'supportive';
+  const oppositions: Record<Element, Element> = {
+    fire: 'water',
+    water: 'fire',
+    air: 'earth',
+    earth: 'air',
+  };
 
-  const forward = (todayIndex - personalIndex + 28) % 28;
-  const backward = (personalIndex - todayIndex + 28) % 28;
-  const distance = Math.min(forward, backward);
+  if (oppositions[personalElement] === currentElement) {
+    return {
+      status: 'tension',
+      color: '#FF9800',
+      icon: '⚠️',
+      label: t('manazilScreen.elementalStatus.tension'),
+      description: t('manazilScreen.elementalStatus.proceedMindfully', {
+        element1: t(`common.elements.${personalElement}`),
+        element2: t(`common.elements.${currentElement}`),
+      }),
+    };
+  }
 
-  if (distance === 14) return 'transformative';
+  return {
+    status: 'balanced',
+    color: '#2196F3',
+    icon: '〰️',
+    label: t('manazilScreen.elementalStatus.balanced'),
+    description: t('manazilScreen.elementalStatus.neutralEnergy', {
+      element1: t(`common.elements.${personalElement}`),
+      element2: t(`common.elements.${currentElement}`),
+    }),
+  };
+}
 
-  const harmony = calculateElementalHarmony(personalElement, todayElement);
-  const elementScore =
-    harmony.level === 'Harmonious' ? 0.35 :
-    harmony.level === 'Supportive' ? 0.2 :
-    harmony.level === 'Challenging' ? -0.2 :
-    0;
+function getNavigationGuidance(
+  status: 'harmonious' | 'balanced' | 'tension',
+  t: (key: string, params?: Record<string, any>) => string
+): string[] {
+  const base = status === 'tension' ? 'tension' : status === 'harmonious' ? 'harmonious' : 'balanced';
+  return [
+    t(`manazilScreen.relationship.tips.${base}1`),
+    t(`manazilScreen.relationship.tips.${base}2`),
+    t(`manazilScreen.relationship.tips.${base}3`),
+  ];
+}
 
-  const distanceScore =
-    distance <= 3 ? 0.2 :
-    distance <= 7 ? 0.1 :
-    distance <= 10 ? 0 :
-    -0.1;
+function findNextMatchingElementMoonDate(targetElement: Element, daysAhead: number = 60): Date | null {
+  const start = new Date();
+  start.setHours(12, 0, 0, 0);
 
-  const total = elementScore + distanceScore;
+  for (let i = 1; i <= daysAhead; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const m = getCosmicLunarMansionForDate(d);
+    if ((m.element as Element) === targetElement) return d;
+  }
+  return null;
+}
 
-  if (total >= 0.35) return 'supportive';
-  if (total >= 0.15) return 'harmonious';
-  if (total > -0.15) return 'neutral';
-  if (total > -0.35) return 'challenging';
-  return 'transformative';
+function getRelativeTimeText(
+  futureDate: Date,
+  currentDate: Date,
+  t: (key: string, params?: Record<string, any>) => string
+): string {
+  const current = new Date(currentDate);
+  current.setHours(12, 0, 0, 0);
+  const future = new Date(futureDate);
+  future.setHours(12, 0, 0, 0);
+
+  const diffMs = future.getTime() - current.getTime();
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays <= 0) return t('manazilScreen.relationship.today');
+  if (diffDays === 1) return t('manazilScreen.relationship.tomorrow');
+  if (diffDays < 7) return t('manazilScreen.relationship.inDays', { count: diffDays });
+  if (diffDays < 14) return t('manazilScreen.relationship.nextWeek');
+  if (diffDays < 30) return t('manazilScreen.relationship.inWeeks', { count: Math.floor(diffDays / 7) });
+  return t('manazilScreen.relationship.inMonths', { count: Math.floor(diffDays / 30) });
+}
+
+function getScoreColor(score: number | null): string {
+  if (typeof score !== 'number' || Number.isNaN(score)) return DarkTheme.textTertiary;
+  if (score >= 70) return '#10b981';
+  if (score >= 40) return '#f59e0b';
+  return '#ef4444';
 }
 
 function ListLine({ text }: { text: string }) {
@@ -439,6 +463,39 @@ export default function ManazilScreen() {
   const insets = useSafeAreaInsets();
   const { language, t } = useLanguage();
   const { profile } = useProfile();
+  const { scrollToTop } = useLocalSearchParams<{ scrollToTop?: string }>();
+
+  const scrollViewRef = React.useRef<ScrollView>(null);
+  const lastScrollTokenRef = React.useRef<string | null>(null);
+
+  React.useEffect(() => {
+    if (!scrollToTop) return;
+    if (lastScrollTokenRef.current === scrollToTop) return;
+
+    lastScrollTokenRef.current = scrollToTop;
+
+    // Ensure we scroll after the ScrollView is mounted/layouted.
+    requestAnimationFrame(() => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+    });
+
+    // Clear param so back-navigation doesn't keep re-triggering.
+    router.setParams({ scrollToTop: undefined });
+  }, [router, scrollToTop]);
+
+  // Current moment (updates every second so the timestamp matches "now")
+  const [now, setNow] = React.useState(() => new Date());
+  React.useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Moon strength single source of truth (rounded once)
+  const { analysis: dailyPlanetAnalysis } = useDailyPlanetaryAnalysis();
+  const moonStrength = React.useMemo(() => {
+    const raw = dailyPlanetAnalysis?.planets?.Moon?.finalPower;
+    return typeof raw === 'number' && !Number.isNaN(raw) ? Math.round(raw) : null;
+  }, [dailyPlanetAnalysis]);
 
   const labels = LABELS[(language as ManazilLanguage) ?? 'en'] ?? LABELS.en;
   const lang = (language as ManazilLanguage) ?? 'en';
@@ -446,15 +503,6 @@ export default function ManazilScreen() {
   const [todayIndex, setTodayIndex] = React.useState<number | null>(null);
   const [isRealTime, setIsRealTime] = React.useState(false);
   const [showSourceExplainer, setShowSourceExplainer] = React.useState(false);
-  
-  // Unified timing state - single source of truth for badges
-  const [timingResult, setTimingResult] = React.useState<AsrariyaTimingResult | null>(null);
-  
-  // Get unified badge from timing analysis
-  const unifiedBadge: UnifiedBadge = timingResult 
-    ? getBadgeFromScore(timingResult.overallScore) 
-    : 'MAINTAIN';
-  const badgeConfig = BADGE_CONFIG[unifiedBadge];
 
   React.useEffect(() => {
     let cancelled = false;
@@ -474,7 +522,9 @@ export default function ManazilScreen() {
     };
 
     void load();
-    const id = setInterval(load, 60 * 60 * 1000);
+    // Refresh periodically; the Moon's mansion changes slowly, but this keeps
+    // the "current moment" display aligned without being too chatty.
+    const id = setInterval(load, 5 * 60 * 1000);
     return () => {
       cancelled = true;
       clearInterval(id);
@@ -488,33 +538,75 @@ export default function ManazilScreen() {
   );
   const personalMansion = typeof personalIndex === 'number' ? getLunarMansionByIndex(personalIndex) : null;
 
-  const resonance = computeResonance({
-    todayIndex: todayMansion?.index ?? null,
-    todayElement: (todayMansion?.element as Element) ?? null,
-    personalIndex: personalMansion?.index ?? null,
-    personalElement: (personalMansion?.element as Element) ?? null,
-  });
+  const elementalStatus = React.useMemo(() => {
+    if (!todayMansion || !personalMansion) return null;
+    return getMansionElementalStatus(
+      personalMansion.element as Element,
+      todayMansion.element as Element,
+      t
+    );
+  }, [todayMansion?.element, personalMansion?.element, t]);
 
-  const statusTone = personalMansion
-    ? (resonance === 'supportive' || resonance === 'harmonious'
-        ? 'favorable'
-        : resonance === 'neutral'
-          ? 'balanced'
-          : 'delicate')
-    : 'balanced';
+  const nextMatchingMoonDate = React.useMemo(() => {
+    if (!personalMansion) return null;
+    return findNextMatchingElementMoonDate(personalMansion.element as Element);
+  }, [personalMansion?.element]);
 
-  const statusColor =
-    statusTone === 'favorable' ? '#10b981' :
-    statusTone === 'delicate' ? '#ef4444' :
-    '#64B5F6';
+  const [dailyEnergyScore, setDailyEnergyScore] = React.useState<number | null>(null);
+  const [momentAlignmentScore, setMomentAlignmentScore] = React.useState<number | null>(null);
 
-  const statusLabel = personalMansion
-    ? (statusTone === 'favorable'
-        ? t('widgets.manazil.favorable')
-        : statusTone === 'balanced'
-          ? t('widgets.manazil.balanced')
-          : t('widgets.manazil.delicate'))
-    : t('widgets.manazil.completeProfile');
+  React.useEffect(() => {
+    let cancelled = false;
+
+    const loadScores = async () => {
+      if (!profile) {
+        if (!cancelled) {
+          setDailyEnergyScore(null);
+          setMomentAlignmentScore(null);
+        }
+        return;
+      }
+
+      const lat = profile.location?.latitude;
+      const lon = profile.location?.longitude;
+      const location =
+        typeof lat === 'number' && typeof lon === 'number'
+          ? { latitude: lat, longitude: lon }
+          : undefined;
+
+      try {
+        const lang = ((language as ManazilLanguage) ?? 'en') as 'en' | 'fr' | 'ar';
+
+        // Moment Alignment score (same as Home strip)
+        const quick = await quickTimingCheck(profile, 'general', location, lang);
+        if (!cancelled) setMomentAlignmentScore(quick.score);
+
+        // Daily Energy score (day-level: treat planetary hour as day ruler)
+        const spiritual = profileToSpiritualProfile(profile);
+        const built = await buildCurrentMoment(location);
+        const dailyMoment = {
+          ...built,
+          planetaryHourPlanet: built.dayRuler,
+          planetaryHourElement: built.dayElement,
+          planetaryHourRemainingSeconds: 0,
+        };
+        const daily = await analyzeTimingForPractice(spiritual, { category: 'general' }, { location, moment: dailyMoment, language: lang });
+        if (!cancelled) setDailyEnergyScore(daily.overallScore);
+      } catch {
+        if (!cancelled) {
+          setDailyEnergyScore(null);
+          setMomentAlignmentScore(null);
+        }
+      }
+    };
+
+    void loadScores();
+    const id = setInterval(loadScores, 5 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [profile, language]);
 
   const guidance = todayMansion
     ? getManazilGuidance({ mansionIndex: todayMansion.index, mansionElement: todayMansion.element })
@@ -535,8 +627,9 @@ export default function ManazilScreen() {
 
   const tracking = useManazilPracticeTracking(practiceMansion?.index ?? 0);
 
-  const now = new Date();
-  const date = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const dateText = now.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+  const timeText = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const dateTimeText = `${dateText} • ${timeText}`;
 
   return (
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
@@ -547,30 +640,39 @@ export default function ManazilScreen() {
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>{labels.title}</Text>
-          <Text style={styles.headerSubtitle}>{date}</Text>
+          <Text style={styles.headerSubtitle}>{dateTimeText}</Text>
+          <Text style={styles.headerLiveIndicator}>{t('manazilScreen.liveIndicator')}</Text>
         </View>
         <View style={styles.placeholder} />
       </View>
 
       <LinearGradient
-        colors={[`${statusColor}15`, `${statusColor}05`, DarkTheme.screenBackground]}
+        colors={[`${accent}15`, `${accent}05`, DarkTheme.screenBackground]}
         style={styles.gradientContainer}
       >
         <ScrollView
+          ref={scrollViewRef}
           style={styles.scrollView}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-          {/* Status Badge */}
-          <View style={[styles.statusBadge, { backgroundColor: `${statusColor}20`, borderColor: statusColor }]}>
-            <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-            <Text style={[styles.statusText, { color: statusColor }]}>{statusLabel}</Text>
-          </View>
+          {/* Elemental Status Badge (replaces confusing "Delicate") */}
+          {elementalStatus ? (
+            <View style={styles.elementalStatusWrap}>
+              <View style={[styles.elementalStatusBadge, { borderColor: elementalStatus.color }]}>
+                <Text style={styles.elementalStatusIcon}>{elementalStatus.icon}</Text>
+                <Text style={[styles.elementalStatusLabel, { color: elementalStatus.color }]}>
+                  {elementalStatus.label}
+                </Text>
+              </View>
+              <Text style={styles.elementalStatusDescription}>{elementalStatus.description}</Text>
+            </View>
+          ) : null}
 
           {/* Today Gate - Current Moon Position */}
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>{labels.todayGate}</Text>
+              <Text style={styles.sectionTitle}>🌙 {labels.todayGate}</Text>
               <TouchableOpacity 
                 style={styles.learnMoreBtn}
                 onPress={() => setShowSourceExplainer(true)}
@@ -587,6 +689,7 @@ export default function ManazilScreen() {
                   isRealTime={isRealTime}
                   onPress={() => setShowSourceExplainer(true)}
                 />
+                <Text style={styles.heroLiveText}>{t('manazilScreen.liveIndicator')}</Text>
               </View>
               
               {/* background star map */}
@@ -611,12 +714,25 @@ export default function ManazilScreen() {
 
               <View style={styles.heroHeaderRow}>
                 <Ionicons name="moon-outline" size={22} color={accent} />
-                <Text style={[styles.cardTitle, { color: accent }]}>{t('widgets.manazil.title')}</Text>
+                <Text style={[styles.cardTitle, { color: accent }]}>{t('manazilScreen.currentMoonPosition')}</Text>
                 <View style={styles.headerSpacer} />
               </View>
 
               {todayMansion ? (
                 <>
+                  {/* Moon Strength */}
+                  {typeof moonStrength === 'number' ? (
+                    <View style={styles.moonStrengthBlock}>
+                      <View style={styles.moonStrengthHeaderRow}>
+                        <Text style={styles.moonStrengthLabel}>{t('manazilScreen.moonStrength')}</Text>
+                        <Text style={[styles.moonStrengthValue, { color: accent }]}>{moonStrength}%</Text>
+                      </View>
+                      <View style={styles.moonStrengthTrack}>
+                        <View style={[styles.moonStrengthFill, { width: `${moonStrength}%`, backgroundColor: accent }]} />
+                      </View>
+                    </View>
+                  ) : null}
+
                   {/* Decorative calligraphy */}
                   <Text style={[styles.calligraphy, { color: `${accent}66` }]}>{todayMansion.nameArabic}</Text>
                   <Text style={styles.heroName}>{todayMansion.nameTransliteration}</Text>
@@ -624,8 +740,34 @@ export default function ManazilScreen() {
                     {lang === 'fr' ? todayMansion.nameFrench : todayMansion.nameEnglish}
                   </Text>
                   <Text style={styles.heroMeta}>
-                    {getElementIcon(todayMansion.element)} {t(`elements.${todayMansion.element}`)} • #{todayMansion.index + 1}
+                    {getElementIcon(todayMansion.element)} {t(`common.elements.${todayMansion.element}`)} • {t('manazilScreen.mansion')} #{todayMansion.index + 1}
                   </Text>
+
+                  {/* Meta: quality + cadence */}
+                  <View style={styles.mansionMetaRow}>
+                    {guidance ? (
+                      <View style={styles.metaItemRow}>
+                        <Ionicons name="sparkles" size={16} color="#FFD700" />
+                        <Text style={styles.metaItemText}>
+                          {t('manazilScreen.quality')}: {tr(guidance.quality, language as ManazilLanguage)}
+                        </Text>
+                      </View>
+                    ) : null}
+                    <View style={styles.metaItemRow}>
+                      <Ionicons name="time" size={16} color="#4FACFE" />
+                      <Text style={styles.metaItemText}>{t('manazilScreen.changesEvery')}</Text>
+                    </View>
+                  </View>
+
+                  {/* Mansion Wisdom (renamed from Cosmic Dialogue) */}
+                  {guidance ? (
+                    <View style={styles.cosmicDialogueBlock}>
+                      <Text style={styles.cosmicDialogueTitle}>{t('manazilScreen.mansionWisdomTitle')}</Text>
+                      <Text style={styles.cosmicDialogueText}>
+                        {tr(guidance.essence, language as ManazilLanguage)}
+                      </Text>
+                    </View>
+                  ) : null}
 
                   {guidance ? (
                     <View style={styles.heroDivider}>
@@ -659,18 +801,9 @@ export default function ManazilScreen() {
             </View>
           </View>
 
-          {/* Alignment Insight - shows when both mansions are available */}
-          {todayMansion && personalMansion && (
-            <AlignmentInsight
-              todayMansion={todayMansion}
-              personalMansion={personalMansion}
-              language={lang}
-            />
-          )}
-
           {/* Your Personal Mansion - Enhanced */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{labels.yourPersonalMansion}</Text>
+            <Text style={styles.sectionTitle}>📝 {labels.yourPersonalMansion}</Text>
             {personalMansion ? (
               <View style={[styles.personalMansionCard, { borderColor: `${ElementAccents[(personalMansion.element as Element) ?? 'air'].primary}35` }]}>
                 {/* Source Badge */}
@@ -687,7 +820,7 @@ export default function ManazilScreen() {
                   <View style={styles.personalMansionHeader}>
                     <View style={[styles.personalMansionIndex, { backgroundColor: `${ElementAccents[(personalMansion.element as Element) ?? 'air'].primary}20` }]}>
                       <Text style={[styles.personalMansionIndexText, { color: ElementAccents[(personalMansion.element as Element) ?? 'air'].primary }]}>
-                        {personalMansion.index + 1}
+                        #{personalMansion.index + 1}
                       </Text>
                     </View>
                     <View style={styles.personalMansionNames}>
@@ -700,7 +833,7 @@ export default function ManazilScreen() {
                     <View style={[styles.personalMansionElement, { backgroundColor: `${ElementAccents[(personalMansion.element as Element) ?? 'air'].primary}15` }]}>
                       <Text style={styles.personalMansionElementIcon}>{getElementIcon(personalMansion.element)}</Text>
                       <Text style={[styles.personalMansionElementText, { color: ElementAccents[(personalMansion.element as Element) ?? 'air'].primary }]}>
-                        {t(`elements.${personalMansion.element}`)}
+                        {t(`common.elements.${personalMansion.element}`)}
                       </Text>
                     </View>
                   </View>
@@ -733,7 +866,7 @@ export default function ManazilScreen() {
                   <View style={styles.personalMansionFooter}>
                     <Ionicons name="lock-closed" size={12} color={DarkTheme.textTertiary} />
                     <Text style={styles.personalMansionFooterText}>
-                      {lang === 'ar' ? 'ثابت - محسوب من اسمك' : lang === 'fr' ? 'Statique - calculé à partir de votre nom' : 'Static - calculated from your name'}
+                      {t('manazilScreen.fromYourName', { name: profile?.nameAr || t('common.you') })} • {t('manazilScreen.staticNeverChanges')}
                     </Text>
                   </View>
                 </View>
@@ -744,6 +877,90 @@ export default function ManazilScreen() {
               </View>
             )}
           </View>
+
+          {/* Mansion Relationship (between Personal Mansion and Meaning) */}
+          {todayMansion && personalMansion && elementalStatus ? (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>🔗 {t('manazilScreen.relationship.title')}</Text>
+              <Text style={styles.sectionSubtitle}>{t('manazilScreen.relationship.subtitle')}</Text>
+              <View style={styles.relationshipCard}>
+                <View style={styles.elementComparison}>
+                  <View style={styles.elementBox}>
+                    <Text style={styles.elementLabel}>{t('manazilScreen.relationship.yourEssence')}</Text>
+                    <View style={styles.elementBadge}>
+                      <Text style={styles.elementIcon}>{getElementIcon(personalMansion.element as Element)}</Text>
+                      <Text style={styles.elementName}>{t(`common.elements.${personalMansion.element}`)}</Text>
+                    </View>
+                    <Text style={styles.mansionNameSmall}>{personalMansion.nameTransliteration}</Text>
+                  </View>
+
+                  <Ionicons name="arrow-forward" size={22} color="#4FACFE" />
+
+                  <View style={styles.elementBox}>
+                    <Text style={styles.elementLabel}>{t('manazilScreen.relationship.currentMoon')}</Text>
+                    <View style={styles.elementBadge}>
+                      <Text style={styles.elementIcon}>{getElementIcon(todayMansion.element as Element)}</Text>
+                      <Text style={styles.elementName}>{t(`common.elements.${todayMansion.element}`)}</Text>
+                    </View>
+                    <Text style={styles.mansionNameSmall}>{todayMansion.nameTransliteration}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.relationshipAnalysis}>
+                  <View style={[styles.statusIndicator, { backgroundColor: elementalStatus.color }]}
+                  >
+                    <Text style={styles.statusIndicatorIcon}>{elementalStatus.icon}</Text>
+                    <Text style={styles.statusIndicatorText}>{elementalStatus.label}</Text>
+                  </View>
+                  <Text style={styles.relationshipExplanation}>
+                    {elementalStatus.description}
+                  </Text>
+                </View>
+
+                {elementalStatus.status !== 'harmonious' ? (
+                  <View style={styles.navigationGuide}>
+                    <Text style={styles.guideTitle}>💡 {t('manazilScreen.relationship.howToNavigate')}</Text>
+                    {getNavigationGuidance(elementalStatus.status, t).map((tip, index) => (
+                      <View key={index} style={styles.tipRow}>
+                        <Text style={styles.tipBullet}>•</Text>
+                        <Text style={styles.tipText}>{tip}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
+
+                <View style={styles.bestCompatibility}>
+                  <Text style={styles.compatibilityTitle}>🌟 {t('manazilScreen.relationship.bestCompatibility')}</Text>
+                  <Text style={styles.compatibilityText}>
+                    {t('manazilScreen.relationship.whenMoonIn', { element: t(`common.elements.${personalMansion.element}`) })}
+                  </Text>
+                  {nextMatchingMoonDate ? (
+                    <View style={styles.nextMoonRow}>
+                      <Ionicons name="calendar" size={16} color="#4FACFE" />
+                      <Text style={styles.nextMoonText}>
+                        {t('manazilScreen.relationship.nextMoon', {
+                          element: t(`common.elements.${personalMansion.element}`),
+                          relativeTime: getRelativeTimeText(nextMatchingMoonDate, now, t),
+                          date: nextMatchingMoonDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                        })}
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+              </View>
+            </View>
+          ) : null}
+
+          {/* Personal Message (separate from Mansion Wisdom) */}
+          {todayMansion && personalMansion ? (
+            <View style={styles.section}>
+              <PersonalMessageCard
+                todayMansion={todayMansion}
+                personalMansion={personalMansion}
+                t={t}
+              />
+            </View>
+          ) : null}
 
           {/* Meaning */}
           {todayMansion && guidance && (
@@ -803,24 +1020,6 @@ export default function ManazilScreen() {
             </View>
           ) : null}
 
-          {/* Asrariya Timing Analysis - Lunar Mansion Specific */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>{t('asrariya.timingAnalysis')}</Text>
-            </View>
-            <TimingAnalysisSection
-              context="manazil"
-              location={
-                typeof profile?.location?.latitude === 'number' && typeof profile?.location?.longitude === 'number'
-                  ? { latitude: profile.location.latitude, longitude: profile.location.longitude }
-                  : undefined
-              }
-            />
-          </View>
-
-          {/* Enhanced Planetary Strength Analysis */}
-          <DailyPlanetaryAnalysisDisplay expanded={true} />
-
           {/* Inner work */}
           {todayMansion && guidance && (
             <View style={styles.section}>
@@ -841,6 +1040,62 @@ export default function ManazilScreen() {
               </View>
             </View>
           )}
+
+          {/* Need Timing Guidance? (use the dedicated timing screens) */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('manazilScreen.needTimingGuidanceTitle')}</Text>
+            <Text style={styles.metaText}>{t('manazilScreen.needTimingGuidanceSubtitle')}</Text>
+
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={styles.timingLinkCard}
+              onPress={() => router.push('/(tabs)/daily-guidance-details')}
+            >
+              <View style={styles.timingLinkRow}>
+                <View style={styles.timingLinkLeft}>
+                  <Ionicons name="calendar" size={28} color="#4FACFE" />
+                  <View style={styles.timingLinkTextCol}>
+                    <Text style={styles.timingLinkTitle}>{t('manazilScreen.dailyEnergyLinkTitle')}</Text>
+                    <Text style={styles.timingLinkSubtitle}>{t('manazilScreen.dailyEnergyLinkSubtitle')}</Text>
+                  </View>
+                </View>
+                <View style={styles.timingLinkRight}>
+                  <View style={[styles.scoreCircle, { borderColor: getScoreColor(dailyEnergyScore) }]}>
+                    <Text style={[styles.scoreValue, { color: getScoreColor(dailyEnergyScore) }]}>
+                      {typeof dailyEnergyScore === 'number' ? `${dailyEnergyScore}%` : '--'}
+                    </Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={18} color={DarkTheme.textSecondary} />
+                </View>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={styles.timingLinkCard}
+              onPress={() => router.push('/(tabs)/moment-alignment-detail')}
+            >
+              <View style={styles.timingLinkRow}>
+                <View style={styles.timingLinkLeft}>
+                  <Ionicons name="flash" size={28} color="#9C27B0" />
+                  <View style={styles.timingLinkTextCol}>
+                    <Text style={styles.timingLinkTitle}>{t('manazilScreen.momentAlignmentLinkTitle')}</Text>
+                    <Text style={styles.timingLinkSubtitle}>{t('manazilScreen.momentAlignmentLinkSubtitle')}</Text>
+                  </View>
+                </View>
+                <View style={styles.timingLinkRight}>
+                  <View style={[styles.scoreCircle, { borderColor: getScoreColor(momentAlignmentScore) }]}>
+                    <Text style={[styles.scoreValue, { color: getScoreColor(momentAlignmentScore) }]}>
+                      {typeof momentAlignmentScore === 'number' ? `${momentAlignmentScore}%` : '--'}
+                    </Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={18} color={DarkTheme.textSecondary} />
+                </View>
+              </View>
+            </TouchableOpacity>
+
+            <Text style={styles.timingGuidanceNote}>{t('manazilScreen.timingGuidanceNote')}</Text>
+          </View>
 
           <View style={{ height: 24 }} />
         </ScrollView>
@@ -868,37 +1123,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: DarkTheme.borderSubtle,
-    backgroundColor: DarkTheme.screenBackground,
+    paddingBottom: Spacing.md,
   },
   backButton: {
-    padding: Spacing.sm,
-    marginLeft: -Spacing.sm,
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTextContainer: {
     flex: 1,
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: Typography.h3,
+    fontSize: Typography.h2,
     fontWeight: Typography.weightSemibold,
     color: DarkTheme.textPrimary,
   },
   headerSubtitle: {
+    marginTop: 2,
     fontSize: Typography.caption,
     color: DarkTheme.textSecondary,
+  },
+  headerLiveIndicator: {
     marginTop: 2,
+    fontSize: 11,
+    color: '#3b82f6',
+    fontWeight: Typography.weightSemibold,
+    letterSpacing: 0.4,
   },
   placeholder: {
-    width: 40,
+    width: 44,
+    height: 44,
   },
   scrollView: {
     flex: 1,
   },
   content: {
     padding: Spacing.lg,
+    paddingBottom: Spacing.xl,
   },
   section: {
     marginBottom: Spacing.xl,
@@ -907,10 +1170,17 @@ const styles = StyleSheet.create({
     fontSize: Typography.h3,
     fontWeight: Typography.weightSemibold,
     color: DarkTheme.textPrimary,
-    marginBottom: Spacing.md,
-    letterSpacing: 0.3,
   },
-  statusBadge: {
+  sectionSubtitle: {
+    marginTop: 6,
+    fontSize: Typography.label,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  elementalStatusWrap: {
+    marginBottom: Spacing.xl,
+  },
+  elementalStatusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.md,
@@ -918,17 +1188,21 @@ const styles = StyleSheet.create({
     borderRadius: Borders.radiusCircle,
     borderWidth: 1,
     alignSelf: 'flex-start',
-    marginBottom: Spacing.xl,
+    backgroundColor: DarkTheme.cardBackground,
   },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: Spacing.sm,
+  elementalStatusIcon: {
+    fontSize: 14,
+    marginRight: 8,
   },
-  statusText: {
+  elementalStatusLabel: {
     fontSize: Typography.label,
     fontWeight: Typography.weightSemibold,
+  },
+  elementalStatusDescription: {
+    marginTop: 8,
+    fontSize: Typography.caption,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
   },
   card: {
     backgroundColor: DarkTheme.cardBackground,
@@ -1074,6 +1348,240 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
     opacity: 0.8,
   },
+  relationshipCard: {
+    backgroundColor: DarkTheme.cardBackground,
+    borderRadius: Borders.radiusLg,
+    padding: Spacing.lg,
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+  },
+  elementComparison: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.lg,
+  },
+  elementBox: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  elementLabel: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textSecondary,
+    marginBottom: 8,
+  },
+  elementBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: Borders.radiusCircle,
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+    backgroundColor: DarkTheme.screenBackground,
+  },
+  elementIcon: {
+    fontSize: 16,
+  },
+  elementName: {
+    fontSize: Typography.label,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+  },
+  mansionNameSmall: {
+    marginTop: 8,
+    fontSize: Typography.caption,
+    color: DarkTheme.textSecondary,
+  },
+  relationshipAnalysis: {
+    borderTopWidth: 1,
+    borderTopColor: DarkTheme.borderSubtle,
+    paddingTop: Spacing.md,
+  },
+  statusIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: Borders.radiusCircle,
+    marginBottom: Spacing.sm,
+  },
+  statusIndicatorIcon: {
+    fontSize: 14,
+    color: '#0b1220',
+  },
+  statusIndicatorText: {
+    fontSize: Typography.caption,
+    fontWeight: Typography.weightSemibold,
+    color: '#0b1220',
+  },
+  relationshipExplanation: {
+    fontSize: Typography.label,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  navigationGuide: {
+    marginTop: Spacing.lg,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: DarkTheme.borderSubtle,
+  },
+  guideTitle: {
+    fontSize: Typography.label,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    marginBottom: Spacing.sm,
+  },
+  tipRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 6,
+  },
+  tipBullet: {
+    width: 14,
+    color: DarkTheme.textSecondary,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: Typography.label,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  bestCompatibility: {
+    marginTop: Spacing.lg,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: DarkTheme.borderSubtle,
+  },
+  compatibilityTitle: {
+    fontSize: Typography.label,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    marginBottom: 6,
+  },
+  compatibilityText: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+  },
+  nextMoonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: Spacing.sm,
+  },
+  nextMoonText: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textSecondary,
+  },
+
+  personalMessageCard: {
+    backgroundColor: DarkTheme.cardBackground,
+    borderRadius: Borders.radiusLg,
+    padding: Spacing.lg,
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+  },
+  personalMessageHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  personalMessageTitle: {
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+  },
+  personalMessageSubtitle: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textSecondary,
+    marginBottom: Spacing.sm,
+  },
+  personalMessageText: {
+    fontSize: Typography.label,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  personalMessageStatusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: Borders.radiusCircle,
+    borderWidth: 1,
+    backgroundColor: DarkTheme.screenBackground,
+  },
+  personalMessageStatusIcon: {
+    fontSize: 12,
+  },
+  personalMessageStatusText: {
+    fontSize: Typography.caption,
+    fontWeight: Typography.weightSemibold,
+  },
+  timingLinkCard: {
+    backgroundColor: DarkTheme.cardBackground,
+    borderRadius: Borders.radiusLg,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+    marginTop: Spacing.md,
+  },
+  timingLinkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  timingLinkTextCol: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  timingLinkLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  timingLinkRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  timingLinkTitle: {
+    fontSize: 15,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    marginBottom: 2,
+  },
+  timingLinkSubtitle: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 16,
+  },
+  scoreCircle: {
+    minWidth: 54,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: DarkTheme.screenBackground,
+  },
+  scoreValue: {
+    fontSize: Typography.caption,
+    fontWeight: Typography.weightSemibold,
+  },
+  timingGuidanceNote: {
+    marginTop: Spacing.md,
+    fontSize: Typography.caption,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+    opacity: 0.9,
+  },
   subCard: {
     marginTop: Spacing.md,
     paddingTop: Spacing.md,
@@ -1139,7 +1647,82 @@ const styles = StyleSheet.create({
     padding: Spacing.xs,
   },
   sourceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: Spacing.sm,
+  },
+  heroLiveText: {
+    fontSize: 11,
+    color: DarkTheme.textSecondary,
+    opacity: 0.85,
+  },
+
+  moonStrengthBlock: {
+    marginBottom: Spacing.md,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Borders.radiusMd,
+    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.18)',
+  },
+  moonStrengthHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  moonStrengthLabel: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textSecondary,
+  },
+  moonStrengthValue: {
+    fontSize: Typography.label,
+    fontWeight: Typography.weightSemibold,
+  },
+  moonStrengthTrack: {
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: DarkTheme.borderSubtle,
+    overflow: 'hidden',
+  },
+  moonStrengthFill: {
+    height: 8,
+    borderRadius: 999,
+  },
+
+  mansionMetaRow: {
+    marginTop: Spacing.sm,
+    gap: 6,
+  },
+  metaItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  metaItemText: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textSecondary,
+    opacity: 0.9,
+  },
+
+  cosmicDialogueBlock: {
+    marginTop: Spacing.md,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: DarkTheme.borderSubtle,
+  },
+  cosmicDialogueTitle: {
+    fontSize: Typography.label,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    marginBottom: 6,
+  },
+  cosmicDialogueText: {
+    fontSize: Typography.label,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
   },
   sourceBadge: {
     flexDirection: 'row',

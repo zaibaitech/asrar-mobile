@@ -9,6 +9,7 @@ import {
     analyzeDailyPlanets,
     calculateDailyPlanetaryScore,
     findBestHoursToday,
+    getDailyScoreBreakdown,
     type DailyPlanetaryAnalysis,
 } from '@/services/DailyPlanetaryAnalysisService';
 import { getAllTransits } from '@/services/TransitService';
@@ -64,8 +65,25 @@ export function useDailyPlanetaryAnalysis(): UseDailyAnalysisResult {
         new Date() // Pass current date for day ruler calculation
       );
 
+      // Calculate weighted daily score and breakdown
+      // CRITICAL: Uses 50% day ruler + 30% moon + 20% others formula
+      const currentDate = new Date();
+      const dailyScoreValue = calculateDailyPlanetaryScore(analysisResult, currentDate);
+      const breakdown = getDailyScoreBreakdown(analysisResult, currentDate);
+      
+      // IMPORTANT: Attach score to analysis object for frontend consumption
+      // Frontend: getDailyEnergyScore() returns this weighted value (56% not 51%)
+      analysisResult.dailyScore = dailyScoreValue;
+      analysisResult.scoreBreakdown = breakdown;
+      
+      // Debug logging to verify weighted calculation is applied correctly
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Daily Planetary Analysis] Weighted score:', dailyScoreValue, '% (50% day ruler + 30% moon + 20% others)');
+        console.log('[Daily Planetary Analysis] Breakdown:', breakdown);
+      }
+
       setAnalysis(analysisResult);
-      setDailyScore(calculateDailyPlanetaryScore(analysisResult));
+      setDailyScore(dailyScoreValue);
       setBestHours(findBestHoursToday(analysisResult));
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unknown error'));
@@ -122,11 +140,12 @@ export function useDailyScoreOnly() {
             Jupiter: transits.Jupiter,
             Saturn: transits.Saturn,
           },
-          transits.Sun
+          transits.Sun,
+          new Date()
         );
 
         if (isMounted) {
-          setScore(calculateDailyPlanetaryScore(analysis));
+          setScore(calculateDailyPlanetaryScore(analysis, new Date()));
           setLoading(false);
         }
       } catch {

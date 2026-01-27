@@ -8,7 +8,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "typecheck:app": "tsc -p tsconfig.app.json --noEmit",
-    "typecheck:caching": "tsc -p tsconfig.caching.json --noEmit"
+    "typecheck:caching": "tsc -p tsconfig.caching.json --noEmit",
+    "test:tier1": "ts-node scripts/test-tier1-cosmic-quality.ts"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
