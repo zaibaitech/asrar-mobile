@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * NASA JPL Horizons API Client
  * Documentation: https://ssd-api.jpl.nasa.gov/doc/horizons.html

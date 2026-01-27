@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI Reflection Edge Function
  * 

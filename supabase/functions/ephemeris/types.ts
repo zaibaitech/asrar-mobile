@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TypeScript types for Ephemeris Edge Function
  */

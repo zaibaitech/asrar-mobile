@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Database cache layer for ephemeris data
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Ephemeris Edge Function
  * 

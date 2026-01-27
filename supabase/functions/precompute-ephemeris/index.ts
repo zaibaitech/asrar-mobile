@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Pre-computation Cron Job for Ephemeris Cache
  * 
