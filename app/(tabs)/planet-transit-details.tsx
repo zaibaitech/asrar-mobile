@@ -4,17 +4,17 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import type { Element } from '@/services/MomentAlignmentService';
 import {
-    calculatePlanetaryHours,
-    getPlanetaryDayBoundariesForNow,
-    type Planet,
-    type PlanetaryHourData
+  calculatePlanetaryHours,
+  getPlanetaryDayBoundariesForNow,
+  type Planet,
+  type PlanetaryHourData
 } from '@/services/PlanetaryHoursService';
 import {
-    getDegreeStageColor,
-    getDegreeStageIcon,
-    getInfluenceTypeColor,
-    getPersonalizedInfluence,
-    type PersonalizedInfluence
+  getDegreeStageColor,
+  getDegreeStageIcon,
+  getInfluenceTypeColor,
+  getPersonalizedInfluence,
+  type PersonalizedInfluence
 } from '@/services/PlanetaryInfluenceService';
 import { calculateEnhancedPlanetaryPower } from '@/services/PlanetaryStrengthService';
 import { ZODIAC_DATA, type PlanetTransitInfo, type ZodiacSign as ZodiacKey } from '@/services/PlanetTransitService';
@@ -30,18 +30,18 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-    Animated,
-    LayoutAnimation,
-    Platform,
-    RefreshControl,
-    SafeAreaView,
-    ScrollView,
-    StyleProp,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    ViewStyle,
+  Animated,
+  LayoutAnimation,
+  Platform,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
@@ -378,6 +378,879 @@ function getPlanetSpiritualData(
     timingStrength,
     isInMatchingHour,
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPREHENSIVE PLANET-SPECIFIC PRACTICES
+// Divine names, essences, talismans, angels, timing, and preparation
+// ─────────────────────────────────────────────────────────────────────────────
+
+type DivineName = {
+  id: string;
+  name: string;
+  nameAr: string;
+  transliteration: string;
+  count: number;
+  purpose: string;
+  purposeAr: string;
+  category: string;
+  icon: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+};
+
+type Essence = {
+  name: string;
+  nameAr: string;
+  transliteration: string;
+  purpose: string;
+  icon: string;
+};
+
+type Talisman = {
+  format: string;
+  formatAr: string;
+  description: string;
+  descriptionAr: string;
+  bestDay: string;
+  bestDayAr: string;
+  bestHour: string;
+  bestHourAr: string;
+};
+
+type Angel = {
+  name: string;
+  nameAr: string;
+  role: string;
+  roleAr: string;
+  advanced: boolean;
+};
+
+type PlanetPractices = {
+  planet: string;
+  planetAr: string;
+  element: Element;
+  divineNames: DivineName[];
+  essences: Essence[];
+  talisman: Talisman;
+  angels: Angel[];
+  timing: {
+    best: string[];
+    bestAr: string[];
+  };
+  preparation: {
+    steps: string[];
+    stepsAr: string[];
+  };
+};
+
+const PLANET_PRACTICES: Record<string, PlanetPractices> = {
+  jupiter: {
+    planet: 'Jupiter',
+    planetAr: 'المشتري',
+    element: 'water',
+    divineNames: [
+      {
+        id: 'protection',
+        name: 'Yā Muhayminu',
+        nameAr: 'يَا مُهَيْمِنُ',
+        transliteration: 'Yā Muhayminu',
+        count: 135,
+        purpose: 'Divine protection and guardianship',
+        purposeAr: 'الحماية والوصاية الإلهية',
+        category: 'Protection',
+        icon: '🛡️',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'taskheer',
+        name: 'Yā Ḥalīmu',
+        nameAr: 'يَا حَلِيمُ',
+        transliteration: 'Yā Ḥalīmu',
+        count: 150,
+        purpose: 'Attracting favor, softening hearts (Taskhīr)',
+        purposeAr: 'جذب المحبة، تليين القلوب (تسخير)',
+        category: 'Influence',
+        icon: '🤝',
+        difficulty: 'intermediate'
+      },
+      {
+        id: 'accounting',
+        name: 'Yā Muḥṣī',
+        nameAr: 'يَا مُحْصِي',
+        transliteration: 'Yā Muḥṣī',
+        count: 117,
+        purpose: 'Divine accounting, keeping track',
+        purposeAr: 'الإحصاء الإلهي',
+        category: 'Clarity',
+        icon: '💰',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'ijaba',
+        name: 'Yā Samīʿu',
+        nameAr: 'يَا سَمِيعُ',
+        transliteration: 'Yā Samīʿu',
+        count: 180,
+        purpose: 'Having prayers answered (Ijābah)',
+        purposeAr: 'إجابة الدعاء',
+        category: 'Prayer',
+        icon: '🙏',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'haiba',
+        name: 'Yā Mutakabbiru',
+        nameAr: 'يَا مُتَكَبِّرُ',
+        transliteration: 'Yā Mutakabbiru',
+        count: 662,
+        purpose: 'Commanding respect, dignified presence (Haybah)',
+        purposeAr: 'الهيبة والوقار',
+        category: 'Dignity',
+        icon: '👑',
+        difficulty: 'advanced'
+      },
+      {
+        id: 'leadership',
+        name: 'Yā ʿAzīzu',
+        nameAr: 'يَا عَزِيزُ',
+        transliteration: 'Yā ʿAzīzu',
+        count: 93,
+        purpose: 'Strength in leadership, personal growth',
+        purposeAr: 'القيادة والنمو الشخصي',
+        category: 'Leadership',
+        icon: '📈',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'rights',
+        name: 'Yā Muhayminu',
+        nameAr: 'يَا مُهَيْمِنُ',
+        transliteration: 'Yā Muhayminu',
+        count: 108,
+        purpose: 'Restoring respect, reclaiming rights',
+        purposeAr: 'استرجاع الحقوق والاحترام',
+        category: 'Justice',
+        icon: '⚖️',
+        difficulty: 'intermediate'
+      },
+      {
+        id: 'career',
+        name: 'Yā Bāqī',
+        nameAr: 'يَا بَاقِي',
+        transliteration: 'Yā Bāqī',
+        count: 113,
+        purpose: 'Strengthening job role, establishing firm position',
+        purposeAr: 'تثبيت الوظيفة والمنصب',
+        category: 'Career',
+        icon: '💼',
+        difficulty: 'intermediate'
+      }
+    ],
+    essences: [
+      {
+        name: 'Camphor',
+        nameAr: 'كافور',
+        transliteration: 'Kāfūr',
+        purpose: 'Cooling, purifying',
+        icon: '🌿'
+      },
+      {
+        name: 'Oud/Agarwood',
+        nameAr: 'عود',
+        transliteration: 'ʿŪd',
+        purpose: 'Grounding, sacred',
+        icon: '🪵'
+      },
+      {
+        name: 'Jawiya',
+        nameAr: 'جاوية',
+        transliteration: 'Jāwiya',
+        purpose: 'Spiritual elevation',
+        icon: '🌸'
+      },
+      {
+        name: 'Mastic',
+        nameAr: 'مستكى',
+        transliteration: 'Mastakā',
+        purpose: 'Clarity, focus',
+        icon: '💎'
+      }
+    ],
+    talisman: {
+      format: 'Murabbaʿa',
+      formatAr: 'المربعة',
+      description: '4×4 square talisman',
+      descriptionAr: 'تعويذة مربعة ٤×٤',
+      bestDay: 'Thursday',
+      bestDayAr: 'الخميس',
+      bestHour: 'Jupiter hour',
+      bestHourAr: 'ساعة المشتري'
+    },
+    angels: [
+      {
+        name: 'Israfil',
+        nameAr: 'إسرافيل',
+        role: 'Angel of the trumpet',
+        roleAr: 'ملاك الصور',
+        advanced: true
+      },
+      {
+        name: 'Samharusi',
+        nameAr: 'سمهروسي',
+        role: 'Spiritual entity of Jupiter',
+        roleAr: 'الكيان الروحاني للمشتري',
+        advanced: true
+      }
+    ],
+    timing: {
+      best: [
+        'Jupiter hour (check Planetary Hours section)',
+        'Thursday (Jupiter\'s day)',
+        'During waxing moon',
+        'When Jupiter is well-placed in your chart'
+      ],
+      bestAr: [
+        'ساعة المشتري (راجع قسم الساعات الكوكبية)',
+        'يوم الخميس (يوم المشتري)',
+        'أثناء القمر المتزايد',
+        'عندما يكون المشتري في وضع جيد في برجك'
+      ]
+    },
+    preparation: {
+      steps: [
+        'Perform wuḍūʾ (ritual ablution)',
+        'Face Qiblah if possible',
+        'Light recommended incense',
+        'Sit in quiet, clean space',
+        'Set clear intention (niyyah)'
+      ],
+      stepsAr: [
+        'توضأ (الوضوء الشرعي)',
+        'واجه القبلة إن أمكن',
+        'أشعل البخور الموصى به',
+        'اجلس في مكان هادئ ونظيف',
+        'اضبط نيتك بوضوح'
+      ]
+    }
+  },
+  sun: {
+    planet: 'Sun',
+    planetAr: 'الشمس',
+    element: 'fire',
+    divineNames: [
+      {
+        id: 'clarity',
+        name: 'Yā Nūr',
+        nameAr: 'يَا نُور',
+        transliteration: 'Yā Nūr',
+        count: 256,
+        purpose: 'Divine light, clarity of vision and purpose',
+        purposeAr: 'النور الإلهي، وضوح الرؤية والهدف',
+        category: 'Clarity',
+        icon: '☀️',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'vitality',
+        name: 'Yā Ḥayy',
+        nameAr: 'يَا حَيّ',
+        transliteration: 'Yā Ḥayy',
+        count: 18,
+        purpose: 'Life force, vitality, and energy',
+        purposeAr: 'قوة الحياة، الحيوية والطاقة',
+        category: 'Vitality',
+        icon: '⚡',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'leadership',
+        name: 'Yā Malik',
+        nameAr: 'يَا مَلِك',
+        transliteration: 'Yā Malik',
+        count: 90,
+        purpose: 'Divine sovereignty, leadership authority',
+        purposeAr: 'السيادة الإلهية، سلطة القيادة',
+        category: 'Leadership',
+        icon: '👑',
+        difficulty: 'intermediate'
+      }
+    ],
+    essences: [
+      {
+        name: 'Frankincense',
+        nameAr: 'لبان',
+        transliteration: 'Lubān',
+        purpose: 'Elevating, purifying',
+        icon: '🕯️'
+      },
+      {
+        name: 'Saffron',
+        nameAr: 'زعفران',
+        transliteration: 'Zaʿfarān',
+        purpose: 'Solar warmth, joy',
+        icon: '🌻'
+      }
+    ],
+    talisman: {
+      format: 'Khātam Sulaymān',
+      formatAr: 'خاتم سليمان',
+      description: 'Seal of Solomon, 6-pointed star',
+      descriptionAr: 'خاتم سليمان، نجمة سداسية',
+      bestDay: 'Sunday',
+      bestDayAr: 'الأحد',
+      bestHour: 'Sun hour',
+      bestHourAr: 'ساعة الشمس'
+    },
+    angels: [
+      {
+        name: 'Mikā\'īl',
+        nameAr: 'ميكائيل',
+        role: 'Angel of sustenance',
+        roleAr: 'ملاك الرزق',
+        advanced: false
+      }
+    ],
+    timing: {
+      best: [
+        'Sunday (Sun\'s day)',
+        'Sun hour (sunrise + solar hours)',
+        'During solar noon',
+        'At dawn for new beginnings'
+      ],
+      bestAr: [
+        'يوم الأحد (يوم الشمس)',
+        'ساعة الشمس (شروق الشمس + الساعات الشمسية)',
+        'أثناء الظهيرة الشمسية',
+        'عند الفجر للبدايات الجديدة'
+      ]
+    },
+    preparation: {
+      steps: [
+        'Perform wuḍūʾ (ritual ablution)',
+        'Face east (direction of sunrise)',
+        'Light solar incense (frankincense)',
+        'Wear clean, light-colored clothing',
+        'Set intention for clarity and purpose'
+      ],
+      stepsAr: [
+        'توضأ (الوضوء الشرعي)',
+        'واجه الشرق (اتجاه شروق الشمس)',
+        'أشعل البخور الشمسي (لبان)',
+        'ارتدِ ملابس نظيفة فاتحة اللون',
+        'اضبط نيتك للوضوح والهدف'
+      ]
+    }
+  },
+  moon: {
+    planet: 'Moon',
+    planetAr: 'القمر',
+    element: 'water',
+    divineNames: [
+      {
+        id: 'gentleness',
+        name: 'Yā Laṭīf',
+        nameAr: 'يَا لَطِيف',
+        transliteration: 'Yā Laṭīf',
+        count: 129,
+        purpose: 'Divine gentleness, emotional healing',
+        purposeAr: 'اللطف الإلهي، الشفاء العاطفي',
+        category: 'Healing',
+        icon: '🌙',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'affection',
+        name: 'Yā Wadūd',
+        nameAr: 'يَا وَدُود',
+        transliteration: 'Yā Wadūd',
+        count: 20,
+        purpose: 'Divine love and affection',
+        purposeAr: 'المحبة والمودة الإلهية',
+        category: 'Love',
+        icon: '💚',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'intuition',
+        name: 'Yā ʿAlīm',
+        nameAr: 'يَا عَلِيم',
+        transliteration: 'Yā ʿAlīm',
+        count: 150,
+        purpose: 'Inner knowing, intuitive wisdom',
+        purposeAr: 'المعرفة الداخلية، الحكمة الحدسية',
+        category: 'Wisdom',
+        icon: '🔮',
+        difficulty: 'intermediate'
+      }
+    ],
+    essences: [
+      {
+        name: 'Sandalwood',
+        nameAr: 'صندل',
+        transliteration: 'Ṣandal',
+        purpose: 'Calming, peaceful',
+        icon: '🌾'
+      },
+      {
+        name: 'Jasmine',
+        nameAr: 'ياسمين',
+        transliteration: 'Yāsamīn',
+        purpose: 'Lunar receptivity',
+        icon: '🌼'
+      }
+    ],
+    talisman: {
+      format: 'Hilāl',
+      formatAr: 'الهلال',
+      description: 'Crescent moon talisman',
+      descriptionAr: 'تعويذة الهلال',
+      bestDay: 'Monday',
+      bestDayAr: 'الاثنين',
+      bestHour: 'Moon hour',
+      bestHourAr: 'ساعة القمر'
+    },
+    angels: [
+      {
+        name: 'Jibrīl',
+        nameAr: 'جبريل',
+        role: 'Angel of revelation',
+        roleAr: 'ملاك الوحي',
+        advanced: false
+      }
+    ],
+    timing: {
+      best: [
+        'Monday (Moon\'s day)',
+        'During full moon for completion',
+        'During new moon for new beginnings',
+        'Moon hour (night hours preferred)'
+      ],
+      bestAr: [
+        'يوم الاثنين (يوم القمر)',
+        'أثناء البدر للإكمال',
+        'أثناء المحاق للبدايات الجديدة',
+        'ساعة القمر (الساعات الليلية مفضلة)'
+      ]
+    },
+    preparation: {
+      steps: [
+        'Perform wuḍūʾ (ritual ablution)',
+        'Create peaceful, dimly lit space',
+        'Light lunar incense (sandalwood)',
+        'Sit near water if possible',
+        'Set intention for emotional clarity'
+      ],
+      stepsAr: [
+        'توضأ (الوضوء الشرعي)',
+        'أنشئ مساحة هادئة خافتة الإضاءة',
+        'أشعل البخور القمري (صندل)',
+        'اجلس بالقرب من الماء إن أمكن',
+        'اضبط نيتك للوضوح العاطفي'
+      ]
+    }
+  },
+  mars: {
+    planet: 'Mars',
+    planetAr: 'المريخ',
+    element: 'fire',
+    divineNames: [
+      {
+        id: 'strength',
+        name: 'Yā Qawiyy',
+        nameAr: 'يَا قَوِيّ',
+        transliteration: 'Yā Qawiyy',
+        count: 116,
+        purpose: 'Divine strength, courage in action',
+        purposeAr: 'القوة الإلهية، الشجاعة في العمل',
+        category: 'Strength',
+        icon: '💪',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'protection',
+        name: 'Yā Ḥāfiẓ',
+        nameAr: 'يَا حَافِظ',
+        transliteration: 'Yā Ḥāfiẓ',
+        count: 998,
+        purpose: 'Divine protection, guardian force',
+        purposeAr: 'الحماية الإلهية، القوة الحارسة',
+        category: 'Protection',
+        icon: '🛡️',
+        difficulty: 'intermediate'
+      }
+    ],
+    essences: [
+      {
+        name: 'Dragon\'s Blood',
+        nameAr: 'دم الأخوين',
+        transliteration: 'Dam al-Akhawayn',
+        purpose: 'Protective, energizing',
+        icon: '🔴'
+      },
+      {
+        name: 'Pepper',
+        nameAr: 'فلفل',
+        transliteration: 'Fulful',
+        purpose: 'Activation, courage',
+        icon: '🌶️'
+      }
+    ],
+    talisman: {
+      format: 'Ṭilsam Marbūʿ',
+      formatAr: 'طلسم مربوع',
+      description: 'Square Mars talisman',
+      descriptionAr: 'طلسم المريخ المربع',
+      bestDay: 'Tuesday',
+      bestDayAr: 'الثلاثاء',
+      bestHour: 'Mars hour',
+      bestHourAr: 'ساعة المريخ'
+    },
+    angels: [
+      {
+        name: 'ʿAzrāʾīl',
+        nameAr: 'عزرائيل',
+        role: 'Angel of transformation',
+        roleAr: 'ملاك التحول',
+        advanced: true
+      }
+    ],
+    timing: {
+      best: [
+        'Tuesday (Mars\' day)',
+        'Mars hour (dawn or dusk)',
+        'Waxing moon for growth',
+        'When facing challenges requiring courage'
+      ],
+      bestAr: [
+        'يوم الثلاثاء (يوم المريخ)',
+        'ساعة المريخ (الفجر أو الغسق)',
+        'القمر المتزايد للنمو',
+        'عند مواجهة تحديات تتطلب الشجاعة'
+      ]
+    },
+    preparation: {
+      steps: [
+        'Perform wuḍūʾ (ritual ablution)',
+        'Energize body with movement',
+        'Light protective incense',
+        'Set clear, decisive intention',
+        'Maintain upright, confident posture'
+      ],
+      stepsAr: [
+        'توضأ (الوضوء الشرعي)',
+        'نشّط جسمك بالحركة',
+        'أشعل البخور الحامي',
+        'اضبط نيتك بوضوح وحسم',
+        'حافظ على وضعية مستقيمة وواثقة'
+      ]
+    }
+  },
+  mercury: {
+    planet: 'Mercury',
+    planetAr: 'عطارد',
+    element: 'air',
+    divineNames: [
+      {
+        id: 'knowledge',
+        name: 'Yā ʿAlīm',
+        nameAr: 'يَا عَلِيم',
+        transliteration: 'Yā ʿAlīm',
+        count: 150,
+        purpose: 'Divine knowledge, learning and wisdom',
+        purposeAr: 'العلم الإلهي، التعلم والحكمة',
+        category: 'Knowledge',
+        icon: '📚',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'wisdom',
+        name: 'Yā Ḥakīm',
+        nameAr: 'يَا حَكِيم',
+        transliteration: 'Yā Ḥakīm',
+        count: 78,
+        purpose: 'Divine wisdom, clear communication',
+        purposeAr: 'الحكمة الإلهية، التواصل الواضح',
+        category: 'Wisdom',
+        icon: '🧠',
+        difficulty: 'beginner'
+      }
+    ],
+    essences: [
+      {
+        name: 'Lavender',
+        nameAr: 'خزامى',
+        transliteration: 'Khuzāmā',
+        purpose: 'Mental clarity',
+        icon: '💜'
+      },
+      {
+        name: 'Mint',
+        nameAr: 'نعناع',
+        transliteration: 'Naʿnāʿ',
+        purpose: 'Quick thinking',
+        icon: '🌿'
+      }
+    ],
+    talisman: {
+      format: 'Jadwal',
+      formatAr: 'جدول',
+      description: 'Table/grid talisman',
+      descriptionAr: 'طلسم الجدول',
+      bestDay: 'Wednesday',
+      bestDayAr: 'الأربعاء',
+      bestHour: 'Mercury hour',
+      bestHourAr: 'ساعة عطارد'
+    },
+    angels: [
+      {
+        name: 'Rūḥāniyya ʿUṭārid',
+        nameAr: 'روحانية عطارد',
+        role: 'Mercury\'s spiritual entity',
+        roleAr: 'الكيان الروحاني لعطارد',
+        advanced: true
+      }
+    ],
+    timing: {
+      best: [
+        'Wednesday (Mercury\'s day)',
+        'Mercury hour (morning preferred)',
+        'Before important communications',
+        'When studying or learning'
+      ],
+      bestAr: [
+        'يوم الأربعاء (يوم عطارد)',
+        'ساعة عطارد (الصباح مفضل)',
+        'قبل التواصلات المهمة',
+        'عند الدراسة أو التعلم'
+      ]
+    },
+    preparation: {
+      steps: [
+        'Perform wuḍūʾ (ritual ablution)',
+        'Clear mental space through breath',
+        'Light clarifying incense',
+        'Have writing materials ready',
+        'Set intention for clear understanding'
+      ],
+      stepsAr: [
+        'توضأ (الوضوء الشرعي)',
+        'اصفِ ذهنك من خلال التنفس',
+        'أشعل البخور المنقي',
+        'جهّز مواد الكتابة',
+        'اضبط نيتك للفهم الواضح'
+      ]
+    }
+  },
+  venus: {
+    planet: 'Venus',
+    planetAr: 'الزهرة',
+    element: 'water',
+    divineNames: [
+      {
+        id: 'beauty',
+        name: 'Yā Jamīl',
+        nameAr: 'يَا جَمِيل',
+        transliteration: 'Yā Jamīl',
+        count: 83,
+        purpose: 'Divine beauty, harmony in relationships',
+        purposeAr: 'الجمال الإلهي، الانسجام في العلاقات',
+        category: 'Beauty',
+        icon: '🌹',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'love',
+        name: 'Yā Wadūd',
+        nameAr: 'يَا وَدُود',
+        transliteration: 'Yā Wadūd',
+        count: 20,
+        purpose: 'Divine love and affection',
+        purposeAr: 'المحبة والمودة الإلهية',
+        category: 'Love',
+        icon: '💕',
+        difficulty: 'beginner'
+      }
+    ],
+    essences: [
+      {
+        name: 'Rose',
+        nameAr: 'ورد',
+        transliteration: 'Ward',
+        purpose: 'Love, beauty',
+        icon: '🌹'
+      },
+      {
+        name: 'Amber',
+        nameAr: 'عنبر',
+        transliteration: 'ʿAnbar',
+        purpose: 'Attraction, warmth',
+        icon: '🟡'
+      }
+    ],
+    talisman: {
+      format: 'Khātam Maḥabba',
+      formatAr: 'خاتم المحبة',
+      description: 'Love and harmony seal',
+      descriptionAr: 'خاتم المحبة والوئام',
+      bestDay: 'Friday',
+      bestDayAr: 'الجمعة',
+      bestHour: 'Venus hour',
+      bestHourAr: 'ساعة الزهرة'
+    },
+    angels: [
+      {
+        name: 'Rūḥāniyya Zuhara',
+        nameAr: 'روحانية الزهرة',
+        role: 'Venus\'s spiritual entity',
+        roleAr: 'الكيان الروحاني للزهرة',
+        advanced: true
+      }
+    ],
+    timing: {
+      best: [
+        'Friday (Venus\' day)',
+        'Venus hour (evening preferred)',
+        'During waxing moon',
+        'When seeking harmony in relationships'
+      ],
+      bestAr: [
+        'يوم الجمعة (يوم الزهرة)',
+        'ساعة الزهرة (المساء مفضل)',
+        'أثناء القمر المتزايد',
+        'عند السعي للانسجام في العلاقات'
+      ]
+    },
+    preparation: {
+      steps: [
+        'Perform wuḍūʾ (ritual ablution)',
+        'Create beautiful, harmonious space',
+        'Light sweet-scented incense (rose)',
+        'Wear pleasant fragrances',
+        'Set intention for love and harmony'
+      ],
+      stepsAr: [
+        'توضأ (الوضوء الشرعي)',
+        'أنشئ مساحة جميلة ومتناغمة',
+        'أشعل البخور العطر (ورد)',
+        'ارتدِ روائح لطيفة',
+        'اضبط نيتك للمحبة والانسجام'
+      ]
+    }
+  },
+  saturn: {
+    planet: 'Saturn',
+    planetAr: 'زحل',
+    element: 'earth',
+    divineNames: [
+      {
+        id: 'patience',
+        name: 'Yā Ṣabūr',
+        nameAr: 'يَا صَبُور',
+        transliteration: 'Yā Ṣabūr',
+        count: 298,
+        purpose: 'Divine patience, endurance through trials',
+        purposeAr: 'الصبر الإلهي، التحمل خلال المحن',
+        category: 'Patience',
+        icon: '⏳',
+        difficulty: 'beginner'
+      },
+      {
+        id: 'wisdom',
+        name: 'Yā Ḥakīm',
+        nameAr: 'يَا حَكِيم',
+        transliteration: 'Yā Ḥakīm',
+        count: 78,
+        purpose: 'Divine wisdom through experience',
+        purposeAr: 'الحكمة الإلهية من خلال التجربة',
+        category: 'Wisdom',
+        icon: '🦉',
+        difficulty: 'intermediate'
+      },
+      {
+        id: 'discipline',
+        name: 'Yā Qawiyy',
+        nameAr: 'يَا قَوِيّ',
+        transliteration: 'Yā Qawiyy',
+        count: 116,
+        purpose: 'Inner strength, discipline',
+        purposeAr: 'القوة الداخلية، الانضباط',
+        category: 'Discipline',
+        icon: '🏔️',
+        difficulty: 'intermediate'
+      }
+    ],
+    essences: [
+      {
+        name: 'Myrrh',
+        nameAr: 'مر',
+        transliteration: 'Murr',
+        purpose: 'Protection, grounding',
+        icon: '🟤'
+      },
+      {
+        name: 'Cypress',
+        nameAr: 'سرو',
+        transliteration: 'Sarw',
+        purpose: 'Endurance, stability',
+        icon: '🌲'
+      }
+    ],
+    talisman: {
+      format: 'Khātam Ḥifẓ',
+      formatAr: 'خاتم الحفظ',
+      description: 'Protection and preservation seal',
+      descriptionAr: 'خاتم الحماية والحفظ',
+      bestDay: 'Saturday',
+      bestDayAr: 'السبت',
+      bestHour: 'Saturn hour',
+      bestHourAr: 'ساعة زحل'
+    },
+    angels: [
+      {
+        name: 'ʿAzrāʾīl',
+        nameAr: 'عزرائيل',
+        role: 'Angel of endings and transformation',
+        roleAr: 'ملاك النهايات والتحول',
+        advanced: true
+      }
+    ],
+    timing: {
+      best: [
+        'Saturday (Saturn\'s day)',
+        'Saturn hour (early morning or late night)',
+        'Waning moon for release',
+        'When establishing boundaries or structures'
+      ],
+      bestAr: [
+        'يوم السبت (يوم زحل)',
+        'ساعة زحل (الصباح الباكر أو الليل المتأخر)',
+        'القمر المتناقص للتحرر',
+        'عند وضع الحدود أو الهياكل'
+      ]
+    },
+    preparation: {
+      steps: [
+        'Perform wuḍūʾ (ritual ablution)',
+        'Create simple, austere space',
+        'Light grounding incense (myrrh)',
+        'Maintain disciplined posture',
+        'Set intention for patience and wisdom'
+      ],
+      stepsAr: [
+        'توضأ (الوضوء الشرعي)',
+        'أنشئ مساحة بسيطة ومتقشفة',
+        'أشعل البخور المثبت (مر)',
+        'حافظ على وضعية منضبطة',
+        'اضبط نيتك للصبر والحكمة'
+      ]
+    }
+  }
+};
+
+function getPlanetPractices(planetKey: string | undefined): PlanetPractices | null {
+  if (!planetKey) return null;
+  const key = planetKey.toLowerCase();
+  return PLANET_PRACTICES[key] || null;
 }
 
 function safeJsonParse<T>(value: unknown): T | null {
@@ -2737,6 +3610,509 @@ export default function PlanetTransitDetailsScreen() {
                   <Ionicons name="information-circle-outline" size={12} color={DarkTheme.textTertiary} />
                   <Text style={styles.balancingDisclaimerText}>{t('screens.planetTransit.balancing.disclaimer')}</Text>
                 </View>
+
+                {/* ─────────────────────────────────────────────────────────────────
+                    COMPREHENSIVE PLANET-SPECIFIC PRACTICES
+                    Divine Names, Essences, Talismans, Angels, Timing, Preparation
+                ───────────────────────────────────────────────────────────────── */}
+                {(() => {
+                  const planetPractices = getPlanetPractices(transitData.planetKey);
+                  if (!planetPractices) return null;
+
+                  const [expandedPractice, setExpandedPractice] = React.useState<string | null>(null);
+                  const [expandedEssences, setExpandedEssences] = React.useState(false);
+                  const [expandedTalisman, setExpandedTalisman] = React.useState(false);
+                  const [expandedAngels, setExpandedAngels] = React.useState(false);
+                  const [expandedTiming, setExpandedTiming] = React.useState(false);
+                  const [expandedPreparation, setExpandedPreparation] = React.useState(false);
+
+                  return (
+                    <>
+                      <View style={styles.divider}>
+                        <Text style={styles.dividerText}>
+                          {language === 'ar' ? 'ممارسات خاصة بالكوكب' : language === 'fr' ? 'Pratiques Planétaires Spécifiques' : 'Planet-Specific Practices'}
+                        </Text>
+                      </View>
+
+                      {/* Divine Names Section */}
+                      <View style={styles.practicesSection}>
+                        <View style={styles.practicesSectionHeader}>
+                          <Ionicons name="star" size={16} color="#FFD700" />
+                          <Text style={styles.practicesSectionTitle}>
+                            {language === 'ar' ? 'الأسماء الإلهية' : language === 'fr' ? 'Noms Divins' : 'Divine Names'}
+                          </Text>
+                        </View>
+                        <Text style={styles.practicesSectionDesc}>
+                          {language === 'ar' 
+                            ? `أسماء الله الحسنى الموصى بها لطاقة ${planetPractices.planetAr}`
+                            : language === 'fr'
+                            ? `Noms divins recommandés pour l'énergie de ${planetPractices.planet}`
+                            : `Divine names recommended for ${planetPractices.planet} energy`}
+                        </Text>
+
+                        {planetPractices.divineNames.map((divineName) => (
+                          <TouchableOpacity
+                            key={divineName.id}
+                            style={styles.practiceCard}
+                            onPress={() => {
+                              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                              setExpandedPractice(expandedPractice === divineName.id ? null : divineName.id);
+                            }}
+                            activeOpacity={0.8}
+                          >
+                            <View style={styles.practiceCardHeader}>
+                              <Text style={styles.practiceIcon}>{divineName.icon}</Text>
+                              <View style={styles.practiceCardTitles}>
+                                <Text style={styles.practiceCardCategory}>
+                                  {language === 'ar' ? `للـ ${divineName.category}` : `For ${divineName.category}`}
+                                </Text>
+                                <Text style={styles.practiceCardNameAr}>{divineName.nameAr}</Text>
+                                <Text style={styles.practiceCardName}>{divineName.transliteration}</Text>
+                              </View>
+                              <View style={[
+                                styles.practiceDifficultyBadge,
+                                divineName.difficulty === 'beginner' && { backgroundColor: 'rgba(76, 175, 80, 0.2)' },
+                                divineName.difficulty === 'intermediate' && { backgroundColor: 'rgba(255, 193, 7, 0.2)' },
+                                divineName.difficulty === 'advanced' && { backgroundColor: 'rgba(156, 39, 176, 0.2)' },
+                              ]}>
+                                <Text style={[
+                                  styles.practiceDifficultyText,
+                                  divineName.difficulty === 'beginner' && { color: '#4CAF50' },
+                                  divineName.difficulty === 'intermediate' && { color: '#FFC107' },
+                                  divineName.difficulty === 'advanced' && { color: '#9C27B0' },
+                                ]}>
+                                  ⭐{divineName.difficulty === 'beginner' ? '' : divineName.difficulty === 'intermediate' ? '⭐' : '⭐⭐'}
+                                </Text>
+                              </View>
+                            </View>
+
+                            {expandedPractice === divineName.id && (
+                              <View style={styles.practiceCardContent}>
+                                <View style={styles.practiceCountRow}>
+                                  <Ionicons name="repeat" size={16} color={accent.primary} />
+                                  <Text style={styles.practiceCountLabel}>
+                                    {language === 'ar' ? 'التكرارات:' : language === 'fr' ? 'Répétitions:' : 'Repetitions:'}
+                                  </Text>
+                                  <Text style={styles.practiceCountValue}>{divineName.count}×</Text>
+                                </View>
+
+                                <View style={styles.practicePurposeBox}>
+                                  <Text style={styles.practicePurposeLabel}>
+                                    {language === 'ar' ? '🎯 الغرض' : language === 'fr' ? '🎯 Objectif' : '🎯 Purpose'}
+                                  </Text>
+                                  <Text style={styles.practicePurposeText}>
+                                    {language === 'ar' ? divineName.purposeAr : divineName.purpose}
+                                  </Text>
+                                </View>
+
+                                {/* Duration Estimate */}
+                                <View style={styles.practiceDurationRow}>
+                                  <Ionicons name="time-outline" size={14} color={DarkTheme.textTertiary} />
+                                  <Text style={styles.practiceDurationText}>
+                                    {language === 'ar' ? 'المدة المقدرة:' : language === 'fr' ? 'Durée:' : 'Duration:'} ~{Math.ceil(divineName.count / 30)} {language === 'ar' ? 'دقائق' : language === 'fr' ? 'min' : 'min'}
+                                  </Text>
+                                </View>
+
+                                {/* How to Practice */}
+                                <View style={styles.practiceHowToBox}>
+                                  <Text style={styles.practiceHowToLabel}>
+                                    {language === 'ar' ? '💡 كيفية الممارسة' : language === 'fr' ? '💡 Comment Pratiquer' : '💡 How to Practice'}
+                                  </Text>
+                                  <View style={styles.practiceHowToStep}>
+                                    <Text style={styles.practiceHowToBullet}>1.</Text>
+                                    <Text style={styles.practiceHowToText}>
+                                      {language === 'ar' ? 'توضأ وواجه القبلة' : language === 'fr' ? 'Faire wuḍūʾ et faire face à la Qiblah' : 'Complete wuḍūʾ and face Qiblah'}
+                                    </Text>
+                                  </View>
+                                  <View style={styles.practiceHowToStep}>
+                                    <Text style={styles.practiceHowToBullet}>2.</Text>
+                                    <Text style={styles.practiceHowToText}>
+                                      {language === 'ar' ? 'اجلس في مكان هادئ ونظيف' : language === 'fr' ? 'S\'asseoir dans un espace calme' : 'Sit in quiet, clean space'}
+                                    </Text>
+                                  </View>
+                                  <View style={styles.practiceHowToStep}>
+                                    <Text style={styles.practiceHowToBullet}>3.</Text>
+                                    <Text style={styles.practiceHowToText}>
+                                      {language === 'ar' ? `اضبط نيتك لـ${divineName.category}` : language === 'fr' ? `Définir l'intention pour ${divineName.category}` : `Set intention for ${divineName.category}`}
+                                    </Text>
+                                  </View>
+                                  <View style={styles.practiceHowToStep}>
+                                    <Text style={styles.practiceHowToBullet}>4.</Text>
+                                    <Text style={styles.practiceHowToText}>
+                                      {language === 'ar' ? 'اتلُ بتركيز وخشوع' : language === 'fr' ? 'Réciter avec concentration' : 'Recite with focus and reverence'}
+                                    </Text>
+                                  </View>
+                                  <View style={styles.practiceHowToStep}>
+                                    <Text style={styles.practiceHowToBullet}>5.</Text>
+                                    <Text style={styles.practiceHowToText}>
+                                      {language === 'ar' ? 'استخدم السبحة للعد' : language === 'fr' ? 'Utiliser un tasbih pour compter' : 'Use prayer beads for counting'}
+                                    </Text>
+                                  </View>
+                                </View>
+
+                                {/* Action Buttons */}
+                                <View style={styles.practiceActionsRow}>
+                                  <TouchableOpacity
+                                    style={[styles.practiceActionButton, styles.practiceActionButtonPrimary, { backgroundColor: accent.primary }]}
+                                    onPress={() => router.push('/dhikr-counter')}
+                                    activeOpacity={0.8}
+                                  >
+                                    <Ionicons name="play-circle" size={16} color="#fff" />
+                                    <Text style={styles.practiceActionButtonText}>
+                                      {language === 'ar' ? 'ابدأ الممارسة' : language === 'fr' ? 'Commencer' : 'Start Practice'}
+                                    </Text>
+                                  </TouchableOpacity>
+                                  <TouchableOpacity
+                                    style={[styles.practiceActionButton, styles.practiceActionButtonSecondary]}
+                                    activeOpacity={0.8}
+                                  >
+                                    <Ionicons name="notifications-outline" size={16} color={accent.primary} />
+                                    <Text style={[styles.practiceActionButtonTextSecondary, { color: accent.primary }]}>
+                                      {language === 'ar' ? 'ضع تذكيرًا' : language === 'fr' ? 'Rappel' : 'Set Reminder'}
+                                    </Text>
+                                  </TouchableOpacity>
+                                </View>
+                              </View>
+                            )}
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+
+                      {/* Essences Section */}
+                      <View style={styles.practicesSection}>
+                        <TouchableOpacity
+                          style={styles.practicesSectionHeaderExpandable}
+                          onPress={() => {
+                            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                            setExpandedEssences(!expandedEssences);
+                          }}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.practicesSectionHeaderLeft}>
+                            <Ionicons name="rose" size={16} color="#F48FB1" />
+                            <Text style={styles.practicesSectionTitle}>
+                              {language === 'ar' ? 'العطور الموصى بها' : language === 'fr' ? 'Essences Recommandées' : 'Recommended Essences'}
+                            </Text>
+                          </View>
+                          <Ionicons 
+                            name={expandedEssences ? 'chevron-up' : 'chevron-down'} 
+                            size={18} 
+                            color={DarkTheme.textTertiary} 
+                          />
+                        </TouchableOpacity>
+
+                        {expandedEssences && (
+                          <>
+                            <Text style={styles.practicesSectionDesc}>
+                              {language === 'ar' 
+                                ? `استخدم هذه العطور لتعزيز ممارساتك مع ${planetPractices.planetAr}`
+                                : language === 'fr'
+                                ? `Utiliser ces parfums pour améliorer vos pratiques ${planetPractices.planet}`
+                                : `Use these fragrances to enhance your ${planetPractices.planet} practices`}
+                            </Text>
+
+                            <View style={styles.essencesGrid}>
+                              {planetPractices.essences.map((essence, index) => (
+                                <View key={index} style={styles.essenceCard}>
+                                  <Text style={styles.essenceIcon}>{essence.icon}</Text>
+                                  <Text style={styles.essenceName}>{essence.name}</Text>
+                                  <Text style={styles.essenceNameAr}>{essence.nameAr}</Text>
+                                  <Text style={styles.essencePurpose}>{essence.purpose}</Text>
+                                </View>
+                              ))}
+                            </View>
+
+                            <View style={styles.essenceHowToBox}>
+                              <Text style={styles.essenceHowToLabel}>
+                                {language === 'ar' ? '💡 كيفية الاستخدام:' : language === 'fr' ? '💡 Comment Utiliser:' : '💡 How to Use:'}
+                              </Text>
+                              <View style={styles.essenceHowToItem}>
+                                <Text style={styles.essenceHowToBullet}>•</Text>
+                                <Text style={styles.essenceHowToText}>
+                                  {language === 'ar' ? 'احرقها كبخور قبل الممارسة' : language === 'fr' ? 'Brûler comme encens avant la pratique' : 'Burn as incense before practice'}
+                                </Text>
+                              </View>
+                              <View style={styles.essenceHowToItem}>
+                                <Text style={styles.essenceHowToBullet}>•</Text>
+                                <Text style={styles.essenceHowToText}>
+                                  {language === 'ar' ? 'ضعها كعطر طبيعي' : language === 'fr' ? 'Appliquer comme parfum naturel' : 'Apply as natural perfume'}
+                                </Text>
+                              </View>
+                              <View style={styles.essenceHowToItem}>
+                                <Text style={styles.essenceHowToBullet}>•</Text>
+                                <Text style={styles.essenceHowToText}>
+                                  {language === 'ar' ? 'احتفظ بها في مكان الممارسة' : language === 'fr' ? 'Garder dans l\'espace de pratique' : 'Keep in practice space'}
+                                </Text>
+                              </View>
+                            </View>
+                          </>
+                        )}
+                      </View>
+
+                      {/* Talisman Section */}
+                      <View style={styles.practicesSection}>
+                        <TouchableOpacity
+                          style={styles.practicesSectionHeaderExpandable}
+                          onPress={() => {
+                            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                            setExpandedTalisman(!expandedTalisman);
+                          }}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.practicesSectionHeaderLeft}>
+                            <Ionicons name="shield-checkmark" size={16} color="#9C27B0" />
+                            <Text style={styles.practicesSectionTitle}>
+                              {language === 'ar' ? 'إرشادات التعويذة (اختياري)' : language === 'fr' ? 'Orientation Talisman (Optionnel)' : 'Talisman Guidance (Optional)'}
+                            </Text>
+                          </View>
+                          <Ionicons 
+                            name={expandedTalisman ? 'chevron-up' : 'chevron-down'} 
+                            size={18} 
+                            color={DarkTheme.textTertiary} 
+                          />
+                        </TouchableOpacity>
+
+                        {expandedTalisman && (
+                          <>
+                            <Text style={styles.practicesSectionDesc}>
+                              {language === 'ar' 
+                                ? 'للممارسين المتقدمين الذين يعملون مع الأدوات الروحية المكتوبة:'
+                                : language === 'fr'
+                                ? 'Pour les praticiens avancés travaillant avec des outils spirituels écrits:'
+                                : 'For advanced practitioners working with written spiritual tools:'}
+                            </Text>
+
+                            <View style={styles.talismanInfoBox}>
+                              <View style={styles.talismanInfoRow}>
+                                <Text style={styles.talismanInfoLabel}>
+                                  {language === 'ar' ? 'التنسيق:' : language === 'fr' ? 'Format:' : 'Format:'}
+                                </Text>
+                                <Text style={styles.talismanInfoValue}>
+                                  {language === 'ar' ? planetPractices.talisman.formatAr : planetPractices.talisman.format}
+                                </Text>
+                              </View>
+                              <Text style={styles.talismanInfoDesc}>
+                                {language === 'ar' ? planetPractices.talisman.descriptionAr : planetPractices.talisman.description}
+                              </Text>
+
+                              <View style={styles.talismanTimingBox}>
+                                <Text style={styles.talismanTimingLabel}>
+                                  {language === 'ar' ? '🗓️ أفضل يوم:' : language === 'fr' ? '🗓️ Meilleur Jour:' : '🗓️ Best Day:'}
+                                </Text>
+                                <Text style={styles.talismanTimingValue}>
+                                  {language === 'ar' ? planetPractices.talisman.bestDayAr : planetPractices.talisman.bestDay}
+                                </Text>
+                              </View>
+
+                              <View style={styles.talismanTimingBox}>
+                                <Text style={styles.talismanTimingLabel}>
+                                  {language === 'ar' ? '⏰ أفضل ساعة:' : language === 'fr' ? '⏰ Meilleure Heure:' : '⏰ Best Hour:'}
+                                </Text>
+                                <Text style={styles.talismanTimingValue}>
+                                  {language === 'ar' ? planetPractices.talisman.bestHourAr : planetPractices.talisman.bestHour}
+                                </Text>
+                              </View>
+                            </View>
+
+                            <View style={styles.talismanWarningBox}>
+                              <Ionicons name="warning" size={16} color="#FF9800" />
+                              <Text style={styles.talismanWarningText}>
+                                {language === 'ar' 
+                                  ? 'تتطلب صناعة التعويذات المعرفة الصحيحة والإذن. استشر معلمًا مؤهلاً (شيخ) قبل المحاولة.'
+                                  : language === 'fr'
+                                  ? 'La création de talismans nécessite des connaissances et une autorisation appropriées. Consultez un enseignant qualifié avant de tenter.'
+                                  : 'Talisman creation requires proper knowledge and authorization. Consult a qualified teacher (shaykh) before attempting.'}
+                              </Text>
+                            </View>
+                          </>
+                        )}
+                      </View>
+
+                      {/* Timing Section */}
+                      <View style={styles.practicesSection}>
+                        <TouchableOpacity
+                          style={styles.practicesSectionHeaderExpandable}
+                          onPress={() => {
+                            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                            setExpandedTiming(!expandedTiming);
+                          }}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.practicesSectionHeaderLeft}>
+                            <Ionicons name="time" size={16} color="#FFD700" />
+                            <Text style={styles.practicesSectionTitle}>
+                              {language === 'ar' ? 'الوقت الأمثل' : language === 'fr' ? 'Timing Optimal' : 'Optimal Timing'}
+                            </Text>
+                          </View>
+                          <Ionicons 
+                            name={expandedTiming ? 'chevron-up' : 'chevron-down'} 
+                            size={18} 
+                            color={DarkTheme.textTertiary} 
+                          />
+                        </TouchableOpacity>
+
+                        {expandedTiming && (
+                          <>
+                            <Text style={styles.practicesSectionDesc}>
+                              {language === 'ar' 
+                                ? `أفضل الأوقات لممارسات ${planetPractices.planetAr}:`
+                                : language === 'fr'
+                                ? `Meilleurs moments pour les pratiques ${planetPractices.planet}:`
+                                : `Best times for ${planetPractices.planet} practices:`}
+                            </Text>
+
+                            <View style={styles.timingList}>
+                              {(language === 'ar' ? planetPractices.timing.bestAr : planetPractices.timing.best).map((timing, index) => (
+                                <View key={index} style={styles.timingItem}>
+                                  <View style={styles.timingBullet}>
+                                    <Ionicons name="time-outline" size={14} color={accent.primary} />
+                                  </View>
+                                  <Text style={styles.practiceTimingText}>{timing}</Text>
+                                </View>
+                              ))}
+                            </View>
+                          </>
+                        )}
+                      </View>
+
+                      {/* Preparation Section */}
+                      <View style={styles.practicesSection}>
+                        <TouchableOpacity
+                          style={styles.practicesSectionHeaderExpandable}
+                          onPress={() => {
+                            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                            setExpandedPreparation(!expandedPreparation);
+                          }}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.practicesSectionHeaderLeft}>
+                            <Ionicons name="list" size={16} color="#2196F3" />
+                            <Text style={styles.practicesSectionTitle}>
+                              {language === 'ar' ? 'خطوات التحضير' : language === 'fr' ? 'Étapes de Préparation' : 'Preparation Steps'}
+                            </Text>
+                          </View>
+                          <Ionicons 
+                            name={expandedPreparation ? 'chevron-up' : 'chevron-down'} 
+                            size={18} 
+                            color={DarkTheme.textTertiary} 
+                          />
+                        </TouchableOpacity>
+
+                        {expandedPreparation && (
+                          <>
+                            <Text style={styles.practicesSectionDesc}>
+                              {language === 'ar' 
+                                ? 'اتبع هذه الخطوات للتحضير لممارستك:'
+                                : language === 'fr'
+                                ? 'Suivez ces étapes pour préparer votre pratique:'
+                                : 'Follow these steps to prepare for your practice:'}
+                            </Text>
+
+                            <View style={styles.preparationList}>
+                              {(language === 'ar' ? planetPractices.preparation.stepsAr : planetPractices.preparation.steps).map((step, index) => (
+                                <View key={index} style={styles.preparationItem}>
+                                  <View style={styles.preparationNumber}>
+                                    <Text style={styles.preparationNumberText}>{index + 1}</Text>
+                                  </View>
+                                  <Text style={styles.preparationText}>{step}</Text>
+                                </View>
+                              ))}
+                            </View>
+                          </>
+                        )}
+                      </View>
+
+                      {/* Advanced: Angels Section */}
+                      {planetPractices.angels.length > 0 && (
+                        <View style={styles.practicesSection}>
+                          <TouchableOpacity
+                            style={styles.practicesSectionHeaderExpandable}
+                            onPress={() => {
+                              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                              setExpandedAngels(!expandedAngels);
+                            }}
+                            activeOpacity={0.7}
+                          >
+                            <View style={styles.practicesSectionHeaderLeft}>
+                              <Ionicons name="planet" size={16} color="#9C27B0" />
+                              <Text style={styles.practicesSectionTitle}>
+                                {language === 'ar' ? '👼 متقدم: الاتصال الروحاني' : language === 'fr' ? '👼 Avancé: Connexion Angélique' : '👼 Advanced: Angelic Connection'}
+                              </Text>
+                            </View>
+                            <Ionicons 
+                              name={expandedAngels ? 'chevron-up' : 'chevron-down'} 
+                              size={18} 
+                              color={DarkTheme.textTertiary} 
+                            />
+                          </TouchableOpacity>
+
+                          {expandedAngels && (
+                            <>
+                              <View style={styles.advancedWarningBox}>
+                                <Ionicons name="alert-circle" size={16} color="#FF6B35" />
+                                <Text style={styles.advancedWarningText}>
+                                  {language === 'ar' 
+                                    ? 'للممارسين ذوي الخبرة فقط'
+                                    : language === 'fr'
+                                    ? 'Pour praticiens expérimentés uniquement'
+                                    : 'For experienced practitioners only'}
+                                </Text>
+                              </View>
+
+                              <Text style={styles.practicesSectionDesc}>
+                                {language === 'ar' 
+                                  ? 'العمل مع الوسطاء الروحانيين:'
+                                  : language === 'fr'
+                                  ? 'Travailler avec des intermédiaires spirituels:'
+                                  : 'Working with spiritual intermediaries:'}
+                              </Text>
+
+                              {planetPractices.angels.map((angel, index) => (
+                                <View key={index} style={styles.angelCard}>
+                                  <Text style={styles.angelName}>{angel.name}</Text>
+                                  <Text style={styles.angelNameAr}>{angel.nameAr}</Text>
+                                  <Text style={styles.angelRole}>
+                                    {language === 'ar' ? angel.roleAr : angel.role}
+                                  </Text>
+                                </View>
+                              ))}
+
+                              <View style={styles.angelPrerequisitesBox}>
+                                <Text style={styles.angelPrerequisitesLabel}>
+                                  {language === 'ar' ? '📚 المتطلبات الأساسية:' : language === 'fr' ? '📚 Prérequis:' : '📚 Prerequisites:'}
+                                </Text>
+                                <View style={styles.angelPrerequisiteItem}>
+                                  <Text style={styles.angelPrerequisiteBullet}>•</Text>
+                                  <Text style={styles.angelPrerequisiteText}>
+                                    {language === 'ar' ? 'الدراسة تحت معلم مؤهل' : language === 'fr' ? 'Étude sous un enseignant qualifié' : 'Study under qualified teacher'}
+                                  </Text>
+                                </View>
+                                <View style={styles.angelPrerequisiteItem}>
+                                  <Text style={styles.angelPrerequisiteBullet}>•</Text>
+                                  <Text style={styles.angelPrerequisiteText}>
+                                    {language === 'ar' ? 'إتقان الممارسات الأساسية' : language === 'fr' ? 'Maîtrise des pratiques de base' : 'Mastery of basic practices'}
+                                  </Text>
+                                </View>
+                                <View style={styles.angelPrerequisiteItem}>
+                                  <Text style={styles.angelPrerequisiteBullet}>•</Text>
+                                  <Text style={styles.angelPrerequisiteText}>
+                                    {language === 'ar' ? 'فهم الحماية الروحية' : language === 'fr' ? 'Compréhension de la protection spirituelle' : 'Understanding of spiritual protection'}
+                                  </Text>
+                                </View>
+                                <View style={styles.angelPrerequisiteItem}>
+                                  <Text style={styles.angelPrerequisiteBullet}>•</Text>
+                                  <Text style={styles.angelPrerequisiteText}>
+                                    {language === 'ar' ? 'إذن من الشيخ' : language === 'fr' ? 'Permission du shaykh' : 'Permission from shaykh'}
+                                  </Text>
+                                </View>
+                              </View>
+                            </>
+                          )}
+                        </View>
+                      )}
+                    </>
+                  );
+                })()}
               </GlassCard>
             ) : null}
 
@@ -4318,6 +5694,423 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: DarkTheme.textTertiary,
     flex: 1,
+  },
+  // ─────────────────────────────────────────────────────────────────
+  // COMPREHENSIVE PLANET PRACTICES STYLES
+  // ─────────────────────────────────────────────────────────────────
+  practicesSection: {
+    marginTop: Spacing.md,
+    gap: Spacing.sm,
+  },
+  practicesSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: Spacing.xs,
+  },
+  practicesSectionHeaderExpandable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: Spacing.xs,
+  },
+  practicesSectionHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  practicesSectionTitle: {
+    fontSize: 14,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+  },
+  practicesSectionDesc: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+    marginBottom: Spacing.sm,
+  },
+  // Practice Cards
+  practiceCard: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    marginBottom: Spacing.xs,
+    overflow: 'hidden',
+  },
+  practiceCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    padding: Spacing.md,
+  },
+  practiceIcon: {
+    fontSize: 28,
+  },
+  practiceCardTitles: {
+    flex: 1,
+    gap: 2,
+  },
+  practiceCardCategory: {
+    fontSize: 10,
+    color: DarkTheme.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  practiceCardNameAr: {
+    fontSize: 18,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    fontFamily: Platform.OS === 'ios' ? 'Geeza Pro' : undefined,
+  },
+  practiceCardName: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+  },
+  practiceDifficultyBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  practiceDifficultyText: {
+    fontSize: 10,
+    fontWeight: Typography.weightSemibold,
+  },
+  practiceCardContent: {
+    padding: Spacing.md,
+    paddingTop: 0,
+    gap: Spacing.sm,
+  },
+  practiceCountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 8,
+  },
+  practiceCountLabel: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    flex: 1,
+  },
+  practiceCountValue: {
+    fontSize: 16,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+  },
+  practicePurposeBox: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 8,
+    padding: Spacing.sm,
+    gap: 4,
+  },
+  practicePurposeLabel: {
+    fontSize: 12,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+  },
+  practicePurposeText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  practiceDurationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  practiceDurationText: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+  },
+  practiceHowToBox: {
+    gap: 6,
+    marginTop: Spacing.xs,
+  },
+  practiceHowToLabel: {
+    fontSize: 12,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    marginBottom: 2,
+  },
+  practiceHowToStep: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'flex-start',
+  },
+  practiceHowToBullet: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+    fontWeight: Typography.weightBold,
+  },
+  practiceHowToText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    flex: 1,
+    lineHeight: 18,
+  },
+  practiceActionsRow: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
+  },
+  practiceActionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: 10,
+  },
+  practiceActionButtonPrimary: {
+    // backgroundColor set dynamically
+  },
+  practiceActionButtonSecondary: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  practiceActionButtonText: {
+    fontSize: 13,
+    fontWeight: Typography.weightSemibold,
+    color: '#fff',
+  },
+  practiceActionButtonTextSecondary: {
+    fontSize: 13,
+    fontWeight: Typography.weightSemibold,
+  },
+  // Essences
+  essencesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  essenceCard: {
+    width: '48%',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 12,
+    padding: Spacing.sm,
+    alignItems: 'center',
+    gap: 4,
+  },
+  essenceIcon: {
+    fontSize: 32,
+  },
+  essenceName: {
+    fontSize: 13,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    textAlign: 'center',
+  },
+  essenceNameAr: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    fontFamily: Platform.OS === 'ios' ? 'Geeza Pro' : undefined,
+  },
+  essencePurpose: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    textAlign: 'center',
+  },
+  essenceHowToBox: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 8,
+    padding: Spacing.sm,
+    gap: 6,
+    marginTop: Spacing.xs,
+  },
+  essenceHowToLabel: {
+    fontSize: 12,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+  },
+  essenceHowToItem: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  essenceHowToBullet: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+  },
+  essenceHowToText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    flex: 1,
+    lineHeight: 18,
+  },
+  // Talisman
+  talismanInfoBox: {
+    backgroundColor: 'rgba(156, 39, 176, 0.08)',
+    borderRadius: 12,
+    padding: Spacing.md,
+    gap: Spacing.sm,
+  },
+  talismanInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  talismanInfoLabel: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+  },
+  talismanInfoValue: {
+    fontSize: 14,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+  },
+  talismanInfoDesc: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+  },
+  talismanTimingBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingTop: Spacing.xs,
+  },
+  talismanTimingLabel: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+  },
+  talismanTimingValue: {
+    fontSize: 13,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+  },
+  talismanWarningBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+    borderRadius: 8,
+    padding: Spacing.sm,
+    marginTop: Spacing.xs,
+  },
+  talismanWarningText: {
+    fontSize: 11,
+    color: '#FF9800',
+    flex: 1,
+    lineHeight: 16,
+  },
+  // Timing
+  timingList: {
+    gap: Spacing.xs,
+  },
+  timingItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    paddingVertical: Spacing.xs,
+  },
+  timingBullet: {
+    marginTop: 2,
+  },
+  practiceTimingText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    flex: 1,
+    lineHeight: 20,
+  },
+  // Preparation
+  preparationList: {
+    gap: Spacing.sm,
+  },
+  preparationItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+  },
+  preparationNumber: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(33, 150, 243, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  preparationNumberText: {
+    fontSize: 12,
+    fontWeight: Typography.weightBold,
+    color: '#2196F3',
+  },
+  preparationText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    flex: 1,
+    lineHeight: 20,
+    paddingTop: 2,
+  },
+  // Advanced Angels
+  advancedWarningBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255, 107, 53, 0.1)',
+    borderRadius: 8,
+    padding: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  advancedWarningText: {
+    fontSize: 11,
+    color: '#FF6B35',
+    fontWeight: Typography.weightSemibold,
+  },
+  angelCard: {
+    backgroundColor: 'rgba(156, 39, 176, 0.08)',
+    borderRadius: 10,
+    padding: Spacing.sm,
+    marginBottom: Spacing.xs,
+    gap: 4,
+    alignItems: 'center',
+  },
+  angelName: {
+    fontSize: 15,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+  },
+  angelNameAr: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    fontFamily: Platform.OS === 'ios' ? 'Geeza Pro' : undefined,
+  },
+  angelRole: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+    textAlign: 'center',
+  },
+  angelPrerequisitesBox: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 8,
+    padding: Spacing.sm,
+    gap: 6,
+    marginTop: Spacing.xs,
+  },
+  angelPrerequisitesLabel: {
+    fontSize: 12,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    marginBottom: 2,
+  },
+  angelPrerequisiteItem: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  angelPrerequisiteBullet: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+  },
+  angelPrerequisiteText: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+    flex: 1,
+    lineHeight: 18,
   },
   signGrid: {
     flexDirection: 'row',
