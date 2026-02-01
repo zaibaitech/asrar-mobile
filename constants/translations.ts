@@ -43,6 +43,227 @@ export const translations = {
       levelFull: "FULL",
     },
 
+    // Moon & Day Harmony (UI Labels)
+    moon: {
+      ui: {
+        moonDayHarmony: "Moon & Day Harmony",
+        perfectAlignment: "Perfect Alignment",
+        goodAlignment: "Good Alignment",
+        neutralAlignment: "Neutral Alignment",
+        challengingAlignment: "Challenging Alignment",
+        explanation: "What This Means",
+        recommendation: "What To Do",
+        lunarTiming: "Lunar Timing",
+        dayOfMonth: "Day {day}",
+        lunarDay: "Lunar Day",
+        moonPower: "Moon Power",
+        moonPowerNote: "Phase power (illumination) is calculated from Sun–Moon elongation (ephemeris).",
+        waxing: "Waxing Moon",
+        waning: "Waning Moon",
+        learnMore: "Learn More",
+        rest: "Rest",
+        suitableFor: "Best For",
+        notSuitableFor: "Avoid",
+        whyThisMatters: "Why This Matters",
+        spiritualGuidance: "Spiritual Guidance",
+      },
+      // Moon phase titles and descriptions
+      new: {
+        title: "New Moon",
+        description: "New Moon is a time of new beginnings, fresh starts, and planting seeds. Well-suited for intention-setting and inner work. Introspection before action.",
+        suitable: {
+          category: "Spiritual Practice",
+          activity1: "Rest and restoration",
+          activity2: "Deep contemplation",
+          activity3: "Shadow work",
+          spiritual1: "Night prayers (Tahajjud)",
+          spiritual2: "Tawbah (repentance)",
+          spiritual3: "Fasting",
+        },
+        notSuitable: {
+          category: "External Action",
+          activity1: "Starting new projects",
+          activity2: "Major launches",
+          activity3: "Business agreements",
+          reason: "The dark Moon lacks the light and momentum for new external endeavors. Wait for the light to return.",
+        },
+      },
+      waxing_crescent: {
+        title: "Waxing Crescent",
+        description: "The Moon is growing and building energy. A time of growth, initiative, and momentum. Take inspired action toward your goals.",
+        suitable: {
+          category: "Growth & New Projects",
+          activity1: "Starting businesses",
+          activity2: "New relationships",
+          activity3: "Learning new skills",
+          activity4: "Creative projects",
+          spiritual1: "Du'a for increase",
+          spiritual2: "Invocation practices",
+          spiritual3: "Goal-setting rituals",
+        },
+        notSuitable: {
+          category: "Endings & Release",
+          activity1: "Major endings",
+          activity2: "Banishing",
+          activity3: "Cutting ties",
+          reason: "Growing light opposes release and completion. The Moon wants to build, not diminish.",
+        },
+      },
+      first_quarter: {
+        title: "First Quarter",
+        description: "Challenges and decisions emerge. A time for facing obstacles with courage. Build through difficulties. Good for overcoming resistance.",
+        suitable: {
+          category: "Challenge & Growth",
+          activity1: "Taking action on plans",
+          activity2: "Overcoming obstacles",
+          activity3: "Major decisions",
+          activity4: "Physical activities",
+          spiritual1: "Protective practices",
+          spiritual2: "Strength-building dhikr",
+          spiritual3: "Will-power work",
+        },
+        notSuitable: {
+          category: "Delicate Matters",
+          activity1: "Peace negotiations",
+          activity2: "Gentle healing",
+          activity3: "Receptive work",
+          reason: "The Moon's growing light creates tension and challenge. Better for gentle work during waning.",
+        },
+      },
+      waxing_gibbous: {
+        title: "Waxing Gibbous",
+        description: "Almost full—energy is nearly peaked. Refine your efforts. Perfect for finishing touches before completion. Trust your progress.",
+        suitable: {
+          category: "Manifestation & Completion",
+          activity1: "Completing projects",
+          activity2: "Final push for goals",
+          activity3: "Manifestation work",
+          activity4: "Important events",
+          spiritual1: "Full Moon practices",
+          spiritual2: "Intention manifestation",
+          spiritual3: "Peak energy rituals",
+        },
+        notSuitable: {
+          category: "Subtle/Hidden Work",
+          activity1: "Secret work",
+          activity2: "Quiet reflection",
+          activity3: "Hidden practices",
+          reason: "Near-full Moon is brilliant and public. If discretion is needed, choose a darker phase.",
+        },
+      },
+      full: {
+        title: "Full Moon",
+        description: "Peak power and illumination. All energies are amplified. Powerful time for manifestation, revelation, and celebration. Use mindfully.",
+        suitable: {
+          category: "Culmination & Healing",
+          activity1: "Healing work",
+          activity2: "Revelations and clarity",
+          activity3: "Completion ceremonies",
+          activity4: "Group gatherings",
+          activity5: "Full Moon rituals",
+          spiritual1: "Full Moon prayers",
+          spiritual2: "Healing rituals",
+          spiritual3: "Community practices",
+          spiritual4: "Vision clarity",
+        },
+        notSuitable: {
+          category: "New Beginnings",
+          activity1: "Starting new projects",
+          activity2: "Quiet introspection",
+          activity3: "Secret work",
+          reason: "Full Moon energy is external and illuminating. For new starts, wait for the waxing crescent.",
+        },
+      },
+      waning_gibbous: {
+        title: "Waning Gibbous",
+        description: "The Moon begins to release. Energy shifts toward completion. Share your blessings. Gratitude and sharing are potent now.",
+        suitable: {
+          category: "Completion & Gratitude",
+          activity1: "Finishing projects",
+          activity2: "Expressing gratitude",
+          activity3: "Teaching/sharing",
+          activity4: "Organizing",
+          spiritual1: "Gratitude practices",
+          spiritual2: "Shukr rituals",
+          spiritual3: "Blessing work",
+          spiritual4: "Teaching practices",
+        },
+        notSuitable: {
+          category: "Major New Ventures",
+          activity1: "Starting big projects",
+          activity2: "Initiating relationships",
+          activity3: "New commitments",
+          reason: "Waning Moon moves toward completion. New ventures belong in the waxing phase.",
+        },
+      },
+      last_quarter: {
+        title: "Last Quarter",
+        description: "Release and reflection. Evaluate what's complete. Perfect for letting go, healing, and preparing for renewal. Wisdom through review.",
+        suitable: {
+          category: "Release & Cleansing",
+          activity1: "Banishing negative patterns",
+          activity2: "Cleansing",
+          activity3: "Forgiveness",
+          activity4: "Ending relationships respectfully",
+          spiritual1: "Cleansing rituals",
+          spiritual2: "Forgiveness practices",
+          spiritual3: "Release ceremonies",
+          spiritual4: "Tawbah work",
+        },
+        notSuitable: {
+          category: "New Growth",
+          activity1: "Starting new projects",
+          activity2: "Expansion",
+          activity3: "New commitments",
+          reason: "Waning Moon energy supports release, not growth. New ventures thrive during the waxing phase.",
+        },
+      },
+      waning_crescent: {
+        title: "Waning Crescent",
+        description: "Final release before the new cycle. Rest, integration, and spiritual deepening. Prepare the soil for new seeds. Surrender and trust.",
+        suitable: {
+          category: "Deep Reflection",
+          activity1: "Meditation",
+          activity2: "Introspection",
+          activity3: "Final closures",
+          activity4: "Spiritual retreat",
+          spiritual1: "Night prayers",
+          spiritual2: "Deep dhikr",
+          spiritual3: "I'tikāf (retreat)",
+          spiritual4: "Fasting",
+        },
+        notSuitable: {
+          category: "Active Undertakings",
+          activity1: "Starting projects",
+          activity2: "Major activities",
+          activity3: "Public work",
+          reason: "Nearly dark Moon calls for rest. Wait for new light to begin new endeavors.",
+        },
+      },
+      harmony: {
+        waxing_active: {
+          explanation: "Waxing Moon + Active Planet (Sun/Mars/Jupiter) = Well-suited for launching projects and building momentum.",
+          recommendation: "Supportive timing for starting new ventures and taking bold action. Channel this energy wisely.",
+        },
+        waning_reflective: {
+          explanation: "Waning Moon + Reflective Planet (Moon/Venus/Saturn) = Well-suited for completing, releasing, and inner work.",
+          recommendation: "Supportive for finishing projects, healing practices, and deep spiritual reflection. Release what no longer serves.",
+        },
+        waxing_reflective: {
+          explanation: "Waxing Moon wants to build, but a reflective planet supports introspection. Mixed but workable signals.",
+          recommendation: "You can still act, but be prepared for some inner need for reflection or adjustment along the way.",
+        },
+        waning_active: {
+          explanation: "Waning Moon supports completion, but an active planet pushes for action. Misaligned energies.",
+          recommendation: "You can push forward if needed, but the day's deeper current supports finishing what's begun more than starting new things.",
+        },
+        neutral: {
+          explanation: "The day ruler is flexible and adaptable. The day remains energetically neutral and balanced.",
+          recommendation: "Both action and reflection are possible today. Let the Moon's phase guide your priorities.",
+        },
+      },
+    },
+
     // Manazil Screen (Detail)
     manazilScreen: {
       currentMoonPosition: "Current Moon Position",
@@ -193,11 +414,12 @@ export const translations = {
         todaysFocus: "Today's Focus",
         forReflection: "For reflection",
         viewDetails: "View details",
+        peakHours: "{planet} hours (check Moment Alignment for specific times)",
         windows: {
           neutral: "Neutral Window",
           favorable: "Favorable Window",
           transformative: "Transformative Window",
-          delicate: "Delicate Window",
+          delicate: "Conditional Window",
         },
         energyDescriptions: {
           fire: "Dynamic & energizing",
@@ -213,6 +435,108 @@ export const translations = {
           mercury: "Communicate clearly, learn something new",
           moon: "Trust your intuition, tend to emotions",
           sun: "Lead with confidence, express yourself",
+        },
+        activities: {
+          jupiter: {
+            excellent: {
+              0: "Starting new learning or teaching",
+              1: "Business expansion and opportunities",
+              2: "Seeking guidance or mentorship",
+              3: "Travel planning or philosophical study",
+              4: "Social connections and networking",
+            },
+            lessFavorable: {
+              0: "Detailed technical work (wait for Mercury day)",
+              1: "Financial conservatism (Jupiter encourages expansion)",
+            },
+          },
+          mars: {
+            excellent: {
+              0: "Physical training and athletics",
+              1: "Starting bold initiatives",
+              2: "Competitive activities",
+              3: "Overcoming obstacles",
+              4: "Decisive action",
+            },
+            lessFavorable: {
+              0: "Delicate negotiations",
+              1: "Emotional conversations",
+              2: "Patience-requiring tasks",
+            },
+          },
+          mercury: {
+            excellent: {
+              0: "Writing and communication",
+              1: "Learning and study",
+              2: "Business negotiations",
+              3: "Planning and strategizing",
+              4: "Short trips and errands",
+            },
+            lessFavorable: {
+              0: "Emotional decision-making",
+              1: "Heavy physical labor",
+              2: "Long-term commitments without analysis",
+            },
+          },
+          venus: {
+            excellent: {
+              0: "Relationship building",
+              1: "Creative and artistic work",
+              2: "Beauty and aesthetic pursuits",
+              3: "Social gatherings",
+              4: "Financial agreements",
+            },
+            lessFavorable: {
+              0: "Aggressive action",
+              1: "Confrontation",
+              2: "Harsh criticism",
+            },
+          },
+          saturn: {
+            excellent: {
+              0: "Completing long-term projects",
+              1: "Building structures and systems",
+              2: "Discipline and focus work",
+              3: "Administrative tasks",
+              4: "Long-term planning",
+            },
+            lessFavorable: {
+              0: "Spontaneous decisions",
+              1: "Starting creative new projects",
+              2: "Social leisure activities",
+            },
+          },
+          sun: {
+            excellent: {
+              0: "Leadership and taking charge",
+              1: "Self-expression and creativity",
+              2: "Public presentations",
+              3: "Personal branding",
+              4: "Confidence-building activities",
+            },
+            lessFavorable: {
+              0: "Submissive roles",
+              1: "Background support work",
+              2: "Self-deprecation",
+            },
+          },
+          moon: {
+            excellent: {
+              0: "Emotional healing and reflection",
+              1: "Nurturing and caregiving",
+              2: "Intuitive work",
+              3: "Family time",
+              4: "Self-care and rest",
+            },
+            lessFavorable: {
+              0: "Aggressive action",
+              1: "Logical-only decisions",
+              2: "Emotional suppression",
+            },
+          },
+          common: {
+            waitForBetterTiming: "Starting major new initiatives (wait for better timing)",
+          },
         },
       },
       dailyGuidance: {
@@ -646,10 +970,13 @@ export const translations = {
 
     // Common UI
     common: {
+      bestFor: "Best For",
+      avoid: "Avoid",
       buttons: {
         learnMore: "Learn More",
         collapse: "Show Less",
         tapToLearn: "Tap to learn more",
+        ok: "OK",
       },
       retry: "Retry",
       on: "ON",
@@ -689,6 +1016,7 @@ export const translations = {
       upload: "Upload",
       remove: "Remove",
       optional: "Optional",
+      required: "Required",
       share: "Share",
       seeMore: "See More",
       seeLess: "See Less",
@@ -704,6 +1032,31 @@ export const translations = {
         fire: "Fire",
         water: "Water",
         earth: "Earth",
+      },
+      // Planet names - shared across features
+      planets: {
+        sun: "Sun",
+        moon: "Moon",
+        mercury: "Mercury",
+        venus: "Venus",
+        mars: "Mars",
+        jupiter: "Jupiter",
+        saturn: "Saturn",
+      },
+      // Zodiac sign names - shared across features
+      zodiacSigns: {
+        aries: "Aries",
+        taurus: "Taurus",
+        gemini: "Gemini",
+        cancer: "Cancer",
+        leo: "Leo",
+        virgo: "Virgo",
+        libra: "Libra",
+        scorpio: "Scorpio",
+        sagittarius: "Sagittarius",
+        capricorn: "Capricorn",
+        aquarius: "Aquarius",
+        pisces: "Pisces",
       },
       // Quality levels (TimingGuidanceCard)
       quality: {
@@ -1897,7 +2250,79 @@ export const translations = {
           line3: "Your personal {userElement} element (derived from your name) interacts with the day's energy",
           line4: "This is a reflection tool, not a predictive system — use it to align intentions with natural rhythms",
         },
+        // Collapsible section subtitles for better UX
+        collapsible: {
+          personalizedInsights: "Personalized insights",
+          planetaryDetails: "Detailed breakdown",
+          lunarGuidance: "Tonight's lunar energy",
+          yourPersonalFilter: "Your personal filter",
+        },
         disclaimer: "For reflection only • Not a ruling",
+        
+        // Daily Energy Card (Enhanced UI)
+        dailyEnergyCard: {
+          title: "Daily Energy Score",
+          weightedCalculation: "Weighted Calculation Breakdown",
+          otherPlanets: "Other Planetary Influences",
+          total: "Total Score",
+          scoreExplanation: "Your daily energy score reflects how well today's planetary ruler (50%), the Moon's position (30%), and other planetary influences (20%) align with your nature.",
+          
+          // Quality levels
+          quality: {
+            excellent: "Excellent",
+            good: "Good",
+            moderate: "Moderate",
+            weak: "Weak",
+          },
+          
+          // Ilm il Nujum Recommendations
+          recommendations: {
+            excellent: {
+              title: "Peak Cosmic Alignment",
+              description: "Today's energies are exceptionally favorable. This is an optimal time for important undertakings, spiritual practices, and major decisions.",
+              practices: "💡 Maximize this window: undertake important projects, deepen spiritual practice, pursue relationships, and take bold action.",
+              timing: "⏰ Peak hours: use {planet}'s strongest hours for best results",
+              caution: "⚠️  Even in excellent days, maintain balance and avoid excess.",
+            },
+            good: {
+              title: "Favorable Energy",
+              description: "Today presents good opportunities. The planetary ruler supports most activities, though some require more patience than others.",
+              practices: "💡 Good for: regular work, relationship building, spiritual reflection, and gradual progress.",
+              timing: "⏰ Best during: morning to early afternoon",
+              caution: "⚠️  Avoid overextending or forcing outcomes.",
+            },
+            moderate: {
+              title: "Balanced Energy",
+              description: "Today offers stable, grounded energy. Neither strongly supporting nor challenging—a day for maintenance and steady work.",
+              practices: "💡 Best suited for: routine tasks, practical matters, health routines, and reflection.",
+              timing: "⏰ Even pacing throughout the day",
+              caution: "⚠️  Keep goals realistic and focus on one priority.",
+            },
+            weak: {
+              title: "Delicate Energy Requires Care",
+              description: "Today's planetary influences are less supportive. Navigate with mindfulness, patience, and gentleness. This is not a day for force.",
+              practices: "💡 Good for: inner work, completion of ongoing tasks, rest, and spiritual deepening.",
+              timing: "⏰ Work with gentler hours; consider evening practices",
+              caution: "⚠️  Delay major decisions and undertakings if possible. Practice acceptance.",
+            },
+          },
+          
+          // Lunar influence labels
+          lunar: {
+            waxing: "🌙 Waxing Moon: Building phase. Favorable for growth, new initiatives, and manifestation.",
+            waning: "🌙 Waning Moon: Releasing phase. Favorable for completion, healing, letting go, and reflection.",
+            full: "🌙 Full Moon: Amplification phase. All energies intensified. Use with awareness.",
+            new: "🌙 New Moon: Renewal phase. Fresh starts, planting seeds, and setting intentions.",
+          },
+          
+          // Factor explanations
+          dayRulerInfluence: "The day's ruling planet contributes 50% of your score. Stronger rulers create higher scores.",
+          moonInfluence: "The Moon's mansion contributes 30%. The Moon rules emotions, intuition, and inner work.",
+          otherInfluence: "Other planetary positions contribute 20%. These include aspects and dignities.",
+          
+          // Calculation note
+          calculationNote: "This score synthesizes classical Islamic astronomical principles (ʿIlm al-Nujūm) with modern astrological analysis for holistic daily guidance.",
+        },
       },
       
       // Daily Guidance Messages & Content
@@ -2243,6 +2668,141 @@ export const translations = {
         jupiter: "Jupiter",
         saturn: "Saturn",
       },
+
+      planetaryJudgment: {
+        title: "Planetary Judgment",
+        cosmicVerdict: "Cosmic Verdict",
+        disclaimer: "For reflection, not ruling.",
+        classicalTerms: {
+          supportive: "Saʿd",
+          neutral: "Mutawassiṭ",
+          restrictive: "Naḥs",
+        },
+        status: {
+          supportive: "Supportive",
+          neutral: "Neutral",
+          restrictive: "Restrictive",
+        },
+        intro: "{planet} governs today.",
+        rulerTone: {
+          sun: "Clarity, leadership, and intention are emphasized.",
+          moon: "Emotions, intuition, and changeability are emphasized.",
+          mercury: "Movement, exchange, and mental clarity are emphasized.",
+          venus: "Harmony, connection, and refinement are emphasized.",
+          mars: "Force, urgency, and sharp edges are emphasized — act with restraint.",
+          jupiter: "Expansion, wisdom, and openings are emphasized.",
+          saturn: "Discipline, protection, and delay are emphasized — prioritize what lasts.",
+        },
+        phaseModifier: {
+          amplify: "With a waxing or full Moon, the ruler’s nature is amplified.",
+          soften: "With a waning Moon, the ruler’s effects are softened.",
+          neutral: "With a quiet Moon, keep the day simple and intentional.",
+        },
+        bestForLabel: "Best for",
+        avoidLabel: "Avoid",
+        bestFor: {
+          sun: {
+            0: "Setting intentions and making clear decisions",
+            1: "Leadership, visibility, and presenting your work",
+            2: "Honorable beginnings with a steady pace",
+          },
+          moon: {
+            0: "Reflection, repair, and emotional clarity",
+            1: "Family matters and tending relationships",
+            2: "Gentle planning and listening before acting",
+          },
+          mercury: {
+            0: "Writing, learning, negotiation, and planning",
+            1: "Short trips, errands, and practical coordination",
+            2: "Asking questions and refining your strategy",
+          },
+          venus: {
+            0: "Reconciliation, friendship, and softening tensions",
+            1: "Creative work, beauty, and refinement",
+            2: "Agreements when intentions are clean and balanced",
+          },
+          mars: {
+            0: "Structured effort, training, and disciplined action",
+            1: "Cutting away what blocks progress (with care)",
+            2: "Protective boundaries and decisive completion",
+          },
+          jupiter: {
+            0: "Learning, teaching, and seeking wise counsel",
+            1: "Generosity, blessings, and opening opportunities",
+            2: "Big-picture planning and uplifted intention",
+          },
+          saturn: {
+            0: "Protection, restraint, and serious commitments",
+            1: "Deep work, structure, and long-term building",
+            2: "Review, accountability, and strengthening limits",
+          },
+        },
+        avoid: {
+          sun: {
+            0: "Ego battles and impulsive pride",
+            1: "Scattered focus and unclear commitments",
+            2: "Overpromising without follow-through",
+          },
+          moon: {
+            0: "Emotional reactivity and vague decisions",
+            1: "Taking on others’ feelings as your burden",
+            2: "Major launches without steadiness",
+          },
+          mercury: {
+            0: "Gossip, haste, and sloppy agreements",
+            1: "Overthinking instead of choosing one path",
+            2: "Important commitments without a clear plan",
+          },
+          venus: {
+            0: "People-pleasing that weakens your boundaries",
+            1: "Avoiding necessary truth for comfort",
+            2: "Spending for appearance rather than value",
+          },
+          mars: {
+            0: "Conflict, harsh speech, and unnecessary risk",
+            1: "Rushed decisions driven by anger",
+            2: "Forcing outcomes when patience is required",
+          },
+          jupiter: {
+            0: "Excess and overextension",
+            1: "Promises bigger than your capacity",
+            2: "Ignoring details that protect the outcome",
+          },
+          saturn: {
+            0: "Starting many new initiatives at once",
+            1: "Heavy conversations without calm structure",
+            2: "Pessimism — keep effort steady and measured",
+          },
+        },
+      },
+
+      authorityBadge: {
+        excellent: "Excellent Timing",
+        supported: "Supported Timing",
+        conditional: "Conditional Timing",
+        restricted: "Restricted Timing",
+        notAdvised: "Not Advised",
+      },
+
+      classicalJudgment: {
+        labels: {
+          nashr: "Nashr (Open / supportive)",
+          neutral: "Neutral (Balanced)",
+          nahs: "Nahs (Restrictive / challenging)",
+          restricted: "Restricted (Avoid)",
+        },
+      },
+
+      scope: {
+        day: "Day scope (all day)",
+        moon: "Moon scope (2–3 days)",
+        hour: "Hour scope (current hour)",
+      },
+
+      authorityNotes: {
+        fullMoonBeginnings: "Full Moon favors culmination and clarity. For major beginnings, wait until after reflection or when the Moon wanes.",
+        saturnOrMarsCap: "Even if conditions look strong, {planet} as day ruler requires restraint: choose discipline, protection, and steady completion over fast new starts.",
+      },
       planetaryStrength: {
         title: "Planetary Strength",
         dataUnavailableTitle: "Data unavailable",
@@ -2299,6 +2859,174 @@ export const translations = {
           retrograde: "Retrograde: better for review and inner work.",
         },
       },
+      
+      // New narrative system fields
+      todaysRuler: "TODAY'S PLANETARY RULER",
+      yourPlanet: "YOUR BIRTH PLANET",
+      todaysAlignment: "TODAY'S ALIGNMENT",
+      lunarInfluence: "LUNAR INFLUENCE",
+      whatThisMeans: "What This Means For You",
+      excellentForToday: "Excellent For Today",
+      lessFavorable: "Less Favorable",
+      bestForToday: "Best For Today",
+      notAdvisedToday: "Not advised today",
+      currentTransit: "Current Transit",
+      peakHours: "Peak Hours",
+      transitIn: "In {sign}{dignity}",
+
+      alignmentOverview: {
+        title: "Alignment Overview",
+        dayRulerLabel: "Day Ruler",
+        yourRulerLabel: "Your Ruler",
+        elementsLabel: "Elements",
+        elementHarmony: "Element Harmony",
+        planetHarmony: "Planet Harmony",
+        ilmGuidanceToggle: "ʿIlm al-Nujūm Guidance",
+        verdict: {
+          excellent: "Strong alignment — act with confidence.",
+          good: "Good alignment — steady progress is favored.",
+          moderate: "Mixed alignment — keep it simple and intentional.",
+          challenging: "Delicate alignment — go gently and prioritize clarity.",
+        },
+        guidance: {
+          essenceLabel: "🌟 Today's Essence",
+          recommendationsLabel: "💡 Recommendations",
+          practiceLabel: "🙏 Spiritual Practice",
+        },
+      },
+
+      spiritualBlueprint: {
+        title: "Your Spiritual Blueprint",
+        signLabel: "Ascendant",
+        modalityLabel: "Modality",
+        temperamentLabel: "Temperament",
+      },
+
+      todaysProfile: {
+        currentHourLabel: "Current Hour",
+      },
+
+      alignmentAnalysis: {
+        title: "Alignment Analysis",
+        scoreLabel: "Overall",
+        temperamentLabel: "Temperament",
+        temperament: {
+          match: "Matched",
+          contrast: "Contrasting",
+        },
+      },
+
+      recommendations: {
+        personalizedHoursTitle: "Personalized Hours",
+        bestForYou: "Best hours for you",
+        supportiveToday: "Supportive today",
+        moreDelicate: "More delicate",
+      },
+
+      temperaments: {
+        sun: "Hot & Dry",
+        moon: "Cold & Moist",
+        mars: "Hot & Dry",
+        mercury: "Variable / Mixed",
+        jupiter: "Hot & Moist",
+        venus: "Cold & Moist",
+        saturn: "Cold & Dry",
+      },
+
+      loading: {
+        generatingGuidance: "✨ Generating your personalized guidance...",
+      },
+      errors: {
+        unableToGenerateTitle: "Unable to Generate Guidance",
+        unableToGenerateBody: "We couldn't generate today's personalized guidance. Please refresh the screen to try again.",
+      },
+      actions: {
+        refresh: "Refresh",
+      },
+      generic: {
+        title: "✨ Today's Energy",
+        completeProfileNote: "💡 Complete your profile to see personalized guidance based on your planetary nature.",
+      },
+
+      // Day descriptions
+      dayEnergy: {
+        expansion: "expansion, wisdom, and growth",
+        action: "action, courage, and decisive movement",
+        communication: "communication, learning, and commerce",
+        love: "love, beauty, and harmony",
+        discipline: "discipline, structure, and mastery",
+        vitality: "vitality, leadership, and personal power",
+        intuition: "emotions, intuition, and nurturing",
+      },
+
+      // Alignment factors
+      factors: {
+        planetaryFriendship: "Planetary Friendship",
+        elementalHarmony: "Elemental Harmony",
+        dailyStrength: "Daily Strength",
+      },
+
+      // Relationship descriptions
+      friendship: {
+        strongFriends: "Strong Friends",
+        friends: "Friends",
+        neutral: "Neutral",
+        tension: "Tension",
+      },
+
+      descriptions: {
+        planetaryFriendship: {
+          samePlanet: "{dayPlanet} energy resonates perfectly with your {userPlanet} nature — powerful amplification.",
+          friend: "{dayPlanet} and {userPlanet} cooperate naturally — supportive flow.",
+          neutral: "{dayPlanet} and {userPlanet} are neutral — keep it simple and consistent.",
+          enemy: "{dayPlanet} and {userPlanet} create tension — move mindfully and avoid forcing outcomes.",
+        },
+        elementalHarmony: {
+          same: "{userElement} strengthens {dayElement} — strong resonance.",
+          supportive: "{dayElement} supports your {userElement} nature — harmonious flow.",
+          neutral: "{dayElement} and {userElement} blend neutrally — adapt and stay balanced.",
+          tension: "{dayElement} and {userElement} are in tension — proceed gently and prioritize clarity.",
+        },
+        dailyStrength: {
+          veryStrong: "{planet} is exceptionally strong today — favorable for decisive actions.",
+          strong: "{planet} has good strength today — supportive energy is available.",
+          moderate: "{planet} is moderate today — steady but not exceptional.",
+          weak: "{planet} is somewhat weak today — take a gentler approach.",
+          veryWeak: "{planet} is very weak today — better to wait for stronger timing.",
+        },
+      },
+
+      // Synthesis templates
+      synthesis: {
+        excellent: "Excellent {day} energy! {day}'s day of {quality} harmonizes beautifully with your {user}-{element} nature. {lunar}. Today favors {activities}.",
+        good: "Good {day} energy. {day}'s {quality} works well with your {user}-{element} nature. {lunar}. Favorable for {activities}.",
+        moderate: "Balanced {day} energy. {day}'s {quality} offers steady support. {lunar}. Good for {activities}.",
+        challenging: "Reflective {day} energy. {day}'s {quality} invites careful navigation. {lunar}. Better for {activities}.",
+      },
+
+      // Lunar additions
+      lunarPhase: {
+        waxing: "The waxing moon adds building momentum",
+        waning: "The waning moon supports release and completion",
+        full: "The full moon amplifies all energies",
+        new: "The new moon offers fresh beginnings",
+      },
+
+      // Strength labels
+      strengthLabels: {
+        veryStrong: "Very Strong",
+        strong: "Strong",
+        moderate: "Moderate",
+        weak: "Weak",
+        veryWeak: "Very Weak",
+      },
+
+      // Source labels
+      sourceLabels: {
+        fromName: "From Name + Mother's Name",
+        fromBirthChart: "From Birth Chart",
+        default: "Default (Sun)",
+      },
     },
 
     // Planetary Strength Analysis (detailed cards)
@@ -2353,6 +3081,52 @@ export const translations = {
         headerSubtitle: "Long-term",
         explanation: "Shows where a planet is in the zodiac — its long-term position that changes over weeks, months, or years.",
         personalizedNote: "Personalized to your elemental nature",
+        practices: {
+          title: "Planet-Specific Practices",
+          minutesShort: "min",
+          divineNames: {
+            title: "Divine Names",
+            description: "Divine names recommended for {planet} energy",
+            forCategory: "For {category}",
+            repetitionsLabel: "Repetitions:",
+            purposeLabel: "🎯 Purpose",
+            durationLabel: "Duration:",
+            categories: {
+              protection: "Protection",
+              influence: "Influence",
+              clarity: "Clarity",
+              prayer: "Prayer",
+              dignity: "Dignity",
+              leadership: "Leadership",
+              justice: "Justice",
+              career: "Career",
+            },
+            purposes: {
+              jupiter: {
+                protection: "Divine protection and guardianship",
+                taskheer: "Attracting favor, softening hearts (Taskhīr)",
+                accounting: "Divine accounting, keeping track",
+                ijaba: "Having prayers answered (Ijābah)",
+                haiba: "Commanding respect, dignified presence (Haybah)",
+                leadership: "Strength in leadership, personal growth",
+                rights: "Restoring respect, reclaiming rights",
+                career: "Strengthening job role, establishing firm position",
+              },
+            },
+            howTo: {
+              label: "💡 How to Practice",
+              step1: "Complete wuḍūʾ and face Qiblah",
+              step2: "Sit in quiet, clean space",
+              step3: "Set intention for {category}",
+              step4: "Recite with focus and reverence",
+              step5: "Use prayer beads for counting",
+            },
+            actions: {
+              startPractice: "Start Practice",
+              setReminder: "Set Reminder",
+            },
+          },
+        },
         summary: {
           bestNow: "Strongest now",
           weakNow: "Weakest now",
@@ -2625,6 +3399,7 @@ export const translations = {
             fire: "Fire nature tends to feel it as urgency—channel it into clean action.",
             earth: "Earth nature tends to seek structure—steady routines help.",
             air: "Air nature often feels it mentally—name priorities to reduce scatter.",
+            scorpioWithFire: "Scorpio's Mars-ruled water shares fire's intensity—use this powerful synergy for deep transformation.",
           },
         },
         daily: {
@@ -2899,12 +3674,92 @@ export const translations = {
       avoidNow: "Avoid for now:",
       disclaimer: "For reflection only • Not a ruling",
 
+      cards: {
+        currentHour: "Current Hour",
+        yourPlanet: "Your Planet",
+        transitConditions: "Transit Conditions",
+        alignmentAnalysis: "Alignment Analysis",
+        whatThisMeans: "What This Means",
+        excellentFor: "Excellent For",
+        avoidNow: "Avoid Now",
+        showTimeline: "Show Timeline",
+        hourEndsIn: "Hour ends in",
+        nextHour: "Next Hour",
+
+        status: {
+          act: "Act",
+          maintain: "Maintain",
+          hold: "Hold",
+          act_desc: "Favorable conditions — act with intention",
+          maintain_desc: "Favorable conditions for steady progress",
+          hold_desc: "Challenging conditions — wait for better timing",
+        },
+
+        transit: {
+          dignity: "Dignity",
+          house: "House",
+          strength: "Current Hour Power",
+          overallNote: "Your {planet} transit overall: {quality}. Tap for details →",
+          positionalPower: "Positional Power",
+          positionalSubtext: "Based on house position & dignity (for action now)",
+          transitQuality: "Transit Quality",
+          transitQualitySubtext: "Overall planetary strength (suits your nature)",
+          explanation: "Positional power is {positional}, while overall transit quality is {quality}",
+          viewFullAnalysis: "View full {planet} transit analysis →",
+          angular: "Angular",
+          succedent: "Succedent",
+          cadent: "Cadent",
+          house_10_angular: "House 10 - Career & Status",
+          exceptional: "Exceptional",
+          strong: "Strong",
+          moderate: "Moderate",
+          weak: "Weak",
+        },
+
+        analysis: {
+          planetaryFriendship: "Planetary Friendship",
+          elementalHarmony: "Elemental Harmony",
+          transitStrength: "Current Hour Power",
+          strong: "Strong",
+          moderate: "Moderate",
+          weak: "Weak",
+          exceptional: "Exceptional",
+        },
+
+        source: {
+          nameMotherPersonal: "Source: Name + Mother (Personal)",
+          birthChart: "Source: Birth Chart",
+        },
+      },
+
       authenticTiming: {
         title: "Authentic Timing",
         hourRuler: "Hour Ruler Strength",
         elemental: "Elemental Relationship",
         opening: "{planet} hour guidance (reflection-focused).",
         nextHour: "Next hour: {planet} begins in {minutes}m.",
+
+        timingAnalysisTitle: "Timing Analysis",
+        planetaryConditionsTitle: "Planetary Conditions",
+        dignityLabel: "Dignity",
+        positionLabel: "Zodiac Position",
+        strengthLabel: "Condition",
+        interpretationLabel: "Interpretation",
+        whyThisStatusTitle: "Why This Status?",
+        showDetails: "Show details",
+        hideDetails: "Hide details",
+        noEnhancements: "No specific enhancements suggested right now.",
+        noCautions: "No cautions flagged for this moment.",
+        recommendedLabel: "Recommended",
+        cautionsLabel: "Cautions",
+        personalPlanetLabel: "Your Planet",
+        personalElementLabel: "Your Element",
+        factors: {
+          elementCompatibility: "Elemental Harmony",
+          planetaryResonance: "Planetary Resonance",
+          manazilAlignment: "Manazil Alignment",
+          practiceMapping: "Practice Mapping",
+        },
       },
 
       currentHour: {
@@ -3651,6 +4506,10 @@ export const translations = {
           title: "General",
           subtitle: "Raw letters",
         },
+        birth: {
+          title: "Birth Profile",
+          subtitle: "Date + Time + Place",
+        },
       },
       
       // Abjad System Labels
@@ -4374,6 +5233,235 @@ export const translations = {
       
       // Note: Individual temperament data is now in temperamentProfiles.ts
       // This section contains only UI labels
+    },
+    
+    // Birth Profile Calculation Type (NEW)
+    birth: {
+      // Input Form
+      dateOfBirth: "Date of Birth",
+      selectDate: "Select Date",
+      timeOfBirth: "Time of Birth",
+      selectTime: "Select Time",
+      timeKnown: "Time Known",
+      timeUnknownNote: "Ascendant/Descendant calculation requires birth time",
+      placeOfBirth: "Place of Birth",
+      city: "City",
+      cityPlaceholder: "e.g., Casablanca, Cairo",
+      latitude: "Latitude",
+      longitude: "Longitude",
+      timezone: "Timezone",
+      timezoneHint: "IANA timezone (e.g., Africa/Casablanca)",
+      detectLocation: "Detect My Location",
+      locationPermission: "Location Permission",
+      locationPermissionMessage: "Location permission is required to auto-detect your birth location.",
+      locationError: "Location Error",
+      locationDetected: "Location Detected",
+      locationFailed: "Failed to detect location",
+      error: "Error",
+      linkWithName: "Link with Name/Lineage",
+      yourName: "Your Name (Arabic)",
+      motherName: "Mother's Name (Arabic)",
+      nameResonanceNote: "Used for resonance analysis with birth chart",
+      
+      // Results
+      results: {
+        birthSummary: "Birth Summary",
+        sun: "Sun",
+        moon: "Moon",
+        ascendant: "Ascendant (Rising Sign)",
+        descendant: "Descendant",
+        manzil: "Lunar Mansion",
+        manzilNumber: "Manzil #{number}",
+        angles: "Angles",
+        planets: "7 Traditional Planets",
+        moonTiming: "Moon Timing",
+        phase: "Phase",
+        lunarDay: "Lunar Day",
+        dayNumber: "Day {day}",
+        illumination: "Illumination",
+        direction: "Direction",
+        spiritualImprint: "Spiritual Imprint",
+        dominantElement: "Dominant Element",
+        dominantPlanet: "Dominant Planet",
+        temperament: "Temperament",
+        guidance: "Spiritual Guidance",
+        nameResonance: "Name ↔ Birth Resonance",
+        birthElement: "Birth Element",
+        birthRuler: "Birth Ruler",
+      },
+      
+      // Planet Conditions
+      condition: {
+        strong: "Strong",
+        neutral: "Neutral",
+        weak: "Weak",
+      },
+      
+      conditionDomicile: "In domicile (home sign)",
+      conditionExaltation: "In exaltation (elevated)",
+      conditionDetriment: "In detriment (challenged)",
+      conditionFall: "In fall (weakened)",
+      conditionPeregrine: "Peregrine (neutral)",
+      conditionNeutral: "Neutral condition",
+      
+      // Temperaments
+      temperament: {
+        "hot-dry": "Hot & Dry (Choleric)",
+        "hot-moist": "Hot & Moist (Sanguine)",
+        "cold-moist": "Cold & Moist (Phlegmatic)",
+        "cold-dry": "Cold & Dry (Melancholic)",
+      },
+      
+      // Alignments
+      alignment: {
+        aligned: "Aligned",
+        mixed: "Mixed",
+        challenging: "Challenging",
+      },
+      
+      nameResonanceAligned: "Your name and birth chart share harmonious elemental energies, creating a strong foundation for spiritual practice.",
+      nameResonanceMixed: "Your name and birth chart have complementary but different energies. This creates opportunities for growth through balance.",
+      nameResonanceChallenging: "Your name and birth chart have contrasting energies. This dynamic tension can be channeled into transformative spiritual work.",
+      
+      // Guidance by Element
+      guidance: {
+        fire: {
+          1: "Fire energy thrives with dynamic practices like active dhikr and physical worship",
+          2: "Keep your intention clear and avoid impulsive reactions — channel heat into disciplined devotion.",
+          3: "Best balance: grounding routines, steady sleep, and consistent worship to stabilize intensity.",
+        },
+        air: {
+          1: "Air energy benefits from intellectual contemplation and breath-focused practices",
+          2: "Protect your focus: choose one main practice and finish it before starting another.",
+          3: "Best balance: journaling, silent reflection, and mindful speech to prevent scattered energy.",
+        },
+        water: {
+          1: "Water energy deepens through emotional presence and heart-centered devotion",
+          2: "Guard your boundaries — sincerity is strength, but avoid carrying everyone’s emotions.",
+          3: "Best balance: nature, gratitude, and gentle routines that soothe and steady the heart.",
+        },
+        earth: {
+          1: "Earth energy grounds through consistent ritual and structured spiritual discipline",
+          2: "Avoid rigidity — keep structure, but leave space for mercy and flexibility.",
+          3: "Best balance: small daily practices done consistently beat occasional extremes.",
+        },
+        sun: {
+          1: "Solar dominance suggests leadership in spiritual community and teaching roles",
+          2: "Lead with humility: let service come before status, and keep your heart soft.",
+        },
+        moon: {
+          1: "Lunar dominance emphasizes intuitive wisdom and receptive spiritual states",
+          2: "Protect your inner rhythm: rest, du‘a, and quiet remembrance keep you centered.",
+        },
+        mercury: {
+          1: "Mercurial strength supports learning sacred texts and communicating spiritual knowledge",
+          2: "Best balance: study with practice — knowledge becomes نور when acted upon.",
+        },
+        venus: {
+          1: "Venusian influence brings harmony through beauty in worship and relational spirituality",
+          2: "Best balance: seek beauty in halal ways and avoid attachment to appearances.",
+        },
+        mars: {
+          1: "Martial energy channels courage into spiritual struggle (jihad al-nafs)",
+          2: "Best balance: turn anger into resolve — patience and restraint are your victories.",
+        },
+        jupiter: {
+          1: "Jupiterian expansion encourages generosity, teaching, and philosophical depth",
+          2: "Best balance: combine big vision with daily accountability to avoid excess.",
+        },
+        saturn: {
+          1: "Saturnine discipline supports long-term dedication and mastery of spiritual practice",
+          2: "Best balance: be firm with habits, gentle with yourself — consistency over harshness.",
+        },
+        temperament: {
+          "hot-dry": "Balance with cooling, moistening practices like fasting and night prayer",
+          "hot-moist": "Channel energy through social worship and joyful remembrance",
+          "cold-moist": "Strengthen through warming practices like movement-based dhikr",
+          "cold-dry": "Soften through heart-opening devotion and community connection",
+        },
+      },
+      
+      // Tooltips for Birth Profile
+      tooltips: {
+        // Planets
+        sun: "The Sun represents your core identity, vitality, and conscious self. It shows where you shine and seek recognition.",
+        moon: "The Moon represents your emotional nature, instincts, and inner world. It reveals how you nurture and need nurturing.",
+        mercury: "Mercury governs intellect, communication, and learning. It shows how you think, speak, and process information.",
+        venus: "Venus rules love, beauty, and values. It reveals what you attract and find pleasure in.",
+        mars: "Mars represents drive, action, and courage. It shows how you assert yourself and pursue goals.",
+        jupiter: "Jupiter governs expansion, wisdom, and blessings. It shows where you find growth and abundance.",
+        saturn: "Saturn represents discipline, limitations, and mastery. It shows where you must work hard and be patient.",
+        
+        // Zodiac Signs
+        aries: "Aries: Cardinal Fire — Pioneering, courageous, initiating new beginnings.",
+        taurus: "Taurus: Fixed Earth — Stable, sensual, values security and beauty.",
+        gemini: "Gemini: Mutable Air — Curious, communicative, mentally agile.",
+        cancer: "Cancer: Cardinal Water — Nurturing, protective, emotionally intuitive.",
+        leo: "Leo: Fixed Fire — Creative, generous, seeks recognition and self-expression.",
+        virgo: "Virgo: Mutable Earth — Analytical, service-oriented, seeks perfection.",
+        libra: "Libra: Cardinal Air — Harmonizing, diplomatic, seeks balance and partnership.",
+        scorpio: "Scorpio: Fixed Water — Intense, transformative, seeks deep truth.",
+        sagittarius: "Sagittarius: Mutable Fire — Philosophical, adventurous, seeks meaning.",
+        capricorn: "Capricorn: Cardinal Earth — Ambitious, disciplined, builds lasting structures.",
+        aquarius: "Aquarius: Fixed Air — Innovative, humanitarian, values freedom and progress.",
+        pisces: "Pisces: Mutable Water — Compassionate, intuitive, connected to the unseen.",
+        
+        // Dignities
+        domicile: "In its home sign — The planet operates with full strength and comfort.",
+        exaltation: "In its sign of exaltation — The planet is honored and operates at peak expression.",
+        detriment: "In its sign of detriment — The planet faces challenges expressing itself.",
+        fall: "In its sign of fall — The planet's energy is weakened and must work harder.",
+        peregrine: "Peregrine — Neither strengthened nor weakened; neutral condition.",
+        
+        // Elements
+        element_fire: "Fire Element: Dynamic, passionate, action-oriented. Associated with courage and transformation.",
+        element_water: "Water Element: Emotional, intuitive, receptive. Associated with healing and depth.",
+        element_air: "Air Element: Intellectual, communicative, social. Associated with ideas and connection.",
+        element_earth: "Earth Element: Practical, stable, grounded. Associated with manifestation and patience.",
+        
+        // Temperaments
+        temperament_hotDry: "Hot & Dry (Choleric): Energetic, decisive, action-driven. Needs cooling and moistening.",
+        temperament_hotMoist: "Hot & Moist (Sanguine): Optimistic, social, enthusiastic. Needs grounding focus.",
+        temperament_coldMoist: "Cold & Moist (Phlegmatic): Calm, patient, receptive. Needs warming activation.",
+        temperament_coldDry: "Cold & Dry (Melancholic): Thoughtful, disciplined, reserved. Needs softening warmth.",
+        
+        // Moon-related
+        lunarPhase: "The lunar phase at birth influences emotional patterns and natural rhythms of energy.",
+        lunarDay: "The lunar day (1-30) carries specific spiritual significance in the Islamic calendar.",
+        illumination: "Moon illumination shows the percentage of the moon's surface reflecting sunlight.",
+        waxingMoon: "Waxing Moon: Energy is building — good for starting projects and growth.",
+        waningMoon: "Waning Moon: Energy is releasing — good for completion and letting go.",
+        lunarMansion: "The 28 Lunar Mansions (Manāzil al-Qamar) each carry unique spiritual qualities.",
+        
+        // Angles
+        ascendant: "The Ascendant (Rising Sign) is the zodiac sign rising on the eastern horizon at birth. It represents your outward personality and how others first perceive you.",
+        descendant: "The Descendant is the sign opposite your Ascendant. It represents partnerships, relationships, and qualities you seek in others.",
+      },
+      
+      // Cosmic Blueprint - "What This Means For You" card
+      cosmicBlueprint: {
+        title: "What This Means For You",
+        youAre: "You are a",
+        with: "with",
+        who: "who",
+        yourGift: "Your Gift",
+        yourChallenge: "Your Challenge",
+        bestPath: "Best Path",
+      },
+      
+      // Action Card - "Try This Now"
+      actionCard: {
+        title: "Try This Now",
+        basedOn: "Based on your {planet} dominance:",
+        practice: "Practice",
+        times: "{count} times",
+        after: "after {prayer}",
+        bestDays: "Best Days",
+        setReminder: "Set Reminder",
+        learnMore: "Learn More",
+      },
+      
+      disclaimer: "Birth profile is for spiritual reflection only. Not predictive astrology. For religious guidance, consult qualified scholars.",
     },
 
     // Life Path
@@ -6456,7 +7544,7 @@ export const translations = {
         practice: "Teach and heal with love",
         verse: "Guide with compassion",
         practical: "Mentor, heal, serve humanity"
-      }
+      },
     },
 
     // GEOMETRY - Letter shapes
@@ -7802,6 +8890,223 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
     tooltips: {
       umHadad1: "Um Ḥadad (أم حدد) - Required for complete Name Destiny calculation",
       umHadad2: "Um Ḥadad (أم حدد) - Reveals your Aṣl al-Rūḥānī (spiritual origin)",
+      
+      // Planets
+      sun: "Your core identity and life purpose.",
+      moon: "Your emotions and inner self.",
+      mercury: "How you think and communicate.",
+      venus: "What you love and value.",
+      mars: "Your drive and energy.",
+      jupiter: "Your growth and luck.",
+      saturn: "Your discipline and lessons.",
+      
+      // Angles
+      ascendant: "How others see you. Your outer personality and first impression.",
+      descendant: "What you seek in partners. The qualities you attract.",
+      
+      // Zodiac Signs
+      aries: "Aries: Cardinal Fire — Pioneering, courageous, bold.",
+      taurus: "Taurus: Fixed Earth — Stable, sensual, grounded.",
+      gemini: "Gemini: Mutable Air — Curious, communicative, adaptable.",
+      cancer: "Cancer: Cardinal Water — Nurturing, protective, intuitive.",
+      leo: "Leo: Fixed Fire — Creative, generous, expressive.",
+      virgo: "Virgo: Mutable Earth — Analytical, helpful, precise.",
+      libra: "Libra: Cardinal Air — Harmonizing, diplomatic, fair.",
+      scorpio: "Scorpio: Mars-ruled water — volcanic hot springs, not gentle water. Intense, transformative, powerful depth.",
+      sagittarius: "Sagittarius: Mutable Fire — Philosophical, adventurous.",
+      capricorn: "Capricorn: Cardinal Earth — Ambitious, disciplined.",
+      aquarius: "Aquarius: Fixed Air — Innovative, humanitarian.",
+      pisces: "Pisces: Mutable Water — Compassionate, intuitive.",
+      
+      // Dignities
+      domicile: "Planet is 'home' - very strong.",
+      exaltation: "Planet is honored - powerful.",
+      detriment: "Planet is uncomfortable - weak.",
+      fall: "Planet is very weak here.",
+      peregrine: "Planet has average strength.",
+      neutral: "Planet has average strength.",
+      strong: "This planet is powerful in your chart. Its qualities are amplified and work naturally for you.",
+      weak: "This planet struggles here. Its qualities need extra effort and conscious development.",
+      
+      // Planet Dominance (for Spiritual Imprint)
+      sunDominance: "Sun dominance brings vitality, leadership, and strong sense of self.",
+      moonDominance: "Moon dominance brings emotional depth, intuition, and connection to cycles.",
+      mercuryDominance: "Mercury dominance brings sharp intellect, communication skills, and adaptability.",
+      venusDominance: "Venus dominance brings appreciation for beauty, harmony, and relationships.",
+      marsDominance: "Mars dominance brings courage, drive, and assertive energy.",
+      jupiterDominance: "Jupiter dominance brings optimism, wisdom, and expansive vision.",
+      saturnDominance: "Saturn dominance brings discipline, patience, and mastery through effort.",
+      
+      // Elements
+      fire: "Hot & dry element - energetic, passionate, creative.",
+      water: "Cold & moist element - emotional, intuitive, receptive.",
+      air: "Hot & moist element - intellectual, communicative, social.",
+      earth: "Cold & dry element - stable, practical, grounded.",
+      element_fire: "Fire Element: Dynamic, passionate, action-oriented.",
+      element_water: "Water Element: Emotional, intuitive, receptive.",
+      element_air: "Air Element: Intellectual, communicative, social.",
+      element_earth: "Earth Element: Practical, stable, grounded.",
+      
+      // Temperaments
+      choleric: "Hot & dry temperament - quick, ambitious, intense.",
+      sanguine: "Hot & moist temperament - social, optimistic, lively.",
+      phlegmatic: "Cold & moist temperament - calm, patient, peaceful.",
+      melancholic: "Cold & dry temperament - thoughtful, reserved, deep.",
+      temperament_hotDry: "Hot & Dry (Choleric): Energetic, decisive, action-driven.",
+      temperament_hotMoist: "Hot & Moist (Sanguine): Optimistic, social, enthusiastic.",
+      temperament_coldMoist: "Cold & Moist (Phlegmatic): Calm, patient, receptive.",
+      temperament_coldDry: "Cold & Dry (Melancholic): Thoughtful, disciplined, reserved.",
+      "hot-dry": "Hot & Dry (Choleric): Energetic, decisive, action-driven.",
+      "hot-moist": "Hot & Moist (Sanguine): Optimistic, social, enthusiastic.",
+      "cold-moist": "Cold & Moist (Phlegmatic): Calm, patient, receptive.",
+      "cold-dry": "Cold & Dry (Melancholic): Thoughtful, disciplined, reserved.",
+      
+      // Moon phases
+      lunarPhase: "The lunar phase influences emotional patterns and energy rhythms.",
+      lunarDay: "The lunar day (1-30) carries spiritual significance.",
+      illumination: "Percentage of moon's surface reflecting sunlight.",
+      waxingMoon: "Moon growing - building energy, good for starting.",
+      waningMoon: "Moon shrinking - releasing energy, good for completion.",
+      lunarMansion: "Moon's position in 28 Islamic lunar stations.",
+      new: "New Moon - time for new beginnings and intentions.",
+      waxing_crescent: "Waxing Crescent - building momentum.",
+      first_quarter: "First Quarter - taking action.",
+      waxing_gibbous: "Waxing Gibbous - refining and adjusting.",
+      waxingGibbous: "Moon growing toward full - building energy.",
+      full: "Full Moon - peak energy, illumination.",
+      waning_gibbous: "Waning Gibbous - sharing wisdom.",
+      last_quarter: "Last Quarter - releasing and letting go.",
+      waning_crescent: "Waning Crescent - rest and reflection.",
+      
+      // Scorpio special water nature
+      scorpioSpecial: "Intense, transformative, passionate. Mars-ruled water sign — like volcanic hot springs, not gentle water. Powerful depth.",
+    },
+
+    // ============================================================================
+    // ELEMENT NUANCES - Special Sign Characteristics by Planetary Ruler
+    // ============================================================================
+    elementNuances: {
+      // WATER SIGNS
+      scorpioSpecial: "Scorpio is unique: Mars-ruled 'boiling water' - intense and transformative. Shares fire's intensity despite being water.",
+      cancerSpecial: "Cancer is Moon-ruled water - the most emotional and changeable. Like tides shifting with lunar phases, or mother's protective waters.",
+      cancerWater: "Tidal water or mother's milk - nurturing, protective, constantly flowing with emotional cycles. Most sensitive of all water signs.",
+      piscesWater: "Ocean water - boundless, spiritual, dissolving boundaries between self and universe.",
+      scorpioWater: "Volcanic water - like hot springs or geysers. Intense, passionate, transformative.",
+      
+      // AIR SIGNS
+      aquariusSpecial: "Aquarius is Saturn-ruled 'cold air' - intellectual but detached. Like high-altitude wind or space. More distant than warm Gemini or harmonious Libra.",
+      aquariusAir: "High-altitude air - thin, cool, clear. Like mountain peaks or the vacuum of space. Intellectual but emotionally detached.",
+      geminiAir: "Warm breeze - social, communicative, light and playful. Mercury's quick, curious wind.",
+      libraAir: "Gentle wind - harmonious, balanced, socially graceful. Venus's diplomatic air.",
+      
+      // EARTH SIGNS
+      capricornSpecial: "Capricorn is double-Saturn earth - extremely cold and dry. Like mountain stone or frozen tundra, not fertile soil. Most disciplined and restrictive.",
+      capricornEarth: "Mountain rock - hard, enduring, unyielding. The most disciplined and structured earth sign.",
+      taurusEarth: "Fertile soil - comfortable, sensual, productive. Venus's lush garden.",
+      virgoEarth: "Cultivated field - organized, practical, serviceable. Mercury's meticulous harvest.",
+      
+      // FIRE SIGNS
+      leoSpecial: "Leo is Sun-ruled fire - not just flames, but the actual Sun. The center that others orbit. Most proud, bright, and radiating of all fire signs.",
+      leoFire: "Solar fire - sustained, central, radiating. Like the sun at the center of the solar system, demanding recognition.",
+      ariesFire: "Spark or ignition - quick, initiating, pioneering. Mars's conquering flame.",
+      sagittariusFire: "Spreading campfire - adventurous, philosophical, expansive. Jupiter's exploring light.",
+    },
+
+    // ============================================================================
+    // MOON TRANSIT ADVICE - Scorpio Moon Special Cases
+    // ============================================================================
+    moonTransits: {
+      // When Moon is in Scorpio (for fire sign users)
+      scorpioForLeo: {
+        rating: "Intense & Powerful",
+        description: "Deep transformative energy meets your bright nature. Excellent for spiritual work and mystical studies.",
+        bestFor: "Deep dhikr, spiritual practices, intense creative work, mystical studies (ʿIlm al-Asrār)",
+        avoid: "Ego battles, surface socializing, controlling others",
+        insight: "Scorpio's Mars-ruled intensity complements Leo's fire. Both are powerful - use this for deep work.",
+      },
+      scorpioForAries: {
+        rating: "Strong & Dynamic",
+        description: "Mars energy supports Mars energy. Powerful time for action and transformation.",
+        bestFor: "Bold initiatives, physical activities, clearing obstacles",
+        avoid: "Impulsiveness, conflicts, rushing decisions",
+      },
+      scorpioForSagittarius: {
+        rating: "Transformative Adventure",
+        description: "Deep intensity meets expansive spirit. Good for spiritual exploration.",
+        bestFor: "Spiritual journeys, deep learning, philosophical breakthroughs",
+        avoid: "Getting lost in darkness, ignoring the light",
+      },
+      scorpioDefault: {
+        rating: "Intense & Deep",
+        description: "Time for inner work, transformation, and depth.",
+        bestFor: "Research, healing, spiritual practices, deep conversations",
+        avoid: "Superficiality, manipulation, control battles",
+      },
+      // When Moon is in fire signs (for Scorpio users) - REVERSE CASE
+      leoForScorpio: {
+        rating: "Radiant & Powerful",
+        description: "Leo's bright creative energy illuminates your deep nature. Your Mars-ruled water meets solar fire — intense transformation through expression.",
+        bestFor: "Creative expression, leadership, spiritual visibility, powerful manifestation",
+        avoid: "Hiding your light, excessive self-criticism, emotional suppression",
+        insight: "As Mars-ruled water, you share fire's intensity. Leo Moon amplifies your power — let yourself shine.",
+      },
+      ariesForScorpio: {
+        rating: "Dynamic & Driven",
+        description: "Mars energy meets Mars energy. Double Mars power for courageous action and transformation.",
+        bestFor: "Starting projects, physical activities, assertive action, breaking through obstacles",
+        avoid: "Aggression, impatience, forcing outcomes",
+        insight: "Both Aries and Scorpio are Mars-ruled. Use this double-Mars power for courageous spiritual work.",
+      },
+      sagittariusForScorpio: {
+        rating: "Expansive Depth",
+        description: "Sagittarian fire expands your deep nature. Adventure meets intensity — seek meaning in the unknown.",
+        bestFor: "Spiritual exploration, philosophical study, travel, expanding horizons",
+        avoid: "Excessive secrecy, fear of the unknown, limiting beliefs",
+        insight: "Fire's optimism lightens Scorpio's depth. Trust the journey and let wisdom emerge.",
+      },
+      
+      // AQUARIUS MOON - Saturn-ruled cold air
+      aquariusMoon: {
+        rating: "Cool & Intellectual",
+        description: "Detached, innovative energy. Excellent for objectivity but challenging for emotional warmth.",
+        bestFor: "Strategic thinking, innovation, group work, humanitarian projects, technology",
+        avoid: "Emotional intimacy, tradition, personal connection, warm gatherings",
+        insight: "Saturn-ruled air is cool and clear. Use for mental clarity, not emotional processing.",
+      },
+      aquariusForFire: {
+        rating: "Cool but Stimulating",
+        description: "Intellectual air cools your fire but stimulates ideas. Good for planning and innovation.",
+        bestFor: "Strategic thinking, innovation, group projects, humanitarian work",
+        avoid: "Impulsive action, emotional decisions, forcing warmth",
+        insight: "Aquarius brings mental clarity to fire's passion. Channel your energy through ideas.",
+      },
+      
+      // CAPRICORN MOON - Saturn's frozen earth
+      capricornMoon: {
+        rating: "Serious & Disciplined",
+        description: "Emotional restraint and focus on duty. Challenging for free expression, excellent for serious work.",
+        bestFor: "Career moves, long-term planning, discipline, responsibilities, building structures",
+        avoid: "Emotional expression, spontaneity, leisure, vulnerability, playfulness",
+        insight: "Capricorn Moon demands maturity and control. Use for serious accomplishments, not emotional connection.",
+      },
+      
+      // LEO MOON - The Sun's fire
+      leoMoon: {
+        rating: "Radiant & Proud",
+        description: "The Moon in the Sun's sign - emotions need to shine and be seen. Creative, dramatic, generous.",
+        bestFor: "Creative expression, performance, leadership, celebration, generosity",
+        avoid: "Hiding, self-doubt, dimming your light for others, excessive humility",
+        insight: "Leo Moon is solar fire in the emotional realm. Your feelings want recognition — let them be seen.",
+      },
+      
+      // CANCER MOON - The Moon at home
+      cancerMoon: {
+        rating: "Deeply Emotional",
+        description: "Moon is HOME in Cancer. Emotions are amplified, sensitivity peaks, nurturing energy is strongest.",
+        bestFor: "Family time, cooking, home care, emotional healing, connecting with mother/children",
+        avoid: "Public exposure, criticism, harsh environments, leaving comfort zone",
+        insight: "Cancer Moon is the Moon at its most powerful. Emotions flow freely — embrace vulnerability and care.",
+      },
     },
 
     // ============================================================================
@@ -7871,6 +9176,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         },
         supportive: {
           description: "Your {userElement} nature is supported by today's {dayElement} energy — favorable conditions for growth and action.",
+        },
+        scorpioFire: {
+          description: "Your Scorpio water carries Mars fire within — today's fire energy ignites your hidden intensity, creating powerful synergy.",
+        },
+        aquariusWater: {
+          description: "Your Aquarius cold air shares Saturn's coolness with water — not the typical air-water friction. Intellectual clarity meets emotional depth.",
         },
         challenging: {
           description: "Your {userElement} nature contrasts with today's {dayElement} energy — practice patience and gentle adaptation.",
@@ -8886,6 +10197,20 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
   },
 
   fr: {
+
+    // Moon phase
+
+    // Moon phase
+    moonPhase: {
+      dayOfMonth: "Jour du Mois",
+      moonPower: "Puissance Lunaire",
+      phaseEnergy: "Énergie de Phase",
+    },
+
+    // Footer disclaimer
+    disclaimer: "Pour réflexion seulement - Pas une règle",
+
+        moonPowerNote: "Puissance de phase (illumination) calculée via l’élongation Soleil–Lune (éphémérides).",
     nav: {
       home: "Accueil",
       calculator: "Calculatrice",
@@ -8925,6 +10250,226 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       levelBasic: "BASIQUE",
       levelEnhanced: "AMÉLIORÉ",
       levelFull: "COMPLET",
+    },
+
+    // Lune & Harmonie Jour (Étiquettes UI)
+    moon: {
+      ui: {
+        moonDayHarmony: "Harmonie Lune & Jour",
+        perfectAlignment: "Alignement Parfait",
+        goodAlignment: "Bon Alignement",
+        neutralAlignment: "Alignement Neutre",
+        challengingAlignment: "Alignement Difficile",
+        explanation: "Ce Que Cela Signifie",
+        recommendation: "Ce À Faire",
+        lunarTiming: "Timing Lunaire",
+        dayOfMonth: "Jour {day}",
+        lunarDay: "Jour Lunaire",
+        moonPower: "Puissance Lunaire",
+        waxing: "Lune Croissante",
+        waning: "Lune Décroissante",
+        learnMore: "En Savoir Plus",
+        rest: "Repos",
+        suitableFor: "Meilleur pour",
+        notSuitableFor: "Éviter",
+        whyThisMatters: "Pourquoi c'est important",
+        spiritualGuidance: "Conseils spirituels",
+      },
+      // Titres et descriptions des phases lunaires
+      new: {
+        title: "Nouvelle Lune",
+        description: "La Nouvelle Lune est un temps de nouveaux débuts et de frais départ. Bien adaptée pour fixer des intentions et le travail intérieur. Introspection avant l'action.",
+        suitable: {
+          category: "Pratique Spirituelle",
+          activity1: "Repos et restauration",
+          activity2: "Contemplation profonde",
+          activity3: "Travail d'ombre",
+          spiritual1: "Prières nocturnes (Tahajjud)",
+          spiritual2: "Tawbah (repentance)",
+          spiritual3: "Jeûne",
+        },
+        notSuitable: {
+          category: "Action Externe",
+          activity1: "Démarrer de nouveaux projets",
+          activity2: "Grands lancements",
+          activity3: "Accords commerciaux",
+          reason: "La Lune noire manque de lumière et d'élan pour les nouvelles entreprises externes. Attendez le retour de la lumière.",
+        },
+      },
+      waxing_crescent: {
+        title: "Lune Croissante Mince",
+        description: "La Lune grandit et accumule de l'énergie. Un temps de croissance, d'initiative et de momentum. Prenez une action inspirée vers vos objectifs.",
+        suitable: {
+          category: "Croissance & Nouveaux Projets",
+          activity1: "Démarrer des entreprises",
+          activity2: "Nouvelles relations",
+          activity3: "Apprendre de nouvelles compétences",
+          activity4: "Projets créatifs",
+          spiritual1: "Du'a pour l'augmentation",
+          spiritual2: "Pratiques d'invocation",
+          spiritual3: "Rituels de définition d'objectifs",
+        },
+        notSuitable: {
+          category: "Fins & Libération",
+          activity1: "Grandes fins",
+          activity2: "Bannissement",
+          activity3: "Couper les liens",
+          reason: "La lumière croissante s'oppose à la libération et à l'achèvement. La Lune veut construire, pas diminuer.",
+        },
+      },
+      first_quarter: {
+        title: "Premier Quartier",
+        description: "Les défis et décisions émergent. Un temps d'affronter les obstacles avec courage. Construisez à travers les difficultés. Bon pour surmonter la résistance.",
+        suitable: {
+          category: "Défi & Croissance",
+          activity1: "Agir sur les plans",
+          activity2: "Surmonter les obstacles",
+          activity3: "Décisions majeures",
+          activity4: "Activités physiques",
+          spiritual1: "Pratiques protectrices",
+          spiritual2: "Dhikr renforçant la force",
+          spiritual3: "Travail de volonté",
+        },
+        notSuitable: {
+          category: "Affaires Délicates",
+          activity1: "Négociations pour la paix",
+          activity2: "Guérison douce",
+          activity3: "Travail réceptif",
+          reason: "La lumière croissante de la Lune crée de la tension et un défi. Meilleur pour le travail doux pendant la Lune décroissante.",
+        },
+      },
+      waxing_gibbous: {
+        title: "Lune Gibbeuse Croissante",
+        description: "Presque pleine—l'énergie est presque à son apogée. Affinez vos efforts. Parfait pour les touches finales avant l'achèvement. Faites confiance à votre progression.",
+        suitable: {
+          category: "Manifestation & Achèvement",
+          activity1: "Achever les projets",
+          activity2: "Dernier effort pour les objectifs",
+          activity3: "Travail de manifestation",
+          activity4: "Événements importants",
+          spiritual1: "Pratiques de Pleine Lune",
+          spiritual2: "Manifestation d'intention",
+          spiritual3: "Rituels d'énergie maximale",
+        },
+        notSuitable: {
+          category: "Travail Subtil/Caché",
+          activity1: "Travail secret",
+          activity2: "Réflexion tranquille",
+          activity3: "Pratiques cachées",
+          reason: "La Lune presque pleine est brillante et publique. Si la discrétion est nécessaire, choisissez une phase plus sombre.",
+        },
+      },
+      full: {
+        title: "Pleine Lune",
+        description: "Puissance maximale et illumination. Toutes les énergies sont amplifiées. Temps puissant pour la manifestation, la révélation et la célébration. Utilisez avec conscience.",
+        suitable: {
+          category: "Culmination & Guérison",
+          activity1: "Travail de guérison",
+          activity2: "Révélations et clarté",
+          activity3: "Cérémonies d'achèvement",
+          activity4: "Rassemblements de groupe",
+          activity5: "Rituels de Pleine Lune",
+          spiritual1: "Prières de Pleine Lune",
+          spiritual2: "Rituels de guérison",
+          spiritual3: "Pratiques communautaires",
+          spiritual4: "Clarté de vision",
+        },
+        notSuitable: {
+          category: "Nouveaux Débuts",
+          activity1: "Démarrer de nouveaux projets",
+          activity2: "Introspection tranquille",
+          activity3: "Travail secret",
+          reason: "L'énergie de Pleine Lune est externe et illuminante. Pour les nouveaux départs, attendez la lune croissante.",
+        },
+      },
+      waning_gibbous: {
+        title: "Lune Gibbeuse Décroissante",
+        description: "La Lune commence à se libérer. L'énergie se déplace vers l'achèvement. Partagez vos bénédictions. La gratitude et le partage sont puissants maintenant.",
+        suitable: {
+          category: "Achèvement & Gratitude",
+          activity1: "Achever les projets",
+          activity2: "Exprimer la gratitude",
+          activity3: "Enseignement/partage",
+          activity4: "Organisation",
+          spiritual1: "Pratiques de gratitude",
+          spiritual2: "Rituels de Shukr",
+          spiritual3: "Travail de bénédiction",
+          spiritual4: "Pratiques d'enseignement",
+        },
+        notSuitable: {
+          category: "Grandes Nouvelles Entreprises",
+          activity1: "Démarrer de grands projets",
+          activity2: "Initier des relations",
+          activity3: "Nouveaux engagements",
+          reason: "L'énergie de Lune décroissante tend vers l'achèvement. Les nouvelles ventures appartiennent à la phase croissante.",
+        },
+      },
+      last_quarter: {
+        title: "Dernier Quartier",
+        description: "Libération et réflexion. Évaluez ce qui est complet. Parfait pour lâcher prise, guérir et préparer le renouveau. Sagesse par l'examen.",
+        suitable: {
+          category: "Libération & Purification",
+          activity1: "Bannir les modèles négatifs",
+          activity2: "Purification",
+          activity3: "Pardon",
+          activity4: "Terminer les relations respectueusement",
+          spiritual1: "Rituels de purification",
+          spiritual2: "Pratiques de pardon",
+          spiritual3: "Cérémonies de libération",
+          spiritual4: "Travail de Tawbah",
+        },
+        notSuitable: {
+          category: "Nouvelle Croissance",
+          activity1: "Démarrer de nouveaux projets",
+          activity2: "Expansion",
+          activity3: "Nouveaux engagements",
+          reason: "L'énergie de Lune décroissante soutient la libération, pas la croissance. Les nouvelles ventures prospèrent pendant la phase croissante.",
+        },
+      },
+      waning_crescent: {
+        title: "Lune Décroissante Mince",
+        description: "Libération finale avant le nouveau cycle. Repos, intégration et approfondissement spirituel. Préparez le sol pour de nouvelles graines. Abandon et confiance.",
+        suitable: {
+          category: "Réflexion Profonde",
+          activity1: "Méditation",
+          activity2: "Introspection",
+          activity3: "Fermetures finales",
+          activity4: "Retraite spirituelle",
+          spiritual1: "Prières nocturnes",
+          spiritual2: "Dhikr profond",
+          spiritual3: "I'tikāf (retraite)",
+          spiritual4: "Jeûne",
+        },
+        notSuitable: {
+          category: "Entreprises Actives",
+          activity1: "Démarrer des projets",
+          activity2: "Activités majeures",
+          activity3: "Travail public",
+          reason: "La Lune presque noire appelle le repos. Attendez la nouvelle lumière pour commencer de nouvelles entreprises.",
+        },
+      },
+      harmony: {
+        waxing_active: {
+          explanation: "Lune croissante + Planète active (Soleil/Mars/Jupiter) = Bien adaptée pour lancer des projets et construire l'élan.",
+          recommendation: "Moment favorable pour démarrer de nouveaux projets et agir avec audace. Canalisez cette énergie avec sagesse.",
+        },
+        waning_reflective: {
+          explanation: "Lune décroissante + Planète réflexive (Lune/Vénus/Saturne) = Bien adaptée pour achever, libérer et le travail intérieur.",
+          recommendation: "Favorable pour terminer les projets, les pratiques de guérison et la réflexion spirituelle profonde. Libérez ce qui ne sert plus.",
+        },
+        waxing_reflective: {
+          explanation: "La Lune croissante veut construire, mais une planète réflexive soutient l'introspection. Signaux mixtes mais viables.",
+          recommendation: "Vous pouvez toujours agir, mais soyez prêt pour un besoin intérieur de réflexion ou d'ajustement en chemin.",
+        },
+        waning_active: {
+          explanation: "La Lune décroissante soutient l'achèvement, mais une planète active pousse à l'action. Énergies mal alignées.",
+          recommendation: "Vous pouvez avancer si nécessaire, mais le courant profond du jour favorise plutôt l'achèvement que le début de nouveautés.",
+        },
+        neutral: {
+          explanation: "La planète gouvernante est flexible et adaptable. Le jour reste énergétiquement neutre et équilibré.",
+          recommendation: "L'action et la réflexion sont toutes deux possibles aujourd'hui. Laissez la phase lunaire guider vos priorités.",
+        },
+      },
     },
 
     // Écran Manazil (détail)
@@ -9077,11 +10622,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         todaysFocus: "Focus du Jour",
         forReflection: "Pour réflexion",
         viewDetails: "Voir détails",
+        peakHours: "Heures de {planet} (vérifier Alignement du Moment pour les heures spécifiques)",
         windows: {
           neutral: "Fenêtre neutre",
           favorable: "Fenêtre favorable",
           transformative: "Fenêtre transformatrice",
-          delicate: "Fenêtre délicate",
+          delicate: "Fenêtre conditionnelle",
         },
         energyDescriptions: {
           fire: "Dynamique & énergisant",
@@ -9097,6 +10643,108 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           mercury: "Communiquez clairement, apprenez quelque chose de nouveau",
           moon: "Faites confiance à votre intuition, occupez-vous de vos émotions",
           sun: "Dirigez avec confiance, exprimez-vous",
+        },
+        activities: {
+          jupiter: {
+            excellent: {
+              0: "Commencer un nouvel apprentissage ou enseignement",
+              1: "Expansion des affaires et opportunités",
+              2: "Chercher des conseils ou du mentorat",
+              3: "Planification de voyages ou études philosophiques",
+              4: "Connexions sociales et réseautage",
+            },
+            lessFavorable: {
+              0: "Travail technique détaillé (attendre le jour de Mercure)",
+              1: "Conservatisme financier (Jupiter encourage l'expansion)",
+            },
+          },
+          mars: {
+            excellent: {
+              0: "Entraînement physique et athlétisme",
+              1: "Lancer des initiatives audacieuses",
+              2: "Activités compétitives",
+              3: "Surmonter les obstacles",
+              4: "Action décisive",
+            },
+            lessFavorable: {
+              0: "Négociations délicates",
+              1: "Conversations émotionnelles",
+              2: "Tâches nécessitant de la patience",
+            },
+          },
+          mercury: {
+            excellent: {
+              0: "Écriture et communication",
+              1: "Apprentissage et étude",
+              2: "Négociations commerciales",
+              3: "Planification et stratégie",
+              4: "Trajets courts et courses",
+            },
+            lessFavorable: {
+              0: "Décisions émotionnelles",
+              1: "Travail physique intense",
+              2: "Engagements à long terme sans analyse",
+            },
+          },
+          venus: {
+            excellent: {
+              0: "Construction de relations",
+              1: "Travail créatif et artistique",
+              2: "Poursuite de la beauté et de l'esthétique",
+              3: "Rassemblements sociaux",
+              4: "Accords financiers",
+            },
+            lessFavorable: {
+              0: "Action agressive",
+              1: "Confrontation",
+              2: "Critique sévère",
+            },
+          },
+          saturn: {
+            excellent: {
+              0: "Achèvement de projets à long terme",
+              1: "Construction de structures et systèmes",
+              2: "Travail de discipline et de concentration",
+              3: "Tâches administratives",
+              4: "Planification à long terme",
+            },
+            lessFavorable: {
+              0: "Décisions spontanées",
+              1: "Lancement de nouveaux projets créatifs",
+              2: "Activités de loisirs sociaux",
+            },
+          },
+          sun: {
+            excellent: {
+              0: "Leadership et prise de responsabilités",
+              1: "Auto-expression et créativité",
+              2: "Présentations publiques",
+              3: "Image de marque personnelle",
+              4: "Activités renforçant la confiance",
+            },
+            lessFavorable: {
+              0: "Rôles soumis",
+              1: "Travail de soutien en arrière-plan",
+              2: "Auto-dépréciation",
+            },
+          },
+          moon: {
+            excellent: {
+              0: "Guérison émotionnelle et réflexion",
+              1: "Soins et attention aux autres",
+              2: "Travail intuitif",
+              3: "Temps en famille",
+              4: "Soins personnels et repos",
+            },
+            lessFavorable: {
+              0: "Action agressive",
+              1: "Décisions uniquement logiques",
+              2: "Suppression émotionnelle",
+            },
+          },
+          common: {
+            waitForBetterTiming: "Lancer de grandes nouvelles initiatives (attendre un meilleur timing)",
+          },
         },
       },
       dailyGuidance: {
@@ -9529,10 +11177,13 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
     },
 
     common: {
+      bestFor: "Favorable pour",
+      avoid: "Éviter",
       buttons: {
         learnMore: "En Savoir Plus",
         collapse: "Afficher Moins",
         tapToLearn: "Appuyez pour en savoir plus",
+        ok: "OK",
       },
       retry: "Réessayer",
       on: "OUI",
@@ -9572,6 +11223,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       upload: "Télécharger",
       remove: "Retirer",
       optional: "Optionnel",
+      required: "Requis",
       share: "Partager",
       seeMore: "Voir Plus",
       seeLess: "Voir Moins",
@@ -9588,6 +11240,31 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         fire: "Feu",
         water: "Eau",
         earth: "Terre",
+      },
+      // Planètes - partagé
+      planets: {
+        sun: "Soleil",
+        moon: "Lune",
+        mercury: "Mercure",
+        venus: "Vénus",
+        mars: "Mars",
+        jupiter: "Jupiter",
+        saturn: "Saturne",
+      },
+      // Signes du zodiaque - partagé
+      zodiacSigns: {
+        aries: "Bélier",
+        taurus: "Taureau",
+        gemini: "Gémeaux",
+        cancer: "Cancer",
+        leo: "Lion",
+        virgo: "Vierge",
+        libra: "Balance",
+        scorpio: "Scorpion",
+        sagittarius: "Sagittaire",
+        capricorn: "Capricorne",
+        aquarius: "Verseau",
+        pisces: "Poissons",
       },
       // Quality levels (TimingGuidanceCard)
       quality: {
@@ -10749,13 +12426,13 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           favorable: "Fenêtre favorable",
           neutral: "Fenêtre neutre",
           transformative: "Fenêtre transformative",
-          delicate: "Fenêtre délicate",
+          delicate: "Fenêtre conditionnelle",
         },
         windowDescription: {
           favorable: "Aujourd'hui présente des conditions favorables pour l'action et la croissance. Les énergies s'alignent pour soutenir vos intentions.",
           neutral: "Aujourd'hui offre des énergies équilibrées. Une journée stable pour les activités routinières et le progrès graduel.",
           transformative: "Aujourd'hui apporte un potentiel transformatif par le contraste. Les opportunités naissent de l'adaptation aux énergies changeantes.",
-          delicate: "Aujourd'hui nécessite une navigation délicate. Pratiquez la patience et la conscience dans vos actions.",
+          delicate: "Aujourd'hui demande une approche conditionnelle et mesurée. Pratiquez la patience, la structure, et avancez étape par étape.",
         },
         dayRulerText: "Aujourd'hui est gouverné par {planet}, apportant l'énergie {element} à toutes les activités et intentions.",
         elementText: "Élément {element}",
@@ -10772,7 +12449,79 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           line3: "Votre élément personnel {userElement} (dérivé de votre nom) interagit avec l'énergie du jour",
           line4: "Ceci est un outil de réflexion, pas un système prédictif — utilisez-le pour aligner vos intentions avec les rythmes naturels",
         },
+        // Sous-titres des sections pliables pour une meilleure UX
+        collapsible: {
+          personalizedInsights: "Analyse personnalisée",
+          planetaryDetails: "Répartition détaillée",
+          lunarGuidance: "Énergie lunaire ce soir",
+          yourPersonalFilter: "Votre filtre personnel",
+        },
         disclaimer: "Pour réflexion • Pas un avis religieux",
+        
+        // Daily Energy Card (Enhanced UI)
+        dailyEnergyCard: {
+          title: "Score énergétique quotidien",
+          weightedCalculation: "Décomposition du calcul pondéré",
+          otherPlanets: "Autres influences planétaires",
+          total: "Score total",
+          scoreExplanation: "Votre score énergétique quotidien reflète l'alignement de la planète gouvernante du jour (50%), de la position lunaire (30%) et d'autres influences planétaires (20%) avec votre nature.",
+          
+          // Quality levels
+          quality: {
+            excellent: "Excellent",
+            good: "Bon",
+            moderate: "Modéré",
+            weak: "Faible",
+          },
+          
+          // Ilm il Nujum Recommendations
+          recommendations: {
+            excellent: {
+              title: "Alignement Cosmique Optimal",
+              description: "Les énergies d'aujourd'hui sont exceptionnellement favorables. C'est un moment idéal pour les entreprises importantes, les pratiques spirituelles et les décisions majeures.",
+              practices: "💡 Maximisez cette fenêtre : entreprendre des projets importants, approfondir la pratique spirituelle, cultiver les relations, et agir avec audace.",
+              timing: "⏰ Heures de pointe : utilisez les heures les plus fortes de {planet} pour les meilleurs résultats",
+              caution: "⚠️  Même dans les jours excellents, maintenez l'équilibre et évitez l'excès.",
+            },
+            good: {
+              title: "Énergie Favorable",
+              description: "Aujourd'hui présente de bonnes opportunités. La planète gouvernante soutient la plupart des activités, bien que certaines nécessitent plus de patience que d'autres.",
+              practices: "💡 Bon pour : le travail régulier, la construction de relations, la réflexion spirituelle et le progrès graduel.",
+              timing: "⏰ Meilleur pendant : matin à début d'après-midi",
+              caution: "⚠️  Évitez de vous surcharger ou de forcer les résultats.",
+            },
+            moderate: {
+              title: "Énergie Équilibrée",
+              description: "Aujourd'hui offre une énergie stable et ancrée. Ni fortement favorable ni défavorable—un jour pour la maintenance et le travail régulier.",
+              practices: "💡 Mieux adapté pour : les tâches routinières, les affaires pratiques, les routines de santé et la réflexion.",
+              timing: "⏰ Rythme régulier tout au long de la journée",
+              caution: "⚠️  Gardez vos objectifs réalistes et concentrez-vous sur une priorité.",
+            },
+            weak: {
+              title: "Énergie Délicate Demande Précaution",
+              description: "Les influences planétaires d'aujourd'hui sont moins favorables. Naviguez avec pleine conscience, patience et douceur. Ce n'est pas un jour pour la force.",
+              practices: "💡 Bon pour : le travail intérieur, l'achèvement des tâches en cours, le repos et l'approfondissement spirituel.",
+              timing: "⏰ Travaillez avec des heures plus douces ; envisagez les pratiques en soirée",
+              caution: "⚠️  Reportez les décisions importantes et les entreprises si possible. Pratiquez l'acceptation.",
+            },
+          },
+          
+          // Lunar influence labels
+          lunar: {
+            waxing: "🌙 Lune croissante : Phase de construction. Favorable pour la croissance, les nouvelles initiatives et la manifestation.",
+            waning: "🌙 Lune décroissante : Phase de libération. Favorable pour l'achèvement, la guérison, le lâcher-prise et la réflexion.",
+            full: "🌙 Pleine Lune : Phase d'amplification. Toutes les énergies intensifiées. À utiliser avec conscience.",
+            new: "🌙 Nouvelle Lune : Phase de renouvellement. Débuts frais, semis de graines et fixation d'intentions.",
+          },
+          
+          // Factor explanations
+          dayRulerInfluence: "La planète gouvernante du jour contribue 50% de votre score. Les gouvernantes plus fortes créent des scores plus élevés.",
+          moonInfluence: "La mansión lunaire contribue 30%. La Lune régit les émotions, l'intuition et le travail intérieur.",
+          otherInfluence: "Les autres positions planétaires contribuent 20%. Celles-ci incluent les aspects et les dignités.",
+          
+          // Calculation note
+          calculationNote: "Ce score synthétise les principes de l'astronomie islamique classique (ʿIlm al-Nujūm) avec l'analyse astrologique moderne pour une guidance quotidienne holistique.",
+        },
       },
       
       // Daily Guidance Messages & Content
@@ -11113,6 +12862,141 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         jupiter: "Jupiter",
         saturn: "Saturne",
       },
+
+      planetaryJudgment: {
+        title: "Jugement planétaire",
+        cosmicVerdict: "Verdict cosmique",
+        disclaimer: "Pour la réflexion, pas pour trancher.",
+        classicalTerms: {
+          supportive: "Saʿd",
+          neutral: "Mutawassiṭ",
+          restrictive: "Naḥs",
+        },
+        status: {
+          supportive: "Soutenant",
+          neutral: "Neutre",
+          restrictive: "Restrictif",
+        },
+        intro: "{planet} gouverne aujourd’hui.",
+        rulerTone: {
+          sun: "Clarté, leadership et intention sont mis en avant.",
+          moon: "Émotions, intuition et changement sont mis en avant.",
+          mercury: "Mouvement, échanges et clarté mentale sont mis en avant.",
+          venus: "Harmonie, lien et raffinement sont mis en avant.",
+          mars: "Force, urgence et arêtes vives dominent — agissez avec retenue.",
+          jupiter: "Expansion, sagesse et ouvertures sont mis en avant.",
+          saturn: "Discipline, protection et délais dominent — privilégiez ce qui dure.",
+        },
+        phaseModifier: {
+          amplify: "Avec une Lune croissante ou pleine, la nature du maître est amplifiée.",
+          soften: "Avec une Lune décroissante, les effets du maître s’adoucissent.",
+          neutral: "Avec une Lune discrète, gardez la journée simple et intentionnelle.",
+        },
+        bestForLabel: "Meilleur pour",
+        avoidLabel: "À éviter",
+        bestFor: {
+          sun: {
+            0: "Fixer une intention et décider clairement",
+            1: "Leadership, visibilité et présentation",
+            2: "Commencer avec honneur et constance",
+          },
+          moon: {
+            0: "Réflexion, réparation et clarté émotionnelle",
+            1: "Affaires familiales et soin du lien",
+            2: "Planifier doucement avant d’agir",
+          },
+          mercury: {
+            0: "Écriture, apprentissage, négociation et planification",
+            1: "Courts déplacements et coordination",
+            2: "Poser les bonnes questions et affiner la stratégie",
+          },
+          venus: {
+            0: "Réconciliation, amitié et apaisement",
+            1: "Création, beauté et raffinement",
+            2: "Accords si l’intention reste claire et équilibrée",
+          },
+          mars: {
+            0: "Effort structuré, entraînement et action disciplinée",
+            1: "Retirer ce qui bloque (avec prudence)",
+            2: "Limiter et terminer avec décision",
+          },
+          jupiter: {
+            0: "Apprendre, enseigner et chercher un conseil sage",
+            1: "Générosité, bénédictions et opportunités",
+            2: "Planifier à long terme avec une intention élevée",
+          },
+          saturn: {
+            0: "Protection, retenue et engagements sérieux",
+            1: "Travail profond, structure et construction durable",
+            2: "Revue, responsabilité et consolidation des limites",
+          },
+        },
+        avoid: {
+          sun: {
+            0: "Conflits d’ego et orgueil impulsif",
+            1: "Dispersion et engagements flous",
+            2: "Promettre sans capacité de tenir",
+          },
+          moon: {
+            0: "Réactivité émotionnelle et décisions vagues",
+            1: "Porter les émotions des autres",
+            2: "Lancements majeurs sans stabilité",
+          },
+          mercury: {
+            0: "Rumeurs, précipitation et accords bâclés",
+            1: "Sur-analyse au lieu de choisir",
+            2: "Engagements importants sans plan clair",
+          },
+          venus: {
+            0: "Plaire à tout prix au détriment de vos limites",
+            1: "Éviter une vérité nécessaire pour le confort",
+            2: "Dépenses pour l’image plutôt que la valeur",
+          },
+          mars: {
+            0: "Conflit, paroles dures et risque inutile",
+            1: "Décisions hâtives sous la colère",
+            2: "Forcer un résultat quand la patience est requise",
+          },
+          jupiter: {
+            0: "Excès et sur-extension",
+            1: "Promesses au-delà de vos moyens",
+            2: "Négliger les détails qui protègent l’issue",
+          },
+          saturn: {
+            0: "Démarrer trop de nouvelles initiatives",
+            1: "Discussions lourdes sans cadre calme",
+            2: "Pessimisme — avancez avec mesure",
+          },
+        },
+      },
+
+      authorityBadge: {
+        excellent: "Timing excellent",
+        supported: "Timing soutenu",
+        conditional: "Timing conditionnel",
+        restricted: "Timing restreint",
+        notAdvised: "Déconseillé",
+      },
+
+      classicalJudgment: {
+        labels: {
+          nashr: "Nashr (Ouvert / favorable)",
+          neutral: "Neutre (Équilibré)",
+          nahs: "Naḥs (Restrictif / difficile)",
+          restricted: "Restreint (À éviter)",
+        },
+      },
+
+      scope: {
+        day: "Portée jour (toute la journée)",
+        moon: "Portée Lune (2–3 jours)",
+        hour: "Portée heure (heure en cours)",
+      },
+
+      authorityNotes: {
+        fullMoonBeginnings: "La Pleine Lune favorise l’aboutissement et la clarté. Pour de grands débuts, attendez après réflexion ou quand la Lune décroît.",
+        saturnOrMarsCap: "Même si tout semble favorable, {planet} comme maître du jour exige retenue : discipline, protection et achèvement régulier plutôt que nouveaux départs rapides.",
+      },
       planetaryStrength: {
         title: "Force planétaire",
         dataUnavailableTitle: "Données indisponibles",
@@ -11169,6 +13053,174 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           retrograde: "Rétrograde : mieux pour révision et travail intérieur.",
         },
       },
+      
+      // New narrative system fields
+      todaysRuler: "PLANÈTE DU JOUR",
+      yourPlanet: "VOTRE PLANÈTE DE NAISSANCE",
+      todaysAlignment: "ALIGNEMENT DU JOUR",
+      lunarInfluence: "INFLUENCE LUNAIRE",
+      whatThisMeans: "Ce que cela signifie pour vous",
+      excellentForToday: "Excellent pour aujourd'hui",
+      lessFavorable: "Moins favorable",
+      bestForToday: "Meilleur pour aujourd'hui",
+      notAdvisedToday: "Non conseillé aujourd'hui",
+      currentTransit: "Transit actuel",
+      peakHours: "Heures de pointe",
+      transitIn: "En {sign}{dignity}",
+
+      alignmentOverview: {
+        title: "Aperçu de l’alignement",
+        dayRulerLabel: "Maître du jour",
+        yourRulerLabel: "Votre maître",
+        elementsLabel: "Éléments",
+        elementHarmony: "Harmonie des éléments",
+        planetHarmony: "Harmonie planétaire",
+        ilmGuidanceToggle: "Guidance ʿIlm al-Nujūm",
+        verdict: {
+          excellent: "Alignement fort — agissez avec confiance.",
+          good: "Bon alignement — progression régulière favorisée.",
+          moderate: "Alignement mitigé — restez simple et intentionnel.",
+          challenging: "Alignement délicat — allez doucement et clarifiez vos priorités.",
+        },
+        guidance: {
+          essenceLabel: "🌟 Essence du jour",
+          recommendationsLabel: "💡 Recommandations",
+          practiceLabel: "🙏 Pratique spirituelle",
+        },
+      },
+
+      spiritualBlueprint: {
+        title: "Votre schéma spirituel",
+        signLabel: "Ascendant",
+        modalityLabel: "Modalité",
+        temperamentLabel: "Tempérament",
+      },
+
+      todaysProfile: {
+        currentHourLabel: "Heure actuelle",
+      },
+
+      alignmentAnalysis: {
+        title: "Analyse de l’alignement",
+        scoreLabel: "Global",
+        temperamentLabel: "Tempérament",
+        temperament: {
+          match: "Accordé",
+          contrast: "Contrasté",
+        },
+      },
+
+      recommendations: {
+        personalizedHoursTitle: "Heures personnalisées",
+        bestForYou: "Meilleures heures pour vous",
+        supportiveToday: "Soutenant aujourd’hui",
+        moreDelicate: "Plus délicat",
+      },
+
+      temperaments: {
+        sun: "Chaud & Sec",
+        moon: "Froid & Humide",
+        mars: "Chaud & Sec",
+        mercury: "Variable / Mixte",
+        jupiter: "Chaud & Humide",
+        venus: "Froid & Humide",
+        saturn: "Froid & Sec",
+      },
+
+      loading: {
+        generatingGuidance: "✨ Génération de votre guidance personnalisée...",
+      },
+      errors: {
+        unableToGenerateTitle: "Impossible de générer la guidance",
+        unableToGenerateBody: "Nous n’avons pas pu générer la guidance personnalisée d’aujourd’hui. Veuillez actualiser l’écran pour réessayer.",
+      },
+      actions: {
+        refresh: "Actualiser",
+      },
+      generic: {
+        title: "✨ Énergie du jour",
+        completeProfileNote: "💡 Complétez votre profil pour voir une guidance personnalisée selon votre nature planétaire.",
+      },
+
+      // Descriptions des jours
+      dayEnergy: {
+        expansion: "expansion, sagesse et croissance",
+        action: "action, courage et mouvement décisif",
+        communication: "communication, apprentissage et commerce",
+        love: "amour, beauté et harmonie",
+        discipline: "discipline, structure et maîtrise",
+        vitality: "vitalité, leadership et pouvoir personnel",
+        intuition: "émotions, intuition et soin",
+      },
+
+      // Facteurs d'alignement
+      factors: {
+        planetaryFriendship: "Amitié planétaire",
+        elementalHarmony: "Harmonie élémentaire",
+        dailyStrength: "Force quotidienne",
+      },
+
+      // Relations
+      friendship: {
+        strongFriends: "Amis forts",
+        friends: "Amis",
+        neutral: "Neutre",
+        tension: "Tension",
+      },
+
+      descriptions: {
+        planetaryFriendship: {
+          samePlanet: "L’énergie de {dayPlanet} résonne parfaitement avec votre nature {userPlanet} — amplification puissante.",
+          friend: "{dayPlanet} et {userPlanet} coopèrent naturellement — flux soutenant.",
+          neutral: "{dayPlanet} et {userPlanet} sont neutres — restez simple et constant.",
+          enemy: "{dayPlanet} et {userPlanet} créent une tension — avancez avec attention, sans forcer.",
+        },
+        elementalHarmony: {
+          same: "{userElement} renforce {dayElement} — forte résonance.",
+          supportive: "{dayElement} soutient votre nature {userElement} — flux harmonieux.",
+          neutral: "{dayElement} et {userElement} se mêlent de façon neutre — adaptez-vous et gardez l’équilibre.",
+          tension: "{dayElement} et {userElement} sont en tension — allez doucement et privilégiez la clarté.",
+        },
+        dailyStrength: {
+          veryStrong: "{planet} est exceptionnellement fort aujourd’hui — favorable aux actions décisives.",
+          strong: "{planet} a une bonne force aujourd’hui — une énergie soutenante est disponible.",
+          moderate: "{planet} est modéré aujourd’hui — stable sans être exceptionnel.",
+          weak: "{planet} est plutôt faible aujourd’hui — adoptez une approche plus douce.",
+          veryWeak: "{planet} est très faible aujourd’hui — mieux vaut attendre un timing plus fort.",
+        },
+      },
+
+      // Templates de synthèse
+      synthesis: {
+        excellent: "Excellente énergie {day}! Le jour de {day} avec {quality} s'harmonise magnifiquement avec votre nature {user}-{element}. {lunar}. Aujourd'hui favorise {activities}.",
+        good: "Bonne énergie {day}. Le {quality} de {day} fonctionne bien avec votre nature {user}-{element}. {lunar}. Favorable pour {activities}.",
+        moderate: "Énergie {day} équilibrée. Le {quality} de {day} offre un soutien stable. {lunar}. Bon pour {activities}.",
+        challenging: "Énergie {day} réflexive. Le {quality} de {day} invite à une navigation prudente. {lunar}. Mieux pour {activities}.",
+      },
+
+      // Phases lunaires
+      lunarPhase: {
+        waxing: "La lune croissante ajoute un élan de construction",
+        waning: "La lune décroissante favorise le relâchement et l'achèvement",
+        full: "La pleine lune amplifie toutes les énergies",
+        new: "La nouvelle lune offre de nouveaux départs",
+      },
+
+      // Labels de force
+      strengthLabels: {
+        veryStrong: "Très fort",
+        strong: "Fort",
+        moderate: "Modéré",
+        weak: "Faible",
+        veryWeak: "Très faible",
+      },
+
+      // Labels de source
+      sourceLabels: {
+        fromName: "Du nom + nom de la mère",
+        fromBirthChart: "De la carte natale",
+        default: "Par défaut (Soleil)",
+      },
     },
 
     // Analyse de force planétaire
@@ -11223,6 +13275,52 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         headerSubtitle: "Long terme",
         explanation: "Indique où se trouve une planète dans le zodiaque — sa position à long terme qui change sur des semaines, des mois ou des années.",
         personalizedNote: "Personnalisé à votre nature élémentaire",
+        practices: {
+          title: "Pratiques Planétaires Spécifiques",
+          minutesShort: "min",
+          divineNames: {
+            title: "Noms Divins",
+            description: "Noms divins recommandés pour l'énergie de {planet}",
+            forCategory: "Pour {category}",
+            repetitionsLabel: "Répétitions:",
+            purposeLabel: "🎯 Objectif",
+            durationLabel: "Durée:",
+            categories: {
+              protection: "Protection",
+              influence: "Influence",
+              clarity: "Clarté",
+              prayer: "Prière",
+              dignity: "Dignité",
+              leadership: "Leadership",
+              justice: "Justice",
+              career: "Carrière",
+            },
+            purposes: {
+              jupiter: {
+                protection: "Protection divine et tutelle",
+                taskheer: "Attirer la faveur, adoucir les cœurs (Taskhīr)",
+                accounting: "Comptabilité divine, tenir registre",
+                ijaba: "Exaucement des invocations (Ijābah)",
+                haiba: "Inspirer le respect, présence digne (Haybah)",
+                leadership: "Force dans le leadership, croissance personnelle",
+                rights: "Rétablir le respect, récupérer ses droits",
+                career: "Renforcer sa fonction, établir une position solide",
+              },
+            },
+            howTo: {
+              label: "💡 Comment Pratiquer",
+              step1: "Faire wuḍūʾ et faire face à la Qiblah",
+              step2: "S'asseoir dans un espace calme",
+              step3: "Définir l'intention pour {category}",
+              step4: "Réciter avec concentration",
+              step5: "Utiliser un tasbih pour compter",
+            },
+            actions: {
+              startPractice: "Commencer",
+              setReminder: "Rappel",
+            },
+          },
+        },
         summary: {
           bestNow: "Les plus fortes maintenant",
           weakNow: "Les plus faibles maintenant",
@@ -11496,6 +13594,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             earth: "La nature Terre cherche souvent la structure — les routines stables aident.",
             air: "La nature Air le ressent souvent mentalement — clarifiez vos priorités pour éviter la dispersion.",
           },
+            scorpioWithFire: "L'eau du Scorpion gouvernée par Mars partage l'intensité du feu — utilisez cette puissante synergie pour une transformation profonde.",
         },
         daily: {
           title: "Conseils du Jour",
@@ -11766,12 +13865,92 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       avoidNow: "Éviter pour l'instant :",
       disclaimer: "Pour réflexion seulement • Pas une règle",
 
+      cards: {
+        currentHour: "Heure Actuelle",
+        yourPlanet: "Votre Planète",
+        transitConditions: "Conditions de Transit",
+        alignmentAnalysis: "Analyse d'Alignement",
+        whatThisMeans: "Ce Que Cela Signifie",
+        excellentFor: "Excellent Pour",
+        avoidNow: "À Éviter Maintenant",
+        showTimeline: "Afficher la Chronologie",
+        hourEndsIn: "L'heure se termine dans",
+        nextHour: "Prochaine Heure",
+
+        status: {
+          act: "Agir",
+          maintain: "Maintenir",
+          hold: "Attendre",
+          act_desc: "Conditions favorables — agissez avec intention",
+          maintain_desc: "Conditions favorables — progressez régulièrement",
+          hold_desc: "Conditions difficiles — attendez un meilleur timing",
+        },
+
+        transit: {
+          dignity: "Dignité",
+          house: "Maison",
+          strength: "Puissance de l'heure actuelle",
+          overallNote: "Transit global de {planet} : {quality}. Appuyez pour les détails →",
+          positionalPower: "Puissance Positionnelle",
+          positionalSubtext: "Basée sur la position de la maison et la dignité (pour agir maintenant)",
+          transitQuality: "Qualité du Transit",
+          transitQualitySubtext: "Force planétaire globale (correspond à votre nature)",
+          explanation: "La puissance positionnelle est {positional}, tandis que la qualité du transit est {quality}",
+          viewFullAnalysis: "Voir l'analyse complète du transit de {planet} →",
+          angular: "Angulaire",
+          succedent: "Succédent",
+          cadent: "Cadent",
+          house_10_angular: "Maison 10 - Carrière et Statut",
+          exceptional: "Exceptionnel",
+          strong: "Fort",
+          moderate: "Modéré",
+          weak: "Faible",
+        },
+
+        analysis: {
+          planetaryFriendship: "Amitié Planétaire",
+          elementalHarmony: "Harmonie Élémentaire",
+          transitStrength: "Puissance de l'heure actuelle",
+          strong: "Fort",
+          moderate: "Modéré",
+          weak: "Faible",
+          exceptional: "Exceptionnel",
+        },
+
+        source: {
+          nameMotherPersonal: "Source : Nom + Mère (Personnel)",
+          birthChart: "Source : Thème Natal",
+        },
+      },
+
       authenticTiming: {
         title: "Timing Authentique",
         hourRuler: "Force du maître de l'heure",
         elemental: "Relation élémentaire",
         opening: "Conseils pour l'heure de {planet} (réflexion seulement).",
         nextHour: "Prochaine heure : {planet} commence dans {minutes}m.",
+
+        timingAnalysisTitle: "Analyse du timing",
+        planetaryConditionsTitle: "Conditions planétaires",
+        dignityLabel: "Dignité",
+        positionLabel: "Position zodiacale",
+        strengthLabel: "Condition",
+        interpretationLabel: "Interprétation",
+        whyThisStatusTitle: "Pourquoi ce statut ?",
+        showDetails: "Afficher les détails",
+        hideDetails: "Masquer les détails",
+        noEnhancements: "Aucune amélioration spécifique suggérée pour l'instant.",
+        noCautions: "Aucune prudence signalée pour ce moment.",
+        recommendedLabel: "Recommandé",
+        cautionsLabel: "Précautions",
+        personalPlanetLabel: "Votre planète",
+        personalElementLabel: "Votre élément",
+        factors: {
+          elementCompatibility: "Harmonie élémentaire",
+          planetaryResonance: "Résonance planétaire",
+          manazilAlignment: "Alignement des Manāzil",
+          practiceMapping: "Correspondance de pratique",
+        },
       },
 
       currentHour: {
@@ -12512,6 +14691,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           title: "Général",
           subtitle: "Lettres brutes",
         },
+        birth: {
+          title: "Profil de Naissance",
+          subtitle: "Date + Heure + Lieu",
+        },
       },
       
       // Abjad System Labels
@@ -13194,12 +15377,6 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       bestHours: "Meilleures Heures",
       footerNote: "Basé sur la cosmologie islamique classique suivant les Quatre Natures (Ṭabāʾiʿ Arbaʿa) • Pour réflexion spirituelle uniquement",
     },
-    
-    // Disclaimer
-    disclaimer: {
-      title: "Outil Éducatif :",
-      message: "Cette application explore les sciences islamiques traditionnelles du ʿIlm al-Ḥurūf et du ʿIlm al-ʿAdad pour une réflexion culturelle et historique. Elle n'est pas destinée à la divination, aux conseils médicaux ou aux jugements religieux. Consultez toujours des érudits qualifiés pour des conseils religieux.",
-    },
 
     elements: {
       fire: "Feu",
@@ -13234,6 +15411,235 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       
       // Note: Les données individuelles de tempérament sont dans temperamentProfiles.ts
       // Cette section contient uniquement les étiquettes de l'interface utilisateur
+    },
+    
+    // Birth Profile (Profil de Naissance) - NEW
+    birth: {
+      // Formulaire de Saisie
+      dateOfBirth: "Date de Naissance",
+      selectDate: "Sélectionner la Date",
+      timeOfBirth: "Heure de Naissance",
+      selectTime: "Sélectionner l'Heure",
+      timeKnown: "Heure Connue",
+      timeUnknownNote: "Le calcul de l'Ascendant/Descendant nécessite l'heure de naissance",
+      placeOfBirth: "Lieu de Naissance",
+      city: "Ville",
+      cityPlaceholder: "ex., Casablanca, Le Caire",
+      latitude: "Latitude",
+      longitude: "Longitude",
+      timezone: "Fuseau Horaire",
+      timezoneHint: "Fuseau horaire IANA (ex., Africa/Casablanca)",
+      detectLocation: "Détecter Ma Position",
+      locationPermission: "Permission de Localisation",
+      locationPermissionMessage: "L'autorisation de localisation est requise pour détecter automatiquement votre lieu de naissance.",
+      locationError: "Erreur de Localisation",
+      locationDetected: "Position Détectée",
+      locationFailed: "Échec de la détection de position",
+      error: "Erreur",
+      linkWithName: "Lier avec Nom/Lignée",
+      yourName: "Votre Nom (Arabe)",
+      motherName: "Nom de la Mère (Arabe)",
+      nameResonanceNote: "Utilisé pour l'analyse de résonance avec le thème natal",
+      
+      // Résultats
+      results: {
+        birthSummary: "Résumé de Naissance",
+        sun: "Soleil",
+        moon: "Lune",
+        ascendant: "Ascendant (Signe Ascendant)",
+        descendant: "Descendant",
+        manzil: "Mansion Lunaire",
+        manzilNumber: "Manzil #{number}",
+        angles: "Angles",
+        planets: "7 Planètes Traditionnelles",
+        moonTiming: "Timing Lunaire",
+        phase: "Phase",
+        lunarDay: "Jour Lunaire",
+        dayNumber: "Jour {day}",
+        illumination: "Illumination",
+        direction: "Direction",
+        spiritualImprint: "Empreinte Spirituelle",
+        dominantElement: "Élément Dominant",
+        dominantPlanet: "Planète Dominante",
+        temperament: "Tempérament",
+        guidance: "Guidance Spirituelle",
+        nameResonance: "Résonance Nom ↔ Naissance",
+        birthElement: "Élément de Naissance",
+        birthRuler: "Maître de Naissance",
+      },
+      
+      // Conditions Planétaires
+      condition: {
+        strong: "Fort",
+        neutral: "Neutre",
+        weak: "Faible",
+      },
+      
+      conditionDomicile: "En domicile (signe de maison)",
+      conditionExaltation: "En exaltation (élevé)",
+      conditionDetriment: "En détriment (challengé)",
+      conditionFall: "En chute (affaibli)",
+      conditionPeregrine: "Pérégrin (neutre)",
+      conditionNeutral: "Condition neutre",
+      
+      // Tempéraments
+      temperament: {
+        "hot-dry": "Chaud & Sec (Colérique)",
+        "hot-moist": "Chaud & Humide (Sanguin)",
+        "cold-moist": "Froid & Humide (Flegmatique)",
+        "cold-dry": "Froid & Sec (Mélancolique)",
+      },
+      
+      // Alignements
+      alignment: {
+        aligned: "Aligné",
+        mixed: "Mixte",
+        challenging: "Challenging",
+      },
+      
+      nameResonanceAligned: "Votre nom et thème natal partagent des énergies élémentaires harmonieuses, créant une base solide pour la pratique spirituelle.",
+      nameResonanceMixed: "Votre nom et thème natal ont des énergies complémentaires mais différentes. Cela crée des opportunités de croissance par l'équilibre.",
+      nameResonanceChallenging: "Votre nom et thème natal ont des énergies contrastées. Cette tension dynamique peut être canalisée dans un travail spirituel transformateur.",
+      
+      // Guidance par Élément
+      guidance: {
+        fire: {
+          1: "L'énergie du feu prospère avec des pratiques dynamiques comme le dhikr actif et l'adoration physique",
+          2: "Gardez l'intention claire et évitez l'impulsivité — canalisez la chaleur vers une dévotion disciplinée.",
+          3: "Meilleur équilibre : routines ancrées, sommeil régulier et adoration constante pour stabiliser l'intensité.",
+        },
+        air: {
+          1: "L'énergie de l'air bénéficie de la contemplation intellectuelle et des pratiques axées sur la respiration",
+          2: "Protégez votre concentration : choisissez une pratique principale et terminez-la avant d'en commencer une autre.",
+          3: "Meilleur équilibre : journal, silence et parole consciente pour éviter la dispersion.",
+        },
+        water: {
+          1: "L'énergie de l'eau s'approfondit par la présence émotionnelle et la dévotion centrée sur le cœur",
+          2: "Gardez des limites : la sincérité est une force, mais évitez de porter les émotions des autres.",
+          3: "Meilleur équilibre : nature, gratitude et routines douces qui apaisent le cœur.",
+        },
+        earth: {
+          1: "L'énergie de la terre s'ancre par des rituels cohérents et une discipline spirituelle structurée",
+          2: "Évitez la rigidité — gardez la structure tout en laissant place à la miséricorde.",
+          3: "Meilleur équilibre : petites pratiques quotidiennes constantes > extrêmes occasionnels.",
+        },
+        sun: {
+          1: "La dominance solaire suggère le leadership dans la communauté spirituelle et les rôles d'enseignement",
+          2: "Dirigez avec humilité : le service avant le statut, et gardez le cœur tendre.",
+        },
+        moon: {
+          1: "La dominance lunaire met l'accent sur la sagesse intuitive et les états spirituels réceptifs",
+          2: "Protégez votre rythme intérieur : repos, du‘a et rappel silencieux.",
+        },
+        mercury: {
+          1: "La force mercurielle soutient l'apprentissage des textes sacrés et la communication des connaissances spirituelles",
+          2: "Meilleur équilibre : étudier avec la pratique — la connaissance devient lumière quand elle est vécue.",
+        },
+        venus: {
+          1: "L'influence vénusienne apporte l'harmonie par la beauté dans l'adoration et la spiritualité relationnelle",
+          2: "Meilleur équilibre : chercher la beauté de façon licite et éviter l'attachement aux apparences.",
+        },
+        mars: {
+          1: "L'énergie martiale canalise le courage dans la lutte spirituelle (jihad al-nafs)",
+          2: "Meilleur équilibre : transformer la colère en résolution — patience et retenue sont vos victoires.",
+        },
+        jupiter: {
+          1: "L'expansion jupitérienne encourage la générosité, l'enseignement et la profondeur philosophique",
+          2: "Meilleur équilibre : grande vision + responsabilité quotidienne pour éviter l'excès.",
+        },
+        saturn: {
+          1: "La discipline saturnienne soutient le dévouement à long terme et la maîtrise de la pratique spirituelle",
+          2: "Meilleur équilibre : ferme avec les habitudes, doux avec soi — constance plutôt que dureté.",
+        },
+        temperament: {
+          "hot-dry": "Équilibrez avec des pratiques rafraîchissantes et hydratantes comme le jeûne et la prière de nuit",
+          "hot-moist": "Canalisez l'énergie par l'adoration sociale et le souvenir joyeux",
+          "cold-moist": "Renforcez par des pratiques réchauffantes comme le dhikr basé sur le mouvement",
+          "cold-dry": "Adoucissez par la dévotion qui ouvre le cœur et la connexion communautaire",
+        },
+      },
+      
+      // Info-bulles pour le Profil de Naissance
+      tooltips: {
+        // Planètes
+        sun: "Le Soleil représente votre identité centrale, votre vitalité et votre moi conscient. Il montre où vous brillez et cherchez la reconnaissance.",
+        moon: "La Lune représente votre nature émotionnelle, vos instincts et votre monde intérieur. Elle révèle comment vous nourrissez et avez besoin d'être nourri.",
+        mercury: "Mercure gouverne l'intellect, la communication et l'apprentissage. Il montre comment vous pensez, parlez et traitez l'information.",
+        venus: "Vénus régit l'amour, la beauté et les valeurs. Elle révèle ce que vous attirez et ce qui vous procure du plaisir.",
+        mars: "Mars représente la motivation, l'action et le courage. Il montre comment vous vous affirmez et poursuivez vos objectifs.",
+        jupiter: "Jupiter gouverne l'expansion, la sagesse et les bénédictions. Il montre où vous trouvez croissance et abondance.",
+        saturn: "Saturne représente la discipline, les limites et la maîtrise. Il montre où vous devez travailler dur et être patient.",
+        
+        // Signes du Zodiaque
+        aries: "Bélier : Feu Cardinal — Pionnier, courageux, initie de nouveaux commencements.",
+        taurus: "Taureau : Terre Fixe — Stable, sensuel, valorise la sécurité et la beauté.",
+        gemini: "Gémeaux : Air Mutable — Curieux, communicatif, mentalement agile.",
+        cancer: "Cancer : Eau Cardinale — Nourrissant, protecteur, émotionnellement intuitif.",
+        leo: "Lion : Feu Fixe — Créatif, généreux, cherche reconnaissance et expression de soi.",
+        virgo: "Vierge : Terre Mutable — Analytique, orienté service, cherche la perfection.",
+        libra: "Balance : Air Cardinal — Harmonisant, diplomatique, cherche équilibre et partenariat.",
+        scorpio: "Scorpion : Eau Fixe — Intense, transformateur, cherche la vérité profonde.",
+        sagittarius: "Sagittaire : Feu Mutable — Philosophique, aventurier, cherche le sens.",
+        capricorn: "Capricorne : Terre Cardinale — Ambitieux, discipliné, bâtit des structures durables.",
+        aquarius: "Verseau : Air Fixe — Innovant, humanitaire, valorise liberté et progrès.",
+        pisces: "Poissons : Eau Mutable — Compatissant, intuitif, connecté à l'invisible.",
+        
+        // Dignités
+        domicile: "Dans son signe de maison — La planète opère avec pleine force et confort.",
+        exaltation: "Dans son signe d'exaltation — La planète est honorée et opère à son expression maximale.",
+        detriment: "Dans son signe de détriment — La planète fait face à des défis pour s'exprimer.",
+        fall: "Dans son signe de chute — L'énergie de la planète est affaiblie et doit travailler plus dur.",
+        peregrine: "Pérégrine — Ni renforcée ni affaiblie ; condition neutre.",
+        
+        // Éléments
+        element_fire: "Élément Feu : Dynamique, passionné, orienté action. Associé au courage et à la transformation.",
+        element_water: "Élément Eau : Émotionnel, intuitif, réceptif. Associé à la guérison et à la profondeur.",
+        element_air: "Élément Air : Intellectuel, communicatif, social. Associé aux idées et à la connexion.",
+        element_earth: "Élément Terre : Pratique, stable, ancré. Associé à la manifestation et à la patience.",
+        
+        // Tempéraments
+        temperament_hotDry: "Chaud & Sec (Colérique) : Énergique, décisif, orienté action. A besoin de rafraîchissement et d'hydratation.",
+        temperament_hotMoist: "Chaud & Humide (Sanguin) : Optimiste, social, enthousiaste. A besoin d'ancrage et de focus.",
+        temperament_coldMoist: "Froid & Humide (Flegmatique) : Calme, patient, réceptif. A besoin d'activation réchauffante.",
+        temperament_coldDry: "Froid & Sec (Mélancolique) : Réfléchi, discipliné, réservé. A besoin de chaleur adoucissante.",
+        
+        // Lune
+        lunarPhase: "La phase lunaire à la naissance influence les schémas émotionnels et les rythmes naturels d'énergie.",
+        lunarDay: "Le jour lunaire (1-30) porte une signification spirituelle spécifique dans le calendrier islamique.",
+        illumination: "L'illumination lunaire montre le pourcentage de la surface de la lune réfléchissant la lumière du soleil.",
+        waxingMoon: "Lune Croissante : L'énergie se construit — bon pour démarrer des projets et la croissance.",
+        waningMoon: "Lune Décroissante : L'énergie se libère — bon pour l'achèvement et le lâcher-prise.",
+        lunarMansion: "Les 28 Mansions Lunaires (Manāzil al-Qamar) portent chacune des qualités spirituelles uniques.",
+        
+        // Angles
+        ascendant: "L'Ascendant (Signe Ascendant) est le signe du zodiaque qui se lève à l'horizon oriental à la naissance. Il représente votre personnalité extérieure et comment les autres vous perçoivent d'abord.",
+        descendant: "Le Descendant est le signe opposé à votre Ascendant. Il représente les partenariats, les relations et les qualités que vous cherchez chez les autres.",
+      },
+      
+      // Cosmic Blueprint - Carte "Ce Que Cela Signifie Pour Vous"
+      cosmicBlueprint: {
+        title: "Ce Que Cela Signifie Pour Vous",
+        youAre: "Vous êtes un(e)",
+        with: "avec",
+        who: "qui",
+        yourGift: "Votre Don",
+        yourChallenge: "Votre Défi",
+        bestPath: "Meilleur Chemin",
+      },
+      
+      // Action Card - "Essayez Ceci Maintenant"
+      actionCard: {
+        title: "Essayez Ceci Maintenant",
+        basedOn: "Basé sur votre dominance {planet} :",
+        practice: "Pratiquez",
+        times: "{count} fois",
+        after: "après {prayer}",
+        bestDays: "Meilleurs Jours",
+        setReminder: "Définir Rappel",
+        learnMore: "En Savoir Plus",
+      },
+      
+      disclaimer: "Le profil de naissance est pour la réflexion spirituelle uniquement. Pas d'astrologie prédictive. Pour guidance religieuse, consultez des érudits qualifiés.",
     },
 
     lifePath: {
@@ -15104,17 +17510,6 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       learnMore: "En savoir plus",
     },
 
-    // Day names
-    days: {
-      sunday: "Dimanche",
-      monday: "Lundi",
-      tuesday: "Mardi",
-      wednesday: "Mercredi",
-      thursday: "Jeudi",
-      friday: "Vendredi",
-      saturday: "Samedi",
-    },
-
     // Divine Names (28 names for resonance calculation)
     divineNames: {
       allah: { meaning: "Le Dieu, L'Unique Vrai Dieu" },
@@ -15197,6 +17592,141 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           mars: "المريخ",
           jupiter: "المشتري",
           saturn: "زحل",
+        },
+
+        planetaryJudgment: {
+          title: "الحُكم الكوكبي",
+          cosmicVerdict: "القرار الكوني",
+          disclaimer: "للتأمل، لا للحُكم القطعي.",
+          classicalTerms: {
+            supportive: "سَعْد",
+            neutral: "مُتَوَسِّط",
+            restrictive: "نَحْس",
+          },
+          status: {
+            supportive: "مسانِد",
+            neutral: "متوازن",
+            restrictive: "مُقيِّد",
+          },
+          intro: "{planet} يحكم اليوم.",
+          rulerTone: {
+            sun: "الوضوح والقيادة والنية في الصدارة.",
+            moon: "العاطفة والحدس والتقلب في الصدارة.",
+            mercury: "الحركة والتبادل وصفاء الذهن في الصدارة.",
+            venus: "الانسجام والودّ والتهذيب في الصدارة.",
+            mars: "القوة والعجلة والحدّة في الصدارة — تصرّف بضبط.",
+            jupiter: "الاتساع والحكمة والفرص في الصدارة.",
+            saturn: "الانضباط والحماية والتأخير في الصدارة — قدّم ما يدوم.",
+          },
+          phaseModifier: {
+            amplify: "مع قمرٍ متزايد أو بدرٍ، تتضاعف طبيعة الحاكم.",
+            soften: "مع قمرٍ متناقص، تلين آثار الحاكم.",
+            neutral: "مع قمرٍ هادئ، اجعل يومك بسيطًا ومقصودًا.",
+          },
+          bestForLabel: "الأفضل لـ",
+          avoidLabel: "تجنّب",
+          bestFor: {
+            sun: {
+              0: "تثبيت النية واتخاذ قرار واضح",
+              1: "القيادة والظهور وعرض العمل",
+              2: "بدايات شريفة بإيقاع ثابت",
+            },
+            moon: {
+              0: "التأمل والترميم وصفاء المشاعر",
+              1: "شؤون الأسرة ورعاية الروابط",
+              2: "تخطيط لطيف قبل الإقدام",
+            },
+            mercury: {
+              0: "الكتابة والتعلم والتفاوض والتخطيط",
+              1: "مشاوير قصيرة وتنسيق عملي",
+              2: "طرح الأسئلة وتنقيح الاستراتيجية",
+            },
+            venus: {
+              0: "الصلح والودّ وتهدئة التوتر",
+              1: "إبداع وجمال وتهذيب",
+              2: "اتفاقات حين تكون النية صافية ومتوازنة",
+            },
+            mars: {
+              0: "جهد منظم وتدريب وعمل منضبط",
+              1: "إزالة ما يعيق التقدم (بحذر)",
+              2: "حدود واقية وإنهاء حاسم",
+            },
+            jupiter: {
+              0: "تعلم وتعليم وطلب مشورة حكيمة",
+              1: "كرم وبركة وفتح فرص",
+              2: "تخطيط بعيد بنية مرفوعة",
+            },
+            saturn: {
+              0: "حماية وضبط والتزامات جادة",
+              1: "عمل عميق وبناء طويل الأمد",
+              2: "مراجعة ومحاسبة وتقوية الحدود",
+            },
+          },
+          avoid: {
+            sun: {
+              0: "صراع الأنا والكبرياء المتسرع",
+              1: "تشتت الانتباه والالتزامات غير الواضحة",
+              2: "وعود بلا قدرة على الوفاء",
+            },
+            moon: {
+              0: "اندفاع عاطفي وقرارات ضبابية",
+              1: "حمل مشاعر الآخرين كعبء",
+              2: "إطلاقات كبيرة بلا ثبات",
+            },
+            mercury: {
+              0: "نميمة وعجلة واتفاقات مرتجلة",
+              1: "إفراط في التفكير بدل الاختيار",
+              2: "التزام كبير بلا خطة واضحة",
+            },
+            venus: {
+              0: "إرضاء الناس على حساب حدودك",
+              1: "تجنب حقيقة لازمة من أجل الراحة",
+              2: "إنفاق للمظهر لا للقيمة",
+            },
+            mars: {
+              0: "خصام وكلام قاسٍ ومخاطرة غير لازمة",
+              1: "قرارات متسرعة بدافع الغضب",
+              2: "فرض النتائج حين تُطلب الصبر",
+            },
+            jupiter: {
+              0: "إفراط وتمدد زائد",
+              1: "وعود أكبر من القدرة",
+              2: "إهمال التفاصيل التي تحمي النتيجة",
+            },
+            saturn: {
+              0: "بدء مبادرات كثيرة دفعة واحدة",
+              1: "نقاشات ثقيلة بلا إطار هادئ",
+              2: "تشاؤم — حافظ على جهد ثابت ومتزن",
+            },
+          },
+        },
+
+        authorityBadge: {
+          excellent: "توقيت ممتاز",
+          supported: "توقيت مدعوم",
+          conditional: "توقيت مشروط",
+          restricted: "توقيت مُقيَّد",
+          notAdvised: "غير مُنصَح به",
+        },
+
+        classicalJudgment: {
+          labels: {
+            nashr: "نَشْر",
+            neutral: "متوازن",
+            nahs: "نَحْس",
+            restricted: "مُقيَّد",
+          },
+        },
+
+        scope: {
+          day: "نطاق اليوم (طوال اليوم)",
+          moon: "نطاق القمر (٢–٣ أيام)",
+          hour: "نطاق الساعة (الساعة الحالية)",
+        },
+
+        authorityNotes: {
+          fullMoonBeginnings: "البدر يدل على الاكتمال والوضوح. للبدايات الكبرى، الأفضل بعد التأمل أو حين يتناقص القمر.",
+          saturnOrMarsCap: "حتى لو بدت الظروف قوية، وجود {planet} حاكمًا لليوم يطلب ضبطًا: انضباطًا وحمايةً وإنهاءً ثابتًا بدل بدايات سريعة.",
         },
         planetaryStrength: {
           title: "قوة الكواكب",
@@ -15391,7 +17921,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         practice: "Enseignez et guérissez avec amour",
         verse: "Guidez avec compassion",
         practical: "Mentorez, guérissez, servez l'humanité"
-      }
+      },
     },
 
     // GEOMETRY - Letter shapes
@@ -16737,6 +19267,223 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     tooltips: {
       umHadad1: "Um Ḥadad (أم حدد) - Requis pour le calcul complet de la Destinée du Nom",
       umHadad2: "Um Ḥadad (أم حدد) - Révèle votre Aṣl al-Rūḥānī (origine spirituelle)",
+      
+      // Planètes
+      sun: "Votre identité centrale et but de vie.",
+      moon: "Vos émotions et moi intérieur.",
+      mercury: "Comment vous pensez et communiquez.",
+      venus: "Ce que vous aimez et valorisez.",
+      mars: "Votre élan et énergie.",
+      jupiter: "Votre croissance et chance.",
+      saturn: "Votre discipline et leçons.",
+      
+      // Angles
+      ascendant: "Comment les autres vous voient. Votre personnalité extérieure.",
+      descendant: "Ce que vous cherchez chez les partenaires.",
+      
+      // Signes du Zodiaque
+      aries: "Bélier: Feu Cardinal — Pionnier, courageux, audacieux.",
+      taurus: "Taureau: Terre Fixe — Stable, sensuel, ancré.",
+      gemini: "Gémeaux: Air Mutable — Curieux, communicatif, adaptable.",
+      cancer: "Cancer: Eau Cardinale — Nourrissant, protecteur, intuitif.",
+      leo: "Lion: Feu Fixe — Créatif, généreux, expressif.",
+      virgo: "Vierge: Terre Mutable — Analytique, serviable, précis.",
+      libra: "Balance: Air Cardinal — Harmonisant, diplomatique, juste.",
+      scorpio: "Scorpion: Eau gouvernée par Mars — sources volcaniques, pas eau douce. Intense, transformateur, profondeur puissante.",
+      sagittarius: "Sagittaire: Feu Mutable — Philosophique, aventurier.",
+      capricorn: "Capricorne: Terre Cardinale — Ambitieux, discipliné.",
+      aquarius: "Verseau: Air Fixe — Innovant, humanitaire.",
+      pisces: "Poissons: Eau Mutable — Compatissant, intuitif.",
+      
+      // Dignités
+      domicile: "Planète 'à la maison' - très forte.",
+      exaltation: "Planète honorée - puissante.",
+      detriment: "Planète inconfortable - faible.",
+      fall: "Planète très faible ici.",
+      peregrine: "Planète de force moyenne.",
+      neutral: "Planète de force moyenne.",
+      strong: "Cette planète est puissante dans votre thème. Ses qualités sont amplifiées et fonctionnent naturellement.",
+      weak: "Cette planète lutte ici. Ses qualités nécessitent un effort supplémentaire et un développement conscient.",
+      
+      // Dominance Planétaire (pour Empreinte Spirituelle)
+      sunDominance: "La dominance du Soleil apporte vitalité, leadership et un fort sens de soi.",
+      moonDominance: "La dominance de la Lune apporte profondeur émotionnelle, intuition et connexion aux cycles.",
+      mercuryDominance: "La dominance de Mercure apporte intellect vif, compétences en communication et adaptabilité.",
+      venusDominance: "La dominance de Vénus apporte appréciation de la beauté, harmonie et relations.",
+      marsDominance: "La dominance de Mars apporte courage, dynamisme et énergie assertive.",
+      jupiterDominance: "La dominance de Jupiter apporte optimisme, sagesse et vision expansive.",
+      saturnDominance: "La dominance de Saturne apporte discipline, patience et maîtrise par l'effort.",
+      
+      // Éléments
+      fire: "Élément chaud et sec - énergique, passionné, créatif.",
+      water: "Élément froid et humide - émotionnel, intuitif, réceptif.",
+      air: "Élément chaud et humide - intellectuel, communicatif, social.",
+      earth: "Élément froid et sec - stable, pratique, ancré.",
+      element_fire: "Élément Feu: Dynamique, passionné, orienté action.",
+      element_water: "Élément Eau: Émotionnel, intuitif, réceptif.",
+      element_air: "Élément Air: Intellectuel, communicatif, social.",
+      element_earth: "Élément Terre: Pratique, stable, ancré.",
+      
+      // Tempéraments
+      choleric: "Tempérament chaud et sec - rapide, ambitieux, intense.",
+      sanguine: "Tempérament chaud et humide - social, optimiste, vif.",
+      phlegmatic: "Tempérament froid et humide - calme, patient, paisible.",
+      melancholic: "Tempérament froid et sec - réfléchi, réservé, profond.",
+      temperament_hotDry: "Chaud & Sec (Colérique): Énergique, décisif.",
+      temperament_hotMoist: "Chaud & Humide (Sanguin): Optimiste, social.",
+      temperament_coldMoist: "Froid & Humide (Flegmatique): Calme, patient.",
+      temperament_coldDry: "Froid & Sec (Mélancolique): Réfléchi, discipliné.",
+      "hot-dry": "Chaud & Sec (Colérique): Énergique, décisif.",
+      "hot-moist": "Chaud & Humide (Sanguin): Optimiste, social.",
+      "cold-moist": "Froid & Humide (Flegmatique): Calme, patient.",
+      "cold-dry": "Froid & Sec (Mélancolique): Réfléchi, discipliné.",
+      
+      // Phases lunaires
+      lunarPhase: "La phase lunaire influence les schémas émotionnels et les rythmes d'énergie.",
+      lunarDay: "Le jour lunaire (1-30) porte une signification spirituelle.",
+      illumination: "Pourcentage de la surface lunaire réfléchissant la lumière.",
+      waxingMoon: "Lune croissante - énergie montante, bon pour commencer.",
+      waningMoon: "Lune décroissante - énergie libérée, bon pour terminer.",
+      lunarMansion: "Position de la Lune dans 28 stations lunaires islamiques.",
+      new: "Nouvelle Lune - temps pour de nouveaux commencements.",
+      waxing_crescent: "Croissant croissant - construction du momentum.",
+      first_quarter: "Premier quartier - passage à l'action.",
+      waxing_gibbous: "Gibbeux croissant - affinage et ajustement.",
+      waxingGibbous: "Lune croissante vers pleine - énergie croissante.",
+      full: "Pleine Lune - énergie maximale, illumination.",
+      waning_gibbous: "Gibbeux décroissant - partage de sagesse.",
+      last_quarter: "Dernier quartier - libération.",
+      waning_crescent: "Croissant décroissant - repos et réflexion.",
+      
+      // Scorpion nature spéciale de l'eau
+      scorpioSpecial: "Intense, transformateur, passionné. Signe d'eau gouverné par Mars — comme sources volcaniques, pas eau douce. Profondeur puissante.",
+    },
+
+    // ============================================================================
+    // NUANCES DES ÉLÉMENTS - Caractéristiques spéciales des signes par règle planétaire
+    // ============================================================================
+    elementNuances: {
+      // SIGNES D'EAU
+      scorpioSpecial: "Le Scorpion est unique: 'eau bouillante' gouvernée par Mars - intense et transformatrice. Partage l'intensité du feu malgré l'élément eau.",
+      cancerSpecial: "Le Cancer est gouverné par la Lune - l'eau la plus émotionnelle et changeante. Comme les marées qui suivent les phases lunaires, ou les eaux protectrices de la mère.",
+      cancerWater: "Eau des marées ou lait maternel - nourrissante, protectrice, en flux constant avec les cycles émotionnels. Le plus sensible de tous les signes d'eau.",
+      piscesWater: "Eau océanique - sans limites, spirituelle, dissolvant les frontières entre soi et l'univers.",
+      scorpioWater: "Eau volcanique - comme sources chaudes ou geysers. Intense, passionnée, transformatrice.",
+      
+      // SIGNES D'AIR
+      aquariusSpecial: "Le Verseau est 'air froid' gouverné par Saturne - intellectuel mais détaché. Comme le vent des hautes altitudes ou l'espace. Plus distant que le Gémeaux chaleureux ou la Balance harmonieuse.",
+      aquariusAir: "Air de haute altitude - mince, frais, clair. Comme les sommets des montagnes ou le vide de l'espace. Intellectuel mais émotionnellement détaché.",
+      geminiAir: "Brise chaude - sociale, communicative, légère et ludique. Le vent rapide et curieux de Mercure.",
+      libraAir: "Vent doux - harmonieux, équilibré, socialement gracieux. L'air diplomatique de Vénus.",
+      
+      // SIGNES DE TERRE
+      capricornSpecial: "Le Capricorne est une terre doublement saturninienne - extrêmement froide et sèche. Comme la pierre de montagne ou la toundra gelée, pas un sol fertile. Le plus discipliné et restrictif.",
+      capricornEarth: "Roche de montagne - dure, endurante, inflexible. Le signe de terre le plus discipliné et structuré.",
+      taurusEarth: "Terre fertile - confortable, sensuelle, productive. Le jardin luxuriant de Vénus.",
+      virgoEarth: "Champ cultivé - organisé, pratique, serviceable. La récolte méticuleuse de Mercure.",
+      
+      // SIGNES DE FEU
+      leoSpecial: "Le Lion est gouverné par le Soleil - pas juste des flammes, mais le Soleil lui-même. Le centre autour duquel les autres orbitent. Le plus fier, brillant et rayonnant de tous les signes de feu.",
+      leoFire: "Feu solaire - soutenu, central, rayonnant. Comme le soleil au centre du système solaire, exigeant la reconnaissance.",
+      ariesFire: "Étincelle ou allumage - rapide, initiant, pionnier. La flamme conquérante de Mars.",
+      sagittariusFire: "Feu de camp qui s'étend - aventurier, philosophique, expansif. La lumière exploratrice de Jupiter.",
+    },
+
+    // ============================================================================
+    // CONSEILS TRANSIT LUNAIRE - Cas spéciaux Lune en Scorpion
+    // ============================================================================
+    moonTransits: {
+      // Quand la Lune est en Scorpion (pour les signes de feu)
+      scorpioForLeo: {
+        rating: "Intense et Puissant",
+        description: "Énergie transformatrice profonde rencontre votre nature lumineuse. Excellent pour le travail spirituel et études mystiques.",
+        bestFor: "Dhikr profond, pratiques spirituelles, travail créatif intense, études mystiques",
+        avoid: "Batailles d'ego, socialisation superficielle, contrôler les autres",
+        insight: "L'intensité du Scorpion gouvernée par Mars complète le feu du Lion. Les deux sont puissants - utilisez ceci pour un travail profond.",
+      },
+      scorpioForAries: {
+        rating: "Fort et Dynamique",
+        description: "L'énergie de Mars soutient l'énergie de Mars. Moment puissant pour l'action et la transformation.",
+        bestFor: "Initiatives audacieuses, activités physiques, éliminer les obstacles",
+        avoid: "Impulsivité, conflits, décisions précipitées",
+      },
+      scorpioForSagittarius: {
+        rating: "Aventure Transformatrice",
+        description: "Intensité profonde rencontre esprit expansif. Bon pour l'exploration spirituelle.",
+        bestFor: "Voyages spirituels, apprentissage profond, percées philosophiques",
+        avoid: "Se perdre dans l'obscurité, ignorer la lumière",
+      },
+      scorpioDefault: {
+        rating: "Intense et Profond",
+        description: "Temps pour le travail intérieur, la transformation et la profondeur.",
+        bestFor: "Recherche, guérison, pratiques spirituelles, conversations profondes",
+        avoid: "Superficialité, manipulation, batailles de contrôle",
+      },
+      // Quand la Lune est en signes de feu (pour les Scorpions) - CAS INVERSE
+      leoForScorpio: {
+        rating: "Rayonnant et Puissant",
+        description: "L'énergie créative brillante du Lion illumine votre nature profonde. Votre eau gouvernée par Mars rencontre le feu solaire — transformation intense par l'expression.",
+        bestFor: "Expression créative, leadership, visibilité spirituelle, manifestation puissante",
+        avoid: "Cacher votre lumière, autocritique excessive, suppression émotionnelle",
+        insight: "En tant qu'eau gouvernée par Mars, vous partagez l'intensité du feu. La Lune en Lion amplifie votre pouvoir — laissez-vous briller.",
+      },
+      ariesForScorpio: {
+        rating: "Dynamique et Déterminé",
+        description: "L'énergie de Mars rencontre l'énergie de Mars. Double puissance martienne pour l'action courageuse et la transformation.",
+        bestFor: "Démarrer des projets, activités physiques, action assertive, percer les obstacles",
+        avoid: "Agressivité, impatience, forcer les résultats",
+        insight: "Bélier et Scorpion sont tous deux gouvernés par Mars. Utilisez cette double puissance martienne pour un travail spirituel courageux.",
+      },
+      sagittariusForScorpio: {
+        rating: "Profondeur Expansive",
+        description: "Le feu du Sagittaire expand votre nature profonde. L'aventure rencontre l'intensité — cherchez le sens dans l'inconnu.",
+        bestFor: "Exploration spirituelle, étude philosophique, voyage, élargir les horizons",
+        avoid: "Secret excessif, peur de l'inconnu, croyances limitantes",
+        insight: "L'optimisme du feu allège la profondeur du Scorpion. Faites confiance au voyage et laissez la sagesse émerger.",
+      },
+      
+      // LUNE EN VERSEAU - Air froid gouverné par Saturne
+      aquariusMoon: {
+        rating: "Frais et Intellectuel",
+        description: "Énergie détachée et innovante. Excellente pour l'objectivité mais difficile pour la chaleur émotionnelle.",
+        bestFor: "Réflexion stratégique, innovation, travail de groupe, projets humanitaires, technologie",
+        avoid: "Intimité émotionnelle, tradition, connexion personnelle, rassemblements chaleureux",
+        insight: "L'air gouverné par Saturne est frais et clair. Utilisez pour la clarté mentale, pas le traitement émotionnel.",
+      },
+      aquariusForFire: {
+        rating: "Frais mais Stimulant",
+        description: "L'air intellectuel refroidit votre feu mais stimule les idées. Bon pour la planification et l'innovation.",
+        bestFor: "Réflexion stratégique, innovation, projets de groupe, travail humanitaire",
+        avoid: "Action impulsive, décisions émotionnelles, forcer la chaleur",
+        insight: "Le Verseau apporte clarté mentale à la passion du feu. Canalisez votre énergie à travers les idées.",
+      },
+      
+      // LUNE EN CAPRICORNE - Terre gelée de Saturne
+      capricornMoon: {
+        rating: "Sérieux et Discipliné",
+        description: "Retenue émotionnelle et focus sur le devoir. Difficile pour l'expression libre, excellente pour le travail sérieux.",
+        bestFor: "Mouvements de carrière, planification à long terme, discipline, responsabilités, construire des structures",
+        avoid: "Expression émotionnelle, spontanéité, loisirs, vulnérabilité, jeu",
+        insight: "La Lune en Capricorne exige maturité et contrôle. Utilisez pour des accomplissements sérieux, pas pour la connexion émotionnelle.",
+      },
+      
+      // LUNE EN LION - Le feu du Soleil
+      leoMoon: {
+        rating: "Rayonnant et Fier",
+        description: "La Lune dans le signe du Soleil - les émotions ont besoin de briller et d'être vues. Créatif, dramatique, généreux.",
+        bestFor: "Expression créative, performance, leadership, célébration, générosité",
+        avoid: "Se cacher, doute de soi, atténuer votre lumière pour les autres, humilité excessive",
+        insight: "La Lune en Lion est le feu solaire dans le domaine émotionnel. Vos sentiments veulent la reconnaissance — laissez-les être vus.",
+      },
+      
+      // LUNE EN CANCER - La Lune chez elle
+      cancerMoon: {
+        rating: "Profondément Émotionnel",
+        description: "La Lune est CHEZ ELLE en Cancer. Les émotions sont amplifiées, la sensibilité culmine, l'énergie nourricière est la plus forte.",
+        bestFor: "Temps en famille, cuisine, soin du foyer, guérison émotionnelle, connexion avec mère/enfants",
+        avoid: "Exposition publique, critique, environnements durs, quitter la zone de confort",
+        insight: "La Lune en Cancer est la Lune à son plus puissant. Les émotions coulent librement — embrassez la vulnérabilité et le soin.",
+      },
     },
 
     // ============================================================================
@@ -16806,6 +19553,12 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         },
         supportive: {
           description: "Votre nature {userElement} est soutenue par l'énergie {dayElement} du jour — des conditions favorables à l'évolution et à l'action.",
+        },
+        scorpioFire: {
+          description: "Votre eau Scorpion porte le feu de Mars en elle — l'énergie de feu d'aujourd'hui enflamme votre intensité cachée, créant une puissante synergie.",
+        },
+        aquariusWater: {
+          description: "Votre air froid du Verseau partage la fraîcheur de Saturne avec l'eau — pas la friction air-eau typique. Clarté intellectuelle rencontre profondeur émotionnelle.",
         },
         challenging: {
           description: "Votre nature {userElement} contraste avec l'énergie {dayElement} du jour — pratiquez la patience et une adaptation en douceur.",
@@ -17808,6 +20561,59 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         },
       },
     },
+
+    // Labels des maîtres des jours
+    dayRulers: {
+      sunday: {
+        name: "Dimanche • Jour du Soleil",
+        desc: "Jour de vitalité, leadership et pouvoir personnel",
+        element: "Feu",
+        planet: "Soleil",
+        arabicName: "الأحد • يوم الشمس",
+      },
+      monday: {
+        name: "Lundi • Jour de la Lune",
+        desc: "Jour des émotions, intuition et soin",
+        element: "Eau",
+        planet: "Lune",
+        arabicName: "الاثنين • يوم القمر",
+      },
+      tuesday: {
+        name: "Mardi • Jour de Mars",
+        desc: "Jour d'action, courage et mouvement décisif",
+        element: "Feu",
+        planet: "Mars",
+        arabicName: "الثلاثاء • يوم المريخ",
+      },
+      wednesday: {
+        name: "Mercredi • Jour de Mercure",
+        desc: "Jour de communication, apprentissage et commerce",
+        element: "Air",
+        planet: "Mercure",
+        arabicName: "الأربعاء • يوم عطارد",
+      },
+      thursday: {
+        name: "Jeudi • Jour de Jupiter",
+        desc: "Jour d'expansion, sagesse et croissance",
+        element: "Air",
+        planet: "Jupiter",
+        arabicName: "الخميس • يوم المشتري",
+      },
+      friday: {
+        name: "Vendredi • Jour de Vénus",
+        desc: "Jour d'amour, beauté et harmonie",
+        element: "Eau",
+        planet: "Vénus",
+        arabicName: "الجمعة • يوم الزهرة",
+      },
+      saturday: {
+        name: "Samedi • Jour de Saturne",
+        desc: "Jour de discipline, structure et maîtrise",
+        element: "Terre",
+        planet: "Saturne",
+        arabicName: "السبت • يوم زحل",
+      },
+    },
   },
   ar: {
         // Moment Alignment Screen (Hourly)
@@ -17829,9 +20635,11 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     
     common: {
       buttons: {
+              moonPowerNote: "قوة الطور (الإضاءة) تُحسب من الاستطالة بين الشمس والقمر (من الإيفيميرس).",
         learnMore: "اعرف المزيد",
         collapse: "إظهار أقل",
         tapToLearn: "اضغط لمعرفة المزيد",
+        ok: "حسناً",
       },
 
       loading: "جارٍ التحميل...",
@@ -17841,6 +20649,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       unknown: "—",
       element: "العنصر",
       you: "أنت",
+      required: "مطلوب",
 
       // Elements - shared across features
       elements: {
@@ -17849,12 +20658,566 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         water: "ماء",
         earth: "أرض",
       },
+      // أسماء الكواكب - مشتركة
+      planets: {
+        sun: "الشمس",
+        moon: "القمر",
+        mercury: "عطارد",
+        venus: "الزهرة",
+        mars: "المريخ",
+        jupiter: "المشتري",
+        saturn: "زحل",
+      },
+      // أسماء الأبراج - مشتركة
+      zodiacSigns: {
+        aries: "الحمل",
+        taurus: "الثور",
+        gemini: "الجوزاء",
+        cancer: "السرطان",
+        leo: "الأسد",
+        virgo: "العذراء",
+        libra: "الميزان",
+        scorpio: "العقرب",
+        sagittarius: "القوس",
+        capricorn: "الجدي",
+        aquarius: "الدلو",
+        pisces: "الحوت",
+      },
       // Quality levels (TimingGuidanceCard)
       quality: {
         excellent: "ممتاز",
         good: "جيد",
         moderate: "معتدل",
         weak: "ضعيف",
+      },
+    },
+
+    // التلميحات التوضيحية
+    tooltips: {
+      // الكواكب
+      sun: "هويتك الجوهرية وهدف حياتك.",
+      moon: "عواطفك وذاتك الداخلية.",
+      mercury: "كيف تفكر وتتواصل.",
+      venus: "ما تحبه وتقدّره.",
+      mars: "دافعك وطاقتك.",
+      jupiter: "نموك وحظك.",
+      saturn: "انضباطك ودروسك.",
+      
+      // الزوايا
+      ascendant: "كيف يراك الآخرون. شخصيتك الظاهرة وانطباعك الأول.",
+      descendant: "ما تبحث عنه في الشركاء. الصفات التي تجذبها.",
+      
+      // البروج
+      aries: "الحمل: نار أساسية — رائد، شجاع، جريء.",
+      taurus: "الثور: أرض ثابتة — مستقر، حسي، راسخ.",
+      gemini: "الجوزاء: هواء متغيّر — فضولي، تواصلي، متكيّف.",
+      cancer: "السرطان: ماء أساسي — راعٍ، حامٍ، حدسي.",
+      leo: "الأسد: نار ثابتة — مبدع، كريم، معبّر.",
+      virgo: "العذراء: أرض متغيّرة — تحليلي، مساعد، دقيق.",
+      libra: "الميزان: هواء أساسي — متناغم، دبلوماسي، عادل.",
+      scorpio: "العقرب: ماء ثابت — عميق، تحويلي، عميق.",
+      sagittarius: "القوس: نار متغيّرة — فلسفي، مغامر.",
+      capricorn: "الجدي: أرض أساسية — طموح، منضبط.",
+      aquarius: "الدلو: هواء ثابت — مبتكر، إنساني.",
+      pisces: "الحوت: ماء متغيّر — رحيم، حدسي.",
+      
+      // الكرامات
+      domicile: "الكوكب 'في بيته' - قوي جداً.",
+      exaltation: "الكوكب مكرَّم - قوي.",
+      detriment: "الكوكب غير مرتاح - ضعيف.",
+      fall: "الكوكب ضعيف جداً هنا.",
+      peregrine: "الكوكب بقوة متوسطة.",
+      neutral: "الكوكب بقوة متوسطة.",
+      strong: "هذا الكوكب قوي في خريطتك. صفاته مُضخَّمة وتعمل بشكل طبيعي لك.",
+      weak: "هذا الكوكب يعاني هنا. صفاته تحتاج جهداً إضافياً وتطويراً واعياً.",
+      
+      // غلبة الكواكب (للبصمة الروحية)
+      sunDominance: "غلبة الشمس تجلب الحيوية والقيادة وإحساساً قوياً بالذات.",
+      moonDominance: "غلبة القمر تجلب العمق العاطفي والحدس والاتصال بالدورات.",
+      mercuryDominance: "غلبة عطارد تجلب الذكاء الحاد ومهارات التواصل والتكيُّف.",
+      venusDominance: "غلبة الزهرة تجلب تقدير الجمال والانسجام والعلاقات.",
+      marsDominance: "غلبة المريخ تجلب الشجاعة والدافع والطاقة الحازمة.",
+      jupiterDominance: "غلبة المشتري تجلب التفاؤل والحكمة والرؤية الواسعة.",
+      saturnDominance: "غلبة زحل تجلب الانضباط والصبر والإتقان بالجهد.",
+      
+      // العناصر
+      fire: "عنصر حار وجاف - نشط، عاطفي، مبدع.",
+      water: "عنصر بارد ورطب - عاطفي، حدسي، متقبّل.",
+      air: "عنصر حار ورطب - فكري، تواصلي، اجتماعي.",
+      earth: "عنصر بارد وجاف - مستقر، عملي، راسخ.",
+      element_fire: "عنصر النار: ديناميكي، عاطفي، عملي.",
+      element_water: "عنصر الماء: عاطفي، حدسي، متقبّل.",
+      element_air: "عنصر الهواء: فكري، تواصلي، اجتماعي.",
+      element_earth: "عنصر الأرض: عملي، مستقر، راسخ.",
+      
+      // الطبائع
+      choleric: "طبع حار وجاف - سريع، طموح، شديد.",
+      sanguine: "طبع حار ورطب - اجتماعي، متفائل، حيوي.",
+      phlegmatic: "طبع بارد ورطب - هادئ، صبور، مسالم.",
+      melancholic: "طبع بارد وجاف - متأمل، متحفظ، عميق.",
+      temperament_hotDry: "حار وجاف (صفراوي): نشط، حاسم.",
+      temperament_hotMoist: "حار ورطب (دموي): متفائل، اجتماعي.",
+      temperament_coldMoist: "بارد ورطب (بلغمي): هادئ، صبور.",
+      temperament_coldDry: "بارد وجاف (سوداوي): متأمل، منضبط.",
+      "hot-dry": "حار وجاف (صفراوي): نشط، حاسم.",
+      "hot-moist": "حار ورطب (دموي): متفائل، اجتماعي.",
+      "cold-moist": "بارد ورطب (بلغمي): هادئ، صبور.",
+      "cold-dry": "بارد وجاف (سوداوي): متأمل، منضبط.",
+      
+      // أطوار القمر
+      lunarPhase: "طور القمر يؤثر على الأنماط العاطفية وإيقاعات الطاقة.",
+      lunarDay: "اليوم القمري (1-30) يحمل أهمية روحية.",
+      illumination: "نسبة سطح القمر التي تعكس الضوء.",
+      waxingMoon: "قمر متزايد - طاقة متصاعدة، جيد للبدء.",
+      waningMoon: "قمر متناقص - طاقة متحررة، جيد للإتمام.",
+      lunarMansion: "موقع القمر في 28 منزلة قمرية إسلامية.",
+      new: "محاق - وقت للبدايات الجديدة.",
+      waxing_crescent: "هلال متزايد - بناء الزخم.",
+      first_quarter: "الربع الأول - اتخاذ الإجراء.",
+      waxing_gibbous: "أحدب متزايد - صقل وتعديل.",
+      waxingGibbous: "القمر ينمو نحو الاكتمال - طاقة متصاعدة.",
+      full: "بدر - ذروة الطاقة، إضاءة.",
+      waning_gibbous: "أحدب متناقص - مشاركة الحكمة.",
+      last_quarter: "الربع الأخير - التحرر.",
+      waning_crescent: "هلال متناقص - راحة وتأمل.",
+    },
+
+    // Calculator (Arabic) - partial; missing keys fall back to EN
+    calculator: {
+      birth: {
+        // نموذج الإدخال
+        dateOfBirth: "تاريخ الميلاد",
+        selectDate: "اختر التاريخ",
+        timeOfBirth: "وقت الميلاد",
+        selectTime: "اختر الوقت",
+        timeKnown: "الوقت معروف",
+        timeUnknownNote: "حساب الطالع/الهابط يتطلب وقت الميلاد",
+        placeOfBirth: "مكان الميلاد",
+        city: "المدينة",
+        cityPlaceholder: "مثال: الدار البيضاء، القاهرة",
+        latitude: "خط العرض",
+        longitude: "خط الطول",
+        timezone: "المنطقة الزمنية",
+        timezoneHint: "منطقة زمنية IANA (مثال: Africa/Casablanca)",
+        detectLocation: "تحديد موقعي",
+        locationPermission: "إذن الموقع",
+        locationPermissionMessage: "يلزم إذن الموقع لتحديد مكان الميلاد تلقائياً.",
+        locationError: "خطأ في الموقع",
+        locationDetected: "تم تحديد الموقع",
+        locationFailed: "فشل تحديد الموقع",
+        error: "خطأ",
+        linkWithName: "ربط مع الاسم/النسب",
+        yourName: "اسمك (بالعربية)",
+        motherName: "اسم الأم (بالعربية)",
+        nameResonanceNote: "يُستخدم لتحليل التوافق مع خريطة الولادة",
+        namePlaceholder: "محمد",
+        motherNamePlaceholder: "فاطمة",
+
+        // النتائج (بطاقات العرض)
+        results: {
+          birthSummary: "ملخص الولادة",
+          sun: "الشمس",
+          moon: "القمر",
+          ascendant: "الطالع (السهم الصاعد)",
+          descendant: "الهابط",
+          manzil: "منزلة القمر",
+          manzilNumber: "المنزلة رقم {number}",
+          angles: "الزوايا",
+          planets: "الكواكب السبعة التقليدية",
+          moonTiming: "توقيت القمر",
+          phase: "الطور",
+          lunarDay: "اليوم القمري",
+          dayNumber: "اليوم {day}",
+          illumination: "الإضاءة",
+          direction: "الاتجاه",
+          spiritualImprint: "البصمة الروحية",
+          dominantElement: "العنصر الغالب",
+          dominantPlanet: "الكوكب الغالب",
+          temperament: "الطبع",
+          guidance: "التوجيه الروحي",
+          nameResonance: "توافق الاسم ↔ الولادة",
+          birthElement: "عنصر الولادة",
+          birthRuler: "حاكم الولادة",
+        },
+
+        // حالة الكواكب
+        condition: {
+          strong: "قوي",
+          neutral: "محايد",
+          weak: "ضعيف",
+        },
+
+        // أسباب القوة/الضعف (تظهر في الشرح إن استُخدمت)
+        conditionDomicile: "في بيتِه (سِمْتُه الأصلي)",
+        conditionExaltation: "في شرفه (رفعة)",
+        conditionDetriment: "في وباله (تحدّي)",
+        conditionFall: "في هبوطه (ضعف)",
+        conditionPeregrine: "غريب (محايد)",
+        conditionNeutral: "حالة محايدة",
+
+        // الطبائع
+        temperament: {
+          "hot-dry": "حار-جاف (صفراوي)",
+          "hot-moist": "حار-رطب (دموي)",
+          "cold-moist": "بارد-رطب (بلغمي)",
+          "cold-dry": "بارد-جاف (سوداوي)",
+        },
+
+        // التوافق
+        alignment: {
+          aligned: "متوافق",
+          mixed: "مختلط",
+          challenging: "صعب",
+        },
+
+        // إرشاد مختصر بحسب العنصر/السيادة (سطر واحد لكلٍ)
+        guidance: {
+          fire: {
+            1: "طاقة النار تزدهر مع الذكر النشط والجهد العملي الواعي",
+            2: "ثبّت نيتك وتجنّب الاندفاع — وجّه الحماس إلى عبادة منضبطة.",
+            3: "أفضل توازن: روتين ثابت ونوم منتظم وعبادة يومية لتثبيت الشدة.",
+          },
+          air: {
+            1: "طاقة الهواء تستفيد من التأمل العقلي وتمارين التنفس الواعي",
+            2: "احمِ تركيزك: اختر ممارسة رئيسية وأكملها قبل البدء بغيرها.",
+            3: "أفضل توازن: كتابة وتأمل وصمت وكلام واعٍ لتجنب التشتت.",
+          },
+          water: {
+            1: "طاقة الماء تتعمّق بالحضور القلبي والعبادة العاطفية المخلصة",
+            2: "ضع حدوداً: الإخلاص قوة، لكن لا تحمل مشاعر الجميع.",
+            3: "أفضل توازن: طبيعة وامتنان وروتين لطيف يهدئ القلب.",
+          },
+          earth: {
+            1: "طاقة الأرض تتأسّس بالثبات والانضباط الروحي المنتظم",
+            2: "تجنب الجمود — حافظ على النظام واترك مساحة للرحمة والمرونة.",
+            3: "أفضل توازن: ممارسات صغيرة يومية بثبات أفضل من الشدة المتقطعة.",
+          },
+          sun: {
+            1: "غلبة الشمس تشير إلى القيادة والتعليم في المجتمع الروحي",
+            2: "قُد بتواضع: قدّم الخدمة على المكانة واحفظ رقة القلب.",
+          },
+          moon: {
+            1: "غلبة القمر تُبرز الحكمة الحدسية والحالات الاستقبالية",
+            2: "احمِ إيقاعك الداخلي: راحة ودعاء وذكر هادئ يبقيك متزناً.",
+          },
+          mercury: {
+            1: "قوة عطارد تدعم تعلّم النصوص ونقل المعرفة الروحية",
+            2: "أفضل توازن: اجمع بين العلم والعمل — العلم نور إذا عُمِل به.",
+          },
+          venus: {
+            1: "تأثير الزهرة يجلب الانسجام والجمال في العبادة والعلاقات",
+            2: "أفضل توازن: اطلب الجمال بالحلال وتجنب التعلّق بالمظاهر.",
+          },
+          mars: {
+            1: "طاقة المريخ تقود الشجاعة في مجاهدة النفس والعمل الروحي",
+            2: "أفضل توازن: حوّل الغضب إلى عزم — الصبر وكظم الغيظ انتصار.",
+          },
+          jupiter: {
+            1: "اتساع المشتري يشجّع السخاء والتعليم والعمق الفلسفي",
+            2: "أفضل توازن: رؤية واسعة مع محاسبة يومية لتجنب الإفراط.",
+          },
+          saturn: {
+            1: "انضباط زحل يدعم الالتزام الطويل والتحكّم في الممارسة",
+            2: "أفضل توازن: كن حازماً مع العادات ولطيفاً مع نفسك — الثبات لا القسوة.",
+          },
+          temperament: {
+            "hot-dry": "وازن بممارسات مبرّدة ومرطِّبة مثل الصوم وقيام الليل",
+            "hot-moist": "وجِّه الطاقة عبر العبادة الجماعية والذكر الفَرِح",
+            "cold-moist": "قوِّ بالطاقة الدافئة مثل الذكر الحركي",
+            "cold-dry": "ليِّن بالقلب عبر العبادة القلبية والوصلة المجتمعية",
+          },
+        },
+
+
+        // تلميحات المعلومات لملف الولادة
+        tooltips: {
+          // الكواكب
+          sun: "الشمس تمثّل هويتك الجوهرية وحيويتك وذاتك الواعية. تُظهر أين تتألق وتسعى للتقدير.",
+          moon: "القمر يمثّل طبيعتك العاطفية وغرائزك وعالمك الداخلي. يكشف كيف تُغذّي وتحتاج للتغذية.",
+          mercury: "عطارد يحكم العقل والتواصل والتعلم. يُظهر كيف تفكر وتتحدث وتعالج المعلومات.",
+          venus: "الزهرة تحكم الحب والجمال والقيم. تكشف ما تجذبه وما يمنحك المتعة.",
+          mars: "المريخ يمثّل الدافع والعمل والشجاعة. يُظهر كيف تؤكد ذاتك وتسعى لأهدافك.",
+          jupiter: "المشتري يحكم التوسع والحكمة والبركات. يُظهر أين تجد النمو والوفرة.",
+          saturn: "زحل يمثّل الانضباط والقيود والإتقان. يُظهر أين يجب أن تعمل بجد وتصبر.",
+          aries: "الحمل: نار أساسية — رائد، شجاع، يبدأ بدايات جديدة.",
+          taurus: "الثور: أرض ثابتة — مستقر، حسي، يقدّر الأمان والجمال.",
+          gemini: "الجوزاء: هواء متغيّر — فضولي، تواصلي، رشيق عقلياً.",
+          cancer: "السرطان: ماء أساسي — راعٍ، حامٍ، حدسي عاطفياً.",
+          leo: "الأسد: نار ثابتة — مبدع، كريم، يسعى للتقدير والتعبير.",
+          virgo: "العذراء: أرض متغيّرة — تحليلي، خدمي، يسعى للكمال.",
+          libra: "الميزان: هواء أساسي — متناغم، دبلوماسي، يسعى للتوازن والشراكة.",
+          scorpio: "العقرب: ماء ثابت — عميق، تحويلي، يسعى للحقيقة العميقة.",
+          sagittarius: "القوس: نار متغيّرة — فلسفي، مغامر، يسعى للمعنى.",
+          capricorn: "الجدي: أرض أساسية — طموح، منضبط، يبني هياكل دائمة.",
+          aquarius: "الدلو: هواء ثابت — مبتكر، إنساني، يقدّر الحرية والتقدم.",
+          pisces: "الحوت: ماء متغيّر — رحيم، حدسي، متصل بالغيب.",
+          domicile: "في بيته — الكوكب يعمل بكامل قوته وراحته.",
+          exaltation: "في شرفه — الكوكب مكرَّم ويعمل بأقصى تعبيره.",
+          detriment: "في وباله — الكوكب يواجه تحديات في التعبير عن نفسه.",
+          fall: "في هبوطه — طاقة الكوكب ضعيفة وتحتاج جهداً أكبر.",
+          peregrine: "غريب — لا تقوية ولا إضعاف؛ حالة محايدة.",
+          element_fire: "عنصر النار: ديناميكي، عاطفي، عملي. مرتبط بالشجاعة والتحول.",
+          element_water: "عنصر الماء: عاطفي، حدسي، متقبّل. مرتبط بالشفاء والعمق.",
+          element_air: "عنصر الهواء: فكري، تواصلي، اجتماعي. مرتبط بالأفكار والاتصال.",
+          element_earth: "عنصر الأرض: عملي، مستقر، راسخ. مرتبط بالتجلي والصبر.",
+          temperament_hotDry: "حار وجاف (صفراوي): نشط، حاسم، عملي. يحتاج تبريداً وترطيباً.",
+          temperament_hotMoist: "حار ورطب (دموي): متفائل، اجتماعي، متحمس. يحتاج ثباتاً وتركيزاً.",
+          temperament_coldMoist: "بارد ورطب (بلغمي): هادئ، صبور، متقبّل. يحتاج تنشيطاً ودفئاً.",
+          temperament_coldDry: "بارد وجاف (سوداوي): متأمل، منضبط، متحفظ. يحتاج دفئاً وليونة.",
+          lunarPhase: "طور القمر عند الولادة يؤثر على الأنماط العاطفية وإيقاعات الطاقة الطبيعية.",
+          lunarDay: "اليوم القمري (1-30) يحمل أهمية روحية خاصة في التقويم الإسلامي.",
+          illumination: "إضاءة القمر تُظهر نسبة سطح القمر التي تعكس ضوء الشمس.",
+          waxingMoon: "قمر متزايد: الطاقة تتصاعد — جيد لبدء المشاريع والنمو.",
+          waningMoon: "قمر متناقص: الطاقة تتحرر — جيد للإتمام والتخلي.",
+          lunarMansion: "المنازل القمرية الـ28 (منازل القمر) كل منها يحمل صفات روحية فريدة.",
+          ascendant: "الطالع (السهم الصاعد) هو البرج الذي يشرق على الأفق الشرقي لحظة الولادة. يمثّل شخصيتك الظاهرة وكيف يراك الآخرون أولاً.",
+          descendant: "الهابط هو البرج المقابل لطالعك. يمثّل الشراكات والعلاقات والصفات التي تبحث عنها في الآخرين.",
+        },
+        
+        // المخطط الكوني
+        cosmicBlueprint: {
+          title: "ماذا يعني هذا لك",
+          youAre: "أنت",
+          with: "بـ",
+          who: "الذي",
+          yourGift: "موهبتك",
+          yourChallenge: "تحدّيك",
+          bestPath: "أفضل مسار",
+        },
+        
+        // بطاقة العمل
+        actionCard: {
+          title: "جرّب هذا الآن",
+          basedOn: "بناءً على غلبة {planet} لديك:",
+          practice: "مارس",
+          times: "{count} مرة",
+          after: "بعد {prayer}",
+          bestDays: "أفضل الأيام",
+          setReminder: "تعيين تذكير",
+          learnMore: "معرفة المزيد",
+        },
+        // تنبيه
+        disclaimer: "ملف الولادة لغرض التأمل الروحي فقط. ليس تنجيماً تنبّؤياً. للاستشارة الدينية، راجعوا أهل العلم المؤهّلين.",
+      },
+    },
+
+    // القمر والتوافق (علامات واجهة المستخدم)
+    moon: {
+      ui: {
+        moonDayHarmony: "توافق القمر والنهار",
+        perfectAlignment: "توافق تام",
+        goodAlignment: "توافق جيد",
+        neutralAlignment: "توافق محايد",
+        challengingAlignment: "توافق صعب",
+        explanation: "ما يعنيه هذا",
+        recommendation: "ما يجب أن تفعله",
+        lunarTiming: "توقيت القمر",
+        dayOfMonth: "اليوم {day}",
+        lunarDay: "اليوم القمري",
+        moonPower: "قوة القمر",
+        waxing: "القمر المتزايد",
+        waning: "القمر المتناقص",
+        learnMore: "اعرف المزيد",
+        rest: "راحة",
+        suitableFor: "الأفضل ل",
+        notSuitableFor: "تجنب",
+        whyThisMatters: "لماذا هذا مهم",
+        spiritualGuidance: "التوجيه الروحي",
+      },
+      // عناوين وأوصاف مراحل القمر
+      new: {
+        title: "محاق (قمر جديد)",
+        description: "المحاق هو وقت البدايات الجديدة والبذور الجديدة. مثالي لتحديد النوايا والعمل الداخلي. التأمل قبل الحركة.",
+        suitable: {
+          category: "الممارسة الروحية",
+          activity1: "الراحة والاستعادة",
+          activity2: "التأمل العميق",
+          activity3: "عمل الظل",
+          spiritual1: "الصلوات الليلية (تهجد)",
+          spiritual2: "التوبة",
+          spiritual3: "الصيام",
+        },
+        notSuitable: {
+          category: "العمل الخارجي",
+          activity1: "بدء مشاريع جديدة",
+          activity2: "الإطلاقات الكبرى",
+          activity3: "الاتفاقيات التجارية",
+          reason: "القمر الأسود يفتقر إلى الضوء والزخم للمشاريع الخارجية الجديدة. انتظر عودة الضوء.",
+        },
+      },
+      waxing_crescent: {
+        title: "هلال متزايد",
+        description: "القمر ينمو ويجمع الطاقة. وقت النمو والمبادرة والزخم. اتخذ إجراءً مستوحى نحو أهدافك.",
+        suitable: {
+          category: "النمو والمشاريع الجديدة",
+          activity1: "بدء الشركات",
+          activity2: "علاقات جديدة",
+          activity3: "تعلم مهارات جديدة",
+          activity4: "مشاريع إبداعية",
+          spiritual1: "الدعاء من أجل الزيادة",
+          spiritual2: "ممارسات الدعاء",
+          spiritual3: "طقوس تحديد الأهداف",
+        },
+        notSuitable: {
+          category: "الأنهايات والتحرر",
+          activity1: "النهايات الكبرى",
+          activity2: "الحظر",
+          activity3: "قطع الروابط",
+          reason: "الضوء المتزايد يعارض التحرر والإكمال. يريد القمر أن يبني، وليس أن ينقص.",
+        },
+      },
+      first_quarter: {
+        title: "الربع الأول",
+        description: "تظهر التحديات والقرارات. وقت مواجهة العقبات بشجاعة. ابنِ من خلال الصعوبات. جيد لتجاوز المقاومة.",
+        suitable: {
+          category: "التحدي والنمو",
+          activity1: "العمل على الخطط",
+          activity2: "التغلب على العقبات",
+          activity3: "القرارات الكبرى",
+          activity4: "الأنشطة البدنية",
+          spiritual1: "الممارسات الحماية",
+          spiritual2: "ذكر يعزز القوة",
+          spiritual3: "عمل الإرادة",
+        },
+        notSuitable: {
+          category: "الأمور الحساسة",
+          activity1: "مفاوضات السلام",
+          activity2: "الشفاء اللطيف",
+          activity3: "العمل الاستقبالي",
+          reason: "الضوء المتزايد للقمر يخلق توترًا وتحديًا. الأفضل للعمل اللطيف خلال القمر المتناقص.",
+        },
+      },
+      waxing_gibbous: {
+        title: "قمر محدب متزايد",
+        description: "يقترب من الامتلاء—الطاقة وصلت تقريباً لذروتها. اصقل جهودك. مثالي للزخارف النهائية قبل الإكمال. ثق بتقدمك.",
+        suitable: {
+          category: "الظهور والإكمال",
+          activity1: "إكمال المشاريع",
+          activity2: "الجهد الأخير للأهداف",
+          activity3: "عمل الظهور",
+          activity4: "الأحداث المهمة",
+          spiritual1: "ممارسات بدر القمر",
+          spiritual2: "ظهور النية",
+          spiritual3: "طقوس الطاقة القصوى",
+        },
+        notSuitable: {
+          category: "العمل الدقيق/المختفي",
+          activity1: "العمل السري",
+          activity2: "التأمل الهادئ",
+          activity3: "الممارسات المخفية",
+          reason: "القمر المكتمل تقريبًا لامع وعام. إذا كانت الكتمان مطلوبة، اختر مرحلة أظلم.",
+        },
+      },
+      full: {
+        title: "بدر (قمر مكتمل)",
+        description: "أعلى قوة وإضاءة. كل الطاقات مضخّمة. وقت قوي للتجسيد والكشف والاحتفال. استخدم بوعي.",
+        suitable: {
+          category: "الذروة والشفاء",
+          activity1: "عمل الشفاء",
+          activity2: "الكشفات والوضوح",
+          activity3: "حفلات الإكمال",
+          activity4: "التجمعات الجماعية",
+          activity5: "طقوس بدر القمر",
+          spiritual1: "صلوات بدر القمر",
+          spiritual2: "طقوس الشفاء",
+          spiritual3: "الممارسات المجتمعية",
+          spiritual4: "وضوح الرؤية",
+        },
+        notSuitable: {
+          category: "البدايات الجديدة",
+          activity1: "بدء مشاريع جديدة",
+          activity2: "الانعكاس الهادئ",
+          activity3: "العمل السري",
+          reason: "طاقة بدر القمر خارجية وملهمة. للبدايات الجديدة، انتظر الهلال المتزايد.",
+        },
+      },
+      waning_gibbous: {
+        title: "قمر محدب متناقص",
+        description: "يبدأ القمر في التحرر. الطاقة تتحول نحو الإكمال. شارك بركاتك. الامتنان والمشاركة قويان الآن.",
+        suitable: {
+          category: "الإكمال والامتنان",
+          activity1: "إكمال المشاريع",
+          activity2: "التعبير عن الامتنان",
+          activity3: "التعليم/المشاركة",
+          activity4: "التنظيم",
+          spiritual1: "ممارسات الامتنان",
+          spiritual2: "طقوس الشكر",
+          spiritual3: "عمل البركة",
+          spiritual4: "ممارسات التعليم",
+        },
+        notSuitable: {
+          category: "المشاريع الجديدة الكبيرة",
+          activity1: "بدء المشاريع الكبيرة",
+          activity2: "بدء العلاقات",
+          activity3: "التزامات جديدة",
+          reason: "تتحرك طاقة القمر المتناقص نحو الإكمال. تنتمي المشاريع الجديدة إلى المرحلة المتزايدة.",
+        },
+      },
+      last_quarter: {
+        title: "الربع الأخير",
+        description: "التحرر والتأمل. قيّم ما اكتمل. مثالي للتحرر والشفاء والتحضير للتجديد. الحكمة من خلال المراجعة.",
+        suitable: {
+          category: "التحرر والتطهير",
+          activity1: "منع الأنماط السلبية",
+          activity2: "التطهير",
+          activity3: "الغفران",
+          activity4: "إنهاء العلاقات باحترام",
+          spiritual1: "طقوس التطهير",
+          spiritual2: "ممارسات الغفران",
+          spiritual3: "حفلات التحرر",
+          spiritual4: "عمل التوبة",
+        },
+        notSuitable: {
+          category: "النمو الجديد",
+          activity1: "بدء مشاريع جديدة",
+          activity2: "التوسع",
+          activity3: "التزامات جديدة",
+          reason: "تدعم طاقة القمر المتناقص التحرر، وليس النمو. تزدهر المشاريع الجديدة خلال المرحلة المتزايدة.",
+        },
+      },
+      waning_crescent: {
+        title: "هلال متناقص",
+        description: "التحرر النهائي قبل الدورة الجديدة. الراحة والتكامل والتعمق الروحي. جهز التربة لبذور جديدة. الاستسلام والثقة.",
+        suitable: {
+          category: "التأمل العميق",
+          activity1: "التأمل",
+          activity2: "الانعكاس الذاتي",
+          activity3: "النهايات النهائية",
+          activity4: "الاعتكاف الروحي",
+          spiritual1: "الصلوات الليلية",
+          spiritual2: "الذكر العميق",
+          spiritual3: "الاعتكاف",
+          spiritual4: "الصيام",
+        },
+        notSuitable: {
+          category: "المشاريع النشطة",
+          activity1: "بدء المشاريع",
+          activity2: "الأنشطة الكبرى",
+          activity3: "العمل العام",
+          reason: "يدعو القمر المظلم تقريبًا للراحة. انتظر الضوء الجديد لبدء مشاريع جديدة.",
+        },
+      },
+      harmony: {
+        waxing_active: {
+          explanation: "قمر متزايد + كوكب نشط (الشمس/المريخ/المشتري) = مثالي لإطلاق المشاريع وبناء الزخم.",
+          recommendation: "هذا وقت ممتاز لبدء مشاريع جديدة والعمل بجرأة. وجه هذه الطاقة بحكمة.",
+        },
+        waning_reflective: {
+          explanation: "قمر متناقص + كوكب تأملي (القمر/الزهرة/زحل) = مثالي للإنجاز والتحرر والعمل الداخلي.",
+          recommendation: "مثالي لإنهاء المشاريع وممارسات الشفاء والتأمل الروحي العميق. حرر ما لم يعد يخدمك.",
+        },
+        waxing_reflective: {
+          explanation: "القمر المتزايد يريد البناء، لكن كوكب تأملي يدعم الانعكاس. إشارات مختلطة لكن قابلة للعمل.",
+          recommendation: "يمكنك أن تعمل، لكن كن مستعداً لحاجة داخلية للتأمل أو التعديل في الطريق.",
+        },
+        waning_active: {
+          explanation: "القمر المتناقص يدعم الإكمال، لكن كوكب نشط يدفع نحو العمل. طاقات غير متوافقة.",
+          recommendation: "يمكنك المضي قدماً إذا لزم الأمر، لكن التيار العميق لليوم يدعم الإكمال أكثر من البدايات الجديدة.",
+        },
+        neutral: {
+          explanation: "حاكم النهار مرن وقابل للتكيف. يبقى اليوم متوازناً وطاقة محايدة.",
+          recommendation: "العمل والتأمل كلاهما ممكن اليوم. دع مرحلة القمر توجه أولوياتك.",
+        },
       },
     },
 
@@ -18007,6 +21370,30 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         headerSubtitle: "طويل المدى",
         explanation: "يعرض موقع الكوكب في الأبراج — وهو موضع طويل المدى يتغير خلال أسابيع أو أشهر أو سنوات.",
         personalizedNote: "مُخصّص حسب طبيعتك العنصرية",
+        practices: {
+          title: "ممارسات خاصة بالكوكب",
+          minutesShort: "دقائق",
+          divineNames: {
+            title: "الأسماء الإلهية",
+            description: "أسماء الله الحسنى الموصى بها لطاقة {planet}",
+            forCategory: "للـ {category}",
+            repetitionsLabel: "التكرارات:",
+            purposeLabel: "🎯 الغرض",
+            durationLabel: "المدة المقدرة:",
+            howTo: {
+              label: "💡 كيفية الممارسة",
+              step1: "توضأ وواجه القبلة",
+              step2: "اجلس في مكان هادئ ونظيف",
+              step3: "اضبط نيتك لـ{category}",
+              step4: "اتلُ بتركيز وخشوع",
+              step5: "استخدم السبحة للعد",
+            },
+            actions: {
+              startPractice: "ابدأ الممارسة",
+              setReminder: "ضع تذكيرًا",
+            },
+          },
+        },
         summary: {
           bestNow: "الأقوى الآن",
           weakNow: "الأضعف الآن",
@@ -19023,12 +22410,91 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     },
 
     momentDetail: {
+      cards: {
+        currentHour: "الساعة الكوكبية الحالية",
+        yourPlanet: "كوكبك",
+        transitConditions: "ظروف العبور",
+        alignmentAnalysis: "تحليل المحاذاة",
+        whatThisMeans: "ماذا يعني هذا",
+        excellentFor: "ممتاز لـ",
+        avoidNow: "يُفضّل تجنّب",
+        showTimeline: "عرض الجدول الزمني الكامل",
+        hourEndsIn: "تنتهي الساعة خلال",
+        nextHour: "الساعة التالية",
+
+        status: {
+          act: "تحرّك",
+          maintain: "استمر",
+          hold: "انتظر",
+          act_desc: "الظروف مواتية — تحرّك بوعي",
+          maintain_desc: "الظروف مواتية — تقدّم بثبات",
+          hold_desc: "الظروف صعبة — انتظر وقتًا أفضل",
+        },
+
+        transit: {
+          dignity: "المنزلة",
+          house: "البيت",
+          strength: "قوة الساعة الحالية",
+          overallNote: "عبور {planet} العام: {quality}. اضغط للتفاصيل →",
+          positionalPower: "القوة الموضعية",
+          positionalSubtext: "بناءً على موضع البيت والمنزلة (للعمل الآن)",
+          transitQuality: "جودة العبور",
+          transitQualitySubtext: "القوة الكوكبية الإجمالية (تناسب طبيعتك)",
+          explanation: "القوة الموضعية {positional}، بينما جودة العبور {quality}",
+          viewFullAnalysis: "عرض التحليل الكامل لعبور {planet} →",
+          angular: "زاوي",
+          succedent: "تالي",
+          cadent: "ساقط",
+          house_10_angular: "البيت العاشر - المهنة والمكانة",
+          exceptional: "قوة استثنائية",
+          strong: "وضع قوي",
+          moderate: "متوسطة",
+          weak: "ضعيفة",
+        },
+
+        analysis: {
+          planetaryFriendship: "الانسجام الكوكبي",
+          elementalHarmony: "الانسجام العنصري",
+          transitStrength: "قوة الساعة الحالية",
+          strong: "قوية",
+          moderate: "متوسطة",
+          weak: "ضعيفة",
+          exceptional: "استثنائية",
+        },
+
+        source: {
+          nameMotherPersonal: "المصدر: الاسم + الأم (شخصي)",
+          birthChart: "المصدر: الخريطة الولادية",
+        },
+      },
       authenticTiming: {
         title: "التوقيت الأصيل",
         hourRuler: "قوة حاكم الساعة",
         elemental: "العلاقة العنصرية",
         opening: "إرشاد ساعة {planet} (للتأمل).",
         nextHour: "الساعة التالية: يبدأ {planet} بعد {minutes} د.",
+
+        timingAnalysisTitle: "تحليل التوقيت",
+        planetaryConditionsTitle: "الظروف الكوكبية",
+        dignityLabel: "الكرامة",
+        positionLabel: "الموضع الفلكي",
+        strengthLabel: "الحالة",
+        interpretationLabel: "التفسير",
+        whyThisStatusTitle: "لماذا هذا الوضع؟",
+        showDetails: "عرض التفاصيل",
+        hideDetails: "إخفاء التفاصيل",
+        noEnhancements: "لا توجد تحسينات محددة مقترحة الآن.",
+        noCautions: "لا توجد تنبيهات لهذا التوقيت.",
+        recommendedLabel: "مستحسن",
+        cautionsLabel: "تنبيهات",
+        personalPlanetLabel: "كوكبك",
+        personalElementLabel: "عنصرك",
+        factors: {
+          elementCompatibility: "الانسجام العنصري",
+          planetaryResonance: "الرنين الكوكبي",
+          manazilAlignment: "محاذاة المنازل",
+          practiceMapping: "مطابقة الممارسة",
+        },
       },
       timeline: {
         in: "بعد",
@@ -19143,110 +22609,295 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         cta: "عرض التفاصيل →",
       },
     },
-    
-    // Moon Phase System
-    moon: {
-      phases: {
-        new: "New Moon",
-        waxing_crescent: "Waxing Crescent",
-        first_quarter: "First Quarter",
-        waxing_gibbous: "Waxing Gibbous",
-        full: "Full Moon",
-        waning_gibbous: "Waning Gibbous",
-        last_quarter: "Last Quarter",
-        waning_crescent: "Waning Crescent",
+
+    // Daily Energy - نظام السرد الجديد
+    dailyEnergy: {
+      // عناوين الأقسام
+      todaysRuler: "حاكم اليوم الكوكبي",
+      yourPlanet: "كوكبك الشخصي",
+      todaysAlignment: "توافق اليوم",
+      lunarInfluence: "التأثير القمري",
+      whatThisMeans: "ماذا يعني هذا لك",
+      excellentForToday: "ممتاز لليوم",
+      lessFavorable: "أقل ملاءمة",
+      bestForToday: "الأفضل لليوم",
+      notAdvisedToday: "غير مُستحسن اليوم",
+      currentTransit: "العبور الحالي",
+      peakHours: "ساعات الذروة",
+      transitIn: "في {sign}{dignity}",
+
+      alignmentOverview: {
+        title: "نظرة عامة على التوافق",
+        dayRulerLabel: "حاكم اليوم",
+        yourRulerLabel: "حاكمك",
+        elementsLabel: "العناصر",
+        elementHarmony: "انسجام العناصر",
+        planetHarmony: "انسجام الكواكب",
+        ilmGuidanceToggle: "إرشاد ʿIlm al-Nujūm",
+        verdict: {
+          excellent: "توافق قوي — تحرك بثقة.",
+          good: "توافق جيد — التقدم المتدرّج مُفضّل.",
+          moderate: "توافق مختلط — بسّط خطواتك وثبّت نيتك.",
+          challenging: "توافق دقيق — تروَّ وركّز على الوضوح.",
+        },
+        guidance: {
+          essenceLabel: "🌟 جوهر اليوم",
+          recommendationsLabel: "💡 توصيات",
+          practiceLabel: "🙏 ممارسة روحية",
+        },
       },
-      
-      phasesArabic: {
-        new: "المحاق",
-        waxing_crescent: "الهلال المتزايد",
-        first_quarter: "التربيع الأول",
-        waxing_gibbous: "الأحدب المتزايد",
-        full: "البدر",
-        waning_gibbous: "الأحدب المتناقص",
-        last_quarter: "التربيع الثاني",
-        waning_crescent: "الهلال المتناقص",
+
+      spiritualBlueprint: {
+        title: "مخططك الروحي",
+        signLabel: "الطالع",
+        modalityLabel: "الصفة",
+        temperamentLabel: "المِزاج",
       },
-      
-      new: {
-        title: "Time for Rest & Intention",
-        description: "Like the darkest hour before dawn, this is a time for quiet reflection, setting intentions, and preparing for the cycle ahead. Conserve your energy.",
+
+      todaysProfile: {
+        currentHourLabel: "الساعة الحالية",
       },
-      
-      waxing_crescent: {
-        title: "Time for New Beginnings",
-        description: "Like a seed breaking through soil, this is when intentions become visible. The Moon's growing light supports starting projects, planting seeds, and building momentum.",
+
+      alignmentAnalysis: {
+        title: "تحليل التوافق",
+        scoreLabel: "الإجمالي",
+        temperamentLabel: "المِزاج",
+        temperament: {
+          match: "متوافق",
+          contrast: "متباين",
+        },
       },
-      
-      first_quarter: {
-        title: "Time for Action & Growth",
-        description: "The Moon is half-illuminated and energy is rising. This is the time to take decisive action, overcome obstacles, and push your projects forward with confidence.",
+
+      recommendations: {
+        personalizedHoursTitle: "ساعات مخصصة",
+        bestForYou: "أفضل ساعات لك",
+        supportiveToday: "مساندة اليوم",
+        moreDelicate: "أكثر دقة",
       },
-      
-      waxing_gibbous: {
-        title: "Time for Refinement",
-        description: "Nearly full, the Moon's light illuminates what needs adjustment. Perfect for refining your work, making improvements, and preparing for completion.",
+
+      temperaments: {
+        sun: "حار يابس",
+        moon: "بارد رطب",
+        mars: "حار يابس",
+        mercury: "متغير / مختلط",
+        jupiter: "حار رطب",
+        venus: "بارد رطب",
+        saturn: "بارد يابس",
       },
-      
-      full: {
-        title: "Time for Culmination",
-        description: "Like a tree heavy with ripe fruit, this is the peak of manifestation. Celebrate achievements, complete major milestones, and make important announcements.",
+
+      loading: {
+        generatingGuidance: "✨ جارٍ توليد إرشادك الشخصي...",
       },
-      
-      waning_gibbous: {
-        title: "Time for Gratitude & Sharing",
-        description: "The light begins to decrease. This is the time to share what you've created, express gratitude for what's been received, and begin releasing what no longer serves.",
+      errors: {
+        unableToGenerateTitle: "تعذر توليد الإرشاد",
+        unableToGenerateBody: "لم نتمكن من توليد الإرشاد الشخصي لليوم. حدّث الشاشة للمحاولة مرة أخرى.",
       },
-      
-      last_quarter: {
-        title: "Time for Release & Clearing",
-        description: "Half the light remains. Actively release what's holding you back, clear away obstacles, break old patterns, and make space for the new cycle ahead.",
+      actions: {
+        refresh: "تحديث",
       },
-      
-      waning_crescent: {
-        title: "Time for Completion & Surrender",
-        description: "The final sliver of light. Finish what remains, tie up loose ends, practice forgiveness, and prepare for the rest period ahead. Let go with grace.",
+      generic: {
+        title: "✨ طاقة اليوم",
+        completeProfileNote: "💡 أكمل ملفك لترى إرشادًا شخصيًا بناءً على طبيعتك الكوكبية.",
       },
-      
-      harmony: {
-        waxing_active: "Perfect alignment! The Moon's growing light beautifully matches {{dayRuler}}'s active energy. Excellent timing for launching projects and taking initiative.",
-        waxing_active_rec: "This is ideal timing for bold action, starting ventures, and making your mark.",
-        
-        waning_reflective: "Perfect alignment! The Moon's decreasing light harmonizes with {{dayRuler}}'s reflective nature. Excellent timing for completion and inner work.",
-        waning_reflective_rec: "Focus on finishing projects, releasing what's done, and inner spiritual practices.",
-        
-        waxing_reflective: "Mixed timing. The waxing Moon wants to build, but {{dayRuler}} calls for reflection. Choose your actions carefully.",
-        waxing_reflective_rec: "Start inner-focused or gentle projects. Avoid aggressive outward action.",
-        
-        waning_active: "Mixed timing. The waning Moon wants to release, but {{dayRuler}} calls for action. Navigate this tension wisely.",
-        waning_active_rec: "Focus on completing active projects rather than starting new ones.",
-        
-        neutral: "Moderate alignment. The Moon and {{dayRuler}} create balanced conditions.",
-        neutral_rec: "Proceed with awareness. Both starting and completing are possible with care.",
+
+      // أوصاف الأيام
+      dayEnergy: {
+        expansion: "التوسع والحكمة والنمو",
+        action: "العمل والشجاعة والحركة الحاسمة",
+        communication: "التواصل والتعلم والتجارة",
+        love: "الحب والجمال والانسجام",
+        discipline: "الانضباط والبنية والإتقان",
+        vitality: "الحيوية والقيادة والقوة الشخصية",
+        intuition: "المشاعر والحدس والرعاية",
       },
-      
-      ui: {
-        lunarTiming: "Lunar Timing",
-        moonPhase: "Moon Phase",
-        lunarDay: "Lunar Day",
-        dayOfMonth: "Day {{day}} of 30",
-        moonPower: "Moon Power",
-        waxing: "Waxing (Growing)",
-        waning: "Waning (Decreasing)",
-        learnMore: "Learn More",
-        fullGuide: "Full Lunar Guide",
-        moonDayHarmony: "Moon-Day Harmony",
-        perfectAlignment: "Perfect Alignment",
-        goodAlignment: "Good Alignment",
-        neutralAlignment: "Neutral Alignment",
-        challengingAlignment: "Challenging Alignment",
-        suitableFor: "Best For",
-        notSuitableFor: "Avoid",
-        whyThisMatters: "Why This Matters",
-        traditionalWisdom: "Traditional Wisdom",
-        practicalExample: "Practical Example",
-        spiritualGuidance: "Spiritual Guidance",
+
+      // عوامل التوافق
+      factors: {
+        planetaryFriendship: "الصداقة الكوكبية",
+        elementalHarmony: "الانسجام العنصري",
+        dailyStrength: "القوة اليومية",
       },
+
+      // العلاقات
+      friendship: {
+        strongFriends: "أصدقاء أقوياء",
+        friends: "أصدقاء",
+        neutral: "محايد",
+        tension: "توتر",
+      },
+
+      descriptions: {
+        planetaryFriendship: {
+          samePlanet: "طاقة {dayPlanet} تتناغم تمامًا مع طبيعتك {userPlanet} — تضخيم قوي.",
+          friend: "{dayPlanet} و{userPlanet} يتعاونان بطبيعة الحال — تدفق مُسانِد.",
+          neutral: "{dayPlanet} و{userPlanet} محايدان — التزم بالبساطة والثبات.",
+          enemy: "{dayPlanet} و{userPlanet} يخلقان توترًا — تحرّك بوعي وتجنّب فرض النتائج.",
+        },
+        elementalHarmony: {
+          same: "{userElement} يقوّي {dayElement} — رنين قوي.",
+          supportive: "{dayElement} يدعم طبيعتك {userElement} — تدفق متناغم.",
+          neutral: "{dayElement} و{userElement} ينسجمان بشكل محايد — تكيّف وحافظ على التوازن.",
+          tension: "{dayElement} و{userElement} بينهما توتر — تقدّم بلطف وامنح الأولوية للوضوح.",
+        },
+        dailyStrength: {
+          veryStrong: "{planet} قوي جدًا اليوم — مناسب للخطوات الحاسمة.",
+          strong: "{planet} قوي اليوم — طاقة مُسانِدة متاحة.",
+          moderate: "{planet} متوسط اليوم — ثابت لكن ليس استثنائيًا.",
+          weak: "{planet} ضعيف نسبيًا اليوم — اتبع نهجًا ألطف.",
+          veryWeak: "{planet} ضعيف جدًا اليوم — الأفضل انتظار توقيت أقوى.",
+        },
+      },
+
+      // قوالب التركيب
+      synthesis: {
+        excellent: "طاقة {day} ممتازة! يوم {day} ذو {quality} ينسجم بشكل جميل مع طبيعتك {user}-{element}. {lunar}. اليوم يفضل {activities}.",
+        good: "طاقة {day} جيدة. {quality} {day} يعمل بشكل جيد مع طبيعتك {user}-{element}. {lunar}. ملائم لـ {activities}.",
+        moderate: "طاقة {day} متوازنة. {quality} {day} يقدم دعمًا ثابتًا. {lunar}. جيد لـ {activities}.",
+        challenging: "طاقة {day} تأملية. {quality} {day} يدعو إلى التنقل الحذر. {lunar}. أفضل لـ {activities}.",
+      },
+
+      // الأطوار القمرية
+      lunarPhase: {
+        waxing: "القمر المتزايد يضيف زخمًا متصاعدًا",
+        waning: "القمر المتناقص يدعم الإطلاق والإكمال",
+        full: "البدر يضخم كل الطاقات",
+        new: "المحاق يقدم بدايات جديدة",
+      },
+
+      // تسميات القوة
+      strengthLabels: {
+        veryStrong: "قوي جدًا",
+        strong: "قوي",
+        moderate: "معتدل",
+        weak: "ضعيف",
+        veryWeak: "ضعيف جدًا",
+      },
+
+      // تسميات المصدر
+      sourceLabels: {
+        fromName: "من الاسم + اسم الأم",
+        fromBirthChart: "من الخريطة الفلكية",
+        default: "افتراضي (الشمس)",
+      },
+    },
+
+    // تسميات حكام الأيام
+    dayRulers: {
+      sunday: {
+        name: "الأحد • يوم الشمس",
+        desc: "يوم الحيوية والقيادة والقوة الشخصية",
+        element: "النار",
+        planet: "الشمس",
+        arabicName: "الأحد • يوم الشمس",
+      },
+      monday: {
+        name: "الاثنين • يوم القمر",
+        desc: "يوم المشاعر والحدس والرعاية",
+        element: "الماء",
+        planet: "القمر",
+        arabicName: "الاثنين • يوم القمر",
+      },
+      tuesday: {
+        name: "الثلاثاء • يوم المريخ",
+        desc: "يوم العمل والشجاعة والحركة الحاسمة",
+        element: "النار",
+        planet: "المريخ",
+        arabicName: "الثلاثاء • يوم المريخ",
+      },
+      wednesday: {
+        name: "الأربعاء • يوم عطارد",
+        desc: "يوم التواصل والتعلم والتجارة",
+        element: "الهواء",
+        planet: "عطارد",
+        arabicName: "الأربعاء • يوم عطارد",
+      },
+      thursday: {
+        name: "الخميس • يوم المشتري",
+        desc: "يوم التوسع والحكمة والنمو",
+        element: "الهواء",
+        planet: "المشتري",
+        arabicName: "الخميس • يوم المشتري",
+      },
+      friday: {
+        name: "الجمعة • يوم الزهرة",
+        desc: "يوم الحب والجمال والانسجام",
+        element: "الماء",
+        planet: "الزهرة",
+        arabicName: "الجمعة • يوم الزهرة",
+      },
+      saturday: {
+        name: "السبت • يوم زحل",
+        desc: "يوم الانضباط والبنية والإتقان",
+        element: "الأرض",
+        planet: "زحل",
+        arabicName: "السبت • يوم زحل",
+      },
+    },
+
+    // أوصاف العلاقات الكوكبية (العربية - مبسطة)
+    planetaryRelations: {
+      "Sun-Moon": "الشمس تضيء أعماق القمر العاطفية",
+      "Sun-Mars": "الشمس تمد شجاعة المريخ بالطاقة",
+      "Sun-Jupiter": "الشمس توسع حكمة المشتري",
+      "Sun-Mercury": "الشمس وعطارد يعملان معًا بشكل طبيعي",
+      "Sun-Venus": "الشمس والزهرة يخلقان توترًا إبداعيًا",
+      "Sun-Saturn": "الشمس وزحل يواجهان تحديات",
+      "Moon-Sun": "القمر يعكس حيوية الشمس",
+      "Moon-Mercury": "القمر ينسجم مع أفكار عطارد",
+      "Moon-Mars": "القمر والمريخ يوازنان العاطفة والعمل",
+      "Moon-Jupiter": "القمر والمشتري يمزجان الرعاية والكرم",
+      "Moon-Venus": "القمر يتدفق طبيعيًا مع الزهرة",
+      "Moon-Saturn": "القمر وزحل يصارعان بين العاطفة والتحكم",
+      "Mars-Sun": "المريخ يوجه حيوية الشمس إلى العمل",
+      "Mars-Moon": "المريخ يدعم عواطف القمر",
+      "Mars-Jupiter": "المريخ ينضم إلى حكمة المشتري",
+      "Mars-Mercury": "المريخ وعطارد يخلقان توترًا",
+      "Mars-Venus": "المريخ والزهرة يصارعان بين التأكيد والانسجام",
+      "Mars-Saturn": "المريخ وزحل يعملان معًا بحياد",
+      "Mercury-Sun": "عطارد يخدم الشمس بدقة",
+      "Mercury-Venus": "عطارد ينسجم مع الزهرة",
+      "Mercury-Moon": "عطارد والقمر يوازنان العقل والعاطفة",
+      "Mercury-Mars": "عطارد والمريخ يواجهان احتكاكًا",
+      "Mercury-Jupiter": "عطارد والمشتري يعملان معًا بحياد",
+      "Mercury-Saturn": "عطارد وزحل يوازنان التحليل والحكمة",
+      "Jupiter-Sun": "المشتري يوسع قيادة الشمس",
+      "Jupiter-Moon": "المشتري يبارك رعاية القمر",
+      "Jupiter-Mars": "المشتري يوجه شجاعة المريخ",
+      "Jupiter-Mercury": "المشتري وعطارد يعملان معًا بحياد",
+      "Jupiter-Venus": "المشتري والزهرة يخلقان توترًا",
+      "Jupiter-Saturn": "المشتري وزحل يعملان معًا بحياد",
+      "Venus-Mercury": "الزهرة تثري تواصل عطارد",
+      "Venus-Saturn": "الزهرة تنسجم مع زحل",
+      "Venus-Mars": "الزهرة والمريخ يصارعان بين الانسجام والصراع",
+      "Venus-Jupiter": "الزهرة والمشتري يخلقان توترًا",
+      "Venus-Sun": "الزهرة والشمس يعملان معًا بحياد",
+      "Venus-Moon": "الزهرة والقمر يمتزجان طبيعيًا",
+      "Saturn-Mercury": "زحل يدعم تحليل عطارد",
+      "Saturn-Venus": "زحل يعطي جمال الزهرة شكلاً دائمًا",
+      "Saturn-Jupiter": "زحل والمشتري يعملان معًا بحياد",
+      "Saturn-Mars": "زحل والمريخ يعملان معًا بحياد",
+      "Saturn-Sun": "زحل والشمس يواجهان تحديات",
+      "Saturn-Moon": "زحل والقمر يصارعان بين الدفء والبرودة",
+    },
+
+    // العلاقات العنصرية (العربية - مبسطة)
+    elementalRelations: {
+      "Fire-Fire": "النار تقوي النار — عاطفة مضخمة",
+      "Fire-Air": "الهواء يؤجج النار — ديناميكية إبداعية",
+      "Fire-Water": "النار والماء يخلقان بخارًا — توتر إبداعي",
+      "Fire-Earth": "النار والأرض يعملان معًا — عمل مثبت",
+      "Water-Water": "الماء يعمق الماء — سيولة منسجمة",
+      "Water-Earth": "الأرض تثبت الماء — عواطف مستقرة",
+      "Water-Air": "الماء والهواء يخلقان ضبابًا — قابل للتكيف",
+      "Water-Fire": "الماء والنار يخلقان بخارًا — شدة",
+      "Air-Air": "الهواء يضخم الهواء — وضوح ذهني مضاعف",
+      "Air-Fire": "النار تمد الهواء بالطاقة — أفكار ملتهبة",
+      "Air-Earth": "الهواء والأرض يعملان معًا — أفكار عملية",
+      "Air-Water": "الهواء والماء يخلقان ضبابًا — عقل وعاطفة",
+      "Earth-Earth": "الأرض تصلب الأرض — استقرار معزز",
+      "Earth-Water": "الماء يغذي الأرض — نمو مثري",
+      "Earth-Fire": "الأرض تثبت النار — طاقة موجهة",
+      "Earth-Air": "الأرض والهواء يعملان معًا — أفكار متجسدة",
     },
   },
 };

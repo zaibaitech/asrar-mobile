@@ -232,6 +232,9 @@ export async function calculateAscendant(
     // Normalize to 0-360
     if (ascendant < 0) ascendant += 360;
     
+    // Quadrant correction: add 180° to correct the spherical trigonometry result
+    ascendant = (ascendant + 180) % 360;
+    
     // Convert to sign and degree
     const burjIndex = Math.floor(ascendant / 30);
     const degree = ascendant % 30;
@@ -282,6 +285,9 @@ export function calculateAscendantSync(
     let ascendant = Math.atan2(numerator, denominator) * (180 / Math.PI);
 
     if (ascendant < 0) ascendant += 360;
+    
+    // Quadrant correction: add 180° to correct the spherical trigonometry result
+    ascendant = (ascendant + 180) % 360;
 
     const burjIndex = Math.floor(ascendant / 30);
     const degree = ascendant % 30;

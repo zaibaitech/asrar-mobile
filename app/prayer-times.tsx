@@ -8,10 +8,10 @@
  * - Minimal initial load time
  */
 
+import { getBestLocation } from '@/services/LocationCacheService';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
-import { getBestLocation } from '@/services/LocationCacheService';
 import { Stack, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {

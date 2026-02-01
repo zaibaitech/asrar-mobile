@@ -22,6 +22,14 @@ export interface MomentStateResult {
   causeTextKey: string; // i18n key
 }
 
+// Fire signs that Scorpio resonates with (Mars-ruled connection)
+const FIRE_SIGNS = ['aries', 'leo', 'sagittarius'];
+const SCORPIO_SIGN = 'scorpio';
+
+// Aquarius (Saturn-ruled cold air) - better with water than other air signs
+const AQUARIUS_SIGN = 'aquarius';
+const WATER_SIGNS = ['cancer', 'scorpio', 'pisces'];
+
 /**
  * Calculate elemental harmony between user and day/moment element
  * 
@@ -30,15 +38,51 @@ export interface MomentStateResult {
  * - Complementary (fire-air, water-earth) = Supportive  
  * - Opposite (fire-water, earth-air) = Challenging
  * - Others = Neutral
+ * 
+ * SPECIAL CASES:
+ * - Scorpio (Mars-ruled water) shares fire's intensity → Supportive with fire
+ * - Aquarius (Saturn-ruled cold air) has coldness like water → Less challenging with water
  */
 export function calculateElementalHarmony(
   userElement: Element,
-  contextElement: Element
+  contextElement: Element,
+  userSignKey?: string,
+  contextSignKey?: string
 ): ElementalHarmony {
   if (userElement === contextElement) {
     return {
       level: 'Harmonious',
       explanationKey: 'dailyGuidance.elemental.harmonious.description',
+    };
+  }
+  
+  // SCORPIO SPECIAL CASE: Mars-ruled water shares fire's intensity
+  // When Scorpio user encounters fire, or fire user encounters Scorpio transit
+  const isScorpioWithFire = 
+    (userSignKey?.toLowerCase() === SCORPIO_SIGN && contextElement === 'fire') ||
+    (userElement === 'fire' && contextSignKey?.toLowerCase() === SCORPIO_SIGN) ||
+    (userSignKey?.toLowerCase() === SCORPIO_SIGN && FIRE_SIGNS.includes(contextSignKey?.toLowerCase() || '')) ||
+    (FIRE_SIGNS.includes(userSignKey?.toLowerCase() || '') && contextSignKey?.toLowerCase() === SCORPIO_SIGN);
+  
+  if (isScorpioWithFire) {
+    return {
+      level: 'Supportive',
+      explanationKey: 'dailyGuidance.elemental.scorpioFire.description',
+    };
+  }
+  
+  // AQUARIUS SPECIAL CASE: Saturn-ruled cold air is less challenging with water
+  // Saturn's coldness matches water's coldness - not warm/social like Gemini/Libra
+  const isAquariusWithWater = 
+    (userSignKey?.toLowerCase() === AQUARIUS_SIGN && contextElement === 'water') ||
+    (userElement === 'water' && contextSignKey?.toLowerCase() === AQUARIUS_SIGN) ||
+    (userSignKey?.toLowerCase() === AQUARIUS_SIGN && WATER_SIGNS.includes(contextSignKey?.toLowerCase() || '')) ||
+    (WATER_SIGNS.includes(userSignKey?.toLowerCase() || '') && contextSignKey?.toLowerCase() === AQUARIUS_SIGN);
+  
+  if (isAquariusWithWater) {
+    return {
+      level: 'Neutral',
+      explanationKey: 'dailyGuidance.elemental.aquariusWater.description',
     };
   }
   

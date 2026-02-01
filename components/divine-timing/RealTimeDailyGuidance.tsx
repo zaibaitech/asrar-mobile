@@ -9,6 +9,7 @@
 
 import { Borders, DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getClassicalJudgment } from '@/services/ClassicalJudgmentService';
 import { DailyGuidance } from '@/services/DailyGuidanceService';
 import { getDayRuler, getPlanetInfo } from '@/services/PlanetaryHoursService';
 import { Ionicons } from '@expo/vector-icons';
@@ -69,6 +70,13 @@ export function RealTimeDailyGuidance({
         return 'neutral';
     }
   }, []);
+
+  const getMasterTimingQuality = React.useCallback((ruler: string): DailyGuidance['timingQuality'] => {
+    const judgment = getClassicalJudgment({ rulerPlanet: ruler as any });
+    if (judgment.restrictionLevel === 0) return 'favorable';
+    if (judgment.restrictionLevel === 1) return 'neutral';
+    return 'delicate';
+  }, []);
   
   const handlePress = async () => {
     try {
@@ -82,7 +90,7 @@ export function RealTimeDailyGuidance({
       const now = new Date();
       const ruler = getDayRuler(now);
       const rulerInfo = getPlanetInfo(ruler);
-      const objectiveQuality = getObjectiveTimingQuality(ruler);
+      const objectiveQuality = getMasterTimingQuality(ruler);
 
       const dayOfWeek = now.getDay();
       const dayKeys = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const;
@@ -164,7 +172,7 @@ export function RealTimeDailyGuidance({
 
   // Use personalized timing quality from guidance (already considers user element)
   // Falls back to objective quality only if guidance somehow doesn't have it
-  const timingQuality = guidance?.timingQuality || getObjectiveTimingQuality(dayRuler);
+  const timingQuality = guidance?.timingQuality || getMasterTimingQuality(dayRuler);
   const statusColor = getStatusColor(timingQuality);
   const statusLabel = getStatusLabel(timingQuality);
 

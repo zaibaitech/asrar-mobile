@@ -142,14 +142,22 @@ export async function getAsrarTimingSnapshot(date: Date = new Date()): Promise<A
     let harmonyScore = 0.5; // Default neutral
     
     if (profile?.derived?.element) {
+      // Get user's zodiac sign for Scorpio special case handling
+      const userBurj = profile?.derived?.burj?.toLowerCase();
+      
       // Calculate harmony from user element vs current elements
+      // Pass user's zodiac sign for Scorpio water nuance (Mars-ruled water supports fire)
       const dayHarmony = calculateElementalHarmony(
         profile.derived.element as Element,
-        dayElement as Element
+        dayElement as Element,
+        userBurj,
+        undefined // day ruler is a planet, not a zodiac sign
       );
       const hourHarmony = calculateElementalHarmony(
         profile.derived.element as Element,
-        hourElement as Element
+        hourElement as Element,
+        userBurj,
+        undefined // hour ruler is a planet, not a zodiac sign
       );
       
       // Combine day and hour harmony (weighted average: 40% day, 60% hour)

@@ -31,7 +31,7 @@ let channelsInitialized = false;
 // Android channel behavior note:
 // - On Android, notification sound is controlled by the *channel*, not per-notification.
 // - Channel sound cannot be changed after creation; use versioned IDs to apply updates.
-const ANDROID_CHANNEL_VERSION = 'v2';
+const ANDROID_CHANNEL_VERSION = 'v3';
 const ANDROID_CHANNEL_PREFIX = `adhan-${ANDROID_CHANNEL_VERSION}`;
 
 type ElementKey = 'fire' | 'water' | 'air' | 'earth';
@@ -153,31 +153,32 @@ async function setupAndroidChannels() {
         id: `${ANDROID_CHANNEL_PREFIX}-default`,
         name: 'Prayer Call (Adhan) — Default',
         description: 'Prayer notifications with default adhan audio',
-        sound: 'adhan_default.mp3',
+        // Android expects the raw resource name (no extension).
+        sound: 'adhan_default',
       },
       {
         id: `${ANDROID_CHANNEL_PREFIX}-mishary`,
         name: 'Prayer Call (Adhan) — Mishary',
         description: 'Prayer notifications with Mishary adhan audio',
-        sound: 'adhan_mishary.mp3',
+        sound: 'adhan_mishary',
       },
       {
         id: `${ANDROID_CHANNEL_PREFIX}-mecca`,
         name: 'Prayer Call (Adhan) — Mecca',
         description: 'Prayer notifications with Mecca adhan audio',
-        sound: 'adhan_mecca.mp3',
+        sound: 'adhan_mecca',
       },
       {
         id: `${ANDROID_CHANNEL_PREFIX}-medina`,
         name: 'Prayer Call (Adhan) — Medina',
         description: 'Prayer notifications with Medina adhan audio',
-        sound: 'adhan_medina.mp3',
+        sound: 'adhan_medina',
       },
       {
         id: `${ANDROID_CHANNEL_PREFIX}-fajr`,
         name: 'Prayer Call (Adhan) — Fajr',
         description: 'Fajr prayer notifications with Fajr adhan audio',
-        sound: 'adhan_fajr.mp3',
+        sound: 'adhan_fajr',
       },
       {
         id: `${ANDROID_CHANNEL_PREFIX}-silent`,
@@ -372,6 +373,13 @@ export async function schedulePrayerNotifications(
       const prayerDate = parsePrayerTime(prayer.time, date);
       const now = new Date();
 
+      // Schedule the next *occurrence* of the prayer.
+      // If the prayer time for the provided date has already passed, schedule it for tomorrow.
+      // This avoids missing notifications when the app was last opened after Isha.
+      if (!Number.isNaN(prayerDate.getTime()) && prayerDate <= now) {
+        prayerDate.setDate(prayerDate.getDate() + 1);
+      }
+
       if (Number.isNaN(prayerDate.getTime())) {
         if (__DEV__) {
           console.warn('[AdhanNotificationService] Invalid prayer time:', { prayer: prayer.name, time: prayer.time });
@@ -379,10 +387,8 @@ export async function schedulePrayerNotifications(
         continue;
       }
 
-      // Skip if prayer time has passed today
-      if (prayerDate <= now) {
-        continue;
-      }
+      // Safety: if still not in the future, skip.
+      if (prayerDate <= now) continue;
 
       // Schedule main notification
       try {

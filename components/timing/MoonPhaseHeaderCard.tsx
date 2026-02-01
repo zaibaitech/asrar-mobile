@@ -9,12 +9,16 @@ interface MoonPhaseHeaderCardProps {
   moonPhase: MoonPhaseAnalysis;
   isExpanded?: boolean;
   onToggle?: () => void;
+  dayRulerPlanet?: 'Sun' | 'Moon' | 'Mars' | 'Mercury' | 'Jupiter' | 'Venus' | 'Saturn';
+  authorityLevel?: 'avoid' | 'conditional' | 'supported';
 }
 
 export default function MoonPhaseHeaderCard({
   moonPhase,
   isExpanded = true,
   onToggle,
+  dayRulerPlanet,
+  authorityLevel,
 }: MoonPhaseHeaderCardProps) {
   const { t, language } = useLanguage();
   const [showEducation, setShowEducation] = useState(false);
@@ -74,7 +78,10 @@ export default function MoonPhaseHeaderCard({
       <View style={[styles.card, { borderColor: moonPhase.color }]}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.sectionLabel}>{t('moon.ui.lunarTiming')}</Text>
+          <View style={styles.headerTitleContainer}>
+            <Text style={styles.moonIcon}>🌙</Text>
+            <Text style={styles.sectionLabel}>{t('moon.ui.lunarTiming')}</Text>
+          </View>
           {onToggle && (
             <TouchableOpacity onPress={onToggle}>
               <Text style={styles.collapseButton}>▲</Text>
@@ -101,14 +108,25 @@ export default function MoonPhaseHeaderCard({
           />
         </View>
         
-        {/* Primary Guidance */}
+        {/* Phase Description */}
         <View style={styles.guidanceContainer}>
-          <Text style={styles.guidanceTitle}>
-            {t(`moon.${moonPhase.phaseName}.title`)}
-          </Text>
-          <Text style={styles.guidanceDescription}>
+          <Text style={styles.phaseDescription}>
             {t(`moon.${moonPhase.phaseName}.description`)}
           </Text>
+
+          <Text style={styles.scopeText}>{t('dailyEnergy.scope.moon')}</Text>
+
+          {moonPhase.phaseName === 'full' && (
+            <Text style={styles.authorityNote}>{t('dailyEnergy.authorityNotes.fullMoonBeginnings')}</Text>
+          )}
+
+          {!!dayRulerPlanet && (dayRulerPlanet === 'Saturn' || dayRulerPlanet === 'Mars') && !!authorityLevel && authorityLevel !== 'supported' && (
+            <Text style={styles.authorityNote}>
+              {t('dailyEnergy.authorityNotes.saturnOrMarsCap', {
+                planet: t(`dailyEnergy.planets.${dayRulerPlanet.toLowerCase()}`),
+              })}
+            </Text>
+          )}
         </View>
         
         {/* Stats Row */}
@@ -129,6 +147,10 @@ export default function MoonPhaseHeaderCard({
             </Text>
           </View>
         </View>
+
+        <Text style={styles.moonPowerNote}>
+          {t('moon.ui.moonPowerNote')}
+        </Text>
         
         {/* Waxing/Waning Indicator */}
         <View style={styles.phaseTypeContainer}>
@@ -167,12 +189,34 @@ export default function MoonPhaseHeaderCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'rgba(88, 77, 150, 0.15)',
+    backgroundColor: 'rgba(30, 20, 60, 0.8)',
     borderRadius: 16,
-    borderWidth: 1,
+    borderWidth: 2,
+    borderColor: 'rgba(147, 112, 219, 0.6)',
     padding: 20,
     marginHorizontal: 16,
     marginVertical: 12,
+    shadowColor: '#9370DB',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+
+  scopeText: {
+    marginTop: 10,
+    color: 'rgba(255, 255, 255, 0.65)',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+
+  authorityNote: {
+    marginTop: 10,
+    color: 'rgba(255, 215, 0, 0.9)',
+    fontSize: 12,
+    lineHeight: 16,
+    textAlign: 'center',
   },
   
   collapsedCard: {
@@ -221,12 +265,22 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   
+  headerTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  
+  moonIcon: {
+    fontSize: 20,
+  },
+  
   sectionLabel: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: 12,
-    fontWeight: '600',
+    color: 'rgba(255, 215, 0, 0.9)',
+    fontSize: 13,
+    fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 1.2,
   },
   
   collapseButton: {
@@ -261,19 +315,12 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   
-  guidanceTitle: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  
-  guidanceDescription: {
-    color: 'rgba(255, 255, 255, 0.8)',
+  phaseDescription: {
+    color: '#CBD5E1',
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 22,
     textAlign: 'center',
+    paddingHorizontal: 8,
   },
   
   statsRow: {
@@ -307,6 +354,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
+  },
+
+  moonPowerNote: {
+    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: -6,
   },
   
   phaseTypeContainer: {

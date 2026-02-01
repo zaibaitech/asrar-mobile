@@ -57,8 +57,20 @@ export function tStatic(lang: AppLanguage, key: string, params?: TranslationPara
   const primary = resolvePath(lang, keys);
   if (primary) return applyParams(primary, params);
 
+  // Alias: Birth Profile translations may live under root `birth.*`
+  // while callers use `calculator.birth.*`
+  if (keys[0] === 'calculator' && keys[1] === 'birth') {
+    const aliased = resolvePath(lang, ['birth', ...keys.slice(2)]);
+    if (aliased) return applyParams(aliased, params);
+  }
+
   const fallback = lang === 'en' ? undefined : resolvePath('en', keys);
   if (fallback) return applyParams(fallback, params);
+
+  if (lang !== 'en' && keys[0] === 'calculator' && keys[1] === 'birth') {
+    const fallbackAliased = resolvePath('en', ['birth', ...keys.slice(2)]);
+    if (fallbackAliased) return applyParams(fallbackAliased, params);
+  }
 
   return applyParams(humanizeKey(key), params);
 }

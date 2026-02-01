@@ -10,8 +10,8 @@
  * - Offline fallback
  */
 
-import * as Location from 'expo-location';
 import { getBestLocation } from '@/services/LocationCacheService';
+import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';

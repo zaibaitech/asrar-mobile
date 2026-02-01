@@ -13,7 +13,6 @@
  */
 
 import { DarkTheme } from '@/constants/DarkTheme';
-import { translations } from '@/constants/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Planet } from '@/services/PlanetaryHoursService';
 import React from 'react';
@@ -35,6 +34,7 @@ interface NextBestHour {
 interface TimingGuidanceCardProps {
   currentHour?: PlanetaryHour;
   nextBestHour?: NextBestHour;
+  windowQuality?: 'favorable' | 'neutral' | 'delicate' | 'transformative';
 }
 
 function getPlanetEmoji(planet: Planet): string {
@@ -50,62 +50,106 @@ function getPlanetEmoji(planet: Planet): string {
   return emojiMap[planet] || '⭐';
 }
 
-function getQualityLevel(power: number, language: 'en' | 'fr' | 'ar'): {
+function getQualityLevel(power: number, t: (key: string, params?: Record<string, string | number>) => string): {
   label: string;
   color: string;
 } {
-  const t = translations[language];
   if (power >= 80) {
     return {
-      label: t.common.quality.excellent,
+      label: t('common.quality.excellent'),
       color: '#10B981',
     };
   }
   if (power >= 60) {
     return {
-      label: t.common.quality.good,
+      label: t('common.quality.good'),
       color: '#3B82F6',
     };
   }
   if (power >= 40) {
     return {
-      label: t.common.quality.moderate,
+      label: t('common.quality.moderate'),
       color: '#F59E0B',
     };
   }
   return {
-    label: t.common.quality.weak,
+    label: t('common.quality.weak'),
     color: '#EF4444',
   };
+}
+
+function getWindowColor(quality?: string): string {
+  switch (quality) {
+    case 'favorable':
+      return '#10b981';
+    case 'transformative':
+      return '#f59e0b';
+    case 'delicate':
+      return '#ef4444';
+    default:
+      return '#64B5F6';
+  }
+}
+
+function getWindowLabel(
+  quality: string | undefined,
+  t: (key: string, params?: Record<string, string | number>) => string
+): string {
+  switch (quality) {
+    case 'favorable':
+      return t('widgets.dailyEnergy.windows.favorable');
+    case 'transformative':
+      return t('widgets.dailyEnergy.windows.transformative');
+    case 'delicate':
+      return t('widgets.dailyEnergy.windows.delicate');
+    default:
+      return t('widgets.dailyEnergy.windows.neutral');
+  }
+}
+
+function getPlanetLabel(planet: Planet, t: (key: string, params?: Record<string, string | number>) => string): string {
+  return t(`planets.${planet.toLowerCase()}`);
 }
 
 export default function TimingGuidanceCard({
   currentHour,
   nextBestHour,
+  windowQuality,
 }: TimingGuidanceCardProps) {
-  const { language } = useLanguage();
-  const lang = language as 'en' | 'fr' | 'ar';
-  const t = translations[lang];
+  const { t } = useLanguage();
 
   if (!currentHour) {
     return null;
   }
 
-  const quality = getQualityLevel(currentHour.power, lang);
+  const quality = getQualityLevel(currentHour.power, t);
+  const windowLabel = getWindowLabel(windowQuality, t);
+  const windowColor = getWindowColor(windowQuality);
   const showNextBestHour = nextBestHour && currentHour.power < 70;
+  const currentPlanetLabel = getPlanetLabel(currentHour.planet, t);
+  const nextBestPlanetLabel = nextBestHour ? getPlanetLabel(nextBestHour.planet, t) : '';
+  const nextBestQuality = nextBestHour ? getQualityLevel(nextBestHour.power, t) : undefined;
 
   return (
     <View style={styles.card}>
       {/* Section Label */}
       <Text style={styles.sectionLabel}>
-        {t.notifications.timing.currentTiming} ⏰
+        {t('notifications.timing.currentTiming')} ⏰
       </Text>
+
+      <Text style={styles.scopeText}>{t('dailyEnergy.scope.hour')}</Text>
+
+      {!!windowQuality && (
+        <View style={[styles.windowBadge, { backgroundColor: `${windowColor}18`, borderColor: `${windowColor}35` }]}>
+          <Text style={[styles.windowBadgeText, { color: windowColor }]}>{windowLabel}</Text>
+        </View>
+      )}
 
       {/* Current Hour */}
       <View style={styles.currentHourContainer}>
         <View style={styles.currentHourHeader}>
           <Text style={styles.planetEmoji}>{getPlanetEmoji(currentHour.planet)}</Text>
-          <Text style={styles.currentHourTitle}>{currentHour.planet}</Text>
+          <Text style={styles.currentHourTitle}>{currentPlanetLabel}</Text>
         </View>
 
         <View
@@ -115,12 +159,12 @@ export default function TimingGuidanceCard({
           ]}
         >
           <Text style={[styles.powerText, { color: quality.color }]}>
-            {currentHour.power}% • {quality.label}
+            {currentHour.power}% • {windowQuality ? windowLabel : quality.label}
           </Text>
         </View>
 
         <Text style={styles.endsAt}>
-          {t.notifications.timing.endsAt}: {currentHour.endsAt}
+          {t('notifications.timing.endsAt')}: {currentHour.endsAt}
         </Text>
       </View>
 
@@ -130,18 +174,18 @@ export default function TimingGuidanceCard({
           <View style={styles.divider} />
 
           <Text style={styles.nextBestLabel}>
-            ⭐ {t.notifications.timing.nextBestHour}
+            ⭐ {t('notifications.timing.nextBestHour')}
           </Text>
 
           <View style={styles.nextBestContent}>
             <Text style={styles.nextBestPlanet}>
-              {getPlanetEmoji(nextBestHour.planet)} {nextBestHour.planet}
+              {getPlanetEmoji(nextBestHour.planet)} {nextBestPlanetLabel}
             </Text>
             <Text style={styles.nextBestTime}>
-              {nextBestHour.startsAt} ({t.notifications.timing.inHours} {nextBestHour.hoursUntil}h)
+              {nextBestHour.startsAt} ({t('notifications.timing.inHours')} {nextBestHour.hoursUntil}h)
             </Text>
             <Text style={styles.nextBestPower}>
-              {t.notifications.timing.expectedQuality}: {nextBestHour.power}% ({t.common.quality.excellent})
+              {t('notifications.timing.expectedQuality')}: {nextBestHour.power}% ({nextBestQuality?.label ?? t('common.quality.excellent')})
             </Text>
           </View>
 
@@ -149,8 +193,8 @@ export default function TimingGuidanceCard({
             <Text style={styles.suggestionText}>
               💡{' '}
               {currentHour.power < 40
-                ? t.notifications.timing.waitForBetter
-                : t.notifications.timing.proceedNow}
+                ? t('notifications.timing.waitForBetter')
+                : t('notifications.timing.proceedNow')}
             </Text>
           </View>
         </View>
@@ -160,7 +204,7 @@ export default function TimingGuidanceCard({
       {currentHour.power >= 70 && (
         <View style={styles.excellentTimingBox}>
           <Text style={styles.excellentTimingText}>
-            ✨ {t.notifications.timing.excellentTiming}
+            ✨ {t('notifications.timing.excellentTiming')}
           </Text>
         </View>
       )}
@@ -186,6 +230,26 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: 16,
+  },
+
+  scopeText: {
+    color: 'rgba(255, 255, 255, 0.55)',
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+
+  windowBadge: {
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginBottom: 16,
+  },
+  windowBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
   },
 
   currentHourContainer: {

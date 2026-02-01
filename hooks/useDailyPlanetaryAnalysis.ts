@@ -21,9 +21,44 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 let globalAnalysisCache: DailyPlanetaryAnalysis | null = null;
 let globalAnalysisCacheTime = 0;
 let globalInflightPromise: Promise<DailyPlanetaryAnalysis | null> | null = null;
+let globalAnalysisCacheDate = new Date();
 
 // Cache TTL: 30 seconds (shorter than full 5-minute transit cache, but still reduces duplicate work)
+// IMPORTANT: Cache is also invalidated when calendar day changes or lunar day changes
 const ANALYSIS_CACHE_TTL_MS = 30 * 1000;
+
+/**
+ * Check if cache needs invalidation
+ * Invalidates when:
+ * 1. Calendar day changes (UTC)
+ * 2. More than 30 seconds have passed
+ */
+function isCacheValid(): boolean {
+  if (!globalAnalysisCache || !globalAnalysisCacheDate) {
+    return false;
+  }
+
+  const now = new Date();
+  const cacheAge = now.getTime() - globalAnalysisCacheTime;
+
+  // Check if 30 seconds have passed
+  if (cacheAge > ANALYSIS_CACHE_TTL_MS) {
+    return false;
+  }
+
+  // Check if calendar day has changed (important for lunar day changes)
+  const cacheDay = globalAnalysisCacheDate.toDateString();
+  const currentDay = now.toDateString();
+
+  if (cacheDay !== currentDay) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[useDailyPlanetaryAnalysis] Cache invalidated: new calendar day detected');
+    }
+    return false;
+  }
+
+  return true;
+}
 
 export interface UseDailyAnalysisResult {
   analysis: DailyPlanetaryAnalysis | null;
@@ -52,8 +87,8 @@ export function useDailyPlanetaryAnalysis(): UseDailyAnalysisResult {
   const refresh = useCallback(async () => {
     try {
       // Check if we have a fresh analysis in global cache
-      const now = Date.now();
-      if (globalAnalysisCache && (now - globalAnalysisCacheTime) < ANALYSIS_CACHE_TTL_MS) {
+      if (isCacheValid() && globalAnalysisCache) {
+        const now = Date.now();
         if (process.env.NODE_ENV === 'development') {
           console.log('[useDailyPlanetaryAnalysis] Using global cache (age: ' + (now - globalAnalysisCacheTime) + 'ms)');
         }
@@ -134,6 +169,7 @@ export function useDailyPlanetaryAnalysis(): UseDailyAnalysisResult {
           // Update global cache
           globalAnalysisCache = analysisResult;
           globalAnalysisCacheTime = Date.now();
+          globalAnalysisCacheDate = new Date(); // Store the date for cache invalidation on day change
 
           // Update all mounted instances
           if (isMountedRef.current) {

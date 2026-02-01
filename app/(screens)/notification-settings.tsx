@@ -3,6 +3,7 @@
  * Centralizes all notification preferences across all categories
  */
 
+import { useLanguage } from '@/contexts/LanguageContext';
 import DivineTimingNotificationService from '@/services/DivineTimingNotificationService';
 import HarmonyHourNotificationService from '@/services/HarmonyHourNotificationService';
 import NotificationService from '@/services/NotificationService';
@@ -20,6 +21,7 @@ import {
 } from 'react-native';
 
 export default function NotificationSettingsScreen() {
+  const { tSafe } = useLanguage();
   const [preferences, setPreferences] = useState<any>(null);
   const [permissionsGranted, setPermissionsGranted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ export default function NotificationSettingsScreen() {
       Alert.alert(
         'Permissions Required',
         'Please enable notifications in your device settings to receive spiritual guidance and prayer reminders.',
-        [{ text: 'OK' }]
+        [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
     }
   }

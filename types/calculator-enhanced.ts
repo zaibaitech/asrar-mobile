@@ -15,7 +15,8 @@ export type CalculationType =
   | 'phrase'         // Sentence/phrase
   | 'quran'          // Qur'an ayah
   | 'dhikr'          // Divine Name or dhikr
-  | 'general';       // Raw letters
+  | 'general'        // Raw letters
+  | 'birth';         // Birth Profile (Date + Time + Place)
 
 export type UnifiedInputType = 'name' | 'phrase' | 'quran' | 'custom';
 
@@ -207,6 +208,60 @@ export interface GeneralInsights {
   };
 }
 
+export interface BirthInsights {
+  birthData: {
+    dateOfBirth: string;          // ISO date
+    timeOfBirth?: string;         // HH:mm format (local)
+    timeKnown: boolean;
+    placeOfBirth: {
+      city?: string;
+      latitude: number;
+      longitude: number;
+      timezone: string;            // IANA timezone
+    };
+  };
+  chartBasics: {
+    sunSign: { sign: string; degree: number; element: ElementType };
+    moonSign: { sign: string; degree: number; element: ElementType };
+    ascendant?: { sign: string; degree: number; element: ElementType };
+    descendant?: { sign: string; degree: number; element: ElementType };
+    lunarMansion: { index: number; arabicName: string; meaningKey: string };
+    dayRuler: { planet: string; element: ElementType };
+    planetaryHourRuler?: { planet: string; element: ElementType };
+  };
+  planets: {
+    planet: string;
+    sign: string;
+    degree: number;
+    retrograde: boolean;
+    condition: {
+      label: 'strong' | 'neutral' | 'weak';
+      score: number; // 0-100
+      reasonKey: string;
+    };
+  }[];
+  moonTiming: {
+    phase: string;              // 'new', 'waxing_crescent', etc.
+    lunarDay: number;           // 1-30
+    illumination: number;       // 0-100
+    isWaxing: boolean;
+  };
+  spiritualImprint: {
+    dominantElement: ElementType;
+    dominantPlanet: string;
+    temperament: string;        // hot/cold/dry/moist
+    guidanceBulletsKeys: string[]; // Translation keys
+  };
+  nameResonance?: {
+    nameElement?: ElementType;
+    nameRuler?: string;
+    birthElement: ElementType;
+    birthRuler: string;
+    alignment: 'aligned' | 'mixed' | 'challenging';
+    explanationKey: string;
+  };
+}
+
 // ============================================================================
 // UNIFIED CALCULATION REQUEST
 // ============================================================================
@@ -257,6 +312,7 @@ export interface EnhancedCalculationResult {
   quranInsights?: QuranInsights;
   dhikrInsights?: DhikrInsights;
   generalInsights?: GeneralInsights;
+  birthInsights?: BirthInsights;
   
   // Legacy compatibility
   system: 'maghribi' | 'mashriqi';

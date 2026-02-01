@@ -1270,8 +1270,42 @@ function toTitleCase(value: string) {
     .join(' ');
 }
 
-function getHarmonyLevel(userElement: Element, contextElement: Element): HarmonyLevel {
+function getHarmonyLevel(
+  userElement: Element,
+  contextElement: Element,
+  userSign?: string,
+  transitSign?: string
+): HarmonyLevel {
   if (userElement === contextElement) return 'harmonious';
+
+  const normalizedUserSign = userSign?.toLowerCase();
+  const normalizedTransitSign = transitSign?.toLowerCase();
+
+  // Scorpio Special Case:
+  // Scorpio is Mars-ruled "boiling water" - shares fire's intensity
+  // Scorpio user + Fire transit = supportive (not challenging)
+  // Fire user + Scorpio transit = supportive (not challenging)
+  const isScorpioUserWithFire = 
+    normalizedUserSign === 'scorpio' && contextElement === 'fire';
+  const isFireUserWithScorpio = 
+    userElement === 'fire' && normalizedTransitSign === 'scorpio';
+  
+  if (isScorpioUserWithFire || isFireUserWithScorpio) {
+    return 'supportive';
+  }
+
+  // Aquarius Special Case:
+  // Aquarius is Saturn-ruled "cold air" - less challenging with water
+  // Aquarius user + Water transit = neutral (not challenging)
+  // Water user + Aquarius transit = neutral (not challenging)
+  const isAquariusUserWithWater = 
+    normalizedUserSign === 'aquarius' && contextElement === 'water';
+  const isWaterUserWithAquarius = 
+    userElement === 'water' && normalizedTransitSign === 'aquarius';
+  
+  if (isAquariusUserWithWater || isWaterUserWithAquarius) {
+    return 'neutral';
+  }
 
   const complementary =
     (userElement === 'fire' && contextElement === 'air') ||
@@ -1687,8 +1721,23 @@ function getSignThemeText(zodiacKey: string | undefined, tSafe: TSafety): string
   return tSafe(`screens.planetTransit.lens.signThemes.${resolved}`, en[resolved]);
 }
 
-function getElementResonanceTail(userElement: Element | null, tSafe: TSafety): string {
+function getElementResonanceTail(
+  userElement: Element | null, 
+  tSafe: TSafety,
+  userSign?: string,
+  transitElement?: Element
+): string {
   if (!userElement) return '';
+  
+  // Scorpio Special Case: Mars-ruled water that shares fire's intensity
+  const normalizedUserSign = userSign?.toLowerCase();
+  if (normalizedUserSign === 'scorpio' && transitElement === 'fire') {
+    return tSafe(
+      'screens.planetTransit.lens.elementTails.scorpioWithFire',
+      "Scorpio's Mars-ruled water shares fire's intensity—use this powerful synergy for deep transformation."
+    );
+  }
+  
   const en: Record<Element, string> = {
     water: 'Water nature often absorbs this quietly rather than confrontationally.',
     fire: 'Fire nature tends to feel it as urgency—channel it into clean action.',
@@ -1705,12 +1754,14 @@ function buildTransitLensCopy(args: {
   zodiacKey: string | undefined;
   signName: string;
   userElement: Element | null;
+  userSign?: string;
+  transitElement?: Element;
   isPersonalTransit: boolean;
   t: TTranslate;
   tSafe: TSafety;
   degreePhase: { phase: 'early' | 'middle' | 'late'; percent: number } | null;
 }): TransitLensCopy {
-  const { planetKey, planetName, zodiacKey, signName, userElement, isPersonalTransit, t, tSafe, degreePhase } = args;
+  const { planetKey, planetName, zodiacKey, signName, userElement, userSign, transitElement, isPersonalTransit, t, tSafe, degreePhase } = args;
 
   const labels = {
     about: t('screens.planetTransit.lens.sections.about'),
@@ -1733,7 +1784,7 @@ function buildTransitLensCopy(args: {
       ? 'screens.planetTransit.lens.resonanceBase.personal'
       : 'screens.planetTransit.lens.resonanceBase.collective'
   );
-  const resonanceTail = getElementResonanceTail(userElement, tSafe);
+  const resonanceTail = getElementResonanceTail(userElement, tSafe, userSign, transitElement);
   const resonanceBody = resonanceTail ? `${resonanceBodyBase} ${resonanceTail}` : resonanceBodyBase;
 
   let degreeBody: string | undefined;
@@ -1981,8 +2032,24 @@ export default function PlanetTransitDetailsScreen() {
     [profile.derived?.burjIndex, profile.derived?.burj]
   );
 
-  const harmony: HarmonyLevel | null =
-    contextElement && userElement ? getHarmonyLevel(userElement, contextElement) : null;
+  // Get transit sign for Scorpio special case handling
+  const transitZodiacKey = useMemo(() => {
+    if (detailsType === 'transit') {
+      const transit = transitData as any;
+      return transit?.zodiacKey?.toLowerCase() ?? undefined;
+    }
+    return undefined;
+  }, [detailsType, transitData]);
+
+  const harmony: HarmonyLevel | null = useMemo(() => {
+    if (!contextElement || !userElement) return null;
+    return getHarmonyLevel(
+      userElement,
+      contextElement,
+      userZodiacKey?.toLowerCase(),
+      transitZodiacKey
+    );
+  }, [userElement, contextElement, userZodiacKey, transitZodiacKey]);
 
   const accent = contextElement ? ElementAccents[contextElement] : ElementAccents.earth;
   const resonancePalette = useMemo(() => getResonancePalette(harmony, accent), [harmony, accent]);
@@ -2466,6 +2533,10 @@ export default function PlanetTransitDetailsScreen() {
     const userElem = userElement ?? 'earth';
     const degree = isLegacyTransit(data) ? (data.signDegree ?? 0) : 0;
     
+    // Get sign keys for Scorpio special case handling
+    const transitSignKey = (data as any)?.zodiacKey?.toLowerCase() ?? undefined;
+    const userSignKey = userZodiacKey?.toLowerCase() ?? undefined;
+    
     // ALWAYS return influence - service handles all cases including non-personal transits
     return getPersonalizedInfluence(
       planet,
@@ -2473,9 +2544,11 @@ export default function PlanetTransitDetailsScreen() {
       transitElement,
       userElem,
       isPersonalTransit,
-      language as any
+      language as any,
+      userSignKey,
+      transitSignKey
     );
-  }, [detailsType, transitData, contextElement, userElement, isPersonalTransit, language]);
+  }, [detailsType, transitData, contextElement, userElement, isPersonalTransit, language, userZodiacKey]);
 
   useEffect(() => {
     Animated.timing(orbScale, {
@@ -3426,6 +3499,8 @@ export default function PlanetTransitDetailsScreen() {
                           zodiacKey: transitData.zodiacKey,
                           signName,
                           userElement: userElement ?? null,
+                          userSign: userZodiacKey ?? undefined,
+                          transitElement: contextElement ?? undefined,
                           isPersonalTransit,
                           t,
                           tSafe,
@@ -3619,6 +3694,8 @@ export default function PlanetTransitDetailsScreen() {
                   const planetPractices = getPlanetPractices(transitData.planetKey);
                   if (!planetPractices) return null;
 
+                  const practicesPlanetKey = (transitData.planetKey ?? '').toLowerCase();
+
                   const [expandedPractice, setExpandedPractice] = React.useState<string | null>(null);
                   const [expandedEssences, setExpandedEssences] = React.useState(false);
                   const [expandedTalisman, setExpandedTalisman] = React.useState(false);
@@ -3630,7 +3707,7 @@ export default function PlanetTransitDetailsScreen() {
                     <>
                       <View style={styles.divider}>
                         <Text style={styles.dividerText}>
-                          {language === 'ar' ? 'ممارسات خاصة بالكوكب' : language === 'fr' ? 'Pratiques Planétaires Spécifiques' : 'Planet-Specific Practices'}
+                          {t('screens.planetTransit.practices.title')}
                         </Text>
                       </View>
 
@@ -3639,15 +3716,13 @@ export default function PlanetTransitDetailsScreen() {
                         <View style={styles.practicesSectionHeader}>
                           <Ionicons name="star" size={16} color="#FFD700" />
                           <Text style={styles.practicesSectionTitle}>
-                            {language === 'ar' ? 'الأسماء الإلهية' : language === 'fr' ? 'Noms Divins' : 'Divine Names'}
+                            {t('screens.planetTransit.practices.divineNames.title')}
                           </Text>
                         </View>
                         <Text style={styles.practicesSectionDesc}>
-                          {language === 'ar' 
-                            ? `أسماء الله الحسنى الموصى بها لطاقة ${planetPractices.planetAr}`
-                            : language === 'fr'
-                            ? `Noms divins recommandés pour l'énergie de ${planetPractices.planet}`
-                            : `Divine names recommended for ${planetPractices.planet} energy`}
+                          {t('screens.planetTransit.practices.divineNames.description', {
+                            planet: language === 'ar' ? planetPractices.planetAr : planetPractices.planet,
+                          })}
                         </Text>
 
                         {planetPractices.divineNames.map((divineName) => (
@@ -3663,9 +3738,17 @@ export default function PlanetTransitDetailsScreen() {
                             <View style={styles.practiceCardHeader}>
                               <Text style={styles.practiceIcon}>{divineName.icon}</Text>
                               <View style={styles.practiceCardTitles}>
-                                <Text style={styles.practiceCardCategory}>
-                                  {language === 'ar' ? `للـ ${divineName.category}` : `For ${divineName.category}`}
-                                </Text>
+                                {(() => {
+                                  const localizedCategory = tSafe(
+                                    `screens.planetTransit.practices.divineNames.categories.${divineName.category.toLowerCase()}`,
+                                    divineName.category
+                                  );
+                                  return (
+                                    <Text style={styles.practiceCardCategory}>
+                                      {t('screens.planetTransit.practices.divineNames.forCategory', { category: localizedCategory })}
+                                    </Text>
+                                  );
+                                })()}
                                 <Text style={styles.practiceCardNameAr}>{divineName.nameAr}</Text>
                                 <Text style={styles.practiceCardName}>{divineName.transliteration}</Text>
                               </View>
@@ -3691,17 +3774,22 @@ export default function PlanetTransitDetailsScreen() {
                                 <View style={styles.practiceCountRow}>
                                   <Ionicons name="repeat" size={16} color={accent.primary} />
                                   <Text style={styles.practiceCountLabel}>
-                                    {language === 'ar' ? 'التكرارات:' : language === 'fr' ? 'Répétitions:' : 'Repetitions:'}
+                                    {t('screens.planetTransit.practices.divineNames.repetitionsLabel')}
                                   </Text>
                                   <Text style={styles.practiceCountValue}>{divineName.count}×</Text>
                                 </View>
 
                                 <View style={styles.practicePurposeBox}>
                                   <Text style={styles.practicePurposeLabel}>
-                                    {language === 'ar' ? '🎯 الغرض' : language === 'fr' ? '🎯 Objectif' : '🎯 Purpose'}
+                                    {t('screens.planetTransit.practices.divineNames.purposeLabel')}
                                   </Text>
                                   <Text style={styles.practicePurposeText}>
-                                    {language === 'ar' ? divineName.purposeAr : divineName.purpose}
+                                    {language === 'ar'
+                                      ? divineName.purposeAr
+                                      : tSafe(
+                                          `screens.planetTransit.practices.divineNames.purposes.${practicesPlanetKey}.${divineName.id}`,
+                                          divineName.purpose
+                                        )}
                                   </Text>
                                 </View>
 
@@ -3709,43 +3797,43 @@ export default function PlanetTransitDetailsScreen() {
                                 <View style={styles.practiceDurationRow}>
                                   <Ionicons name="time-outline" size={14} color={DarkTheme.textTertiary} />
                                   <Text style={styles.practiceDurationText}>
-                                    {language === 'ar' ? 'المدة المقدرة:' : language === 'fr' ? 'Durée:' : 'Duration:'} ~{Math.ceil(divineName.count / 30)} {language === 'ar' ? 'دقائق' : language === 'fr' ? 'min' : 'min'}
+                                    {t('screens.planetTransit.practices.divineNames.durationLabel')} ~{Math.ceil(divineName.count / 30)} {t('screens.planetTransit.practices.minutesShort')}
                                   </Text>
                                 </View>
 
                                 {/* How to Practice */}
                                 <View style={styles.practiceHowToBox}>
                                   <Text style={styles.practiceHowToLabel}>
-                                    {language === 'ar' ? '💡 كيفية الممارسة' : language === 'fr' ? '💡 Comment Pratiquer' : '💡 How to Practice'}
+                                    {t('screens.planetTransit.practices.divineNames.howTo.label')}
                                   </Text>
                                   <View style={styles.practiceHowToStep}>
                                     <Text style={styles.practiceHowToBullet}>1.</Text>
                                     <Text style={styles.practiceHowToText}>
-                                      {language === 'ar' ? 'توضأ وواجه القبلة' : language === 'fr' ? 'Faire wuḍūʾ et faire face à la Qiblah' : 'Complete wuḍūʾ and face Qiblah'}
+                                      {t('screens.planetTransit.practices.divineNames.howTo.step1')}
                                     </Text>
                                   </View>
                                   <View style={styles.practiceHowToStep}>
                                     <Text style={styles.practiceHowToBullet}>2.</Text>
                                     <Text style={styles.practiceHowToText}>
-                                      {language === 'ar' ? 'اجلس في مكان هادئ ونظيف' : language === 'fr' ? 'S\'asseoir dans un espace calme' : 'Sit in quiet, clean space'}
+                                      {t('screens.planetTransit.practices.divineNames.howTo.step2')}
                                     </Text>
                                   </View>
                                   <View style={styles.practiceHowToStep}>
                                     <Text style={styles.practiceHowToBullet}>3.</Text>
                                     <Text style={styles.practiceHowToText}>
-                                      {language === 'ar' ? `اضبط نيتك لـ${divineName.category}` : language === 'fr' ? `Définir l'intention pour ${divineName.category}` : `Set intention for ${divineName.category}`}
+                                      {t('screens.planetTransit.practices.divineNames.howTo.step3', { category: divineName.category })}
                                     </Text>
                                   </View>
                                   <View style={styles.practiceHowToStep}>
                                     <Text style={styles.practiceHowToBullet}>4.</Text>
                                     <Text style={styles.practiceHowToText}>
-                                      {language === 'ar' ? 'اتلُ بتركيز وخشوع' : language === 'fr' ? 'Réciter avec concentration' : 'Recite with focus and reverence'}
+                                      {t('screens.planetTransit.practices.divineNames.howTo.step4')}
                                     </Text>
                                   </View>
                                   <View style={styles.practiceHowToStep}>
                                     <Text style={styles.practiceHowToBullet}>5.</Text>
                                     <Text style={styles.practiceHowToText}>
-                                      {language === 'ar' ? 'استخدم السبحة للعد' : language === 'fr' ? 'Utiliser un tasbih pour compter' : 'Use prayer beads for counting'}
+                                      {t('screens.planetTransit.practices.divineNames.howTo.step5')}
                                     </Text>
                                   </View>
                                 </View>
@@ -3759,7 +3847,7 @@ export default function PlanetTransitDetailsScreen() {
                                   >
                                     <Ionicons name="play-circle" size={16} color="#fff" />
                                     <Text style={styles.practiceActionButtonText}>
-                                      {language === 'ar' ? 'ابدأ الممارسة' : language === 'fr' ? 'Commencer' : 'Start Practice'}
+                                      {t('screens.planetTransit.practices.divineNames.actions.startPractice')}
                                     </Text>
                                   </TouchableOpacity>
                                   <TouchableOpacity
@@ -3768,7 +3856,7 @@ export default function PlanetTransitDetailsScreen() {
                                   >
                                     <Ionicons name="notifications-outline" size={16} color={accent.primary} />
                                     <Text style={[styles.practiceActionButtonTextSecondary, { color: accent.primary }]}>
-                                      {language === 'ar' ? 'ضع تذكيرًا' : language === 'fr' ? 'Rappel' : 'Set Reminder'}
+                                      {t('screens.planetTransit.practices.divineNames.actions.setReminder')}
                                     </Text>
                                   </TouchableOpacity>
                                 </View>

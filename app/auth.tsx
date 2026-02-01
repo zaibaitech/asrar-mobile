@@ -47,7 +47,7 @@ type BackendStatus = {
 
 export default function AuthScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, tSafe } = useLanguage();
   const { profile, setProfile } = useProfile();
   
   const [mode, setMode] = useState<AuthMode>('signup');
@@ -336,7 +336,7 @@ export default function AuthScreen() {
         Alert.alert(
           'Reset link sent',
           'Check your email for a password reset link. Open it on this device to continue in the app.',
-          [{ text: 'OK' }]
+          [{ text: tSafe('common.buttons.ok', 'OK') }]
         );
       } else {
         Alert.alert('Error', result.error?.message || 'Failed to send reset email');

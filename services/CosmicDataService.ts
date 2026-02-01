@@ -20,6 +20,7 @@
 import { moonDataCache } from '@/services/cache/CacheManager';
 import { globalRequestManager } from '@/services/cache/RequestManager';
 import { MoonLongitudeResult } from '@/services/EphemerisService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ============================================================================
 // CONFIGURATION

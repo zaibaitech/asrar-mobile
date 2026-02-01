@@ -12,6 +12,8 @@ interface PreciseTimingGuidanceProps {
   practiceNight: PracticeNight; // e.g., "Sunday night"
   userElement: "Fire" | "Water" | "Air" | "Earth" | "fire" | "water" | "air" | "earth";
   zodiacPlanet?: string; // e.g., "Moon" for Cancer
+  /** Optional zodiac sign key for Scorpio special case (Mars-ruled water with fire affinity) */
+  userZodiacSign?: string;
 }
 
 /**
@@ -30,6 +32,7 @@ export function PreciseTimingGuidance({
   practiceNight,
   userElement,
   zodiacPlanet,
+  userZodiacSign,
 }: PreciseTimingGuidanceProps) {
   const { language } = useLanguage();
   const isFr = language === 'fr';
@@ -199,6 +202,7 @@ export function PreciseTimingGuidance({
   }, [location, practiceNight, normalizedElement, zodiacPlanet]);
 
   // Calculate alignment score for a planetary hour
+  // SCORPIO SPECIAL CASE: Mars-ruled water shares fire's intensity
   const calculateAlignment = (hour: AccuratePlanetaryHour): number => {
     let score = 0;
 
@@ -214,10 +218,15 @@ export function PreciseTimingGuidance({
     ) {
       score += 30; // Compatible
     } else if (
+      // SCORPIO + FIRE = Compatible (Mars-ruled water shares fire intensity)
+      userZodiacSign?.toLowerCase() === 'scorpio' && planetElement === 'fire'
+    ) {
+      score += 30; // Scorpio resonates with fire
+    } else if (
       (normalizedElement === 'fire' && planetElement === 'water') ||
       (normalizedElement === 'water' && planetElement === 'fire')
     ) {
-      score += 0; // Opposing
+      score += 0; // Opposing (except Scorpio handled above)
     } else {
       score += 15; // Neutral
     }

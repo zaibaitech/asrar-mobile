@@ -456,6 +456,10 @@ export function getPlanetaryAttributes(planet: string): {
 /**
  * Check if two Burjs are compatible
  * Based on element harmony
+ * 
+ * SPECIAL CASES:
+ * - Scorpio (index 7) is Mars-ruled water, compatible with fire signs
+ * - Aquarius (index 10) is Saturn-ruled cold air, less challenging with water
  */
 export function checkBurjCompatibility(
   burjIndex1: number,
@@ -467,6 +471,38 @@ export function checkBurjCompatibility(
 } {
   const element1 = deriveElementFromBurj(burjIndex1);
   const element2 = deriveElementFromBurj(burjIndex2);
+  
+  // Sign indices for special cases
+  const SCORPIO_INDEX = 7;
+  const AQUARIUS_INDEX = 10;
+  const FIRE_INDICES = [0, 4, 8]; // Aries, Leo, Sagittarius
+  const WATER_INDICES = [3, 7, 11]; // Cancer, Scorpio, Pisces
+  
+  // SCORPIO SPECIAL CASE: Mars-ruled water shares fire's intensity
+  const isScorpioWithFire = 
+    (burjIndex1 === SCORPIO_INDEX && FIRE_INDICES.includes(burjIndex2)) ||
+    (burjIndex2 === SCORPIO_INDEX && FIRE_INDICES.includes(burjIndex1));
+  
+  if (isScorpioWithFire) {
+    return {
+      compatible: true,
+      reason: 'Scorpio & Fire - Mars-fueled passion',
+      harmonyScore: 75,
+    };
+  }
+  
+  // AQUARIUS SPECIAL CASE: Saturn-ruled cold air is less challenging with water
+  const isAquariusWithWater = 
+    (burjIndex1 === AQUARIUS_INDEX && WATER_INDICES.includes(burjIndex2)) ||
+    (burjIndex2 === AQUARIUS_INDEX && WATER_INDICES.includes(burjIndex1));
+  
+  if (isAquariusWithWater) {
+    return {
+      compatible: true,
+      reason: 'Aquarius & Water - shared coolness',
+      harmonyScore: 60,
+    };
+  }
   
   // Same element = high compatibility
   if (element1 === element2) {

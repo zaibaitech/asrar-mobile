@@ -2,13 +2,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Stack } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { BirthProfileData, BirthProfileInput } from '../components/calculator/BirthProfileInput';
 import { CalculationTypeSelector } from '../components/calculator/CalculationTypeSelector';
 import { CalculatorInput } from '../components/calculator/CalculatorInput';
 import { EnhancedResultsDisplay } from '../components/calculator/EnhancedResultsDisplay';
+import { BirthProfileResults } from '../components/calculator/results/BirthResultSection';
 import { CalculatorColors } from '../constants/CalculatorColors';
 import { useLanguage } from '../contexts/LanguageContext';
+import { calculateBirthProfile, validateBirthInput } from '../services/BirthProfileService';
 import { EnhancedCalculatorEngine } from '../services/EnhancedCalculatorEngine';
-import { CalculationType, EnhancedCalculationResult } from '../types/calculator-enhanced';
+import { BirthInsights, CalculationType, EnhancedCalculationResult } from '../types/calculator-enhanced';
 
 export default function CalculatorScreen() {
   const colors = CalculatorColors;
@@ -36,6 +39,21 @@ export default function CalculatorScreen() {
   const [removeVowels, setRemoveVowels] = useState(false);
   const [ignorePunctuation, setIgnorePunctuation] = useState(true);
   const [ignoreSpaces, setIgnoreSpaces] = useState(false);
+  
+  // Birth profile state
+  const [birthData, setBirthData] = useState<BirthProfileData>({
+    dateOfBirth: null,
+    timeOfBirth: null,
+    timeKnown: false,
+    placeCity: '',
+    placeLatitude: '',
+    placeLongitude: '',
+    placeTimezone: '',
+    linkWithName: false,
+    arabicName: '',
+    motherName: '',
+  });
+  const [birthInsights, setBirthInsights] = useState<BirthInsights | null>(null);
 
   const handleCalculate = async () => {
     if (isLoading) {
@@ -125,6 +143,45 @@ export default function CalculatorScreen() {
             ignoreSpaces,
           });
           break;
+
+        case 'birth':
+          const validation = validateBirthInput({
+            dateOfBirth: birthData.dateOfBirth!,
+            timeOfBirth: birthData.timeOfBirth ?? undefined,
+            timeKnown: birthData.timeKnown,
+            placeOfBirth: {
+              city: birthData.placeCity,
+              latitude: parseFloat(birthData.placeLatitude),
+              longitude: parseFloat(birthData.placeLongitude),
+              timezone: birthData.placeTimezone,
+            },
+            arabicName: birthData.linkWithName ? birthData.arabicName : undefined,
+            motherName: birthData.linkWithName ? birthData.motherName : undefined,
+          });
+
+          if (!validation.valid) {
+            setCalculationWarning(validation.errors.join('\n'));
+            return;
+          }
+
+          const insights = await calculateBirthProfile({
+            dateOfBirth: birthData.dateOfBirth!,
+            timeOfBirth: birthData.timeOfBirth ?? undefined,
+            timeKnown: birthData.timeKnown,
+            placeOfBirth: {
+              city: birthData.placeCity,
+              latitude: parseFloat(birthData.placeLatitude),
+              longitude: parseFloat(birthData.placeLongitude),
+              timezone: birthData.placeTimezone,
+            },
+            arabicName: birthData.linkWithName ? birthData.arabicName : undefined,
+            motherName: birthData.linkWithName ? birthData.motherName : undefined,
+          });
+
+          setBirthInsights(insights);
+          setActiveTab('results');
+          setIsLoading(false);
+          return;
 
         default:
           return;
@@ -235,8 +292,17 @@ export default function CalculatorScreen() {
               onTypeChange={setCalculationType}
             />
 
-            {/* Enhanced Calculator Input */}
-            <CalculatorInput
+            {/* Birth Profile Input */}
+            {calculationType === 'birth' ? (
+              <BirthProfileInput
+                data={birthData}
+                onChange={setBirthData}
+                onCalculate={handleCalculate}
+                isLoading={isLoading}
+              />
+            ) : (
+              /* Enhanced Calculator Input */
+              <CalculatorInput
                 calculationType={calculationType}
                 system={system}
                 onSystemChange={setSystem}
@@ -261,12 +327,15 @@ export default function CalculatorScreen() {
                 onCalculate={handleCalculate}
                 isLoading={isLoading}
               />
+            )}
           </ScrollView>
         )}
 
         {activeTab === 'results' && (
           currentResult ? (
             <EnhancedResultsDisplay result={currentResult} />
+          ) : birthInsights ? (
+            <BirthProfileResults insights={birthInsights} />
           ) : (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateTitle}>

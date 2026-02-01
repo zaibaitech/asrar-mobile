@@ -101,6 +101,7 @@ export default function PrayerGuidanceScreen() {
         temperament: 'balanced',
         reduction: abjad.saghir,
         planet: mapProfilePlanetaryRulerToPlanet(profile.derived?.planetaryRuler),
+        burjKey: profile.derived?.burj?.toLowerCase(),
       },
     };
   }, [
@@ -111,6 +112,7 @@ export default function PrayerGuidanceScreen() {
     profile.nameLatin,
     profile.nameAr,
     profile.derived?.planetaryRuler,
+    profile.derived?.burj,
   ]);
 
   useEffect(() => {

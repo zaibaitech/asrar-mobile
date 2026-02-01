@@ -33,6 +33,8 @@ export interface UserProfile {
     temperament: Temperament;
     reduction: number; // 1-9
     planet?: Planet;
+    /** Optional zodiac sign for Scorpio special case (Mars-ruled water with fire affinity) */
+    burjKey?: string;
   };
 }
 
@@ -148,9 +150,11 @@ export class PrayerGuidanceEngine {
     );
     
     // 2. Calculate elemental alignment between user and current hour
+    // Pass burjKey for Scorpio special case (Mars-ruled water with fire affinity)
     const alignment = this.calculateAlignment(
       userProfile.derived.element,
-      planetaryHour.element
+      planetaryHour.element,
+      userProfile.derived.burjKey
     );
     
     const alignmentDescription = this.getAlignmentDescription(
@@ -288,15 +292,36 @@ export class PrayerGuidanceEngine {
    * - Compatible (Fire-Air, Water-Earth) = strong
    * - Neutral = favorable/moderate
    * - Opposite (Fire-Water, Air-Earth) = challenging (requires extra care)
+   * 
+   * SPECIAL CASES:
+   * - Scorpio (Mars-ruled water) shares fire's intensity → strong with fire
+   * - Aquarius (Saturn-ruled cold air) shares coolness with water → favorable, not challenging
    */
   private static calculateAlignment(
     userElement: Element,
-    hourElement: Element
+    hourElement: Element,
+    userBurjKey?: string
   ): 'exceptional' | 'strong' | 'favorable' | 'moderate' | 'balanced' | 'challenging' {
     
     // Same element = exceptional resonance
     if (userElement === hourElement) {
       return 'exceptional';
+    }
+    
+    // SCORPIO SPECIAL CASE: Mars-ruled water shares fire's intensity
+    const isScorpioWithFire = 
+      userBurjKey?.toLowerCase() === 'scorpio' && hourElement === 'Fire';
+    
+    if (isScorpioWithFire) {
+      return 'strong';
+    }
+    
+    // AQUARIUS SPECIAL CASE: Saturn-ruled cold air is less challenging with water
+    const isAquariusWithWater = 
+      userBurjKey?.toLowerCase() === 'aquarius' && hourElement === 'Water';
+    
+    if (isAquariusWithWater) {
+      return 'favorable';
     }
     
     // Compatible elements = strong harmony

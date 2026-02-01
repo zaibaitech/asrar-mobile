@@ -64,7 +64,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ postSave?: string }>();
   const postSave = Array.isArray(params.postSave) ? params.postSave[0] : params.postSave;
-  const { t, language } = useLanguage();
+  const { t, tSafe, language } = useLanguage();
   const {
     profile,
     setProfile,
@@ -228,7 +228,7 @@ export default function ProfileScreen() {
         Alert.alert(
           'Location Permission',
           'Location permission is required to auto-detect your location.',
-          [{ text: 'OK' }]
+          [{ text: tSafe('common.buttons.ok', 'OK') }]
         );
         return;
       }
@@ -240,7 +240,7 @@ export default function ProfileScreen() {
         Alert.alert(
           'Location Error',
           error || 'Failed to get location',
-          [{ text: 'OK' }]
+          [{ text: tSafe('common.buttons.ok', 'OK') }]
         );
         return;
       }
@@ -252,14 +252,14 @@ export default function ProfileScreen() {
       Alert.alert(
         'Location Updated',
         `Set to: ${location.label}`,
-        [{ text: 'OK' }]
+        [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
       
     } catch (error) {
       Alert.alert(
         'Error',
         'Failed to get location',
-        [{ text: 'OK' }]
+        [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
     } finally {
       setLoadingLocation(false);
@@ -275,14 +275,14 @@ export default function ProfileScreen() {
         Alert.alert(
           'Location Permission',
           'Location permission is required to auto-detect your birth location coordinates.',
-          [{ text: 'OK' }]
+          [{ text: tSafe('common.buttons.ok', 'OK') }]
         );
         return;
       }
 
       const { location, error } = await getCurrentLocation();
       if (error || !location) {
-        Alert.alert('Location Error', error || 'Failed to get location', [{ text: 'OK' }]);
+        Alert.alert('Location Error', error || 'Failed to get location', [{ text: tSafe('common.buttons.ok', 'OK') }]);
         return;
       }
 
@@ -293,10 +293,10 @@ export default function ProfileScreen() {
       Alert.alert(
         'Birth Location Updated',
         `Set to: ${location.label}`,
-        [{ text: 'OK' }]
+        [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to get birth location', [{ text: 'OK' }]);
+      Alert.alert('Error', 'Failed to get birth location', [{ text: tSafe('common.buttons.ok', 'OK') }]);
     } finally {
       setLoadingBirthLocation(false);
     }
@@ -367,14 +367,14 @@ export default function ProfileScreen() {
       Alert.alert(
         'Profile Saved',
         'Your personalization data has been updated.',
-        [{ text: 'OK' }]
+        [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
       
     } catch (error) {
       Alert.alert(
         'Error',
         'Failed to save profile. Please try again.',
-        [{ text: 'OK' }]
+        [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
     }
   };

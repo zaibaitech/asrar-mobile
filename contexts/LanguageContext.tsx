@@ -63,7 +63,34 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
       setLanguageState(lang);
     } catch (error) {
-      console.error('Failed to save language:', error);
+      // Handle storage full error with retry
+      if (error instanceof Error && error.message.includes('SQLITE_FULL')) {
+        console.warn('AsyncStorage full, clearing old data and retrying...');
+        try {
+          // Try to clear non-critical items to free up space
+          const allKeys = await AsyncStorage.getAllKeys();
+          const keysToRemove = allKeys.filter(key => 
+            !key.startsWith('@asrar_') || 
+            key === '@asrar_cache' || 
+            key === '@asrar_temp'
+          );
+          
+          if (keysToRemove.length > 0) {
+            await AsyncStorage.multiRemove(keysToRemove);
+            // Retry saving language
+            await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+            setLanguageState(lang);
+            console.log('Language saved successfully after cleanup');
+            return;
+          }
+        } catch (cleanupError) {
+          console.error('Failed to cleanup storage:', cleanupError);
+        }
+      }
+      
+      // If we couldn't save to storage, at least update the state
+      setLanguageState(lang);
+      console.error('Failed to save language to storage:', error);
     }
   };
 
@@ -87,6 +114,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const direct = resolvePath(keys);
     if (direct) {
       return direct;
+    }
+
+    // Alias: Birth Profile translations were historically nested at root `birth.*`
+    // while UI/service keys use `calculator.birth.*`
+    if (keys[0] === 'calculator' && keys[1] === 'birth') {
+      const aliased = resolvePath(['birth', ...keys.slice(2)]);
+      if (aliased) {
+        return aliased;
+      }
     }
 
     // Alias: Prayer Guidance translations are nested under home.prayerGuidance

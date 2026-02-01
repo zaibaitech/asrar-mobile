@@ -8,45 +8,65 @@
  * PREMIUM: What actions are favored now, What to avoid, Suggested dhikr, Deeper guidance
  */
 
-import { PremiumSection } from '@/components/subscription/PremiumSection';
+import CollapsibleSection from '@/components/common/CollapsibleSection';
+import { MomentAnalysisCard } from '@/components/momentAlignment/MomentAnalysisCard';
+import { MomentGuidanceCard } from '@/components/momentAlignment/MomentGuidanceCard';
+import { StatusOverviewCard } from '@/components/momentAlignment/StatusOverviewCard';
 import { TimingAnalysisSection } from '@/components/timing';
+import { getPlanetArabicName } from '@/constants/arabicTerms';
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import {
-    BADGE_CONFIG,
-    getBadgeFromScore,
-    type AsrariyaTimingResult,
-    type UnifiedBadge,
-} from '@/services/AsrariyaTimingEngine';
-import { getMomentAlignment, MomentAlignment } from '@/services/MomentAlignmentService';
-import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, PlanetaryHourData, type PlanetaryDayBoundaries } from '@/services/PlanetaryHoursService';
 import { fetchPrayerTimes } from '@/services/api/prayerTimes';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  BADGE_CONFIG,
+  getBadgeFromScore,
+  type AsrariyaTimingResult,
+  type UnifiedBadge,
+} from '@/services/AsrariyaTimingEngine';
+import { getClassicalJudgment } from '@/services/ClassicalJudgmentService';
 import { getBestLocation } from '@/services/LocationCacheService';
+import { getMomentAlignment, MomentAlignment } from '@/services/MomentAlignmentService';
+import { calculateAspects, calculateHouses } from '@/services/NatalChartService';
+import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, PlanetaryHourData, type Planet, type PlanetaryDayBoundaries } from '@/services/PlanetaryHoursService';
+import { calculateEnhancedPlanetaryPower } from '@/services/PlanetaryStrengthService';
+import { getAllTransits } from '@/services/TransitService';
+import { adaptTransitToLegacyFormat } from '@/utils/transitAdapters';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function MomentAlignmentDetailScreen() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile } = useProfile();
 
+  const userPlanetKey = profile?.derived?.planetaryRuler; // e.g. 'sun'
+  const planetGlyphByKey: Record<string, string> = {
+    sun: '☉',
+    moon: '☽',
+    mercury: '☿',
+    venus: '♀',
+    mars: '♂',
+    jupiter: '♃',
+    saturn: '♄',
+  };
+
   const [alignment, setAlignment] = useState<MomentAlignment | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showTimeline, setShowTimeline] = useState(false);
   const [planetaryData, setPlanetaryData] = useState<PlanetaryHourData | null>(null);
+  const [allTransits, setAllTransits] = useState<any>(null);
   const [prayerTimesData, setPrayerTimesData] = useState<any>(null);
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
@@ -54,19 +74,137 @@ export default function MomentAlignmentDetailScreen() {
   const [minuteNow, setMinuteNow] = useState(new Date());
   const alignmentInFlightRef = useRef(false);
   const alignmentRef = useRef<MomentAlignment | null>(null);
-  
+
+  type OverallTransitLink = {
+    planet: Planet;
+    planetKey: string;
+    qualityLabel: string;
+    finalPower: number;
+    payload: string;
+  };
+
+  const [userTransitLink, setUserTransitLink] = useState<OverallTransitLink | null>(null);
+  const [currentHourTransitData, setCurrentHourTransitData] = useState<OverallTransitLink | null>(null);
+
   // Unified timing state - this is the single source of truth for badges
   const [timingResult, setTimingResult] = useState<AsrariyaTimingResult | null>(null);
-  
+
   // Get unified badge from timing analysis (single source of truth)
-  const unifiedBadge: UnifiedBadge = timingResult 
-    ? getBadgeFromScore(timingResult.overallScore) 
+  const unifiedBadge: UnifiedBadge = timingResult
+    ? getBadgeFromScore(timingResult.overallScore)
     : 'MAINTAIN';
   const badgeConfig = BADGE_CONFIG[unifiedBadge];
 
   useEffect(() => {
     alignmentRef.current = alignment;
   }, [alignment]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const planetFromKey = (planetKey: string | null | undefined): Planet | null => {
+      const key = (planetKey ?? '').toLowerCase();
+      if (key === 'sun') return 'Sun';
+      if (key === 'moon') return 'Moon';
+      if (key === 'mercury') return 'Mercury';
+      if (key === 'venus') return 'Venus';
+      if (key === 'mars') return 'Mars';
+      if (key === 'jupiter') return 'Jupiter';
+      if (key === 'saturn') return 'Saturn';
+      return null;
+    };
+
+    const getQualityKey = (strength: number): 'excellent' | 'good' | 'moderate' => {
+      if (strength >= 90) return 'excellent';
+      if (strength >= 70) return 'good';
+      return 'moderate';
+    };
+
+    const computeTransitData = async (planet: Planet, planetKey: string, allTransits: any): Promise<OverallTransitLink | null> => {
+      const planetTransit = allTransits[planet];
+      const sunTransit = allTransits.Sun;
+      if (!planetTransit) return null;
+
+      const legacy = adaptTransitToLegacyFormat(planetTransit);
+      const payload = JSON.stringify(legacy);
+
+      const longitude = planetTransit.longitude;
+      const sunLongitude = sunTransit?.longitude;
+      const degree =
+        typeof planetTransit.signDegree === 'number'
+          ? planetTransit.signDegree + (planetTransit.signMinute ?? 0) / 60
+          : typeof longitude === 'number'
+            ? ((longitude % 30) + 30) % 30
+            : null;
+
+      if (typeof longitude !== 'number' || typeof sunLongitude !== 'number' || typeof degree !== 'number') {
+        return { planet, planetKey, qualityLabel: '', finalPower: 0, payload };
+      }
+
+      const enhanced = calculateEnhancedPlanetaryPower(
+        planet,
+        planetTransit.sign,
+        degree,
+        longitude,
+        sunLongitude,
+        !!planetTransit.isRetrograde
+      );
+
+      const qualityKey = getQualityKey(enhanced.finalPower);
+      const qualityLabel = t(`dailyEnergy.planetaryStrength.qualities.${qualityKey}`);
+
+      return { planet, planetKey, qualityLabel, finalPower: enhanced.finalPower, payload };
+    };
+
+    const run = async () => {
+      try {
+        const transits = await getAllTransits();
+        if (!transits) {
+          if (!cancelled) {
+            setAllTransits(null);
+            setUserTransitLink(null);
+            setCurrentHourTransitData(null);
+          }
+          return;
+        }
+        if (!cancelled) setAllTransits(transits);
+
+        // Fetch user planet transit
+        const userPlanet = planetFromKey(userPlanetKey);
+        if (userPlanet && userPlanetKey) {
+          const userData = await computeTransitData(userPlanet, userPlanetKey, transits);
+          if (!cancelled) setUserTransitLink(userData);
+        } else {
+          if (!cancelled) setUserTransitLink(null);
+        }
+
+        // Fetch current hour planet transit
+        const currentHourPlanet = planetaryData?.currentHour?.planet;
+        if (currentHourPlanet) {
+          const hourPlanet = planetFromKey(currentHourPlanet.toLowerCase());
+          if (hourPlanet) {
+            const hourData = await computeTransitData(hourPlanet, currentHourPlanet.toLowerCase(), transits);
+            if (!cancelled) setCurrentHourTransitData(hourData);
+          } else {
+            if (!cancelled) setCurrentHourTransitData(null);
+          }
+        } else {
+          if (!cancelled) setCurrentHourTransitData(null);
+        }
+      } catch {
+        if (!cancelled) {
+          setAllTransits(null);
+          setUserTransitLink(null);
+          setCurrentHourTransitData(null);
+        }
+      }
+    };
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [t, userPlanetKey, planetaryData?.currentHour?.planet]);
 
   const loadAlignment = useCallback(async (options?: { silent?: boolean }) => {
     if (alignmentInFlightRef.current) return;
@@ -104,9 +242,12 @@ export default function MomentAlignmentDetailScreen() {
   }, []);
 
   useEffect(() => {
-    loadAlignment();
-    loadPrayerTimes();
-  }, [loadAlignment, loadPrayerTimes]);
+    void loadPrayerTimes();
+  }, [loadPrayerTimes]);
+
+  useEffect(() => {
+    void loadAlignment();
+  }, [loadAlignment]);
 
   useEffect(() => {
     void loadAlignment({ silent: true });
@@ -189,7 +330,9 @@ export default function MomentAlignmentDetailScreen() {
 
   const getElementLabel = (element?: string) => {
     if (!element) return '';
-    return element.charAt(0).toUpperCase() + element.slice(1);
+    // Translate element using i18n
+    const elementKey = element.toLowerCase();
+    return t(`elements.${elementKey}` as any) || element.charAt(0).toUpperCase() + element.slice(1);
   };
 
   const formatTime = () => {
@@ -197,21 +340,6 @@ export default function MomentAlignmentDetailScreen() {
     const hours = current.getHours().toString().padStart(2, '0');
     const minutes = current.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
-  };
-
-  const getGuidanceLists = (status?: string) => {
-    const key = status?.toLowerCase();
-    return {
-      bestNow: [
-        t(`momentDetail.guidance.${key}.best1`),
-        t(`momentDetail.guidance.${key}.best2`),
-        t(`momentDetail.guidance.${key}.best3`),
-      ].filter(Boolean),
-      avoidNow: [
-        t(`momentDetail.guidance.${key}.avoid1`),
-        t(`momentDetail.guidance.${key}.avoid2`),
-      ].filter(Boolean),
-    };
   };
 
   const formatTimeUntil = (targetDate: Date) => {
@@ -237,28 +365,373 @@ export default function MomentAlignmentDetailScreen() {
     return t('momentDetail.timeline.daysAway', { count: daysAway });
   };
 
-  const getReasonBullets = (status?: string) => {
-    const key = status?.toLowerCase();
-    return [
-      t(`momentDetail.reasons.${key}.bullet1`),
-      t(`momentDetail.reasons.${key}.bullet2`),
-      t(`momentDetail.reasons.${key}.bullet3`),
-    ].filter(Boolean);
-  };
-
-  const currentHourProgress = useMemo(() => {
+  const currentHourRemainingLabel = useMemo(() => {
     if (!planetaryData) return null;
-    const start = planetaryData.currentHour.startTime.getTime();
-    const end = planetaryData.currentHour.endTime.getTime();
-    const total = Math.max(1, end - start);
-    const remaining = Math.max(0, end - now.getTime());
-    const percent = Math.min(100, Math.max(0, 100 - (remaining / total) * 100));
-    return {
-      percent,
-      remainingLabel: formatTimeUntil(planetaryData.currentHour.endTime),
-    };
-  }, [planetaryData, now]);
+    return formatTimeUntil(planetaryData.currentHour.endTime);
+  }, [planetaryData]);
 
+  const getLocalizedLayerReasoning = useCallback((layer: { reasoning: string; reasoningAr?: string; reasoningFr?: string }) => {
+    if (language === 'ar' && layer.reasoningAr) return layer.reasoningAr;
+    if (language === 'fr' && layer.reasoningFr) return layer.reasoningFr;
+    return layer.reasoning;
+  }, [language]);
+
+  const getLocalizedEnhancementText = useCallback((enh: { text: string; textAr?: string; textFr?: string }) => {
+    if (language === 'ar' && enh.textAr) return enh.textAr;
+    if (language === 'fr' && enh.textFr) return enh.textFr;
+    return enh.text;
+  }, [language]);
+
+  const getDignityLabel = useCallback((dignityType?: string) => {
+    switch (dignityType) {
+      case 'domicile':
+        return t('dignityDomicile');
+      case 'exaltation':
+        return t('dignityExalted');
+      case 'detriment':
+        return t('dignityDetriment');
+      case 'fall':
+        return t('dignityFall');
+      case 'peregrine':
+      default:
+        return t('dignityNeutral');
+    }
+  }, [t]);
+
+  const transitHouse = useMemo(() => {
+    if (!coords) return null;
+    if (!alignment?.hourRulerCondition?.position?.absoluteDegree) return null;
+
+    const planetDegree = alignment.hourRulerCondition.position.absoluteDegree;
+    const houses = calculateHouses(new Date(), coords);
+    if (!Array.isArray(houses) || houses.length < 12) return null;
+
+    const isBetween = (deg: number, start: number, end: number) => {
+      const d = ((deg % 360) + 360) % 360;
+      const s = ((start % 360) + 360) % 360;
+      const e = ((end % 360) + 360) % 360;
+      if (s <= e) return d >= s && d < e;
+      return d >= s || d < e;
+    };
+
+    let houseIndex = 0;
+    for (let i = 0; i < 12; i++) {
+      const start = houses[i];
+      const end = houses[(i + 1) % 12];
+      if (typeof start !== 'number' || typeof end !== 'number') continue;
+      if (isBetween(planetDegree, start, end)) {
+        houseIndex = i;
+        break;
+      }
+    }
+
+    const houseNumber = houseIndex + 1;
+    const angular = houseNumber === 1 || houseNumber === 4 || houseNumber === 7 || houseNumber === 10;
+    const succedent = houseNumber === 2 || houseNumber === 5 || houseNumber === 8 || houseNumber === 11;
+    const cadent = !angular && !succedent;
+
+    const sectorKey = angular ? 'angular' : succedent ? 'succedent' : 'cadent';
+    return { houseNumber, sectorKey } as const;
+  }, [coords, alignment?.hourRulerCondition?.position?.absoluteDegree]);
+
+  const classicalJudgment = useMemo(() => {
+    const rulerPlanet = planetaryData?.currentHour?.planet;
+    if (!rulerPlanet) return undefined;
+
+    const dignityType = alignment?.hourRulerCondition?.dignity?.type;
+    const houseType = transitHouse?.sectorKey;
+
+    const isDignified = dignityType === 'domicile' || dignityType === 'exaltation';
+
+    // Compute benefic/malefic connections from real transit longitudes.
+    // This keeps the shared judgment deterministic while grounding it in actual sky geometry.
+    let aspectsToBenefics = 0;
+    let aspectsToMalefics = 0;
+
+    const degrees: Record<string, number> = {};
+    const planets: Planet[] = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'];
+    planets.forEach((p) => {
+      const lon = allTransits?.[p]?.longitude;
+      if (typeof lon === 'number') {
+        degrees[p] = ((lon % 360) + 360) % 360;
+      }
+    });
+
+    if (degrees[rulerPlanet] !== undefined) {
+      const aspects = calculateAspects(degrees);
+      aspects.forEach((a) => {
+        const involves = a.planet1 === rulerPlanet || a.planet2 === rulerPlanet;
+        if (!involves) return;
+
+        const other = a.planet1 === rulerPlanet ? a.planet2 : a.planet1;
+        if (other === 'Jupiter' || other === 'Venus') aspectsToBenefics += 1;
+        if (other === 'Mars' || other === 'Saturn') aspectsToMalefics += 1;
+      });
+    }
+
+    const baseJudgment = getClassicalJudgment({
+      rulerPlanet,
+      dignityType,
+      houseType,
+      aspectsToBenefics,
+      aspectsToMalefics,
+    });
+
+    // Unison rule: if the transit condition is very strong, the classical label cannot remain "Neutral".
+    // Only upgrade when the planet is allowed to be Nashr.
+    const transitPower = currentHourTransitData?.finalPower;
+    const isExceptionalStrength = typeof transitPower === 'number' && transitPower >= 90;
+    const isStrongStrength = typeof transitPower === 'number' && transitPower >= 70;
+    const canUpgradeToNashr =
+      rulerPlanet !== 'Saturn' &&
+      rulerPlanet !== 'Mars' &&
+      rulerPlanet !== 'Mercury' &&
+      (rulerPlanet !== 'Moon' || isDignified);
+
+    if (canUpgradeToNashr && baseJudgment.restrictionLevel === 1 && (isExceptionalStrength || isStrongStrength)) {
+      return {
+        ...baseJudgment,
+        classicalLabel: 'Nashr',
+        restrictionLevel: 0,
+        practiceIntensity: 'high',
+      };
+    }
+
+    return baseJudgment;
+  }, [alignment?.hourRulerCondition?.dignity?.type, allTransits, currentHourTransitData?.finalPower, planetaryData?.currentHour?.planet, transitHouse?.sectorKey]);
+
+  const statusColor = useMemo(() => {
+    if (classicalJudgment) {
+      switch (classicalJudgment.restrictionLevel) {
+        case 0:
+          return '#10b981';
+        case 1:
+          return '#f59e0b';
+        case 2:
+          return '#f97316';
+        case 3:
+        default:
+          return '#ef4444';
+      }
+    }
+    return getStatusColor(alignment?.status);
+  }, [alignment?.status, classicalJudgment]);
+
+  const statusSubtitle = (() => {
+    if (classicalJudgment) {
+      const keyByLevel: Record<0 | 1 | 2 | 3, string> = {
+        0: 'momentDetail.cards.status.act_desc',
+        1: 'momentDetail.cards.status.maintain_desc',
+        2: 'momentDetail.cards.status.maintain_desc',
+        3: 'momentDetail.cards.status.hold_desc',
+      };
+      const level = classicalJudgment.restrictionLevel as 0 | 1 | 2 | 3;
+      const key = keyByLevel[level];
+      const translated = t(key);
+      return translated || '';
+    }
+    if (timingResult) {
+      const keyByBadge: Record<UnifiedBadge, string> = {
+        ACT: 'momentDetail.cards.status.act_desc',
+        MAINTAIN: 'momentDetail.cards.status.maintain_desc',
+        HOLD: 'momentDetail.cards.status.hold_desc',
+        OPTIMAL: 'momentDetail.cards.status.act_desc',
+        CAREFUL: 'momentDetail.cards.status.maintain_desc',
+      };
+      const key = keyByBadge[unifiedBadge];
+      const translated = t(key);
+      return translated || timingResult.shortSummary || getLocalizedLayerReasoning(timingResult);
+    }
+    return alignment ? t(alignment.shortHintKey) : '';
+  })();
+
+  const statusBadgeText = (() => {
+    if (classicalJudgment) {
+      const emoji =
+        classicalJudgment.restrictionLevel === 0
+          ? '🟢'
+          : classicalJudgment.restrictionLevel === 1
+            ? '🟡'
+            : classicalJudgment.restrictionLevel === 2
+              ? '🟠'
+              : '⛔';
+      const labelKey = `dailyEnergy.classicalJudgment.labels.${classicalJudgment.classicalLabel.toLowerCase()}`;
+      return `${emoji} ${t(labelKey) || classicalJudgment.classicalLabel}`;
+    }
+    if (timingResult) {
+      const emojiByBadge: Record<UnifiedBadge, string> = {
+        ACT: '🟢',
+        MAINTAIN: '🟡',
+        HOLD: '🟣',
+        OPTIMAL: '🟢',
+        CAREFUL: '🟡',
+      };
+      return `${emojiByBadge[unifiedBadge]} ${t(badgeConfig.labelKey) || unifiedBadge}`;
+    }
+    return alignment ? t(alignment.shortLabelKey) : '';
+  })();
+
+  const hourEndsInLabel = (() => {
+    if (alignment?.currentWindowEnd) {
+      return `${t('momentDetail.cards.hourEndsIn')} ${formatTimeUntil(alignment.currentWindowEnd)}`;
+    }
+    if (planetaryData?.currentHour?.endTime) {
+      return `${t('momentDetail.cards.hourEndsIn')} ${formatTimeUntil(planetaryData.currentHour.endTime)}`;
+    }
+    return undefined;
+  })();
+
+  const currentHourModel = useMemo(() => {
+    if (!planetaryData) {
+      return {
+        symbol: '✦',
+        name: t('common.unknown'),
+      };
+    }
+
+    const planetKey = planetaryData.currentHour.planet.toLowerCase();
+    return {
+      symbol: planetaryData.currentHour.planetInfo.symbol,
+      name: t(`planets.${planetKey}`) || planetaryData.currentHour.planet,
+      arabicName: planetaryData.currentHour.planetInfo.arabicName,
+      elementLabel: getElementLabel(planetaryData.currentHour.planetInfo.element),
+      elementIcon: getElementIcon(planetaryData.currentHour.planetInfo.element),
+    };
+  }, [planetaryData, t]);
+
+  const userPlanetModel = useMemo(() => {
+    const planetName = userPlanetKey ? (t(`planets.${userPlanetKey}`) || userPlanetKey) : t('common.unknown');
+    return {
+      symbol: userPlanetKey ? (planetGlyphByKey[userPlanetKey] ?? '✦') : '✦',
+      name: planetName,
+      arabicName: userPlanetKey ? getPlanetArabicName(userPlanetKey) : undefined,
+      elementLabel: getElementLabel(alignment?.zahirElement),
+      elementIcon: getElementIcon(alignment?.zahirElement),
+      sourceLabel: t('momentDetail.cards.source.nameMotherPersonal') || t('momentDetail.zahirOutward'),
+    };
+  }, [userPlanetKey, t, alignment?.zahirElement]);
+
+  const transitModel = useMemo(() => {
+    if (!alignment || !alignment.hourRulerCondition) return undefined;
+
+    const condition = alignment.hourRulerCondition;
+    const dignityText = getDignityLabel(condition.dignity.type);
+    const dignityDetail = `${dignityText} · ${condition.position.sign} ${Math.round(condition.position.degree)}°`;
+    const dignityDesc = language === 'ar'
+      ? condition.dignity.descriptionAr
+      : language === 'fr'
+        ? condition.dignity.descriptionFr
+        : condition.dignity.description;
+
+    const houseBadge = transitHouse
+      ? transitHouse.houseNumber === 10
+        ? t('momentDetail.cards.transit.house_10_angular')
+        : `${t('momentDetail.cards.transit.house')} ${transitHouse.houseNumber}${transitHouse.sectorKey === 'angular' ? ` · ${t('momentDetail.cards.transit.angular')}` : transitHouse.sectorKey === 'succedent' ? ` · ${t('momentDetail.cards.transit.succedent')}` : ` · ${t('momentDetail.cards.transit.cadent')}`}`
+      : undefined;
+    const houseDesc = transitHouse
+      ? transitHouse.houseNumber === 10
+        ? t('momentDetail.cards.transit.house_10_angular')
+        : transitHouse.sectorKey === 'angular'
+          ? t('momentDetail.cards.transit.angular')
+          : transitHouse.sectorKey === 'succedent'
+            ? t('momentDetail.cards.transit.succedent')
+            : t('momentDetail.cards.transit.cadent')
+      : undefined;
+
+    // Positional power (house + dignity)
+    const positionalPct = Math.max(0, Math.min(100, Math.round(condition.overallQuality)));
+    const positionalTone: 'good' | 'neutral' | 'warn' =
+      condition.ruling === 'excellent' || condition.ruling === 'strong'
+        ? 'good'
+        : condition.ruling === 'moderate'
+          ? 'neutral'
+          : 'warn';
+    const positionalLabel = condition.ruling === 'excellent'
+      ? t('momentDetail.cards.transit.exceptional')
+      : condition.ruling === 'strong'
+        ? t('momentDetail.cards.transit.strong')
+        : condition.ruling === 'moderate'
+          ? t('momentDetail.cards.transit.moderate')
+          : t('momentDetail.cards.transit.weak');
+
+    // Transit quality (overall planetary strength)
+    const transitPct = currentHourTransitData?.finalPower ?? 0;
+    const transitQualityTone: 'good' | 'neutral' | 'warn' =
+      transitPct >= 80 ? 'good' : transitPct >= 50 ? 'neutral' : 'warn';
+    const transitQualityLabel = transitPct >= 90
+      ? t('momentDetail.cards.transit.exceptional')
+      : transitPct >= 70
+        ? t('momentDetail.cards.transit.strong')
+        : transitPct >= 50
+          ? t('momentDetail.cards.transit.moderate')
+          : t('momentDetail.cards.transit.weak');
+
+    return {
+      dignityLabel: t('momentDetail.cards.transit.dignity'),
+      dignityBadge: dignityText,
+      dignityDetail,
+      dignityDescription: dignityDesc,
+      houseLabel: t('momentDetail.cards.transit.house'),
+      houseBadge,
+      houseDescription: houseDesc,
+      positionalLabel: t('momentDetail.cards.transit.positionalPower'),
+      positionalDetail: positionalLabel,
+      positionalPercent: positionalPct,
+      positionalTone,
+      positionalSubtext: t('momentDetail.cards.transit.positionalSubtext'),
+      transitQualityLabel: t('momentDetail.cards.transit.transitQuality'),
+      transitQualityDetail: transitQualityLabel,
+      transitQualityPercent: transitPct,
+      transitQualityTone,
+      transitQualitySubtext: t('momentDetail.cards.transit.transitQualitySubtext'),
+    };
+  }, [alignment, getDignityLabel, language, t, transitHouse, currentHourTransitData]);
+
+  const factorRows = useMemo(() => {
+    if (!timingResult) return undefined;
+
+    const scoreLabel = (score: number) => {
+      if (score >= 75) return { text: `${t('momentDetail.cards.analysis.exceptional')} ✓`, color: '#34D399' };
+      if (score >= 55) return { text: `${t('momentDetail.cards.analysis.strong')} ✓`, color: '#34D399' };
+      if (score >= 40) return { text: t('momentDetail.cards.status.maintain'), color: '#F59E0B' };
+      return { text: t('momentDetail.cards.status.hold'), color: '#A78BFA' };
+    };
+
+    const elem = scoreLabel(timingResult.layers.elementCompatibility.score);
+    const planet = scoreLabel(timingResult.layers.planetaryResonance.score);
+    const transit = alignment && alignment.hourRulerCondition
+      ? alignment.hourRulerCondition.ruling === 'excellent'
+        ? { text: `${t('momentDetail.cards.analysis.exceptional')} ✓`, color: '#34D399' }
+        : alignment.hourRulerCondition.ruling === 'strong'
+          ? { text: `${t('momentDetail.cards.analysis.strong')} ✓`, color: '#34D399' }
+          : alignment.hourRulerCondition.ruling === 'moderate'
+            ? { text: t('momentDetail.cards.analysis.moderate') || t('momentDetail.cards.status.maintain'), color: '#F59E0B' }
+            : { text: t('momentDetail.cards.analysis.weak') || t('momentDetail.cards.status.hold'), color: '#A78BFA' }
+      : { text: t('momentDetail.cards.analysis.moderate') || t('momentDetail.cards.status.maintain'), color: '#94A3B8' };
+
+    return [
+      {
+        icon: '🔥',
+        text: t('momentDetail.cards.analysis.elementalHarmony'),
+        scoreText: elem.text,
+        scoreColor: elem.color,
+      },
+      {
+        icon: '🤝',
+        text: t('momentDetail.cards.analysis.planetaryFriendship'),
+        scoreText: planet.text,
+        scoreColor: planet.color,
+      },
+      {
+        icon: '⭐',
+        text: t('momentDetail.cards.analysis.transitStrength'),
+        scoreText: transit.text,
+        scoreColor: transit.color,
+      },
+    ];
+  }, [timingResult, t, alignment]);
+
+  // IMPORTANT: only return early AFTER all hooks above have run.
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}
@@ -300,8 +773,6 @@ export default function MomentAlignmentDetailScreen() {
     );
   }
 
-  const statusColor = getStatusColor(alignment.status);
-
   return (
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}
       >
@@ -318,178 +789,8 @@ export default function MomentAlignmentDetailScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryHeader}>
-            <View style={[styles.summaryIcon, { backgroundColor: `${statusColor}20` }]}
-              >
-              <Ionicons name="sparkles" size={18} color={statusColor} />
-            </View>
-            <View style={styles.summaryHeaderText}>
-              <Text style={styles.summaryTitle}>{t('momentDetail.title')}</Text>
-              {/* Show unified description based on timing analysis when available */}
-              <Text style={styles.summarySubtitle}>
-                {timingResult 
-                  ? t(`timing.badges.${unifiedBadge.toLowerCase()}.hint`) || timingResult.shortSummary
-                  : t(alignment.shortHintKey)}
-              </Text>
-            </View>
-            {/* Unified badge - single source of truth */}
-            <View style={[styles.statusPill, { backgroundColor: `${statusColor}20`, borderColor: statusColor }]}
-              >
-              <Text style={[styles.statusPillText, { color: statusColor }]}
-                >
-                {timingResult 
-                  ? `${badgeConfig.icon} ${t(badgeConfig.labelKey) || unifiedBadge}`
-                  : t(alignment.shortLabelKey)}
-              </Text>
-            </View>
-          </View>
-
-          {/* Show score when timing analysis is available */}
-          {timingResult && (
-            <View style={styles.scoreDisplay}>
-              <Text style={[styles.scoreText, { color: statusColor }]}>
-                {timingResult.overallScore}%
-              </Text>
-              <Text style={styles.scoreLabel}>
-                {t('timing.compatible') || 'Compatible'}
-              </Text>
-            </View>
-          )}
-
-          <View style={styles.summaryMetaRow}>
-            <Text style={styles.timestampLabel}>{t('momentDetail.updated')}</Text>
-            <Text style={styles.timestampValue}>{formatTime()}</Text>
-          </View>
-
-          <View style={styles.equationRow}>
-            <View style={styles.equationChip}>
-              <Text style={styles.equationChipText}>
-                {t('momentDetail.equation.zahir')} ({getElementLabel(alignment.zahirElement)})
-              </Text>
-            </View>
-            <Text style={styles.equationOperator}>×</Text>
-            <View style={styles.equationChip}>
-              <Text style={styles.equationChipText}>
-                {t('momentDetail.equation.hour')} ({getElementLabel(alignment.timeElement)})
-              </Text>
-            </View>
-            <Text style={styles.equationOperator}>→</Text>
-            <View style={[styles.equationChip, { backgroundColor: `${statusColor}20`, borderColor: statusColor }]}
-              >
-              <Text style={[styles.equationChipText, { color: statusColor }]}
-                >
-                {/* Use unified badge when timing available */}
-                {timingResult ? (t(badgeConfig.labelKey) || unifiedBadge) : t(alignment.shortLabelKey)}
-              </Text>
-            </View>
-          </View>
-
-          {alignment.currentWindowEnd && (
-            <View style={styles.windowInfo}>
-              <Ionicons name="time-outline" size={16} color={DarkTheme.textTertiary} />
-              <Text style={styles.windowInfoText}>
-                {t('momentDetail.timeline.windowEnds')} {t('momentDetail.timeline.in')} {formatTimeUntil(alignment.currentWindowEnd)}
-              </Text>
-            </View>
-          )}
-
-          {planetaryData && planetaryData.countdownSeconds > 0 && planetaryData.countdownSeconds <= 10 * 60 && (
-            <View style={[styles.windowInfo, { marginTop: 6 }]}
-              >
-              <Ionicons name="alert-circle-outline" size={16} color={DarkTheme.textTertiary} />
-              <Text style={styles.windowInfoText}>
-                {t('home.nextPlanetHour')}: {t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`)} ({getElementLabel(planetaryData.nextHour.planetInfo.element)}) {t('momentDetail.timeline.in')} {formatTimeUntil(planetaryData.currentHour.endTime)}
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {alignment.nextWindows && alignment.nextWindows.length > 0 && (
-          <TouchableOpacity
-            style={styles.timelineButton}
-            onPress={() => setShowTimeline(!showTimeline)}
-          >
-            <Ionicons
-              name={showTimeline ? 'chevron-up' : 'chevron-down'}
-              size={20}
-              color={DarkTheme.textSecondary}
-            />
-            <Text style={styles.timelineButtonText}>
-              {showTimeline ? t('momentDetail.timeline.hideTimeline') : t('momentDetail.timeline.showTimeline')}
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        {showTimeline && alignment.nextWindows && alignment.nextWindows.length > 0 && (
-          <View style={styles.timeline}>
-            <Text style={styles.timelineTitle}>{t('momentDetail.timeline.nextOptimal')}</Text>
-            {alignment.nextWindows
-              .filter((window) => window.status === 'ACT' || window.status === 'MAINTAIN')
-              .slice(0, 8)
-              .map((window, idx) => (
-                <View key={idx} style={styles.timelineItem}>
-                  <View
-                    style={[
-                      styles.timelineStatus,
-                      { backgroundColor: window.status === 'ACT' ? '#10b981' : '#8B7355' },
-                    ]}
-                  >
-                    <Text style={styles.timelineStatusText}>
-                      {t(window.status === 'ACT' ? 'home.moment.status.act' : 'home.moment.status.maintain')}
-                    </Text>
-                  </View>
-                  <View style={styles.timelineContent}>
-                    <View style={styles.timelineHeader}>
-                      <Text style={styles.timelineDay}>{formatWindowDay(window)}</Text>
-                      <Text style={styles.timelineDayName}>{window.planet}</Text>
-                    </View>
-                    <View style={styles.timelineElement}>
-                      <Text style={styles.timelineElementIcon}>{getElementIcon(window.element)}</Text>
-                      <Text style={styles.timelineElementText}>{getElementLabel(window.element)}</Text>
-                    </View>
-                    <Text style={styles.timelineTime}>
-                      {new Date(window.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </Text>
-                  </View>
-                </View>
-              ))}
-            {alignment.nextWindows.filter((w) => w.status === 'ACT' || w.status === 'MAINTAIN').length === 0 && (
-              <Text style={styles.noWindows}>{t('momentDetail.timeline.noOptimalWindows')}</Text>
-            )}
-          </View>
-        )}
-
-        <View style={styles.elementsGrid}>
-          <View style={styles.elementCard}>
-            <Text style={styles.elementCardLabel}>{t('momentDetail.zahirOutward')}</Text>
-            <View style={styles.elementDisplay}>
-              <Text style={styles.elementIcon}>{getElementIcon(alignment.zahirElement)}</Text>
-              <Text style={styles.elementName}>{getElementLabel(alignment.zahirElement)}</Text>
-            </View>
-            <Text style={styles.elementDescription}>
-              {t(`momentDetail.zahirShort.${alignment.zahirElement}`)}
-            </Text>
-          </View>
-
-          <View style={styles.elementCard}>
-            <Text style={styles.elementCardLabel}>{t('momentDetail.hourQuality')}</Text>
-            <View style={styles.elementDisplay}>
-              <Text style={styles.elementIcon}>{getElementIcon(alignment.timeElement)}</Text>
-              <Text style={styles.elementName}>{getElementLabel(alignment.timeElement)}</Text>
-            </View>
-            <Text style={styles.elementDescription}>
-              {t(`momentDetail.timeShort.${alignment.timeElement}`)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Asrariya Timing Analysis - Personalized */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="analytics-outline" size={20} color="#8B7355" />
-            <Text style={styles.sectionTitle}>{t('asrariya.timingAnalysis') || 'Timing Analysis For You'}</Text>
-          </View>
+        {/* Keep timing engine running to power status + analysis cards */}
+        <View style={styles.hiddenAnalysis}>
           <TimingAnalysisSection
             context="moment"
             location={coords ?? undefined}
@@ -498,182 +799,135 @@ export default function MomentAlignmentDetailScreen() {
           />
         </View>
 
-        {planetaryData && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Ionicons name="planet-outline" size={20} color="#8B7355" />
-              <Text style={styles.sectionTitle}>{t('planetaryHours.title')}</Text>
-            </View>
+        <StatusOverviewCard
+          title={t('momentDetail.title')}
+          subtitle={statusSubtitle}
+          badgeText={statusBadgeText}
+          badgeColor={statusColor}
+          timeRemainingLabel={hourEndsInLabel}
+        />
 
-            <View style={styles.planetaryHourCard}>
-              <View style={styles.planetaryHourHeader}>
-                <Text style={styles.planetaryHourLabel}>{t('planetaryHours.currentHour')}</Text>
-                <View style={[styles.hourBadge, { backgroundColor: 'rgba(139, 115, 85, 0.15)' }]}>
-                  <Text style={[styles.hourBadgeText, { color: '#8B7355' }]}>
-                    Hour #{planetaryData.currentHour.hourNumber}
+        <MomentAnalysisCard
+          currentHour={currentHourModel}
+          userPlanet={userPlanetModel}
+          transit={transitModel}
+          transitFooter={
+            currentHourTransitData?.payload ? (
+              <View style={styles.transitFooterContainer}>
+                {currentHourTransitData.finalPower > 0 && transitModel && (
+                  <Text style={styles.transitExplanation}>
+                    {t('momentDetail.cards.transit.explanation', {
+                      positional: transitModel.positionalDetail,
+                      quality: currentHourTransitData.qualityLabel,
+                    })}
                   </Text>
-                </View>
-              </View>
-              <View style={styles.planetaryHourContent}>
-                <Text style={styles.planetSymbol}>{planetaryData.currentHour.planetInfo.symbol}</Text>
-                <View style={styles.planetInfo}>
-                  <Text style={styles.planetName}>{planetaryData.currentHour.planet}</Text>
-                  <Text style={styles.planetArabic}>{planetaryData.currentHour.planetInfo.arabicName}</Text>
-                  <View style={[styles.elementBadge, { backgroundColor: 'rgba(139, 115, 85, 0.1)' }]}
-                    >
-                    <Text style={[styles.elementBadgeText, { color: '#8B7355' }]}
-                      >
-                      {getElementIcon(planetaryData.currentHour.planetInfo.element)} {getElementLabel(planetaryData.currentHour.planetInfo.element)}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              {currentHourProgress && (
-                <View style={styles.progressBlock}>
-                  <View style={styles.progressHeader}>
-                    <Text style={styles.progressLabel}>{t('momentDetail.timeline.windowEnds')}</Text>
-                    <Text style={styles.progressValue}>
-                      {t('momentDetail.timeline.in')} {currentHourProgress.remainingLabel}
-                    </Text>
-                  </View>
-                  <View style={styles.progressTrack}>
-                    <View style={[styles.progressFill, { width: `${currentHourProgress.percent}%` }]} />
-                  </View>
-                </View>
-              )}
-              <View style={styles.timeRange}>
-                <Ionicons name="time-outline" size={14} color={DarkTheme.textTertiary} />
-                <Text style={styles.timeRangeText}>
-                  {planetaryData.currentHour.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {planetaryData.currentHour.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </Text>
-              </View>
-            </View>
-
-            <View style={[styles.planetaryHourCard, { backgroundColor: 'rgba(255, 255, 255, 0.02)' }]}
-              >
-              <View style={styles.planetaryHourHeader}>
-                <Text style={styles.planetaryHourLabel}>{t('home.nextPlanetHour')}</Text>
-                <View style={[styles.hourBadge, { backgroundColor: 'rgba(100, 181, 246, 0.15)' }]}
-                  >
-                  <Text style={[styles.hourBadgeText, { color: '#64B5F6' }]}
-                    >
-                    Hour #{planetaryData.nextHour.hourNumber}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.planetaryHourContent}>
-                <Text style={styles.planetSymbol}>{planetaryData.nextHour.planetInfo.symbol}</Text>
-                <View style={styles.planetInfo}>
-                  <Text style={styles.planetName}>{planetaryData.nextHour.planet}</Text>
-                  <Text style={styles.planetArabic}>{planetaryData.nextHour.planetInfo.arabicName}</Text>
-                  <View style={[styles.elementBadge, { backgroundColor: 'rgba(100, 181, 246, 0.1)' }]}
-                    >
-                    <Text style={[styles.elementBadgeText, { color: '#64B5F6' }]}
-                      >
-                      {getElementIcon(planetaryData.nextHour.planetInfo.element)} {getElementLabel(planetaryData.nextHour.planetInfo.element)}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View style={styles.timeRange}>
-                <Ionicons name="time-outline" size={14} color={DarkTheme.textTertiary} />
-                <Text style={styles.timeRangeText}>
-                  {t('home.startsAt')} {planetaryData.nextHour.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </Text>
-              </View>
-            </View>
-
-            {planetaryData.afterNextHour && (
-              <View style={[styles.planetaryHourCard, { backgroundColor: 'rgba(255, 255, 255, 0.015)' }]}
+                )}
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    router.push({
+                      pathname: '/(tabs)/planet-transit-details',
+                      params: {
+                        type: 'transit',
+                        payload: currentHourTransitData.payload,
+                        isPersonal: 'false',
+                      },
+                    });
+                  }}
+                  style={styles.transitLink}
                 >
-                <View style={styles.planetaryHourHeader}>
-                  <Text style={styles.planetaryHourLabel}>Hour After Next</Text>
-                  <View style={[styles.hourBadge, { backgroundColor: 'rgba(148, 163, 184, 0.15)' }]}
+                  <Text style={styles.transitLinkText}>
+                    {t('momentDetail.cards.transit.viewFullAnalysis', {
+                      planet: planetaryData?.currentHour?.planet || 'planet',
+                    })}
+                  </Text>
+                  <Text style={styles.transitLinkArrow}>→</Text>
+                </TouchableOpacity>
+              </View>
+            ) : undefined
+          }
+          factors={factorRows}
+          sectionLabels={{
+            currentHour: t('momentDetail.cards.currentHour'),
+            userPlanet: t('momentDetail.cards.yourPlanet'),
+            transitConditions: t('momentDetail.cards.transitConditions'),
+            alignmentAnalysis: t('momentDetail.cards.alignmentAnalysis'),
+          }}
+        />
+
+        <MomentGuidanceCard
+          title={`✨ ${t('momentDetail.cards.whatThisMeans')}`}
+          summary={(() => {
+            const hourPlanetKey = planetaryData?.currentHour?.planet?.toLowerCase();
+            if (classicalJudgment && hourPlanetKey) {
+              const tone = t(`dailyEnergy.planetaryJudgment.rulerTone.${hourPlanetKey}`);
+              if (tone) return tone;
+            }
+            return timingResult
+              ? getLocalizedLayerReasoning(timingResult)
+              : (alignment.reasoning
+                  ? (language === 'ar' ? alignment.reasoning.ar : language === 'fr' ? alignment.reasoning.fr : alignment.reasoning.en)
+                  : t(alignment.shortHintKey));
+          })()}
+          excellentForTitle={classicalJudgment
+            ? `🟢 ${t('dailyEnergy.planetaryJudgment.bestForLabel')}`
+            : `🟢 ${t('momentDetail.cards.excellentFor')}`}
+          excellentForItems={classicalJudgment
+            ? classicalJudgment.allowedDomains.map((k) => t(k)).filter(Boolean)
+            : (timingResult?.enhancements ?? []).slice(0, 4).map(getLocalizedEnhancementText)}
+          avoidTitle={classicalJudgment
+            ? `⚠️ ${t('dailyEnergy.planetaryJudgment.avoidLabel')}`
+            : (timingResult?.cautions?.length ? `⚠️ ${t('momentDetail.cards.avoidNow')}` : undefined)}
+          avoidItems={classicalJudgment
+            ? classicalJudgment.avoidDomains.map((k) => t(k)).filter(Boolean)
+            : (timingResult?.cautions ?? []).slice(0, 3)}
+          timingNote={planetaryData
+            ? `${t('momentDetail.cards.nextHour')}: ${t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`)} (${getElementLabel(planetaryData.nextHour.planetInfo.element)}) ${t('momentDetail.timeline.in')} ${formatTimeUntil(planetaryData.currentHour.endTime)}`
+            : undefined}
+        />
+
+        <CollapsibleSection
+          title={`📅 ${t('momentDetail.cards.showTimeline')}`}
+          subtitle={t('momentDetail.timeline.nextOptimal')}
+          hideHint
+        >
+          <View style={styles.timeline}>
+            {alignment.nextWindows && alignment.nextWindows.length > 0 ? (
+              alignment.nextWindows
+                .slice(0, 12)
+                .map((window, idx) => (
+                  <View key={idx} style={styles.timelineItem}>
+                    <View
+                      style={[
+                        styles.timelineStatus,
+                        { backgroundColor: window.status === 'ACT' ? '#10b981' : window.status === 'MAINTAIN' ? '#f59e0b' : '#7C3AED' },
+                      ]}
                     >
-                    <Text style={[styles.hourBadgeText, { color: '#94a3b8' }]}
-                      >
-                      Hour #{planetaryData.afterNextHour.hourNumber}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.planetaryHourContent}>
-                  <Text style={styles.planetSymbol}>{planetaryData.afterNextHour.planetInfo.symbol}</Text>
-                  <View style={styles.planetInfo}>
-                    <Text style={styles.planetName}>{planetaryData.afterNextHour.planet}</Text>
-                    <Text style={styles.planetArabic}>{planetaryData.afterNextHour.planetInfo.arabicName}</Text>
-                    <View style={[styles.elementBadge, { backgroundColor: 'rgba(148, 163, 184, 0.1)' }]}
-                      >
-                      <Text style={[styles.elementBadgeText, { color: '#94a3b8' }]}
-                        >
-                        {getElementIcon(planetaryData.afterNextHour.planetInfo.element)} {getElementLabel(planetaryData.afterNextHour.planetInfo.element)}
+                      <Text style={styles.timelineStatusText}>
+                        {t(window.status === 'ACT' ? 'home.moment.status.act' : window.status === 'MAINTAIN' ? 'home.moment.status.maintain' : 'home.moment.status.hold')}
+                      </Text>
+                    </View>
+                    <View style={styles.timelineContent}>
+                      <View style={styles.timelineHeader}>
+                        <Text style={styles.timelineDay}>{formatWindowDay(window)}</Text>
+                        <Text style={styles.timelineDayName}>{window.planet}</Text>
+                      </View>
+                      <View style={styles.timelineElement}>
+                        <Text style={styles.timelineElementIcon}>{getElementIcon(window.element)}</Text>
+                        <Text style={styles.timelineElementText}>{getElementLabel(window.element)}</Text>
+                      </View>
+                      <Text style={styles.timelineTime}>
+                        {new Date(window.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </Text>
                     </View>
                   </View>
-                </View>
-                <View style={styles.timeRange}>
-                  <Ionicons name="time-outline" size={14} color={DarkTheme.textTertiary} />
-                  <Text style={styles.timeRangeText}>
-                    {t('home.startsAt')} {planetaryData.afterNextHour.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </Text>
-                </View>
-              </View>
+                ))
+            ) : (
+              <Text style={styles.noWindows}>{t('momentDetail.timeline.noOptimalWindows')}</Text>
             )}
           </View>
-        )}
+        </CollapsibleSection>
 
-        {!timingResult && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Ionicons name="information-circle-outline" size={20} color="#8B7355" />
-              <Text style={styles.sectionTitle}>{t('momentDetail.whyThisStatus')}</Text>
-            </View>
-            <View style={styles.sectionCard}>
-              {getReasonBullets(alignment.status).map((bullet, idx) => (
-                <View key={idx} style={styles.bulletRow}>
-                  <Text style={styles.bulletDot}>•</Text>
-                  <Text style={styles.bulletText}>{bullet}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* PREMIUM: Legacy Personal Guidance (hidden when unified timing is available) */}
-        {!timingResult && (
-          <PremiumSection
-            featureId="personalGuidance"
-            title={t('premiumSections.personalGuidance.title')}
-            description={t('premiumSections.personalGuidance.description')}
-            icon="💡"
-          >
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Ionicons name="bulb-outline" size={20} color="#8B7355" />
-                <Text style={styles.sectionTitle}>{t('momentDetail.guidanceTitle')}</Text>
-              </View>
-
-              <View style={[styles.guidanceBlock, styles.guidanceBest]}>
-                <Text style={styles.guidanceListTitle}>{t('momentDetail.bestNow')}</Text>
-                {getGuidanceLists(alignment.status).bestNow.map((item, idx) => (
-                  <View key={idx} style={styles.bulletRow}>
-                    <Text style={[styles.bulletDot, { color: '#10b981' }]}>✓</Text>
-                    <Text style={styles.bulletText}>{item}</Text>
-                  </View>
-                ))}
-              </View>
-
-              <View style={[styles.guidanceBlock, styles.guidanceAvoid]}>
-                <Text style={styles.guidanceListTitle}>{t('momentDetail.avoidNow')}</Text>
-                {getGuidanceLists(alignment.status).avoidNow.map((item, idx) => (
-                  <View key={idx} style={styles.bulletRow}>
-                    <Text style={[styles.bulletDot, { color: '#94a3b8' }]}>○</Text>
-                    <Text style={styles.bulletText}>{item}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          </PremiumSection>
-        )}
 
         <View style={styles.disclaimer}>
           <Ionicons name="shield-checkmark-outline" size={16} color={DarkTheme.textTertiary} />
@@ -766,9 +1020,17 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderColor: 'rgba(255, 255, 255, 0.10)',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     gap: Spacing.md,
+    overflow: 'hidden',
+  },
+  summaryAccent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3,
   },
   summaryHeader: {
     flexDirection: 'row',
@@ -782,6 +1044,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  summaryPlanetGlyph: {
+    fontSize: 18,
+    fontWeight: '800',
+  },
   summaryHeaderText: {
     flex: 1,
   },
@@ -794,6 +1060,44 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: DarkTheme.textSecondary,
     marginTop: 2,
+  },
+  summaryChipsRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  summaryChip: {
+    flex: 1,
+    padding: Spacing.sm,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.10)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    gap: 4,
+  },
+  summaryChipWide: {
+    padding: Spacing.sm,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.10)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    gap: 4,
+  },
+  summaryChipLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: DarkTheme.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  summaryChipValue: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: DarkTheme.textPrimary,
+  },
+  summaryChipSubValue: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: DarkTheme.textSecondary,
   },
   scoreDisplay: {
     flexDirection: 'row',
@@ -980,12 +1284,36 @@ const styles = StyleSheet.create({
   },
   elementCard: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     padding: Spacing.md,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
+    borderColor: 'rgba(255, 255, 255, 0.10)',
     gap: Spacing.sm,
+  },
+
+  advancedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.xs,
+  },
+  advancedHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    flex: 1,
+  },
+  advancedHeaderAction: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#8B7355',
+  },
+  hiddenAnalysis: {
+    height: 0,
+    opacity: 0,
+    overflow: 'hidden',
   },
   elementCardLabel: {
     fontSize: 12,
@@ -1089,6 +1417,33 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: DarkTheme.textTertiary,
     lineHeight: 18,
+  },
+  transitFooterContainer: {
+    gap: 8,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  transitExplanation: {
+    fontSize: 11,
+    color: DarkTheme.textTertiary,
+    lineHeight: 15,
+    fontStyle: 'italic',
+  },
+  transitLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  transitLinkText: {
+    fontSize: 12,
+    color: '#8B7355',
+    fontWeight: '600',
+  },
+  transitLinkArrow: {
+    fontSize: 12,
+    color: '#8B7355',
   },
   planetaryHourCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
@@ -1195,6 +1550,171 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 999,
     backgroundColor: '#8B7355',
+  },
+
+  // --------------------------------------------------------------------------
+  // Authentic (non-percentage) UI
+  // --------------------------------------------------------------------------
+  glassCard: {
+    padding: Spacing.md,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.10)',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    gap: Spacing.sm,
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+  },
+  cardTitle: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+  },
+  cardBodyText: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  sectionSubHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+  },
+  authenticMetaRow: {
+    gap: 6,
+    marginTop: 2,
+  },
+  authenticMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  authenticMetaLabel: {
+    fontSize: 13,
+    color: DarkTheme.textTertiary,
+    fontWeight: '600',
+  },
+  planetSymbolLarge: {
+    fontSize: 44,
+  },
+  conditionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  conditionHeaderText: {
+    flex: 1,
+    gap: 2,
+  },
+  conditionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  conditionItem: {
+    flexGrow: 1,
+    minWidth: 120,
+    padding: Spacing.sm,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    gap: 4,
+  },
+  conditionLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: DarkTheme.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  conditionValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: DarkTheme.textPrimary,
+  },
+  conditionInterpretationLabel: {
+    marginTop: Spacing.xs,
+    fontSize: 12,
+    fontWeight: '700',
+    color: DarkTheme.textTertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  conditionInterpretation: {
+    fontSize: 14,
+    color: DarkTheme.textSecondary,
+    lineHeight: 20,
+  },
+  collapsibleHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: Spacing.sm,
+  },
+  collapsibleTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: DarkTheme.textPrimary,
+  },
+  collapsibleAction: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#8B7355',
+  },
+  factorRow: {
+    paddingVertical: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+    gap: 6,
+  },
+  factorHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+  },
+  factorTitle: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '800',
+    color: DarkTheme.textPrimary,
+  },
+  factorPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  factorPillText: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  factorDescription: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    lineHeight: 18,
+  },
+  guidanceDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    marginVertical: Spacing.sm,
+  },
+  mutedText: {
+    fontSize: 13,
+    color: DarkTheme.textTertiary,
+    fontStyle: 'italic',
+    lineHeight: 18,
   },
 
   countdown: {

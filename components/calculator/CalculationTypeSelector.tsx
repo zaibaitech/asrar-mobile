@@ -51,6 +51,11 @@ const TYPE_OPTIONS: TypeOption[] = [
     icon: '🔤',
     color: '#06b6d4',
   },
+  {
+    type: 'birth',
+    icon: '🌟',
+    color: '#a855f7',
+  },
 ];
 
 export const CalculationTypeSelector: React.FC<CalculationTypeSelectorProps> = ({

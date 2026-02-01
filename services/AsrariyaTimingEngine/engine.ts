@@ -180,16 +180,48 @@ function getConfigForPractice(
 }
 
 /**
- * Calculate recommendation level from score
+ * Calculate recommendation level from score and individual layers
  * 
- * Thresholds aligned with MomentAlignment badge system:
- * - 75%+: highly-favorable (OPTIMAL badge)
- * - 55-74%: favorable (ACT badge) 
- * - 40-54%: moderate (MAINTAIN badge)
- * - 25-39%: cautious (CAREFUL badge)
- * - 0-24%: challenging (HOLD badge)
+ * Updated Logic:
+ * - "EXCELLENT TIME / ACT" (highly-favorable) requires:
+ *   - Overall score >= 75 AND
+ *   - Exceptional harmony (elementCompatibility >= 75) AND
+ *   - Exceptional friendship (planetaryResonance >= 75) AND  
+ *   - Strong hour power (planetaryResonance.planetaryHourScore >= 70)
+ * 
+ * - "GOOD TIME / MAINTAIN" (favorable) requires:
+ *   - Overall score >= 55 OR
+ *   - Good layers but moderate hour power (planetaryHourScore >= 50)
+ * 
+ * - Other thresholds remain:
+ *   - 40-54%: moderate (MAINTAIN badge)
+ *   - 25-39%: cautious (CAREFUL badge)
+ *   - 0-24%: challenging (HOLD badge)
  */
-function getRecommendationLevel(score: number): RecommendationLevel {
+function getRecommendationLevel(
+  score: number,
+  layers?: AsrariyaTimingResult['layers']
+): RecommendationLevel {
+  // If layers provided, check individual requirements for "highly-favorable"
+  if (layers && score >= 75) {
+    const elementScore = layers.elementCompatibility.score;
+    const planetaryScore = layers.planetaryResonance.score;
+    const hourPower = (layers.planetaryResonance as any).planetaryHourScore ?? planetaryScore;
+    
+    // Require ALL three to be strong/exceptional for "highly-favorable"
+    const hasExceptionalHarmony = elementScore >= 75;
+    const hasExceptionalFriendship = planetaryScore >= 75;
+    const hasStrongHourPower = hourPower >= 70;
+    
+    // If any key factor is weak, downgrade to "favorable"
+    if (!hasExceptionalHarmony || !hasExceptionalFriendship || !hasStrongHourPower) {
+      return 'favorable';
+    }
+    
+    return 'highly-favorable';
+  }
+  
+  // Standard score-based thresholds
   if (score >= 75) return 'highly-favorable';
   if (score >= 55) return 'favorable';
   if (score >= 40) return 'moderate';
@@ -629,8 +661,8 @@ export async function analyzeTimingForPractice(
     practiceMapping.score * config.practiceWeight
   );
   
-  // Determine recommendation level and action
-  const level = getRecommendationLevel(overallScore);
+  // Determine recommendation level and action (now considers individual layer scores)
+  const level = getRecommendationLevel(overallScore, layers);
   const action = getActionRecommendation(overallScore, layers);
   const confidence = calculateConfidence(layers);
   

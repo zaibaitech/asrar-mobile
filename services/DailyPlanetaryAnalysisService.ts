@@ -161,10 +161,13 @@ export function analyzeDailyPlanets(
 
   if (moonData && sunPosition) {
     try {
-      // Calculate moon illumination from lunar day
-      // Simple approximation: sin(lunarDay * pi / 29.5)
+      // Calculate moon illumination from REAL Sun–Moon elongation (ephemeris-derived longitudes)
+      // This avoids synodic-day approximation and tracks the true sky more closely.
       const lunarDay = calculateLunarDay(date);
-      const moonIllumination = calculateMoonIllumination(lunarDay);
+      const moonIllumination = calculateMoonIlluminationFromElongation(
+        sunPosition.longitude || 0,
+        moonData.longitude || 0
+      );
       
       moonPhase = analyzeMoonPhase(
         moonIllumination,
@@ -432,22 +435,15 @@ function calculateLunarDay(date: Date): number {
  * Calculate moon illumination percentage from lunar day
  * Approximates the illumination using sine wave
  */
-function calculateMoonIllumination(lunarDay: number): number {
-  // Waxing: Days 1-14.75 go from 0% to 100%
-  // Full: Days 14.75-15.25 stay at 100%
-  // Waning: Days 15.25-29.53 go from 100% back to 0%
-  
-  const synodicMonth = 29.53058867;
-  const normalizedDay = (lunarDay % synodicMonth);
-  
-  if (normalizedDay < 14.75) {
-    // Waxing: 0% to 100%
-    return (normalizedDay / 14.75) * 100;
-  } else if (normalizedDay < 15.25) {
-    // Full moon
-    return 100;
-  } else {
-    // Waning: 100% back to 0%
-    return Math.max(0, ((synodicMonth - normalizedDay) / 14.28) * 100);
-  }
+function calculateMoonIlluminationFromElongation(sunLongitude: number, moonLongitude: number): number {
+  // Illumination fraction is determined by the Sun–Moon elongation angle:
+  // k = (1 - cos(D)) / 2, where D is the angular separation (0=new, 180=full).
+  // Source: standard astronomical approximation for phase fraction.
+  let delta = moonLongitude - sunLongitude;
+  delta = ((delta % 360) + 360) % 360; // normalize 0..360
+  if (delta > 180) delta = 360 - delta; // shortest separation 0..180
+
+  const radians = (delta * Math.PI) / 180;
+  const fraction = (1 - Math.cos(radians)) / 2;
+  return Math.max(0, Math.min(100, fraction * 100));
 }

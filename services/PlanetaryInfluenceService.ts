@@ -96,6 +96,16 @@ const ELEMENTAL_RESONANCE_MATRIX: Record<Element, Record<Element, ElementalReson
   },
 };
 
+/**
+ * Scorpio Special Case
+ * ====================
+ * Scorpio is unique among water signs: Mars-ruled "boiling water"
+ * It shares fire's intensity despite being a water sign.
+ * This means Scorpio has supportive (not challenging) relationships with fire signs.
+ */
+const FIRE_SIGNS = ['aries', 'leo', 'sagittarius'];
+const SCORPIO_SIGN = 'scorpio';
+
 // ============================================================================
 // PLANET INFLUENCE TYPE
 // ============================================================================
@@ -590,11 +600,42 @@ function getPlanetSpecificGuidance(planet: Planet, stage: DegreeStage, lang: App
 
 /**
  * Calculate elemental resonance between user and transit
+ * 
+ * Special case: Scorpio (Mars-ruled water) has a supportive relationship
+ * with fire signs, not the typical water-fire challenging relationship.
+ * Scorpio's "boiling water" nature shares fire's intensity and passion.
  */
 export function getElementalResonance(
   userElement: Element,
-  transitElement: Element
+  transitElement: Element,
+  userSign?: string,
+  transitSign?: string
 ): ElementalResonance {
+  const normalizedUserSign = userSign?.toLowerCase();
+  const normalizedTransitSign = transitSign?.toLowerCase();
+  
+  // Scorpio Special Case:
+  // When user is Scorpio (water) and transit is fire, or
+  // when user is fire and transit is Scorpio (water),
+  // the relationship is supportive (not challenging)
+  // because Scorpio is Mars-ruled "boiling water" that shares fire's intensity
+  
+  // Case 1: User is Scorpio, transit is fire element
+  if (normalizedUserSign === SCORPIO_SIGN && transitElement === 'fire') {
+    return 'supportive';
+  }
+  
+  // Case 2: User is fire sign, transit is Scorpio
+  if (userElement === 'fire' && normalizedTransitSign === SCORPIO_SIGN) {
+    return 'supportive';
+  }
+  
+  // Case 3: Both are Scorpio - harmonious (same sign)
+  if (normalizedUserSign === SCORPIO_SIGN && normalizedTransitSign === SCORPIO_SIGN) {
+    return 'harmonious';
+  }
+  
+  // Default: use the standard elemental matrix
   return ELEMENTAL_RESONANCE_MATRIX[userElement][transitElement];
 }
 
@@ -679,6 +720,9 @@ export function getResonanceExplanation(
 
 /**
  * Generate complete personalized influence analysis
+ * 
+ * @param userSign - Optional: user's zodiac sign (for Scorpio special case)
+ * @param transitSign - Optional: transit zodiac sign (for Scorpio special case)
  */
 export function getPersonalizedInfluence(
   planet: Planet,
@@ -686,12 +730,15 @@ export function getPersonalizedInfluence(
   transitElement: Element,
   userElement: Element,
   isInUserSign: boolean,
-  lang: AppLanguage = 'en'
+  lang: AppLanguage = 'en',
+  userSign?: string,
+  transitSign?: string
 ): PersonalizedInfluence {
   const influenceType = getPlanetInfluenceType(planet);
   const scope = getInfluenceScope(influenceType, lang);
   const degreeStage = getDegreeStageInfo(planet, signDegree, influenceType, lang);
-  const elementalResonance = getElementalResonance(userElement, transitElement);
+  // Pass sign info for Scorpio special case handling
+  const elementalResonance = getElementalResonance(userElement, transitElement, userSign, transitSign);
   const resonanceExplanation = getResonanceExplanation(
     elementalResonance,
     userElement,

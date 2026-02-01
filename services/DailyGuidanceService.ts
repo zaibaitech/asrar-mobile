@@ -7,6 +7,7 @@
  * Uses user's element + today's planetary energy
  */
 
+import { getClassicalJudgment } from '@/services/ClassicalJudgmentService';
 import { UserProfile } from '@/types/user-profile';
 
 export interface DailyGuidance {
@@ -57,6 +58,11 @@ export async function getDailyGuidanceForDate(
   date: Date
 ): Promise<DailyGuidance> {
   const dayOfWeek = date.getDay();
+
+  // Day ruler baseline (master rule): used to cap/define the public-facing daily window.
+  // Sunday..Saturday
+  const dayRulers = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'] as const;
+  const dayRulerPlanet = dayRulers[dayOfWeek] ?? 'Sun';
   
   // Get day's element from planetary ruler
   // Based on traditional Maghribi planetary associations
@@ -91,6 +97,24 @@ export async function getDailyGuidanceForDate(
   } else if (relationship === 'transformative') {
     // Opposing elements
     timingQuality = 'transformative';
+  }
+
+  // MASTER TONE: day ruler defines the baseline (non-negotiable) public window.
+  // This prevents contradictions like "Fenêtre favorable" on Saturn day.
+  const rulerJudgment = getClassicalJudgment({ rulerPlanet: dayRulerPlanet });
+  const masterWindow: DailyGuidance['timingQuality'] =
+    rulerJudgment.restrictionLevel === 0
+      ? 'favorable'
+      : rulerJudgment.restrictionLevel === 1
+        ? 'neutral'
+        : 'delicate';
+
+  // Unison rule: master tone caps the final timing quality.
+  // (We keep the relationship-derived value for messaging nuance, but the window must not contradict.)
+  if (masterWindow === 'delicate') {
+    timingQuality = timingQuality === 'transformative' ? 'transformative' : 'delicate';
+  } else if (masterWindow === 'neutral') {
+    timingQuality = timingQuality === 'favorable' ? 'neutral' : timingQuality;
   }
   
   // Generate guidance message

@@ -201,8 +201,14 @@ function calculateLunarDay(date: Date): number {
     (currentTime - referenceNewMoon) / (1000 * 60 * 60 * 24);
 
   const lunarDay = (daysSinceReference % synodicMonth) + 1;
+  const finalDay = Math.floor(lunarDay);
 
-  return Math.floor(lunarDay);
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[LunarDay] Date: ${date.toISOString()}, Days since reference: ${daysSinceReference.toFixed(1)}, Lunar Day: ${finalDay} of 30`);
+  }
+
+  return finalDay;
 }
 
 /**
@@ -254,7 +260,15 @@ function calculateMoonPower(
   }
 
   // Clamp to 0-100
-  return Math.max(0, Math.min(100, power));
+  const finalPower = Math.max(0, Math.min(100, power));
+
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    const multiplier = illumination > 0 ? power / illumination : 0;
+    console.log(`[MoonPhase] Lunar Day: ${lunarDay}, Illumination: ${illumination.toFixed(1)}%, Power Multiplier: ${multiplier.toFixed(2)}x, Final Power: ${finalPower.toFixed(1)}%`);
+  }
+
+  return finalPower;
 }
 
 /**
@@ -399,7 +413,7 @@ const PHASE_GUIDANCE: Record<
       title: 'Rest & Reflection',
       titleKey: 'moon.new.title',
       description:
-        'The dark Moon is a time of rest, completion, and spiritual preparation. Perfect for contemplation and inner work before new beginnings.',
+        'The dark Moon is a time of rest, completion, and spiritual preparation. Well-suited for contemplation and inner work before new beginnings.',
       descriptionKey: 'moon.new.description',
     },
     suitable: {
@@ -709,9 +723,9 @@ const PHASE_GUIDANCE: Record<
  * Analyze harmony between Moon phase and Day ruling planet
  * 
  * Classical principle:
- * - Waxing Moon + Active planet (Sun/Mars/Jupiter) = Perfect for starting
- * - Waning Moon + Reflective planet (Moon/Venus/Saturn) = Perfect for completing
- * - Mismatches = Mixed timing
+ * - Waxing Moon + Active planet (Sun/Mars/Jupiter) = supportive for starting
+ * - Waning Moon + Reflective planet (Moon/Venus/Saturn) = supportive for completing
+ * - Mismatches = mixed timing
  */
 export function analyzeMoonDayHarmony(
   moonPhase: MoonPhaseAnalysis,
@@ -733,18 +747,18 @@ export function analyzeMoonDayHarmony(
     return {
       isAligned: true,
       harmonyLevel: 'perfect',
-      explanation: `Waxing Moon + ${dayRuler} (active planet) = Ideal for launching projects and building momentum.`,
+      explanation: `Waxing Moon + ${dayRuler} (active planet) = well-suited for launching projects and building momentum.`,
       explanationKey: 'moon.harmony.waxing_active.explanation',
-      recommendation: 'This is excellent timing for starting new ventures and taking action.',
+      recommendation: 'Supportive timing for starting new ventures and taking action.',
       recommendationKey: 'moon.harmony.waxing_active.recommendation',
     };
   } else if (!isWaxing && isDayReflective) {
     return {
       isAligned: true,
       harmonyLevel: 'perfect',
-      explanation: `Waning Moon + ${dayRuler} (reflective planet) = Ideal for completing, releasing, and internal work.`,
+      explanation: `Waning Moon + ${dayRuler} (reflective planet) = well-suited for completing, releasing, and internal work.`,
       explanationKey: 'moon.harmony.waning_reflective.explanation',
-      recommendation: 'Perfect for finishing projects, healing, and deep spiritual work.',
+      recommendation: 'Supportive for finishing projects, healing, and deep spiritual work.',
       recommendationKey: 'moon.harmony.waning_reflective.recommendation',
     };
   } else if (isWaxing && isDayReflective) {

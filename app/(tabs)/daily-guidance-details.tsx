@@ -6,710 +6,96 @@
  * 
  * FREE: Day ruler, Element, General theme, Generic "Best for" categories
  * PREMIUM: Personal impact on user, Elemental harmony guidance, Personalized spiritual advice
+ * 
+ * REDESIGN: Narrative-driven synthesis system showing how TODAY'S energy
+ * interacts with USER'S personal nature
  */
 
+import CollapsibleSection from '@/components/common/CollapsibleSection';
 import { PremiumSection } from '@/components/subscription/PremiumSection';
-import { TimingAnalysisSection } from '@/components/timing';
 import CollapsibleEducationalSection from '@/components/timing/CollapsibleEducationalSection';
 import DailyEnergyCard from '@/components/timing/DailyEnergyCard';
 import { DailyPlanetaryAnalysisDisplay } from '@/components/timing/DailyPlanetaryAnalysisDisplay';
 import MoonDayHarmonyCard from '@/components/timing/MoonDayHarmonyCard';
 import MoonPhaseHeaderCard from '@/components/timing/MoonPhaseHeaderCard';
+import PlanetaryJudgmentCard from '@/components/timing/PlanetaryJudgmentCard';
 import TimingGuidanceCard from '@/components/timing/TimingGuidanceCard';
 import TodayDetailsCard from '@/components/timing/TodayDetailsCard';
+// New Daily Energy Redesign Components
+import TodaysAlignmentSection from '@/components/timing/TodaysAlignmentSection';
+import TodaysRulerSection from '@/components/timing/TodaysRulerSection';
+import UserPlanetSection from '@/components/timing/UserPlanetSection';
+import WhatThisMeansCard from '@/components/timing/WhatThisMeansCard';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { ZODIAC_SIGNS } from '@/constants/zodiacData';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { getCosmicLunarMansionForDate, getLunarMansionByIndex, normalizeMansionIndex, type LunarMansion } from '@/data/lunarMansions';
-import { getManazilGuidance, tr } from '@/data/manazilGuidance';
 import { useDailyPlanetaryAnalysis } from '@/hooks/useDailyPlanetaryAnalysis';
-import { getCurrentLunarMansion } from '@/services/LunarMansionService';
-import { getDayRuler, getPlanetInfo } from '@/services/PlanetaryHoursService';
+import { useNowTicker } from '@/hooks/useNowTicker';
+import {
+  calculatePlanetaryHours,
+  formatTime,
+  getDayRuler,
+  getPlanetaryDayBoundariesForNow,
+  getPlanetInfo,
+  preCalculateDailyPlanetaryHours,
+  type Planet,
+  type PlanetaryDayBoundaries,
+  type PlanetaryHour,
+  type PlanetaryHourData,
+  type Element as PlanetElement,
+} from '@/services/PlanetaryHoursService';
+// New Daily Energy Services
+import { buildDestiny } from '@/features/name-destiny/services/nameDestinyCalculator';
+import { getDailyGuidance, type DailyGuidance } from '@/services/DailyGuidanceService';
+import { generateDailySynthesis, getUserPlanet, type DailySynthesis } from '@/services/DailySynthesisService';
+import { getElementRelationship as getClassicalElementRelationship, getPlanetaryRelationship } from '@/services/PlanetaryRelationshipService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type TimingQuality = 'favorable' | 'neutral' | 'delicate' | 'transformative';
 
-// ============================================
-// MANAZIL SOURCE DIFFERENTIATION SYSTEM
-// ============================================
-// Clear identification of where manazil data comes from:
-// - CURRENT_MOON: Live real-time moon position (changes ~2.4 days)
-// - FROM_NAME: Personal mansion from name calculation (static)
-// - FROM_BIRTH: Personal mansion from exact birth time (static, highest precision)
-// - FROM_BIRTH_APPROXIMATE: Personal mansion from approximate birth time
-
-type ManazilSourceType = 'CURRENT_MOON' | 'FROM_NAME' | 'FROM_BIRTH' | 'FROM_BIRTH_APPROXIMATE';
-
-interface ManazilSourceConfig {
-  id: ManazilSourceType;
-  icon: string;
-  badgeColor: string;
-  badgeTextColor: string;
-  label: { en: string; fr: string; ar: string };
-  shortLabel: { en: string; fr: string; ar: string };
-  description: { en: string; fr: string; ar: string };
-  nature: 'dynamic' | 'static';
-}
-
-const MANAZIL_SOURCES: Record<ManazilSourceType, ManazilSourceConfig> = {
-  CURRENT_MOON: {
-    id: 'CURRENT_MOON',
-    icon: '🌙',
-    badgeColor: '#3b82f6',
-    badgeTextColor: '#ffffff',
-    label: {
-      en: "Current Moon Position",
-      fr: "Position lunaire actuelle",
-      ar: "موقع القمر الحالي"
-    },
-    shortLabel: {
-      en: "LIVE",
-      fr: "EN DIRECT",
-      ar: "مباشر"
-    },
-    description: {
-      en: "The lunar mansion where the Moon is right now. Changes every ~2.4 days as the Moon travels through the 28 mansions.",
-      fr: "La demeure lunaire où se trouve la Lune en ce moment. Change environ tous les 2,4 jours.",
-      ar: "المنزلة القمرية التي يتواجد فيها القمر الآن. تتغير كل ~2.4 يوم"
-    },
-    nature: 'dynamic'
-  },
-  FROM_NAME: {
-    id: 'FROM_NAME',
-    icon: '📝',
-    badgeColor: '#8b5cf6',
-    badgeTextColor: '#ffffff',
-    label: {
-      en: "Personal Mansion (Name)",
-      fr: "Demeure personnelle (Nom)",
-      ar: "منزلة شخصية (الاسم)"
-    },
-    shortLabel: {
-      en: "PERSONAL",
-      fr: "PERSONNEL",
-      ar: "شخصي"
-    },
-    description: {
-      en: "Your personal lunar mansion calculated from your Arabic name using traditional Abjad numerology. This is your spiritual signature.",
-      fr: "Votre demeure lunaire personnelle calculée à partir de votre nom en utilisant la numérologie Abjad.",
-      ar: "منزلتك القمرية الشخصية محسوبة من اسمك العربي باستخدام حساب الأبجد"
-    },
-    nature: 'static'
-  },
-  FROM_BIRTH: {
-    id: 'FROM_BIRTH',
-    icon: '⭐',
-    badgeColor: '#f59e0b',
-    badgeTextColor: '#000000',
-    label: {
-      en: "Birth Mansion (Precise)",
-      fr: "Demeure de naissance (Précise)",
-      ar: "منزلة الميلاد (دقيقة)"
-    },
-    shortLabel: {
-      en: "PRECISE",
-      fr: "PRÉCIS",
-      ar: "دقيق"
-    },
-    description: {
-      en: "Your birth lunar mansion calculated from your exact birth time and location. Highest precision for personal guidance.",
-      fr: "Votre demeure lunaire de naissance calculée à partir de l'heure et du lieu exacts.",
-      ar: "منزلة ميلادك القمرية المحسوبة من وقت ومكان ولادتك بدقة"
-    },
-    nature: 'static'
-  },
-  FROM_BIRTH_APPROXIMATE: {
-    id: 'FROM_BIRTH_APPROXIMATE',
-    icon: '🌟',
-    badgeColor: '#f97316',
-    badgeTextColor: '#ffffff',
-    label: {
-      en: "Birth Mansion (Estimated)",
-      fr: "Demeure de naissance (Estimée)",
-      ar: "منزلة الميلادك القمرية المقدرة من تاريخ ولادتك"
-    },
-    nature: 'static'
-  }
-};
-
 type Element = 'fire' | 'water' | 'air' | 'earth';
 
-// ============================================
-// MANAZIL SOURCE BADGE COMPONENT
-// ============================================
-interface ManazilSourceBadgeProps {
-  sourceType: ManazilSourceType;
-  language: 'en' | 'fr' | 'ar';
-  size?: 'small' | 'normal';
-  showIcon?: boolean;
-  onPress?: () => void;
+// ========================================
+// ZODIAC RULING PLANET MAPPING
+// ========================================
+
+/**
+ * Get zodiac ruling planet from burj index (0-11)
+ * Based on classical Islamic astronomy
+ * Burj index: 0=Aries, 1=Taurus, ... 11=Pisces
+ */
+function getZodiacRulingPlanet(burjIndex: number | undefined): Planet | undefined {
+  if (burjIndex === undefined) return undefined;
+  
+  const burjRulers: Planet[] = [
+    'Mars',      // 0: Aries
+    'Venus',     // 1: Taurus
+    'Mercury',   // 2: Gemini
+    'Moon',      // 3: Cancer
+    'Sun',       // 4: Leo
+    'Mercury',   // 5: Virgo
+    'Venus',     // 6: Libra
+    'Mars',      // 7: Scorpio
+    'Jupiter',   // 8: Sagittarius
+    'Saturn',    // 9: Capricorn
+    'Saturn',    // 10: Aquarius
+    'Jupiter',   // 11: Pisces
+  ];
+  
+  return burjRulers[burjIndex];
 }
 
-function ManazilSourceBadge({ 
-  sourceType, 
-  language, 
-  size = 'normal', 
-  showIcon = true,
-  onPress 
-}: ManazilSourceBadgeProps) {
-  const source = MANAZIL_SOURCES[sourceType];
-  const isSmall = size === 'small';
-  
-  const content = (
-    <View style={[
-      styles.sourceBadge,
-      { backgroundColor: source.badgeColor },
-      isSmall && styles.sourceBadgeSmall
-    ]}>
-      {showIcon && <Text style={styles.sourceBadgeIcon}>{source.icon}</Text>}
-      <Text style={[
-        styles.sourceBadgeText,
-        { color: source.badgeTextColor },
-        isSmall && styles.sourceBadgeTextSmall
-      ]}>
-        {source.shortLabel[language]}
-      </Text>
-      {source.nature === 'dynamic' && (
-        <View style={styles.liveDot} />
-      )}
-    </View>
-  );
-  
-  if (onPress) {
-    return (
-      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-        {content}
-      </TouchableOpacity>
-    );
-  }
-  
-  return content;
-}
+// ========================================
 
-// ============================================
-// MANAZIL SOURCE EXPLAINER MODAL
-// ============================================
-interface ManazilSourceExplainerProps {
-  visible: boolean;
-  onClose: () => void;
-  language: 'en' | 'fr' | 'ar';
-  highlightSource?: ManazilSourceType;
-}
-
-function ManazilSourceExplainer({ visible, onClose, language, highlightSource }: ManazilSourceExplainerProps) {
-  const titles = {
-    en: "Understanding Lunar Mansions",
-    fr: "Comprendre les demeures lunaires",
-    ar: "فهم المنازل القمرية"
-  };
-  
-  const intros = {
-    en: "The app shows two types of lunar mansions. Each serves a different purpose in your spiritual journey.",
-    fr: "L'application affiche deux types de demeures lunaires. Chacune a un but différent dans votre cheminement spirituel.",
-    ar: "يعرض التطبيق نوعين من المنازل القمرية. كل منها يخدم غرضًا مختلفًا في رحلتك الروحية."
-  };
-
-  const sourceEntries: ManazilSourceType[] = ['CURRENT_MOON', 'FROM_NAME', 'FROM_BIRTH'];
-  
-  return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.explainerModal}>
-          <View style={styles.explainerHeader}>
-            <Text style={styles.explainerTitle}>{titles[language]}</Text>
-            <TouchableOpacity onPress={onClose} style={styles.explainerCloseBtn}>
-              <Ionicons name="close" size={24} color={DarkTheme.textPrimary} />
-            </TouchableOpacity>
-          </View>
-          
-          <ScrollView style={styles.explainerContent} showsVerticalScrollIndicator={false}>
-            <Text style={styles.explainerIntro}>{intros[language]}</Text>
-            
-            {sourceEntries.map((sourceKey) => {
-              const source = MANAZIL_SOURCES[sourceKey];
-              const isHighlighted = highlightSource === sourceKey;
-              
-              return (
-                <View 
-                  key={sourceKey}
-                  style={[
-                    styles.explainerSourceCard,
-                    isHighlighted && { borderColor: source.badgeColor, borderWidth: 2 }
-                  ]}
-                >
-                  <View style={styles.explainerSourceHeader}>
-                    <Text style={styles.explainerSourceIcon}>{source.icon}</Text>
-                    <View style={styles.explainerSourceTitleRow}>
-                      <Text style={styles.explainerSourceLabel}>{source.label[language]}</Text>
-                      <ManazilSourceBadge 
-                        sourceType={sourceKey} 
-                        language={language} 
-                        size="small" 
-                        showIcon={false}
-                      />
-                    </View>
-                  </View>
-                  <Text style={styles.explainerSourceDesc}>{source.description[language]}</Text>
-                  <View style={styles.explainerSourceNature}>
-                    <Text style={[
-                      styles.explainerNatureText,
-                      { color: source.nature === 'dynamic' ? '#3b82f6' : '#8b5cf6' }
-                    ]}>
-                      {source.nature === 'dynamic' 
-                        ? (language === 'ar' ? '● متغير' : language === 'fr' ? '● Dynamique' : '● Changes over time')
-                        : (language === 'ar' ? '● ثابت' : language === 'fr' ? '● Statique' : '● Never changes')
-                      }
-                    </Text>
-                  </View>
-                </View>
-              );
-            })}
-            
-            <View style={styles.explainerTip}>
-              <Text style={styles.explainerTipIcon}>💡</Text>
-              <Text style={styles.explainerTipText}>
-                {language === 'ar' 
-                  ? 'عندما يتطابق موقع القمر الحالي مع منزلتك الشخصية، يكون ذلك وقتًا قويًا بشكل خاص للتأمل والممارسة الروحية.'
-                  : language === 'fr'
-                  ? 'Quand la position actuelle de la Lune correspond à votre demeure personnelle, c\'est un moment particulièrement puissant pour la méditation.'
-                  : 'When the current Moon position aligns with your personal mansion, it\'s an especially powerful time for meditation and spiritual practice.'
-                }
-              </Text>
-            </View>
-          </ScrollView>
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
-// ============================================
-// MANSION DISPLAY CARD (Reusable)
-// ============================================
-interface MansionCardProps {
-  mansion: LunarMansion;
-  sourceType: ManazilSourceType;
-  language: 'en' | 'fr' | 'ar';
-  getElementIcon: (element: Element) => string;
-  getElementLabel: (element: Element) => string;
-  showFullDetails?: boolean;
-  onSourcePress?: () => void;
-  isHighlighted?: boolean;
-}
-
-function MansionCard({ 
-  mansion, 
-  sourceType, 
-  language, 
-  getElementIcon, 
-  getElementLabel,
-  showFullDetails = false,
-  onSourcePress,
-  isHighlighted = false
-}: MansionCardProps) {
-  const [expanded, setExpanded] = useState(false);
-  const source = MANAZIL_SOURCES[sourceType];
-  
-  const guidance = useMemo(() => {
-    return getManazilGuidance({
-      mansionIndex: mansion.index,
-      mansionElement: mansion.element,
-    });
-  }, [mansion.index, mansion.element]);
-
-  const getElementColor = (element?: Element) => {
-    switch (element) {
-      case 'fire': return '#fb7185';
-      case 'water': return '#60a5fa';
-      case 'air': return '#a78bfa';
-      case 'earth': return '#4ade80';
-      default: return DarkTheme.accent;
-    }
-  };
-
-  const elementColor = getElementColor(mansion.element);
-  const lang = language as 'en' | 'fr' | 'ar';
-
-  return (
-    <View style={[
-      styles.mansionCard,
-      { borderColor: `${source.badgeColor}40` },
-      isHighlighted && { borderColor: source.badgeColor, borderWidth: 2 }
-    ]}>
-      {/* Source Badge Row */}
-      <View style={styles.mansionSourceRow}>
-        <ManazilSourceBadge 
-          sourceType={sourceType} 
-          language={language}
-          onPress={onSourcePress}
-        />
-        {source.nature === 'dynamic' && (
-          <Text style={styles.mansionUpdateText}>
-            {language === 'ar' ? 'يتحدث الآن' : language === 'fr' ? 'Mise à jour en direct' : 'Updates in real-time'}
-          </Text>
-        )}
-      </View>
-
-      {/* Header with mansion info */}
-      <View style={styles.mansionHeader}>
-        <View style={[styles.mansionIndexBadge, { backgroundColor: `${elementColor}20` }]}>
-          <Text style={[styles.mansionIndex, { color: elementColor }]}>
-            {mansion.index + 1}
-          </Text>
-        </View>
-        <View style={styles.mansionHeaderText}>
-          <Text style={styles.mansionNameArabic}>{mansion.nameArabic}</Text>
-          <Text style={styles.mansionNameTranslit}>{mansion.nameTransliteration}</Text>
-          <Text style={styles.mansionNameEnglish}>
-            {language === 'fr' ? mansion.nameFrench : mansion.nameEnglish}
-          </Text>
-        </View>
-        <View style={[styles.mansionElementBadge, { backgroundColor: `${elementColor}15`, borderColor: `${elementColor}30` }]}>
-          <Text style={styles.mansionElementIcon}>{getElementIcon(mansion.element)}</Text>
-          <Text style={[styles.mansionElementText, { color: elementColor }]}>
-            {getElementLabel(mansion.element)}
-          </Text>
-        </View>
-      </View>
-
-      {/* Theme & Quality */}
-      {guidance && (
-        <View style={styles.mansionThemeRow}>
-          <View style={[styles.mansionThemeBadge, { backgroundColor: 'rgba(139, 92, 246, 0.15)' }]}>
-            <Text style={styles.mansionThemeText}>
-              ✦ {tr(guidance.themeLabel, lang)}
-            </Text>
-          </View>
-          <Text style={styles.mansionQuality}>{tr(guidance.quality, lang)}</Text>
-        </View>
-      )}
-
-      {/* Essence */}
-      {guidance && (
-        <View style={styles.mansionEssenceBox}>
-          <Text style={styles.mansionEssenceLabel}>
-            {language === 'ar' ? 'الجوهر' : language === 'fr' ? 'Essence' : 'Essence'}
-          </Text>
-          <Text style={styles.mansionEssence}>{tr(guidance.essence, lang)}</Text>
-        </View>
-      )}
-
-      {/* Expandable Details (only for full details mode) */}
-      {showFullDetails && (
-        <>
-          <TouchableOpacity 
-            style={styles.mansionExpandButton}
-            onPress={() => setExpanded(!expanded)}
-          >
-            <Text style={styles.mansionExpandText}>
-              {expanded 
-                ? (language === 'ar' ? 'إخفاء التفاصيل' : language === 'fr' ? 'Masquer' : 'Hide Details')
-                : (language === 'ar' ? 'عرض التفاصيل' : language === 'fr' ? 'Voir plus' : 'View Details')
-              }
-            </Text>
-            <Ionicons 
-              name={expanded ? 'chevron-up' : 'chevron-down'} 
-              size={16} 
-              color={DarkTheme.accent} 
-            />
-          </TouchableOpacity>
-
-          {expanded && guidance && (
-            <View style={styles.mansionExpandedContent}>
-              <View style={styles.mansionDetailBlock}>
-                <Text style={styles.mansionDetailLabel}>
-                  {language === 'ar' ? 'ما يتجلى' : language === 'fr' ? 'Ce qui se manifeste' : 'What Manifests'}
-                </Text>
-                <Text style={styles.mansionDetailText}>{tr(guidance.manifests, lang)}</Text>
-              </View>
-
-              <View style={styles.mansionDetailBlock}>
-                <View style={styles.mansionDetailHeader}>
-                  <Text style={styles.mansionDetailIcon}>✓</Text>
-                  <Text style={[styles.mansionDetailLabel, { color: '#10b981' }]}>
-                    {language === 'ar' ? 'أيسر اليوم' : language === 'fr' ? 'Plus facile aujourd\'hui' : 'Easier Today'}
-                  </Text>
-                </View>
-                <Text style={styles.mansionDetailText}>{tr(guidance.easier, lang)}</Text>
-              </View>
-
-              <View style={styles.mansionDetailBlock}>
-                <View style={styles.mansionDetailHeader}>
-                  <Text style={styles.mansionDetailIcon}>⚠️</Text>
-                  <Text style={[styles.mansionDetailLabel, { color: '#f59e0b' }]}>
-                    {language === 'ar' ? 'حساس اليوم' : language === 'fr' ? 'Sensible aujourd\'hui' : 'Sensitive Today'}
-                  </Text>
-                </View>
-                <Text style={styles.mansionDetailText}>{tr(guidance.sensitive, lang)}</Text>
-              </View>
-
-              {guidance.reflection && (
-                <View style={[styles.mansionReflectionBox, { borderColor: `${elementColor}30` }]}>
-                  <Text style={styles.mansionReflectionLabel}>
-                    {language === 'ar' ? 'تأمل' : language === 'fr' ? 'Réflexion' : 'Reflection'}
-                  </Text>
-                  <Text style={styles.mansionReflectionText}>
-                    "{tr(guidance.reflection.hikmah, lang)}"
-                  </Text>
-                  {guidance.reflection.ayahRef && (
-                    <Text style={styles.mansionAyahRef}>📖 {guidance.reflection.ayahRef}</Text>
-                  )}
-                </View>
-              )}
-            </View>
-          )}
-        </>
-      )}
-    </View>
-  );
-}
-
-// ============================================
-// MANAZIL ALIGNMENT INSIGHT
-// ============================================
-interface ManazilAlignmentProps {
-  currentMoon: LunarMansion | null;
-  personalMansion: LunarMansion | null;
-  language: 'en' | 'fr' | 'ar';
-}
-
-function ManazilAlignmentInsight({ currentMoon, personalMansion, language }: ManazilAlignmentProps) {
-  if (!currentMoon || !personalMansion) return null;
-  
-  const isAligned = currentMoon.index === personalMansion.index;
-  const sameElement = currentMoon.element === personalMansion.element;
-  
-  const getInsight = () => {
-    if (isAligned) {
-      return {
-        icon: '✨',
-        color: '#10b981',
-        title: {
-          en: "Perfect Alignment!",
-          fr: "Alignement parfait !",
-          ar: "توافق تام!"
-        },
-        message: {
-          en: "The Moon is in your personal mansion today. This is a powerful time for inner work, meditation, and connecting with your deepest intentions.",
-          fr: "La Lune est dans votre demeure personnelle aujourd'hui. C'est un moment puissant pour le travail intérieur et la méditation.",
-          ar: "القمر في منزلتك الشخصية اليوم. هذا وقت قوي للعمل الداخلي والتأمل."
-        }
-      };
-    } else if (sameElement) {
-      return {
-        icon: '🌟',
-        color: '#8b5cf6',
-        title: {
-          en: "Elemental Harmony",
-          fr: "Harmonie élémentaire",
-          ar: "انسجام عنصري"
-        },
-        message: {
-          en: `Both mansions share the ${currentMoon.element} element. You'll feel naturally attuned to today's cosmic energies.`,
-          fr: `Les deux demeures partagent l'élément ${currentMoon.element}. Vous vous sentirez naturellement en harmonie.`,
-          ar: `كلا المنزلتين تشتركان في عنصر ${currentMoon.element}. ستشعر بالتناغم الطبيعي مع طاقات اليوم.`
-        }
-      };
-    } else {
-      return {
-        icon: '🔄',
-        color: '#3b82f6',
-        title: {
-          en: "Cosmic Conversation",
-          fr: "Dialogue cosmique",
-          ar: "حوار كوني"
-        },
-        message: {
-          en: `Today's ${currentMoon.element} Moon energy interacts with your ${personalMansion.element} nature. Notice how these energies blend.`,
-          fr: `L'énergie lunaire ${currentMoon.element} d'aujourd'hui interagit avec votre nature ${personalMansion.element}.`,
-          ar: `طاقة القمر ${currentMoon.element} اليوم تتفاعل مع طبيعتك ${personalMansion.element}.`
-        }
-      };
-    }
-  };
-  
-  const insight = getInsight();
-  
-  return (
-    <View style={[styles.alignmentCard, { borderColor: `${insight.color}40` }]}>
-      <View style={styles.alignmentHeader}>
-        <Text style={styles.alignmentIcon}>{insight.icon}</Text>
-        <Text style={[styles.alignmentTitle, { color: insight.color }]}>{insight.title[language]}</Text>
-      </View>
-      <Text style={styles.alignmentMessage}>{insight.message[language]}</Text>
-    </View>
-  );
-}
-
-// ============================================
-// ENHANCED MANAZIL SECTION (Main Component)
-// ============================================
-interface ManazilSectionProps {
-  manazilBaseline: ReturnType<typeof getLunarMansionByIndex>;
-  language: 'en' | 'fr' | 'ar';
-  t: (key: string, params?: Record<string, string>) => string;
-  getElementIcon: (element: Element) => string;
-  getElementLabel: (element: Element) => string;
-}
-
-function ManazilSection({ manazilBaseline, language, t, getElementIcon, getElementLabel }: ManazilSectionProps) {
-  const [showExplainer, setShowExplainer] = useState(false);
-  const [currentMoonMansion, setCurrentMoonMansion] = useState<LunarMansion | null>(null);
-  const [currentMoonLoading, setCurrentMoonLoading] = useState(true);
-
-  // Fetch current moon position on mount
-  useEffect(() => {
-    async function fetchCurrentMoon() {
-      try {
-        setCurrentMoonLoading(true);
-        const result = await getCurrentLunarMansion();
-        if (result && result.mansion) {
-          const mansion = getLunarMansionByIndex(result.index);
-          setCurrentMoonMansion(mansion);
-        } else {
-          // Fallback to calculated position
-          const fallback = getCosmicLunarMansionForDate(new Date());
-          setCurrentMoonMansion(fallback);
-        }
-      } catch (error) {
-        console.error('Error fetching current moon:', error);
-        // Use fallback calculation
-        const fallback = getCosmicLunarMansionForDate(new Date());
-        setCurrentMoonMansion(fallback);
-      } finally {
-        setCurrentMoonLoading(false);
-      }
-    }
-    fetchCurrentMoon();
-  }, []);
-
-  const sectionTitles = {
-    en: "Lunar Mansions (Manāzil)",
-    fr: "Demeures lunaires (Manāzil)",
-    ar: "المنازل القمرية"
-  };
-
-  const currentMoonTitles = {
-    en: "Tonight's Moon",
-    fr: "La Lune ce soir",
-    ar: "قمر الليلة"
-  };
-
-  const personalMansionTitles = {
-    en: "Your Personal Mansion",
-    fr: "Votre demeure personnelle",
-    ar: "منزلتك الشخصية"
-  };
-
-  const learnMoreText = {
-    en: "Learn about the difference",
-    fr: "En savoir plus sur la différence",
-    ar: "تعرف على الفرق"
-  };
-
-  const loadingText = {
-    en: "Loading current moon position...",
-    fr: "Chargement de la position lunaire...",
-    ar: "جاري تحميل موقع القمر..."
-  };
-
-  return (
-    <View style={styles.section}>
-      {/* Section Header */}
-      <View style={styles.manazilSectionHeader}>
-        <Text style={styles.sectionTitle}>{sectionTitles[language]}</Text>
-        <TouchableOpacity 
-          style={styles.learnMoreButton}
-          onPress={() => setShowExplainer(true)}
-        >
-          <Ionicons name="help-circle-outline" size={20} color={DarkTheme.accent} />
-          <Text style={styles.learnMoreText}>{learnMoreText[language]}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Current Moon Position Section */}
-      <View style={styles.manazilSubsection}>
-        <Text style={styles.manazilSubsectionTitle}>
-          🌙 {currentMoonTitles[language]}
-        </Text>
-        {currentMoonLoading ? (
-          <View style={styles.loadingCard}>
-            <Text style={styles.loadingText}>{loadingText[language]}</Text>
-          </View>
-        ) : currentMoonMansion ? (
-          <MansionCard
-            mansion={currentMoonMansion}
-            sourceType="CURRENT_MOON"
-            language={language}
-            getElementIcon={getElementIcon}
-            getElementLabel={getElementLabel}
-            showFullDetails={false}
-            onSourcePress={() => setShowExplainer(true)}
-          />
-        ) : null}
-      </View>
-
-      {/* Alignment Insight (when both are available) */}
-      {currentMoonMansion && manazilBaseline && (
-        <ManazilAlignmentInsight
-          currentMoon={currentMoonMansion}
-          personalMansion={manazilBaseline}
-          language={language}
-        />
-      )}
-
-      {/* Personal Mansion Section */}
-      <View style={styles.manazilSubsection}>
-        <Text style={styles.manazilSubsectionTitle}>
-          📝 {personalMansionTitles[language]}
-        </Text>
-        {manazilBaseline ? (
-          <MansionCard
-            mansion={manazilBaseline}
-            sourceType="FROM_NAME"
-            language={language}
-            getElementIcon={getElementIcon}
-            getElementLabel={getElementLabel}
-            showFullDetails={true}
-            onSourcePress={() => setShowExplainer(true)}
-          />
-        ) : (
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={{ fontSize: 24 }}>🌙</Text>
-              <Text style={[styles.cardTitle, { color: DarkTheme.accent }]}>
-                {t('home.dailyGuidanceDetails.manazil.title')}
-              </Text>
-            </View>
-            <Text style={styles.cardText}>{t('home.dailyGuidanceDetails.manazil.missing')}</Text>
-          </View>
-        )}
-      </View>
-
-      {/* Info hint */}
-      <Text style={styles.manazilHint}>
-        {t('home.dailyGuidanceDetails.manazil.hint')}
-      </Text>
-
-      {/* Source Explainer Modal */}
-      <ManazilSourceExplainer
-        visible={showExplainer}
-        onClose={() => setShowExplainer(false)}
-        language={language}
-      />
-    </View>
-  );
-}
+// ========================================
+// MAIN SCREEN COMPONENT
+// ========================================
 
 export default function DailyGuidanceDetailsScreen() {
   const router = useRouter();
@@ -732,7 +118,8 @@ export default function DailyGuidanceDetailsScreen() {
   const avoidKeys = params.avoidKeys ? JSON.parse(params.avoidKeys as string) : [];
   const peakHoursKey = (params.peakHoursKey as string) || '';
   
-  const now = new Date();
+  const now = useNowTicker(1000);
+  const minuteNow = useNowTicker(60_000);
   const dayOfWeek = now.getDay();
   const dayKeys = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const dayKey = dayKeys[dayOfWeek];
@@ -752,29 +139,269 @@ export default function DailyGuidanceDetailsScreen() {
   // Get day ruler
   const dayRuler = getDayRuler(now);
   const dayRulerInfo = getPlanetInfo(dayRuler);
+
+  const ascendantBurjIndex = profile?.derived?.ascendantBurjIndex;
+  const zodiacSign = useMemo(() => {
+    if (typeof ascendantBurjIndex !== 'number') return undefined;
+    return ZODIAC_SIGNS[ascendantBurjIndex + 1];
+  }, [ascendantBurjIndex]);
+
+  const userZodiacRuler = useMemo(() => {
+    if (typeof ascendantBurjIndex !== 'number') return undefined;
+    return getZodiacRulingPlanet(ascendantBurjIndex);
+  }, [ascendantBurjIndex]);
   
-  // CRITICAL FIX: Single source of truth for daily energy score
-  // Use dailyAnalysis.dailyScore throughout (weighted calculation: 50% day ruler + 30% moon + 20% others)
-  // This replaces the old TimingAnalysisSection which was showing a different percentage
+  // NEW: Daily Synthesis State
+  const [dailySynthesis, setDailySynthesis] = useState<DailySynthesis | null>(null);
+  const [synthesisLoading, setSynthesisLoading] = useState(false);
+  const [synthesisError, setSynthesisError] = useState<string | null>(null);
+
+  // Keep the same day-level window status as the Home "Daily Energy" widget
+  const [dailyGuidance, setDailyGuidance] = useState<DailyGuidance | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const g = await getDailyGuidance(profile);
+        if (!cancelled) {
+          setDailyGuidance(g);
+        }
+      } catch {
+        if (!cancelled) {
+          setDailyGuidance(null);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile]);
   
-  function getDailyEnergyScore(): number {
-    return dailyAnalysis?.dailyScore || 0;
-  }
+  // NEW: Generate daily synthesis when data is available
+  useEffect(() => {
+    if (profile && dailyAnalysis && dailyAnalysis.moonPhase) {
+      // Start loading
+      setSynthesisLoading(true);
+      setSynthesisError(null);
+      
+      // Use setTimeout to simulate async and allow UI to show loading state
+      const timer = setTimeout(() => {
+        try {
+          // Get user's planet (for alignment): prefer Name + Mother's Name derived planet
+          let nameMotherPlanet: Planet | undefined;
+          try {
+            if (profile.nameAr) {
+              const destiny = buildDestiny(profile.nameAr, profile.motherName);
+              const p = destiny?.burj?.planet;
+              const ok = p === 'Sun' || p === 'Moon' || p === 'Mercury' || p === 'Venus' || p === 'Mars' || p === 'Jupiter' || p === 'Saturn';
+              if (ok) nameMotherPlanet = p;
+            }
+          } catch {
+            nameMotherPlanet = undefined;
+          }
+          const fallback = getUserPlanet(undefined, nameMotherPlanet);
+          const userPlanet = fallback.planet;
+          
+          // Get user's element
+          const userElement = ((profile as any).zahirElement || (profile.derived as any)?.element || 'fire') as PlanetElement;
+          
+          // Get day element from day ruler
+          const dayElement = dayRulerInfo.element as PlanetElement;
+          
+          // Get moon phase
+          const moonPhase = dailyAnalysis.moonPhase?.phaseName || 'waxing_crescent';
+          
+          // Get day ruler transit power
+          const transitPower = 50;
+          
+          // Generate synthesis
+          const synthesis = generateDailySynthesis(
+            dayRuler,
+            userPlanet,
+            userElement,
+            dayElement,
+            moonPhase,
+            transitPower,
+            t
+          );
+          
+          setDailySynthesis(synthesis);
+          setSynthesisLoading(false);
+        } catch (error) {
+          console.error('Failed to generate daily synthesis:', error);
+          setSynthesisError(t('errors.synthesisGenerationFailed') || 'Unable to generate synthesis');
+          setSynthesisLoading(false);
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [profile, dailyAnalysis, dayRuler, dayRulerInfo, t, userZodiacRuler]);
   
-  function getStatusColor() {
-    const score = getDailyEnergyScore();
-    if (score >= 70) return '#10b981';      // Excellent (Green)
-    if (score >= 55) return '#3B82F6';      // Good (Blue)
-    if (score >= 40) return '#F59E0B';      // Moderate (Amber)
-    return '#EF4444';                        // Weak (Red)
-  }
+  // Get user planet info for display
+  const userPlanetInfo = useMemo(() => {
+    if (!profile) return null;
+    let nameMotherPlanet: Planet | undefined;
+    try {
+      if (profile.nameAr) {
+        const destiny = buildDestiny(profile.nameAr, profile.motherName);
+        const p = destiny?.burj?.planet;
+        const ok = p === 'Sun' || p === 'Moon' || p === 'Mercury' || p === 'Venus' || p === 'Mars' || p === 'Jupiter' || p === 'Saturn';
+        if (ok) nameMotherPlanet = p;
+      }
+    } catch {
+      nameMotherPlanet = undefined;
+    }
+
+    const { planet, source } = getUserPlanet(undefined, nameMotherPlanet);
+    const element = ((profile as any).zahirElement || (profile.derived as any)?.element || 'fire') as PlanetElement;
+    return { planet, element, source };
+  }, [profile]);
+
+  const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
+  const [planetaryData, setPlanetaryData] = useState<PlanetaryHourData | null>(null);
+  const [planetaryHours, setPlanetaryHours] = useState<PlanetaryHour[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const location = profile?.location;
+
+      // If no location, fall back to approximate boundaries.
+      if (!location || typeof location.latitude !== 'number' || typeof location.longitude !== 'number') {
+        const approxSunrise = new Date(minuteNow);
+        approxSunrise.setHours(6, 30, 0, 0);
+        const approxSunset = new Date(minuteNow);
+        approxSunset.setHours(18, 30, 0, 0);
+        const approxNextSunrise = new Date(approxSunrise);
+        approxNextSunrise.setDate(approxNextSunrise.getDate() + 1);
+
+        if (!cancelled) {
+          setPlanetaryBoundaries({ sunrise: approxSunrise, sunset: approxSunset, nextSunrise: approxNextSunrise });
+        }
+        return;
+      }
+
+      const boundaries = await getPlanetaryDayBoundariesForNow(
+        { latitude: location.latitude, longitude: location.longitude },
+        { now: minuteNow }
+      );
+
+      if (!cancelled) setPlanetaryBoundaries(boundaries);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile?.location?.latitude, profile?.location?.longitude, minuteNow]);
+
+  useEffect(() => {
+    if (!planetaryBoundaries) return;
+    setPlanetaryData(
+      calculatePlanetaryHours(
+        planetaryBoundaries.sunrise,
+        planetaryBoundaries.sunset,
+        planetaryBoundaries.nextSunrise,
+        now
+      )
+    );
+  }, [planetaryBoundaries, now]);
+
+  useEffect(() => {
+    if (!planetaryBoundaries) return;
+    let cancelled = false;
+    (async () => {
+      const cache = await preCalculateDailyPlanetaryHours(
+        planetaryBoundaries.sunrise,
+        planetaryBoundaries.sunset,
+        planetaryBoundaries.nextSunrise
+      );
+
+      if (cancelled) return;
+      const normalized = (cache?.hours || []).map((h) => ({
+        ...h,
+        startTime: new Date(h.startTime),
+        endTime: new Date(h.endTime),
+      }));
+      setPlanetaryHours(normalized);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [planetaryBoundaries]);
+
+  const alignmentScore = useMemo(() => {
+    if (!dailySynthesis) return undefined;
+    const a = dailySynthesis.factors.planetaryFriendship.score;
+    const b = dailySynthesis.factors.elementalHarmony.score;
+    const c = dailySynthesis.factors.dailyStrength.score;
+    return Math.round((a + b + c) / 3);
+  }, [dailySynthesis]);
+
+  type AuthorityLevel = 'avoid' | 'conditional' | 'supported';
+  type DisplayQuality = 'excellent' | 'good' | 'moderate' | 'challenging';
+
+  const authority = useMemo(() => {
+    const moonPhaseName = dailyAnalysis?.moonPhase?.phaseName;
+    const isFullMoon = moonPhaseName === 'full';
+    const isSaturnDay = dayRuler === 'Saturn';
+    const isMarsDay = dayRuler === 'Mars';
+    const hardRestriction = isSaturnDay || isMarsDay;
+
+    // Language mapping follows the requested alignment-score thresholds.
+    // If alignment score is missing, fall back to dailyScore.
+    const score =
+      typeof alignmentScore === 'number'
+        ? alignmentScore
+        : typeof dailyAnalysis?.dailyScore === 'number'
+          ? dailyAnalysis.dailyScore
+          : 0;
+
+    let base: AuthorityLevel = 'conditional';
+    if (score < 40) base = 'avoid';
+    else if (score < 70) base = 'conditional';
+    else base = 'supported';
+
+    // Hard day-ruler restrictions can never be overridden by lower layers.
+    const level: AuthorityLevel = hardRestriction && base === 'supported' ? 'conditional' : base;
+
+    // Convert authority into the quality tokens used by existing UI.
+    // Never allow "excellent" language below 70% or under hard restriction.
+    let displayQuality: DisplayQuality;
+    if (level === 'avoid') displayQuality = 'challenging';
+    else if (level === 'conditional') displayQuality = 'moderate';
+    else displayQuality = score >= 85 && !hardRestriction ? 'excellent' : 'good';
+
+    return {
+      level,
+      displayQuality,
+      score,
+      hardRestriction,
+      isFullMoon,
+      moonPhaseName,
+    };
+  }, [alignmentScore, dailyAnalysis?.dailyScore, dailyAnalysis?.moonPhase?.phaseName, dayRuler]);
   
   function getStatusLabel() {
-    const score = getDailyEnergyScore();
-    if (score >= 70) return '✨ Excellent Timing';
-    if (score >= 55) return '🌟 Good Timing';
-    if (score >= 40) return '⚠️ Moderate Timing';
-    return '🔄 Proceed Mindfully';
+    // Keep the existing emoji style, but never contradict the authority.
+    // NOTE: hardRestriction implies "conditional" even if score is high.
+    switch (authority.displayQuality) {
+      case 'excellent':
+        return `✨ ${t('dailyEnergy.authorityBadge.excellent')}`;
+      case 'good':
+        return `🌟 ${t('dailyEnergy.authorityBadge.supported')}`;
+      case 'moderate':
+        return authority.hardRestriction
+          ? `🛡️ ${t('dailyEnergy.authorityBadge.restricted')}`
+          : `⚠️ ${t('dailyEnergy.authorityBadge.conditional')}`;
+      case 'challenging':
+      default:
+        return `⛔ ${t('dailyEnergy.authorityBadge.notAdvised')}`;
+    }
   }
   
   function getElementIcon(element: Element) {
@@ -791,15 +418,143 @@ export default function DailyGuidanceDetailsScreen() {
     return t(`home.dailyGuidanceDetails.elements.${element}`);
   }
   
-  const statusColor = getStatusColor();
+  // Get color based on synthesis quality
+  function getQualityColor(quality: 'excellent' | 'good' | 'moderate' | 'challenging') {
+    switch (quality) {
+      case 'excellent': return '#10b981'; // Green
+      case 'good': return '#3B82F6';      // Blue
+      case 'moderate': return '#F59E0B';  // Amber
+      case 'challenging': return '#EF4444'; // Red
+    }
+  }
+  
+  // Get label based on synthesis quality
+  function getQualityLabel(quality: 'excellent' | 'good' | 'moderate' | 'challenging') {
+    switch (quality) {
+      case 'excellent':
+        return `✨ ${t('dailyEnergy.authorityBadge.excellent')}`;
+      case 'good':
+        return `🌟 ${t('dailyEnergy.authorityBadge.supported')}`;
+      case 'moderate':
+        return authority.hardRestriction
+          ? `🛡️ ${t('dailyEnergy.authorityBadge.restricted')}`
+          : `⚠️ ${t('dailyEnergy.authorityBadge.conditional')}`;
+      case 'challenging':
+        return `⛔ ${t('dailyEnergy.authorityBadge.notAdvised')}`;
+    }
+  }
+  
+  const windowQuality: TimingQuality = (dailyGuidance?.timingQuality as TimingQuality) || timingQuality;
 
-  const manazilBaselineIndex = normalizeMansionIndex(profile?.derived?.manazilBaseline);
-  const manazilBaseline = manazilBaselineIndex !== null
-    ? getLunarMansionByIndex(manazilBaselineIndex)
-    : null;
+  const getWindowColor = (quality: TimingQuality) => {
+    switch (quality) {
+      case 'favorable':
+        return '#10b981';
+      case 'transformative':
+        return '#f59e0b';
+      case 'delicate':
+        return '#ef4444';
+      case 'neutral':
+      default:
+        return '#64B5F6';
+    }
+  };
+
+  const masterToneColor = getWindowColor(windowQuality);
+
+  const masterCapQuality: 'excellent' | 'good' | 'moderate' | 'challenging' =
+    windowQuality === 'favorable'
+      ? 'good'
+      : windowQuality === 'neutral' || windowQuality === 'transformative'
+        ? 'moderate'
+        : 'challenging';
+
+  const verdictQuality = (() => {
+    const rank: Record<'excellent' | 'good' | 'moderate' | 'challenging', number> = {
+      excellent: 0,
+      good: 1,
+      moderate: 2,
+      challenging: 3,
+    };
+    return rank[authority.displayQuality] >= rank[masterCapQuality]
+      ? authority.displayQuality
+      : masterCapQuality;
+  })();
+  const getWindowLabel = (quality: TimingQuality) => {
+    return t(`widgets.dailyEnergy.windows.${quality}`);
+  };
 
   const ascendantBurj = profile?.derived?.ascendantBurj;
   const ascendantElement = profile?.derived?.ascendantElement as Element | undefined;
+
+  function formatHourRange(start: Date, end: Date): string {
+    return `${formatTime(start)}-${formatTime(end)}`;
+  }
+
+  const userBestHours = useMemo(() => {
+    if (!userZodiacRuler || !planetaryHours?.length) return [];
+    return planetaryHours
+      .filter((h) => h.planet === userZodiacRuler && h.endTime.getTime() > now.getTime())
+      .slice(0, 3);
+  }, [planetaryHours, userZodiacRuler, now]);
+
+  const dayBestHours = useMemo(() => {
+    if (!planetaryHours?.length) return [];
+    return planetaryHours
+      .filter((h) => h.planet === dayRuler && h.endTime.getTime() > now.getTime())
+      .slice(0, 3);
+  }, [planetaryHours, dayRuler, now]);
+
+  const challengingHours = useMemo(() => {
+    if (!userZodiacRuler || !planetaryHours?.length) return [];
+    return planetaryHours
+      .filter((h) => h.endTime.getTime() > now.getTime())
+      .filter((h) => getPlanetaryRelationship(userZodiacRuler, h.planet) === 'enemy')
+      .slice(0, 3);
+  }, [planetaryHours, userZodiacRuler, now]);
+
+  function getHourPowerForUser(hourPlanet: Planet): number {
+    const userElement = ascendantElement ?? ((profile as any)?.zahirElement as Element | undefined) ?? ((profile?.derived as any)?.element as Element | undefined);
+    if (!userElement) return 55;
+    const relation = getPlanetaryRelationship(userZodiacRuler ?? hourPlanet, hourPlanet);
+    const planetScore = relation === 'friend' ? 90 : relation === 'neutral' ? 60 : 30;
+    const elementRelation = getClassicalElementRelationship(userElement, getPlanetInfo(hourPlanet).element);
+    const elementScore =
+      elementRelation === 'same' ? 90 : elementRelation === 'supportive' ? 75 : elementRelation === 'neutral' ? 50 : 25;
+    return Math.round((planetScore + elementScore) / 2);
+  }
+
+  const timingGuidanceProps = useMemo(() => {
+    if (!planetaryData) return null;
+    const current = planetaryData.currentHour;
+    const currentPower = getHourPowerForUser(current.planet);
+
+    const candidates: PlanetaryHour[] = planetaryHours?.length
+      ? planetaryHours.filter((h) => h.startTime.getTime() >= now.getTime()).slice(0, 6)
+      : ([planetaryData.nextHour, planetaryData.afterNextHour].filter(Boolean) as PlanetaryHour[]);
+
+    let best: { hour: PlanetaryHour; power: number } | null = null;
+    for (const h of candidates) {
+      const power = getHourPowerForUser(h.planet);
+      if (!best || power > best.power) best = { hour: h, power };
+    }
+
+    return {
+      currentHour: {
+        planet: current.planet,
+        power: currentPower,
+        endsAt: formatTime(current.endTime),
+      },
+      nextBestHour: best
+        ? {
+            planet: best.hour.planet,
+            power: best.power,
+            startsAt: formatTime(best.hour.startTime),
+            hoursUntil: Math.max(0, Math.round((best.hour.startTime.getTime() - now.getTime()) / (1000 * 60 * 60))),
+          }
+        : undefined,
+    };
+  }, [planetaryData, planetaryHours, now]);
 
   function getElementRelationship(a?: Element, b?: Element): 'harmonious' | 'complementary' | 'transformative' | 'neutral' {
     if (!a || !b) return 'neutral';
@@ -833,7 +588,7 @@ export default function DailyGuidanceDetailsScreen() {
       </View>
       
       <LinearGradient
-        colors={[`${statusColor}15`, `${statusColor}05`, DarkTheme.screenBackground]}
+        colors={[`${masterToneColor}15`, `${masterToneColor}05`, DarkTheme.screenBackground]}
         style={styles.gradientContainer}
       >
         <ScrollView 
@@ -841,20 +596,190 @@ export default function DailyGuidanceDetailsScreen() {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-          {/* Status Badge - Shows Daily Energy Score (Weighted: 50% day ruler + 30% moon + 20% others) */}
-          <View style={[styles.statusBadge, { backgroundColor: `${statusColor}20`, borderColor: statusColor }]}>
-            <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-            <Text style={[styles.statusText, { color: statusColor }]}>{getStatusLabel()}</Text>
-            {dailyAnalysis && (
-              <Text style={[styles.statusScore, { color: statusColor }]}>
-                {getDailyEnergyScore()}%
+          {/* Status Badge - Shows synthesis quality (no percentage) */}
+          {dailySynthesis && (
+            <View style={[styles.statusBadge, { backgroundColor: `${getWindowColor(windowQuality)}20`, borderColor: getWindowColor(windowQuality) }]}> 
+              <View style={[styles.statusDot, { backgroundColor: getWindowColor(windowQuality) }]} />
+              <Text style={[styles.statusText, { color: getWindowColor(windowQuality) }]}>
+                {getWindowLabel(windowQuality)}
               </Text>
-            )}
-          </View>
+            </View>
+          )}
 
-          {/* SECTION 1: MOON PHASE (Primary Layer - Moved to top) */}
+          {/* SECTION 1: ALIGNMENT OVERVIEW (Most Important) */}
+          <TodayDetailsCard
+            dayRuler={dayRuler}
+            userRuler={userZodiacRuler}
+            dayElement={dayRulerInfo.element as PlanetElement}
+            userElement={ascendantElement}
+            alignmentScore={alignmentScore}
+            elementalHarmonyScore={dailySynthesis?.factors.elementalHarmony.score}
+            planetaryHarmonyScore={dailySynthesis?.factors.planetaryFriendship.score}
+            verdict={
+              dailySynthesis
+                ? t(`dailyEnergy.alignmentOverview.verdict.${verdictQuality}`)
+                : undefined
+            }
+          />
+
+          {/* SECTION 1: PLANETARY JUDGMENT (Global layer, non-personal) */}
+          <PlanetaryJudgmentCard
+            dayRuler={dayRuler}
+            moonPhaseName={dailyAnalysis?.moonPhase?.phaseName}
+          />
+
+          {/* SECTION 1: MOON PHASE (Primary Layer) */}
           {dailyAnalysis?.moonPhase && (
-            <MoonPhaseHeaderCard moonPhase={dailyAnalysis.moonPhase} isExpanded={true} />
+            <MoonPhaseHeaderCard
+              moonPhase={dailyAnalysis.moonPhase}
+              isExpanded={true}
+              dayRulerPlanet={dayRuler}
+              authorityLevel={authority.level}
+            />
+          )}
+          
+          {/* NEW: Daily Synthesis Section with Error Boundary */}
+          {synthesisLoading ? (
+            // Loading State
+            <View style={styles.loadingCard}>
+              <Text style={styles.loadingText}>{t('dailyEnergy.loading.generatingGuidance')}</Text>
+            </View>
+          ) : synthesisError ? (
+            // Error State
+            <View style={styles.errorCard}>
+              <Text style={styles.errorIcon}>⚠️</Text>
+              <Text style={styles.errorTitle}>{t('dailyEnergy.errors.unableToGenerateTitle')}</Text>
+              <Text style={styles.errorMessage}>
+                {t('dailyEnergy.errors.unableToGenerateBody')}
+              </Text>
+              <TouchableOpacity 
+                style={styles.refreshButton}
+                onPress={() => {
+                  setSynthesisError(null);
+                  setSynthesisLoading(true);
+                }}
+              >
+                <Text style={styles.refreshButtonText}>{t('dailyEnergy.actions.refresh')}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : dailySynthesis && (userPlanetInfo || userZodiacRuler) ? (
+            // Success State - Show Full Synthesis
+            <>
+              {/* Main Analysis Card - Today's Ruler + Your Planet + Alignment */}
+              <View style={styles.analysisCard}>
+                {/* YOUR COSMIC PROFILE */}
+                {userPlanetInfo ? (
+                  <UserPlanetSection
+                    userPlanet={userPlanetInfo.planet}
+                    userElement={(ascendantElement ?? userPlanetInfo.element) as PlanetElement}
+                    source={userPlanetInfo.source}
+                    zodiacSign={zodiacSign}
+                  />
+                ) : userZodiacRuler && ascendantElement ? (
+                  <UserPlanetSection
+                    userPlanet={userZodiacRuler}
+                    userElement={ascendantElement as PlanetElement}
+                    source={'default'}
+                    zodiacSign={zodiacSign}
+                  />
+                ) : null}
+                
+                {/* Divider */}
+                <View style={styles.divider} />
+
+                {/* TODAY'S COSMIC PROFILE */}
+                <TodaysRulerSection
+                  dayRuler={dayRuler}
+                  dayElement={dayRulerInfo.element as PlanetElement}
+                  dayDescription={t(`dayRulers.${dayKey.toLowerCase()}.desc`)}
+                  transitPower={dailyAnalysis?.dayRulingStrength || 50}
+                  transitSign={undefined}
+                  transitDignity={undefined}
+                  currentHour={
+                    planetaryData
+                      ? {
+                          planet: planetaryData.currentHour.planet,
+                          range: formatHourRange(planetaryData.currentHour.startTime, planetaryData.currentHour.endTime),
+                        }
+                      : undefined
+                  }
+                />
+                
+                {/* Divider */}
+                <View style={styles.divider} />
+
+                {/* ALIGNMENT ANALYSIS */}
+                <TodaysAlignmentSection
+                  synthesis={dailySynthesis}
+                  alignmentScore={alignmentScore}
+                  userTemperament={
+                    zodiacSign
+                      ? ((language || '').toLowerCase() === 'fr'
+                          ? zodiacSign.temperamentFr
+                          : zodiacSign.temperament)
+                      : undefined
+                  }
+                  dayTemperament={t(`dailyEnergy.temperaments.${dayRuler.toLowerCase()}`)}
+                />
+              </View>
+              
+              {/* What This Means For You Card */}
+              <WhatThisMeansCard
+                synthesis={dailySynthesis}
+                dayRuler={dayRuler}
+                moonPhaseName={dailyAnalysis?.moonPhase?.phaseName}
+                authorityLevel={authority.level}
+                authorityDisplayQuality={authority.displayQuality}
+                hardRestriction={authority.hardRestriction}
+                userRulerHours={userBestHours.map((h) => ({
+                  planet: h.planet,
+                  range: formatHourRange(h.startTime, h.endTime),
+                }))}
+                dayRulerHours={dayBestHours.map((h) => ({
+                  planet: h.planet,
+                  range: formatHourRange(h.startTime, h.endTime),
+                }))}
+                challengingHours={challengingHours.map((h) => ({
+                  planet: h.planet,
+                  range: formatHourRange(h.startTime, h.endTime),
+                }))}
+              />
+            </>
+          ) : dailySynthesis ? (
+            // Fallback - No user profile, show generic guidance
+            <View style={styles.genericCard}>
+              <Text style={styles.genericTitle}>{t('dailyEnergy.generic.title')}</Text>
+              <Text style={styles.genericText}>{dailySynthesis.summaryText}</Text>
+              <Text style={styles.genericNote}>
+                {t('dailyEnergy.generic.completeProfileNote')}
+              </Text>
+            </View>
+          ) : null}
+          
+          {/* SECTION 2B: DAILY ENERGY SCORE (Ilm al-Nujum Synthesis) */}
+          {dailyAnalysis && (
+            <DailyEnergyCard 
+              score={dailyAnalysis.dayRulingStrength || 50}
+              authorityLevel={authority.level}
+              hardRestriction={authority.hardRestriction}
+              breakdown={{
+                dayRuler: dailyAnalysis.dayRulingPlanet as Planet,
+                dayRulerPower: dailyAnalysis.dayRulingStrength || 50,
+                dayRulerContribution: Math.round((dailyAnalysis.dayRulingStrength || 50) * 0.5),
+                moonPower: dailyAnalysis.moonPhase?.moonPower || 60,
+                moonContribution: Math.round((dailyAnalysis.moonPhase?.moonPower || 60) * 0.3),
+                othersPower: 55,
+                othersContribution: Math.round(55 * 0.2),
+                totalScore: dailyAnalysis.dayRulingStrength || 50,
+                moonPhase: dailyAnalysis.moonPhase?.phaseName === 'waxing_crescent' || dailyAnalysis.moonPhase?.phaseName === 'waxing_gibbous' || dailyAnalysis.moonPhase?.phaseName === 'first_quarter'
+                  ? 'waxing' 
+                  : dailyAnalysis.moonPhase?.phaseName === 'waning_gibbous' || dailyAnalysis.moonPhase?.phaseName === 'waning_crescent' || dailyAnalysis.moonPhase?.phaseName === 'last_quarter'
+                  ? 'waning'
+                  : dailyAnalysis.moonPhase?.phaseName === 'full'
+                  ? 'full'
+                  : 'new',
+              }}
+            />
           )}
           
           {/* SECTION 2: MOON-DAY HARMONY (Synthesis) */}
@@ -864,53 +789,40 @@ export default function DailyGuidanceDetailsScreen() {
               dayRuler={dailyAnalysis.dayRulingPlanet}
             />
           )}
-          
-          {/* SECTION 3: DAILY ENERGY (Overall Weighted Score with Breakdown) */}
-          {dailyAnalysis && (
-            <DailyEnergyCard 
-              score={dailyAnalysis.dailyScore || 0}
-              breakdown={dailyAnalysis.scoreBreakdown}
-            />
-          )}
 
-          {/* Asrariya Timing Analysis - Personalized */}
-          <TimingAnalysisSection
-            context="daily"
-            hideSections={['alternatives']}
+          {/* SECTION 9: PRACTICAL GUIDANCE (Planetary hour quality) */}
+          <TimingGuidanceCard
+            currentHour={timingGuidanceProps?.currentHour}
+            nextBestHour={timingGuidanceProps?.nextBestHour}
+            windowQuality={dailyGuidance?.timingQuality}
           />
 
-          {/* Enhanced Planetary Strength Analysis */}
-          <DailyPlanetaryAnalysisDisplay expanded={true} />
-          
-          {/* SECTION 4: TODAY'S DETAILS (Day ruler, element, quality) */}
-          <TodayDetailsCard
-            dayRuler={dayRuler}
-            dayRulerPower={dayRulerInfo.power || 50}
-            element={dayElement}
-            elementIcon={getElementIcon(dayElement)}
-            dayQuality={t('home.dailyGuidanceDetails.dayQuality')}
-          />
-          
-          {/* SECTION 5: TIMING GUIDANCE (Planetary hour quality) */}
-          <TimingGuidanceCard />
+          {/* ================================================ */}
+          {/* COLLAPSIBLE SECTIONS - Details on Demand         */}
+          {/* ================================================ */}
 
-          {/* Manazil (Lunar Mansion) Section - Enhanced */}
-          <ManazilSection
-            manazilBaseline={manazilBaseline}
-            language={language as 'en' | 'fr' | 'ar'}
-            t={t}
-            getElementIcon={getElementIcon}
-            getElementLabel={getElementLabel}
-          />
+          {/* COLLAPSIBLE: Detailed Planetary Analysis */}
+          <CollapsibleSection
+            title={t('dailyEnergy.planetaryStrength.title') || 'Planetary Strength'}
+            icon="🌍"
+            defaultExpanded={false}
+            subtitle={t('home.dailyGuidanceDetails.collapsible.planetaryDetails') || 'Detailed breakdown'}
+          >
+            <DailyPlanetaryAnalysisDisplay expanded={true} />
+          </CollapsibleSection>
 
-          {/* Ascendant Lens (Educational) */}
+          {/* COLLAPSIBLE: Ascendant Lens (Educational) */}
           {ascendantBurj && ascendantElement && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>{t('home.dailyGuidanceDetails.sections.ascendantLens')}</Text>
+            <CollapsibleSection
+              title={t('home.dailyGuidanceDetails.sections.ascendantLens') || 'Ascendant Lens'}
+              icon="✨"
+              defaultExpanded={false}
+              subtitle={t('home.dailyGuidanceDetails.collapsible.yourPersonalFilter') || 'Your personal filter'}
+            >
               <View style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <Ionicons name="sparkles-outline" size={24} color={DarkTheme.accent} />
-                  <Text style={[styles.cardTitle, { color: DarkTheme.accent }]}>
+                  <Ionicons name="sparkles-outline" size={24} color="#a78bfa" />
+                  <Text style={[styles.cardTitle, { color: '#a78bfa' }]}>
                     {t('home.dailyGuidanceDetails.ascendant.title')}
                   </Text>
                 </View>
@@ -927,7 +839,7 @@ export default function DailyGuidanceDetailsScreen() {
                   {t(`home.dailyGuidanceDetails.ascendant.blend.${getElementRelationship(ascendantElement, dayElement)}`)}
                 </Text>
               </View>
-            </View>
+            </CollapsibleSection>
           )}
           
           {/* PREMIUM: Best For Section - Personal action guidance */}
@@ -1124,6 +1036,22 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.1)',
     gap: Spacing.md,
   },
+  
+  // NEW: Analysis Card for Daily Energy Redesign
+  analysisCard: {
+    backgroundColor: 'rgba(30, 20, 60, 0.6)',
+    borderWidth: 2,
+    borderColor: 'rgba(180, 170, 255, 0.3)',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+  },
+  
+  divider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginVertical: 16,
+  },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1225,238 +1153,6 @@ const styles = StyleSheet.create({
     color: DarkTheme.textTertiary,
   },
 
-  // Enhanced Manazil Section Styles
-  manazilCard: {
-    padding: Spacing.lg,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: Spacing.lg,
-    borderWidth: 1,
-    gap: Spacing.md,
-  },
-  manazilHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-  },
-  manazilIndexBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  manazilIndex: {
-    fontSize: 20,
-    fontWeight: Typography.weightBold as any,
-  },
-  manazilHeaderText: {
-    flex: 1,
-    gap: 2,
-  },
-  manazilNameArabic: {
-    fontSize: Typography.h2,
-    fontWeight: Typography.weightBold as any,
-    color: DarkTheme.textPrimary,
-  },
-  manazilNameTranslit: {
-    fontSize: Typography.body,
-    color: DarkTheme.textSecondary,
-    fontStyle: 'italic',
-  },
-  manazilNameEnglish: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textTertiary,
-  },
-  manazilElementBadge: {
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-    borderRadius: Spacing.md,
-    borderWidth: 1,
-    alignItems: 'center',
-    gap: 2,
-  },
-  manazilElementIcon: {
-    fontSize: 18,
-  },
-  manazilElementText: {
-    fontSize: Typography.caption,
-    fontWeight: Typography.weightMedium as any,
-  },
-  manazilThemeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    flexWrap: 'wrap',
-    marginTop: Spacing.xs,
-  },
-  manazilThemeBadge: {
-    paddingVertical: 4,
-    paddingHorizontal: Spacing.sm,
-    borderRadius: 12,
-  },
-  manazilThemeText: {
-    fontSize: Typography.caption,
-    color: '#a78bfa',
-    fontWeight: Typography.weightMedium as any,
-  },
-  manazilQuality: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textTertiary,
-    flex: 1,
-  },
-  manazilEssenceBox: {
-    backgroundColor: 'rgba(139, 92, 246, 0.08)',
-    padding: Spacing.md,
-    borderRadius: Spacing.md,
-    marginTop: Spacing.xs,
-  },
-  manazilEssenceLabel: {
-    fontSize: Typography.caption,
-    color: '#a78bfa',
-    fontWeight: Typography.weightMedium as any,
-    marginBottom: 4,
-  },
-  manazilEssence: {
-    fontSize: Typography.body,
-    lineHeight: Typography.body * Typography.lineHeightNormal,
-    color: DarkTheme.textPrimary,
-  },
-  manazilExpandButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.xs,
-    paddingVertical: Spacing.sm,
-    marginTop: Spacing.xs,
-  },
-  manazilExpandText: {
-    fontSize: Typography.caption,
-    color: '#FFFFFF',
-    fontWeight: Typography.weightMedium as any,
-  },
-  manazilExpandedContent: {
-    gap: Spacing.md,
-    paddingTop: Spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  manazilDetailBlock: {
-    gap: 4,
-  },
-  manazilDetailHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-  },
-  manazilDetailIcon: {
-    fontSize: 14,
-  },
-  manazilDetailLabel: {
-    fontSize: Typography.caption,
-    fontWeight: Typography.weightMedium as any,
-    color: DarkTheme.textSecondary,
-  },
-  manazilDetailText: {
-    fontSize: Typography.body,
-    lineHeight: Typography.body * Typography.lineHeightNormal,
-    color: DarkTheme.textSecondary,
-  },
-  manazilReflectionBox: {
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    padding: Spacing.md,
-    borderRadius: Spacing.md,
-    borderLeftWidth: 3,
-    marginTop: Spacing.xs,
-  },
-  manazilReflectionLabel: {
-    fontSize: Typography.caption,
-    color: DarkTheme.accent,
-    fontWeight: Typography.weightMedium as any,
-    marginBottom: 6,
-  },
-  manazilReflectionText: {
-    fontSize: Typography.body,
-    lineHeight: Typography.body * Typography.lineHeightNormal,
-    color: DarkTheme.textPrimary,
-    fontStyle: 'italic',
-  },
-  manazilAyahRef: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textTertiary,
-    marginTop: Spacing.sm,
-  },
-  manazilHint: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textTertiary,
-    textAlign: 'center',
-    marginTop: Spacing.sm,
-  },
-
-  // ===========================================
-  // SOURCE DIFFERENTIATION STYLES
-  // ===========================================
-  
-  // Source Badge
-  sourceBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 12,
-  },
-  sourceBadgeSmall: {
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    borderRadius: 8,
-  },
-  sourceBadgeIcon: {
-    fontSize: 12,
-  },
-  sourceBadgeText: {
-    fontSize: 11,
-    fontWeight: '700' as any,
-    letterSpacing: 0.5,
-  },
-  sourceBadgeTextSmall: {
-    fontSize: 9,
-  },
-  liveDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#10b981',
-  },
-
-  // Section Header with Learn More
-  manazilSectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  learnMoreButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  learnMoreText: {
-    fontSize: Typography.caption,
-    color: DarkTheme.accent,
-  },
-
-  // Subsection (Current Moon / Personal)
-  manazilSubsection: {
-    gap: Spacing.sm,
-  },
-  manazilSubsectionTitle: {
-    fontSize: Typography.label,
-    fontWeight: Typography.weightMedium as any,
-    color: DarkTheme.textSecondary,
-    marginBottom: 4,
-  },
-
   // Loading State
   loadingCard: {
     padding: Spacing.lg,
@@ -1473,297 +1169,68 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-  // Mansion Card (replaces manazilCard for reusable component)
-  mansionCard: {
+  // Error State
+  errorCard: {
+    padding: Spacing.lg,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderRadius: Spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+    gap: Spacing.md,
+    alignItems: 'center',
+  },
+  errorIcon: {
+    fontSize: 32,
+  },
+  errorTitle: {
+    fontSize: Typography.h3,
+    fontWeight: Typography.weightBold as any,
+    color: '#ef4444',
+  },
+  errorMessage: {
+    fontSize: Typography.body,
+    color: DarkTheme.textSecondary,
+    lineHeight: Typography.body * Typography.lineHeightNormal,
+    textAlign: 'center',
+  },
+  refreshButton: {
+    marginTop: Spacing.sm,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    borderRadius: Spacing.md,
+  },
+  refreshButtonText: {
+    fontSize: Typography.body,
+    fontWeight: Typography.weightMedium as any,
+    color: '#a78bfa',
+  },
+
+  // Generic Fallback State
+  genericCard: {
     padding: Spacing.lg,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: Spacing.lg,
     borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     gap: Spacing.md,
   },
-  mansionSourceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.xs,
-  },
-  mansionUpdateText: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textTertiary,
-    fontStyle: 'italic',
-  },
-  mansionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-  },
-  mansionIndexBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mansionIndex: {
-    fontSize: 20,
-    fontWeight: Typography.weightBold as any,
-  },
-  mansionHeaderText: {
-    flex: 1,
-    gap: 2,
-  },
-  mansionNameArabic: {
-    fontSize: Typography.h2,
-    fontWeight: Typography.weightBold as any,
-    color: DarkTheme.textPrimary,
-  },
-  mansionNameTranslit: {
-    fontSize: Typography.body,
-    color: DarkTheme.textSecondary,
-    fontStyle: 'italic',
-  },
-  mansionNameEnglish: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textTertiary,
-  },
-  mansionElementBadge: {
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-    borderRadius: Spacing.md,
-    borderWidth: 1,
-    alignItems: 'center',
-    gap: 2,
-  },
-  mansionElementIcon: {
-    fontSize: 18,
-  },
-  mansionElementText: {
-    fontSize: Typography.caption,
-    fontWeight: Typography.weightMedium as any,
-  },
-  mansionThemeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    flexWrap: 'wrap',
-    marginTop: Spacing.xs,
-  },
-  mansionThemeBadge: {
-    paddingVertical: 4,
-    paddingHorizontal: Spacing.sm,
-    borderRadius: 12,
-  },
-  mansionThemeText: {
-    fontSize: Typography.caption,
-    color: '#a78bfa',
-    fontWeight: Typography.weightMedium as any,
-  },
-  mansionQuality: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textTertiary,
-    flex: 1,
-  },
-  mansionEssenceBox: {
-    backgroundColor: 'rgba(139, 92, 246, 0.08)',
-    padding: Spacing.md,
-    borderRadius: Spacing.md,
-    marginTop: Spacing.xs,
-  },
-  mansionEssenceLabel: {
-    fontSize: Typography.caption,
-    color: '#a78bfa',
-    fontWeight: Typography.weightMedium as any,
-    marginBottom: 4,
-  },
-  mansionEssence: {
-    fontSize: Typography.body,
-    lineHeight: Typography.body * Typography.lineHeightNormal,
-    color: DarkTheme.textPrimary,
-  },
-  mansionExpandButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.xs,
-    paddingVertical: Spacing.sm,
-    marginTop: Spacing.xs,
-  },
-  mansionExpandText: {
-    fontSize: Typography.caption,
-    color: '#FFFFFF',
-    fontWeight: Typography.weightMedium as any,
-  },
-  mansionExpandedContent: {
-    gap: Spacing.md,
-    paddingTop: Spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  mansionDetailBlock: {
-    gap: 4,
-  },
-  mansionDetailHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-  },
-  mansionDetailIcon: {
-    fontSize: 14,
-  },
-  mansionDetailLabel: {
-    fontSize: Typography.caption,
-    fontWeight: Typography.weightMedium as any,
-    color: DarkTheme.textSecondary,
-  },
-  mansionDetailText: {
-    fontSize: Typography.body,
-    lineHeight: Typography.body * Typography.lineHeightNormal,
-    color: DarkTheme.textSecondary,
-  },
-  mansionReflectionBox: {
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    padding: Spacing.md,
-    borderRadius: Spacing.md,
-    borderLeftWidth: 3,
-    marginTop: Spacing.xs,
-  },
-  mansionReflectionLabel: {
-    fontSize: Typography.caption,
-    color: DarkTheme.accent,
-    fontWeight: Typography.weightMedium as any,
-    marginBottom: 6,
-  },
-  mansionReflectionText: {
-    fontSize: Typography.body,
-    lineHeight: Typography.body * Typography.lineHeightNormal,
-    color: DarkTheme.textPrimary,
-    fontStyle: 'italic',
-  },
-  mansionAyahRef: {
-    fontSize: Typography.caption,
-    color: DarkTheme.textTertiary,
-    marginTop: Spacing.sm,
-  },
-
-  // Alignment Insight Card
-  alignmentCard: {
-    padding: Spacing.md,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderRadius: Spacing.lg,
-    borderWidth: 1,
-    gap: Spacing.sm,
-    marginVertical: Spacing.sm,
-  },
-  alignmentHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-  },
-  alignmentIcon: {
-    fontSize: 20,
-  },
-  alignmentTitle: {
-    fontSize: Typography.h3,
-    fontWeight: Typography.weightBold as any,
-  },
-  alignmentMessage: {
-    fontSize: Typography.body,
-    lineHeight: Typography.body * Typography.lineHeightNormal,
-    color: DarkTheme.textSecondary,
-  },
-
-  // Modal Styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'flex-end',
-  },
-  explainerModal: {
-    backgroundColor: DarkTheme.cardBackground,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    maxHeight: '85%',
-    paddingBottom: Spacing.xl,
-  },
-  explainerHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: Spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  explainerTitle: {
-    fontSize: Typography.h2,
-    fontWeight: Typography.weightBold as any,
-    color: DarkTheme.textPrimary,
-  },
-  explainerCloseBtn: {
-    padding: Spacing.xs,
-  },
-  explainerContent: {
-    padding: Spacing.lg,
-  },
-  explainerIntro: {
-    fontSize: Typography.body,
-    lineHeight: Typography.body * Typography.lineHeightNormal,
-    color: DarkTheme.textSecondary,
-    marginBottom: Spacing.lg,
-  },
-  explainerSourceCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: Spacing.lg,
-    padding: Spacing.lg,
-    marginBottom: Spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  explainerSourceHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: Spacing.md,
-    marginBottom: Spacing.sm,
-  },
-  explainerSourceIcon: {
-    fontSize: 28,
-  },
-  explainerSourceTitleRow: {
-    flex: 1,
-    gap: 6,
-  },
-  explainerSourceLabel: {
+  genericTitle: {
     fontSize: Typography.h3,
     fontWeight: Typography.weightBold as any,
     color: DarkTheme.textPrimary,
   },
-  explainerSourceDesc: {
+  genericText: {
     fontSize: Typography.body,
-    lineHeight: Typography.body * Typography.lineHeightNormal,
     color: DarkTheme.textSecondary,
+    lineHeight: Typography.body * Typography.lineHeightNormal,
   },
-  explainerSourceNature: {
+  genericNote: {
+    fontSize: Typography.caption,
+    color: '#a78bfa',
+    fontStyle: 'italic',
     marginTop: Spacing.sm,
   },
-  explainerNatureText: {
-    fontSize: Typography.caption,
-    fontWeight: Typography.weightMedium as any,
-  },
-  explainerTip: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: Spacing.sm,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    padding: Spacing.md,
-    borderRadius: Spacing.md,
-    marginTop: Spacing.md,
-  },
-  explainerTipIcon: {
-    fontSize: 20,
-  },
-  explainerTipText: {
-    flex: 1,
-    fontSize: Typography.body,
-    lineHeight: Typography.body * Typography.lineHeightNormal,
-    color: DarkTheme.textPrimary,
-  },
+
+  // 
 });

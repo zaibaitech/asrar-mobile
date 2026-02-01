@@ -30,8 +30,43 @@ interface PlanetTransitWidgetProps {
 
 type HarmonyLevel = 'harmonious' | 'supportive' | 'neutral' | 'challenging';
 
-function getHarmonyLevel(userElement: Element, contextElement: Element): HarmonyLevel {
+function getHarmonyLevel(
+  userElement: Element,
+  contextElement: Element,
+  userSign?: string,
+  transitSign?: string
+): HarmonyLevel {
   if (userElement === contextElement) return 'harmonious';
+  
+  const normalizedUserSign = userSign?.toLowerCase();
+  const normalizedTransitSign = transitSign?.toLowerCase();
+
+  // Scorpio Special Case:
+  // Scorpio is Mars-ruled "boiling water" - shares fire's intensity
+  // Scorpio user + Fire transit = supportive (not challenging)
+  // Fire user + Scorpio transit = supportive (not challenging)
+  const isScorpioUserWithFire = 
+    normalizedUserSign === 'scorpio' && contextElement === 'fire';
+  const isFireUserWithScorpio = 
+    userElement === 'fire' && normalizedTransitSign === 'scorpio';
+  
+  if (isScorpioUserWithFire || isFireUserWithScorpio) {
+    return 'supportive';
+  }
+
+  // Aquarius Special Case:
+  // Aquarius is Saturn-ruled "cold air" - less challenging with water
+  // Aquarius user + Water transit = neutral (not challenging)
+  // Water user + Aquarius transit = neutral (not challenging)
+  const isAquariusUserWithWater = 
+    normalizedUserSign === 'aquarius' && contextElement === 'water';
+  const isWaterUserWithAquarius = 
+    userElement === 'water' && normalizedTransitSign === 'aquarius';
+  
+  if (isAquariusUserWithWater || isWaterUserWithAquarius) {
+    return 'neutral';
+  }
+
   const complementary =
     (userElement === 'fire' && contextElement === 'air') ||
     (userElement === 'air' && contextElement === 'fire') ||
@@ -138,7 +173,12 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
   const elementAccent = ElementAccents[elementKeySafe];
   const planetGradient = getPlanetGradient(transitData?.planetKey);
   const userElement = (profile.derived?.element as Element | undefined) ?? null;
-  const harmony = userElement ? getHarmonyLevel(userElement, elementKeySafe) : null;
+  
+  // Get sign keys for Scorpio special case handling
+  const userSignKey = myZodiacKey?.toLowerCase() ?? undefined;
+  const transitSignKey = (transitData?.zodiacKey as string)?.toLowerCase() ?? undefined;
+  
+  const harmony = userElement ? getHarmonyLevel(userElement, elementKeySafe, userSignKey, transitSignKey) : null;
   const harmonyColors = getHarmonyColors(harmony);
 
   const slides = [
