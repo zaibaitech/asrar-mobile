@@ -3,6 +3,10 @@
  * =============
  * 
  * React hooks for accessing real planetary transit data
+ * 
+ * BATTERY OPTIMIZATION (Feb 2026):
+ * - Added module-level fetch tracking to prevent duplicate calls
+ * - Transit data changes slowly (hours/days), so aggressive caching is safe
  */
 
 import { Planet } from '@/services/PlanetaryHoursService';
@@ -17,6 +21,10 @@ import {
     PlanetTransit
 } from '@/types/planetary-systems';
 import { useCallback, useEffect, useState } from 'react';
+
+// BATTERY OPTIMIZATION: Track last fetch to prevent concurrent/redundant calls
+let lastAllTransitsFetchAt = 0;
+const TRANSIT_FETCH_COOLDOWN = 5 * 60 * 1000; // 5 minutes between fetches
 
 // ============================================================================
 // SINGLE PLANET TRANSIT HOOK
@@ -133,6 +141,7 @@ export interface UseAllTransitsResult {
 
 /**
  * Hook to get transits for all planets
+ * BATTERY OPTIMIZATION: Uses module-level cooldown to prevent repeated fetches
  */
 export function useAllTransits(): UseAllTransitsResult {
   const [transits, setTransits] = useState<AllPlanetTransits | null>(() => getTransitsFromMemory());
@@ -141,13 +150,23 @@ export function useAllTransits(): UseAllTransitsResult {
   const [refreshing, setRefreshing] = useState(false);
   
   const loadTransits = useCallback(async () => {
+    // BATTERY OPTIMIZATION: Skip if we fetched recently and have cached data
+    const now = Date.now();
+    const cached = getTransitsFromMemory();
+    if (cached && now - lastAllTransitsFetchAt < TRANSIT_FETCH_COOLDOWN) {
+      setTransits(cached);
+      setLoading(false);
+      return;
+    }
+
     try {
       // Only show loading if we have nothing to render yet.
-      if (!getTransitsFromMemory()) {
+      if (!cached) {
         setLoading(true);
       }
       setError(null);
       
+      lastAllTransitsFetchAt = now;
       const data = await getAllTransits();
       if (!data) {
         setTransits(null);

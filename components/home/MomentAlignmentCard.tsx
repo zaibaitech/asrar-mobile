@@ -30,6 +30,7 @@ interface MomentAlignmentCardProps {
   t: (key: string) => string;
   planetaryData?: PlanetaryHourData | null;
   causeText?: string; // Cause-based explanation text
+  userSignKey?: string; // User's zodiac sign for special harmony rules (Scorpio+Fire, Aquarius+Water)
 }
 
 type StatusVisual = {
@@ -118,6 +119,7 @@ export function MomentAlignmentCard({
   t,
   planetaryData,
   causeText,
+  userSignKey,
 }: MomentAlignmentCardProps) {
   const router = useRouter();
 
@@ -161,7 +163,7 @@ export function MomentAlignmentCard({
     if (!(seconds > 0 && seconds <= 10 * 60)) return null;
 
     const nextElement = planetaryData.nextHour.planetInfo.element;
-    const nextStatus = getAlignmentStatusForElements(zahirElement, nextElement);
+    const nextStatus = getAlignmentStatusForElements(zahirElement, nextElement, userSignKey);
 
     const statusKey: Record<AlignmentStatus, string> = {
       ACT: 'home.moment.status.act',

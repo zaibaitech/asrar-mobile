@@ -168,6 +168,9 @@ export interface PlanetaryResonanceResult extends LayerAnalysisResult {
   
   /** User's ruling planet matches planetary hour? */
   planetaryHourMatch: boolean;
+  
+  /** Classical nature of hour planet: Sa'd (benefic), Nahs (malefic), or Neutral */
+  hourPlanetNature?: 'saad' | 'nahs' | 'neutral';
 }
 
 export interface ManazilAlignmentResult extends LayerAnalysisResult {

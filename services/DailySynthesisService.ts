@@ -11,19 +11,19 @@
  * that shows how TODAY'S energy interacts with the USER'S nature
  */
 
-import type { Planet, Element } from './PlanetaryHoursService';
 import type { MoonPhaseName } from './MoonPhaseService';
+import type { Element, Planet } from './PlanetaryHoursService';
 import {
-  getPlanetaryRelationship,
-  getRelationshipScore,
-  getRelationshipLabel,
-  getPlanetaryFriendshipDesc,
-  getElementRelationship,
-  getElementScore,
-  getElementRelationLabel,
-  getElementalHarmonyDesc,
-  getStrengthLabel,
-  getDailyStrengthDesc,
+    getDailyStrengthDesc,
+    getElementRelationLabel,
+    getElementRelationship,
+    getElementScore,
+    getElementalHarmonyDesc,
+    getPlanetaryFriendshipDesc,
+    getPlanetaryRelationship,
+    getRelationshipLabel,
+    getRelationshipScore,
+    getStrengthLabel,
 } from './PlanetaryRelationshipService';
 
 /**
@@ -80,6 +80,7 @@ export interface DailySynthesis {
  * @param moonPhase - Current moon phase
  * @param dayRulerTransitPower - Current strength of day ruler (0-100)
  * @param t - Translation function
+ * @param userSignKey - Optional user's zodiac sign for special harmony rules
  * @returns Complete synthesis object
  */
 export function generateDailySynthesis(
@@ -89,14 +90,15 @@ export function generateDailySynthesis(
   dayElement: Element,
   moonPhase: MoonPhaseName,
   dayRulerTransitPower: number,
-  t: (key: string, params?: Record<string, string | number>) => string
+  t: (key: string, params?: Record<string, string | number>) => string,
+  userSignKey?: string
 ): DailySynthesis {
   // 1. Calculate planetary friendship
   const relationship = getPlanetaryRelationship(dayRuler, userPlanet);
   const friendshipScore = getRelationshipScore(relationship);
   
-  // 2. Calculate elemental harmony
-  const elementRelation = getElementRelationship(userElement, dayElement);
+  // 2. Calculate elemental harmony (with sign-based nuances)
+  const elementRelation = getElementRelationship(userElement, dayElement, userSignKey);
   const harmonyScore = getElementScore(elementRelation);
   
   // 3. Day ruler strength
@@ -145,7 +147,7 @@ export function generateDailySynthesis(
       elementalHarmony: {
         score: harmonyScore,
         label: getElementRelationLabel(elementRelation, t),
-        description: getElementalHarmonyDesc(dayElement, userElement, t),
+        description: getElementalHarmonyDesc(dayElement, userElement, t, userSignKey),
       },
       dailyStrength: {
         score: strengthScore,

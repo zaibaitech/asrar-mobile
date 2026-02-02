@@ -31,6 +31,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
+  AppState,
   LayoutAnimation,
   Platform,
   RefreshControl,
@@ -130,6 +131,9 @@ type SpiritualGuidance = {
   nextPlanetHour: PlanetaryHourWindow | null;
   timingStrength: TimingStrength;
   isInMatchingHour: boolean;
+  // Transit strength info (based on dignity, not just phase)
+  transitStrengthPercent: number;
+  transitStrengthLabel: 'strong' | 'moderate' | 'weak';
 };
 
 /**
@@ -255,8 +259,18 @@ function findNextPlanetHour(
 }
 
 /**
+ * Determine transit strength label from percentage
+ */
+function getTransitStrengthLabel(percent: number): 'strong' | 'moderate' | 'weak' {
+  if (percent >= 65) return 'strong';
+  if (percent >= 45) return 'moderate';
+  return 'weak';
+}
+
+/**
  * Planet-specific spiritual guidance based on classical Islamic sources
  * Each planet has: spiritual focus, recommended dhikr, and what to avoid
+ * Now also considers actual transit strength (dignity) not just degree phase
  */
 function getPlanetSpiritualData(
   planetKey: string | undefined,
@@ -267,7 +281,8 @@ function getPlanetSpiritualData(
   sunrise: Date | null,
   sunset: Date | null,
   nextSunrise: Date | null,
-  now: Date
+  now: Date,
+  transitStrengthPercent: number = 50 // Default to neutral if not provided
 ): Omit<SpiritualGuidance, 'phase'> {
   const key = (planetKey ?? 'saturn').toLowerCase();
   
@@ -278,11 +293,26 @@ function getPlanetSpiritualData(
     exit: { en: 'Exiting', ar: 'خروج' },
   };
   
-  // Phase status text (universal)
-  const statusByPhase: Record<SpiritualPhase, string> = {
-    entry: tSafe('screens.planetTransit.spiritual.status.entry', 'The influence is forming. Focus on purification, not action.'),
-    strength: tSafe('screens.planetTransit.spiritual.status.strength', 'This transit is at full strength. Spiritual work is supported.'),
-    exit: tSafe('screens.planetTransit.spiritual.status.exit', 'The influence is fading. Seal and protect, do not initiate.'),
+  // Determine actual transit strength label
+  const transitStrengthLabel = getTransitStrengthLabel(transitStrengthPercent);
+  
+  // Phase status text - now considers BOTH phase AND actual transit strength
+  // A planet in the "strength" phase (10-20°) but in detriment should NOT say "full strength"
+  const getStatusText = (): string => {
+    if (phase === 'entry') {
+      return tSafe('screens.planetTransit.spiritual.status.entry', 'The influence is forming. Focus on purification, not action.');
+    }
+    if (phase === 'exit') {
+      return tSafe('screens.planetTransit.spiritual.status.exit', 'The influence is fading. Seal and protect, do not initiate.');
+    }
+    // Phase is 'strength' - check actual transit strength
+    if (transitStrengthLabel === 'weak') {
+      return tSafe('screens.planetTransit.spiritual.status.strengthWeak', 'This transit is weak. Spiritual work requires extra patience and discipline.');
+    }
+    if (transitStrengthLabel === 'moderate') {
+      return tSafe('screens.planetTransit.spiritual.status.strengthModerate', 'This transit has moderate strength. Spiritual work is supported with steady effort.');
+    }
+    return tSafe('screens.planetTransit.spiritual.status.strength', 'This transit is at full strength. Spiritual work is strongly supported.');
   };
 
   // Planet-specific dhikr and guidance
@@ -365,7 +395,7 @@ function getPlanetSpiritualData(
   return {
     phaseLabel: tSafe(`screens.planetTransit.spiritual.phaseLabel.${phase}`, phaseLabels[phase].en),
     phaseArabic: phaseLabels[phase].ar,
-    statusText: statusByPhase[phase],
+    statusText: getStatusText(),
     guidanceText,
     dhikrName: data.dhikr.name,
     dhikrArabic: data.dhikr.arabic,
@@ -377,6 +407,8 @@ function getPlanetSpiritualData(
     nextPlanetHour,
     timingStrength,
     isInMatchingHour,
+    transitStrengthPercent,
+    transitStrengthLabel,
   };
 }
 
@@ -2054,10 +2086,41 @@ export default function PlanetTransitDetailsScreen() {
   const accent = contextElement ? ElementAccents[contextElement] : ElementAccents.earth;
   const resonancePalette = useMemo(() => getResonancePalette(harmony, accent), [harmony, accent]);
 
+  // BATTERY OPTIMIZATION: Pause countdown timer when app is backgrounded
   const [now, setNow] = useState(new Date());
+  const appStateRef = useRef(AppState.currentState);
   useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(interval);
+    let interval: ReturnType<typeof setInterval> | null = null;
+    
+    const startInterval = () => {
+      if (interval) clearInterval(interval);
+      interval = setInterval(() => {
+        if (appStateRef.current === 'active') {
+          setNow(new Date());
+        }
+      }, 1000);
+    };
+    
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      const wasBackground = appStateRef.current !== 'active';
+      appStateRef.current = nextState;
+      if (nextState === 'active' && wasBackground) {
+        setNow(new Date());
+        startInterval();
+      } else if (nextState !== 'active' && interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    });
+    
+    if (appStateRef.current === 'active') {
+      startInterval();
+    }
+    
+    return () => {
+      subscription.remove();
+      if (interval) clearInterval(interval);
+    };
   }, []);
 
   const countdownText = useMemo(() => {
@@ -2214,7 +2277,7 @@ export default function PlanetTransitDetailsScreen() {
 
   // ─────────────────────────────────────────────────────────────────────────────
   // SPIRITUAL GUIDANCE based on classical degree system (0-10 / 10-20 / 20-30)
-  // Enhanced with planetary hour timing and dhikr tiers
+  // Enhanced with planetary hour timing, dhikr tiers, AND actual transit strength
   // ─────────────────────────────────────────────────────────────────────────────
   const spiritualGuidance = useMemo<SpiritualGuidance | null>(() => {
     if (detailsType !== 'transit') return null;
@@ -2223,6 +2286,10 @@ export default function PlanetTransitDetailsScreen() {
     
     const degree = data.signDegree ?? 0;
     const phase = getSpiritualPhase(degree);
+    
+    // Pass the actual transit strength (from dignity calculation) to get accurate status
+    const transitStrength = enhancedPower?.finalPower ?? 50;
+    
     const planetData = getPlanetSpiritualData(
       data.planetKey,
       phase,
@@ -2232,14 +2299,15 @@ export default function PlanetTransitDetailsScreen() {
       planetaryBoundaries?.sunrise ?? null,
       planetaryBoundaries?.sunset ?? null,
       planetaryBoundaries?.nextSunrise ?? null,
-      now
+      now,
+      transitStrength
     );
     
     return {
       phase,
       ...planetData,
     };
-  }, [detailsType, transitData, t, tSafe, planetaryHourData, planetaryBoundaries, now]);
+  }, [detailsType, transitData, enhancedPower, t, tSafe, planetaryHourData, planetaryBoundaries, now]);
   
   // Update selected tier when recommended tier changes
   useEffect(() => {
@@ -4247,6 +4315,38 @@ export default function PlanetTransitDetailsScreen() {
 
                 {/* Status Text */}
                 <Text style={styles.spiritualStatusText}>{spiritualGuidance.statusText}</Text>
+                
+                {/* Transit Strength Indicator - Shows actual dignity-based strength */}
+                <View style={styles.transitStrengthRow}>
+                  <Text style={styles.transitStrengthLabel}>
+                    {tSafe('screens.planetTransit.practice.transitStrength', 'Transit Strength')}:
+                  </Text>
+                  <Text style={[
+                    styles.transitStrengthValue,
+                    spiritualGuidance.transitStrengthLabel === 'strong' && { color: '#4CAF50' },
+                    spiritualGuidance.transitStrengthLabel === 'moderate' && { color: '#FFC107' },
+                    spiritualGuidance.transitStrengthLabel === 'weak' && { color: '#F87171' },
+                  ]}>
+                    {spiritualGuidance.transitStrengthPercent}%
+                  </Text>
+                  <View style={[
+                    styles.transitStrengthPill,
+                    spiritualGuidance.transitStrengthLabel === 'strong' && { borderColor: '#4CAF50', backgroundColor: 'rgba(76, 175, 80, 0.15)' },
+                    spiritualGuidance.transitStrengthLabel === 'moderate' && { borderColor: '#FFC107', backgroundColor: 'rgba(255, 193, 7, 0.15)' },
+                    spiritualGuidance.transitStrengthLabel === 'weak' && { borderColor: '#F87171', backgroundColor: 'rgba(248, 113, 113, 0.15)' },
+                  ]}>
+                    <Text style={[
+                      styles.transitStrengthPillText,
+                      spiritualGuidance.transitStrengthLabel === 'strong' && { color: '#4CAF50' },
+                      spiritualGuidance.transitStrengthLabel === 'moderate' && { color: '#FFC107' },
+                      spiritualGuidance.transitStrengthLabel === 'weak' && { color: '#F87171' },
+                    ]}>
+                      {tSafe(`screens.planetTransit.practice.strength.${spiritualGuidance.transitStrengthLabel}`, 
+                        spiritualGuidance.transitStrengthLabel.charAt(0).toUpperCase() + spiritualGuidance.transitStrengthLabel.slice(1)
+                      )}
+                    </Text>
+                  </View>
+                </View>
                 
                 {/* Guidance Text */}
                 <View style={styles.spiritualGuidanceBox}>
@@ -6720,6 +6820,33 @@ const styles = StyleSheet.create({
     color: DarkTheme.textPrimary,
     fontWeight: Typography.weightMedium,
     lineHeight: 20,
+  },
+  transitStrengthRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 6,
+  },
+  transitStrengthLabel: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+  },
+  transitStrengthValue: {
+    fontSize: 14,
+    fontWeight: Typography.weightSemibold,
+    fontVariant: ['tabular-nums'],
+  },
+  transitStrengthPill: {
+    borderRadius: 8,
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  transitStrengthPillText: {
+    fontSize: 10,
+    fontWeight: Typography.weightSemibold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   spiritualGuidanceBox: {
     backgroundColor: 'rgba(255, 215, 0, 0.08)',

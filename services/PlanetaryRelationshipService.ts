@@ -249,17 +249,37 @@ export type ElementRelation = 'same' | 'supportive' | 'neutral' | 'tension';
  * - Fire + Water: Tension (opposing forces)
  * - Air + Earth: Neutral
  * 
- * @param element1 - First element
- * @param element2 - Second element
+ * SPECIAL CASES (based on planetary ruler nuances):
+ * - Scorpio (Mars-ruled water) + Fire: Supportive (shares fire's intensity)
+ * - Aquarius (Saturn-ruled cold air) + Water: Neutral (shares water's coldness)
+ * 
+ * @param element1 - First element (typically user's element)
+ * @param element2 - Second element (typically time/transit element)
+ * @param userSignKey - Optional user's zodiac sign key (for special harmony rules)
  * @returns The elemental relationship
  */
 export function getElementRelationship(
   element1: Element,
-  element2: Element
+  element2: Element,
+  userSignKey?: string
 ): ElementRelation {
   // Same element
   if (element1 === element2) {
     return 'same';
+  }
+  
+  // SPECIAL CASE: Scorpio (Mars-ruled water) shares fire's intensity
+  // When user is Scorpio, treat fire as supportive (not tension)
+  // This applies regardless of the user's calculated Abjad element
+  if (userSignKey === 'scorpio' && element2 === 'fire') {
+    return 'supportive';
+  }
+  
+  // SPECIAL CASE: Aquarius (Saturn-ruled cold air) shares water's coldness  
+  // When user is Aquarius, treat water as neutral (not tension)
+  // This applies regardless of the user's calculated Abjad element
+  if (userSignKey === 'aquarius' && element2 === 'water') {
+    return 'neutral';
   }
   
   // Supportive pairs
@@ -326,12 +346,14 @@ export function getElementRelationLabel(
  * @param dayElement - The day's element
  * @param userElement - The user's element
  * @param t - Translation function
+ * @param userSignKey - Optional user's zodiac sign for special harmony rules
  * @returns Localized description
  */
 export function getElementalHarmonyDesc(
   dayElement: Element,
   userElement: Element,
-  t: (key: string, params?: Record<string, string | number>) => string
+  t: (key: string, params?: Record<string, string | number>) => string,
+  userSignKey?: string
 ): string {
   // Use translation key for specific element pair
   const key = `elementalRelations.${userElement}-${dayElement}`;
@@ -342,8 +364,8 @@ export function getElementalHarmonyDesc(
     return translated;
   }
   
-  // Fallback: generic description
-  const relation = getElementRelationship(userElement, dayElement);
+  // Fallback: generic description (with sign-based nuances)
+  const relation = getElementRelationship(userElement, dayElement, userSignKey);
   const userElementLabel = t(`elements.${userElement}`);
   const dayElementLabel = t(`elements.${dayElement}`);
   

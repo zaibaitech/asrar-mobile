@@ -33,23 +33,24 @@ import { useProfile } from '@/contexts/ProfileContext';
 import { useDailyPlanetaryAnalysis } from '@/hooks/useDailyPlanetaryAnalysis';
 import { useNowTicker } from '@/hooks/useNowTicker';
 import {
-  calculatePlanetaryHours,
-  formatTime,
-  getDayRuler,
-  getPlanetaryDayBoundariesForNow,
-  getPlanetInfo,
-  preCalculateDailyPlanetaryHours,
-  type Planet,
-  type PlanetaryDayBoundaries,
-  type PlanetaryHour,
-  type PlanetaryHourData,
-  type Element as PlanetElement,
+    calculatePlanetaryHours,
+    formatTime,
+    getDayRuler,
+    getPlanetaryDayBoundariesForNow,
+    getPlanetInfo,
+    preCalculateDailyPlanetaryHours,
+    type Planet,
+    type PlanetaryDayBoundaries,
+    type PlanetaryHour,
+    type PlanetaryHourData,
+    type Element as PlanetElement,
 } from '@/services/PlanetaryHoursService';
 // New Daily Energy Services
 import { buildDestiny } from '@/features/name-destiny/services/nameDestinyCalculator';
 import { getDailyGuidance, type DailyGuidance } from '@/services/DailyGuidanceService';
 import { generateDailySynthesis, getUserPlanet, type DailySynthesis } from '@/services/DailySynthesisService';
 import { getElementRelationship as getClassicalElementRelationship, getPlanetaryRelationship } from '@/services/PlanetaryRelationshipService';
+import { BURJ_NAMES_EN } from '@/services/ProfileDerivationService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -217,6 +218,11 @@ export default function DailyGuidanceDetailsScreen() {
           // Get day ruler transit power
           const transitPower = 50;
           
+          // Get user's zodiac sign for special harmony rules (Scorpio+Fire, Aquarius+Water)
+          // Use burjIndex to get English name since derived.burj is in Arabic
+          const burjIndex = profile?.derived?.burjIndex;
+          const synthesisUserSignKey = burjIndex !== undefined ? BURJ_NAMES_EN[burjIndex]?.toLowerCase() : undefined;
+          
           // Generate synthesis
           const synthesis = generateDailySynthesis(
             dayRuler,
@@ -225,7 +231,8 @@ export default function DailyGuidanceDetailsScreen() {
             dayElement,
             moonPhase,
             transitPower,
-            t
+            t,
+            synthesisUserSignKey
           );
           
           setDailySynthesis(synthesis);
@@ -513,12 +520,17 @@ export default function DailyGuidanceDetailsScreen() {
       .slice(0, 3);
   }, [planetaryHours, userZodiacRuler, now]);
 
+  // Get user's zodiac sign for special case handling (Scorpio+Fire, Aquarius+Water)
+  // Use burjIndex to get English name since derived.burj is in Arabic
+  const localBurjIndex = profile?.derived?.burjIndex;
+  const userSignKey = localBurjIndex !== undefined ? BURJ_NAMES_EN[localBurjIndex]?.toLowerCase() : undefined;
+
   function getHourPowerForUser(hourPlanet: Planet): number {
     const userElement = ascendantElement ?? ((profile as any)?.zahirElement as Element | undefined) ?? ((profile?.derived as any)?.element as Element | undefined);
     if (!userElement) return 55;
     const relation = getPlanetaryRelationship(userZodiacRuler ?? hourPlanet, hourPlanet);
     const planetScore = relation === 'friend' ? 90 : relation === 'neutral' ? 60 : 30;
-    const elementRelation = getClassicalElementRelationship(userElement, getPlanetInfo(hourPlanet).element);
+    const elementRelation = getClassicalElementRelationship(userElement, getPlanetInfo(hourPlanet).element, userSignKey);
     const elementScore =
       elementRelation === 'same' ? 90 : elementRelation === 'supportive' ? 75 : elementRelation === 'neutral' ? 50 : 25;
     return Math.round((planetScore + elementScore) / 2);
@@ -555,10 +567,21 @@ export default function DailyGuidanceDetailsScreen() {
         : undefined,
     };
   }, [planetaryData, planetaryHours, now]);
-
+  
   function getElementRelationship(a?: Element, b?: Element): 'harmonious' | 'complementary' | 'transformative' | 'neutral' {
     if (!a || !b) return 'neutral';
     if (a === b) return 'harmonious';
+    
+    // SCORPIO SPECIAL CASE: Mars-ruled water shares fire's intensity
+    if (userSignKey === 'scorpio' && b === 'fire') {
+      return 'complementary';
+    }
+    
+    // AQUARIUS SPECIAL CASE: Saturn-ruled cold air is less challenging with water
+    if (userSignKey === 'aquarius' && b === 'water') {
+      return 'neutral';
+    }
+    
     const active = new Set<Element>(['fire', 'air']);
     const receptive = new Set<Element>(['water', 'earth']);
     if ((active.has(a) && active.has(b)) || (receptive.has(a) && receptive.has(b))) {

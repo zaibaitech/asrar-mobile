@@ -23,6 +23,7 @@ import type { Planet } from '@/data/classical-hour-practices';
 import type { Element, Prayer } from '@/data/divine-names-planetary';
 import type { UserProfile as GuidanceUserProfile, PrayerGuidanceRecommendation } from '@/services/PrayerGuidanceEngine';
 import { PrayerGuidanceEngine } from '@/services/PrayerGuidanceEngine';
+import { BURJ_NAMES_EN } from '@/services/ProfileDerivationService';
 import { getUserAbjadResultFromProfile } from '@/services/UserAbjadService';
 import { getCurrentPlanetaryHour } from '@/utils/planetary-hours';
 import { determineCurrentOrNextPrayer, formatPrayerTime, getPrayerTimeForGuidance } from '@/utils/prayer-times';
@@ -92,6 +93,9 @@ export default function PrayerGuidanceScreen() {
 
   const guidanceUserProfile: GuidanceUserProfile | null = useMemo(() => {
     if (!abjad) return null;
+    // Use burjIndex to get English sign name since derived.burj is in Arabic
+    const burjIndex = profile.derived?.burjIndex;
+    const burjKey = burjIndex !== undefined ? BURJ_NAMES_EN[burjIndex]?.toLowerCase() : undefined;
     return {
       userId: profile.account?.userId ?? 'local-user',
       name: profile.nameLatin ?? profile.nameAr ?? 'User',
@@ -101,7 +105,7 @@ export default function PrayerGuidanceScreen() {
         temperament: 'balanced',
         reduction: abjad.saghir,
         planet: mapProfilePlanetaryRulerToPlanet(profile.derived?.planetaryRuler),
-        burjKey: profile.derived?.burj?.toLowerCase(),
+        burjKey,
       },
     };
   }, [
@@ -112,7 +116,7 @@ export default function PrayerGuidanceScreen() {
     profile.nameLatin,
     profile.nameAr,
     profile.derived?.planetaryRuler,
-    profile.derived?.burj,
+    profile.derived?.burjIndex,
   ]);
 
   useEffect(() => {
@@ -590,13 +594,13 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.lg,
     borderRadius: 12,
-    backgroundColor: DarkTheme.primary,
+    backgroundColor: '#6366f1', // Primary purple
     alignItems: 'center',
   },
   profileHintButtonText: {
     fontSize: Typography.label,
     fontWeight: Typography.weightSemibold,
-    color: DarkTheme.background,
+    color: '#FFFFFF',
   },
   loadingContainer: {
     padding: Spacing.xxxl,

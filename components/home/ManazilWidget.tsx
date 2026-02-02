@@ -5,6 +5,10 @@
  * Matches Daily Energy widget design system exactly
  * 
  * Enhanced with Asrariya Timing Engine for personalized practice timing
+ * 
+ * BATTERY OPTIMIZATION (Feb 2026):
+ * - Uses module-level cache to avoid repeated API calls across mounts
+ * - Only refreshes once per hour (lunar mansions change slowly)
  */
 
 import { Borders, DarkTheme, Spacing } from '@/constants/DarkTheme';
@@ -19,6 +23,11 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { PracticeTimingBadge, usePracticeTiming } from './PracticeTimingBadge';
+
+// BATTERY OPTIMIZATION: Module-level cache to share state across mounts
+// This prevents repeated API calls when the widget rotates in/out of view
+let cachedMansionData: { index: number; isRealTime: boolean; fetchedAt: number } | null = null;
+const MANSION_CACHE_TTL = 60 * 60 * 1000; // 1 hour - mansions change slowly
 
 interface ManazilWidgetProps {
   compact?: boolean;
@@ -35,25 +44,47 @@ export function ManazilWidget({
   const { t } = useLanguage();
   const { profile } = useProfile();
 
-  // Render instantly using deterministic local manzil.
-  // Then refresh with server/ephemeris-backed value in the background.
+  // BATTERY OPTIMIZATION: Use module-level cache to avoid repeated fetches
+  // across component mounts (e.g., when RotatingCardContent switches slides)
   const [todayIndex, setTodayIndex] = React.useState<number | null>(() => {
+    // Use cached value if available and fresh
+    if (cachedMansionData && Date.now() - cachedMansionData.fetchedAt < MANSION_CACHE_TTL) {
+      return cachedMansionData.index;
+    }
+    // Otherwise use deterministic local calculation
     try {
       return getCosmicLunarMansionForDate(new Date()).index;
     } catch {
       return null;
     }
   });
-  const [isRealTime, setIsRealTime] = React.useState(false);
+  const [isRealTime, setIsRealTime] = React.useState(() => cachedMansionData?.isRealTime ?? false);
 
   React.useEffect(() => {
     let cancelled = false;
 
     const load = async () => {
+      // BATTERY OPTIMIZATION: Skip fetch if cache is fresh
+      if (cachedMansionData && Date.now() - cachedMansionData.fetchedAt < MANSION_CACHE_TTL) {
+        if (!cancelled) {
+          setTodayIndex(cachedMansionData.index);
+          setIsRealTime(cachedMansionData.isRealTime);
+        }
+        return;
+      }
+
       try {
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
         const result = await getCurrentLunarMansion(new Date(), timezone);
         if (cancelled) return;
+        
+        // Update module-level cache
+        cachedMansionData = {
+          index: result.index,
+          isRealTime: result.source === 'ephemeris',
+          fetchedAt: Date.now(),
+        };
+        
         setTodayIndex(result.index);
         setIsRealTime(result.source === 'ephemeris');
       } catch {
@@ -64,7 +95,8 @@ export function ManazilWidget({
     };
 
     void load();
-    const id = setInterval(load, 60 * 60 * 1000);
+    // BATTERY OPTIMIZATION: Increased interval from 1h to 2h - mansions change slowly
+    const id = setInterval(load, 2 * 60 * 60 * 1000);
     return () => {
       cancelled = true;
       clearInterval(id);

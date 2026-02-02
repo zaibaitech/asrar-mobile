@@ -577,9 +577,6 @@ const styles = StyleSheet.create({
     color: '#e0e7ff',
     fontWeight: '600',
   },
-  inputSection: {
-    marginBottom: 0,
-  },
   inputSectionLabel: {
     fontSize: 13,
     fontWeight: '600',

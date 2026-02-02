@@ -19,7 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AppState, Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Element = 'fire' | 'water' | 'air' | 'earth';
@@ -483,11 +483,41 @@ export default function ManazilScreen() {
     router.setParams({ scrollToTop: undefined });
   }, [router, scrollToTop]);
 
-  // Current moment (updates every second so the timestamp matches "now")
+  // BATTERY OPTIMIZATION: Pause when backgrounded to save battery
   const [now, setNow] = React.useState(() => new Date());
+  const appStateRef = React.useRef(AppState.currentState);
   React.useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
+    let id: ReturnType<typeof setInterval> | null = null;
+    
+    const startInterval = () => {
+      if (id) clearInterval(id);
+      id = setInterval(() => {
+        if (appStateRef.current === 'active') {
+          setNow(new Date());
+        }
+      }, 1000);
+    };
+    
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      const wasBackground = appStateRef.current !== 'active';
+      appStateRef.current = nextState;
+      if (nextState === 'active' && wasBackground) {
+        setNow(new Date());
+        startInterval();
+      } else if (nextState !== 'active' && id) {
+        clearInterval(id);
+        id = null;
+      }
+    });
+    
+    if (appStateRef.current === 'active') {
+      startInterval();
+    }
+    
+    return () => {
+      subscription.remove();
+      if (id) clearInterval(id);
+    };
   }, []);
 
   // Moon strength single source of truth (rounded once)

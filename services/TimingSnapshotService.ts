@@ -9,6 +9,7 @@
 import { calculateElementalHarmony } from './ElementalHarmonyService';
 import type { Element } from './MomentAlignmentService';
 import { calculatePlanetaryHours, Planet } from './PlanetaryHoursService';
+import { BURJ_NAMES_EN } from './ProfileDerivationService';
 import { loadProfile } from './UserProfileStorage';
 import { getPrayerTimesForDate, type CalculationMethod } from './api/prayerTimes';
 
@@ -143,7 +144,9 @@ export async function getAsrarTimingSnapshot(date: Date = new Date()): Promise<A
     
     if (profile?.derived?.element) {
       // Get user's zodiac sign for Scorpio special case handling
-      const userBurj = profile?.derived?.burj?.toLowerCase();
+      // Use burjIndex to get English name since derived.burj is in Arabic
+      const burjIndex = profile?.derived?.burjIndex;
+      const userBurj = burjIndex !== undefined ? BURJ_NAMES_EN[burjIndex]?.toLowerCase() : undefined;
       
       // Calculate harmony from user element vs current elements
       // Pass user's zodiac sign for Scorpio water nuance (Mars-ruled water supports fire)

@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: Typography.h3,
-    fontWeight: Typography.weightSemiBold as any,
+    fontWeight: Typography.weightSemibold as any,
     color: DarkTheme.textPrimary,
     letterSpacing: 0.3,
   },

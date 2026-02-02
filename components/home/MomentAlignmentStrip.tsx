@@ -24,6 +24,8 @@ interface MomentAlignmentStripProps {
   planetaryData?: PlanetaryHourData | null;
   /** Asrariya timing score (0-100) for the current moment */
   timingScore?: number | null;
+  /** User's zodiac sign for special harmony rules (Scorpio+Fire, Aquarius+Water) */
+  userSignKey?: string;
 }
 
 const FALLBACK_BADGE_LABEL: Record<UnifiedBadge, string> = {
@@ -58,6 +60,7 @@ export function MomentAlignmentStrip({
   t,
   planetaryData,
   timingScore,
+  userSignKey,
 }: MomentAlignmentStripProps) {
   const router = useRouter();
 
@@ -134,7 +137,7 @@ export function MomentAlignmentStrip({
     if (!(seconds > 0 && seconds <= 10 * 60)) return null;
 
     const nextElement = planetaryData.nextHour.planetInfo.element;
-    const legacyStatus = getAlignmentStatusForElements(zahirElement, nextElement);
+    const legacyStatus = getAlignmentStatusForElements(zahirElement, nextElement, userSignKey);
     const nextBadge = convertLegacyStatus(legacyStatus);
     const nextConfig = BADGE_CONFIG[nextBadge];
     const nextBadgeLabel = t(nextConfig.labelKey) || FALLBACK_BADGE_LABEL[nextBadge];

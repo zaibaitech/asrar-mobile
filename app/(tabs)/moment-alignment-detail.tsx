@@ -19,10 +19,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { fetchPrayerTimes } from '@/services/api/prayerTimes';
 import {
-  BADGE_CONFIG,
-  getBadgeFromScore,
-  type AsrariyaTimingResult,
-  type UnifiedBadge,
+    BADGE_CONFIG,
+    getBadgeFromScore,
+    type AsrariyaTimingResult,
+    type UnifiedBadge,
 } from '@/services/AsrariyaTimingEngine';
 import { getClassicalJudgment } from '@/services/ClassicalJudgmentService';
 import { getBestLocation } from '@/services/LocationCacheService';
@@ -36,13 +36,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    AppState,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -280,18 +281,51 @@ export default function MomentAlignmentDetailScreen() {
     }
   }, [planetaryBoundaries, now]);
 
+  // BATTERY OPTIMIZATION: Pause all intervals when app is backgrounded
+  const appStateRef = useRef(AppState.currentState);
   useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMinuteNow(new Date());
-    }, 60_000);
-    return () => clearInterval(interval);
+    let secondInterval: ReturnType<typeof setInterval> | null = null;
+    let minuteInterval: ReturnType<typeof setInterval> | null = null;
+    
+    const startIntervals = () => {
+      if (secondInterval) clearInterval(secondInterval);
+      if (minuteInterval) clearInterval(minuteInterval);
+      
+      secondInterval = setInterval(() => {
+        if (appStateRef.current === 'active') {
+          setNow(new Date());
+        }
+      }, 1000);
+      
+      minuteInterval = setInterval(() => {
+        if (appStateRef.current === 'active') {
+          setMinuteNow(new Date());
+        }
+      }, 60_000);
+    };
+    
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      const wasBackground = appStateRef.current !== 'active';
+      appStateRef.current = nextState;
+      if (nextState === 'active' && wasBackground) {
+        setNow(new Date());
+        setMinuteNow(new Date());
+        startIntervals();
+      } else if (nextState !== 'active') {
+        if (secondInterval) { clearInterval(secondInterval); secondInterval = null; }
+        if (minuteInterval) { clearInterval(minuteInterval); minuteInterval = null; }
+      }
+    });
+    
+    if (appStateRef.current === 'active') {
+      startIntervals();
+    }
+    
+    return () => {
+      subscription.remove();
+      if (secondInterval) clearInterval(secondInterval);
+      if (minuteInterval) clearInterval(minuteInterval);
+    };
   }, []);
 
   // Use unified badge color when timing result available, otherwise fallback to old logic

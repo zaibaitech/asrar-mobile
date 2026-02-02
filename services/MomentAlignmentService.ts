@@ -22,20 +22,25 @@ import type { ElementType } from '@/contexts/ThemeContext';
 import type { CalculationMethod } from '@/services/api/prayerTimes';
 import { UserProfile } from '@/types/user-profile';
 import { calculateHadadKabir, calculateTabElement, normalizeArabic } from '@/utils/coreCalculations';
+import { analyzeCosmicQuality, type CosmicQuality } from './CosmicQualityService';
 import { getCurrentPlanetaryHour as getSimplifiedPlanetaryHour, getPlanetElement as getSimplifiedPlanetElement, type Planet as SimplifiedPlanet } from './DayBlessingService';
+import { type PlanetaryCondition } from './PlanetaryConditionService';
 import {
     getPlanetaryDayBoundariesForNow,
     preCalculateDailyPlanetaryHours,
     type Planet,
 } from './PlanetaryHoursService';
-import { analyzeCosmicQuality, type CosmicQuality } from './CosmicQualityService';
-import { getPlanetaryCondition, type PlanetaryCondition } from './PlanetaryConditionService';
+import { BURJ_NAMES_EN } from './ProfileDerivationService';
 
 export type Element = ElementType;
 export type AlignmentStatus = 'ACT' | 'MAINTAIN' | 'HOLD';
 
-export function getAlignmentStatusForElements(zahirElement: Element, timeElement: Element): AlignmentStatus {
-  return computeAlignmentStatus(zahirElement, timeElement);
+export function getAlignmentStatusForElements(
+  zahirElement: Element,
+  timeElement: Element,
+  userSignKey?: string
+): AlignmentStatus {
+  return computeAlignmentStatus(zahirElement, timeElement, userSignKey);
 }
 
 export interface TimeWindow {
@@ -248,18 +253,20 @@ async function getUpcomingPlanetaryHourWindowsAccurate(
  * @param userElement - User's Ẓāhir element
  * @param now - Current time
  * @param lookAheadHours - How many hours to look ahead (default 24)
+ * @param userSignKey - Optional user's zodiac sign (for special harmony rules)
  */
 export function getNextOptimalWindows(
   userElement: Element,
   now: Date = new Date(),
-  lookAheadHours: number = 24
+  lookAheadHours: number = 24,
+  userSignKey?: string
 ): TimeWindow[] {
   const allWindows = getUpcomingPlanetaryHours(now, lookAheadHours);
   
   // Calculate status for each window based on user element
   return allWindows.map(window => ({
     ...window,
-    status: computeAlignmentStatus(userElement, window.element),
+    status: computeAlignmentStatus(userElement, window.element, userSignKey),
   })).filter((window, index) => {
     // Skip current hour if we're past the start
     if (index === 0 && window.startTime < now) {
@@ -280,15 +287,36 @@ export function getNextOptimalWindows(
  * Compatibility Matrix:
  * - Fire ↔ Air (active/yang pair)
  * - Earth ↔ Water (receptive/yin pair)
+ * 
+ * SPECIAL CASES:
+ * - Scorpio (Mars-ruled water) shares fire's intensity → MAINTAIN with fire
+ * - Aquarius (Saturn-ruled cold air) shares coldness with water → MAINTAIN with water
  */
-function computeAlignmentStatus(zahirElement: Element, timeElement: Element): AlignmentStatus {
+function computeAlignmentStatus(
+  zahirElement: Element,
+  timeElement: Element,
+  userSignKey?: string
+): AlignmentStatus {
   // Normalize for case-insensitive comparison
   const userEl = zahirElement.toLowerCase();
   const timeEl = timeElement.toLowerCase();
+  const normalizedUserSign = userSignKey?.toLowerCase();
   
   // Perfect alignment
   if (userEl === timeEl) {
     return 'ACT';
+  }
+  
+  // SCORPIO SPECIAL CASE: Mars-ruled water shares fire's intensity
+  // Scorpio user + Fire time = MAINTAIN (not HOLD)
+  if (normalizedUserSign === 'scorpio' && timeEl === 'fire') {
+    return 'MAINTAIN';
+  }
+  
+  // AQUARIUS SPECIAL CASE: Saturn-ruled cold air is less challenging with water
+  // Aquarius user + Water time = MAINTAIN (not HOLD)
+  if (normalizedUserSign === 'aquarius' && timeEl === 'water') {
+    return 'MAINTAIN';
   }
   
   // Supportive pairs
@@ -341,13 +369,18 @@ export async function getMomentAlignment(
   // Compute user element (name + mother when available; falls back to name only)
   const zahirElement = computeZahirElement(userName, motherName);
 
+  // Extract user sign for special harmony logic (Scorpio+Fire, Aquarius+Water)
+  // Use burjIndex to get English name since derived.burj is in Arabic
+  const burjIndex = profile?.derived?.burjIndex;
+  const userSignKey = burjIndex !== undefined ? BURJ_NAMES_EN[burjIndex]?.toLowerCase() : undefined;
+
   // Prefer accurate planetary-hour element when we have a location.
   const location = options?.location ?? profile?.location;
   const method = options?.method ?? 3;
 
   let timeElement: Element = getCurrentTimeElement(now);
   let currentWindowEnd: Date | undefined = getNextHourTransition(now);
-  let nextWindows: TimeWindow[] | undefined = getNextOptimalWindows(zahirElement, now, 24);
+  let nextWindows: TimeWindow[] | undefined = getNextOptimalWindows(zahirElement, now, 24, userSignKey);
 
   if (location?.latitude != null && location?.longitude != null) {
     const resolved = await getUpcomingPlanetaryHourWindowsAccurate(
@@ -360,7 +393,7 @@ export async function getMomentAlignment(
       timeElement = resolved.timeElement;
       currentWindowEnd = resolved.currentWindowEnd;
       nextWindows = resolved.windows
-        .map(w => ({ ...w, status: computeAlignmentStatus(zahirElement, w.element) }))
+        .map(w => ({ ...w, status: computeAlignmentStatus(zahirElement, w.element, userSignKey) }))
         .filter(w => w.endTime > now);
     }
   }
@@ -389,8 +422,8 @@ export async function getMomentAlignment(
     }
   }
   
-  // Compute alignment status (basic elemental matching)
-  const status = computeAlignmentStatus(zahirElement, timeElement);
+  // Compute alignment status (basic elemental matching, with sign nuances)
+  const status = computeAlignmentStatus(zahirElement, timeElement, userSignKey);
   
   // ========================================
   // ENHANCED STATUS OVERRIDE LOGIC

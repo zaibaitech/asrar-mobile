@@ -50,6 +50,7 @@ import { getTodayBlessing } from '../../services/DayBlessingService';
 import { getBestLocation } from '../../services/LocationCacheService';
 import { getMomentAlignment, MomentAlignment } from '../../services/MomentAlignmentService';
 import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, type PlanetaryDayBoundaries, PlanetaryHourData } from '../../services/PlanetaryHoursService';
+import { BURJ_NAMES_EN } from '../../services/ProfileDerivationService';
 
 /**
  * Module configuration for all spiritual features
@@ -165,9 +166,10 @@ export default function HomeScreen() {
   // Get modules with translations
   const MODULES = useMemo(() => getModules(t), [t]);
   
-  // Keep home screen light: update at 10s granularity (battery + stability).
+  // BATTERY OPTIMIZATION: Use 30s ticker for home screen.
+  // Planetary hour countdown doesn't need sub-minute precision.
   // Detail screens can use 1s precision if needed.
-  const now = useNowTicker(10_000);
+  const now = useNowTicker(30_000);
   
   const [dailyGuidance, setDailyGuidance] = useState<DailyGuidance | null>(null);
   const [momentAlignment, setMomentAlignment] = useState<MomentAlignment | null>(null);
@@ -187,23 +189,33 @@ export default function HomeScreen() {
   const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
   const [tomorrowBlessing, setTomorrowBlessing] = useState<any>(null);
 
-  // Lower-frequency ticker for recomputing sunrise/sunset boundaries.
-  const minuteNow = useNowTicker(60_000);
+  // BATTERY OPTIMIZATION: 5-minute ticker for boundary/timing recalculation.
+  // Planetary boundaries only change at sunrise/sunset, no need for per-minute updates.
+  const minuteNow = useNowTicker(5 * 60_000);
 
   const hasRequestedLocationRef = React.useRef(false);
   const nextPrayerRef = React.useRef<typeof nextPrayer>(null);
   const lastPrayerLoadAtRef = React.useRef<number>(0);
   const lastRefreshAtRef = React.useRef<number>(0);
+  // BATTERY OPTIMIZATION: Track last timing check to avoid redundant calls
+  const lastTimingCheckRef = React.useRef<number>(0);
+  const lastBoundaryCheckRef = React.useRef<string>('');
 
   useEffect(() => {
     nextPrayerRef.current = nextPrayer;
   }, [nextPrayer]);
   
-  // Resolve correct planetary-day boundaries (handles pre-sunrise) once per minute.
+  // BATTERY OPTIMIZATION: Only recompute boundaries when location changes or on 5-min tick.
+  // Skip if we already computed for this tick.
   useEffect(() => {
     const lat = prayerTimesData?.meta?.latitude ?? profile.location?.latitude;
     const lon = prayerTimesData?.meta?.longitude ?? profile.location?.longitude;
     if (typeof lat !== 'number' || typeof lon !== 'number') return;
+
+    // Skip if we already computed boundaries for this time window
+    const boundaryKey = `${Math.floor(minuteNow.getTime() / 300000)}_${lat.toFixed(2)}_${lon.toFixed(2)}`;
+    if (lastBoundaryCheckRef.current === boundaryKey && planetaryBoundaries) return;
+    lastBoundaryCheckRef.current = boundaryKey;
 
     let cancelled = false;
     (async () => {
@@ -214,7 +226,7 @@ export default function HomeScreen() {
     return () => {
       cancelled = true;
     };
-  }, [minuteNow, prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude, profile.location?.latitude, profile.location?.longitude]);
+  }, [minuteNow, prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude, profile.location?.latitude, profile.location?.longitude, planetaryBoundaries]);
 
   // Compute current/next planetary hours every second for countdown accuracy.
   useEffect(() => {
@@ -253,7 +265,15 @@ export default function HomeScreen() {
 
   // Single source of truth for the Moment Alignment badge/score.
   // Uses the same Asrariya timing engine as the detail screen (category: 'general').
+  // BATTERY OPTIMIZATION: Throttle to max once per 5 minutes.
   const loadMomentTiming = useCallback(async () => {
+    const nowMs = Date.now();
+    // Skip if we checked within the last 5 minutes
+    if (nowMs - lastTimingCheckRef.current < 5 * 60 * 1000 && momentTimingScore !== null) {
+      return;
+    }
+    lastTimingCheckRef.current = nowMs;
+
     const currentProfile = profileRef.current;
     const lat = prayerTimesData?.meta?.latitude ?? currentProfile.location?.latitude;
     const lon = prayerTimesData?.meta?.longitude ?? currentProfile.location?.longitude;
@@ -269,7 +289,7 @@ export default function HomeScreen() {
       console.error('Error loading moment timing:', error);
       setMomentTimingScore(null);
     }
-  }, [prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude]);
+  }, [prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude, momentTimingScore]);
   
   // Load prayer times
   const loadPrayerTimes = useCallback(async () => {
@@ -313,7 +333,8 @@ export default function HomeScreen() {
     }
   }, []);
   
-  // Load today's blessing
+  // BATTERY OPTIMIZATION: Single initial load effect with stable deps.
+  // Removed loadMomentTiming from deps to prevent re-runs when score changes.
   useEffect(() => {
     // Initial load (best effort). Subsequent focus refresh is throttled below.
     loadDailyGuidance();
@@ -321,11 +342,12 @@ export default function HomeScreen() {
     loadMomentTiming();
     loadPrayerTimes();
     
-    // Calculate tomorrow's blessing
+    // Calculate tomorrow's blessing (sync, no state dependency)
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     setTomorrowBlessing(getTodayBlessing(tomorrow));
-  }, [loadDailyGuidance, loadMomentAlignment, loadPrayerTimes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   // Update countdown every minute
   useEffect(() => {
@@ -352,26 +374,29 @@ export default function HomeScreen() {
     return t(`days.${dayKeys[dayIndex]}`);
   }, [t]);
 
+  // BATTERY OPTIMIZATION: Increased throttle to 60s and removed duplicate timing effect.
   useFocusEffect(
     useCallback(() => {
       const nowMs = Date.now();
-      // Avoid hammering services during fast tab switching.
-      if (nowMs - lastRefreshAtRef.current < 20_000) {
+      // Avoid hammering services during fast tab switching (60s throttle).
+      if (nowMs - lastRefreshAtRef.current < 60_000) {
         return;
       }
       lastRefreshAtRef.current = nowMs;
 
+      // Stagger the calls to avoid concurrent async pressure
       loadDailyGuidance();
-      loadMomentAlignment();
-      loadMomentTiming();
+      // Delay alignment/timing by 500ms to reduce concurrent load
+      setTimeout(() => {
+        loadMomentAlignment();
+        loadMomentTiming();
+      }, 500);
       loadPrayerTimes();
     }, [loadDailyGuidance, loadMomentAlignment, loadMomentTiming, loadPrayerTimes])
   );
 
-  // Refresh Moment Alignment timing on a low frequency ticker.
-  useEffect(() => {
-    loadMomentTiming();
-  }, [minuteNow, loadMomentTiming]);
+  // REMOVED: Duplicate loadMomentTiming call that ran on minuteNow.
+  // The 5-min throttle in loadMomentTiming handles periodic refresh.
 
   /**
    * Handle module card press - navigate to appropriate screen
@@ -503,6 +528,7 @@ export default function HomeScreen() {
           t={t}
           planetaryData={planetaryData}
           timingScore={momentTimingScore}
+          userSignKey={profile?.derived?.burjIndex !== undefined ? BURJ_NAMES_EN[profile.derived.burjIndex]?.toLowerCase() : undefined}
         />
         
         {/* 2. Action Pills - Inline Buttons */}

@@ -638,8 +638,31 @@ export function analyzePlanetaryResonance(
     practiceModifier += 5;
   }
   
-  // Weighted combination
-  const baseScore = (dayRulerScore * 0.3) + (planetaryHourScore * 0.5) + practiceModifier;
+  // ─────────────────────────────────────────────────────────────────────────────
+  // NAHS/SA'D MODIFIER: Apply classical benefic/malefic nature of the hour planet
+  // This ensures Saturn hours are appropriately marked as challenging,
+  // even when personal compatibility might be high.
+  // ─────────────────────────────────────────────────────────────────────────────
+  let nahsSaadModifier = 0;
+  let hourPlanetNature: 'saad' | 'nahs' | 'neutral' = 'neutral';
+  
+  if (hourPlanet === 'Jupiter' || hourPlanet === 'Venus') {
+    // Sa'd (benefic) planets receive a bonus
+    nahsSaadModifier = 8;
+    hourPlanetNature = 'saad';
+  } else if (hourPlanet === 'Saturn') {
+    // Saturn is Nahs Akbar (greater malefic) - significant penalty
+    nahsSaadModifier = -15;
+    hourPlanetNature = 'nahs';
+  } else if (hourPlanet === 'Mars') {
+    // Mars is Nahs Asghar (lesser malefic) - moderate penalty
+    nahsSaadModifier = -10;
+    hourPlanetNature = 'nahs';
+  }
+  // Sun, Moon, Mercury are neutral - no modifier
+  
+  // Weighted combination (now includes Nahs/Sa'd nature)
+  const baseScore = (dayRulerScore * 0.3) + (planetaryHourScore * 0.5) + practiceModifier + nahsSaadModifier;
   const finalScore = Math.min(100, Math.max(0, baseScore));
   
   // Generate reasoning
@@ -679,11 +702,13 @@ export function analyzePlanetaryResonance(
     planetaryHourScore,
     dayRulerMatch,
     planetaryHourMatch,
+    hourPlanetNature, // 'saad' | 'nahs' | 'neutral' for UI display
     factors: {
       userPlanet,
       dayRuler: dayRuler.toString(),
       hourPlanet: hourPlanet.toString(),
       practiceModifier,
+      nahsSaadModifier, // For debugging/display
     },
   };
 }

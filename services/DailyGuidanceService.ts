@@ -8,6 +8,7 @@
  */
 
 import { getClassicalJudgment } from '@/services/ClassicalJudgmentService';
+import { BURJ_NAMES_EN } from '@/services/ProfileDerivationService';
 import { UserProfile } from '@/types/user-profile';
 
 export interface DailyGuidance {
@@ -78,9 +79,12 @@ export async function getDailyGuidanceForDate(
   
   const dayElement = dayElements[dayOfWeek];
   const userElement = profile?.derived?.element;
+  // Use burjIndex to get English sign name since derived.burj is in Arabic
+  const burjIndex = profile?.derived?.burjIndex;
+  const userSignKey = burjIndex !== undefined ? BURJ_NAMES_EN[burjIndex]?.toLowerCase() : undefined;
   
-  // Calculate element relationship
-  const relationship = calculateElementRelationship(userElement, dayElement);
+  // Calculate element relationship (with sign-based nuances for Scorpio+Fire, Aquarius+Water)
+  const relationship = calculateElementRelationship(userElement, dayElement, userSignKey);
   
   // Get timing quality based on relationship
   let timingQuality: DailyGuidance['timingQuality'] = 'neutral';
@@ -135,10 +139,15 @@ export async function getDailyGuidanceForDate(
 
 /**
  * Calculate relationship between user element and day element
+ * 
+ * SPECIAL CASES:
+ * - Scorpio (Mars-ruled water) shares fire's intensity → complementary with fire
+ * - Aquarius (Saturn-ruled cold air) shares coldness with water → neutral with water
  */
 function calculateElementRelationship(
   userElement?: 'fire' | 'water' | 'air' | 'earth',
-  dayElement?: 'fire' | 'water' | 'air' | 'earth'
+  dayElement?: 'fire' | 'water' | 'air' | 'earth',
+  userSignKey?: string
 ): 'harmonious' | 'complementary' | 'neutral' | 'transformative' {
   if (!userElement || !dayElement) {
     return 'neutral';
@@ -147,6 +156,18 @@ function calculateElementRelationship(
   // Same element = harmonious
   if (userElement === dayElement) {
     return 'harmonious';
+  }
+  
+  const normalizedUserSign = userSignKey?.toLowerCase();
+  
+  // SCORPIO SPECIAL CASE: Mars-ruled water shares fire's intensity
+  if (normalizedUserSign === 'scorpio' && dayElement === 'fire') {
+    return 'complementary';
+  }
+  
+  // AQUARIUS SPECIAL CASE: Saturn-ruled cold air is less challenging with water
+  if (normalizedUserSign === 'aquarius' && dayElement === 'water') {
+    return 'neutral';
   }
   
   // Complementary pairs (active/yang or receptive/yin)

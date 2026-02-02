@@ -19,19 +19,23 @@ export function StatusOverviewCard({
 }: StatusOverviewCardProps) {
   return (
     <View style={styles.container}>
-      <View style={styles.headerRow}>
-        <View style={styles.titleCol}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
-        </View>
-
-        <View style={[styles.badge, { borderColor: badgeColor, backgroundColor: `${badgeColor}1F` }]}>
-          <Text style={[styles.badgeText, { color: badgeColor }]}>{badgeText}</Text>
-        </View>
+      {/* Title on top - always visible */}
+      <Text style={styles.title}>{title}</Text>
+      
+      {/* Badge below title - with full width to avoid collision */}
+      <View style={[styles.badge, { borderColor: badgeColor, backgroundColor: `${badgeColor}1F` }]}>
+        <Text style={[styles.badgeText, { color: badgeColor }]}>{badgeText}</Text>
       </View>
+      
+      {/* Subtitle/description below badge */}
+      <Text style={styles.subtitle}>{subtitle}</Text>
 
+      {/* Time remaining at bottom */}
       {!!timeRemainingLabel && (
-        <Text style={styles.timeRemaining}>{timeRemainingLabel}</Text>
+        <View style={styles.timeRemainingRow}>
+          <Text style={styles.clockIcon}>⏱️</Text>
+          <Text style={styles.timeRemaining}>{timeRemainingLabel}</Text>
+        </View>
       )}
     </View>
   );
@@ -44,40 +48,43 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.10)',
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    gap: 10,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: Spacing.md,
-  },
-  titleCol: {
-    flex: 1,
-    gap: 4,
+    gap: 12,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 22,
+    fontWeight: '700',
     color: DarkTheme.textPrimary,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: DarkTheme.textSecondary,
-    lineHeight: 20,
+    letterSpacing: 0.3,
   },
   badge: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
-    borderWidth: 1,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1.5,
   },
   badgeText: {
-    fontSize: 13,
-    fontWeight: '800',
-    letterSpacing: 0.4,
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: DarkTheme.textSecondary,
+    lineHeight: 22,
+  },
+  timeRemainingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+  },
+  clockIcon: {
+    fontSize: 14,
   },
   timeRemaining: {
-    fontSize: 13,
+    fontSize: 14,
     color: DarkTheme.textTertiary,
+    fontWeight: '500',
   },
 });

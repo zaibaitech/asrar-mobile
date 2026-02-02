@@ -3,15 +3,19 @@
  * =================================
  * Crossfades between two slides with configurable interval
  * Shows dots indicator and handles tap interactions
+ * 
+ * BATTERY OPTIMIZATION (Feb 2026):
+ * - Pauses rotation when app is in background via AppState
+ * - Uses longer default interval (12s instead of 8s)
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, AppState, AppStateStatus, StyleSheet, View } from 'react-native';
 
 interface RotatingCardContentProps {
   /** Array of exactly 2 slides to rotate between */
   slides: React.ReactNode[];
-  /** Rotation interval in milliseconds (default 8000ms) */
+  /** Rotation interval in milliseconds (default 12000ms - battery optimized) */
   intervalMs?: number;
   /** Whether to show slide dots indicator */
   showDots?: boolean;
@@ -23,13 +27,26 @@ interface RotatingCardContentProps {
 
 export function RotatingCardContent({
   slides,
-  intervalMs = 8000,
+  intervalMs = 12000, // BATTERY OPTIMIZATION: Increased from 8000 to 12000
   showDots = true,
   onSlideChange,
   paused = false,
 }: RotatingCardContentProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const fadeAnim = useRef(new Animated.Value(1)).current;
+  // BATTERY OPTIMIZATION: Track app state to pause when backgrounded
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+  const [isAppActive, setIsAppActive] = useState(true);
+  
+  // BATTERY OPTIMIZATION: Listen to app state changes
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      appStateRef.current = nextAppState;
+      setIsAppActive(nextAppState === 'active');
+    });
+    
+    return () => subscription.remove();
+  }, []);
   
   useEffect(() => {
     if (slides.length !== 2) {
@@ -37,9 +54,13 @@ export function RotatingCardContent({
       return;
     }
     
-    if (paused) return;
+    // BATTERY OPTIMIZATION: Don't run interval when paused or app is backgrounded
+    if (paused || !isAppActive) return;
     
     const interval = setInterval(() => {
+      // Double-check app is still active before animating
+      if (appStateRef.current !== 'active') return;
+      
       // Fade out
       Animated.timing(fadeAnim, {
         toValue: 0,
@@ -63,7 +84,7 @@ export function RotatingCardContent({
     }, intervalMs);
     
     return () => clearInterval(interval);
-  }, [slides.length, intervalMs, paused, fadeAnim, onSlideChange]);
+  }, [slides.length, intervalMs, paused, isAppActive, fadeAnim, onSlideChange]);
   
   return (
     <View style={styles.container}>
