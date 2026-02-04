@@ -117,23 +117,40 @@ export default function PlanetaryJudgmentCard({ dayRuler, moonPhaseName }: Plane
 
       <Text style={styles.description}>{`${intro} ${rulerTone} ${phaseTone}`}</Text>
 
-      <View style={styles.columns}>
-        <View style={styles.column}>
-          <Text style={styles.columnTitle}>✅ {bestForLabel}</Text>
-          {bestForItems.map((item, idx) => (
-            <Text key={`best-${idx}`} style={styles.bullet}>
-              • {item}
-            </Text>
-          ))}
+      {/* Best For / Avoid */}
+      <View style={styles.guidanceContainer}>
+        {/* Best For */}
+        <View style={styles.section}>
+          <View style={[styles.accentBar, styles.favorableAccent]} />
+          <View style={styles.sectionContent}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionEmoji}>✅</Text>
+              <Text style={styles.sectionTitle}>{bestForLabel}</Text>
+            </View>
+            
+            {bestForItems.map((activity, index) => (
+              <Text key={index} style={styles.activityText}>
+                • {activity}
+              </Text>
+            ))}
+          </View>
         </View>
 
-        <View style={styles.column}>
-          <Text style={styles.columnTitle}>⚠️ {avoidLabel}</Text>
-          {avoidItems.map((item, idx) => (
-            <Text key={`avoid-${idx}`} style={styles.bullet}>
-              • {item}
-            </Text>
-          ))}
+        {/* Avoid */}
+        <View style={styles.section}>
+          <View style={[styles.accentBar, styles.warningAccent]} />
+          <View style={styles.sectionContent}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionEmoji}>⚠️</Text>
+              <Text style={styles.sectionTitle}>{avoidLabel}</Text>
+            </View>
+            
+            {avoidItems.map((activity, index) => (
+              <Text key={index} style={styles.activityText}>
+                • {activity}
+              </Text>
+            ))}
+          </View>
         </View>
       </View>
 
@@ -214,32 +231,57 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
 
-  columns: {
+  guidanceContainer: {
+    gap: 20,
+    marginBottom: 16,
+  },
+
+  section: {
     flexDirection: 'row',
-    gap: 14,
+    gap: 16,
   },
 
-  column: {
+  accentBar: {
+    width: 4,
+    borderRadius: 2,
+    minHeight: 80,
+  },
+
+  favorableAccent: {
+    backgroundColor: '#10b981',
+  },
+
+  warningAccent: {
+    backgroundColor: '#f59e0b',
+  },
+
+  sectionContent: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    padding: 12,
+    gap: 12,
   },
 
-  columnTitle: {
-    color: DarkTheme.textPrimary,
-    fontSize: 13,
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 4,
+  },
+
+  sectionEmoji: {
+    fontSize: 20,
+  },
+
+  sectionTitle: {
+    fontSize: 17,
     fontWeight: '700',
-    marginBottom: 8,
+    color: '#ffffff',
   },
 
-  bullet: {
-    color: DarkTheme.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-    marginBottom: 6,
+  activityText: {
+    fontSize: 15,
+    lineHeight: 24,
+    color: '#d1d5db',
+    paddingLeft: 8,
   },
 
   disclaimer: {

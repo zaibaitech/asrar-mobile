@@ -12,7 +12,6 @@
  */
 
 import CollapsibleSection from '@/components/common/CollapsibleSection';
-import { PremiumSection } from '@/components/subscription/PremiumSection';
 import CollapsibleEducationalSection from '@/components/timing/CollapsibleEducationalSection';
 import DailyEnergyCard from '@/components/timing/DailyEnergyCard';
 import { DailyPlanetaryAnalysisDisplay } from '@/components/timing/DailyPlanetaryAnalysisDisplay';
@@ -863,41 +862,6 @@ export default function DailyGuidanceDetailsScreen() {
                 </Text>
               </View>
             </CollapsibleSection>
-          )}
-          
-          {/* PREMIUM: Best For Section - Personal action guidance */}
-          {bestForKeys.length > 0 && (
-            <PremiumSection
-              featureId="personalGuidance"
-              title={t('premiumSections.bestActionsToday.title')}
-              description={t('premiumSections.bestActionsToday.description')}
-              icon="✅"
-              compact={false}
-            >
-              <View style={styles.section}>
-                <TouchableOpacity 
-                  style={styles.expandableHeader}
-                  onPress={() => setBestForExpanded(!bestForExpanded)}
-                >
-                  <Text style={styles.sectionTitle}>✅ {t('home.dailyGuidanceDetails.sections.bestFor')}</Text>
-                  <Ionicons 
-                    name={bestForExpanded ? 'chevron-up' : 'chevron-down'} 
-                    size={20} 
-                    color={DarkTheme.textSecondary}
-                  />
-                </TouchableOpacity>
-                {bestForExpanded && (
-                  <View style={styles.listCard}>
-                    {bestForKeys.map((key: string, index: number) => (
-                      <View key={index} style={styles.listItem}>
-                        <View style={[styles.listDot, { backgroundColor: '#10b981' }]} />
-                        <Text style={styles.listText}>{t(key)}</Text>
-                      </View>
-                    ))}
-                  </View>
-                )}
-              </View>
-            </PremiumSection>
           )}
           
           {/* Why This? Section - FREE (Educational) */}
