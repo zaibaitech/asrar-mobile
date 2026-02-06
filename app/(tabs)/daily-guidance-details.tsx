@@ -13,9 +13,7 @@
 
 import CollapsibleSection from '@/components/common/CollapsibleSection';
 import CollapsibleEducationalSection from '@/components/timing/CollapsibleEducationalSection';
-import DailyEnergyCard from '@/components/timing/DailyEnergyCard';
 import { DailyPlanetaryAnalysisDisplay } from '@/components/timing/DailyPlanetaryAnalysisDisplay';
-import MoonDayHarmonyCard from '@/components/timing/MoonDayHarmonyCard';
 import MoonPhaseHeaderCard from '@/components/timing/MoonPhaseHeaderCard';
 import PlanetaryJudgmentCard from '@/components/timing/PlanetaryJudgmentCard';
 import TimingGuidanceCard from '@/components/timing/TimingGuidanceCard';
@@ -230,8 +228,7 @@ export default function DailyGuidanceDetailsScreen() {
             dayElement,
             moonPhase,
             transitPower,
-            t,
-            synthesisUserSignKey
+            t
           );
           
           setDailySynthesis(synthesis);
@@ -529,7 +526,7 @@ export default function DailyGuidanceDetailsScreen() {
     if (!userElement) return 55;
     const relation = getPlanetaryRelationship(userZodiacRuler ?? hourPlanet, hourPlanet);
     const planetScore = relation === 'friend' ? 90 : relation === 'neutral' ? 60 : 30;
-    const elementRelation = getClassicalElementRelationship(userElement, getPlanetInfo(hourPlanet).element, userSignKey);
+    const elementRelation = getClassicalElementRelationship(userElement, getPlanetInfo(hourPlanet).element);
     const elementScore =
       elementRelation === 'same' ? 90 : elementRelation === 'supportive' ? 75 : elementRelation === 'neutral' ? 50 : 25;
     return Math.round((planetScore + elementScore) / 2);
@@ -695,14 +692,12 @@ export default function DailyGuidanceDetailsScreen() {
                     userPlanet={userPlanetInfo.planet}
                     userElement={(ascendantElement ?? userPlanetInfo.element) as PlanetElement}
                     source={userPlanetInfo.source}
-                    zodiacSign={zodiacSign}
                   />
                 ) : userZodiacRuler && ascendantElement ? (
                   <UserPlanetSection
                     userPlanet={userZodiacRuler}
                     userElement={ascendantElement as PlanetElement}
                     source={'default'}
-                    zodiacSign={zodiacSign}
                   />
                 ) : null}
                 
@@ -717,55 +712,17 @@ export default function DailyGuidanceDetailsScreen() {
                   transitPower={dailyAnalysis?.dayRulingStrength || 50}
                   transitSign={undefined}
                   transitDignity={undefined}
-                  currentHour={
-                    planetaryData
-                      ? {
-                          planet: planetaryData.currentHour.planet,
-                          range: formatHourRange(planetaryData.currentHour.startTime, planetaryData.currentHour.endTime),
-                        }
-                      : undefined
-                  }
                 />
                 
                 {/* Divider */}
                 <View style={styles.divider} />
 
                 {/* ALIGNMENT ANALYSIS */}
-                <TodaysAlignmentSection
-                  synthesis={dailySynthesis}
-                  alignmentScore={alignmentScore}
-                  userTemperament={
-                    zodiacSign
-                      ? ((language || '').toLowerCase() === 'fr'
-                          ? zodiacSign.temperamentFr
-                          : zodiacSign.temperament)
-                      : undefined
-                  }
-                  dayTemperament={t(`dailyEnergy.temperaments.${dayRuler.toLowerCase()}`)}
-                />
+                <TodaysAlignmentSection synthesis={dailySynthesis} />
               </View>
               
               {/* What This Means For You Card */}
-              <WhatThisMeansCard
-                synthesis={dailySynthesis}
-                dayRuler={dayRuler}
-                moonPhaseName={dailyAnalysis?.moonPhase?.phaseName}
-                authorityLevel={authority.level}
-                authorityDisplayQuality={authority.displayQuality}
-                hardRestriction={authority.hardRestriction}
-                userRulerHours={userBestHours.map((h) => ({
-                  planet: h.planet,
-                  range: formatHourRange(h.startTime, h.endTime),
-                }))}
-                dayRulerHours={dayBestHours.map((h) => ({
-                  planet: h.planet,
-                  range: formatHourRange(h.startTime, h.endTime),
-                }))}
-                challengingHours={challengingHours.map((h) => ({
-                  planet: h.planet,
-                  range: formatHourRange(h.startTime, h.endTime),
-                }))}
-              />
+              <WhatThisMeansCard synthesis={dailySynthesis} />
             </>
           ) : dailySynthesis ? (
             // Fallback - No user profile, show generic guidance
@@ -778,40 +735,6 @@ export default function DailyGuidanceDetailsScreen() {
             </View>
           ) : null}
           
-          {/* SECTION 2B: DAILY ENERGY SCORE (Ilm al-Nujum Synthesis) */}
-          {dailyAnalysis && (
-            <DailyEnergyCard 
-              score={dailyAnalysis.dayRulingStrength || 50}
-              authorityLevel={authority.level}
-              hardRestriction={authority.hardRestriction}
-              breakdown={{
-                dayRuler: dailyAnalysis.dayRulingPlanet as Planet,
-                dayRulerPower: dailyAnalysis.dayRulingStrength || 50,
-                dayRulerContribution: Math.round((dailyAnalysis.dayRulingStrength || 50) * 0.5),
-                moonPower: dailyAnalysis.moonPhase?.moonPower || 60,
-                moonContribution: Math.round((dailyAnalysis.moonPhase?.moonPower || 60) * 0.3),
-                othersPower: 55,
-                othersContribution: Math.round(55 * 0.2),
-                totalScore: dailyAnalysis.dayRulingStrength || 50,
-                moonPhase: dailyAnalysis.moonPhase?.phaseName === 'waxing_crescent' || dailyAnalysis.moonPhase?.phaseName === 'waxing_gibbous' || dailyAnalysis.moonPhase?.phaseName === 'first_quarter'
-                  ? 'waxing' 
-                  : dailyAnalysis.moonPhase?.phaseName === 'waning_gibbous' || dailyAnalysis.moonPhase?.phaseName === 'waning_crescent' || dailyAnalysis.moonPhase?.phaseName === 'last_quarter'
-                  ? 'waning'
-                  : dailyAnalysis.moonPhase?.phaseName === 'full'
-                  ? 'full'
-                  : 'new',
-              }}
-            />
-          )}
-          
-          {/* SECTION 2: MOON-DAY HARMONY (Synthesis) */}
-          {dailyAnalysis?.moonDayHarmony && (
-            <MoonDayHarmonyCard 
-              harmony={dailyAnalysis.moonDayHarmony}
-              dayRuler={dailyAnalysis.dayRulingPlanet}
-            />
-          )}
-
           {/* SECTION 9: PRACTICAL GUIDANCE (Planetary hour quality) */}
           <TimingGuidanceCard
             currentHour={timingGuidanceProps?.currentHour}
