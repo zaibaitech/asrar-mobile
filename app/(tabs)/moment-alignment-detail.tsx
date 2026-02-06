@@ -503,8 +503,15 @@ export default function MomentAlignmentDetailScreen() {
       });
     }
 
+    // Get user's ruling planet for same-planet rule check
+    // userPlanetKey is lowercase (e.g., 'mars'), need to convert to Planet type
+    const userRulingPlanet = userPlanetKey 
+      ? (userPlanetKey.charAt(0).toUpperCase() + userPlanetKey.slice(1)) as Planet
+      : undefined;
+
     const baseJudgment = getClassicalJudgment({
       rulerPlanet,
+      userRulingPlanet,
       dignityType,
       houseType,
       aspectsToBenefics,
@@ -513,14 +520,20 @@ export default function MomentAlignmentDetailScreen() {
 
     // Unison rule: if the transit condition is very strong, the classical label cannot remain "Neutral".
     // Only upgrade when the planet is allowed to be Nashr.
+    // NOTE: Same-planet cases are now handled directly in getClassicalJudgment and return Nashr
     const transitPower = currentHourTransitData?.finalPower;
     const isExceptionalStrength = typeof transitPower === 'number' && transitPower >= 90;
     const isStrongStrength = typeof transitPower === 'number' && transitPower >= 70;
-    const canUpgradeToNashr =
+    
+    // canUpgradeToNashr: For same-planet, it's already Nashr from the service
+    // For other planets, check if they qualify for upgrade
+    const isSamePlanet = userRulingPlanet === rulerPlanet;
+    const canUpgradeToNashr = isSamePlanet || (
       rulerPlanet !== 'Saturn' &&
       rulerPlanet !== 'Mars' &&
       rulerPlanet !== 'Mercury' &&
-      (rulerPlanet !== 'Moon' || isDignified);
+      (rulerPlanet !== 'Moon' || isDignified)
+    );
 
     if (canUpgradeToNashr && baseJudgment.restrictionLevel === 1 && (isExceptionalStrength || isStrongStrength)) {
       return {
@@ -532,9 +545,23 @@ export default function MomentAlignmentDetailScreen() {
     }
 
     return baseJudgment;
-  }, [alignment?.hourRulerCondition?.dignity?.type, allTransits, currentHourTransitData?.finalPower, planetaryData?.currentHour?.planet, transitHouse?.sectorKey]);
+  }, [alignment?.hourRulerCondition?.dignity?.type, allTransits, currentHourTransitData?.finalPower, planetaryData?.currentHour?.planet, transitHouse?.sectorKey, userPlanetKey]);
 
+  // UNIFIED: Prioritize timingResult (engine score) over classicalJudgment for consistent badge display
+  // This ensures the badge matches the widget on Daily Guidance Details (both use same engine)
   const statusColor = useMemo(() => {
+    // Prioritize unified timing engine result
+    if (timingResult) {
+      const colorByBadge: Record<UnifiedBadge, string> = {
+        OPTIMAL: '#10b981',
+        ACT: '#10b981',
+        MAINTAIN: '#f59e0b',
+        CAREFUL: '#f59e0b',
+        HOLD: '#ef4444',
+      };
+      return colorByBadge[unifiedBadge] || '#f59e0b';
+    }
+    // Fallback to classical judgment if engine not loaded yet
     if (classicalJudgment) {
       switch (classicalJudgment.restrictionLevel) {
         case 0:
@@ -549,21 +576,10 @@ export default function MomentAlignmentDetailScreen() {
       }
     }
     return getStatusColor(alignment?.status);
-  }, [alignment?.status, classicalJudgment]);
+  }, [alignment?.status, classicalJudgment, timingResult, unifiedBadge]);
 
   const statusSubtitle = (() => {
-    if (classicalJudgment) {
-      const keyByLevel: Record<0 | 1 | 2 | 3, string> = {
-        0: 'momentDetail.cards.status.act_desc',
-        1: 'momentDetail.cards.status.maintain_desc',
-        2: 'momentDetail.cards.status.maintain_desc',
-        3: 'momentDetail.cards.status.hold_desc',
-      };
-      const level = classicalJudgment.restrictionLevel as 0 | 1 | 2 | 3;
-      const key = keyByLevel[level];
-      const translated = t(key);
-      return translated || '';
-    }
+    // Prioritize unified timing engine result
     if (timingResult) {
       const keyByBadge: Record<UnifiedBadge, string> = {
         ACT: 'momentDetail.cards.status.act_desc',
@@ -576,10 +592,35 @@ export default function MomentAlignmentDetailScreen() {
       const translated = t(key);
       return translated || timingResult.shortSummary || getLocalizedLayerReasoning(timingResult);
     }
+    // Fallback to classical judgment
+    if (classicalJudgment) {
+      const keyByLevel: Record<0 | 1 | 2 | 3, string> = {
+        0: 'momentDetail.cards.status.act_desc',
+        1: 'momentDetail.cards.status.maintain_desc',
+        2: 'momentDetail.cards.status.maintain_desc',
+        3: 'momentDetail.cards.status.hold_desc',
+      };
+      const level = classicalJudgment.restrictionLevel as 0 | 1 | 2 | 3;
+      const key = keyByLevel[level];
+      const translated = t(key);
+      return translated || '';
+    }
     return alignment ? t(alignment.shortHintKey) : '';
   })();
 
   const statusBadgeText = (() => {
+    // Prioritize unified timing engine result (same as widget)
+    if (timingResult) {
+      const emojiByBadge: Record<UnifiedBadge, string> = {
+        OPTIMAL: '🟢',
+        ACT: '🟢',
+        MAINTAIN: '🟡',
+        CAREFUL: '🟡',
+        HOLD: '🟣',
+      };
+      return `${emojiByBadge[unifiedBadge]} ${t(badgeConfig.labelKey) || unifiedBadge}`;
+    }
+    // Fallback to classical judgment
     if (classicalJudgment) {
       const emoji =
         classicalJudgment.restrictionLevel === 0
@@ -591,16 +632,6 @@ export default function MomentAlignmentDetailScreen() {
               : '⛔';
       const labelKey = `dailyEnergy.classicalJudgment.labels.${classicalJudgment.classicalLabel.toLowerCase()}`;
       return `${emoji} ${t(labelKey) || classicalJudgment.classicalLabel}`;
-    }
-    if (timingResult) {
-      const emojiByBadge: Record<UnifiedBadge, string> = {
-        ACT: '🟢',
-        MAINTAIN: '🟡',
-        HOLD: '🟣',
-        OPTIMAL: '🟢',
-        CAREFUL: '🟡',
-      };
-      return `${emojiByBadge[unifiedBadge]} ${t(badgeConfig.labelKey) || unifiedBadge}`;
     }
     return alignment ? t(alignment.shortLabelKey) : '';
   })();
@@ -732,7 +763,17 @@ export default function MomentAlignmentDetailScreen() {
     };
 
     const elem = scoreLabel(timingResult.layers.elementCompatibility.score);
-    const planet = scoreLabel(timingResult.layers.planetaryResonance.score);
+    
+    // Check if same planet (user's ruling planet === current hour planet)
+    const currentHourPlanet = planetaryData?.currentHour?.planet?.toLowerCase();
+    const isSamePlanet = userPlanetKey && currentHourPlanet && 
+      userPlanetKey.toLowerCase() === currentHourPlanet;
+    
+    // For same planet, show special label instead of generic "friendship"
+    const planetLabel = isSamePlanet
+      ? { text: `${t('momentDetail.cards.analysis.samePlanet') || 'Same Planet'} ✓`, color: '#34D399' }
+      : scoreLabel(timingResult.layers.planetaryResonance.score);
+    
     const transit = alignment && alignment.hourRulerCondition
       ? alignment.hourRulerCondition.ruling === 'excellent'
         ? { text: `${t('momentDetail.cards.analysis.exceptional')} ✓`, color: '#34D399' }
@@ -751,10 +792,13 @@ export default function MomentAlignmentDetailScreen() {
         scoreColor: elem.color,
       },
       {
-        icon: '🤝',
-        text: t('momentDetail.cards.analysis.planetaryFriendship'),
-        scoreText: planet.text,
-        scoreColor: planet.color,
+        // Use "Planetary Resonance" label for same planet (more accurate than "Friendship")
+        icon: isSamePlanet ? '⚡' : '🤝',
+        text: isSamePlanet 
+          ? (t('momentDetail.cards.analysis.planetaryResonance') || t('momentDetail.cards.analysis.planetaryFriendship'))
+          : t('momentDetail.cards.analysis.planetaryFriendship'),
+        scoreText: planetLabel.text,
+        scoreColor: planetLabel.color,
       },
       {
         icon: '⭐',
@@ -763,7 +807,7 @@ export default function MomentAlignmentDetailScreen() {
         scoreColor: transit.color,
       },
     ];
-  }, [timingResult, t, alignment]);
+  }, [timingResult, t, alignment, userPlanetKey, planetaryData?.currentHour?.planet]);
 
   // IMPORTANT: only return early AFTER all hooks above have run.
   if (loading) {

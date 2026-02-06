@@ -1,7 +1,7 @@
-import { useLanguage } from '@/contexts/LanguageContext';
-import type { Element, Planet } from '@/services/PlanetaryHoursService';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
+import type { Planet, Element } from '@/services/PlanetaryHoursService';
 
 interface TodaysRulerSectionProps {
   dayRuler: Planet;
@@ -10,10 +10,6 @@ interface TodaysRulerSectionProps {
   transitPower?: number;
   transitSign?: string;
   transitDignity?: string;
-  currentHour?: {
-    planet: Planet;
-    range: string;
-  };
 }
 
 /**
@@ -54,7 +50,6 @@ export default function TodaysRulerSection({
   transitPower,
   transitSign,
   transitDignity,
-  currentHour,
 }: TodaysRulerSectionProps) {
   const { t } = useLanguage();
   const planetInfo = getPlanetInfo(dayRuler);
@@ -77,15 +72,6 @@ export default function TodaysRulerSection({
               {t('notifications.timing.element')}: {t(`elements.${dayElement}`)}
             </Text>
           </View>
-
-          {currentHour && (
-            <View style={styles.elementRow}>
-              <Text style={styles.elementIcon}>⏳</Text>
-              <Text style={styles.elementText}>
-                {t('dailyEnergy.todaysProfile.currentHourLabel')}: {t(`planets.${currentHour.planet.toLowerCase()}`)} ({currentHour.range})
-              </Text>
-            </View>
-          )}
           <Text style={styles.description}>{dayDescription}</Text>
         </View>
       </View>

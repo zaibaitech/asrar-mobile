@@ -748,36 +748,36 @@ export function analyzeMoonDayHarmony(
       isAligned: true,
       harmonyLevel: 'perfect',
       explanation: `Waxing Moon + ${dayRuler} (active planet) = well-suited for launching projects and building momentum.`,
-      explanationKey: 'moon.harmony.waxing_active.explanation',
+      explanationKey: 'moon.harmony.waxing_active',
       recommendation: 'Supportive timing for starting new ventures and taking action.',
-      recommendationKey: 'moon.harmony.waxing_active.recommendation',
+      recommendationKey: 'moon.harmony.waxing_active_rec',
     };
   } else if (!isWaxing && isDayReflective) {
     return {
       isAligned: true,
       harmonyLevel: 'perfect',
       explanation: `Waning Moon + ${dayRuler} (reflective planet) = well-suited for completing, releasing, and internal work.`,
-      explanationKey: 'moon.harmony.waning_reflective.explanation',
+      explanationKey: 'moon.harmony.waning_reflective',
       recommendation: 'Supportive for finishing projects, healing, and deep spiritual work.',
-      recommendationKey: 'moon.harmony.waning_reflective.recommendation',
+      recommendationKey: 'moon.harmony.waning_reflective_rec',
     };
   } else if (isWaxing && isDayReflective) {
     return {
       isAligned: false,
       harmonyLevel: 'challenging',
       explanation: `Waxing Moon wants to build, but ${dayRuler} supports reflection and release. Mixed signals.`,
-      explanationKey: 'moon.harmony.waxing_reflective.explanation',
+      explanationKey: 'moon.harmony.waxing_reflective',
       recommendation: 'You can still act, but be prepared for some inner resistance or need for reflection.',
-      recommendationKey: 'moon.harmony.waxing_reflective.recommendation',
+      recommendationKey: 'moon.harmony.waxing_reflective_rec',
     };
   } else if (!isWaxing && isDayActive) {
     return {
       isAligned: false,
       harmonyLevel: 'challenging',
       explanation: `Waning Moon supports release, but ${dayRuler} pushes for action. Misaligned energies.`,
-      explanationKey: 'moon.harmony.waning_active.explanation',
+      explanationKey: 'moon.harmony.waning_active',
       recommendation: 'Push forward if you must, but the day supports completion more than initiation.',
-      recommendationKey: 'moon.harmony.waning_active.recommendation',
+      recommendationKey: 'moon.harmony.waning_active_rec',
     };
   } else {
     // Neutral planets (Mercury, neutral relationships)
@@ -785,9 +785,9 @@ export function analyzeMoonDayHarmony(
       isAligned: true,
       harmonyLevel: 'neutral',
       explanation: `${dayRuler} is neither strongly active nor reflective. The day remains flexible.`,
-      explanationKey: 'moon.harmony.neutral.explanation',
+      explanationKey: 'moon.harmony.neutral',
       recommendation: 'Both action and reflection are possible. Follow the Moon\'s phase as your guide.',
-      recommendationKey: 'moon.harmony.neutral.recommendation',
+      recommendationKey: 'moon.harmony.neutral_rec',
     };
   }
 }

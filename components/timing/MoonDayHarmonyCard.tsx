@@ -14,6 +14,16 @@ export default function MoonDayHarmonyCard({
   dayRuler,
 }: MoonDayHarmonyCardProps) {
   const { t } = useLanguage();
+
+  const resolveText = (
+    key: string,
+    fallback: string,
+    options?: Record<string, unknown>
+  ) => {
+    const translated = options ? t(key, options as any) : t(key);
+    if (!translated || translated === key) return fallback;
+    return translated;
+  };
   
   // Get harmony color and icon
   const harmonyConfig = {
@@ -21,39 +31,42 @@ export default function MoonDayHarmonyCard({
       icon: '✅',
       color: '#10B981',
       bg: 'rgba(16, 185, 129, 0.15)',
-      label: t('moon.ui.perfectAlignment'),
+      label: resolveText('moon.ui.perfectAlignment', 'Perfect Alignment'),
     },
     good: {
       icon: '🟢',
       color: '#3B82F6',
       bg: 'rgba(59, 130, 246, 0.15)',
-      label: t('moon.ui.goodAlignment'),
+      label: resolveText('moon.ui.goodAlignment', 'Good Alignment'),
     },
     neutral: {
       icon: '⚖️',
       color: '#64B5F6',
       bg: 'rgba(100, 181, 246, 0.15)',
-      label: t('moon.ui.neutralAlignment'),
+      label: resolveText('moon.ui.neutralAlignment', 'Neutral Alignment'),
     },
     challenging: {
       icon: '⚠️',
       color: '#F59E0B',
       bg: 'rgba(245, 158, 11, 0.15)',
-      label: t('moon.ui.challengingAlignment'),
+      label: resolveText('moon.ui.challengingAlignment', 'Challenging Alignment'),
     },
   };
   
   const config = harmonyConfig[harmony.harmonyLevel];
   
-  // Replace {{dayRuler}} placeholder in translation
-  const explanation = t(harmony.explanationKey, { dayRuler });
-  const recommendation = t(harmony.recommendationKey);
+  const explanation = resolveText(harmony.explanationKey, harmony.explanation, { dayRuler });
+  const recommendation = resolveText(harmony.recommendationKey, harmony.recommendation);
+
+  const title = resolveText('moon.ui.moonDayHarmony', 'Moon-Day Harmony');
+  const explanationLabel = resolveText('moon.ui.explanation', 'Explanation');
+  const recommendationLabel = resolveText('moon.ui.recommendation', 'Recommendation');
   
   return (
     <View style={[styles.card, { backgroundColor: config.bg, borderColor: config.color }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.sectionLabel}>{t('moon.ui.moonDayHarmony')}</Text>
+        <Text style={styles.sectionLabel}>{title}</Text>
       </View>
       
       {/* Harmony Level */}
@@ -66,13 +79,13 @@ export default function MoonDayHarmonyCard({
       
       {/* Explanation */}
       <View style={styles.explanationBox}>
-        <Text style={styles.explanationLabel}>📝 {t('moon.ui.explanation')}</Text>
+        <Text style={styles.explanationLabel}>📝 {explanationLabel}</Text>
         <Text style={styles.explanation}>{explanation}</Text>
       </View>
       
       {/* Recommendation */}
       <View style={styles.recommendationBox}>
-        <Text style={styles.recommendationLabel}>💡 {t('moon.ui.recommendation')}</Text>
+        <Text style={styles.recommendationLabel}>💡 {recommendationLabel}</Text>
         <Text style={styles.recommendation}>{recommendation}</Text>
       </View>
     </View>

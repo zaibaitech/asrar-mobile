@@ -78,6 +78,8 @@ interface DhikrCounterProps {
     accent: string;
     border: string;
   };
+  /** When true, shows a note that count is a default (not personalized from name calculation) */
+  isBirthdateOnly?: boolean;
   onComplete?: () => void;
 }
 
@@ -91,6 +93,7 @@ export function DhikrCounter({
   zodiacSign,
   instructions,
   elementColors,
+  isBirthdateOnly = false,
   onComplete 
 }: DhikrCounterProps) {
   const { language } = useLanguage();
@@ -280,7 +283,7 @@ export function DhikrCounter({
     // Save to history
     const session = {
       date: new Date().toISOString(),
-      count: targetCount,
+      count: normalizedTargetCount,
       duration: elapsedTime,
       completed: true
     };
@@ -300,7 +303,7 @@ export function DhikrCounter({
   
   // Reset counter
   const handleReset = () => {
-    if (count > 0 && count < targetCount) {
+    if (count > 0 && count < normalizedTargetCount) {
       Alert.alert(
         language === 'en' ? 'Reset Progress?' : 'Réinitialiser?',
         language === 'en' 
@@ -346,8 +349,8 @@ export function DhikrCounter({
   // Share progress
   const handleShare = async () => {
     const shareText = language === 'en'
-      ? `I've completed ${count} of ${targetCount} recitations of ${divineNames.transliteration} 🌙✨`
-      : `J'ai complété ${count} de ${targetCount} récitations de ${divineNames.transliteration} 🌙✨`;
+      ? `I've completed ${count} of ${normalizedTargetCount} recitations of ${divineNames.transliteration} 🌙✨`
+      : `J'ai complété ${count} de ${normalizedTargetCount} récitations de ${divineNames.transliteration} 🌙✨`;
     
     try {
       await Sharing.shareAsync('data:text/plain;base64,' + btoa(shareText), {
@@ -372,7 +375,7 @@ export function DhikrCounter({
   
   // Estimate time remaining
   const estimatedTimeRemaining = averagePace > 0 
-    ? (targetCount - count) * averagePace 
+    ? (normalizedTargetCount - count) * averagePace 
     : 0;
 
   return (
@@ -519,7 +522,12 @@ export function DhikrCounter({
           {/* Count Display */}
           <View style={styles.countDisplay}>
             <Text style={styles.countNumber}>{count}</Text>
-            <Text style={styles.countTarget}>/ {targetCount}</Text>
+            <Text style={styles.countTarget}>/ {normalizedTargetCount}</Text>
+            {isBirthdateOnly && (
+              <Text style={styles.defaultCountNote}>
+                {language === 'en' ? '(default count)' : '(compteur par défaut)'}
+              </Text>
+            )}
             <View style={styles.progressBadge}>
               <Text style={styles.progressPercent}>{Math.round(progress)}%</Text>
             </View>
@@ -588,21 +596,25 @@ export function DhikrCounter({
           onPress={countingMode === 'manual' ? handleIncrement : undefined}
           disabled={count >= targetCount}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={count >= targetCount 
+            ? (language === 'ar' ? 'اكتمل العد' : language === 'fr' ? 'Completé' : 'Completed')
+            : (language === 'ar' ? 'اضغط للعد' : language === 'fr' ? 'Appuyer pour compter' : 'Tap to count')}
         >
           {count >= targetCount ? (
             <View style={styles.mainButtonContent}>
               <Trophy size={20} color="#9ca3af" />
               <Text style={styles.mainButtonTextDisabled}>
-                {language === 'en' ? 'Completed' : 'Terminé'}
+                {language === 'ar' ? 'اكتمل' : language === 'fr' ? 'Terminé' : 'Completed'}
               </Text>
             </View>
           ) : (
             <Text style={styles.mainButtonText}>
               {countingMode === 'manual' 
-                ? (language === 'en' ? 'Tap to Count' : 'Appuyer pour Compter')
+                ? (language === 'ar' ? 'اضغط للعد' : language === 'fr' ? 'Appuyer pour Compter' : 'Tap to Count')
                 : isActive 
-                  ? (language === 'en' ? 'Auto Counting...' : 'Comptage Auto...')
-                  : (language === 'en' ? 'Start Auto Count' : 'Démarrer Auto')
+                  ? (language === 'ar' ? 'عد تلقائي...' : language === 'fr' ? 'Comptage Auto...' : 'Auto Counting...')
+                  : (language === 'ar' ? 'بدء العد التلقائي' : language === 'fr' ? 'Démarrer Auto' : 'Start Auto Count')
               }
             </Text>
           )}
@@ -629,15 +641,27 @@ export function DhikrCounter({
             </Text>
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.controlButton} onPress={handleReset}>
+          <TouchableOpacity 
+            style={styles.controlButton} 
+            onPress={handleReset}
+            accessibilityRole="button"
+            accessibilityLabel={language === 'ar' ? 'إعادة تعيين' : language === 'fr' ? 'Réinitialiser' : 'Reset counter'}
+          >
             <RotateCcw size={16} color="#FFF" />
-            <Text style={styles.controlButtonText}>Reset</Text>
+            <Text style={styles.controlButtonText}>
+              {language === 'ar' ? 'إعادة' : language === 'fr' ? 'Réinit.' : 'Reset'}
+            </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.controlButton} onPress={handleShare}>
+          <TouchableOpacity 
+            style={styles.controlButton} 
+            onPress={handleShare}
+            accessibilityRole="button"
+            accessibilityLabel={language === 'ar' ? 'مشاركة التقدم' : language === 'fr' ? 'Partager' : 'Share progress'}
+          >
             <Share2 size={16} color="#FFF" />
             <Text style={styles.controlButtonText}>
-              {language === 'en' ? 'Share' : 'Partager'}
+              {language === 'ar' ? 'مشاركة' : language === 'fr' ? 'Partager' : 'Share'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -647,17 +671,21 @@ export function DhikrCounter({
           <View style={styles.tipRow}>
             <Heart size={14} color={colors.accent} />
             <Text style={styles.tipText}>
-              {language === 'en' 
-                ? 'Best practiced with presence and devotion'
-                : 'Meilleur pratiqué avec présence et dévotion'}
+              {language === 'ar' 
+                ? 'أفضل ممارسة بحضور وخشوع'
+                : language === 'fr'
+                ? 'Meilleur pratiqué avec présence et dévotion'
+                : 'Best practiced with presence and devotion'}
             </Text>
           </View>
           <View style={styles.tipRow}>
             <Moon size={14} color={colors.accent} />
             <Text style={styles.tipText}>
-              {language === 'en'
-                ? 'Practice during quiet hours for deeper connection'
-                : 'Pratiquer pendant les heures calmes pour une connexion plus profonde'}
+              {language === 'ar'
+                ? 'تدرَّب في الساعات الهادئة لاتصال أعمق'
+                : language === 'fr'
+                ? 'Pratiquer pendant les heures calmes pour une connexion plus profonde'
+                : 'Practice during quiet hours for deeper connection'}
             </Text>
           </View>
         </View>
@@ -809,6 +837,12 @@ const styles = StyleSheet.create({
   countTarget: {
     fontSize: 20,
     color: 'rgba(255,255,255,0.8)',
+  },
+  defaultCountNote: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
+    fontStyle: 'italic',
+    marginTop: 2,
   },
   progressBadge: {
     backgroundColor: 'rgba(168,85,247,0.3)',

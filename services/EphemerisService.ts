@@ -35,6 +35,9 @@ const inflightMoon = new Map<string, Promise<MoonLongitudeResult>>();
 // Higher precision (5-minute bucket) positions for UI.
 const inflightPrecisePositions = new Map<string, Promise<PlanetPositions | null>>();
 
+// Track if we've warned about network issues (to avoid log spam)
+let hasWarnedNetworkIssue = false;
+
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
@@ -299,8 +302,10 @@ export async function getPlanetPositions(
     return result;
     
   } catch (error) {
-    if (__DEV__) {
-      console.error('[EphemerisService] Error fetching positions:', error);
+    // Network errors are expected when offline - fallback positions will be used
+    if (__DEV__ && !hasWarnedNetworkIssue) {
+      hasWarnedNetworkIssue = true;
+      console.warn('[EphemerisService] Network unavailable - using fallback positions');
     }
     
     // Final fallback: approx positions
@@ -402,10 +407,7 @@ export async function getPlanetPositionsPrecise(
         return hourlyResult;
       }
 
-      // DO NOT serve synthetic data for real-time transit display
-      if (__DEV__) {
-        console.error('[EphemerisService] Could not fetch real ephemeris data for real-time display');
-      }
+      // Real-time transit display prefers actual data; proceed with null (caller handles fallback)
       return null;
     })();
 
@@ -416,8 +418,10 @@ export async function getPlanetPositionsPrecise(
       inflightPrecisePositions.delete(cacheKey);
     }
   } catch (error) {
-    if (__DEV__) {
-      console.error('[EphemerisService] Error fetching precise positions:', error);
+    // Network errors are expected - caller will handle
+    if (__DEV__ && !hasWarnedNetworkIssue) {
+      hasWarnedNetworkIssue = true;
+      console.warn('[EphemerisService] Precise positions unavailable - using fallback');
     }
     return null;
   }
@@ -530,8 +534,10 @@ export async function getMoonEclipticLongitude(
       inflightMoon.delete(cacheKey);
     }
   } catch (error) {
-    if (__DEV__) {
-      console.error('[EphemerisService] Moon longitude error:', error);
+    // Network errors are expected - fallback will be used
+    if (__DEV__ && !hasWarnedNetworkIssue) {
+      hasWarnedNetworkIssue = true;
+      console.warn('[EphemerisService] Moon API unavailable - using fallback');
     }
     // Final fallback — still cache approx (best effort) using the current bucket.
     const fallbackBucket = new Date(date);
@@ -599,8 +605,10 @@ async function fetchPositionsFromHorizons(
     return positions as Record<PlanetId, PlanetPosition>;
     
   } catch (error) {
-    if (__DEV__) {
-      console.error('[EphemerisService] Horizons fetch error:', error);
+    // Network errors are expected - caller will use fallback
+    if (__DEV__ && !hasWarnedNetworkIssue) {
+      hasWarnedNetworkIssue = true;
+      console.warn('[EphemerisService] Horizons API unavailable - using fallback');
     }
     return null;
   }
@@ -691,9 +699,10 @@ async function fetchSinglePlanetPosition(
     };
     
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error);
-    if (__DEV__) {
-      console.error(`[EphemerisService] Error fetching ${planetId}: ${errorMsg}`, error);
+    // Network errors are expected - caller will use fallback
+    if (__DEV__ && !hasWarnedNetworkIssue) {
+      hasWarnedNetworkIssue = true;
+      console.warn(`[EphemerisService] Unable to fetch ${planetId} - using fallback`);
     }
     return null;
   }
@@ -724,8 +733,10 @@ async function fetchPositionsFromHorizonsWithSpeed(
 
     return positions as Record<PlanetId, PlanetPositionWithSpeed>;
   } catch (error) {
-    if (__DEV__) {
-      console.error('[EphemerisService] Horizons speed fetch error:', error);
+    // Network errors are expected - caller will use fallback
+    if (__DEV__ && !hasWarnedNetworkIssue) {
+      hasWarnedNetworkIssue = true;
+      console.warn('[EphemerisService] Horizons speed fetch unavailable - using fallback');
     }
     return null;
   }
@@ -796,8 +807,10 @@ async function fetchSinglePlanetPositionWithSpeed(
       speedDegPerDay,
     };
   } catch (error) {
-    if (__DEV__) {
-      console.error(`[EphemerisService] Error fetching ${planetId} with speed:`, error);
+    // Network errors are expected when offline - fallback positions will be used
+    if (__DEV__ && !hasWarnedNetworkIssue) {
+      hasWarnedNetworkIssue = true;
+      console.warn(`[EphemerisService] Network unavailable for ${planetId} - using fallback positions`);
     }
     return null;
   }

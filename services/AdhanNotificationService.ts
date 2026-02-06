@@ -332,7 +332,8 @@ export async function saveAdhanSettings(settings: Partial<AdhanSettings>): Promi
 }
 
 /**
- * Schedule prayer notifications for the day
+ * Schedule prayer notifications for multiple days ahead
+ * Schedules for 7 days to ensure notifications work without app being opened
  */
 export async function schedulePrayerNotifications(
   timings: PrayerTimings,
@@ -357,6 +358,11 @@ export async function schedulePrayerNotifications(
     await cancelAllPrayerNotifications();
 
     const scheduledIds: string[] = [];
+    const now = new Date();
+
+    // Schedule each prayer for the next 7 days
+    // iOS limit is 64 notifications, 5 prayers * 7 days = 35, staying well under
+    const DAYS_TO_SCHEDULE = 7;
 
     // Schedule each prayer
     const prayers = [
@@ -367,130 +373,128 @@ export async function schedulePrayerNotifications(
       { name: 'Isha', nameArabic: 'العشاء', time: timings.Isha, enabled: settings.notifyIsha, isFajr: false },
     ];
 
-    for (const prayer of prayers) {
-      if (!prayer.enabled) continue;
+    for (let dayOffset = 0; dayOffset < DAYS_TO_SCHEDULE; dayOffset++) {
+      const scheduleDate = new Date(date);
+      scheduleDate.setDate(scheduleDate.getDate() + dayOffset);
 
-      const prayerDate = parsePrayerTime(prayer.time, date);
-      const now = new Date();
+      for (const prayer of prayers) {
+        if (!prayer.enabled) continue;
 
-      // Schedule the next *occurrence* of the prayer.
-      // If the prayer time for the provided date has already passed, schedule it for tomorrow.
-      // This avoids missing notifications when the app was last opened after Isha.
-      if (!Number.isNaN(prayerDate.getTime()) && prayerDate <= now) {
-        prayerDate.setDate(prayerDate.getDate() + 1);
-      }
+        const prayerDate = parsePrayerTime(prayer.time, scheduleDate);
 
-      if (Number.isNaN(prayerDate.getTime())) {
-        if (__DEV__) {
-          console.warn('[AdhanNotificationService] Invalid prayer time:', { prayer: prayer.name, time: prayer.time });
+        // Skip invalid times
+        if (Number.isNaN(prayerDate.getTime())) {
+          if (__DEV__) {
+            console.warn('[AdhanNotificationService] Invalid prayer time:', { prayer: prayer.name, time: prayer.time });
+          }
+          continue;
         }
-        continue;
-      }
 
-      // Safety: if still not in the future, skip.
-      if (prayerDate <= now) continue;
+        // Skip if already passed
+        if (prayerDate <= now) continue;
 
-      // Schedule main notification
-      try {
-        const androidChannelId = Platform.OS === 'android'
-          ? androidChannelIdFromSettings(prayer.isFajr, settings)
-          : undefined;
+        // Schedule main notification
+        try {
+          const androidChannelId = Platform.OS === 'android'
+            ? androidChannelIdFromSettings(prayer.isFajr, settings)
+            : undefined;
 
-        const title = tStatic(lang, 'notifications.prayer.prayerTitle', {
-          prayerName: prayer.name,
-        });
-        const glimpse = await buildPrayerGuidanceGlimpse(prayerDate);
-        const body = tStatic(lang, 'notifications.prayer.prayerBody', {
-          prayerName: prayer.name,
-          arabic: prayer.nameArabic,
-          glimpse,
-        });
-        
-        const notificationContent: any = {
-          title,
-          body,
-          // iOS plays sound per-notification. Note: iOS custom notification sounds must be .caf/.wav/.aiff.
-          // Our bundled adhan assets are .mp3, so we fall back to the default iOS notification sound.
-          sound: Platform.OS === 'ios' ? (settings.playSound ? 'default' : null) : undefined,
-          data: {
-            category: 'prayer',
-            type: 'prayer',
-            action: 'prayerGuidance',
-            prayer: prayer.name,
+          const title = tStatic(lang, 'notifications.prayer.prayerTitle', {
             prayerName: prayer.name,
-            prayerArabic: prayer.nameArabic,
-            isFajr: prayer.isFajr,
-          },
-        };
+          });
+          const glimpse = await buildPrayerGuidanceGlimpse(prayerDate);
+          const body = tStatic(lang, 'notifications.prayer.prayerBody', {
+            prayerName: prayer.name,
+            arabic: prayer.nameArabic,
+            glimpse,
+          });
+          
+          const notificationContent: any = {
+            title,
+            body,
+            // iOS plays sound per-notification. Note: iOS custom notification sounds must be .caf/.wav/.aiff.
+            // Our bundled adhan assets are .mp3, so we fall back to the default iOS notification sound.
+            sound: Platform.OS === 'ios' ? (settings.playSound ? 'default' : null) : undefined,
+            data: {
+              category: 'prayer',
+              type: 'prayer',
+              action: 'prayerGuidance',
+              prayer: prayer.name,
+              prayerName: prayer.name,
+              prayerArabic: prayer.nameArabic,
+              isFajr: prayer.isFajr,
+            },
+          };
 
-        // Android-specific configuration
-        if (Platform.OS === 'android') {
-          // On Android 8.0+, channelId must be attached to the trigger.
-          notificationContent.priority = 'max';
-          notificationContent.vibrate = settings.vibrate ? [0, 250, 250, 250] : undefined;
+          // Android-specific configuration
+          if (Platform.OS === 'android') {
+            // On Android 8.0+, channelId must be attached to the trigger.
+            notificationContent.priority = 'max';
+            notificationContent.vibrate = settings.vibrate ? [0, 250, 250, 250] : undefined;
+          }
+
+          const notificationId = await Notifications.scheduleNotificationAsync({
+            content: notificationContent,
+            trigger: {
+              type: SchedulableTriggerInputTypes.DATE,
+              date: prayerDate,
+              channelId: androidChannelId,
+            },
+          });
+
+          scheduledIds.push(notificationId);
+        } catch (error) {
+          console.warn(`Failed to schedule ${prayer.name} notification:`, error);
         }
 
-        const notificationId = await Notifications.scheduleNotificationAsync({
-          content: notificationContent,
-          trigger: {
-            type: SchedulableTriggerInputTypes.DATE,
-            date: prayerDate,
-            channelId: androidChannelId,
-          },
-        });
+        // Schedule reminder if enabled (only for first day to avoid too many notifications)
+        if (dayOffset === 0 && settings.reminderMinutes > 0) {
+          const reminderDate = new Date(prayerDate.getTime() - settings.reminderMinutes * 60 * 1000);
+          
+          if (reminderDate > now) {
+            try {
+              const reminderChannelId = Platform.OS === 'android'
+                ? `${ANDROID_CHANNEL_PREFIX}-silent`
+                : undefined;
 
-        scheduledIds.push(notificationId);
-      } catch (error) {
-        console.warn(`Failed to schedule ${prayer.name} notification:`, error);
-      }
+              const reminderTitle = tStatic(lang, 'notifications.prayer.reminderTitle', {
+                prayerName: prayer.name,
+                minutes: settings.reminderMinutes,
+              });
+              const reminderGlimpse = await buildPrayerGuidanceGlimpse(reminderDate);
+              const reminderBody = tStatic(lang, 'notifications.prayer.reminderBody', {
+                prayerName: prayer.name,
+                minutes: settings.reminderMinutes,
+                glimpse: reminderGlimpse,
+              });
 
-      // Schedule reminder if enabled
-      if (settings.reminderMinutes > 0) {
-        const reminderDate = new Date(prayerDate.getTime() - settings.reminderMinutes * 60 * 1000);
-        
-        if (reminderDate > now) {
-          try {
-            const reminderChannelId = Platform.OS === 'android'
-              ? `${ANDROID_CHANNEL_PREFIX}-silent`
-              : undefined;
-
-            const reminderTitle = tStatic(lang, 'notifications.prayer.reminderTitle', {
-              prayerName: prayer.name,
-              minutes: settings.reminderMinutes,
-            });
-            const reminderGlimpse = await buildPrayerGuidanceGlimpse(reminderDate);
-            const reminderBody = tStatic(lang, 'notifications.prayer.reminderBody', {
-              prayerName: prayer.name,
-              minutes: settings.reminderMinutes,
-              glimpse: reminderGlimpse,
-            });
-
-            const reminderId = await Notifications.scheduleNotificationAsync({
-              content: {
-                title: reminderTitle,
-                body: reminderBody,
-                // Explicitly disable sound for reminders
-                sound: null,
-                data: {
-                  category: 'prayer',
-                  type: 'reminder',
-                  action: 'prayerGuidance',
-                  prayer: prayer.name,
-                  prayerName: prayer.name,
-                  prayerArabic: prayer.nameArabic,
-                  minutes: settings.reminderMinutes,
+              const reminderId = await Notifications.scheduleNotificationAsync({
+                content: {
+                  title: reminderTitle,
+                  body: reminderBody,
+                  // Explicitly disable sound for reminders
+                  sound: null,
+                  data: {
+                    category: 'prayer',
+                    type: 'reminder',
+                    action: 'prayerGuidance',
+                    prayer: prayer.name,
+                    prayerName: prayer.name,
+                    prayerArabic: prayer.nameArabic,
+                    minutes: settings.reminderMinutes,
+                  },
                 },
-              },
-              trigger: {
-                type: SchedulableTriggerInputTypes.DATE,
-                date: reminderDate,
-                channelId: reminderChannelId,
-              },
-            });
+                trigger: {
+                  type: SchedulableTriggerInputTypes.DATE,
+                  date: reminderDate,
+                  channelId: reminderChannelId,
+                },
+              });
 
-            scheduledIds.push(reminderId);
-          } catch (error) {
-            console.warn(`Failed to schedule ${prayer.name} reminder:`, error);
+              scheduledIds.push(reminderId);
+            } catch (error) {
+              console.warn(`Failed to schedule ${prayer.name} reminder:`, error);
+            }
           }
         }
       }
@@ -505,6 +509,7 @@ export async function schedulePrayerNotifications(
       JSON.stringify({
         lastScheduledAt: new Date().toISOString(),
         scheduledCount: scheduledIds.length,
+        daysScheduled: DAYS_TO_SCHEDULE,
         timings: {
           Fajr: timings.Fajr,
           Dhuhr: timings.Dhuhr,
@@ -514,6 +519,8 @@ export async function schedulePrayerNotifications(
         },
       })
     );
+
+    console.log(`✅ Scheduled ${scheduledIds.length} prayer notifications for ${DAYS_TO_SCHEDULE} days`);
 
   } catch (error) {
     console.error('Failed to schedule prayer notifications:', error);

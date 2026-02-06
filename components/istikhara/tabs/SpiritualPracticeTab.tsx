@@ -289,6 +289,9 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
   const zodiac = getZodiacSign(result.burujRemainder);
   const totalHadadValue = result.combinedTotal;
   const ritualEssence = RITUAL_ESSENCES_BY_BURUJ[result.burujRemainder];
+  
+  // Check if this is a birthdate-only calculation (no valid name-based count)
+  const isBirthdateOnly = result.calculationMethod === 'birthdate';
 
   const cardSurface = {
     backgroundColor: withAlpha(accentColor, 0.14),
@@ -760,12 +763,13 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                 <Text style={[styles.cardTitle, { color: accentColor }]}>
                   {language === 'en' ? 'Divine Names to Recite' : 'Noms Divins à Réciter'}
                 </Text>
-                <View style={[styles.countPill, { borderColor: colors.border }]}
-                >
-                  <Text style={[styles.countPillText, { color: accentColor }]}>
-                    {totalHadadValue}×
-                  </Text>
-                </View>
+                {!isBirthdateOnly && (
+                  <View style={[styles.countPill, { borderColor: colors.border }]}>
+                    <Text style={[styles.countPillText, { color: accentColor }]}>
+                      {totalHadadValue}×
+                    </Text>
+                  </View>
+                )}
               </View>
               
               <View style={styles.divineNamesContent}>
@@ -794,17 +798,19 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                           {names.map((name, idx) => (
                             <View key={`${name}-${idx}`} style={[styles.zikrRow, { borderColor: colors.border }]}>
                               <Text style={styles.zikrNameArabic}>{name}</Text>
-                              <View style={[styles.zikrCountBadge, { backgroundColor: withAlpha(accentColor, 0.12), borderColor: withAlpha(accentColor, 0.25) }]}>
-                                <Text style={[styles.zikrCountText, { color: accentColor }]}>
-                                  {totalHadadValue}
-                                </Text>
-                              </View>
+                              {!isBirthdateOnly && (
+                                <View style={[styles.zikrCountBadge, { backgroundColor: withAlpha(accentColor, 0.12), borderColor: withAlpha(accentColor, 0.25) }]}>
+                                  <Text style={[styles.zikrCountText, { color: accentColor }]}>
+                                    {totalHadadValue}
+                                  </Text>
+                                </View>
+                              )}
                             </View>
                           ))}
                         </View>
                       )}
 
-                      {names.length <= 1 && (
+                      {names.length <= 1 && !isBirthdateOnly && (
                         <View style={styles.singleCountRow}>
                           <Text style={styles.singleCountLabel}>
                             {language === 'en' ? 'Recite this name:' : 'Récitez ce nom :'}
@@ -840,7 +846,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
           {/* Dhikr Counter */}
           {showDhikrCounter && 'arabic' in spiritual_practice.divine_names && (
             <DhikrCounter
-              targetCount={totalHadadValue}
+              targetCount={isBirthdateOnly ? 33 : totalHadadValue}
               divineNames={spiritual_practice.divine_names}
               quranicVerse={spiritual_practice.quranic_verse}
               angel={spiritual_practice.angel}
@@ -849,6 +855,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
               zodiacSign={zodiac ? { en: zodiac.nameEn, fr: zodiac.nameFr, arabic: zodiac.nameAr } : undefined}
               instructions={spiritual_practice.instructions}
               elementColors={colors}
+              isBirthdateOnly={isBirthdateOnly}
             />
           )}
 
@@ -864,11 +871,13 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                   <Text style={[styles.cardTitle, { color: accentColor }]}>
                     {language === 'en' ? 'Quranic Verse' : 'Verset Coranique'}
                   </Text>
-                  <View style={[styles.countPill, { borderColor: colors.border }]}>
-                    <Text style={[styles.countPillText, { color: accentColor }]}>
-                      {totalHadadValue}×
-                    </Text>
-                  </View>
+                  {!isBirthdateOnly && (
+                    <View style={[styles.countPill, { borderColor: colors.border }]}>
+                      <Text style={[styles.countPillText, { color: accentColor }]}>
+                        {totalHadadValue}×
+                      </Text>
+                    </View>
+                  )}
                 </View>
                 {showQuranicVerse ? <ChevronUp size={20} color="#FFF" /> : <ChevronDown size={20} color="#FFF" />}
               </TouchableOpacity>
@@ -903,11 +912,13 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                     <Text style={[styles.smallCardTitle, { color: accentColor }]}>
                       {language === 'en' ? 'Angel' : 'Ange'}
                     </Text>
-                    <View style={[styles.countPill, { borderColor: colors.border }]}>
-                      <Text style={[styles.countPillText, { color: accentColor }]}>
-                        {totalHadadValue}×
-                      </Text>
-                    </View>
+                    {!isBirthdateOnly && (
+                      <View style={[styles.countPill, { borderColor: colors.border }]}>
+                        <Text style={[styles.countPillText, { color: accentColor }]}>
+                          {totalHadadValue}×
+                        </Text>
+                      </View>
+                    )}
                   </View>
                   <Text style={styles.angelArabic}>{spiritual_practice.angel.arabic}</Text>
                   <Text style={[styles.angelTransliteration, { color: withAlpha(accentColor, 0.9) }]}>{spiritual_practice.angel.transliteration}</Text>
@@ -926,11 +937,13 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                     <Text style={[styles.smallCardTitle, { color: accentColor }]}>
                       {language === 'en' ? 'Jinn' : 'Djinn'}
                     </Text>
-                    <View style={[styles.countPill, { borderColor: colors.border }]}>
-                      <Text style={[styles.countPillText, { color: accentColor }]}>
-                        {totalHadadValue}×
-                      </Text>
-                    </View>
+                    {!isBirthdateOnly && (
+                      <View style={[styles.countPill, { borderColor: colors.border }]}>
+                        <Text style={[styles.countPillText, { color: accentColor }]}>
+                          {totalHadadValue}×
+                        </Text>
+                      </View>
+                    )}
                   </View>
                   <Text style={styles.angelArabic}>{spiritual_practice.jinn.arabic}</Text>
                   <Text style={[styles.angelTransliteration, { color: withAlpha(accentColor, 0.9) }]}>{spiritual_practice.jinn.transliteration}</Text>

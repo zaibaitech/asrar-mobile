@@ -190,14 +190,14 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
         <Text style={styles.elementEmoji}>{profile.element_emoji}</Text>
         <View style={styles.elementInfo}>
           <Text style={[styles.elementText, { color: accentColor }]}>
-            {profile.element.charAt(0).toUpperCase() + profile.element.slice(1)} Element
+            {profile.element.charAt(0).toUpperCase() + profile.element.slice(1)} {language === 'ar' ? 'عنصر' : language === 'fr' ? 'Élément' : 'Element'}
           </Text>
           <Text style={styles.elementNumber}>
-            {language === 'en' ? 'Elemental Number' : 'Numéro Élémentaire'}: {profile.element_number}
+            {language === 'ar' ? 'رقم العنصر' : language === 'fr' ? 'Numéro Élémentaire' : 'Elemental Number'}: {profile.element_number}
           </Text>
           {!!zodiac && (
             <Text style={styles.elementZodiacLine}>
-              {language === 'en' ? 'Burūj' : 'Burūj'}: {language === 'fr' ? zodiac.nameFr : zodiac.nameEn} · {zodiac.planetaryRuler?.[language as 'en' | 'fr'] || zodiac.planetaryRuler?.en}
+              {language === 'ar' ? 'البرج' : 'Burūj'}: {language === 'ar' ? zodiac.nameAr : language === 'fr' ? zodiac.nameFr : zodiac.nameEn} · {zodiac.planetaryRuler?.[language as 'en' | 'fr' | 'ar'] || zodiac.planetaryRuler?.en}
             </Text>
           )}
         </View>
@@ -212,13 +212,15 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
         <View style={styles.summaryHeader}>
           <Info size={20} color={accentColor} />
           <Text style={styles.summaryTitle}>
-            {language === 'en' ? 'About This Profile' : 'À Propos de ce Profil'}
+            {language === 'ar' ? 'حول هذا الملف الشخصي' : language === 'fr' ? 'À Propos de ce Profil' : 'About This Profile'}
           </Text>
         </View>
         <Text style={styles.summaryText}>
-          {language === 'en'
-            ? `Your ${profile.element} nature reveals ${availableTraits.length} key aspects of your personality. Each trait offers insights into your character, relationships, and life path.`
-            : `Votre nature ${profile.element} révèle ${availableTraits.length} aspects clés de votre personnalité. Chaque trait offre des aperçus sur votre caractère, vos relations et votre chemin de vie.`}
+          {language === 'ar'
+            ? `طبيعتك ${profile.element} تكشف ${availableTraits.length} جوانب رئيسية من شخصيتك. كل سمة تقدم رؤى حول شخصيتك وعلاقاتك ومسار حياتك.`
+            : language === 'fr'
+            ? `Votre nature ${profile.element} révèle ${availableTraits.length} aspects clés de votre personnalité. Chaque trait offre des perspectives sur votre caractère, vos relations et votre chemin de vie.`
+            : `Your ${profile.element} nature reveals ${availableTraits.length} key aspects of your personality. Each trait offers insights into your character, relationships, and life path.`}
         </Text>
       </PatternCard>
 
@@ -273,7 +275,7 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
                   }]}>
                     <Shield size={16} color={accentColor} />
                     <Text style={[styles.blessingText, { color: accentColor }]}>
-                      {language === 'en' ? 'Divine Blessing' : 'Bénédiction Divine'}
+                      {language === 'ar' ? 'بركة إلهية' : language === 'fr' ? 'Bénédiction Divine' : 'Divine Blessing'}
                     </Text>
                   </View>
                 )}
@@ -285,7 +287,7 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
                   }]}>
                     <AlertCircle size={16} color={accentColor} />
                     <Text style={[styles.challengeText, { color: accentColor }]}>
-                      {language === 'en' ? 'Area for Growth' : 'Zone de Croissance'}
+                      {language === 'ar' ? 'مجال للنمو' : language === 'fr' ? 'Zone de Croissance' : 'Area for Growth'}
                     </Text>
                   </View>
                 )}

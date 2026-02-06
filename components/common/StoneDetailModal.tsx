@@ -112,25 +112,6 @@ export function StoneDetailModal({ visible, onClose, stone, zodiacSign, element 
         <View pointerEvents="none" style={styles.patternOverlay}>
           <IslamicPatternOverlay />
         </View>
-
-        {/* Header with close button */}
-        <LinearGradient
-          colors={colors.primary}
-          style={styles.header}
-        >
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <X size={24} color="#ffffff" />
-          </TouchableOpacity>
-          
-          <View style={styles.headerActions}>
-            <TouchableOpacity onPress={handleBookmark} style={styles.iconButton}>
-              <Bookmark size={24} color={bookmarked ? "#FFD700" : "#ffffff"} fill={bookmarked ? "#FFD700" : "none"} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleShare} style={styles.iconButton}>
-              <Share2 size={24} color="#ffffff" />
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
         
         {/* Scrollable content */}
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -382,6 +363,43 @@ export function StoneDetailModal({ visible, onClose, stone, zodiacSign, element 
           
           <View style={{ height: 40 }} />
         </ScrollView>
+        
+        {/* Floating Header - overlays content */}
+        <LinearGradient
+          colors={['rgba(11, 16, 32, 0.95)', 'rgba(11, 16, 32, 0.7)', 'transparent']}
+          style={styles.floatingHeader}
+        >
+          <TouchableOpacity 
+            onPress={onClose} 
+            style={styles.closeButton}
+            accessibilityRole="button"
+            accessibilityLabel={language === 'ar' ? 'إغلاق' : language === 'fr' ? 'Fermer' : 'Close'}
+          >
+            <X size={22} color="#ffffff" />
+          </TouchableOpacity>
+          
+          <View style={styles.headerActions}>
+            <TouchableOpacity 
+              onPress={handleBookmark} 
+              style={styles.iconButton}
+              accessibilityRole="button"
+              accessibilityLabel={bookmarked 
+                ? (language === 'ar' ? 'إزالة الإشارة المرجعية' : language === 'fr' ? 'Retirer le favori' : 'Remove bookmark')
+                : (language === 'ar' ? 'حفظ' : language === 'fr' ? 'Ajouter aux favoris' : 'Bookmark')
+              }
+            >
+              <Bookmark size={22} color={bookmarked ? "#FCD34D" : "#ffffff"} fill={bookmarked ? "#FCD34D" : "none"} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={handleShare} 
+              style={styles.iconButton}
+              accessibilityRole="button"
+              accessibilityLabel={language === 'ar' ? 'مشاركة' : language === 'fr' ? 'Partager' : 'Share'}
+            >
+              <Share2 size={22} color="#ffffff" />
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
       </View>
     </Modal>
   );
@@ -396,30 +414,46 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     opacity: 0.55,
   },
-  header: {
+  floatingHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     paddingTop: 50,
-    paddingBottom: 16,
+    paddingBottom: 20,
     paddingHorizontal: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    zIndex: 10,
   },
   closeButton: {
-    padding: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
   },
   iconButton: {
-    padding: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   content: {
     flex: 1,
   },
   imageContainer: {
     width: width,
-    height: 240,
+    height: 280,
+    paddingTop: 80,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.22)',

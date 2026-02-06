@@ -25,6 +25,17 @@ function getElementNameFr(element: string): string {
   return elementMap[element.toLowerCase()] || element;
 }
 
+// Helper function to get Arabic element names
+function getElementNameAr(element: string): string {
+  const elementMap: Record<string, string> = {
+    fire: 'النار',
+    earth: 'التراب',
+    air: 'الهواء',
+    water: 'الماء',
+  };
+  return elementMap[element.toLowerCase()] || element;
+}
+
 function IslamicPatternOverlay({ opacity = 0.06 }: { opacity?: number }) {
   return (
     <Svg pointerEvents="none" width="100%" height="100%" style={StyleSheet.absoluteFill}>
@@ -61,7 +72,8 @@ function PatternCard({
 
 export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
   const { t, language } = useLanguage();
-  const { burujProfile, personTotal, motherTotal, combinedTotal, repetitionCount, burujRemainder } = data;
+  const { burujProfile, personTotal, motherTotal, combinedTotal, repetitionCount, burujRemainder, calculationMethod } = data;
+  const isBirthdateOnly = calculationMethod === 'birthdate';
   const zodiacSign = getZodiacSign(burujRemainder);
   const elementColors = getElementBackgroundColors(burujProfile.element);
   const elementKey = burujProfile.element.toLowerCase() as "fire" | "earth" | "air" | "water";
@@ -102,7 +114,9 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
 
         {/* Core Spiritual Attributes - 3 Compact Cards */}
         <View style={styles.supportingSignsSection}>
-          <Text style={styles.supportingSignsTitle}>Core Spiritual Attributes</Text>
+          <Text style={styles.supportingSignsTitle}>
+            {language === 'ar' ? 'الصفات الروحية الأساسية' : language === 'fr' ? 'Attributs Spirituels Fondamentaux' : 'Core Spiritual Attributes'}
+          </Text>
           
           <View style={styles.supportingSignsGrid}>
             {/* Element */}
@@ -146,7 +160,9 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
 
         {/* Key Insights - Professional Card Style */}
         <View style={styles.keyInsightsSection}>
-          <Text style={styles.keyInsightsTitle}>Key Insights</Text>
+          <Text style={styles.keyInsightsTitle}>
+            {language === 'ar' ? 'رؤى رئيسية' : language === 'fr' ? 'Aperçus Clés' : 'Key Insights'}
+          </Text>
           
           <PatternCard style={[styles.insightCard, {
             backgroundColor: `${accentColor}33`,
@@ -159,9 +175,14 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
               <Text style={styles.insightIconText}>📿</Text>
             </View>
             <View style={styles.insightContent}>
-              <Text style={[styles.insightLabel, { color: accentColor }]}>Practice Focus</Text>
+              <Text style={[styles.insightLabel, { color: accentColor }]}>
+                {language === 'ar' ? 'تركيز الممارسة' : language === 'fr' ? 'Focus de Pratique' : 'Practice Focus'}
+              </Text>
               <Text style={styles.insightText}>
-                Recite Divine Names {repetitionCount} times for spiritual alignment
+                {isBirthdateOnly
+                  ? (language === 'ar' ? 'رتّل الأسماء الإلهية للتوافق الروحي' : language === 'fr' ? 'Récitez les Noms Divins pour l\'alignement spirituel' : 'Recite Divine Names for spiritual alignment')
+                  : (language === 'ar' ? `رتّل الأسماء الإلهية ${repetitionCount} مرة للتوافق الروحي` : language === 'fr' ? `Récitez les Noms Divins ${repetitionCount} fois pour l'alignement spirituel` : `Recite Divine Names ${repetitionCount} times for spiritual alignment`)
+                }
               </Text>
             </View>
           </PatternCard>
@@ -177,9 +198,16 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
               <Text style={styles.insightIconText}>{burujProfile.element_emoji}</Text>
             </View>
             <View style={styles.insightContent}>
-              <Text style={[styles.insightLabel, { color: accentColor }]}>Elemental Advice</Text>
+              <Text style={[styles.insightLabel, { color: accentColor }]}>
+                {language === 'ar' ? 'نصيحة العنصر' : language === 'fr' ? 'Conseil Élémentaire' : 'Elemental Advice'}
+              </Text>
               <Text style={styles.insightText}>
-                Embrace {language === 'fr' ? getElementNameFr(burujProfile.element).toLowerCase() : burujProfile.element.toLowerCase()} qualities through mindful presence
+                {language === 'ar'
+                  ? `تقبّل صفات ${getElementNameAr(burujProfile.element)} من خلال الحضور الواعي`
+                  : language === 'fr'
+                    ? `Embrassez les qualités ${getElementNameFr(burujProfile.element).toLowerCase()} à travers une présence attentive`
+                    : `Embrace ${burujProfile.element.toLowerCase()} qualities through mindful presence`
+                }
               </Text>
             </View>
           </PatternCard>
@@ -195,9 +223,16 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
               <Text style={styles.insightIconText}>🧭</Text>
             </View>
             <View style={styles.insightContent}>
-              <Text style={[styles.insightLabel, { color: accentColor }]}>Path Guidance</Text>
+              <Text style={[styles.insightLabel, { color: accentColor }]}>
+                {language === 'ar' ? 'إرشاد الطريق' : language === 'fr' ? 'Guidance du Chemin' : 'Path Guidance'}
+              </Text>
               <Text style={styles.insightText}>
-                Contemplate {zodiacSign?.nameEn} wisdom in moments of decision
+                {language === 'ar'
+                  ? `تأمّل حكمة ${zodiacSign?.nameAr || zodiacSign?.nameEn} في لحظات القرار`
+                  : language === 'fr'
+                    ? `Contemplez la sagesse de ${zodiacSign?.nameFr || zodiacSign?.nameEn} dans les moments de décision`
+                    : `Contemplate ${zodiacSign?.nameEn} wisdom in moments of decision`
+                }
               </Text>
             </View>
           </PatternCard>
@@ -234,7 +269,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
           }]}>
             {/* Spiritual Practice */}
             <Text style={[styles.detailSectionTitle, { color: accentColor }]}> 
-              {language === 'en' ? 'SPIRITUAL PRACTICE' : 'PRATIQUE SPIRITUELLE'}
+              {language === 'ar' ? 'الممارسة الروحية' : language === 'fr' ? 'PRATIQUE SPIRITUELLE' : 'SPIRITUAL PRACTICE'}
             </Text>
             
             {/* Divine Names */}
@@ -243,7 +278,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
                 <View style={styles.practiceHeader}>
                   <Text style={styles.practiceIcon}>✨</Text>
                   <Text style={[styles.practiceTitle, { color: accentColor }]}>
-                    {language === 'en' ? 'Divine Names' : 'Noms Divins'}
+                    {language === 'ar' ? 'الأسماء الإلهية' : language === 'fr' ? 'Noms Divins' : 'Divine Names'}
                   </Text>
                 </View>
                 <Text style={styles.practiceArabic}>{burujProfile.spiritual_practice.divine_names.arabic}</Text>
@@ -251,10 +286,12 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
                 <Text style={styles.practiceTranslation}>
                   {burujProfile.spiritual_practice.divine_names.translation[language as 'en' | 'fr']}
                 </Text>
-                <View style={[styles.practiceCount, { backgroundColor: `${accentColor}1A` }]}> 
-                  <Text style={styles.practiceCountLabel}>{language === 'en' ? 'Recite' : 'Réciter'}</Text>
-                  <Text style={[styles.practiceCountValue, { color: accentColor }]}>{repetitionCount}×</Text>
-                </View>
+                {!isBirthdateOnly && (
+                  <View style={[styles.practiceCount, { backgroundColor: `${accentColor}1A` }]}> 
+                    <Text style={styles.practiceCountLabel}>{language === 'ar' ? 'رتّل' : language === 'fr' ? 'Réciter' : 'Recite'}</Text>
+                    <Text style={[styles.practiceCountValue, { color: accentColor }]}>{repetitionCount}×</Text>
+                  </View>
+                )}
               </View>
             )}
 
@@ -266,15 +303,15 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
                 <View style={styles.practiceHeader}>
                   <Text style={styles.practiceIcon}>🌙</Text>
                   <Text style={[styles.practiceTitle, { color: accentColor }]}>
-                    {language === 'en' ? 'Practice Night' : 'Nuit de Pratique'}
+                    {language === 'ar' ? 'ليلة الممارسة' : language === 'fr' ? 'Nuit de Pratique' : 'Practice Night'}
                   </Text>
                 </View>
                 <Text style={styles.practiceValue}>
-                  {burujProfile.spiritual_practice.practice_night.primary[language as 'en' | 'fr']}
+                  {burujProfile.spiritual_practice.practice_night.primary[language as 'en' | 'fr' | 'ar']}
                 </Text>
                 {burujProfile.spiritual_practice.practice_night.note && (
                   <Text style={styles.practiceNote}>
-                    {burujProfile.spiritual_practice.practice_night.note[language as 'en' | 'fr']}
+                    {burujProfile.spiritual_practice.practice_night.note[language as 'en' | 'fr' | 'ar']}
                   </Text>
                 )}
               </View>
@@ -284,7 +321,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
 
             {/* Spiritual Guardians */}
             <Text style={[styles.detailSectionTitle, { color: accentColor }]}>
-              {language === 'en' ? 'SPIRITUAL GUARDIANS' : 'GARDIENS SPIRITUELS'}
+              {language === 'ar' ? 'الحراس الروحيون' : language === 'fr' ? 'GARDIENS SPIRITUELS' : 'SPIRITUAL GUARDIANS'}
             </Text>
             
             <View style={styles.guardiansGrid}>
@@ -292,7 +329,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
               {burujProfile.spiritual_practice?.angel && (
                 <PatternCard style={[styles.guardianCard, { borderColor: `${accentColor}26` }]}>
                   <Text style={styles.guardianIcon}>👼</Text>
-                  <Text style={[styles.guardianLabel, { color: accentColor }]}>{language === 'en' ? 'Angel' : 'Ange'}</Text>
+                  <Text style={[styles.guardianLabel, { color: accentColor }]}>{language === 'ar' ? 'الملك' : language === 'fr' ? 'Ange' : 'Angel'}</Text>
                   <Text style={styles.guardianArabic}>{burujProfile.spiritual_practice.angel.arabic}</Text>
                   <Text style={[styles.guardianName, { color: accentColor }]}>{burujProfile.spiritual_practice.angel.transliteration}</Text>
                 </PatternCard>
@@ -302,7 +339,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
               {burujProfile.spiritual_practice?.jinn && (
                 <PatternCard style={[styles.guardianCard, { borderColor: `${accentColor}26` }]}>
                   <Text style={styles.guardianIcon}>🔮</Text>
-                  <Text style={[styles.guardianLabel, { color: accentColor }]}>{language === 'en' ? 'Jinn King' : 'Roi Jinn'}</Text>
+                  <Text style={[styles.guardianLabel, { color: accentColor }]}>{language === 'ar' ? 'ملك الجن' : language === 'fr' ? 'Roi Jinn' : 'Jinn King'}</Text>
                   <Text style={styles.guardianArabic}>{burujProfile.spiritual_practice.jinn.arabic}</Text>
                   <Text style={[styles.guardianName, { color: accentColor }]}>{burujProfile.spiritual_practice.jinn.transliteration}</Text>
                 </PatternCard>
@@ -317,7 +354,7 @@ export default function OverviewTab({ data, elementColor }: OverviewTabProps) {
                 <View style={styles.practiceHeader}>
                   <Text style={styles.practiceIcon}>📖</Text>
                   <Text style={[styles.practiceTitle, { color: accentColor }]}>
-                    {language === 'en' ? 'Quranic Connection' : 'Connexion Coranique'}
+                    {language === 'ar' ? 'الصلة القرآنية' : language === 'fr' ? 'Connexion Coranique' : 'Quranic Connection'}
                   </Text>
                 </View>
                 <Text style={[styles.verseReference, { color: accentColor }]}>{burujProfile.spiritual_practice.quranic_verse.reference}</Text>

@@ -446,12 +446,29 @@ export function analyzeElementCompatibility(
   // When day ruler matches user ruling planet, it's a FAVORABLE window regardless of element
   let minScore = dayRulerIsUserRuler ? 50 : 0;
   
-  // GUARD 2: NEW - Check for STRONG planetary friendship with hour planet
+  // GUARD 2: SAME PLANET HOUR - HIGHEST PRIORITY FOR HOURLY ALIGNMENT
+  // When the hour planet is THE SAME as user's ruling planet, elemental opposition 
+  // should NEVER restrict. This is the core traditional ʿIlm al-Nujum rule:
+  // Same planet hour = ALWAYS favorable for that native.
+  // Example: Scorpio (Mars-ruled) during Mars hour = ALWAYS Sa'd regardless of Fire/Water tension
+  const isHourPlanetSameAsUserRuler = user.rulingPlanet && 
+    moment.planetaryHourPlanet.toLowerCase() === user.rulingPlanet;
+  
+  if (isHourPlanetSameAsUserRuler) {
+    // Same planet hour = minimum 65% (ensures at least MAINTAIN, typically ACT)
+    minScore = Math.max(minScore, 65);
+    modifierScore += 20; // Strong boost for same planet resonance
+    modifierReason += 'Your ruling planet governs this hour — natural empowerment. ';
+    modifierReasonFr += 'Votre planète dominante gouverne cette heure — renforcement naturel. ';
+    modifierReasonAr += 'كوكبك الحاكم يحكم هذه الساعة — تمكين طبيعي. ';
+  }
+  
+  // GUARD 3: Check for STRONG planetary friendship with hour planet
   // If hour planet is a FRIEND of user's ruling planet, element opposition should not restrict
   // This addresses: "Planetary Friendship should outweigh elemental opposition"
   // Example: Sun (Fire) hour + Mars (Water) native = FRIENDS, so Fire ↔ Water opposition
   //          should not create "Restricted" status despite elemental opposition
-  if (user.rulingPlanet && moment.planetaryHourPlanet) {
+  if (user.rulingPlanet && moment.planetaryHourPlanet && !isHourPlanetSameAsUserRuler) {
     const hourPlanetFriendship = getPlanetaryFriendship(
       user.rulingPlanet.toLowerCase(),
       moment.planetaryHourPlanet.toLowerCase()
@@ -869,6 +886,10 @@ export function analyzePlanetaryResonance(
 }
 
 function getPlanetaryFriendship(planet1: string, planet2: string): 'friend' | 'neutral' | 'enemy' {
+  // Same planet is always "self-harmonious" - treat as friend (actually better than friend)
+  if (planet1 === planet2) {
+    return 'friend';
+  }
   const key = `${planet1}-${planet2}`;
   return PLANETARY_FRIENDSHIPS[key] || 'neutral';
 }

@@ -17,6 +17,8 @@ export type HouseType = 'angular' | 'succedent' | 'cadent' | undefined;
 
 export interface ClassicalJudgmentInput {
   rulerPlanet: Planet;
+  /** User's personal ruling planet (from birth chart/zodiac sign) */
+  userRulingPlanet?: Planet;
   dignityType?: DignityType;
   houseType?: HouseType;
   aspectsToBenefics?: number;
@@ -100,6 +102,34 @@ function domainsForPlanet(planet: Planet): { allowed: string[]; avoid: string[] 
 }
 
 export function getClassicalJudgment(input: ClassicalJudgmentInput): ClassicalJudgment {
+  // ─────────────────────────────────────────────────────────────────────────────
+  // PRIMARY RULE (HIGHEST PRIORITY): Same Planet Rule
+  // ─────────────────────────────────────────────────────────────────────────────
+  // In traditional ʿIlm al-Nujum (Islamic astrology), when the hour ruler is
+  // the SAME as the user's personal ruling planet, this is ALWAYS favorable.
+  // Secondary factors (dignity, house, aspects) can only ENHANCE this, never diminish it.
+  // 
+  // Example: Scorpio person (Mars-ruled) during Mars hour = ALWAYS Sa'd/Nashr
+  // ─────────────────────────────────────────────────────────────────────────────
+  if (input.userRulingPlanet && input.rulerPlanet === input.userRulingPlanet) {
+    // Same planet = automatic favorable alignment
+    // Dignity and house can upgrade it further, but can never downgrade below Nashr
+    const { allowed, avoid } = domainsForPlanet(input.rulerPlanet);
+    
+    const dignity = (input.dignityType ?? 'unknown').toString().toLowerCase();
+    const isDignified = dignity === 'domicile' || dignity === 'exaltation';
+    const isAngular = input.houseType === 'angular';
+    
+    // Same planet is minimum Nashr (favorable), can be enhanced but never diminished
+    return {
+      classicalLabel: 'Nashr',
+      restrictionLevel: 0, // Always open/favorable for same planet
+      allowedDomains: allowed,
+      avoidDomains: isDignified && isAngular ? [] : avoid, // If dignified+angular, even "avoid" domains become accessible
+      practiceIntensity: isDignified || isAngular ? 'high' : 'moderate',
+    };
+  }
+
   const base = baseRestrictionLevelForPlanet(input.rulerPlanet);
 
   // Modifiers (simple version): negative improves, positive worsens

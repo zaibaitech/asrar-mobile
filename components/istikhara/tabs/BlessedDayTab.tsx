@@ -1,25 +1,25 @@
 import * as Haptics from 'expo-haptics';
 import {
-    CheckCircle,
-    ChevronDown,
-    ChevronUp,
-    Heart,
-    Info,
-    Lightbulb,
-    Sparkles,
-    Star,
-    Sun,
-    Target,
-    TrendingUp
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  Heart,
+  Info,
+  Lightbulb,
+  Sparkles,
+  Star,
+  Sun,
+  Target,
+  TrendingUp
 } from "lucide-react-native";
 import React, { useState } from "react";
 import {
-    Dimensions,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Svg, { Circle, Defs, Path, Pattern, Rect } from 'react-native-svg';
 import { Borders, DarkTheme, Spacing, Typography } from "../../../constants/DarkTheme";
@@ -81,13 +81,13 @@ function PatternCard({ children, style }: { children: React.ReactNode; style?: a
 }
 
 const DAYS_OF_WEEK = [
-  { en: 'Sunday', fr: 'Dimanche', emoji: '☀️' },
-  { en: 'Monday', fr: 'Lundi', emoji: '🌙' },
-  { en: 'Tuesday', fr: 'Mardi', emoji: '⚔️' },
-  { en: 'Wednesday', fr: 'Mercredi', emoji: '📚' },
-  { en: 'Thursday', fr: 'Jeudi', emoji: '⚡' },
-  { en: 'Friday', fr: 'Vendredi', emoji: '🌟' },
-  { en: 'Saturday', fr: 'Samedi', emoji: '🪐' },
+  { en: 'Sunday', fr: 'Dimanche', ar: 'الأحد', emoji: '☀️' },
+  { en: 'Monday', fr: 'Lundi', ar: 'الاثنين', emoji: '🌙' },
+  { en: 'Tuesday', fr: 'Mardi', ar: 'الثلاثاء', emoji: '⚔️' },
+  { en: 'Wednesday', fr: 'Mercredi', ar: 'الأربعاء', emoji: '📚' },
+  { en: 'Thursday', fr: 'Jeudi', ar: 'الخميس', emoji: '⚡' },
+  { en: 'Friday', fr: 'Vendredi', ar: 'الجمعة', emoji: '🌟' },
+  { en: 'Saturday', fr: 'Samedi', ar: 'السبت', emoji: '🪐' },
 ];
 
 export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps) {
@@ -137,12 +137,14 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>
-          {language === 'en' ? 'Your Blessed Day' : 'Votre Jour Béni'}
+          {language === 'ar' ? 'يومك المبارك' : language === 'fr' ? 'Votre Jour Béni' : 'Your Blessed Day'}
         </Text>
         <Text style={styles.subtitle}>
-          {language === 'en' 
-            ? 'The most auspicious day for important decisions and spiritual practices' 
-            : 'Le jour le plus propice pour les décisions importantes et les pratiques spirituelles'}
+          {language === 'ar' 
+            ? 'اليوم الأكثر بركة للقرارات المهمة والممارسات الروحية'
+            : language === 'fr'
+            ? 'Le jour le plus propice pour les décisions importantes et les pratiques spirituelles' 
+            : 'The most auspicious day for important decisions and spiritual practices'}
         </Text>
       </View>
 
@@ -155,19 +157,21 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
         </View>
         
         <Text style={[styles.dayName, { color: accentColor }]}>
-          {blessedDay.day[language as 'en' | 'fr']}
+          {blessedDay.day[language as 'en' | 'fr' | 'ar'] || blessedDay.day.en}
         </Text>
         
         <Text style={styles.daySubtext}>
-          {language === 'en' 
-            ? 'Your Power Day of the Week' 
-            : 'Votre Jour de Puissance de la Semaine'}
+          {language === 'ar' 
+            ? 'يوم قوتك في الأسبوع'
+            : language === 'fr'
+            ? 'Votre Jour de Puissance de la Semaine' 
+            : 'Your Power Day of the Week'}
         </Text>
         
         {blessedDay.day_number !== null && (
           <View style={[styles.dayNumberBadge, { backgroundColor: withAlpha(accentColor, 0.12), borderColor: withAlpha(accentColor, 0.55) }]}>
             <Text style={[styles.dayNumberText, { color: accentColor }]}>
-              {language === 'en' ? 'Day' : 'Jour'} #{blessedDay.day_number}
+              {language === 'ar' ? 'اليوم' : language === 'fr' ? 'Jour' : 'Day'} #{blessedDay.day_number}
             </Text>
           </View>
         )}
@@ -178,7 +182,7 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
         <View style={styles.cardHeader}>
           <Sun size={20} color={accentColor} />
           <Text style={styles.cardTitle}>
-            {language === 'en' ? 'Weekly Overview' : 'Aperçu Hebdomadaire'}
+            {language === 'ar' ? 'نظرة عامة أسبوعية' : language === 'fr' ? 'Aperçu Hebdomadaire' : 'Weekly Overview'}
           </Text>
         </View>
         <View style={styles.daysGrid}>
@@ -204,7 +208,7 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
                     isBlessed && { color: accentColor, fontWeight: '700' },
                   ]}
                 >
-                  {day[language as 'en' | 'fr'].substring(0, 3)}
+                  {day[language as 'en' | 'fr' | 'ar'].substring(0, 3)}
                 </Text>
               </View>
             );
@@ -213,21 +217,23 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
       </PatternCard>
 
       {/* Best Activities Section */}
-      {blessedDay.best_for[language as 'en' | 'fr'].length > 0 && (
+      {blessedDay.best_for[language as 'en' | 'fr' | 'ar']?.length > 0 && (
         <PatternCard style={[styles.card, cardSurface, { borderLeftWidth: Borders.accent, borderLeftColor: accentColor }]}>
           <View style={styles.cardHeader}>
             <CheckCircle size={20} color={accentColor} />
             <Text style={styles.cardTitle}>
-              {language === 'en' ? 'Best Activities' : 'Meilleures Activités'}
+              {language === 'ar' ? 'أفضل الأنشطة' : language === 'fr' ? 'Meilleures Activités' : 'Best Activities'}
             </Text>
           </View>
           <Text style={styles.cardSubtitle}>
-            {language === 'en'
-              ? 'Recommended activities for your blessed day'
-              : 'Activités recommandées pour votre jour béni'}
+            {language === 'ar'
+              ? 'الأنشطة الموصى بها ليومك المبارك'
+              : language === 'fr'
+              ? 'Activités recommandées pour votre jour béni'
+              : 'Recommended activities for your blessed day'}
           </Text>
           <View style={styles.activitiesList}>
-            {blessedDay.best_for[language as 'en' | 'fr'].map((activity, index) => (
+            {blessedDay.best_for[language as 'en' | 'fr' | 'ar']?.map((activity, index) => (
               <View key={index} style={styles.activityItem}>
                 <View style={[styles.activityBullet, { backgroundColor: accentColor }]} />
                 <Text style={styles.activityText}>{activity}</Text>
@@ -238,15 +244,15 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
       )}
 
       {/* Special Notes */}
-      {blessedDay.special_notes && blessedDay.special_notes[language as 'en' | 'fr'].length > 0 && (
+      {blessedDay.special_notes && blessedDay.special_notes[language as 'en' | 'fr' | 'ar']?.length > 0 && (
         <PatternCard style={[styles.card, cardSurface]}>
           <View style={styles.cardHeader}>
             <Star size={20} color={accentColor} />
             <Text style={styles.cardTitle}>
-              {language === 'en' ? 'Spiritual Significance' : 'Signification Spirituelle'}
+              {language === 'ar' ? 'الأهمية الروحية' : language === 'fr' ? 'Signification Spirituelle' : 'Spiritual Significance'}
             </Text>
           </View>
-          {blessedDay.special_notes[language as 'en' | 'fr'].map((note, index) => (
+          {blessedDay.special_notes[language as 'en' | 'fr' | 'ar']?.map((note, index) => (
             <View key={index} style={styles.noteItem}>
               <Star size={14} color={accentColor} />
               <Text style={styles.noteText}>{note}</Text>
@@ -261,13 +267,13 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
           <View style={styles.cardHeader}>
             <Sparkles size={20} color={accentColor} />
             <Text style={styles.cardTitle}>
-              {language === 'en' ? 'Associated Prophet' : 'Prophète Associé'}
+              {language === 'ar' ? 'النبي المرتبط' : language === 'fr' ? 'Prophète Associé' : 'Associated Prophet'}
             </Text>
           </View>
           <View style={styles.prophetContent}>
             <Text style={styles.prophetArabic}>{blessedDay.associated_prophet.arabic}</Text>
             <Text style={styles.prophetName}>
-              {blessedDay.associated_prophet[language as 'en' | 'fr']}
+              {blessedDay.associated_prophet[language as 'en' | 'fr' | 'ar'] || blessedDay.associated_prophet.en}
             </Text>
           </View>
         </PatternCard>
@@ -283,7 +289,7 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
             <View style={styles.cardHeader}>
               <Lightbulb size={20} color={accentColor} />
               <Text style={styles.cardTitle}>
-                {language === 'en' ? 'Practical Tips' : 'Conseils Pratiques'}
+                {language === 'ar' ? 'نصائح عملية' : language === 'fr' ? 'Conseils Pratiques' : 'Practical Tips'}
               </Text>
             </View>
             {expandedSections.has('tips') ? (
@@ -299,13 +305,15 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
                 <View style={styles.tipHeader}>
                   <Target size={16} color={accentColor} />
                   <Text style={styles.tipTitle}>
-                    {language === 'en' ? 'Pro Tip' : 'Conseil Pro'}
+                    {language === 'ar' ? 'نصيحة مهمة' : language === 'fr' ? 'Conseil Pro' : 'Pro Tip'}
                   </Text>
                 </View>
                 <Text style={styles.tipText}>
-                  {language === 'en'
-                    ? `Schedule your most important decisions and spiritual practices on ${blessedDay.day.en}. This day carries special energy aligned with your elemental nature.`
-                    : `Planifiez vos décisions les plus importantes et vos pratiques spirituelles le ${blessedDay.day.fr}. Ce jour porte une énergie spéciale alignée avec votre nature élémentaire.`}
+                  {language === 'ar'
+                    ? `حدد موعد أهم قراراتك وممارساتك الروحية يوم ${blessedDay.day.ar || blessedDay.day.en}. هذا اليوم يحمل طاقة خاصة متوافقة مع طبيعتك العنصرية.`
+                    : language === 'fr'
+                    ? `Planifiez vos décisions les plus importantes et vos pratiques spirituelles le ${blessedDay.day.fr}. Ce jour porte une énergie spéciale alignée avec votre nature élémentaire.`
+                    : `Schedule your most important decisions and spiritual practices on ${blessedDay.day.en}. This day carries special energy aligned with your elemental nature.`}
                 </Text>
               </View>
 
@@ -313,13 +321,15 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
                 <View style={styles.tipHeader}>
                   <TrendingUp size={16} color={accentColor} />
                   <Text style={styles.tipTitle}>
-                    {language === 'en' ? 'Weekly Planning' : 'Planification Hebdomadaire'}
+                    {language === 'ar' ? 'التخطيط الأسبوعي' : language === 'fr' ? 'Planification Hebdomadaire' : 'Weekly Planning'}
                   </Text>
                 </View>
                 <Text style={styles.tipText}>
-                  {language === 'en'
-                    ? 'Start planning your week with this day in mind. Reserve it for high-priority activities and avoid scheduling routine tasks.'
-                    : 'Commencez à planifier votre semaine en gardant ce jour à l\'esprit. Réservez-le pour des activités hautement prioritaires et évitez de planifier des tâches routinières.'}
+                  {language === 'ar'
+                    ? 'ابدأ تخطيط أسبوعك مع وضع هذا اليوم في الاعتبار. احتفظ به للأنشطة ذات الأولوية العالية وتجنب جدولة المهام الروتينية.'
+                    : language === 'fr'
+                    ? 'Commencez à planifier votre semaine en gardant ce jour à l\'esprit. Réservez-le pour des activités hautement prioritaires et évitez de planifier des tâches routinières.'
+                    : 'Start planning your week with this day in mind. Reserve it for high-priority activities and avoid scheduling routine tasks.'}
                 </Text>
               </View>
 
@@ -327,13 +337,15 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
                 <View style={styles.tipHeader}>
                   <Heart size={16} color={accentColor} />
                   <Text style={styles.tipTitle}>
-                    {language === 'en' ? 'Element Alignment' : 'Alignement Élémentaire'}
+                    {language === 'ar' ? 'توافق العناصر' : language === 'fr' ? 'Alignement Élémentaire' : 'Element Alignment'}
                   </Text>
                 </View>
                 <Text style={styles.tipText}>
-                  {language === 'en'
-                    ? `As a ${profile.element} element person, this day resonates with your core energy. Use it to recharge and align with your true nature.`
-                    : `En tant que personne de l'élément ${profile.element}, ce jour résonne avec votre énergie centrale. Utilisez-le pour vous ressourcer et vous aligner avec votre vraie nature.`}
+                  {language === 'ar'
+                    ? `باعتبارك شخصًا من عنصر ${profile.element}، هذا اليوم يتردد مع طاقتك الأساسية. استخدمه للتجدد والتوافق مع طبيعتك الحقيقية.`
+                    : language === 'fr'
+                    ? `En tant que personne de l'élément ${profile.element}, ce jour résonne avec votre énergie centrale. Utilisez-le pour vous ressourcer et vous aligner avec votre vraie nature.`
+                    : `As a ${profile.element} element person, this day resonates with your core energy. Use it to recharge and align with your true nature.`}
                 </Text>
               </View>
             </View>
@@ -347,11 +359,12 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
           <View style={styles.cardHeader}>
             <Info size={20} color={accentColor} />
             <Text style={[styles.cardTitle, { color: DarkTheme.textPrimary }]}>
-              {language === 'en' ? 'Important Note' : 'Note Importante'}
+              {language === 'ar' ? 'ملاحظة مهمة' : language === 'fr' ? 'Note Importante' : 'Important Note'}
             </Text>
           </View>
           <Text style={styles.noteInfoText}>
-            {(blessedDay.note || blessedDay.temporary_suggestion)?.[language as 'en' | 'fr']}
+            {(blessedDay.note || blessedDay.temporary_suggestion)?.[language as 'en' | 'fr' | 'ar'] || 
+             (blessedDay.note || blessedDay.temporary_suggestion)?.en}
           </Text>
         </PatternCard>
       )}

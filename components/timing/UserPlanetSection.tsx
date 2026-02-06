@@ -1,14 +1,12 @@
-import type { ZodiacSign } from '@/constants/zodiacData';
-import { useLanguage } from '@/contexts/LanguageContext';
-import type { Element, Planet } from '@/services/PlanetaryHoursService';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
+import type { Planet, Element } from '@/services/PlanetaryHoursService';
 
 interface UserPlanetSectionProps {
   userPlanet: Planet;
   userElement: Element;
   source: 'name' | 'birth' | 'default';
-  zodiacSign?: ZodiacSign;
 }
 
 /**
@@ -46,10 +44,8 @@ export default function UserPlanetSection({
   userPlanet,
   userElement,
   source,
-  zodiacSign,
 }: UserPlanetSectionProps) {
-  const { t, language } = useLanguage();
-  const lang = (language || '').toLowerCase();
+  const { t } = useLanguage();
   const planetInfo = getPlanetInfo(userPlanet);
   
   const getSourceLabel = (): string => {
@@ -63,30 +59,10 @@ export default function UserPlanetSection({
     }
   };
   
-  const zodiacName = zodiacSign
-    ? lang === 'ar'
-      ? zodiacSign.nameAr
-      : lang === 'fr'
-        ? zodiacSign.nameFr
-        : zodiacSign.nameEn
-    : undefined;
-
-  const zodiacModality = zodiacSign
-    ? lang === 'fr'
-      ? zodiacSign.modalityFr
-      : zodiacSign.modality
-    : undefined;
-
-  const zodiacTemperament = zodiacSign
-    ? lang === 'fr'
-      ? zodiacSign.temperamentFr
-      : zodiacSign.temperament
-    : undefined;
-
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>
-        {zodiacSign ? t('dailyEnergy.spiritualBlueprint.title') : t('dailyEnergy.yourPlanet')}
+        {t('dailyEnergy.yourPlanet')}
       </Text>
       
       <View style={styles.planetDisplay}>
@@ -95,21 +71,6 @@ export default function UserPlanetSection({
           <Text style={styles.planetName}>
             {t(`planets.${userPlanet.toLowerCase()}`)} • {planetInfo.arabicName}
           </Text>
-
-          {zodiacSign && (
-            <View style={styles.profileMeta}>
-              <Text style={styles.profileMetaLine}>
-                {t('dailyEnergy.spiritualBlueprint.signLabel')}: {zodiacName}
-              </Text>
-              <Text style={styles.profileMetaLine}>
-                {t('dailyEnergy.spiritualBlueprint.modalityLabel')}: {zodiacModality}
-              </Text>
-              <Text style={styles.profileMetaLine}>
-                {t('dailyEnergy.spiritualBlueprint.temperamentLabel')}: {zodiacTemperament}
-              </Text>
-            </View>
-          )}
-
           <View style={styles.elementRow}>
             <Text style={styles.elementIcon}>{getElementIcon(userElement)}</Text>
             <Text style={styles.element}>
@@ -164,15 +125,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginBottom: 4,
-  },
-
-  profileMeta: {
-    marginBottom: 8,
-  },
-  profileMetaLine: {
-    color: 'rgba(255, 255, 255, 0.78)',
-    fontSize: 13,
-    marginBottom: 2,
   },
   
   elementIcon: {

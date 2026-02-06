@@ -15,46 +15,7 @@
  * - Ilm al-Nujum (Islamic astronomy/astrology)
  */
 
-import type { Element, Planet } from './PlanetaryHoursService';
-
-function isProbablyEnglishFallbackText(
-  text: string,
-  t: (key: string, params?: Record<string, string | number>) => string
-): boolean {
-  const trimmed = String(text || '').trim();
-  if (!trimmed) return false;
-
-  const planetPairs: Array<[string, string]> = [
-    ['Sun', t('planets.sun')],
-    ['Moon', t('planets.moon')],
-    ['Mars', t('planets.mars')],
-    ['Mercury', t('planets.mercury')],
-    ['Jupiter', t('planets.jupiter')],
-    ['Venus', t('planets.venus')],
-    ['Saturn', t('planets.saturn')],
-  ];
-
-  for (const [enName, localized] of planetPairs) {
-    if (localized && localized !== enName && trimmed.includes(enName)) {
-      return true;
-    }
-  }
-
-  const elementPairs: Array<[string, string]> = [
-    ['Fire', t('elements.fire')],
-    ['Water', t('elements.water')],
-    ['Air', t('elements.air')],
-    ['Earth', t('elements.earth')],
-  ];
-
-  for (const [enName, localized] of elementPairs) {
-    if (localized && localized !== enName && trimmed.includes(enName)) {
-      return true;
-    }
-  }
-
-  return false;
-}
+import type { Planet, Element } from './PlanetaryHoursService';
 
 export type PlanetaryRelationship = 'friend' | 'neutral' | 'enemy';
 
@@ -169,7 +130,7 @@ export function getRelationshipScore(
  */
 export function getRelationshipLabel(
   relationship: PlanetaryRelationship,
-  t: (key: string, params?: Record<string, string | number>) => string
+  t: (key: string) => string
 ): string {
   switch (relationship) {
     case 'friend': return t('dailyEnergy.friendship.strongFriends');
@@ -190,17 +151,11 @@ export function getRelationshipLabel(
 export function getPlanetaryFriendshipDesc(
   dayRuler: Planet,
   userPlanet: Planet,
-  t: (key: string, params?: Record<string, string | number>) => string
+  t: (key: string) => string
 ): string {
-  const dayPlanetLabel = t(`planets.${dayRuler.toLowerCase()}`);
-  const userPlanetLabel = t(`planets.${userPlanet.toLowerCase()}`);
-
   // Same planet
   if (dayRuler === userPlanet) {
-    return t('dailyEnergy.descriptions.planetaryFriendship.samePlanet', {
-      dayPlanet: dayPlanetLabel,
-      userPlanet: userPlanetLabel,
-    });
+    return `${dayRuler} energy resonates perfectly with your ${userPlanet} nature — powerful amplification`;
   }
   
   // Use translation key for specific planet pair
@@ -208,7 +163,7 @@ export function getPlanetaryFriendshipDesc(
   const translated = t(key);
   
   // If translation exists and is different from key, use it
-  if (translated && translated !== key && !isProbablyEnglishFallbackText(translated, t)) {
+  if (translated && translated !== key) {
     return translated;
   }
   
@@ -216,20 +171,11 @@ export function getPlanetaryFriendshipDesc(
   const relationship = getPlanetaryRelationship(dayRuler, userPlanet);
   switch (relationship) {
     case 'friend':
-      return t('dailyEnergy.descriptions.planetaryFriendship.friend', {
-        dayPlanet: dayPlanetLabel,
-        userPlanet: userPlanetLabel,
-      });
+      return `${dayRuler} and ${userPlanet} work together harmoniously`;
     case 'neutral':
-      return t('dailyEnergy.descriptions.planetaryFriendship.neutral', {
-        dayPlanet: dayPlanetLabel,
-        userPlanet: userPlanetLabel,
-      });
+      return `${dayRuler} and ${userPlanet} work together neutrally`;
     case 'enemy':
-      return t('dailyEnergy.descriptions.planetaryFriendship.enemy', {
-        dayPlanet: dayPlanetLabel,
-        userPlanet: userPlanetLabel,
-      });
+      return `${dayRuler} and ${userPlanet} create creative tension`;
   }
 }
 
@@ -249,37 +195,17 @@ export type ElementRelation = 'same' | 'supportive' | 'neutral' | 'tension';
  * - Fire + Water: Tension (opposing forces)
  * - Air + Earth: Neutral
  * 
- * SPECIAL CASES (based on planetary ruler nuances):
- * - Scorpio (Mars-ruled water) + Fire: Supportive (shares fire's intensity)
- * - Aquarius (Saturn-ruled cold air) + Water: Neutral (shares water's coldness)
- * 
- * @param element1 - First element (typically user's element)
- * @param element2 - Second element (typically time/transit element)
- * @param userSignKey - Optional user's zodiac sign key (for special harmony rules)
+ * @param element1 - First element
+ * @param element2 - Second element
  * @returns The elemental relationship
  */
 export function getElementRelationship(
   element1: Element,
-  element2: Element,
-  userSignKey?: string
+  element2: Element
 ): ElementRelation {
   // Same element
   if (element1 === element2) {
     return 'same';
-  }
-  
-  // SPECIAL CASE: Scorpio (Mars-ruled water) shares fire's intensity
-  // When user is Scorpio, treat fire as supportive (not tension)
-  // This applies regardless of the user's calculated Abjad element
-  if (userSignKey === 'scorpio' && element2 === 'fire') {
-    return 'supportive';
-  }
-  
-  // SPECIAL CASE: Aquarius (Saturn-ruled cold air) shares water's coldness  
-  // When user is Aquarius, treat water as neutral (not tension)
-  // This applies regardless of the user's calculated Abjad element
-  if (userSignKey === 'aquarius' && element2 === 'water') {
-    return 'neutral';
   }
   
   // Supportive pairs
@@ -330,7 +256,7 @@ export function getElementScore(relation: ElementRelation): number {
  */
 export function getElementRelationLabel(
   relation: ElementRelation,
-  t: (key: string, params?: Record<string, string | number>) => string
+  t: (key: string) => string
 ): string {
   switch (relation) {
     case 'same': return t('dailyEnergy.friendship.strongFriends');
@@ -346,50 +272,36 @@ export function getElementRelationLabel(
  * @param dayElement - The day's element
  * @param userElement - The user's element
  * @param t - Translation function
- * @param userSignKey - Optional user's zodiac sign for special harmony rules
  * @returns Localized description
  */
 export function getElementalHarmonyDesc(
   dayElement: Element,
   userElement: Element,
-  t: (key: string, params?: Record<string, string | number>) => string,
-  userSignKey?: string
+  t: (key: string) => string
 ): string {
   // Use translation key for specific element pair
   const key = `elementalRelations.${userElement}-${dayElement}`;
   const translated = t(key);
   
   // If translation exists and is different from key, use it
-  if (translated && translated !== key && !isProbablyEnglishFallbackText(translated, t)) {
+  if (translated && translated !== key) {
     return translated;
   }
   
-  // Fallback: generic description (with sign-based nuances)
-  const relation = getElementRelationship(userElement, dayElement, userSignKey);
-  const userElementLabel = t(`elements.${userElement}`);
-  const dayElementLabel = t(`elements.${dayElement}`);
+  // Fallback: generic description
+  const relation = getElementRelationship(userElement, dayElement);
+  const capitalizedUser = userElement.charAt(0).toUpperCase() + userElement.slice(1);
+  const capitalizedDay = dayElement.charAt(0).toUpperCase() + dayElement.slice(1);
   
   switch (relation) {
     case 'same':
-      return t('dailyEnergy.descriptions.elementalHarmony.same', {
-        userElement: userElementLabel,
-        dayElement: dayElementLabel,
-      });
+      return `${capitalizedUser} strengthens ${capitalizedDay} — powerful resonance`;
     case 'supportive':
-      return t('dailyEnergy.descriptions.elementalHarmony.supportive', {
-        userElement: userElementLabel,
-        dayElement: dayElementLabel,
-      });
+      return `${capitalizedDay} supports your ${capitalizedUser} nature — harmonious flow`;
     case 'neutral':
-      return t('dailyEnergy.descriptions.elementalHarmony.neutral', {
-        userElement: userElementLabel,
-        dayElement: dayElementLabel,
-      });
+      return `${capitalizedDay} and ${capitalizedUser} work together adaptably`;
     case 'tension':
-      return t('dailyEnergy.descriptions.elementalHarmony.tension', {
-        userElement: userElementLabel,
-        dayElement: dayElementLabel,
-      });
+      return `${capitalizedDay} and ${capitalizedUser} create dynamic tension — navigate mindfully`;
   }
 }
 
@@ -402,7 +314,7 @@ export function getElementalHarmonyDesc(
  */
 export function getStrengthLabel(
   score: number,
-  t: (key: string, params?: Record<string, string | number>) => string
+  t: (key: string) => string
 ): string {
   if (score >= 80) return t('dailyEnergy.strengthLabels.veryStrong');
   if (score >= 60) return t('dailyEnergy.strengthLabels.strong');
@@ -423,21 +335,19 @@ export function getStrengthLabel(
 export function getDailyStrengthDesc(
   dayRuler: Planet,
   strengthScore: number,
-  t: (key: string, params?: Record<string, string | number>) => string
+  t: (key: string) => string
 ): string {
-  const planetLabel = t(`planets.${dayRuler.toLowerCase()}`);
-
+  const strengthLabel = getStrengthLabel(strengthScore, t).toLowerCase();
+  
   if (strengthScore >= 80) {
-    return t('dailyEnergy.descriptions.dailyStrength.veryStrong', { planet: planetLabel });
+    return `${dayRuler} is exceptionally strong today — favorable for ${dayRuler}-related activities`;
+  } else if (strengthScore >= 60) {
+    return `${dayRuler} has good strength today — supportive energy available`;
+  } else if (strengthScore >= 40) {
+    return `${dayRuler} has moderate strength — steady but not exceptional`;
+  } else if (strengthScore >= 20) {
+    return `${dayRuler} is somewhat weak today — gentler approach recommended`;
+  } else {
+    return `${dayRuler} is very weak today — better to wait for stronger timing`;
   }
-  if (strengthScore >= 60) {
-    return t('dailyEnergy.descriptions.dailyStrength.strong', { planet: planetLabel });
-  }
-  if (strengthScore >= 40) {
-    return t('dailyEnergy.descriptions.dailyStrength.moderate', { planet: planetLabel });
-  }
-  if (strengthScore >= 20) {
-    return t('dailyEnergy.descriptions.dailyStrength.weak', { planet: planetLabel });
-  }
-  return t('dailyEnergy.descriptions.dailyStrength.veryWeak', { planet: planetLabel });
 }

@@ -254,6 +254,9 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
   const profile = result.burujProfile;
   const element = profile.element as 'fire' | 'earth' | 'air' | 'water';
   const config = ElementColors[element];
+  
+  // Check if this is a birthdate-only calculation (no name/mother data)
+  const isBirthdateOnly = result.calculationMethod === 'birthdate';
 
   // Allow the Overview screen to enforce a single uniform accent.
   const accent = accentColor || config.primarySolid;
@@ -630,110 +633,102 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
             </View>
 
             <View style={styles.statsGrid}>
-              <View style={styles.statsRow}>
-                {/* Buruj Number */}
-                <View style={[styles.statCard, { borderColor: withAlpha(accent, 0.3) }]}>
-                  <LinearGradient colors={cardBg as any} style={styles.statGradient}>
-                    <View style={[styles.statIndicator, { backgroundColor: accent }]} />
-                    <Text style={styles.statIcon}>🌙</Text>
-                    <Text style={[styles.statValue, { color: accent }]}>{result.burujRemainder}</Text>
-
-                    {(() => {
-                      const zodiacInfo = getZodiacInfo(result.burujRemainder, language);
-                      return zodiacInfo ? (
-                        <>
-                          <Text style={styles.statZodiacName}>{zodiacInfo.name}</Text>
-                          <Text style={styles.statZodiacArabic}>{zodiacInfo.nameAr}</Text>
-                        </>
-                      ) : null;
-                    })()}
-
-                    <Text style={styles.statLabel}>{language === 'en' ? 'Burūj' : 'Burūj'}</Text>
-
+              {/* Featured: Buruj Card - Full Width */}
+              <View style={[styles.featuredCard, { borderColor: withAlpha(accent, 0.3) }]}>
+                <LinearGradient colors={cardBg as any} style={styles.featuredGradient}>
+                  <View style={[styles.statIndicator, { backgroundColor: accent }]} />
+                  <View style={styles.featuredHeader}>
+                    <Text style={styles.featuredIcon}>🌙</Text>
+                    <View style={styles.featuredHeaderText}>
+                      <Text style={[styles.featuredNumber, { color: accent }]}>{result.burujRemainder}</Text>
+                      {(() => {
+                        const zodiacInfo = getZodiacInfo(result.burujRemainder, language);
+                        return zodiacInfo ? (
+                          <Text style={styles.featuredTitle}>{zodiacInfo.name} • {zodiacInfo.nameAr}</Text>
+                        ) : null;
+                      })()}
+                    </View>
+                  </View>
+                  <View style={styles.featuredContent}>
+                    <Text style={styles.featuredSubtitle}>{language === 'en' ? 'Burūj' : 'Burūj'}</Text>
                     {(() => {
                       const mansionInfo = getMansionInfo(result.burujRemainder, language);
                       return mansionInfo ? (
                         <>
-                          <Text style={styles.statMansionName}>{mansionInfo.name}</Text>
-                          <Text style={styles.statMansionArabic}>{mansionInfo.nameAr}</Text>
+                          <Text style={styles.featuredDescription}>{mansionInfo.name}</Text>
+                          <Text style={styles.featuredArabic}>{mansionInfo.nameAr} • {language === 'en' ? 'Mansion' : 'Maison'}</Text>
                         </>
                       ) : null;
                     })()}
-
-                    <Text style={styles.statSublabel}>{language === 'en' ? 'Mansion' : 'Maison'}</Text>
-
                     {(() => {
                       const quality = getZodiacSpiritualQuality(result.burujRemainder, language);
                       return quality ? (
-                        <View style={styles.statFooter}>
-                          <Text style={styles.statFooterText}>
-                            {language === 'en' ? 'Spiritual Strength: ' : 'Force spirituelle : '}
-                            {quality}
-                          </Text>
-                        </View>
+                        <Text style={[styles.featuredStrength, { color: withAlpha(accent, 0.9) }]}>
+                          {language === 'en' ? 'Spiritual Strength: ' : 'Force spirituelle : '}{quality}
+                        </Text>
                       ) : null;
                     })()}
+                  </View>
+                </LinearGradient>
+              </View>
+
+              {/* Compact 2-column: Element & Repetitions */}
+              <View style={styles.compactRow}>
+                {/* Element Card */}
+                <View style={[styles.compactCard, { borderColor: withAlpha(accent, 0.3) }]}>
+                  <LinearGradient colors={cardBg as any} style={styles.compactGradient}>
+                    <Text style={styles.compactIcon}>{profile.element_emoji}</Text>
+                    <Text style={[styles.compactNumber, { color: accent }]}>{profile.element_number}</Text>
+                    <Text style={styles.compactLabel}>{language === 'en' ? 'Element' : 'Élément'}</Text>
+                    <Text style={styles.compactSublabel}>{language === 'en' ? 'ID Number' : 'Numéro ID'}</Text>
+                    <Text style={[styles.compactDetail, { color: withAlpha(accent, 0.85) }]}>
+                      {getElementTagline(profile.element, language)}
+                    </Text>
                   </LinearGradient>
                 </View>
 
-                {/* Element Number */}
-                <View style={[styles.statCard, { borderColor: withAlpha(accent, 0.3) }]}>
-                  <LinearGradient colors={cardBg as any} style={styles.statGradient}>
-                    <Text style={styles.statIcon}>{profile.element_emoji}</Text>
-                    <Text style={[styles.statValue, { color: accent }]}>{profile.element_number}</Text>
-                    <Text style={styles.statLabel}>{language === 'en' ? 'Element' : 'Élément'}</Text>
-                    <Text style={styles.statSublabel}>{language === 'en' ? 'ID Number' : 'Numéro ID'}</Text>
-
-                    <View style={styles.statFooter}>
-                      <Text style={[styles.statFooterText, { color: withAlpha(accent, 0.85) }]}>
-                        {getElementTagline(profile.element, language)}
-                      </Text>
-                    </View>
+                {/* Repetition Count Card */}
+                <View style={[styles.compactCard, { borderColor: withAlpha(accent, 0.3) }]}>
+                  <LinearGradient colors={cardBg as any} style={styles.compactGradient}>
+                    <Text style={styles.compactIcon}>🔢</Text>
+                    <Text style={[styles.compactNumber, { color: accent }]}>
+                      {isBirthdateOnly ? '—' : result.repetitionCount}
+                    </Text>
+                    <Text style={styles.compactLabel}>{language === 'en' ? 'Count' : 'Compteur'}</Text>
+                    <Text style={styles.compactSublabel}>{language === 'en' ? 'Repetitions' : 'Répétitions'}</Text>
+                    <Text style={[styles.compactDetail, { color: withAlpha(accent, 0.85) }]}>
+                      {isBirthdateOnly 
+                        ? (language === 'en' ? 'Use name method for count' : 'Utilisez la méthode nom')
+                        : (profile.spiritual_practice?.practice_night?.primary?.[language] 
+                            ? `${language === 'en' ? 'Best day: ' : 'Meilleur jour : '}${profile.spiritual_practice.practice_night.primary[language]}`
+                            : getBestTimeSuggestion(profile.element, language))}
+                    </Text>
                   </LinearGradient>
                 </View>
               </View>
 
-              <View style={styles.statsRow}>
-                {/* Total Hadad */}
-                <View style={[styles.statCard, { borderColor: withAlpha(accent, 0.3) }]}>
-                  <LinearGradient colors={cardBg as any} style={styles.statGradient}>
-                    <Text style={styles.statIcon}>📊</Text>
-                    <Text style={[styles.statValue, { color: accent }]}>{result.combinedTotal}</Text>
-                    <Text style={styles.statLabel}>{language === 'en' ? 'Total' : 'Total'}</Text>
-                    <Text style={styles.statSublabel}>{language === 'en' ? 'Ḥadad Value' : 'Valeur Ḥadad'}</Text>
-
-                    <View style={styles.statFooter}>
-                      <Text style={styles.statFooterText}>
-                        {language === 'en' ? 'Divine Frequency' : 'Fréquence divine'}
-                      </Text>
+              {/* Featured: Total Hadad - Full Width (hide for birthdate-only) */}
+              {!isBirthdateOnly && (
+                <View style={[styles.featuredCard, { borderColor: withAlpha(accent, 0.3) }]}>
+                  <LinearGradient colors={cardBg as any} style={styles.featuredGradient}>
+                    <View style={styles.featuredHeader}>
+                      <Text style={styles.featuredIcon}>📊</Text>
+                      <View style={styles.featuredHeaderText}>
+                        <Text style={[styles.featuredNumber, { color: accent }]}>{result.combinedTotal}</Text>
+                        <Text style={styles.featuredTitle}>{language === 'en' ? 'Total Ḥadad Value' : 'Valeur Ḥadad Total'}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.featuredContent}>
+                      <Text style={styles.featuredSubtitle}>{language === 'en' ? 'Divine Frequency' : 'Fréquence divine'}</Text>
                       {(typeof result?.personTotal === 'number' || typeof result?.motherTotal === 'number') && (
-                        <Text style={styles.statFooterSubtext}>
-                          {language === 'en' ? 'You' : 'Vous'}: {typeof result?.personTotal === 'number' ? result.personTotal : 0}  ·  {language === 'en' ? 'Mother' : 'Mère'}: {typeof result?.motherTotal === 'number' ? result.motherTotal : 0}
+                        <Text style={styles.featuredDescription}>
+                          {language === 'en' ? 'You' : 'Vous'}: {typeof result?.personTotal === 'number' ? result.personTotal : 0}  •  {language === 'en' ? 'Mother' : 'Mère'}: {typeof result?.motherTotal === 'number' ? result.motherTotal : 0}
                         </Text>
                       )}
                     </View>
                   </LinearGradient>
                 </View>
-
-                {/* Repetition Count */}
-                <View style={[styles.statCard, { borderColor: withAlpha(accent, 0.3) }]}>
-                  <LinearGradient colors={cardBg as any} style={styles.statGradient}>
-                    <Text style={styles.statIcon}>🔢</Text>
-                    <Text style={[styles.statValue, { color: accent }]}>{result.repetitionCount}</Text>
-                    <Text style={styles.statLabel}>{language === 'en' ? 'Count' : 'Compteur'}</Text>
-                    <Text style={styles.statSublabel}>{language === 'en' ? 'Repetitions' : 'Répétitions'}</Text>
-
-                    <View style={styles.statFooter}>
-                      <Text style={[styles.statFooterText, { color: withAlpha(accent, 0.85) }]}>
-                        {language === 'en' ? 'Recommended daily recitation' : 'Récitation quotidienne recommandée'}
-                      </Text>
-                      <Text style={[styles.statFooterSubtext, { color: withAlpha(accent, 0.75) }]}>
-                        {getBestTimeSuggestion(profile.element, language)}
-                      </Text>
-                    </View>
-                  </LinearGradient>
-                </View>
-              </View>
+              )}
             </View>
 
             {/* Blessed Day Card */}
@@ -1138,23 +1133,127 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     gap: 12,
   },
+
+  // Featured Card (Full Width) - For Buruj and Hadad
+  featuredCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  featuredGradient: {
+    padding: 20,
+    position: 'relative',
+  },
+  featuredHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 12,
+  },
+  featuredIcon: {
+    fontSize: 36,
+  },
+  featuredHeaderText: {
+    flex: 1,
+  },
+  featuredNumber: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    lineHeight: 40,
+  },
+  featuredTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+    marginTop: 2,
+  },
+  featuredContent: {
+    paddingLeft: 52,
+  },
+  featuredSubtitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.7)',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  featuredDescription: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#ffffff',
+    marginBottom: 2,
+  },
+  featuredArabic: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginBottom: 8,
+  },
+  featuredStrength: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 4,
+  },
+
+  // Compact Row (2-column) - For Element and Count
+  compactRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  compactCard: {
+    flex: 1,
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  compactGradient: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  compactIcon: {
+    fontSize: 24,
+    marginBottom: 6,
+  },
+  compactNumber: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  compactLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  compactSublabel: {
+    fontSize: 10,
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: 8,
+  },
+  compactDetail: {
+    fontSize: 11,
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 15,
+  },
+
+  // Legacy styles kept for compatibility
   statsRow: {
     flexDirection: 'row',
     gap: 12,
   },
   statCard: {
     flex: 1,
-    aspectRatio: 0.85,
+    minHeight: 200,
     borderRadius: 20,
     borderWidth: 1,
     overflow: 'hidden',
   },
   statGradient: {
-    paddingVertical: 16,
+    paddingVertical: 20,
     paddingHorizontal: 14,
+    paddingBottom: 24,
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
     position: 'relative',
   },
   statIndicator: {
@@ -1166,26 +1265,28 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   statIcon: {
-    fontSize: 24,
-    marginBottom: 2,
+    fontSize: 28,
+    marginBottom: 4,
   },
   statValue: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     color: '#ffffff',
+    marginTop: 8,
   },
   statSublabel: {
     fontSize: 10,
     color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: 4,
   },
   statFooter: {
     width: '100%',
-    marginTop: 'auto',
+    marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.1)',
@@ -1204,27 +1305,27 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   statZodiacName: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: '#ffffff',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   statZodiacArabic: {
-    fontSize: 11,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 8,
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.85)',
+    marginBottom: 10,
     fontFamily: 'System',
   },
   statMansionName: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: 14,
+    fontWeight: '600',
     color: '#ffffff',
-    marginTop: 8,
-    marginBottom: 2,
+    marginTop: 10,
+    marginBottom: 4,
   },
   statMansionArabic: {
-    fontSize: 10,
-    color: 'rgba(255, 255, 255, 0.75)',
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.8)',
     fontFamily: 'System',
   },
 

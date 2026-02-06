@@ -1,14 +1,11 @@
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { DailySynthesis } from '@/services/DailySynthesisService';
 import { getStatusColor } from '@/services/DailySynthesisService';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 
 interface TodaysAlignmentSectionProps {
   synthesis: DailySynthesis;
-  alignmentScore?: number;
-  userTemperament?: string;
-  dayTemperament?: string;
 }
 
 interface AlignmentFactorProps {
@@ -47,36 +44,14 @@ function AlignmentFactor({ icon, label, status, statusColor, detail }: Alignment
  */
 export default function TodaysAlignmentSection({
   synthesis,
-  alignmentScore,
-  userTemperament,
-  dayTemperament,
 }: TodaysAlignmentSectionProps) {
   const { t } = useLanguage();
-
-  const hasTemperaments = !!userTemperament && !!dayTemperament;
-  const temperamentMatches = hasTemperaments ? userTemperament === dayTemperament : undefined;
   
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>
-        {t('dailyEnergy.alignmentAnalysis.title')}
+        {t('dailyEnergy.todaysAlignment')}
       </Text>
-
-      {typeof alignmentScore === 'number' && (
-        <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>{t('dailyEnergy.alignmentAnalysis.scoreLabel')}</Text>
-          <Text style={styles.summaryValue}>{alignmentScore}%</Text>
-        </View>
-      )}
-
-      {hasTemperaments && (
-        <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>{t('dailyEnergy.alignmentAnalysis.temperamentLabel')}</Text>
-          <Text style={styles.summaryValue}>
-            {temperamentMatches ? t('dailyEnergy.alignmentAnalysis.temperament.match') : t('dailyEnergy.alignmentAnalysis.temperament.contrast')}
-          </Text>
-        </View>
-      )}
       
       {/* Planetary Friendship */}
       <AlignmentFactor
@@ -120,23 +95,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: 16,
-  },
-
-  summaryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  summaryLabel: {
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  summaryValue: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
   },
   
   factor: {

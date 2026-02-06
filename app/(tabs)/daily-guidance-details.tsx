@@ -44,6 +44,7 @@ import {
 } from '@/services/PlanetaryHoursService';
 // New Daily Energy Services
 import { buildDestiny } from '@/features/name-destiny/services/nameDestinyCalculator';
+import { quickTimingCheck } from '@/services/AsrariyaTimingEngine';
 import { getDailyGuidance, type DailyGuidance } from '@/services/DailyGuidanceService';
 import { generateDailySynthesis, getUserPlanet, type DailySynthesis } from '@/services/DailySynthesisService';
 import { getElementRelationship as getClassicalElementRelationship, getPlanetaryRelationship } from '@/services/PlanetaryRelationshipService';
@@ -154,6 +155,9 @@ export default function DailyGuidanceDetailsScreen() {
   const [synthesisLoading, setSynthesisLoading] = useState(false);
   const [synthesisError, setSynthesisError] = useState<string | null>(null);
 
+  // UNIFIED: Current moment timing score from Asrariya Engine (same as home screen)
+  const [unifiedTimingScore, setUnifiedTimingScore] = useState<number | null>(null);
+
   // Keep the same day-level window status as the Home "Daily Energy" widget
   const [dailyGuidance, setDailyGuidance] = useState<DailyGuidance | null>(null);
 
@@ -169,6 +173,37 @@ export default function DailyGuidanceDetailsScreen() {
       } catch {
         if (!cancelled) {
           setDailyGuidance(null);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile]);
+
+  // UNIFIED: Load current moment timing score using same engine as home screen
+  useEffect(() => {
+    if (!profile) return;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const lat = profile.location?.latitude;
+        const lon = profile.location?.longitude;
+        const location =
+          typeof lat === 'number' && typeof lon === 'number'
+            ? { latitude: lat, longitude: lon }
+            : undefined;
+
+        const quick = await quickTimingCheck(profile, 'general', location);
+        if (!cancelled) {
+          setUnifiedTimingScore(quick.score);
+        }
+      } catch (error) {
+        console.error('Error loading unified timing score:', error);
+        if (!cancelled) {
+          setUnifiedTimingScore(null);
         }
       }
     })();
@@ -521,6 +556,7 @@ export default function DailyGuidanceDetailsScreen() {
   const localBurjIndex = profile?.derived?.burjIndex;
   const userSignKey = localBurjIndex !== undefined ? BURJ_NAMES_EN[localBurjIndex]?.toLowerCase() : undefined;
 
+  // Legacy function for estimating future hour power (kept for "next best hour" only)
   function getHourPowerForUser(hourPlanet: Planet): number {
     const userElement = ascendantElement ?? ((profile as any)?.zahirElement as Element | undefined) ?? ((profile?.derived as any)?.element as Element | undefined);
     if (!userElement) return 55;
@@ -535,7 +571,9 @@ export default function DailyGuidanceDetailsScreen() {
   const timingGuidanceProps = useMemo(() => {
     if (!planetaryData) return null;
     const current = planetaryData.currentHour;
-    const currentPower = getHourPowerForUser(current.planet);
+    // UNIFIED: Use the same score as home screen for current hour
+    // Fall back to legacy calculation only if unified score not yet loaded
+    const currentPower = unifiedTimingScore ?? getHourPowerForUser(current.planet);
 
     const candidates: PlanetaryHour[] = planetaryHours?.length
       ? planetaryHours.filter((h) => h.startTime.getTime() >= now.getTime()).slice(0, 6)
@@ -562,7 +600,7 @@ export default function DailyGuidanceDetailsScreen() {
           }
         : undefined,
     };
-  }, [planetaryData, planetaryHours, now]);
+  }, [planetaryData, planetaryHours, now, unifiedTimingScore]);
   
   function getElementRelationship(a?: Element, b?: Element): 'harmonious' | 'complementary' | 'transformative' | 'neutral' {
     if (!a || !b) return 'neutral';
