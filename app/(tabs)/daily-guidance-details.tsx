@@ -484,6 +484,19 @@ export default function DailyGuidanceDetailsScreen() {
   
   const windowQuality: TimingQuality = (dailyGuidance?.timingQuality as TimingQuality) || timingQuality;
 
+  // Convert unified timing score to window quality for current hour display
+  // Thresholds match UnifiedBadge system: OPTIMAL(75+), ACT(60-74), MAINTAIN(45-59), CAREFUL(30-44), HOLD(<30)
+  const getTimingQualityFromScore = (score: number | null): TimingQuality => {
+    if (score === null) return 'neutral';
+    if (score >= 60) return 'favorable';  // OPTIMAL + ACT = Good Time / Excellent
+    if (score >= 45) return 'neutral';    // MAINTAIN = Proceed mindfully
+    if (score >= 30) return 'transformative'; // CAREFUL = Proceed with caution
+    return 'delicate';                    // HOLD = Unfavorable
+  };
+
+  // Use unified score for current hour timing quality (matches widget/moment alignment)
+  const currentHourTimingQuality = getTimingQualityFromScore(unifiedTimingScore);
+
   const getWindowColor = (quality: TimingQuality) => {
     switch (quality) {
       case 'favorable':
@@ -777,7 +790,7 @@ export default function DailyGuidanceDetailsScreen() {
           <TimingGuidanceCard
             currentHour={timingGuidanceProps?.currentHour}
             nextBestHour={timingGuidanceProps?.nextBestHour}
-            windowQuality={dailyGuidance?.timingQuality}
+            windowQuality={currentHourTimingQuality}
           />
 
           {/* ================================================ */}
