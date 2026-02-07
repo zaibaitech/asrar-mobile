@@ -23,6 +23,19 @@ export default function MoonPhaseHeaderCard({
   const { t, language } = useLanguage();
   const [showEducation, setShowEducation] = useState(false);
   const currentLang = language;
+
+  // Safe translation helper - falls back to service-provided text when i18n key is missing
+  const tSafe = (key: string, fallback: string, params?: Record<string, string | number>) => {
+    const value = params ? t(key, params) : t(key);
+    const last = key.split('.').pop() || '';
+    const valueLower = typeof value === 'string' ? value.toLowerCase().replace(/\s+/g, '') : '';
+    const lastLower = last.toLowerCase();
+    // Detect missing translations (returns key itself, leaf key, or spaced camelCase version)
+    if (!value || value === key || valueLower === lastLower || value === last) {
+      return fallback;
+    }
+    return value;
+  };
   
   // Get translated phase name
   const phaseName = currentLang === 'ar' 
@@ -43,7 +56,7 @@ export default function MoonPhaseHeaderCard({
       case 'Weak':
         return t('common.quality.weak');
       case 'Rest':
-        return t('moon.ui.rest');
+        return tSafe('moon.ui.rest', 'Rest');
       default:
         return t('common.quality.moderate');
     }
@@ -60,10 +73,13 @@ export default function MoonPhaseHeaderCard({
           <Text style={styles.moonEmoji}>{moonPhase.moonEmoji}</Text>
           <View style={styles.collapsedText}>
             <Text style={styles.collapsedTitle}>
-              {phaseName} • {t('moon.ui.dayOfMonth', { day: moonPhase.lunarDay })}
+              {phaseName} • {tSafe('moon.ui.dayOfMonth', `Day ${moonPhase.lunarDay} of 30`, { day: moonPhase.lunarDay })}
             </Text>
             <Text style={styles.collapsedSubtitle}>
-              {t(`moon.${moonPhase.phaseName}.title`)}
+              {tSafe(
+                `moon.${moonPhase.phaseName}.title`,
+                moonPhase.primaryGuidance?.title ?? phaseName
+              )}
             </Text>
           </View>
           <Text style={styles.powerBadge}>{moonPhase.moonPower}%</Text>
@@ -80,7 +96,7 @@ export default function MoonPhaseHeaderCard({
         <View style={styles.header}>
           <View style={styles.headerTitleContainer}>
             <Text style={styles.moonIcon}>🌙</Text>
-            <Text style={styles.sectionLabel}>{t('moon.ui.lunarTiming')}</Text>
+            <Text style={styles.sectionLabel}>{tSafe('moon.ui.lunarTiming', 'Lunar Timing')}</Text>
           </View>
           {onToggle && (
             <TouchableOpacity onPress={onToggle}>
@@ -111,10 +127,15 @@ export default function MoonPhaseHeaderCard({
         {/* Phase Description */}
         <View style={styles.guidanceContainer}>
           <Text style={styles.phaseDescription}>
-            {t(`moon.${moonPhase.phaseName}.description`)}
+            {tSafe(
+              `moon.${moonPhase.phaseName}.description`,
+              moonPhase.primaryGuidance?.description ?? ''
+            )}
           </Text>
 
-          <Text style={styles.scopeText}>{t('dailyEnergy.scope.moon')}</Text>
+          <Text style={styles.scopeText}>
+            {tSafe('dailyEnergy.scope.moon', tSafe('moon.ui.moonPhase', 'Moon Phase'))}
+          </Text>
 
           {moonPhase.phaseName === 'full' && (
             <Text style={styles.authorityNote}>{t('dailyEnergy.authorityNotes.fullMoonBeginnings')}</Text>
@@ -132,16 +153,16 @@ export default function MoonPhaseHeaderCard({
         {/* Stats Row */}
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
-            <Text style={styles.statLabel}>{t('moon.ui.lunarDay')}</Text>
+            <Text style={styles.statLabel}>{tSafe('moon.ui.lunarDay', 'Lunar Day')}</Text>
             <Text style={styles.statValue}>
-              {t('moon.ui.dayOfMonth', { day: moonPhase.lunarDay })}
+              {tSafe('moon.ui.dayOfMonth', `Day ${moonPhase.lunarDay} of 30`, { day: moonPhase.lunarDay })}
             </Text>
           </View>
           
           <View style={styles.statDivider} />
           
           <View style={styles.statItem}>
-            <Text style={styles.statLabel}>{t('moon.ui.moonPower')}</Text>
+            <Text style={styles.statLabel}>{tSafe('moon.ui.moonPower', 'Moon Power')}</Text>
             <Text style={styles.statValue}>
               {moonPhase.moonPower}% ({getPowerQualityLabel()})
             </Text>
@@ -149,7 +170,7 @@ export default function MoonPhaseHeaderCard({
         </View>
 
         <Text style={styles.moonPowerNote}>
-          {t('moon.ui.moonPowerNote')}
+          {tSafe('moon.ui.moonPowerNote', 'Moon power indicates illumination percentage')}
         </Text>
         
         {/* Waxing/Waning Indicator */}
@@ -160,8 +181,8 @@ export default function MoonPhaseHeaderCard({
           ]}>
             <Text style={styles.phaseTypeText}>
               {moonPhase.isWaxing 
-                ? t('moon.ui.waxing') 
-                : t('moon.ui.waning')}
+                ? tSafe('moon.ui.waxing', 'Waxing (Growing)') 
+                : tSafe('moon.ui.waning', 'Waning (Decreasing)')}
             </Text>
           </View>
         </View>
@@ -172,7 +193,7 @@ export default function MoonPhaseHeaderCard({
             style={styles.button}
             onPress={() => setShowEducation(true)}
           >
-            <Text style={styles.buttonText}>ℹ️ {t('moon.ui.learnMore')}</Text>
+            <Text style={styles.buttonText}>ℹ️ {tSafe('moon.ui.learnMore', 'Learn More')}</Text>
           </TouchableOpacity>
         </View>
       </View>
