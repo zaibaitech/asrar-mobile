@@ -23,45 +23,28 @@ export default function MoonPhaseEducationalModal({
 }: MoonPhaseEducationalModalProps) {
   const { t } = useLanguage();
 
-  const tSafe = (key: string, fallback: string, params?: Record<string, string | number>) => {
-    const value = params ? t(key, params) : t(key);
-    const last = key.split('.').pop();
-    const valueLower = typeof value === 'string' ? value.toLowerCase() : '';
-    const lastLower = last ? last.toLowerCase() : '';
-    if (!value || value === key || (last && (value === last || valueLower === lastLower))) {
-      return fallback;
-    }
-    return value;
-  };
-
   const suitableCategory = moonPhase.suitable?.categoryKey
-    ? tSafe(moonPhase.suitable.categoryKey, moonPhase.suitable?.category ?? '')
+    ? t(moonPhase.suitable.categoryKey)
     : moonPhase.suitable?.category;
 
   const suitableActivities = moonPhase.suitable?.activitiesKeys?.length
-    ? moonPhase.suitable.activitiesKeys.map((key, index) =>
-        tSafe(key, moonPhase.suitable?.activities?.[index] ?? '')
-      )
+    ? moonPhase.suitable.activitiesKeys.map((key) => t(key))
     : moonPhase.suitable?.activities;
 
   const spiritualPractices = moonPhase.suitable?.spiritualPracticesKeys?.length
-    ? moonPhase.suitable.spiritualPracticesKeys.map((key, index) =>
-        tSafe(key, moonPhase.suitable?.spiritualPractices?.[index] ?? '')
-      )
+    ? moonPhase.suitable.spiritualPracticesKeys.map((key) => t(key))
     : moonPhase.suitable?.spiritualPractices;
 
   const notSuitableCategory = moonPhase.notSuitable?.categoryKey
-    ? tSafe(moonPhase.notSuitable.categoryKey, moonPhase.notSuitable?.category ?? '')
+    ? t(moonPhase.notSuitable.categoryKey)
     : moonPhase.notSuitable?.category;
 
   const notSuitableActivities = moonPhase.notSuitable?.activitiesKeys?.length
-    ? moonPhase.notSuitable.activitiesKeys.map((key, index) =>
-        tSafe(key, moonPhase.notSuitable?.activities?.[index] ?? '')
-      )
+    ? moonPhase.notSuitable.activitiesKeys.map((key) => t(key))
     : moonPhase.notSuitable?.activities;
 
   const notSuitableReason = moonPhase.notSuitable?.reasonKey
-    ? tSafe(moonPhase.notSuitable.reasonKey, moonPhase.notSuitable?.reason ?? '')
+    ? t(moonPhase.notSuitable.reasonKey)
     : moonPhase.notSuitable?.reason;
   
   return (
@@ -76,10 +59,7 @@ export default function MoonPhaseEducationalModal({
           {/* Header */}
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>
-              {tSafe(
-                `moon.${moonPhase.phaseName}.title`,
-                moonPhase.primaryGuidance?.title ?? moonPhase.phaseName
-              )}
+              {t(`moon.${moonPhase.phaseName}.title`)}
             </Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>✕</Text>
@@ -90,13 +70,10 @@ export default function MoonPhaseEducationalModal({
             {/* What It Is */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>
-                {moonPhase.moonEmoji} {tSafe('moon.ui.whyThisMatters', 'Why This Matters')}
+                {moonPhase.moonEmoji} {t('moon.ui.whyThisMatters')}
               </Text>
               <Text style={styles.sectionText}>
-                {tSafe(
-                  `moon.${moonPhase.phaseName}.description`,
-                  moonPhase.primaryGuidance?.description ?? ''
-                )}
+                {t(`moon.${moonPhase.phaseName}.description`)}
               </Text>
             </View>
             
@@ -104,7 +81,7 @@ export default function MoonPhaseEducationalModal({
             {moonPhase.suitable && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>
-                  ✅ {tSafe('moon.ui.suitableFor', 'Best For')}
+                  ✅ {t('moon.ui.suitableFor')}
                 </Text>
                 {!!suitableCategory && (
                   <Text style={styles.categoryText}>{suitableCategory}</Text>
@@ -121,7 +98,7 @@ export default function MoonPhaseEducationalModal({
             {moonPhase.suitable && moonPhase.suitable.spiritualPractices && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>
-                  🕌 {tSafe('moon.ui.spiritualGuidance', 'Spiritual Guidance')}
+                  🕌 {t('moon.ui.spiritualGuidance')}
                 </Text>
                 {spiritualPractices?.map((practice, index) => (
                   <Text key={`practice-${index}`} style={styles.bulletItem}>
@@ -135,7 +112,7 @@ export default function MoonPhaseEducationalModal({
             {moonPhase.notSuitable && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>
-                  ❌ {tSafe('moon.ui.notSuitableFor', 'Avoid')}
+                  ❌ {t('moon.ui.notSuitableFor')}
                 </Text>
                 {!!notSuitableCategory && (
                   <Text style={styles.categoryText}>{notSuitableCategory}</Text>

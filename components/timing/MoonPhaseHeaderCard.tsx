@@ -23,17 +23,6 @@ export default function MoonPhaseHeaderCard({
   const { t, language } = useLanguage();
   const [showEducation, setShowEducation] = useState(false);
   const currentLang = language;
-
-  const tSafe = (key: string, fallback: string, params?: Record<string, string | number>) => {
-    const value = params ? t(key, params) : t(key);
-    const last = key.split('.').pop();
-    const valueLower = typeof value === 'string' ? value.toLowerCase() : '';
-    const lastLower = last ? last.toLowerCase() : '';
-    if (!value || value === key || (last && (value === last || valueLower === lastLower))) {
-      return fallback;
-    }
-    return value;
-  };
   
   // Get translated phase name
   const phaseName = currentLang === 'ar' 
@@ -74,10 +63,7 @@ export default function MoonPhaseHeaderCard({
               {phaseName} • {t('moon.ui.dayOfMonth', { day: moonPhase.lunarDay })}
             </Text>
             <Text style={styles.collapsedSubtitle}>
-              {tSafe(
-                `moon.${moonPhase.phaseName}.title`,
-                moonPhase.primaryGuidance?.title ?? phaseName
-              )}
+              {t(`moon.${moonPhase.phaseName}.title`)}
             </Text>
           </View>
           <Text style={styles.powerBadge}>{moonPhase.moonPower}%</Text>
@@ -125,15 +111,10 @@ export default function MoonPhaseHeaderCard({
         {/* Phase Description */}
         <View style={styles.guidanceContainer}>
           <Text style={styles.phaseDescription}>
-            {tSafe(
-              `moon.${moonPhase.phaseName}.description`,
-              moonPhase.primaryGuidance?.description ?? ''
-            )}
+            {t(`moon.${moonPhase.phaseName}.description`)}
           </Text>
 
-          <Text style={styles.scopeText}>
-            {tSafe('dailyEnergy.scope.moon', tSafe('moon.ui.moonPhase', 'Moon Phase'))}
-          </Text>
+          <Text style={styles.scopeText}>{t('dailyEnergy.scope.moon')}</Text>
 
           {moonPhase.phaseName === 'full' && (
             <Text style={styles.authorityNote}>{t('dailyEnergy.authorityNotes.fullMoonBeginnings')}</Text>
