@@ -45,10 +45,15 @@ import {
 // New Daily Energy Services
 import { buildDestiny } from '@/features/name-destiny/services/nameDestinyCalculator';
 import { quickTimingCheck } from '@/services/AsrariyaTimingEngine';
+import { getClassicalJudgment } from '@/services/ClassicalJudgmentService';
 import { getDailyGuidance, type DailyGuidance } from '@/services/DailyGuidanceService';
 import { generateDailySynthesis, getUserPlanet, type DailySynthesis } from '@/services/DailySynthesisService';
 import { getElementRelationship as getClassicalElementRelationship, getPlanetaryRelationship } from '@/services/PlanetaryRelationshipService';
 import { BURJ_NAMES_EN } from '@/services/ProfileDerivationService';
+import {
+    buildSpiritualPracticeGuidance,
+    type DailyPracticeStatus,
+} from '@/services/SpiritualPracticeGuidanceService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -538,6 +543,25 @@ export default function DailyGuidanceDetailsScreen() {
   const ascendantBurj = profile?.derived?.ascendantBurj;
   const ascendantElement = profile?.derived?.ascendantElement as Element | undefined;
 
+  const dailyPracticeStatus: DailyPracticeStatus = useMemo(() => {
+    // IMPORTANT: This does NOT change any existing timing/status.
+    // It only translates the day-ruler's classical baseline into a practice tone.
+    const judgment = getClassicalJudgment({ rulerPlanet: dayRuler });
+    if (judgment.restrictionLevel === 0) return 'nashr';
+    if (judgment.restrictionLevel >= 2) return 'restricted';
+    return 'neutral';
+  }, [dayRuler]);
+
+  const spiritualPracticeGuidance = useMemo(() => {
+    const userPlanet = userPlanetInfo?.planet ?? userZodiacRuler;
+    return buildSpiritualPracticeGuidance({
+      status: dailyPracticeStatus,
+      dayRuler,
+      userPlanet,
+      dayName: (dayKey) => t(`home.dailyGuidanceDetails.days.${dayKey}`),
+    });
+  }, [dailyPracticeStatus, dayRuler, t, userPlanetInfo?.planet, userZodiacRuler]);
+
   function formatHourRange(start: Date, end: Date): string {
     return `${formatTime(start)}-${formatTime(end)}`;
   }
@@ -685,6 +709,7 @@ export default function DailyGuidanceDetailsScreen() {
             alignmentScore={alignmentScore}
             elementalHarmonyScore={dailySynthesis?.factors.elementalHarmony.score}
             planetaryHarmonyScore={dailySynthesis?.factors.planetaryFriendship.score}
+            toneColor={getWindowColor(windowQuality)}
             verdict={
               dailySynthesis
                 ? t(`dailyEnergy.alignmentOverview.verdict.${verdictQuality}`)
@@ -785,6 +810,31 @@ export default function DailyGuidanceDetailsScreen() {
               </Text>
             </View>
           ) : null}
+
+          {/* Recommended Spiritual Practice */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('dailyEnergy.spiritualPractice.title')}</Text>
+
+            <View style={styles.listCard}>
+              <Text style={styles.sectionTitle}>{t('dailyEnergy.spiritualPractice.recommendedTodayTitle')}</Text>
+              {spiritualPracticeGuidance.recommendedToday.map((line) => (
+                <View key={line.key} style={styles.listItem}>
+                  <View style={[styles.listDot, { backgroundColor: masterToneColor }]} />
+                  <Text style={styles.listText}>{t(line.key, line.params)}</Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.listCard}>
+              <Text style={styles.sectionTitle}>{t('dailyEnergy.spiritualPractice.betterToWaitForTitle')}</Text>
+              {spiritualPracticeGuidance.betterToWaitFor.map((line) => (
+                <View key={line.key} style={styles.listItem}>
+                  <View style={[styles.listDot, { backgroundColor: masterToneColor }]} />
+                  <Text style={styles.listText}>{t(line.key, line.params)}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
           
           {/* SECTION 9: PRACTICAL GUIDANCE (Planetary hour quality) */}
           <TimingGuidanceCard

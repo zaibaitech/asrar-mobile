@@ -28,6 +28,8 @@ interface TodayDetailsCardProps {
   elementalHarmonyScore?: number;
   planetaryHarmonyScore?: number;
   verdict?: string;
+  /** Accent color that reflects the screen's final day window tone (e.g. delicate = red). */
+  toneColor?: string;
 }
 
 function getPlanetEmoji(planet: Planet): string {
@@ -159,6 +161,7 @@ export default function TodayDetailsCard({
   elementalHarmonyScore,
   planetaryHarmonyScore,
   verdict,
+  toneColor,
 }: TodayDetailsCardProps) {
   const { language, t } = useLanguage();
   const lang = language as 'en' | 'fr' | 'ar';
@@ -174,7 +177,15 @@ export default function TodayDetailsCard({
       {typeof alignmentScore === 'number' && (
         <View style={styles.meterRow}>
           <View style={styles.meterTrack}>
-            <View style={[styles.meterFill, { width: `${Math.max(0, Math.min(100, alignmentScore))}%` }]} />
+            <View
+              style={[
+                styles.meterFill,
+                {
+                  width: `${Math.max(0, Math.min(100, alignmentScore))}%`,
+                  backgroundColor: toneColor ?? styles.meterFill.backgroundColor,
+                },
+              ]}
+            />
           </View>
           <Text style={styles.meterValue}>{alignmentScore}%</Text>
         </View>
@@ -221,13 +232,13 @@ export default function TodayDetailsCard({
       {(typeof elementalHarmonyScore === 'number' || typeof planetaryHarmonyScore === 'number') && (
         <View style={styles.factorRow}>
           {typeof elementalHarmonyScore === 'number' && (
-            <View style={styles.factorPill}>
+            <View style={[styles.factorPill, toneColor ? { borderColor: `${toneColor}55` } : null]}>
               <Text style={styles.factorLabel}>{t('dailyEnergy.alignmentOverview.elementHarmony')}</Text>
               <Text style={styles.factorValue}>{elementalHarmonyScore}%</Text>
             </View>
           )}
           {typeof planetaryHarmonyScore === 'number' && (
-            <View style={styles.factorPill}>
+            <View style={[styles.factorPill, toneColor ? { borderColor: `${toneColor}55` } : null]}>
               <Text style={styles.factorLabel}>{t('dailyEnergy.alignmentOverview.planetHarmony')}</Text>
               <Text style={styles.factorValue}>{planetaryHarmonyScore}%</Text>
             </View>

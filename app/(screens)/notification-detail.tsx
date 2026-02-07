@@ -2,7 +2,7 @@ import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import type { Href } from 'expo-router';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -117,14 +117,16 @@ export default function NotificationDetailScreen() {
   ]);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={22} color={DarkTheme.textPrimary} />
           <Text style={styles.backText}>{tSafe('notifications.detail.back', 'Back')}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{tSafe('notifications.detail.title', 'Notification')}</Text>
-        <View style={{ width: 60 }} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -165,23 +167,25 @@ export default function NotificationDetailScreen() {
           )}
         </Text>
       </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#0B0A10',
+    backgroundColor: DarkTheme.screenBackground,
   },
   header: {
     height: 56,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
+    backgroundColor: DarkTheme.screenBackground,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.08)',
+    borderBottomColor: DarkTheme.borderSubtle,
   },
   backButton: {
     flexDirection: 'row',
@@ -191,13 +195,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   backText: {
-    color: DarkTheme.textPrimary,
+    color: DarkTheme.textSecondary,
     fontSize: 14,
   },
   headerTitle: {
     color: DarkTheme.textPrimary,
     fontSize: 16,
     fontWeight: '600',
+  },
+  headerSpacer: {
+    width: 60,
   },
   container: {
     flex: 1,
@@ -212,9 +219,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: DarkTheme.cardBackground,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: DarkTheme.borderSubtle,
     borderRadius: 12,
     padding: 14,
   },
@@ -224,9 +231,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   metaCard: {
-    backgroundColor: 'rgba(99,102,241,0.08)',
+    backgroundColor: DarkTheme.cardBackgroundAlt,
     borderWidth: 1,
-    borderColor: 'rgba(99,102,241,0.18)',
+    borderColor: DarkTheme.borderSubtle,
     borderRadius: 12,
     padding: 14,
     gap: 6,

@@ -2652,6 +2652,54 @@ export const translations = {
           challenging: "Challenging alignment today.",
         },
       },
+
+      spiritualPractice: {
+        title: "Recommended Spiritual Practice",
+        recommendedTodayTitle: "Recommended Today",
+        betterToWaitForTitle: "Better to Wait For",
+
+        items: {
+          grounding: "Keep close to the earth: simple routines, clean food, steady breath.",
+          protection: "Protect the heart: seek refuge, keep wudūʾ if you can, and avoid agitation.",
+          repentance: "Return softly: istighfār, repairing wrongs, and a guarded tongue.",
+          discipline: "Choose discipline over impulse: finish what is necessary, leave what is extra.",
+          silence: "Reduce speech and noise: let the day pass with dignity and restraint.",
+
+          supportiveDhikr: "Gentle dhikr with presence: let the tongue match the heart.",
+          openingDua: "Make duʿāʾ with good hope: ask for guidance, ease, and right action.",
+          goodIntention: "Set a clear intention: seek benefit without excess, and begin with adab.",
+          charity: "Give something small in charity: it opens doors without stirring the ego.",
+          reconciliation: "Mend ties and soften harshness: a small kindness carries great weight.",
+
+          cleanIntention: "Keep intentions clean and modest: do what is sound, leave what is doubtful.",
+          modestDhikr: "Short, consistent dhikr: better a little with sincerity than much without.",
+          fulfillDuties: "Fulfill duties first: prayer on time, obligations before extras.",
+          shortDua: "A brief duʿāʾ at the opening and closing of your day.",
+          gratitude: "Practice gratitude quietly: name your blessings, and do not chase what is absent.",
+
+          controlledCaution: "If you feel drawn to more, keep it brief and contained—avoid excess.",
+        },
+
+        matchItems: {
+          sun: "A short practice for clarity and noble intention—without pride.",
+          moon: "A short practice for mercy and inward calm—without drowning in emotion.",
+          mercury: "A short practice for understanding and truthful speech—without restlessness.",
+          venus: "A short practice for harmony and gentleness—without indulgence.",
+          mars: "A short practice for courage with restraint—without anger or haste.",
+          jupiter: "A short practice for wisdom and expansion of خير—without overreach.",
+          saturn: "A short practice for patience and steadfastness—without hardness of heart.",
+        },
+
+        waitItems: {
+          loveAttraction: "Matters of affection and attraction—better on {days}.",
+          expansionBigAsks: "Big requests and expansive openings—better on {days}.",
+          deepEmotionalOpening: "Deep emotional openings—better on {days}.",
+          hardConfrontation: "Harsh confrontation—better on {days} if needed.",
+          overStrictVows: "Overly strict vows and heavy self-imposed burdens—better on {days}.",
+          heavyEmotionalWork: "Heavy emotional work—better on {days}.",
+          bigExpansion: "Large expansions and risky commitments—better on {days}.",
+        },
+      },
       // Section Headers (Narrative System)
       todaysRuler: "TODAY'S PLANETARY RULER",
       yourPlanet: "YOUR BIRTH PLANET",
@@ -4201,6 +4249,10 @@ export const translations = {
         general: {
           title: "General",
           subtitle: "Raw letters",
+        },
+        birth: {
+          title: "Birth Profile",
+          subtitle: "Date • Time • Place",
         },
       },
       
@@ -12231,6 +12283,54 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           challenging: "Alignement difficile aujourd'hui.",
         },
       },
+
+      spiritualPractice: {
+        title: "Pratique spirituelle recommandée",
+        recommendedTodayTitle: "Recommandé aujourd'hui",
+        betterToWaitForTitle: "Mieux vaut attendre",
+
+        items: {
+          grounding: "Restez ancré : routines simples, nourriture saine, souffle régulier.",
+          protection: "Protégez le cœur : demandez refuge, gardez les ablutions si possible, évitez l'agitation.",
+          repentance: "Revenez avec douceur : istighfār, réparer les torts, langue surveillée.",
+          discipline: "Choisissez la discipline plutôt que l'impulsion : terminez le nécessaire, laissez le superflu.",
+          silence: "Réduisez parole et bruit : traversez la journée avec dignité et retenue.",
+
+          supportiveDhikr: "Dhikr doux avec présence : que la langue suive le cœur.",
+          openingDua: "Faites duʿāʾ avec bonne espérance : guidance, facilité, juste action.",
+          goodIntention: "Fixez une intention claire : bénéfice sans excès, commencez avec adab.",
+          charity: "Donnez une petite aumône : elle ouvre les portes sans nourrir l'ego.",
+          reconciliation: "Réparez les liens et adoucissez la dureté : une petite bonté pèse lourd.",
+
+          cleanIntention: "Gardez des intentions propres et modestes : faites le sûr, laissez le douteux.",
+          modestDhikr: "Dhikr court et constant : un peu avec sincérité vaut mieux que beaucoup sans.",
+          fulfillDuties: "Accomplissez d'abord les devoirs : prière à l'heure, obligations avant les surérogatoires.",
+          shortDua: "Un duʿāʾ bref au début et à la fin de votre journée.",
+          gratitude: "Pratiquez la gratitude en silence : nommez les bienfaits, ne poursuivez pas l'absent.",
+
+          controlledCaution: "Si vous ressentez l'appel à plus, gardez-le bref et contenu — évitez l'excès.",
+        },
+
+        matchItems: {
+          sun: "Une pratique brève pour la clarté et l'intention noble — sans orgueil.",
+          moon: "Une pratique brève pour la miséricorde et le calme intérieur — sans se noyer dans l'émotion.",
+          mercury: "Une pratique brève pour la compréhension et la parole vraie — sans agitation.",
+          venus: "Une pratique brève pour l'harmonie et la douceur — sans indulgence.",
+          mars: "Une pratique brève pour le courage avec retenue — sans colère ni précipitation.",
+          jupiter: "Une pratique brève pour la sagesse et l'ouverture du خير — sans débordement.",
+          saturn: "Une pratique brève pour la patience et la constance — sans dureté du cœur.",
+        },
+
+        waitItems: {
+          loveAttraction: "Affection et attraction — plutôt {days}.",
+          expansionBigAsks: "Grandes demandes et ouvertures expansives — plutôt {days}.",
+          deepEmotionalOpening: "Ouvertures émotionnelles profondes — plutôt {days}.",
+          hardConfrontation: "Confrontation dure — plutôt {days} si nécessaire.",
+          overStrictVows: "Vœux trop stricts et charges auto-imposées — plutôt {days}.",
+          heavyEmotionalWork: "Travail émotionnel lourd — plutôt {days}.",
+          bigExpansion: "Grandes expansions et engagements risqués — plutôt {days}.",
+        },
+      },
       // En-têtes de section (Système narratif)
       todaysRuler: "PLANÈTE DU JOUR",
       yourPlanet: "VOTRE PLANÈTE DE NAISSANCE",
@@ -13771,6 +13871,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         general: {
           title: "Général",
           subtitle: "Lettres brutes",
+        },
+        birth: {
+          title: "Profil de Naissance",
+          subtitle: "Date • Heure • Lieu",
         },
       },
       
@@ -20736,6 +20840,54 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       currentTransit: "العبور الحالي",
       peakHours: "ساعات الذروة",
       transitIn: "في {sign}{dignity}",
+
+      spiritualPractice: {
+        title: "الممارسة الروحية الموصى بها",
+        recommendedTodayTitle: "موصى به اليوم",
+        betterToWaitForTitle: "الأفضل تأجيله",
+
+        items: {
+          grounding: "الزم الأرض: روتين بسيط، طعام طيب، ونَفَس ثابت.",
+          protection: "احفظ القلب: استعذ بالله، وحافظ على الوضوء إن استطعت، وابتعد عن الاضطراب.",
+          repentance: "ارجع بلطف: استغفار، إصلاح ما فسد، ولسانٌ محروس.",
+          discipline: "قدّم الانضباط على الاندفاع: أتمّ الضروري، واترك الزائد.",
+          silence: "قلّل الكلام والضوضاء: دع اليوم يمضي بوقارٍ وكفّ.",
+
+          supportiveDhikr: "ذِكرٌ لطيف بحضور: ليوافق اللسانُ القلب.",
+          openingDua: "ادعُ بحسن الظن: هداية، تيسير، وعملٌ راشد.",
+          goodIntention: "نوِّ نيةً واضحة: نفعٌ بلا إفراط، وابدأ بالأدب.",
+          charity: "تصدّق بشيءٍ يسير: يفتح الأبواب ولا يوقظ الأنا.",
+          reconciliation: "أصلح ما انقطع ولِنْ ما اشتد: إحسانٌ صغيرٌ يزن كثيرًا.",
+
+          cleanIntention: "طهّر النية واعتدل: خذ بالمتيقَّن واترك المشتبه.",
+          modestDhikr: "ذِكرٌ قصيرٌ دائم: قليلٌ بإخلاص خيرٌ من كثيرٍ بلا حضور.",
+          fulfillDuties: "ابدأ بالفرائض: صلاةٌ في وقتها، وحقوقٌ قبل النوافل.",
+          shortDua: "دعاءٌ يسير في أول يومك وآخره.",
+          gratitude: "اشكر بهدوء: عدِّد النِّعم ولا تطارد الغائب.",
+
+          controlledCaution: "إن مالت نفسك إلى المزيد فاجعله قصيرًا محصورًا—واحذر الإفراط.",
+        },
+
+        matchItems: {
+          sun: "ممارسةٌ قصيرة لصفاء النية وعلوّ الهمّة—بلا كِبر.",
+          moon: "ممارسةٌ قصيرة للرحمة وسكينة الباطن—بلا غرقٍ في العاطفة.",
+          mercury: "ممارسةٌ قصيرة للفهم والصدق في القول—بلا قلقٍ وتشتّت.",
+          venus: "ممارسةٌ قصيرة للألفة واللين—بلا ترفٍ وإغراء.",
+          mars: "ممارسةٌ قصيرة للشجاعة مع كفّ النفس—بلا غضبٍ ولا عجلة.",
+          jupiter: "ممارسةٌ قصيرة للحكمة وتوسعة الخير—بلا مجاوزة.",
+          saturn: "ممارسةٌ قصيرة للصبر والثبات—بلا قسوةٍ في القلب.",
+        },
+
+        waitItems: {
+          loveAttraction: "أمور المودّة والجذب—أحسنُها في {days}.",
+          expansionBigAsks: "الطلبات الكبيرة وفتح الأبواب الواسعة—أحسنُها في {days}.",
+          deepEmotionalOpening: "الانفتاح العاطفي العميق—أحسنُه في {days}.",
+          hardConfrontation: "المواجهة القاسية—أحسنُها في {days} إن لزم.",
+          overStrictVows: "التشدد في النذور والأحمال على النفس—أحسنُه في {days}.",
+          heavyEmotionalWork: "العمل العاطفي الثقيل—أحسنُه في {days}.",
+          bigExpansion: "التوسّع الكبير والالتزامات الخطرة—أحسنُها في {days}.",
+        },
+      },
 
       // أوصاف الأيام
       dayEnergy: {
