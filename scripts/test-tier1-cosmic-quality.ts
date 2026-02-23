@@ -5,8 +5,15 @@
  * assessments are working correctly.
  */
 
-import { analyzeCosmicQuality } from '../services/CosmicQualityService';
-import { getPlanetaryCondition } from '../services/PlanetaryConditionService';
+// Use require() to keep this script compatible with ts-node defaults in this repo.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { analyzeCosmicQuality } = require('../services/CosmicQualityService') as {
+  analyzeCosmicQuality: (...args: any[]) => Promise<any>;
+};
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { getPlanetaryCondition } = require('../services/PlanetaryConditionService') as {
+  getPlanetaryCondition: (...args: any[]) => Promise<any>;
+};
 
 async function testTier1() {
   console.log('═══════════════════════════════════════════════');
@@ -53,7 +60,7 @@ async function testTier1() {
 
       if (condition.aspects.majorAspects.length > 0) {
         console.log(`   Aspects:`);
-        condition.aspects.majorAspects.slice(0, 3).forEach(aspect => {
+        condition.aspects.majorAspects.slice(0, 3).forEach((aspect: any) => {
           const symbol = aspect.aspect === 'trine' ? '△' :
                         aspect.aspect === 'square' ? '□' :
                         aspect.aspect === 'opposition' ? '☍' :
@@ -103,7 +110,7 @@ async function testTier1() {
 
     if (cosmic.prohibitions.length > 0) {
       console.log('⚠️  PROHIBITIONS:');
-      cosmic.prohibitions.forEach(p => {
+      cosmic.prohibitions.forEach((p: any) => {
         const severitySymbol = p.severity === 'absolute' ? '🚫' :
                                p.severity === 'strong' ? '⛔' : '⚠️ ';
         console.log(`   ${severitySymbol} ${p.type.toUpperCase()} (${p.severity})`);

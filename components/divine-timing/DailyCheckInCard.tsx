@@ -32,11 +32,17 @@ export function DailyCheckInCard({
     router.push('/daily-checkin');
   };
   
+  /**
+   * Colors matching Moment Alignment for consistency:
+   * - favorable (Benefics): Green
+   * - neutral (Variable): Yellow/Amber
+   * - cautious (Malefics): Purple
+   */
   const getTimingColor = () => {
     if (!summary.timingQuality) return colors.primary;
-    if (summary.timingQuality === 'favorable') return '#10b981';
-    if (summary.timingQuality === 'neutral') return '#f59e0b';
-    if (summary.timingQuality === 'delicate') return '#ef4444';
+    if (summary.timingQuality === 'favorable') return '#10b981'; // Green
+    if (summary.timingQuality === 'neutral') return '#f59e0b';   // Yellow/Amber
+    if (summary.timingQuality === 'cautious') return '#7C3AED';  // Purple
     return colors.primary;
   };
   

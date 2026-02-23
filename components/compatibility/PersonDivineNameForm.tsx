@@ -124,20 +124,6 @@ export function PersonDivineNameForm({ onCalculate }: PersonDivineNameFormProps)
             </View>
           </View>
 
-          {/* Display Name */}
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>
-              {t('compatibility.form.personInfo.displayName.label')}
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={personName}
-              onChangeText={setPersonName}
-              placeholder={t('compatibility.form.personInfo.displayName.placeholder')}
-              placeholderTextColor="#64748b"
-            />
-          </View>
-
           {/* Latin Name Autocomplete */}
           <View style={styles.inputWrapper}>
             <Text style={styles.label}>

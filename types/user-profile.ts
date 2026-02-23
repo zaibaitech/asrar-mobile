@@ -72,6 +72,13 @@ export interface DerivedAstrologicalData {
    * Used for personal mansion resonance against today's mansion.
    */
   manazilPersonal?: number;
+
+  /**
+   * Birth Manazil (lunar mansion) computed from the Moon's exact longitude
+   * at the user's birth time/location. This is the most accurate personal
+   * mansion when birthTime + birthLocation are available.
+   */
+  manazilBirth?: number;
 }
 
 /**

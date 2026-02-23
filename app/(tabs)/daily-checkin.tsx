@@ -197,7 +197,8 @@ export default function DailyCheckInV2Screen() {
         energy,
         planetarySnapshot: positions || undefined,
         timingSnapshot: {
-          timingQuality: (dailyGuidance?.timingQuality === 'transformative' ? 'delicate' : dailyGuidance?.timingQuality) || 'neutral',
+          // Use classical system: favorable/neutral/cautious
+          timingQuality: dailyGuidance?.timingQuality || 'neutral',
           cycleState: 'initiation',
           elementalTone: dailyGuidance?.dayElement || 'earth',
           guidanceLevel: 'act',

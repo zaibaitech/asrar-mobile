@@ -15,6 +15,7 @@
  */
 
 import { getCurrentLunarMansion } from '@/services/LunarMansionService';
+import { getPlanetaryCondition } from '@/services/PlanetaryConditionService';
 import type { Planet } from '@/services/PlanetaryHoursService';
 import { getPlanetaryHourDataForNow } from '@/services/PlanetaryHoursService';
 import type { UserProfile } from '@/types/user-profile';
@@ -41,6 +42,55 @@ import {
     analyzePlanetaryResonance,
     analyzePracticeMapping,
 } from './layers';
+
+async function analyzeHourRulerDignity(
+  moment: CurrentMoment,
+  location: { latitude: number; longitude: number } | undefined,
+  language: 'en' | 'fr' | 'ar'
+): Promise<AsrariyaTimingResult['layers']['hourRulerDignity']> {
+  if (!location) {
+    return {
+      score: 50,
+      reasoning: 'Hour ruler dignity unavailable (no location).',
+      reasoningFr: 'Dignité du maître de l’heure indisponible (pas de localisation).',
+      reasoningAr: 'تعذر حساب كرامة كوكب الساعة (لا يوجد موقع).',
+      shortSummary: language === 'fr' ? 'Dignité: inconnue' : language === 'ar' ? 'الكرامة: غير معروفة' : 'Dignity: unknown',
+      planet: moment.planetaryHourPlanet,
+      dignityType: undefined,
+    };
+  }
+
+  try {
+    const condition = await getPlanetaryCondition(moment.planetaryHourPlanet, moment.timestamp, location);
+    const dignityType = condition.dignity?.type;
+    const dignityScore = typeof condition.dignity?.score === 'number' ? condition.dignity.score : 50;
+
+    return {
+      score: Math.max(0, Math.min(100, Math.round(dignityScore))),
+      reasoning: `Hour ruler dignity: ${dignityType || 'unknown'} (${Math.round(dignityScore)}/100).`,
+      reasoningFr: `Dignité du maître de l’heure : ${dignityType || 'inconnue'} (${Math.round(dignityScore)}/100).`,
+      reasoningAr: `كرامة كوكب الساعة: ${dignityType || 'غير معروفة'} (${Math.round(dignityScore)}/100).`,
+      shortSummary:
+        language === 'fr'
+          ? `Dignité: ${dignityType || 'inconnue'}`
+          : language === 'ar'
+            ? `الكرامة: ${dignityType || 'غير معروفة'}`
+            : `Dignity: ${dignityType || 'unknown'}`,
+      planet: moment.planetaryHourPlanet,
+      dignityType: dignityType as any,
+    };
+  } catch {
+    return {
+      score: 50,
+      reasoning: 'Hour ruler dignity unavailable.',
+      reasoningFr: 'Dignité du maître de l’heure indisponible.',
+      reasoningAr: 'تعذر حساب كرامة كوكب الساعة.',
+      shortSummary: language === 'fr' ? 'Dignité: inconnue' : language === 'ar' ? 'الكرامة: غير معروفة' : 'Dignity: unknown',
+      planet: moment.planetaryHourPlanet,
+      dignityType: undefined,
+    };
+  }
+}
 
 // ============================================================================
 // CONSTANTS
@@ -637,29 +687,40 @@ export async function analyzeTimingForPractice(
   // Get configuration with practice-specific weights
   const baseConfig = { ...DEFAULT_ENGINE_CONFIG, ...(options?.config || {}) };
   const config = getConfigForPractice(baseConfig, intent.category);
+
+  const language = options?.language ?? 'en';
   
   // Run all analysis layers
   const elementCompatibility = analyzeElementCompatibility(user, moment, intent);
   const planetaryResonance = analyzePlanetaryResonance(user, moment, intent);
+  const hourRulerDignity = await analyzeHourRulerDignity(moment, options?.location, language);
   const manazilAlignment = analyzeManazilAlignment(user, moment, intent);
   const practiceMapping = analyzePracticeMapping(user, moment, intent);
   
   const layers = {
     elementCompatibility,
     planetaryResonance,
+    hourRulerDignity,
     manazilAlignment,
     practiceMapping,
   };
-
-  const language = options?.language ?? 'en';
   
-  // Calculate weighted overall score
-  const overallScore = Math.round(
+  // Calculate weighted overall score (normalized so adding layers doesn't skew totals)
+  const totalWeight =
+    (config.elementWeight || 0) +
+    (config.planetaryWeight || 0) +
+    (config.dignityWeight || 0) +
+    (config.manazilWeight || 0) +
+    (config.practiceWeight || 0);
+
+  const weightedSum =
     elementCompatibility.score * config.elementWeight +
     planetaryResonance.score * config.planetaryWeight +
+    hourRulerDignity.score * config.dignityWeight +
     manazilAlignment.score * config.manazilWeight +
-    practiceMapping.score * config.practiceWeight
-  );
+    practiceMapping.score * config.practiceWeight;
+
+  const overallScore = Math.round(totalWeight > 0 ? (weightedSum / totalWeight) : weightedSum);
   
   // Determine recommendation level and action (now considers individual layer scores)
   const level = getRecommendationLevel(overallScore, layers);

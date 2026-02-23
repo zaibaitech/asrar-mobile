@@ -7,6 +7,10 @@
  * This is a core component of Tier 1: Objective Cosmic Quality
  */
 
+import {
+    evaluatePlanetCondition,
+    type PlanetConditionEvaluation,
+} from '../src/lib/astro/planetConditionEngine';
 import { getPlanetPositions } from './EphemerisService';
 import type { Planet } from './PlanetaryHoursService';
 
@@ -84,6 +88,12 @@ export interface PlanetaryCondition {
   dignity: Dignity;
   motion: PlanetaryMotion;
   aspects: PlanetaryAspects;
+
+  /**
+   * Lightweight, reusable condition evaluation (sign dignities + peak degrees + critical degrees).
+   * Designed for UI status chips and explanation lists.
+   */
+  conditionEngine?: PlanetConditionEvaluation;
   
   overallQuality: number;      // 0-100 composite score
   ruling: PlanetaryQuality;
@@ -436,6 +446,13 @@ export async function getPlanetaryCondition(
     
     // Calculate dignity
     const dignity = calculateDignity(planet, position);
+
+    // Reusable sign+degree condition engine output (for UI consumption)
+    const conditionEngine = evaluatePlanetCondition({
+      planet,
+      sign: position.sign as any,
+      degree: position.degree,
+    });
     
     // Analyze motion
     // Note: Current ephemeris data doesn't include speed/retrograde info
@@ -511,6 +528,7 @@ export async function getPlanetaryCondition(
       dignity,
       motion,
       aspects,
+      conditionEngine,
       overallQuality,
       ruling,
       summary,
@@ -542,6 +560,11 @@ export async function getPlanetaryCondition(
         underBeams: false,
         majorAspects: [],
       },
+      conditionEngine: evaluatePlanetCondition({
+        planet,
+        sign: 'Aries',
+        degree: 0,
+      }),
       overallQuality: 50,
       ruling: 'moderate',
       summary: {

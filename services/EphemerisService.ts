@@ -13,7 +13,9 @@
  * @see https://ssd-api.jpl.nasa.gov/doc/horizons.html
  */
 
+import { BACKEND_FEATURE_FLAGS } from '@/config/featureFlags';
 import { ephemerisCache } from '@/services/cache/CacheManager';
+import { fetchMultipleEphemerisFromEdgeFunction } from '@/services/EdgeFunctionClient';
 import {
     generateSyntheticPositions,
     getCachedEphemerisData,
@@ -26,8 +28,6 @@ import {
 } from '@/types/divine-timing-personal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
-import { BACKEND_FEATURE_FLAGS } from '@/config/featureFlags';
-import { fetchMultipleEphemerisFromEdgeFunction, EphemerisResponse } from '@/services/EdgeFunctionClient';
 
 const inflightPositions = new Map<string, Promise<PlanetPositions | null>>();
 const inflightMoon = new Map<string, Promise<MoonLongitudeResult>>();
@@ -82,11 +82,27 @@ const MOON_CACHE_TTL_MS = MOON_CACHE_BUCKET_HOURS * 60 * 60 * 1000;
  * AsyncStorage keys
  */
 const STORAGE_KEYS = {
-  CACHE_PREFIX: 'ephemeris.cache.',
-  PRECISE_CACHE_PREFIX: 'ephemeris.precise.cache.',
+  // Bump version to invalidate any previously cached malformed longitudes.
+  CACHE_PREFIX: 'ephemeris.v2.cache.',
+  PRECISE_CACHE_PREFIX: 'ephemeris.v2.precise.cache.',
   MOON_CACHE_PREFIX: 'ephemeris.moon.cache.',
   LAST_FETCH: 'ephemeris.lastFetch',
 } as const;
+
+const ZODIAC_INDEX: Record<string, number> = {
+  aries: 0,
+  taurus: 1,
+  gemini: 2,
+  cancer: 3,
+  leo: 4,
+  virgo: 5,
+  libra: 6,
+  scorpio: 7,
+  sagittarius: 8,
+  capricorn: 9,
+  aquarius: 10,
+  pisces: 11,
+};
 
 // Planet transit UI wants degrees that update frequently.
 // Bucket requests to avoid hitting Horizons excessively.
@@ -173,12 +189,28 @@ export async function getPlanetPositions(
         for (const planet of planets) {
           const data = edgeResults[planet];
           if (data) {
-            const sign = Math.floor(data.longitude / 30);
-            const signDegree = data.longitude % 30;
-            
+            const edgeSignRaw = typeof data.zodiac_sign === 'string' ? data.zodiac_sign.trim().toLowerCase() : '';
+            const signFromEdge = edgeSignRaw ? ZODIAC_INDEX[edgeSignRaw] : undefined;
+            const degreeFromEdge = typeof data.zodiac_degree === 'number' ? data.zodiac_degree : undefined;
+
+            // Prefer absolute longitude if it looks valid (0..360).
+            // Some edge payloads may return longitude as "degree within sign"; detect and reconstruct.
+            let longitude = typeof data.longitude === 'number' ? ((data.longitude % 360) + 360) % 360 : 0;
+            if (typeof signFromEdge === 'number' && typeof degreeFromEdge === 'number') {
+              const degInSign = ((degreeFromEdge % 30) + 30) % 30;
+
+              // Heuristic: if longitude is in [0,30) but sign isn't Aries, it's almost certainly degree-in-sign.
+              if (longitude >= 0 && longitude < 30 && signFromEdge !== 0) {
+                longitude = signFromEdge * 30 + degInSign;
+              }
+            }
+
+            const sign = Math.floor(longitude / 30);
+            const signDegree = longitude % 30;
+
             planetPositions[planet] = {
               planet,
-              longitude: data.longitude,
+              longitude,
               sign,
               signDegree,
             };

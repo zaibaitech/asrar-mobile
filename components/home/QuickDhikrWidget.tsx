@@ -45,9 +45,9 @@ export function QuickDhikrWidget() {
   };
 
   const handlePress = () => {
-    // Navigate to full dhikr counter screen
+    // Navigate to new Zikr hub screen
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.push('/dhikr-counter');
+    router.push('/zikr');
   };
 
   const animatedCounterStyle = useAnimatedStyle(() => ({

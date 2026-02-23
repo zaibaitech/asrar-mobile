@@ -16,6 +16,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { getCosmicLunarMansionForDate, getLunarMansionByIndex, normalizeMansionIndex } from '@/data/lunarMansions';
 import { calculateElementalHarmony } from '@/services/ElementalHarmonyService';
+import { getPlanetPositions } from '@/services/EphemerisService';
 import { getCurrentLunarMansion } from '@/services/LunarMansionService';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -28,6 +29,9 @@ import { PracticeTimingBadge, usePracticeTiming } from './PracticeTimingBadge';
 // This prevents repeated API calls when the widget rotates in/out of view
 let cachedMansionData: { index: number; isRealTime: boolean; fetchedAt: number } | null = null;
 const MANSION_CACHE_TTL = 60 * 60 * 1000; // 1 hour - mansions change slowly
+
+// BATTERY OPTIMIZATION: Cache birth mansion calculation (only changes when profile changes)
+let cachedBirthMansion: { key: string; index: number | null } | null = null;
 
 interface ManazilWidgetProps {
   compact?: boolean;
@@ -105,8 +109,77 @@ export function ManazilWidget({
 
   const todayMansion = typeof todayIndex === 'number' ? getLunarMansionByIndex(todayIndex) : null;
 
+  // Calculate birth mansion from exact birth time (battery-optimized with caching)
+  const [manazilBirthIndex, setManazilBirthIndex] = React.useState<number | null>(() => {
+    // Check if we have a cached value for this profile
+    const cacheKey = `${profile?.dobISO}-${profile?.birthTime}-${profile?.timezone}`;
+    if (cachedBirthMansion && cachedBirthMansion.key === cacheKey) {
+      return cachedBirthMansion.index;
+    }
+    return null;
+  });
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    const calculateBirthMansion = async () => {
+      const birthLocation = profile?.birthLocation ?? profile?.location;
+      const cacheKey = `${profile?.dobISO}-${profile?.birthTime}-${profile?.timezone}`;
+
+      // Check cache first
+      if (cachedBirthMansion && cachedBirthMansion.key === cacheKey) {
+        if (!cancelled) {
+          setManazilBirthIndex(cachedBirthMansion.index);
+        }
+        return;
+      }
+
+      if (!profile?.dobISO || !profile?.birthTime || !birthLocation || !profile?.timezone) {
+        cachedBirthMansion = { key: cacheKey, index: null };
+        if (!cancelled) {
+          setManazilBirthIndex(null);
+        }
+        return;
+      }
+
+      try {
+        const [hours, minutes] = profile.birthTime.split(':').map(Number);
+        const birthDate = new Date(profile.dobISO);
+        birthDate.setHours(hours, minutes, 0, 0);
+        const localTimeStr = birthDate.toLocaleString('en-US', { timeZone: profile.timezone });
+        const localDate = new Date(localTimeStr);
+        const utcDate = new Date(birthDate.getTime() - (localDate.getTime() - birthDate.getTime()));
+
+        const positions = await getPlanetPositions(utcDate, profile.timezone);
+        if (cancelled || !positions?.planets?.moon?.longitude) return;
+
+        const moonLon = positions.planets.moon.longitude;
+        const normalizedLon = ((moonLon % 360) + 360) % 360;
+        const manzilIndex = Math.floor(normalizedLon / 12.857);
+        const birthIndex = normalizeMansionIndex(manzilIndex);
+
+        cachedBirthMansion = { key: cacheKey, index: birthIndex ?? null };
+        if (!cancelled && typeof birthIndex === 'number') {
+          setManazilBirthIndex(birthIndex);
+        }
+      } catch {
+        cachedBirthMansion = { key: cacheKey, index: null };
+        if (!cancelled) {
+          setManazilBirthIndex(null);
+        }
+      }
+    };
+
+    void calculateBirthMansion();
+    return () => { cancelled = true; };
+  }, [profile?.dobISO, profile?.birthTime, profile?.birthLocation, profile?.location, profile?.timezone]);
+
+  // Personal mansion priority:
+  // 1. manazilBirthIndex (from exact birth time - most accurate)
+  // 2. manazilPersonal (from name)
+  // 3. manazilBaseline (from DOB date only)
   const personalIndex = normalizeMansionIndex(
-    profile?.derived?.manazilPersonal ?? profile?.derived?.manazilBaseline
+    manazilBirthIndex ?? profile?.derived?.manazilPersonal ?? profile?.derived?.manazilBaseline
   );
   const personalMansion = typeof personalIndex === 'number' ? getLunarMansionByIndex(personalIndex) : null;
 

@@ -584,7 +584,7 @@ export async function getPlanetaryHoursFromCache(
       // Check if still valid
       if (Date.now() < cacheData.expiresAt) {
         // Find current hour from cached data
-        let currentHourIndex = 0;
+        let currentHourIndex = -1;
         for (let i = 0; i < cacheData.hours.length; i++) {
           const hour = cacheData.hours[i];
           const start = new Date(hour.startTime);
@@ -594,6 +594,13 @@ export async function getPlanetaryHoursFromCache(
             currentHourIndex = i;
             break;
           }
+        }
+
+        // If `now` doesn't fall into any cached hour window, the cache is out of sync
+        // with the provided sunrise/sunset frame (location/method/timezone changes).
+        // Fall back to real-time calculation to avoid showing the wrong hour ruler.
+        if (currentHourIndex === -1) {
+          return calculatePlanetaryHours(sunrise, sunset, nextSunrise, now);
         }
         
         const currentHour = cacheData.hours[currentHourIndex];

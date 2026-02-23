@@ -14,16 +14,16 @@
 
 import type { Planet } from '@/services/PlanetaryHoursService';
 import {
-    CurrentMoment,
-    Element,
-    ElementCompatibilityResult,
-    ManazilAlignmentResult,
-    PlanetaryResonanceResult,
-    PlanetaryRuler,
-    PracticeCategory,
-    PracticeMappingResult,
-    UserIntent,
-    UserSpiritalProfile
+  CurrentMoment,
+  Element,
+  ElementCompatibilityResult,
+  ManazilAlignmentResult,
+  PlanetaryResonanceResult,
+  PlanetaryRuler,
+  PracticeCategory,
+  PracticeMappingResult,
+  UserIntent,
+  UserSpiritalProfile
 } from './types';
 
 const PRACTICE_CATEGORY_VALUES: PracticeCategory[] = [
@@ -447,20 +447,17 @@ export function analyzeElementCompatibility(
   let minScore = dayRulerIsUserRuler ? 50 : 0;
   
   // GUARD 2: SAME PLANET HOUR - HIGHEST PRIORITY FOR HOURLY ALIGNMENT
-  // When the hour planet is THE SAME as user's ruling planet, elemental opposition 
-  // should NEVER restrict. This is the core traditional ʿIlm al-Nujum rule:
-  // Same planet hour = ALWAYS favorable for that native.
-  // Example: Scorpio (Mars-ruled) during Mars hour = ALWAYS Sa'd regardless of Fire/Water tension
+  // When the hour planet is the same as the user's ruling planet, intensity increases.
+  // This should not be treated as automatic permission; elemental tension can still matter.
   const isHourPlanetSameAsUserRuler = user.rulingPlanet && 
     moment.planetaryHourPlanet.toLowerCase() === user.rulingPlanet;
   
   if (isHourPlanetSameAsUserRuler) {
-    // Same planet hour = minimum 65% (ensures at least MAINTAIN, typically ACT)
-    minScore = Math.max(minScore, 65);
-    modifierScore += 20; // Strong boost for same planet resonance
-    modifierReason += 'Your ruling planet governs this hour — natural empowerment. ';
-    modifierReasonFr += 'Votre planète dominante gouverne cette heure — renforcement naturel. ';
-    modifierReasonAr += 'كوكبك الحاكم يحكم هذه الساعة — تمكين طبيعي. ';
+    // Same-planet hours increase intensity and consequence, but do not guarantee permission.
+    // Keep scoring neutral; communicate the qualitative shift in reasoning only.
+    modifierReason += 'Your ruling planet governs this hour — higher intensity and higher consequence. ';
+    modifierReasonFr += 'Votre planète dominante gouverne cette heure — intensité plus élevée et conséquences plus fortes. ';
+    modifierReasonAr += 'كوكبك الحاكم يحكم هذه الساعة — كثافة أعلى وعواقب أكبر. ';
   }
   
   // GUARD 3: Check for STRONG planetary friendship with hour planet
@@ -755,61 +752,6 @@ export function analyzePlanetaryResonance(
   }
   
   // ─────────────────────────────────────────────────────────────────────────────
-  // GUARD CLAUSE 2: Hour planet equals user ruler → VERY FAVORABLE
-  // ─────────────────────────────────────────────────────────────────────────────
-  if (planetaryHourMatch) {
-    // Perfect hour-level alignment: user's ruling planet governs this hour
-    // Still protected from nahs/sad modifiers, but slightly lower than day-level match
-    const finalScore = Math.min(100, Math.max(75, (planetaryHourScore * 0.6) + practiceModifier + 20));
-    
-    const reasoning = generatePlanetaryReasoning(
-      userPlanet,
-      dayRuler,
-      hourPlanet,
-      dayRulerMatch,
-      planetaryHourMatch,
-      practiceAligned
-    );
-
-    const reasoningFr = generatePlanetaryReasoningFr(
-      userPlanet,
-      dayRuler,
-      hourPlanet,
-      dayRulerMatch,
-      planetaryHourMatch,
-      practiceAligned
-    );
-
-    const reasoningAr = generatePlanetaryReasoningAr(
-      userPlanet,
-      dayRuler,
-      hourPlanet,
-      dayRulerMatch,
-      planetaryHourMatch,
-      practiceAligned
-    );
-    
-    return {
-      score: finalScore,
-      reasoning,
-      reasoningFr,
-      reasoningAr,
-      dayRulerScore,
-      planetaryHourScore: 100,
-      dayRulerMatch,
-      planetaryHourMatch,
-      hourPlanetNature: 'saad', // Treat as benefic when it's the user's own ruler
-      factors: {
-        userPlanet,
-        dayRuler: dayRuler.toString(),
-        hourPlanet: hourPlanet.toString(),
-        practiceModifier,
-        nahsSaadModifier: 0, // No penalty when hour planet === user ruler
-      },
-    };
-  }
-  
-  // ─────────────────────────────────────────────────────────────────────────────
   // NORMAL CASE: Apply nahs/sad modifiers (only when rulership doesn't match)
   // Element should only affect intensity, not permission/restriction
   // ─────────────────────────────────────────────────────────────────────────────
@@ -886,10 +828,6 @@ export function analyzePlanetaryResonance(
 }
 
 function getPlanetaryFriendship(planet1: string, planet2: string): 'friend' | 'neutral' | 'enemy' {
-  // Same planet is always "self-harmonious" - treat as friend (actually better than friend)
-  if (planet1 === planet2) {
-    return 'friend';
-  }
   const key = `${planet1}-${planet2}`;
   return PLANETARY_FRIENDSHIPS[key] || 'neutral';
 }
@@ -913,8 +851,8 @@ function generatePlanetaryReasoning(
   if (hourMatch) {
     parts.push(
       isDayInfluence
-        ? `Today's ruler (${dayRuler}) perfectly matches your ruling planet  -  amplifying your spiritual strength.`
-        : `The current planetary hour (${hourPlanet}) perfectly matches your ruling planet  -  amplifying your spiritual strength.`
+        ? `Today's ruler (${dayRuler}) matches your ruling planet — intensity rises; outcomes depend on restraint.`
+        : `This planetary hour (${hourPlanet}) matches your ruling planet — intensity rises; outcomes depend on restraint.`
     );
   } else if (dayMatch) {
     parts.push(`Today's ruler (${dayRuler}) resonates with your planetary nature.`);
@@ -929,7 +867,7 @@ function generatePlanetaryReasoning(
   }
   
   if (practiceAligned) {
-    parts.push('Current planetary hour is ideal for your chosen practice.');
+    parts.push('Current planetary hour supports your chosen practice.');
   }
 
   // Subtle clarification for "daily" contexts where day and hour can differ.
@@ -957,8 +895,8 @@ function generatePlanetaryReasoningFr(
   if (hourMatch) {
     parts.push(
       isDayInfluence
-        ? `Le maître du jour (${PLANET_LABELS[dayRuler].fr}) correspond à votre planète dominante  -  cela amplifie votre force spirituelle.`
-        : `L’heure planétaire actuelle (${PLANET_LABELS[hourPlanet].fr}) correspond à votre planète dominante  -  cela amplifie votre force spirituelle.`
+        ? `Le maître du jour (${PLANET_LABELS[dayRuler].fr}) correspond à votre planète dominante — l’intensité augmente; le résultat dépend de la retenue.`
+        : `L’heure planétaire actuelle (${PLANET_LABELS[hourPlanet].fr}) correspond à votre planète dominante — l’intensité augmente; le résultat dépend de la retenue.`
     );
   } else if (dayMatch) {
     parts.push(`Le maître du jour (${PLANET_LABELS[dayRuler].fr}) résonne avec votre nature planétaire.`);
@@ -973,7 +911,7 @@ function generatePlanetaryReasoningFr(
   }
 
   if (practiceAligned) {
-    parts.push('L’heure planétaire actuelle est idéale pour votre pratique.');
+    parts.push('L’heure planétaire actuelle soutient votre pratique.');
   }
 
   return parts.join(' ');
@@ -996,8 +934,8 @@ function generatePlanetaryReasoningAr(
   if (hourMatch) {
     parts.push(
       isDayInfluence
-        ? `حاكم اليوم (${PLANET_LABELS[dayRuler].ar}) يطابق كوكبك الحاكم  -  ما يعزز قوتك الروحية.`
-        : `الساعة الكوكبية الحالية (${PLANET_LABELS[hourPlanet].ar}) تطابق كوكبك الحاكم  -  ما يعزز قوتك الروحية.`
+        ? `حاكم اليوم (${PLANET_LABELS[dayRuler].ar}) يطابق كوكبك الحاكم — تزداد الكثافة؛ والنتيجة تعتمد على ضبط النفس.`
+        : `الساعة الكوكبية الحالية (${PLANET_LABELS[hourPlanet].ar}) تطابق كوكبك الحاكم — تزداد الكثافة؛ والنتيجة تعتمد على ضبط النفس.`
     );
   } else if (dayMatch) {
     parts.push(`حاكم اليوم (${PLANET_LABELS[dayRuler].ar}) ينسجم مع طبيعتك الكوكبية.`);
@@ -1012,7 +950,7 @@ function generatePlanetaryReasoningAr(
   }
 
   if (practiceAligned) {
-    parts.push('الساعة الكوكبية الحالية مناسبة لممارستك.');
+    parts.push('الساعة الكوكبية الحالية تدعم ممارستك.');
   }
 
   return parts.join(' ');

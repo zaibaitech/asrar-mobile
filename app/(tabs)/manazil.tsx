@@ -14,6 +14,7 @@ import { getManzilPracticePack } from '@/data/manazilPractices';
 import { useDailyPlanetaryAnalysis } from '@/hooks/useDailyPlanetaryAnalysis';
 import { useManazilPracticeTracking } from '@/hooks/useManazilPracticeTracking';
 import { analyzeTimingForPractice, buildCurrentMoment, profileToSpiritualProfile, quickTimingCheck } from '@/services/AsrariyaTimingEngine';
+import { getPlanetPositions } from '@/services/EphemerisService';
 import { getCurrentLunarMansion } from '@/services/LunarMansionService';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -533,6 +534,9 @@ export default function ManazilScreen() {
   const [todayIndex, setTodayIndex] = React.useState<number | null>(null);
   const [isRealTime, setIsRealTime] = React.useState(false);
   const [showSourceExplainer, setShowSourceExplainer] = React.useState(false);
+  
+  // Birth mansion calculated from exact birth time (most accurate personal mansion)
+  const [manazilBirthIndex, setManazilBirthIndex] = React.useState<number | null>(null);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -561,10 +565,73 @@ export default function ManazilScreen() {
     };
   }, []);
 
+  // Calculate birth mansion from exact birth time when available
+  // Priority: birthTime+birthLocation > name-based > DOB date only
+  React.useEffect(() => {
+    let cancelled = false;
+
+    const calculateBirthMansion = async () => {
+      // Need birthTime and birthLocation (or location) to calculate accurate birth mansion
+      const birthLocation = profile?.birthLocation ?? profile?.location;
+      if (!profile?.dobISO || !profile?.birthTime || !birthLocation || !profile?.timezone) {
+        setManazilBirthIndex(null);
+        return;
+      }
+
+      try {
+        // Create birth datetime in UTC
+        const [hours, minutes] = profile.birthTime.split(':').map(Number);
+        const birthDate = new Date(profile.dobISO);
+        birthDate.setHours(hours, minutes, 0, 0);
+
+        // Convert local birth time to UTC using timezone
+        const localTimeStr = birthDate.toLocaleString('en-US', { timeZone: profile.timezone });
+        const localDate = new Date(localTimeStr);
+        const utcDate = new Date(birthDate.getTime() - (localDate.getTime() - birthDate.getTime()));
+
+        // Get ephemeris data for birth moment
+        const positions = await getPlanetPositions(utcDate, profile.timezone);
+        if (cancelled || !positions?.planets?.moon?.longitude) {
+          return;
+        }
+
+        // Convert moon longitude to mansion index (0-27)
+        const moonLon = positions.planets.moon.longitude;
+        const normalizedLon = ((moonLon % 360) + 360) % 360;
+        const manzilIndex = Math.floor(normalizedLon / 12.857); // 360/28 ≈ 12.857
+        const birthIndex = normalizeMansionIndex(manzilIndex);
+
+        if (!cancelled && typeof birthIndex === 'number') {
+          setManazilBirthIndex(birthIndex);
+          if (__DEV__) {
+            console.log('[Manazil] Birth mansion calculated from exact birth time:', birthIndex, 'Moon longitude:', moonLon);
+          }
+        }
+      } catch (error) {
+        if (__DEV__) {
+          console.error('[Manazil] Error calculating birth mansion:', error);
+        }
+        if (!cancelled) {
+          setManazilBirthIndex(null);
+        }
+      }
+    };
+
+    void calculateBirthMansion();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile?.dobISO, profile?.birthTime, profile?.birthLocation, profile?.location, profile?.timezone]);
+
   const todayMansion = typeof todayIndex === 'number' ? getLunarMansionByIndex(todayIndex) : null;
 
+  // Personal mansion priority:
+  // 1. manazilBirthIndex (from exact birth time - most accurate)
+  // 2. manazilPersonal (from name) 
+  // 3. manazilBaseline (from DOB date only)
   const personalIndex = normalizeMansionIndex(
-    profile?.derived?.manazilPersonal ?? profile?.derived?.manazilBaseline
+    manazilBirthIndex ?? profile?.derived?.manazilPersonal ?? profile?.derived?.manazilBaseline
   );
   const personalMansion = typeof personalIndex === 'number' ? getLunarMansionByIndex(personalIndex) : null;
 

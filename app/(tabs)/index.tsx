@@ -50,7 +50,7 @@ import { getTodayBlessing } from '../../services/DayBlessingService';
 import { getBestLocation } from '../../services/LocationCacheService';
 import { getMomentAlignment, MomentAlignment } from '../../services/MomentAlignmentService';
 import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, type PlanetaryDayBoundaries, PlanetaryHourData } from '../../services/PlanetaryHoursService';
-import { BURJ_NAMES_EN } from '../../services/ProfileDerivationService';
+import { deriveBurjFromDOB, deriveElementFromBurj } from '../../services/ProfileDerivationService';
 
 /**
  * Module configuration for all spiritual features
@@ -149,6 +149,15 @@ const getModules = (t: any): (Omit<ModuleCardProps, 'onPress'> & { id: string })
     element: 'air',
     comingSoon: false,
   },
+  {
+    id: 'zikr',
+    title: t('modules.zikr.title'),
+    titleArabic: 'مركز الأذكار',
+    description: t('modules.zikr.description'),
+    icon: '🤲',
+    element: 'spirit',
+    comingSoon: false,
+  },
 ];
 
 export default function HomeScreen() {
@@ -175,6 +184,16 @@ export default function HomeScreen() {
   const [momentAlignment, setMomentAlignment] = useState<MomentAlignment | null>(null);
   const [momentTimingScore, setMomentTimingScore] = useState<number | null>(null);
   const [modulesExpanded, setModulesExpanded] = useState(false);
+
+  // Prefer zodiac-derived (DOB) element for the "You" pill in Moment Alignment.
+  // Falls back to name-derived zahirElement when DOB is missing.
+  const momentAlignmentUserElement = useMemo(() => {
+    if (profile?.dobISO) {
+      const burj = deriveBurjFromDOB(profile.dobISO);
+      if (burj) return deriveElementFromBurj(burj.burjIndex);
+    }
+    return momentAlignment?.zahirElement;
+  }, [profile?.dobISO, momentAlignment?.zahirElement]);
   
   // Rotation state for bottom cards
   const [prayerCardSlide, setPrayerCardSlide] = useState(0);
@@ -433,6 +452,9 @@ export default function HomeScreen() {
       case 'dhikrCounter':
         router.push('/dhikr-counter');
         break;
+      case 'zikr':
+        router.push('/zikr');
+        break;
       default:
         console.log(`${moduleId} - Coming Soon`);
     }
@@ -521,14 +543,13 @@ export default function HomeScreen() {
         
         {/* Full-width Moment Alignment Strip with Element Pills */}
         <MomentAlignmentStrip
-          zahirElement={momentAlignment?.zahirElement}
+          zahirElement={momentAlignmentUserElement}
           timeElement={momentAlignment?.timeElement}
           loading={!momentAlignment && hasProfileName}
           hasProfileName={hasProfileName}
           t={t}
           planetaryData={planetaryData}
           timingScore={momentTimingScore}
-          userSignKey={profile?.derived?.burjIndex !== undefined ? BURJ_NAMES_EN[profile.derived.burjIndex]?.toLowerCase() : undefined}
         />
         
         {/* 2. Action Pills - Inline Buttons */}

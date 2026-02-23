@@ -174,23 +174,6 @@ export default function TodayDetailsCard({
       <Text style={styles.sectionLabel}>{t('dailyEnergy.alignmentOverview.title')}</Text>
       <Text style={styles.scopeText}>{t('dailyEnergy.scope.day')}</Text>
 
-      {typeof alignmentScore === 'number' && (
-        <View style={styles.meterRow}>
-          <View style={styles.meterTrack}>
-            <View
-              style={[
-                styles.meterFill,
-                {
-                  width: `${Math.max(0, Math.min(100, alignmentScore))}%`,
-                  backgroundColor: toneColor ?? styles.meterFill.backgroundColor,
-                },
-              ]}
-            />
-          </View>
-          <Text style={styles.meterValue}>{alignmentScore}%</Text>
-        </View>
-      )}
-
       <View style={styles.detailsGrid}>
         {/* Day Ruler */}
         <View style={styles.detailItem}>
@@ -228,23 +211,6 @@ export default function TodayDetailsCard({
           </View>
         )}
       </View>
-
-      {(typeof elementalHarmonyScore === 'number' || typeof planetaryHarmonyScore === 'number') && (
-        <View style={styles.factorRow}>
-          {typeof elementalHarmonyScore === 'number' && (
-            <View style={[styles.factorPill, toneColor ? { borderColor: `${toneColor}55` } : null]}>
-              <Text style={styles.factorLabel}>{t('dailyEnergy.alignmentOverview.elementHarmony')}</Text>
-              <Text style={styles.factorValue}>{elementalHarmonyScore}%</Text>
-            </View>
-          )}
-          {typeof planetaryHarmonyScore === 'number' && (
-            <View style={[styles.factorPill, toneColor ? { borderColor: `${toneColor}55` } : null]}>
-              <Text style={styles.factorLabel}>{t('dailyEnergy.alignmentOverview.planetHarmony')}</Text>
-              <Text style={styles.factorValue}>{planetaryHarmonyScore}%</Text>
-            </View>
-          )}
-        </View>
-      )}
 
       {!!verdict && <Text style={styles.verdictText}>{verdict}</Text>}
       

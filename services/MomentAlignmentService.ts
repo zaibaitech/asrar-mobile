@@ -35,6 +35,83 @@ import { BURJ_NAMES_EN } from './ProfileDerivationService';
 export type Element = ElementType;
 export type AlignmentStatus = 'ACT' | 'MAINTAIN' | 'HOLD';
 
+/**
+ * Classical Planetary Ruling System (ʿIlm al-Nujūm)
+ * =================================================
+ * Traditional categorization of planetary hours based on their inherent nature.
+ * This is UNIVERSAL - same for all users, regardless of birth chart.
+ * 
+ * FAVORABLE (Benefics): Sun ☀️, Jupiter ♃, Venus ♀
+ *   - Leadership, authority, success (Sun)
+ *   - Growth, expansion, blessings (Jupiter)
+ *   - Harmony, beauty, relationships (Venus)
+ * 
+ * CAUTIOUS (Malefics): Saturn ♄, Mars ♂
+ *   - Restriction, delays, patience needed (Saturn)
+ *   - Conflict, aggression, caution advised (Mars)
+ * 
+ * NEUTRAL (Variable): Moon ☽, Mercury ☿
+ *   - Fluctuating, depends on context (Moon)
+ *   - Communication, varied outcomes (Mercury)
+ */
+export type ClassicalPlanetaryRuling = 'FAVORABLE' | 'NEUTRAL' | 'CAUTIOUS';
+
+/**
+ * Get the classical planetary ruling for a given planet.
+ * This is the traditional categorization used in ʿIlm al-Nujūm.
+ * 
+ * @param planet - The ruling planet of the current hour
+ * @returns Universal ruling classification
+ */
+export function getClassicalPlanetaryRuling(planet: Planet | string): ClassicalPlanetaryRuling {
+  const normalizedPlanet = planet.toString().toLowerCase();
+  
+  switch (normalizedPlanet) {
+    case 'sun':
+    case 'jupiter':
+    case 'venus':
+      return 'FAVORABLE';
+    case 'saturn':
+    case 'mars':
+      return 'CAUTIOUS';
+    case 'moon':
+    case 'mercury':
+    default:
+      return 'NEUTRAL';
+  }
+}
+
+/**
+ * Get alignment status from planet using classical ruling system.
+ * Maps classical ruling to existing AlignmentStatus for UI compatibility.
+ * 
+ * Mapping:
+ *   FAVORABLE → ACT (Excellent Time - proceed with confidence)
+ *   NEUTRAL → MAINTAIN (Neutral - steady as you go)
+ *   CAUTIOUS → HOLD (Proceed Mindfully - exercise patience)
+ * 
+ * @param planet - The ruling planet of the current hour
+ * @returns AlignmentStatus for UI display
+ */
+export function getAlignmentStatusFromPlanet(planet: Planet | string): AlignmentStatus {
+  const ruling = getClassicalPlanetaryRuling(planet);
+  
+  switch (ruling) {
+    case 'FAVORABLE':
+      return 'ACT';
+    case 'CAUTIOUS':
+      return 'HOLD';
+    case 'NEUTRAL':
+    default:
+      return 'MAINTAIN';
+  }
+}
+
+/**
+ * Get element-based alignment status.
+ * @deprecated Use getAlignmentStatusFromPlanet for consistent classical ruling.
+ * Kept for backwards compatibility with existing code paths.
+ */
 export function getAlignmentStatusForElements(
   zahirElement: Element,
   timeElement: Element,
@@ -60,6 +137,12 @@ export interface MomentAlignment {
   
   /** Current time element */
   timeElement: Element;
+  
+  /** Current hour ruling planet (for classical ruling display) */
+  currentHourPlanet?: Planet | string;
+  
+  /** Classical planetary ruling (FAVORABLE, NEUTRAL, CAUTIOUS) */
+  classicalRuling?: ClassicalPlanetaryRuling;
   
   /** Alignment status */
   status: AlignmentStatus;
@@ -249,11 +332,11 @@ async function getUpcomingPlanetaryHourWindowsAccurate(
 }
 
 /**
- * Find next optimal planetary hours for user's element
- * @param userElement - User's Ẓāhir element
+ * Find next optimal planetary hours using classical ruling system
+ * @param userElement - User's Ẓāhir element (kept for interface compatibility)
  * @param now - Current time
  * @param lookAheadHours - How many hours to look ahead (default 24)
- * @param userSignKey - Optional user's zodiac sign (for special harmony rules)
+ * @param userSignKey - Optional user's zodiac sign (kept for interface compatibility)
  */
 export function getNextOptimalWindows(
   userElement: Element,
@@ -263,10 +346,10 @@ export function getNextOptimalWindows(
 ): TimeWindow[] {
   const allWindows = getUpcomingPlanetaryHours(now, lookAheadHours);
   
-  // Calculate status for each window based on user element
+  // Use classical planetary ruling for window status (consistent for all users)
   return allWindows.map(window => ({
     ...window,
-    status: computeAlignmentStatus(userElement, window.element, userSignKey),
+    status: getAlignmentStatusFromPlanet(window.planet),
   })).filter((window, index) => {
     // Skip current hour if we're past the start
     if (index === 0 && window.startTime < now) {
@@ -381,6 +464,10 @@ export async function getMomentAlignment(
   let timeElement: Element = getCurrentTimeElement(now);
   let currentWindowEnd: Date | undefined = getNextHourTransition(now);
   let nextWindows: TimeWindow[] | undefined = getNextOptimalWindows(zahirElement, now, 24, userSignKey);
+  
+  // Get the current hour planet for classical ruling (fallback: simplified calculation)
+  const simplifiedHour = getSimplifiedPlanetaryHour(now);
+  let currentHourPlanet: Planet | string = simplifiedHour.planet;
 
   if (location?.latitude != null && location?.longitude != null) {
     const resolved = await getUpcomingPlanetaryHourWindowsAccurate(
@@ -392,8 +479,13 @@ export async function getMomentAlignment(
     if (resolved.timeElement) {
       timeElement = resolved.timeElement;
       currentWindowEnd = resolved.currentWindowEnd;
+      // Update current hour planet from accurate calculation
+      if (resolved.windows.length > 0) {
+        currentHourPlanet = resolved.windows[0].planet;
+      }
+      // Use classical planetary ruling for window status (consistent for all users)
       nextWindows = resolved.windows
-        .map(w => ({ ...w, status: computeAlignmentStatus(zahirElement, w.element, userSignKey) }))
+        .map(w => ({ ...w, status: getAlignmentStatusFromPlanet(w.planet) }))
         .filter(w => w.endTime > now);
     }
   }
@@ -415,6 +507,8 @@ export async function getMomentAlignment(
       // Get detailed hour ruler condition
       if (cosmicQuality?.hourRuler?.planet) {
         hourRulerCondition = cosmicQuality.hourRuler.condition;
+        // Use the more accurate planet from cosmic quality
+        currentHourPlanet = cosmicQuality.hourRuler.planet;
       }
     } catch (error) {
       console.warn('[MomentAlignment] Failed to analyze cosmic quality:', error);
@@ -422,13 +516,18 @@ export async function getMomentAlignment(
     }
   }
   
-  // Compute alignment status (basic elemental matching, with sign nuances)
-  const status = computeAlignmentStatus(zahirElement, timeElement, userSignKey);
+  // ========================================
+  // CLASSICAL PLANETARY RULING SYSTEM
+  // ========================================
+  // Use traditional ʿIlm al-Nujūm planetary ruling (universal, not personalized)
+  // This ensures consistent status badges based on the hour planet's inherent nature
+  const classicalRuling = getClassicalPlanetaryRuling(currentHourPlanet);
+  const status = getAlignmentStatusFromPlanet(currentHourPlanet);
   
   // ========================================
-  // ENHANCED STATUS OVERRIDE LOGIC
+  // OVERRIDE LOGIC FOR FORBIDDEN MOMENTS
   // ========================================
-  // If cosmic quality indicates forbidden moment, override status to HOLD
+  // If cosmic quality indicates forbidden moment (e.g., void of course), override to HOLD
   let finalStatus = status;
   if (cosmicQuality?.ruling === 'forbidden') {
     finalStatus = 'HOLD';
@@ -448,11 +547,11 @@ export async function getMomentAlignment(
   };
   
   // ========================================
-  // GENERATE ENHANCED REASONING
+  // GENERATE CLASSICAL REASONING
   // ========================================
-  const reasoning = generateEnhancedReasoning(
-    zahirElement,
-    timeElement,
+  const reasoning = generateClassicalReasoning(
+    currentHourPlanet,
+    classicalRuling,
     finalStatus,
     cosmicQuality,
     hourRulerCondition
@@ -461,6 +560,8 @@ export async function getMomentAlignment(
   return {
     zahirElement,
     timeElement,
+    currentHourPlanet,
+    classicalRuling,
     status: finalStatus,
     shortLabelKey: labelKeys[finalStatus],
     shortHintKey: hintKeys[finalStatus],
@@ -474,7 +575,122 @@ export async function getMomentAlignment(
 }
 
 /**
+ * Generate classical planetary reasoning based on ʿIlm al-Nujūm tradition
+ */
+function generateClassicalReasoning(
+  planet: Planet | string,
+  ruling: ClassicalPlanetaryRuling,
+  status: AlignmentStatus,
+  cosmicQuality?: CosmicQuality,
+  hourRulerCondition?: PlanetaryCondition
+): { en: string; ar: string; fr: string } {
+  const planetName = planet.toString();
+  const planetArabic = getPlanetArabic(planetName);
+  const planetFrench = getPlanetFrench(planetName);
+  
+  // Classical planetary descriptions
+  const descriptions: Record<string, { en: string; ar: string; fr: string }> = {
+    Sun: {
+      en: 'Sun hour — leadership, authority, success',
+      ar: 'ساعة الشمس — قيادة، سلطة، نجاح',
+      fr: 'Heure du Soleil — leadership, autorité, succès',
+    },
+    Jupiter: {
+      en: 'Jupiter hour — growth, expansion, blessings',
+      ar: 'ساعة المشتري — نمو، توسع، بركة',
+      fr: 'Heure de Jupiter — croissance, expansion, bénédictions',
+    },
+    Venus: {
+      en: 'Venus hour — harmony, beauty, relationships',
+      ar: 'ساعة الزهرة — انسجام، جمال، علاقات',
+      fr: 'Heure de Vénus — harmonie, beauté, relations',
+    },
+    Saturn: {
+      en: 'Saturn hour — patience, discipline, long-term work',
+      ar: 'ساعة زحل — صبر، انضباط، عمل طويل المدى',
+      fr: 'Heure de Saturne — patience, discipline, travail à long terme',
+    },
+    Mars: {
+      en: 'Mars hour — caution advised, avoid conflict',
+      ar: 'ساعة المريخ — يُنصح بالحذر، تجنب الصراع',
+      fr: 'Heure de Mars — prudence conseillée, évitez les conflits',
+    },
+    Moon: {
+      en: 'Moon hour — fluctuating energy, go with the flow',
+      ar: 'ساعة القمر — طاقة متقلبة، سِر مع التيار',
+      fr: 'Heure de la Lune — énergie fluctuante, suivez le mouvement',
+    },
+    Mercury: {
+      en: 'Mercury hour — communication, learning, adaptability',
+      ar: 'ساعة عطارد — تواصل، تعلم، مرونة',
+      fr: 'Heure de Mercure — communication, apprentissage, adaptabilité',
+    },
+  };
+  
+  const desc = descriptions[planetName] || {
+    en: `${planetName} hour`,
+    ar: `ساعة ${planetArabic}`,
+    fr: `Heure de ${planetFrench}`,
+  };
+  
+  // Add ruling assessment
+  const rulingText: Record<ClassicalPlanetaryRuling, { en: string; ar: string; fr: string }> = {
+    FAVORABLE: {
+      en: 'Excellent time — proceed with confidence.',
+      ar: 'وقت ممتاز — تابع بثقة.',
+      fr: 'Excellent moment — procédez avec confiance.',
+    },
+    NEUTRAL: {
+      en: 'Neutral energy — steady as you go.',
+      ar: 'طاقة محايدة — استمر بثبات.',
+      fr: 'Énergie neutre — continuez tranquillement.',
+    },
+    CAUTIOUS: {
+      en: 'Proceed mindfully — exercise patience.',
+      ar: 'تابع بوعي — تحلَّ بالصبر.',
+      fr: 'Procédez avec attention — faites preuve de patience.',
+    },
+  };
+  
+  const rulingDesc = rulingText[ruling];
+  
+  return {
+    en: `${desc.en}. ${rulingDesc.en}`,
+    ar: `${desc.ar} ${rulingDesc.ar}`,
+    fr: `${desc.fr}. ${rulingDesc.fr}`,
+  };
+}
+
+// Planet name translations
+function getPlanetArabic(planet: string): string {
+  const map: Record<string, string> = {
+    Sun: 'الشمس',
+    Moon: 'القمر',
+    Mars: 'المريخ',
+    Mercury: 'عطارد',
+    Jupiter: 'المشتري',
+    Venus: 'الزهرة',
+    Saturn: 'زحل',
+  };
+  return map[planet] || planet;
+}
+
+function getPlanetFrench(planet: string): string {
+  const map: Record<string, string> = {
+    Sun: 'Soleil',
+    Moon: 'Lune',
+    Mars: 'Mars',
+    Mercury: 'Mercure',
+    Jupiter: 'Jupiter',
+    Venus: 'Vénus',
+    Saturn: 'Saturne',
+  };
+  return map[planet] || planet;
+}
+
+/**
  * Generate enhanced multi-language reasoning combining elemental + cosmic analysis
+ * @deprecated Use generateClassicalReasoning for consistent classical ruling.
  */
 function generateEnhancedReasoning(
   zahirElement: Element,

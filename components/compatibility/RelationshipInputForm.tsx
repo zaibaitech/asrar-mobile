@@ -212,21 +212,6 @@ export function RelationshipInputForm({
             </Text>
           </View>
           
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>
-              {isFrench ? "Nom d'Affichage (Optionnel)" : 'Display Name (Optional)'}
-            </Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                value={person1Name}
-                onChangeText={setPerson1Name}
-                placeholder={isFrench ? 'ex: Ahmed' : 'e.g., Ahmed'}
-                style={styles.input}
-                placeholderTextColor={DarkTheme.textMuted}
-              />
-            </View>
-          </View>
-          
           {/* Latin Name Autocomplete */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>
@@ -295,21 +280,6 @@ export function RelationshipInputForm({
             <Text style={styles.personTitle}>
               {isFrench ? 'Personne 2' : 'Person 2'}
             </Text>
-          </View>
-          
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>
-              {isFrench ? "Nom d'Affichage (Optionnel)" : 'Display Name (Optional)'}
-            </Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                value={person2Name}
-                onChangeText={setPerson2Name}
-                placeholder={isFrench ? 'ex: Fatima' : 'e.g., Fatima'}
-                style={styles.input}
-                placeholderTextColor={DarkTheme.textMuted}
-              />
-            </View>
           </View>
           
           {/* Latin Name Autocomplete */}

@@ -111,6 +111,13 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
           route: '/(tabs)/name-destiny',
         },
         {
+          id: 'zikr',
+          label: t('drawer.zikr') || 'Dhikr & Wird',
+          icon: 'sparkles',
+          route: '/zikr',
+          color: '#FBBF24',
+        },
+        {
           id: 'compatibility',
           label: t('drawer.compatibility'),
           icon: 'heart',

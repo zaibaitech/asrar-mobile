@@ -3,8 +3,6 @@
  * ==============================
  * Shows current day's spiritual timing guidance
  * Always displays real-time data (not dependent on check-ins)
- * 
- * Enhanced with Asrariya Timing Engine for personalized practice timing
  */
 
 import { Borders, DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
@@ -17,7 +15,6 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { usePracticeTiming } from '../home/PracticeTimingBadge';
 
 interface RealTimeDailyGuidanceProps {
   guidance: DailyGuidance | null;
@@ -54,18 +51,22 @@ export function RealTimeDailyGuidance({
     }
   }, []);
 
-  const getObjectiveTimingQuality = React.useCallback((dayRuler: string): DailyGuidance['timingQuality'] => {
+  /**
+   * Classical Planetary Ruling (ʿIlm al-Nujūm)
+   * Matches the Moment Alignment system for consistency
+   */
+  const getClassicalTimingQuality = React.useCallback((dayRuler: string): DailyGuidance['timingQuality'] => {
     switch (dayRuler) {
       case 'Sun':
       case 'Jupiter':
       case 'Venus':
-        return 'favorable';
-      case 'Mars':
-        return 'transformative';
+        return 'favorable';  // Benefics → Excellent Time
       case 'Moon':
-      case 'Saturn':
-        return 'delicate';
       case 'Mercury':
+        return 'neutral';    // Variable → Neutral
+      case 'Saturn':
+      case 'Mars':
+        return 'cautious';   // Malefics → Proceed Mindfully
       default:
         return 'neutral';
     }
@@ -75,7 +76,7 @@ export function RealTimeDailyGuidance({
     const judgment = getClassicalJudgment({ rulerPlanet: ruler as any });
     if (judgment.restrictionLevel === 0) return 'favorable';
     if (judgment.restrictionLevel === 1) return 'neutral';
-    return 'delicate';
+    return 'cautious';
   }, []);
   
   const handlePress = async () => {
@@ -119,29 +120,37 @@ export function RealTimeDailyGuidance({
     }
   };
   
+  /**
+   * Status colors matching Moment Alignment for consistency
+   * - favorable (Benefics): Green
+   * - neutral (Variable): Yellow/Amber
+   * - cautious (Malefics): Purple
+   */
   const getStatusColor = (quality?: string) => {
     switch (quality) {
       case 'favorable':
-        return '#10b981'; // Green
-      case 'transformative':
-        return '#f59e0b'; // Amber
-      case 'delicate':
-        return '#ef4444'; // Red
+        return '#10b981'; // Green - Excellent Time
+      case 'cautious':
+        return '#7C3AED'; // Purple - Proceed Mindfully
+      case 'neutral':
       default:
-        return '#64B5F6'; // Blue
+        return '#f59e0b'; // Yellow/Amber - Neutral
     }
   };
   
+  /**
+   * Status labels for Daily Energy (Day-based, not hourly)
+   * Uses dailyEnergy.status.* translations
+   */
   const getStatusLabel = (quality?: string) => {
     switch (quality) {
       case 'favorable':
-        return t('widgets.dailyEnergy.windows.favorable');
-      case 'transformative':
-        return t('widgets.dailyEnergy.windows.transformative');
-      case 'delicate':
-        return t('widgets.dailyEnergy.windows.delicate');
+        return t('dailyEnergy.status.favorable');   // "Favorable Day"
+      case 'cautious':
+        return t('dailyEnergy.status.cautious');    // "Mindful Day"
+      case 'neutral':
       default:
-        return t('widgets.dailyEnergy.windows.neutral');
+        return t('dailyEnergy.status.neutral');     // "Balanced Day"
     }
   };
   
@@ -287,9 +296,6 @@ export function RealTimeDailyGuidance({
             </View>
           )}
 
-          {/* Asrariya Practice Timing */}
-          <AsrariyaTimingIndicator compact={compact} t={t} />
-
         </View>
 
         {/* Footer (pinned) */}
@@ -306,40 +312,6 @@ export function RealTimeDailyGuidance({
         </View>
       </View>
     </Pressable>
-  );
-}
-
-function AsrariyaTimingIndicator({
-  compact,
-  t,
-}: {
-  compact: boolean;
-  t: (key: string) => string;
-}) {
-  const { timing, isLoading } = usePracticeTiming('general');
-  if (isLoading || !timing) return null;
-
-  const colorMap: Record<string, string> = {
-    optimal: '#10b981',
-    favorable: '#60A5FA',
-    moderate: '#f59e0b',
-    challenging: '#f97316',
-    avoid: '#ef4444',
-  };
-  const color = colorMap[timing.level] ?? '#64B5F6';
-
-  return (
-    <View style={[styles.asrariyaRow, compact && styles.asrariyaRowCompact, { borderColor: `${color}35`, backgroundColor: `${color}12` }]}>
-      <Text style={styles.asrariyaIcon}>🕰️</Text>
-      <Text style={styles.asrariyaLabel} numberOfLines={1}>
-        {t('asrariya.title')}
-      </Text>
-      <View style={[styles.asrariyaChip, { backgroundColor: `${color}18`, borderColor: `${color}35` }]}>
-        <Text style={[styles.asrariyaChipText, { color }]} numberOfLines={1}>
-          {timing.label}
-        </Text>
-      </View>
-    </View>
   );
 }
 
@@ -383,39 +355,6 @@ const styles = StyleSheet.create({
 
   body: {
     gap: 12,
-  },
-
-  asrariyaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  asrariyaRowCompact: {
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-  },
-  asrariyaIcon: {
-    fontSize: 12,
-  },
-  asrariyaLabel: {
-    flex: 1,
-    fontSize: 12,
-    color: DarkTheme.textSecondary,
-    fontWeight: Typography.weightMedium as any,
-  },
-  asrariyaChip: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  asrariyaChipText: {
-    fontSize: 11,
-    fontWeight: Typography.weightSemibold as any,
   },
   
   // Header

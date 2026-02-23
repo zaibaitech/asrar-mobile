@@ -92,12 +92,12 @@ function calculateHarmonyScore(
     score -= 10;
   }
   
-  // Daily Guidance contribution (30 points)
+  // Daily Guidance contribution (30 points) - using classical system
   if (dailyGuidance.timingQuality === 'favorable') {
     score += 30;
   } else if (dailyGuidance.timingQuality === 'neutral') {
     score += 10;
-  } else if (dailyGuidance.timingQuality === 'delicate') {
+  } else if (dailyGuidance.timingQuality === 'cautious') {
     score -= 10;
   }
   
@@ -106,8 +106,7 @@ function calculateHarmonyScore(
     'favorable': 40,
     'moderately favorable': 25,
     'neutral': 10,
-    'delicate': -10,
-    'transformative': 0,
+    'cautious': -10,
   };
   score += qualityScores[divineResult.timingQuality] || 0;
   

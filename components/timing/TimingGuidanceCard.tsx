@@ -34,7 +34,11 @@ interface NextBestHour {
 interface TimingGuidanceCardProps {
   currentHour?: PlanetaryHour;
   nextBestHour?: NextBestHour;
-  windowQuality?: 'favorable' | 'neutral' | 'delicate' | 'transformative';
+  /** 
+   * Classical planetary ruling quality
+   * Matches Moment Alignment system: favorable/neutral/cautious
+   */
+  windowQuality?: 'favorable' | 'neutral' | 'cautious';
 }
 
 function getPlanetEmoji(planet: Planet): string {
@@ -78,32 +82,43 @@ function getQualityLevel(power: number, t: (key: string, params?: Record<string,
   };
 }
 
+/**
+ * Colors matching Moment Alignment for consistency:
+ * - favorable (Benefics): Green
+ * - neutral (Variable): Yellow/Amber
+ * - cautious (Malefics): Purple
+ */
 function getWindowColor(quality?: string): string {
   switch (quality) {
     case 'favorable':
-      return '#10b981';
-    case 'transformative':
-      return '#f59e0b';
-    case 'delicate':
-      return '#ef4444';
+      return '#10b981'; // Green - Excellent Time
+    case 'cautious':
+      return '#7C3AED'; // Purple - Proceed Mindfully
+    case 'neutral':
     default:
-      return '#64B5F6';
+      return '#f59e0b'; // Yellow/Amber - Neutral
   }
 }
 
+/**
+ * Labels matching Moment Alignment (Hour-based)
+ * Uses home.moment.status.* translations:
+ * - ACT = "Excellent Time"
+ * - MAINTAIN = "Neutral"
+ * - HOLD = "Proceed Mindfully"
+ */
 function getWindowLabel(
   quality: string | undefined,
   t: (key: string, params?: Record<string, string | number>) => string
 ): string {
   switch (quality) {
     case 'favorable':
-      return t('widgets.dailyEnergy.windows.favorable');
-    case 'transformative':
-      return t('widgets.dailyEnergy.windows.transformative');
-    case 'delicate':
-      return t('widgets.dailyEnergy.windows.delicate');
+      return t('home.moment.status.act');      // "Excellent Time"
+    case 'cautious':
+      return t('home.moment.status.hold');     // "Proceed Mindfully"
+    case 'neutral':
     default:
-      return t('widgets.dailyEnergy.windows.neutral');
+      return t('home.moment.status.maintain'); // "Neutral"
   }
 }
 
@@ -122,7 +137,6 @@ export default function TimingGuidanceCard({
     return null;
   }
 
-  const quality = getQualityLevel(currentHour.power, t);
   const windowLabel = getWindowLabel(windowQuality, t);
   const windowColor = getWindowColor(windowQuality);
   const showNextBestHour = nextBestHour && currentHour.power < 70;
@@ -139,12 +153,6 @@ export default function TimingGuidanceCard({
 
       <Text style={styles.scopeText}>{t('dailyEnergy.scope.hour')}</Text>
 
-      {!!windowQuality && (
-        <View style={[styles.windowBadge, { backgroundColor: `${windowColor}18`, borderColor: `${windowColor}35` }]}>
-          <Text style={[styles.windowBadgeText, { color: windowColor }]}>{windowLabel}</Text>
-        </View>
-      )}
-
       {/* Current Hour */}
       <View style={styles.currentHourContainer}>
         <View style={styles.currentHourHeader}>
@@ -155,11 +163,11 @@ export default function TimingGuidanceCard({
         <View
           style={[
             styles.powerBadge,
-            { backgroundColor: quality.color + '20', borderColor: quality.color },
+            { backgroundColor: windowColor + '20', borderColor: windowColor },
           ]}
         >
-          <Text style={[styles.powerText, { color: quality.color }]}>
-            {currentHour.power}% • {windowQuality ? windowLabel : quality.label}
+          <Text style={[styles.powerText, { color: windowColor }]}>
+            {windowLabel}
           </Text>
         </View>
 
@@ -185,7 +193,7 @@ export default function TimingGuidanceCard({
               {nextBestHour.startsAt} ({t('notifications.timing.inHours')} {nextBestHour.hoursUntil}h)
             </Text>
             <Text style={styles.nextBestPower}>
-              {t('notifications.timing.expectedQuality')}: {nextBestHour.power}% ({nextBestQuality?.label ?? t('common.quality.excellent')})
+              {t('notifications.timing.expectedQuality')}: {nextBestQuality?.label ?? t('common.quality.excellent')}
             </Text>
           </View>
 

@@ -14,7 +14,7 @@ import {
 import {
     AlignmentStatus,
     Element,
-    getAlignmentStatusForElements,
+    getAlignmentStatusFromPlanet,
 } from '@/services/MomentAlignmentService';
 import { PlanetaryHourData } from '@/services/PlanetaryHoursService';
 
@@ -158,12 +158,12 @@ export function MomentAlignmentCard({
 
   const nextHourPreview = (() => {
     if (!planetaryData) return null;
-    if (!zahirElement) return null;
     const seconds = planetaryData.countdownSeconds;
     if (!(seconds > 0 && seconds <= 10 * 60)) return null;
 
-    const nextElement = planetaryData.nextHour.planetInfo.element;
-    const nextStatus = getAlignmentStatusForElements(zahirElement, nextElement, userSignKey);
+    // Use classical planetary ruling for next hour (based on planet, not element)
+    const nextPlanet = planetaryData.nextHour.planet;
+    const nextStatus = getAlignmentStatusFromPlanet(nextPlanet);
 
     const statusKey: Record<AlignmentStatus, string> = {
       ACT: 'home.moment.status.act',
@@ -173,7 +173,7 @@ export function MomentAlignmentCard({
 
     return {
       seconds,
-      nextElement,
+      nextElement: planetaryData.nextHour.planetInfo.element,
       nextStatus,
       nextStatusLabel: t(statusKey[nextStatus]),
       nextPlanetLabel: t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`),

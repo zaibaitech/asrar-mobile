@@ -179,20 +179,6 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
             </View>
           </View>
 
-          {/* Display Name */}
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>
-              {t('compatibility.form.displayNameOptional')}
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={person1Name}
-              onChangeText={setPerson1Name}
-              placeholder={t('compatibility.form.exampleAhmed')}
-              placeholderTextColor="#64748b"
-            />
-          </View>
-
           {/* Latin Name Autocomplete */}
           <View style={styles.inputWrapper}>
             <Text style={styles.label}>
@@ -257,20 +243,6 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
                 {t('compatibility.form.person2')}
               </Text>
             </View>
-          </View>
-
-          {/* Display Name */}
-          <View style={styles.inputWrapper}>
-            <Text style={styles.label}>
-              {t('compatibility.form.displayNameOptional')}
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={person2Name}
-              onChangeText={setPerson2Name}
-              placeholder={t('compatibility.form.exampleAhmed')}
-              placeholderTextColor="#64748b"
-            />
           </View>
 
           {/* Latin Name Autocomplete */}

@@ -34,24 +34,30 @@ export interface ClassicalJudgment {
 }
 
 function baseRestrictionLevelForPlanet(planet: Planet): RestrictionLevel {
-  // Baseline mapping (master rule layer)
-  // 0 = open (Nashr)
-  // 1 = caution (Neutral)
-  // 2 = restricted (Nahs)
-  // 3 = avoid (Restricted)
+  // Classical Planetary Ruling (ʿIlm al-Nujūm)
+  // ==========================================
+  // Traditional categorization of planetary hours based on inherent nature.
+  // 
+  // 0 = FAVORABLE (Nashr/Benefic): Sun ☀️, Jupiter ♃, Venus ♀
+  //     Leadership, authority, success, growth, expansion, harmony
+  // 
+  // 1 = NEUTRAL (Variable): Moon ☽, Mercury ☿
+  //     Fluctuating energy, communication, adaptability
+  // 
+  // 2 = CAUTIOUS (Nahs/Malefic): Saturn ♄, Mars ♂
+  //     Restriction, delays, patience needed, conflict potential
+  // 
+  // 3 = AVOID (Restricted): Reserved for exceptional circumstances
   switch (planet) {
+    case 'Sun':
     case 'Jupiter':
     case 'Venus':
       return 0;
-    case 'Sun':
-      return 1;
     case 'Moon':
     case 'Mercury':
       return 1;
     case 'Mars':
-      return 2;
     case 'Saturn':
-      // Saturn is heavy by nature; keep as restricted-but-usable baseline.
       return 2;
     default:
       return 1;
@@ -102,75 +108,45 @@ function domainsForPlanet(planet: Planet): { allowed: string[]; avoid: string[] 
 }
 
 export function getClassicalJudgment(input: ClassicalJudgmentInput): ClassicalJudgment {
-  // ─────────────────────────────────────────────────────────────────────────────
-  // PRIMARY RULE (HIGHEST PRIORITY): Same Planet Rule
-  // ─────────────────────────────────────────────────────────────────────────────
-  // In traditional ʿIlm al-Nujum (Islamic astrology), when the hour ruler is
-  // the SAME as the user's personal ruling planet, this is ALWAYS favorable.
-  // Secondary factors (dignity, house, aspects) can only ENHANCE this, never diminish it.
-  // 
-  // Example: Scorpio person (Mars-ruled) during Mars hour = ALWAYS Sa'd/Nashr
-  // ─────────────────────────────────────────────────────────────────────────────
-  if (input.userRulingPlanet && input.rulerPlanet === input.userRulingPlanet) {
-    // Same planet = automatic favorable alignment
-    // Dignity and house can upgrade it further, but can never downgrade below Nashr
-    const { allowed, avoid } = domainsForPlanet(input.rulerPlanet);
-    
-    const dignity = (input.dignityType ?? 'unknown').toString().toLowerCase();
-    const isDignified = dignity === 'domicile' || dignity === 'exaltation';
-    const isAngular = input.houseType === 'angular';
-    
-    // Same planet is minimum Nashr (favorable), can be enhanced but never diminished
-    return {
-      classicalLabel: 'Nashr',
-      restrictionLevel: 0, // Always open/favorable for same planet
-      allowedDomains: allowed,
-      avoidDomains: isDignified && isAngular ? [] : avoid, // If dignified+angular, even "avoid" domains become accessible
-      practiceIntensity: isDignified || isAngular ? 'high' : 'moderate',
-    };
-  }
-
+  // Use simple classical baseline - avoid complex modifiers that cause inconsistency
   const base = baseRestrictionLevelForPlanet(input.rulerPlanet);
 
-  // Modifiers (simple version): negative improves, positive worsens
-  let delta = 0;
+  // SIMPLIFIED: Start with classical baseline
+  // Only apply minimal modifiers to avoid conflicting status badges
+  let computed = base;
 
-  // A) Dignity / sign condition modifier
+  // A) Dignity modifier - only upgrade, never downgrade benefics
   const dignity = (input.dignityType ?? 'unknown').toString().toLowerCase();
   const isDignified = dignity === 'domicile' || dignity === 'exaltation';
-  if (dignity === 'domicile' || dignity === 'exaltation') delta -= 1;
-  else if (dignity === 'detriment' || dignity === 'fall') delta += 1;
+  
+  // Dignified planets can improve their status
+  if (isDignified && computed > 0) {
+    computed = clampRestrictionLevel(computed - 1);
+  }
 
-  // B) House power modifier
-  if (input.houseType === 'angular') delta -= 1;
-  else if (input.houseType === 'cadent') delta += 1;
+  // B) "Forbidden" override stays in place via MomentAlignmentService
+  // No additional modifiers here to keep status consistent
 
-  // C) Malefic/benefic contamination
-  if ((input.aspectsToBenefics ?? 0) > 0) delta -= 1;
-  if ((input.aspectsToMalefics ?? 0) > 0) delta += 1;
+  // Moon upgrade rule: if Moon is essentially dignified, upgrade to Nashr
+  if (input.rulerPlanet === 'Moon' && isDignified && computed === 1) {
+    computed = 0;
+  }
 
-  let computed = clampRestrictionLevel(base + delta);
-
-  // Moon upgrade rule: if Moon is essentially dignified, it cannot remain merely Neutral.
-  // This upgrades the baseline (Neutral) -> Nashr, without overriding genuine restrictions.
-  if (input.rulerPlanet === 'Moon' && isDignified && computed === 1) computed = 0;
-
-  // D) Clamp rule (never exceed certain best-case labels)
-  // "Max label = Neutral" means: never allow level 0 on these rulers.
-  const cannotBeNashr =
-    input.rulerPlanet === 'Saturn' ||
-    input.rulerPlanet === 'Mars' ||
-    input.rulerPlanet === 'Mercury' ||
-    (input.rulerPlanet === 'Moon' && !isDignified);
-  if (cannotBeNashr && computed === 0) computed = 1;
+  // Classical malefics can never show as FAVORABLE (Nashr)
+  const isMalefic = input.rulerPlanet === 'Saturn' || input.rulerPlanet === 'Mars';
+  if (isMalefic && computed === 0) {
+    computed = 1; // At best Neutral
+  }
 
   const { allowed, avoid } = domainsForPlanet(input.rulerPlanet);
+  const isSamePlanet = !!input.userRulingPlanet && input.rulerPlanet === input.userRulingPlanet;
 
   return {
     classicalLabel: labelFromRestrictionLevel(computed),
     restrictionLevel: computed,
     allowedDomains: allowed,
     avoidDomains: avoid,
-    practiceIntensity: practiceIntensityFromLevel(computed),
+    // Same-planet hour: higher intensity (not automatic permission).
+    practiceIntensity: isSamePlanet ? 'high' : practiceIntensityFromLevel(computed),
   };
 }

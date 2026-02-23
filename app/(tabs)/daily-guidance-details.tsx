@@ -48,6 +48,7 @@ import { quickTimingCheck } from '@/services/AsrariyaTimingEngine';
 import { getClassicalJudgment } from '@/services/ClassicalJudgmentService';
 import { getDailyGuidance, type DailyGuidance } from '@/services/DailyGuidanceService';
 import { generateDailySynthesis, getUserPlanet, type DailySynthesis } from '@/services/DailySynthesisService';
+import { getBestLocation } from '@/services/LocationCacheService';
 import { getElementRelationship as getClassicalElementRelationship, getPlanetaryRelationship } from '@/services/PlanetaryRelationshipService';
 import { BURJ_NAMES_EN } from '@/services/ProfileDerivationService';
 import {
@@ -61,7 +62,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type TimingQuality = 'favorable' | 'neutral' | 'delicate' | 'transformative';
+/**
+ * Classical Planetary Ruling timing quality
+ * Matches Moment Alignment system for consistency:
+ * - favorable: Benefics (Sun, Jupiter, Venus) → Excellent Time
+ * - neutral: Variable (Moon, Mercury) → Neutral
+ * - cautious: Malefics (Saturn, Mars) → Proceed Mindfully
+ */
+type TimingQuality = 'favorable' | 'neutral' | 'cautious';
 
 type Element = 'fire' | 'water' | 'air' | 'earth';
 
@@ -252,8 +260,8 @@ export default function DailyGuidanceDetailsScreen() {
           // Get moon phase
           const moonPhase = dailyAnalysis.moonPhase?.phaseName || 'waxing_crescent';
           
-          // Get day ruler transit power
-          const transitPower = 50;
+          // Get day ruler transit power from actual analysis data
+          const transitPower = dailyAnalysis.dayRulingStrength ?? 50;
           
           // Get user's zodiac sign for special harmony rules (Scorpio+Fire, Aquarius+Water)
           // Use burjIndex to get English name since derived.burj is in Arabic
@@ -311,7 +319,9 @@ export default function DailyGuidanceDetailsScreen() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const location = profile?.location;
+      // Use getBestLocation for consistency with Moment Alignment screen
+      const best = await getBestLocation({ allowPrompt: false });
+      const location = best ?? profile?.location;
 
       // If no location, fall back to approximate boundaries.
       if (!location || typeof location.latitude !== 'number' || typeof location.longitude !== 'number') {
@@ -490,29 +500,32 @@ export default function DailyGuidanceDetailsScreen() {
   const windowQuality: TimingQuality = (dailyGuidance?.timingQuality as TimingQuality) || timingQuality;
 
   // Convert unified timing score to window quality for current hour display
-  // Thresholds match UnifiedBadge system: OPTIMAL(75+), ACT(60-74), MAINTAIN(45-59), CAREFUL(30-44), HOLD(<30)
+  // Simplified to match classical system: favorable/neutral/cautious
   const getTimingQualityFromScore = (score: number | null): TimingQuality => {
     if (score === null) return 'neutral';
-    if (score >= 60) return 'favorable';  // OPTIMAL + ACT = Good Time / Excellent
-    if (score >= 45) return 'neutral';    // MAINTAIN = Proceed mindfully
-    if (score >= 30) return 'transformative'; // CAREFUL = Proceed with caution
-    return 'delicate';                    // HOLD = Unfavorable
+    if (score >= 60) return 'favorable';  // Good Time / Excellent
+    if (score >= 40) return 'neutral';    // Neutral
+    return 'cautious';                    // Proceed Mindfully
   };
 
   // Use unified score for current hour timing quality (matches widget/moment alignment)
   const currentHourTimingQuality = getTimingQualityFromScore(unifiedTimingScore);
 
+  /**
+   * Colors matching Moment Alignment for consistency:
+   * - favorable (Benefics): Green
+   * - neutral (Variable): Yellow/Amber
+   * - cautious (Malefics): Purple
+   */
   const getWindowColor = (quality: TimingQuality) => {
     switch (quality) {
       case 'favorable':
-        return '#10b981';
-      case 'transformative':
-        return '#f59e0b';
-      case 'delicate':
-        return '#ef4444';
+        return '#10b981'; // Green - Excellent Time
+      case 'cautious':
+        return '#7C3AED'; // Purple - Proceed Mindfully
       case 'neutral':
       default:
-        return '#64B5F6';
+        return '#f59e0b'; // Yellow/Amber - Neutral
     }
   };
 
@@ -521,9 +534,9 @@ export default function DailyGuidanceDetailsScreen() {
   const masterCapQuality: 'excellent' | 'good' | 'moderate' | 'challenging' =
     windowQuality === 'favorable'
       ? 'good'
-      : windowQuality === 'neutral' || windowQuality === 'transformative'
+      : windowQuality === 'neutral'
         ? 'moderate'
-        : 'challenging';
+        : 'challenging';  // cautious
 
   const verdictQuality = (() => {
     const rank: Record<'excellent' | 'good' | 'moderate' | 'challenging', number> = {
@@ -536,8 +549,21 @@ export default function DailyGuidanceDetailsScreen() {
       ? authority.displayQuality
       : masterCapQuality;
   })();
+  
+  /**
+   * Labels for Daily Energy (Day-based, not hourly)
+   * Uses dailyEnergy.status.* translations
+   */
   const getWindowLabel = (quality: TimingQuality) => {
-    return t(`widgets.dailyEnergy.windows.${quality}`);
+    switch (quality) {
+      case 'favorable':
+        return t('dailyEnergy.status.favorable');   // "Favorable Day"
+      case 'cautious':
+        return t('dailyEnergy.status.cautious');    // "Mindful Day"
+      case 'neutral':
+      default:
+        return t('dailyEnergy.status.neutral');     // "Balanced Day"
+    }
   };
 
   const ascendantBurj = profile?.derived?.ascendantBurj;

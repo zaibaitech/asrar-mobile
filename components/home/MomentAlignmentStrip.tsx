@@ -11,8 +11,7 @@ import {
     Spacing,
     Typography,
 } from '@/constants/DarkTheme';
-import { BADGE_CONFIG, convertLegacyStatus, getBadgeFromScore, type UnifiedBadge } from '@/services/AsrariyaTimingEngine';
-import { Element, getAlignmentStatusForElements } from '@/services/MomentAlignmentService';
+import { AlignmentStatus, Element, getAlignmentStatusFromPlanet } from '@/services/MomentAlignmentService';
 import { PlanetaryHourData } from '@/services/PlanetaryHoursService';
 
 interface MomentAlignmentStripProps {
@@ -22,18 +21,33 @@ interface MomentAlignmentStripProps {
   hasProfileName?: boolean;
   t: (key: string) => string;
   planetaryData?: PlanetaryHourData | null;
-  /** Asrariya timing score (0-100) for the current moment */
+  /** @deprecated No longer used - classical planetary ruling is derived from planetaryData */
   timingScore?: number | null;
-  /** User's zodiac sign for special harmony rules (Scorpio+Fire, Aquarius+Water) */
-  userSignKey?: string;
 }
 
-const FALLBACK_BADGE_LABEL: Record<UnifiedBadge, string> = {
-  OPTIMAL: 'Optimal',
-  ACT: 'Good Time',
-  MAINTAIN: 'Maintain',
-  CAREFUL: 'Careful',
-  HOLD: 'Hold',
+/**
+ * Classical planetary ruling badge configuration
+ * Based on traditional ʿIlm al-Nujūm categorization
+ */
+const CLASSICAL_BADGE_CONFIG: Record<AlignmentStatus, { color: string; bgColor: string; icon: string; labelKey: string }> = {
+  ACT: {
+    color: '#10b981',
+    bgColor: 'rgba(16, 185, 129, 0.15)',
+    icon: '✨',
+    labelKey: 'home.moment.status.act',
+  },
+  MAINTAIN: {
+    color: '#f59e0b',
+    bgColor: 'rgba(245, 158, 11, 0.15)',
+    icon: '○',
+    labelKey: 'home.moment.status.maintain',
+  },
+  HOLD: {
+    color: '#7C3AED',
+    bgColor: 'rgba(124, 58, 237, 0.15)',
+    icon: '⚡',
+    labelKey: 'home.moment.status.hold',
+  },
 };
 
 function getElementLabel(element: Element | undefined, t: (key: string) => string) {
@@ -59,16 +73,17 @@ export function MomentAlignmentStrip({
   hasProfileName,
   t,
   planetaryData,
-  timingScore,
-  userSignKey,
 }: MomentAlignmentStripProps) {
   const router = useRouter();
 
-  const unifiedBadge: UnifiedBadge | undefined =
-    typeof timingScore === 'number' ? getBadgeFromScore(timingScore) : undefined;
-  const badgeConfig = unifiedBadge ? BADGE_CONFIG[unifiedBadge] : undefined;
-  const badgeLabel = unifiedBadge
-    ? t(badgeConfig?.labelKey ?? '') || FALLBACK_BADGE_LABEL[unifiedBadge]
+  // Use classical planetary ruling (based on current hour planet)
+  const currentPlanet = planetaryData?.currentHour?.planet;
+  const classicalStatus: AlignmentStatus | undefined = currentPlanet 
+    ? getAlignmentStatusFromPlanet(currentPlanet) 
+    : undefined;
+  const badgeConfig = classicalStatus ? CLASSICAL_BADGE_CONFIG[classicalStatus] : undefined;
+  const badgeLabel = classicalStatus && badgeConfig
+    ? t(badgeConfig.labelKey) || classicalStatus
     : undefined;
 
   const handlePress = () => {
@@ -137,16 +152,10 @@ export function MomentAlignmentStrip({
     if (!(seconds > 0 && seconds <= 10 * 60)) return null;
 
     const nextElement = planetaryData.nextHour.planetInfo.element;
-    const legacyStatus = getAlignmentStatusForElements(zahirElement, nextElement, userSignKey);
-    const nextBadge = convertLegacyStatus(legacyStatus);
-    const nextConfig = BADGE_CONFIG[nextBadge];
-    const nextBadgeLabel = t(nextConfig.labelKey) || FALLBACK_BADGE_LABEL[nextBadge];
 
     return {
       seconds,
       nextElement,
-      nextBadge,
-      nextBadgeLabel,
       nextPlanetLabel: t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`),
       nextPlanetArabic: planetaryData.nextHour.planetInfo.arabicName,
     };
@@ -164,11 +173,11 @@ export function MomentAlignmentStrip({
             {t('home.cards.momentAlignment.title')}
           </Text>
         </View>
-        {unifiedBadge && badgeConfig && badgeLabel && (
+        {classicalStatus && badgeConfig && badgeLabel && (
           <View style={[styles.statusChip, { borderColor: badgeConfig.color, backgroundColor: badgeConfig.bgColor }]}>
             <View style={[styles.statusDot, { backgroundColor: badgeConfig.color }]} />
             <Text style={[styles.statusLabel, { color: badgeConfig.color }]} numberOfLines={1}>
-              {badgeConfig.icon} {badgeLabel}{typeof timingScore === 'number' ? ` • ${Math.round(timingScore)}%` : ''}
+              {badgeConfig.icon} {badgeLabel}
             </Text>
           </View>
         )}
@@ -191,14 +200,16 @@ export function MomentAlignmentStrip({
       )}
 
       {/* Element Pills - Responsive Layout */}
-      {(zahirElement || timeElement) && (
+      {/* Use planetaryData.currentHour.planetInfo.element when available for real-time accuracy,
+          falling back to timeElement from momentAlignment (which may be stale between updates) */}
+      {(zahirElement || timeElement || planetaryData) && (
         <View style={styles.elementRow}>
           {renderElementPill('home.cards.momentAlignment.youLabel', zahirElement)}
-          {renderElementPill('home.cards.momentAlignment.momentLabel', timeElement)}
+          {renderElementPill('home.cards.momentAlignment.momentLabel', planetaryData?.currentHour?.planetInfo?.element ?? timeElement)}
         </View>
       )}
 
-      {/* Next hour preview (avoid confusing current vs upcoming) */}
+      {/* Next hour preview - shows planet info only (no badge since Asrariya score isn't pre-calculated) */}
       {nextHourPreview && (
         <View style={styles.previewRow}>
           <Text style={styles.previewLabel} numberOfLines={1} ellipsizeMode="tail">
@@ -207,19 +218,6 @@ export function MomentAlignmentStrip({
           <Text style={styles.previewValue} numberOfLines={1} ellipsizeMode="tail">
             {nextHourPreview.nextPlanetLabel} ({nextHourPreview.nextPlanetArabic}) • {getElementLabel(nextHourPreview.nextElement, t)} • {formatCountdownShort(nextHourPreview.seconds)}
           </Text>
-          <View
-            style={[
-              styles.previewStatus,
-              {
-                borderColor: BADGE_CONFIG[nextHourPreview.nextBadge].color,
-                backgroundColor: BADGE_CONFIG[nextHourPreview.nextBadge].bgColor,
-              },
-            ]}
-          >
-            <Text style={[styles.previewStatusText, { color: BADGE_CONFIG[nextHourPreview.nextBadge].color }]} numberOfLines={1}>
-              {BADGE_CONFIG[nextHourPreview.nextBadge].icon} {nextHourPreview.nextBadgeLabel}
-            </Text>
-          </View>
         </View>
       )}
 
@@ -433,17 +431,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: DarkTheme.textSecondary,
     fontWeight: Typography.weightMedium,
-  },
-  previewStatus: {
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderRadius: Borders.radiusSm,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  previewStatusText: {
-    fontSize: 10,
-    fontWeight: Typography.weightBold,
-    letterSpacing: 0.3,
   },
 });

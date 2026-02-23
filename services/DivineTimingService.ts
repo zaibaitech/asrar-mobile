@@ -214,7 +214,7 @@ function getGuidanceLevel(
   timingQuality: TimingQuality,
   cycleState: CycleState
 ): GuidanceLevel {
-  // Favorable timing
+  // Favorable timing (Benefics: Sun, Jupiter, Venus)
   if (timingQuality === 'favorable') {
     if (ACTION_CYCLES.includes(cycleState)) {
       return 'act';
@@ -223,12 +223,12 @@ function getGuidanceLevel(
     }
   }
   
-  // Delicate timing
-  if (timingQuality === 'delicate') {
+  // Cautious timing (Malefics: Saturn, Mars)
+  if (timingQuality === 'cautious') {
     return 'observe';
   }
   
-  // Neutral timing
+  // Neutral timing (Variable: Moon, Mercury)
   if (ACTION_CYCLES.includes(cycleState)) {
     return 'slow';
   } else {

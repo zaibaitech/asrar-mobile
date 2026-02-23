@@ -30,6 +30,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import LocationAutocomplete from '../../components/LocationAutocomplete';
 import NameAutocomplete from '../../components/NameAutocomplete';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useProfile } from '../../contexts/ProfileContext';
@@ -63,6 +64,17 @@ export default function WhoAmICalculator() {
   const [birthMonth, setBirthMonth] = useState('');
   const [birthDay, setBirthDay] = useState('');
   
+  // Birth time states (optional - for ascendant calculation)
+  const [birthTime, setBirthTime] = useState<Date | null>(null);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  
+  // Birth location states (optional - for ascendant calculation)
+  const [birthLocationLabel, setBirthLocationLabel] = useState('');
+  const [birthLocation, setBirthLocationState] = useState<{
+    latitude: number;
+    longitude: number;
+    label?: string;
+  } | null>(null);
   // Auto-fill from profile if available
   useEffect(() => {
     if (profile.nameAr && !personName) {
@@ -78,7 +90,20 @@ export default function WhoAmICalculator() {
       setBirthDate(new Date(profile.dobISO));
       setBirthInputMode('full');
     }
-  }, [profile.nameAr, profile.nameLatin, profile.motherName, profile.dobISO]);
+    // Auto-fill birth time if available in profile
+    if (profile.birthTime && !birthTime) {
+      const [hours, minutes] = profile.birthTime.split(':').map(Number);
+      const timeDate = new Date();
+      timeDate.setHours(hours, minutes, 0, 0);
+      setBirthTime(timeDate);
+    }
+    // Auto-fill birth location if available in profile
+    const profileBirthLocation = profile.birthLocation ?? profile.location;
+    if (profileBirthLocation && !birthLocation) {
+      setBirthLocationState(profileBirthLocation);
+      setBirthLocationLabel(profileBirthLocation.label || '');
+    }
+  }, [profile.nameAr, profile.nameLatin, profile.motherName, profile.dobISO, profile.birthTime, profile.birthLocation, profile.location]);
   
   // Collapsible section states - ALL COLLAPSED BY DEFAULT
   const [educationExpanded, setEducationExpanded] = useState(false);
@@ -180,6 +205,14 @@ export default function WhoAmICalculator() {
         // Year is not required for burj/element. Manazil baseline depends on full DOB year,
         // so we intentionally avoid using it in this quick path.
         
+        // Prepare birth profile data for ascendant calculation (if time is provided)
+        const birthTimeStr = birthTime 
+          ? `${String(birthTime.getHours()).padStart(2, '0')}:${String(birthTime.getMinutes()).padStart(2, '0')}`
+          : null;
+        
+        // Use form's birth location if set, otherwise fall back to profile
+        const finalBirthLocation = birthLocation ?? profile.birthLocation ?? profile.location;
+        
         // Create a result object that matches the expected format
         const birthdateResult = {
           success: true,
@@ -196,10 +229,30 @@ export default function WhoAmICalculator() {
             // Provide a sane non-zero target so the Spiritual Practice counter works.
             repetitionCount: 33,
             calculationMethod: 'birthdate' as const,
+            // Birth profile data for the new Birth Profile tab
+            birthProfile: {
+              dobISO: dobISO.split('T')[0], // Extract just YYYY-MM-DD
+              birthTime: birthTimeStr,
+              hasBirthTime: !!birthTimeStr,
+              timezone: profile.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+              birthLocation: finalBirthLocation ? {
+                latitude: finalBirthLocation.latitude,
+                longitude: finalBirthLocation.longitude,
+                label: finalBirthLocation.label,
+              } : null,
+              sunSign: {
+                burjAr: burjData.burjAr,
+                burjEn: burjData.burjEn,
+                burjIndex: burjData.burjIndex,
+              },
+            },
           }
         };
         
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        
+        // Save to history for birthdate calculations
+        HistoryService.saveCalculation(birthdateResult.data, `Birth Date: ${dobLabel}`, '');
         
         // Navigate to results with birthdate data
         router.push({
@@ -276,7 +329,7 @@ export default function WhoAmICalculator() {
 
           {/* METHOD SELECTOR */}
           <View style={styles.methodSelectorContainer}>
-            <Text style={styles.methodSelectorLabel}>Choose Calculation Method:</Text>
+            <Text style={styles.methodSelectorLabel}>{t('istikhara.methodSelector.label') || 'Choose Calculation Method:'}</Text>
             
             {/* Name-Based Method Button */}
             <TouchableOpacity
@@ -308,13 +361,13 @@ export default function WhoAmICalculator() {
                       styles.methodButtonTitle,
                       calculationMethod === 'name' && styles.methodButtonTitleSelected
                     ]}>
-                      Name-Based
+                      {t('istikhara.methodSelector.nameBased.title') || 'Name-Based'}
                     </Text>
                     <View style={styles.methodBadge}>
-                      <Text style={styles.methodBadgeText}>CLASSICAL</Text>
+                      <Text style={styles.methodBadgeText}>{t('istikhara.methodSelector.nameBased.badge') || 'CLASSICAL'}</Text>
                     </View>
                     <Text style={styles.methodButtonDescription}>
-                      Traditional ʿIlm al-Ḥurūf method using your name + mother's name
+                      {t('istikhara.methodSelector.nameBased.description') || "Traditional ʿIlm al-Ḥurūf method using your name + mother's name"}
                     </Text>
                   </View>
                 </View>
@@ -354,13 +407,13 @@ export default function WhoAmICalculator() {
                       styles.methodButtonTitle,
                       calculationMethod === 'birthdate' && styles.methodButtonTitleSelected
                     ]}>
-                      Birth Date
+                      {t('istikhara.methodSelector.birthDate.title') || 'Birth Date'}
                     </Text>
                     <View style={[styles.methodBadge, styles.methodBadgeQuick]}>
-                      <Text style={styles.methodBadgeText}>QUICK</Text>
+                      <Text style={styles.methodBadgeText}>{t('istikhara.methodSelector.birthDate.badge') || 'QUICK'}</Text>
                     </View>
                     <Text style={styles.methodButtonDescription}>
-                      Simpler method using only your date of birth
+                      {t('istikhara.methodSelector.birthDate.description') || 'Simpler method using only your date of birth'}
                     </Text>
                   </View>
                 </View>
@@ -471,7 +524,7 @@ export default function WhoAmICalculator() {
                 <View style={styles.birthdateSection}>
                   <View style={styles.nameSectionHeader}>
                     <Calendar size={24} color="#a78bfa" />
-                    <Text style={styles.nameSectionTitle}>Select Your Birth Date</Text>
+                    <Text style={styles.nameSectionTitle}>{t('istikhara.birthDateForm.selectDate') || 'Select Your Birth Date'}</Text>
                   </View>
 
                   {/* Full DOB vs Month/Day only */}
@@ -488,7 +541,7 @@ export default function WhoAmICalculator() {
                         styles.birthInputModeChipText,
                         birthInputMode === 'full' && styles.birthInputModeChipTextSelected,
                       ]}>
-                        Full date
+                        {t('istikhara.birthDateForm.useFullDate') || 'Full date'}
                       </Text>
                     </TouchableOpacity>
 
@@ -504,15 +557,15 @@ export default function WhoAmICalculator() {
                         styles.birthInputModeChipText,
                         birthInputMode === 'monthDay' && styles.birthInputModeChipTextSelected,
                       ]}>
-                        Month & day only
+                        {t('istikhara.birthDateForm.useMonthDayOnly') || 'Month & day only'}
                       </Text>
                     </TouchableOpacity>
                   </View>
 
                   <Text style={styles.birthInputHint}>
                     {birthInputMode === 'full'
-                      ? 'Best when using your own saved profile.'
-                      : 'Recommended when calculating for someone else (year not required for Burj/element).'}
+                      ? (t('istikhara.birthDateForm.fullDateDesc') || 'Best when using your own saved profile.')
+                      : (t('istikhara.birthDateForm.monthDayDesc') || 'Recommended when calculating for someone else (year not required for Burj/element).')}
                   </Text>
 
                   {birthInputMode === 'full' ? (
@@ -530,12 +583,12 @@ export default function WhoAmICalculator() {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric'
-                          }) : 'Tap to select your birth date'}
+                          }) : (t('istikhara.birthDateForm.tapToSelect') || 'Tap to select your birth date')}
                         </Text>
                       </Pressable>
 
                       {!birthDateValid && touched.birthDate && (
-                        <Text style={styles.errorText}>Please select your birth date</Text>
+                        <Text style={styles.errorText}>{t('istikhara.birthDateForm.pleaseSelect') || 'Please select your birth date'}</Text>
                       )}
 
                       {showDatePicker && (
@@ -553,11 +606,95 @@ export default function WhoAmICalculator() {
                           minimumDate={new Date(1900, 0, 1)}
                         />
                       )}
+
+                      {/* Birth Time Input (Optional) */}
+                      <View style={styles.birthTimeSection}>
+                        <Text style={styles.birthTimeLabel}>🕐 {t('istikhara.birthDateForm.birthTime') || 'Birth Time (Optional)'}</Text>
+                        <Text style={styles.birthTimeHint}>
+                          {t('istikhara.birthDateForm.birthTimeHint') || 'Add your birth time to unlock Ascendant & Descendant calculations'}
+                        </Text>
+                        <Pressable
+                          style={[styles.datePickerButton, styles.timePickerButton]}
+                          onPress={() => setShowTimePicker(true)}
+                        >
+                          <Text style={styles.datePickerText}>
+                            {birthTime 
+                              ? birthTime.toLocaleTimeString('en-US', {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  hour12: true
+                                })
+                              : (t('istikhara.birthDateForm.tapToSetTime') || 'Tap to set birth time (if known)')}
+                          </Text>
+                          {birthTime && (
+                            <TouchableOpacity
+                              onPress={(e) => {
+                                e.stopPropagation();
+                                setBirthTime(null);
+                              }}
+                              style={styles.clearTimeButton}
+                            >
+                              <Text style={styles.clearTimeButtonText}>✕</Text>
+                            </TouchableOpacity>
+                          )}
+                        </Pressable>
+
+                        {showTimePicker && (
+                          <DateTimePicker
+                            value={birthTime || new Date()}
+                            mode="time"
+                            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                            onChange={(event, selectedTime) => {
+                              setShowTimePicker(Platform.OS === 'ios');
+                              if (selectedTime && event.type !== 'dismissed') {
+                                setBirthTime(selectedTime);
+                              }
+                            }}
+                          />
+                        )}
+                      </View>
+
+                      {/* Birth Location Input (Optional) */}
+                      <View style={styles.birthTimeSection}>
+                        <Text style={styles.birthTimeLabel}>📍 {t('istikhara.birthDateForm.birthLocation') || 'Birth Location (Optional)'}</Text>
+                        <Text style={styles.birthTimeHint}>
+                          {t('istikhara.birthDateForm.birthLocationHint') || 'Add your birth city for accurate Ascendant calculation'}
+                        </Text>
+                        <LocationAutocomplete
+                          value={birthLocationLabel}
+                          onChange={setBirthLocationLabel}
+                          onSelect={(loc) => {
+                            setBirthLocationState({
+                              latitude: loc.latitude,
+                              longitude: loc.longitude,
+                              label: loc.label,
+                            });
+                            setBirthLocationLabel(loc.label || '');
+                          }}
+                          placeholder={t('istikhara.birthDateForm.searchCity') || 'Search for a city...'}
+                        />
+                        {birthLocation && (
+                          <View style={styles.locationSelectedRow}>
+                            <Text style={styles.locationSelectedText}>
+                              ✓ {birthLocation.label || `${birthLocation.latitude.toFixed(2)}, ${birthLocation.longitude.toFixed(2)}`}
+                            </Text>
+                            <TouchableOpacity
+                              onPress={() => {
+                                setBirthLocationState(null);
+                                setBirthLocationLabel('');
+                              }}
+                              style={styles.clearTimeButton}
+                            >
+                              <Text style={styles.clearTimeButtonText}>✕</Text>
+                            </TouchableOpacity>
+                          </View>
+                        )}
+                      </View>
                     </>
                   ) : (
                     <View style={styles.monthDayRow}>
                       <View style={styles.monthDayField}>
-                        <Text style={styles.monthDayLabel}>Month (1-12)</Text>
+                        <Text style={styles.monthDayLabel}>{t('istikhara.birthDateForm.monthLabel') || 'Month (1-12)'}</Text>
                         <TextInput
                           value={birthMonth}
                           onChangeText={(text) => {
@@ -573,7 +710,7 @@ export default function WhoAmICalculator() {
                       </View>
 
                       <View style={styles.monthDayField}>
-                        <Text style={styles.monthDayLabel}>Day (1-31)</Text>
+                        <Text style={styles.monthDayLabel}>{t('istikhara.birthDateForm.dayLabel') || 'Day (1-31)'}</Text>
                         <TextInput
                           value={birthDay}
                           onChangeText={(text) => {
@@ -591,13 +728,26 @@ export default function WhoAmICalculator() {
                   )}
                   
                   <View style={styles.birthdateInfoBox}>
-                    <Text style={styles.birthdateInfoTitle}>✨ What You'll Discover:</Text>
-                    <Text style={styles.birthdateInfoText}>• Your Burj (zodiac sign)</Text>
-                    <Text style={styles.birthdateInfoText}>• Your elemental nature</Text>
-                    {birthInputMode === 'full' ? (
-                      <Text style={styles.birthdateInfoText}>• Optional lunar timing baselines (requires full DOB year)</Text>
-                    ) : (
-                      <Text style={styles.birthdateInfoText}>• Year is not needed for Burj/element calculations</Text>
+                    <Text style={styles.birthdateInfoTitle}>✨ {t('istikhara.birthDateForm.whatYouDiscover') || "What You'll Discover:"}</Text>
+                    <Text style={styles.birthdateInfoText}>• {t('istikhara.birthDateForm.sunSign') || 'Your Sun Sign (Burj)'}</Text>
+                    <Text style={styles.birthdateInfoText}>• {t('istikhara.birthDateForm.elementalNature') || 'Your elemental nature'}</Text>
+                    {birthInputMode === 'full' && (
+                      <>
+                        <Text style={styles.birthdateInfoText}>• {t('istikhara.birthDateForm.moonSign') || 'Moon Sign (lunar placement)'}</Text>
+                        {birthTime && birthLocation ? (
+                          <>
+                            <Text style={[styles.birthdateInfoText, styles.birthdateInfoHighlight]}>• {t('istikhara.birthDateForm.ascendant') || 'Ascendant (Rising Sign)'} ✓</Text>
+                            <Text style={[styles.birthdateInfoText, styles.birthdateInfoHighlight]}>• {t('istikhara.birthDateForm.descendant') || 'Descendant Sign'} ✓</Text>
+                          </>
+                        ) : (
+                          <Text style={styles.birthdateInfoNote}>
+                            💡 {t('istikhara.birthDateForm.unlockHint') || 'Add birth time & location above to unlock Ascendant & Descendant'}
+                          </Text>
+                        )}
+                      </>
+                    )}
+                    {birthInputMode === 'monthDay' && (
+                      <Text style={styles.birthdateInfoText}>• {t('istikhara.birthDateForm.yearNotNeeded') || 'Year is not needed for basic calculations'}</Text>
                     )}
                   </View>
                 </View>
@@ -1172,4 +1322,65 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 4,
   },
-});
+  birthdateInfoHighlight: {
+    color: '#a78bfa',
+    fontWeight: '600',
+  },
+  birthdateInfoNote: {
+    fontSize: 12,
+    color: 'rgba(167, 139, 250, 0.8)',
+    fontStyle: 'italic',
+    marginTop: 4,
+    lineHeight: 18,
+  },
+  // Birth Time Picker Styles
+  birthTimeSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  birthTimeLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#ffffff',
+    marginBottom: 4,
+  },
+  birthTimeHint: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.6)',
+    marginBottom: 10,
+    lineHeight: 16,
+  },
+  timePickerButton: {
+    borderColor: 'rgba(34, 197, 94, 0.3)',
+    backgroundColor: 'rgba(34, 197, 94, 0.05)',
+  },
+  clearTimeButton: {
+    padding: 6,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  clearTimeButtonText: {
+    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  locationSelectedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(34, 197, 94, 0.3)',
+  },
+  locationSelectedText: {
+    fontSize: 13,
+    color: '#22c55e',
+    fontWeight: '500',
+    flex: 1,
+  },});

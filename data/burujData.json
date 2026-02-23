@@ -283,9 +283,9 @@
           }
         },
         "zodiac_sign": {
-          "en": "Aries (Al-Hamal) - The Ram, Scorpio (Al-Aqrab) - The Scorpion",
-          "fr": "Bélier (Al-Hamal) - Le Bélier, Scorpion (Al-Aqrab) - Le Scorpion",
-          "arabic": "الحمل، العقرب"
+          "en": "Aries (Al-Hamal) - The Ram",
+          "fr": "Bélier (Al-Hamal) - Le Bélier",
+          "arabic": "الحمل"
         },
         "divine_names": {
           "arabic": "يا مالك يا قدوس",
@@ -663,9 +663,9 @@
           }
         },
         "zodiac_sign": {
-          "en": "Taurus (Ath-Thawr) - The Bull, Libra (Al-Mizan) - The Balance",
-          "fr": "Taureau (Ath-Thawr) - Le Taureau, Balance (Al-Mizan) - La Balance",
-          "arabic": "الثور، الميزان"
+          "en": "Taurus (Ath-Thawr) - The Bull",
+          "fr": "Taureau (Ath-Thawr) - Le Taureau",
+          "arabic": "الثور"
         },
         "divine_names": {
           "arabic": "يا كافي يا غني",
@@ -1067,9 +1067,9 @@
           }
         },
         "zodiac_sign": {
-          "en": "Gemini (Jawza al-Azra) - The Twins, Virgo (Al-Azra) - The Virgin",
-          "fr": "Gémeaux (Jawza al-Azra) - Les Jumeaux, Vierge (Al-Azra) - La Vierge",
-          "arabic": "الجوزاء، العذراء",
+          "en": "Gemini (Al-Jawzāʾ) - The Twins",
+          "fr": "Gémeaux (Al-Jawzāʾ) - Les Jumeaux",
+          "arabic": "الجوزاء",
           "note": {
             "en": "Associated with Prophet Musa (Moses)",
             "fr": "Associé au Prophète Musa (Moïse)"
@@ -1465,9 +1465,9 @@
           }
         },
         "zodiac_sign": {
-          "en": "Aries (Ash-Shartan)",
-          "fr": "Bélier (Ash-Shartan)",
-          "arabic": "الشرطان"
+          "en": "Cancer (Al-Saraṭān) - The Crab",
+          "fr": "Cancer (Al-Saraṭān) - Le Crabe",
+          "arabic": "السرطان"
         },
         "divine_names": {
           "arabic": "يا رحمن يا رحيم",
@@ -2205,9 +2205,9 @@
           }
         },
         "zodiac_sign": {
-          "en": "Capricorn (Al-Jady) - The Goat, Aquarius (Al-Dalw) - The Water Bearer",
-          "fr": "Capricorne (Al-Jady) - La Chèvre, Verseau (Al-Dalw) - Le Porteur d'Eau",
-          "arabic": "الجدي، الدلو"
+          "en": "Virgo (Al-Sunbulah) - The Maiden",
+          "fr": "Vierge (Al-Sunbulah) - La Vierge",
+          "arabic": "السنبلة"
         },
         "divine_names": {
           "arabic": "يا فتاح يا رزاق",
@@ -2564,9 +2564,9 @@
           }
         },
         "zodiac_sign": {
-          "en": "Gemini (Al-Jawzāʾ) - The Twins, Libra (Al-Mīzān) - The Balance, Aquarius (Al-Dalw) - The Water Bearer",
-          "fr": "Gémeaux (Al-Jawzāʾ) - Les Jumeaux, Balance (Al-Mīzān) - La Balance, Verseau (Al-Dalw) - Le Porteur d'Eau",
-          "arabic": "ٱلْجَوْزَاء، ٱلْمِيزَان، ٱلدَّلْو"
+          "en": "Libra (Al-Mīzān) - The Balance",
+          "fr": "Balance (Al-Mīzān) - La Balance",
+          "arabic": "الميزان"
         },
         "divine_names": {
           "arabic": "يَا عَلِيُّ يَا عَظِيمُ",
@@ -3277,9 +3277,9 @@
           }
         },
         "zodiac_sign": {
-          "en": "Sagittarius (Al-Qaws) - The Archer, Pisces (Al-Hut) - The Fish",
-          "fr": "Sagittaire (Al-Qaws) - L'Archer, Poissons (Al-Hut) - Le Poisson",
-          "arabic": "القوس، الحوت"
+          "en": "Sagittarius (Al-Qaws) - The Archer",
+          "fr": "Sagittaire (Al-Qaws) - L'Archer",
+          "arabic": "القوس"
         },
         "divine_names": {
           "arabic": "يا كبير يا متعالي",

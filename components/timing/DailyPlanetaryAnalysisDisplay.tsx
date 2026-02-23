@@ -255,7 +255,7 @@ export function DailyPlanetaryAnalysisDisplay({
             <Text style={styles.scoreLabel}>{t('dailyEnergy.planetaryStrength.todaysEnergy')}:</Text>
             <View style={[styles.scoreBadge, { backgroundColor: getScoreColor(dailyScore) + '20' }]}>
               <Text style={[styles.scoreValue, { color: getScoreColor(dailyScore) }]}>
-                {dailyScore}%
+                {dailyScore}
               </Text>
             </View>
           </View>
@@ -277,7 +277,7 @@ export function DailyPlanetaryAnalysisDisplay({
                 </View>
                 <View style={styles.compactRulerStrength}>
                   <Text style={[styles.compactRulerValue, { color: getScoreColor(rulerStrength) }]}>
-                    {rulerStrength.toFixed(0)}%
+                    {rulerStrength.toFixed(0)}
                   </Text>
                 </View>
                 <View style={[styles.compactRulerImpact, { backgroundColor: impactColor + '20' }]}>
@@ -342,7 +342,7 @@ export function DailyPlanetaryAnalysisDisplay({
         >
           <Text style={styles.scoreCardLabel}>{t('dailyEnergy.planetaryStrength.todaysOverallEnergy')}</Text>
           <Text style={[styles.scoreCardValue, { color: getScoreColor(dailyScore) }]}>
-            {dailyScore}%
+            {dailyScore}
           </Text>
           <Text style={styles.scoreCardHint}>{t('dailyEnergy.planetaryStrength.averageOfAll')}</Text>
         </LinearGradient>
@@ -379,7 +379,7 @@ export function DailyPlanetaryAnalysisDisplay({
                   />
                 </View>
                 <Text style={[styles.rulerStrengthValue, { color: getScoreColor(rulerStrength) }]}>
-                  {rulerStrength.toFixed(0)}%
+                  {rulerStrength.toFixed(0)}
                 </Text>
               </View>
 
@@ -523,7 +523,7 @@ export function DailyPlanetaryAnalysisDisplay({
                   ]}
                 >
                   <Text style={[styles.planetCardPowerText, { color: getPowerColor(planetData.finalPower) }]}>
-                    {planetData.finalPower}%
+                    {planetData.finalPower}
                   </Text>
                 </View>
                 <Ionicons
@@ -537,7 +537,7 @@ export function DailyPlanetaryAnalysisDisplay({
                 <View style={styles.planetCardDetails}>
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>{t('dailyEnergy.planetaryStrength.degreeStrength')}:</Text>
-                    <Text style={styles.detailValue}>{Math.round(planetData.degreeInfo.strength * 100)}%</Text>
+                    <Text style={styles.detailValue}>{Math.round(planetData.degreeInfo.strength * 100)}</Text>
                   </View>
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>{t('dailyEnergy.planetaryStrength.dignityLabel')}:</Text>

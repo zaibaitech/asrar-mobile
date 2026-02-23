@@ -17,6 +17,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ProfileProvider, useProfile } from '@/contexts/ProfileContext';
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
+import { ZikrProvider } from '@/features/zikr';
 import { prefetchCoreCaches } from '@/services/AppPrefetchService';
 import { handleAuthCallback } from '@/services/AuthService';
 import { getOnboardingCompleted } from '@/services/OnboardingService';
@@ -82,9 +83,11 @@ function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: { showAnim
       <ProfileProvider>
         <SubscriptionProvider>
           <LanguageProvider>
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <RootLayoutContent showAnimatedSplash={showAnimatedSplash} setShowAnimatedSplash={setShowAnimatedSplash} />
-            </ThemeProvider>
+            <ZikrProvider>
+              <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <RootLayoutContent showAnimatedSplash={showAnimatedSplash} setShowAnimatedSplash={setShowAnimatedSplash} />
+              </ThemeProvider>
+            </ZikrProvider>
           </LanguageProvider>
         </SubscriptionProvider>
       </ProfileProvider>
@@ -118,6 +121,10 @@ function RootLayoutContent({ showAnimatedSplash, setShowAnimatedSplash }: { show
         />
         <Stack.Screen 
           name="dhikr-counter" 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="zikr" 
           options={{ headerShown: false }} 
         />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />

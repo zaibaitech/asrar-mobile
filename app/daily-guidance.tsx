@@ -48,17 +48,9 @@ export default function DailyGuidanceScreen() {
 
   const mapTimingQualityToReflection = (
     quality: DailyGuidance['timingQuality']
-  ): 'favorable' | 'neutral' | 'delicate' => {
-    switch (quality) {
-      case 'favorable':
-        return 'favorable';
-      case 'delicate':
-        return 'delicate';
-      case 'transformative':
-        return 'delicate';
-      default:
-        return 'neutral';
-    }
+  ): 'favorable' | 'neutral' | 'cautious' => {
+    // Direct mapping - classical system is now consistent
+    return quality;
   };
 
   const mapRelationshipToCycleState = (
@@ -118,16 +110,21 @@ export default function DailyGuidanceScreen() {
     loadGuidance();
   }, [loadGuidance]);
   
+  /**
+   * Status colors matching Moment Alignment for consistency:
+   * - favorable (Benefics): Green
+   * - neutral (Variable): Yellow/Amber
+   * - cautious (Malefics): Purple
+   */
   const getStatusColor = (quality?: string) => {
     switch (quality) {
       case 'favorable':
-        return '#10b981';
-      case 'transformative':
-        return '#8B7355';
-      case 'delicate':
-        return '#64748b';
+        return '#10b981'; // Green - Excellent Time
+      case 'cautious':
+        return '#7C3AED'; // Purple - Proceed Mindfully
+      case 'neutral':
       default:
-        return '#64B5F6';
+        return '#f59e0b'; // Yellow/Amber - Neutral
     }
   };
   
@@ -164,16 +161,19 @@ export default function DailyGuidanceScreen() {
     }
   };
   
+  /**
+   * Labels for Daily Energy (Day-based, not hourly)
+   * Uses dailyEnergy.status.* translations
+   */
   const getTimingQualityLabel = (quality?: string) => {
     switch (quality) {
       case 'favorable':
-        return t('dailyGuidance.timing.favorable');
-      case 'transformative':
-        return t('dailyGuidance.timing.transformative');
-      case 'delicate':
-        return t('dailyGuidance.timing.delicate');
+        return t('dailyEnergy.status.favorable');   // "Favorable Day"
+      case 'cautious':
+        return t('dailyEnergy.status.cautious');    // "Mindful Day"
+      case 'neutral':
       default:
-        return t('dailyGuidance.timing.neutral');
+        return t('dailyEnergy.status.neutral');     // "Balanced Day"
     }
   };
   

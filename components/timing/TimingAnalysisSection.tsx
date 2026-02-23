@@ -135,6 +135,12 @@ const LAYER_LABELS: Record<string, { en: string; fr: string; ar: string; icon: s
     ar: 'رنين كوكبي',
     icon: '🪐',
   },
+  hourRulerDignity: {
+    en: 'Hour Ruler Dignity',
+    fr: 'Dignité du maître de l’heure',
+    ar: 'كرامة صاحب الساعة',
+    icon: '♄',
+  },
   manazilAlignment: {
     en: 'Manazil Alignment',
     fr: 'Alignement des Manazil',
@@ -340,14 +346,16 @@ export function TimingAnalysisSection({
             <View style={styles.breakdownContainer}>
               {Object.entries(result.layers).map(([key, layer]) => {
                 const layerLabel = LAYER_LABELS[key];
+                const icon = layerLabel?.icon ?? '•';
+                const name = (layerLabel as any)?.[lang] ?? layerLabel?.en ?? key;
                 const scoreColor = layer.score >= 70 ? '#10b981' : layer.score >= 40 ? '#f59e0b' : '#ef4444';
                 
                 return (
                   <View key={key} style={styles.layerRow}>
                     <View style={styles.layerInfo}>
-                      <Text style={styles.layerIcon}>{layerLabel.icon}</Text>
+                      <Text style={styles.layerIcon}>{icon}</Text>
                       <View style={styles.layerTextContainer}>
-                        <Text style={styles.layerName}>{layerLabel[lang]}</Text>
+                        <Text style={styles.layerName}>{name}</Text>
                         <Text style={styles.layerReasoning} numberOfLines={2}>
                           {layer.reasoning}
                         </Text>

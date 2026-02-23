@@ -28,12 +28,8 @@ function CustomHeader() {
 
   // Hide header on name-destiny screens (they have their own DestinyHeader)
   const isNameDestinyScreen = segments.includes('name-destiny');
-  
-  if (isNameDestinyScreen) {
-    return null;
-  }
 
-  const handleLoadFromHistory = (saved: SavedCalculation) => {
+  const handleLoadFromHistory = React.useCallback((saved: SavedCalculation) => {
     router.push({
       pathname: '/(tabs)/results',
       params: {
@@ -43,7 +39,12 @@ function CustomHeader() {
       },
     });
     setShowHistory(false);
-  };
+  }, [router]);
+
+  // Return empty fragment instead of null to maintain consistent hook count
+  if (isNameDestinyScreen) {
+    return <></>;
+  }
 
   return (
     <>

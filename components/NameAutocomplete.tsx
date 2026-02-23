@@ -1,15 +1,14 @@
 /**
  * NameAutocomplete Component for React Native
  * West African name autocomplete with Latin-to-Arabic transliteration
- * Provides dropdown suggestions as user types
+ * Provides compact inline dropdown suggestions as user types
  */
 
 import { Search, X } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-    FlatList,
-    Modal,
-    Pressable,
+    Keyboard,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -46,23 +45,29 @@ export default function NameAutocomplete({
 }: NameAutocompleteProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [matches, setMatches] = useState<NameMatch[]>([]);
+  const [isFocused, setIsFocused] = useState(false);
+  const containerRef = useRef<View>(null);
 
   // Search for matches when input changes
   useEffect(() => {
     if (value.trim().length > 0) {
       const results = searchNameTransliterations(value);
       setMatches(results);
-      setShowDropdown(results.length > 0);
+      // Only show dropdown if focused and has results
+      if (isFocused && results.length > 0) {
+        setShowDropdown(true);
+      }
     } else {
       setMatches([]);
       setShowDropdown(false);
     }
-  }, [value]);
+  }, [value, isFocused]);
 
   const handleSelectName = (item: NameMatch) => {
     onChange(item.matchedVariation);
     onArabicSelect(item.arabic, item.matchedVariation);
     setShowDropdown(false);
+    Keyboard.dismiss();
   };
 
   const handleClearInput = () => {
@@ -71,47 +76,83 @@ export default function NameAutocomplete({
     setShowDropdown(false);
   };
 
-  const renderItem = ({ item }: { item: NameMatch }) => (
-    <TouchableOpacity
-      style={styles.dropdownItem}
-      onPress={() => handleSelectName(item)}
-    >
-      <View style={styles.dropdownItemContent}>
-        <Text style={styles.dropdownItemLatin}>
-          {getNameDisplayLabel(item)}
-        </Text>
-        <Text style={styles.dropdownItemArabic}>
-          {item.arabic}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const handleFocus = () => {
+    setIsFocused(true);
+    if (matches.length > 0) {
+      setShowDropdown(true);
+    }
+  };
+
+  const handleBlur = () => {
+    // Delay to allow tap on dropdown item to register
+    setTimeout(() => {
+      setIsFocused(false);
+      setShowDropdown(false);
+    }, 200);
+  };
+
+  const dismissDropdown = () => {
+    setShowDropdown(false);
+    Keyboard.dismiss();
+  };
 
   return (
-    <View style={[styles.container, style]}>
+    <View style={[styles.container, style]} ref={containerRef}>
       {/* Input Field */}
-      <View style={styles.inputContainer}>
-        <View style={styles.searchIcon}>
-          <Search size={16} color="#94a3b8" />
+      <View style={styles.inputWrapper}>
+        <View style={styles.inputContainer}>
+          <View style={styles.searchIcon}>
+            <Search size={16} color="#94a3b8" />
+          </View>
+          <TextInput
+            style={styles.input}
+            value={value}
+            onChangeText={onChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            placeholder={placeholder}
+            placeholderTextColor="#64748b"
+          />
+          {value ? (
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={handleClearInput}
+            >
+              <X size={16} color="#94a3b8" />
+            </TouchableOpacity>
+          ) : null}
         </View>
-        <TextInput
-          style={styles.input}
-          value={value}
-          onChangeText={onChange}
-          onFocus={() => {
-            if (matches.length > 0) setShowDropdown(true);
-          }}
-          placeholder={placeholder}
-          placeholderTextColor="#64748b"
-        />
-        {value ? (
-          <TouchableOpacity
-            style={styles.clearButton}
-            onPress={handleClearInput}
-          >
-            <X size={16} color="#94a3b8" />
-          </TouchableOpacity>
-        ) : null}
+
+        {/* Inline Dropdown - positioned absolutely below input */}
+        {showDropdown && matches.length > 0 && (
+          <View style={styles.dropdownContainer}>
+            <ScrollView 
+              style={styles.dropdown}
+              keyboardShouldPersistTaps="handled"
+              nestedScrollEnabled={true}
+              showsVerticalScrollIndicator={true}
+            >
+              {matches.slice(0, 8).map((item, index) => (
+                <TouchableOpacity
+                  key={`${item.arabic}-${index}`}
+                  style={[
+                    styles.dropdownItem,
+                    index === matches.slice(0, 8).length - 1 && styles.dropdownItemLast
+                  ]}
+                  onPress={() => handleSelectName(item)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.dropdownItemLatin}>
+                    {getNameDisplayLabel(item)}
+                  </Text>
+                  <Text style={styles.dropdownItemArabic}>
+                    {item.arabic}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
       </View>
 
       {/* Helper Text */}
@@ -126,38 +167,6 @@ export default function NameAutocomplete({
               : 'اكتب اسمك بالأحرف اللاتينية - سنعرض المعادل العربي')}
         </Text>
       )}
-
-      {/* Dropdown Modal */}
-      <Modal
-        visible={showDropdown && matches.length > 0}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowDropdown(false)}
-      >
-        <Pressable 
-          style={styles.modalOverlay} 
-          onPress={() => setShowDropdown(false)}
-        >
-          <View style={styles.dropdownContainer}>
-            <FlatList
-              data={matches}
-              renderItem={renderItem}
-              keyExtractor={(item, index) => `${item.arabic}-${index}`}
-              style={styles.dropdown}
-              keyboardShouldPersistTaps="handled"
-            />
-          </View>
-        </Pressable>
-      </Modal>
-
-      {/* No Matches Message */}
-      {showDropdown && matches.length === 0 && value.trim().length > 0 && (
-        <View style={styles.noMatchesContainer}>
-          <Text style={styles.noMatchesText}>
-            {language === 'en' ? 'No matches found' : 'لم يتم العثور على تطابقات'}
-          </Text>
-        </View>
-      )}
     </View>
   );
 }
@@ -165,6 +174,10 @@ export default function NameAutocomplete({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 12,
+  },
+  inputWrapper: {
+    position: 'relative',
+    zIndex: 1000,
   },
   inputContainer: {
     position: 'relative',
@@ -200,46 +213,50 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     fontStyle: 'italic',
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
   dropdownContainer: {
-    backgroundColor: '#1e293b',
-    borderRadius: 16,
-    maxHeight: 400,
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    marginTop: 4,
+    backgroundColor: 'rgba(30, 41, 59, 0.98)',
+    borderRadius: 12,
+    maxHeight: 200,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderColor: 'rgba(139, 92, 246, 0.4)',
     shadowColor: '#8b5cf6',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 16,
-    elevation: 12,
+    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 12,
+    elevation: 10,
+    overflow: 'hidden',
   },
   dropdown: {
-    borderRadius: 16,
+    maxHeight: 200,
   },
   dropdownItem: {
-    padding: 18,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(148, 163, 184, 0.1)',
+    borderBottomColor: 'rgba(148, 163, 184, 0.15)',
   },
-  dropdownItemContent: {
-    flexDirection: 'column',
-    gap: 10,
+  dropdownItemLast: {
+    borderBottomWidth: 0,
   },
   dropdownItemLatin: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '500',
     color: '#e0e7ff',
+    flex: 1,
   },
   dropdownItemArabic: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '600',
     color: '#ffffff',
-    textAlign: 'right',
+    marginLeft: 16,
   },
   noMatchesContainer: {
     marginTop: 8,

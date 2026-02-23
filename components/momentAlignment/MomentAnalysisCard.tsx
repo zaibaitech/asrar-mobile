@@ -16,6 +16,10 @@ export type TransitConditionsModel = {
   dignityBadge?: string;
   dignityDetail?: string;
   dignityDescription?: string;
+  conditionLabel?: string;
+  conditionBadge?: string;
+  conditionDetail?: string;
+  conditionDescription?: string;
   houseLabel?: string;
   houseBadge?: string;
   houseDescription?: string;
@@ -171,6 +175,14 @@ function TransitConditions({ model }: { model: TransitConditionsModel }) {
           description={model.dignityDescription}
         />
       )}
+      {(model.conditionLabel || model.conditionBadge || model.conditionDetail) && (
+        <TransitRow
+          label={model.conditionLabel ?? ''}
+          badge={model.conditionBadge}
+          detail={model.conditionDetail}
+          description={model.conditionDescription}
+        />
+      )}
       {(model.houseLabel || model.houseBadge) && (
         <TransitRow
           label={model.houseLabel ?? ''}
@@ -243,7 +255,7 @@ function TransitRow({
         <Text style={styles.transitDetail} numberOfLines={2}>{detail}</Text>
       )}
       {!!description && (
-        <Text style={styles.transitDescription} numberOfLines={3}>{description}</Text>
+        <Text style={styles.transitDescription} numberOfLines={6}>{description}</Text>
       )}
     </View>
   );

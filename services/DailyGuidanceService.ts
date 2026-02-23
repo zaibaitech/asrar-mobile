@@ -12,8 +12,15 @@ import { BURJ_NAMES_EN } from '@/services/ProfileDerivationService';
 import { UserProfile } from '@/types/user-profile';
 
 export interface DailyGuidance {
-  /** Today's timing quality */
-  timingQuality: 'favorable' | 'neutral' | 'delicate' | 'transformative';
+  /** 
+   * Today's timing quality based on classical planetary ruling (ʿIlm al-Nujūm)
+   * 
+   * Matches the Moment Alignment system for consistency:
+   * - 'favorable' = Benefic day (Sun, Jupiter, Venus) → Excellent Time
+   * - 'neutral' = Variable day (Moon, Mercury) → Neutral
+   * - 'cautious' = Malefic day (Saturn, Mars) → Proceed Mindfully
+   */
+  timingQuality: 'favorable' | 'neutral' | 'cautious';
   
   /** Day's elemental tone */
   dayElement: 'fire' | 'water' | 'air' | 'earth';
@@ -21,7 +28,7 @@ export interface DailyGuidance {
   /** User's element (if available) */
   userElement?: 'fire' | 'water' | 'air' | 'earth';
   
-  /** Element relationship */
+  /** Element relationship (informational, does not affect timingQuality) */
   relationship: 'harmonious' | 'complementary' | 'neutral' | 'transformative';
   
   /** Translation key for the message */
@@ -84,44 +91,26 @@ export async function getDailyGuidanceForDate(
   const userSignKey = burjIndex !== undefined ? BURJ_NAMES_EN[burjIndex]?.toLowerCase() : undefined;
   
   // Calculate element relationship (with sign-based nuances for Scorpio+Fire, Aquarius+Water)
+  // Note: This is informational only - does NOT affect the primary timing quality badge
   const relationship = calculateElementRelationship(userElement, dayElement, userSignKey);
   
-  // Get timing quality based on relationship
-  let timingQuality: DailyGuidance['timingQuality'] = 'neutral';
-  
-  if (!userElement) {
-    // No user element - show general guidance
-    timingQuality = 'neutral';
-  } else if (userElement === dayElement) {
-    // Perfect alignment
-    timingQuality = 'favorable';
-  } else if (relationship === 'complementary') {
-    // Supportive elements
-    timingQuality = 'favorable';
-  } else if (relationship === 'transformative') {
-    // Opposing elements
-    timingQuality = 'transformative';
-  }
-
-  // MASTER TONE: day ruler defines the baseline (non-negotiable) public window.
-  // This prevents contradictions like "Fenêtre favorable" on Saturn day.
+  // ========================================
+  // CLASSICAL PLANETARY RULING (ʿIlm al-Nujūm)
+  // ========================================
+  // Use the day ruler's inherent nature for timing quality (universal, not personalized)
+  // This matches the Moment Alignment system for consistency:
+  //   - FAVORABLE (Nashr/Benefic): Sun, Jupiter, Venus
+  //   - NEUTRAL (Variable): Moon, Mercury  
+  //   - CAUTIOUS (Nahs/Malefic): Saturn, Mars
   const rulerJudgment = getClassicalJudgment({ rulerPlanet: dayRulerPlanet });
-  const masterWindow: DailyGuidance['timingQuality'] =
+  const timingQuality: DailyGuidance['timingQuality'] =
     rulerJudgment.restrictionLevel === 0
       ? 'favorable'
       : rulerJudgment.restrictionLevel === 1
         ? 'neutral'
-        : 'delicate';
-
-  // Unison rule: master tone caps the final timing quality.
-  // (We keep the relationship-derived value for messaging nuance, but the window must not contradict.)
-  if (masterWindow === 'delicate') {
-    timingQuality = timingQuality === 'transformative' ? 'transformative' : 'delicate';
-  } else if (masterWindow === 'neutral') {
-    timingQuality = timingQuality === 'favorable' ? 'neutral' : timingQuality;
-  }
+        : 'cautious';
   
-  // Generate guidance message
+  // Generate guidance message (can still use element relationship for messaging nuance)
   const guidance = generateGuidanceMessage(date, dayElement, userElement, relationship, timingQuality);
   
   return {

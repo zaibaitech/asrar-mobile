@@ -285,6 +285,7 @@ export interface AsrariyaTimingResult {
   layers: {
     elementCompatibility: ElementCompatibilityResult;
     planetaryResonance: PlanetaryResonanceResult;
+    hourRulerDignity: HourRulerDignityResult;
     manazilAlignment: ManazilAlignmentResult;
     practiceMapping: PracticeMappingResult;
   };
@@ -306,6 +307,17 @@ export interface AsrariyaTimingResult {
 }
 
 // ============================================================================
+// LAYER: HOUR RULER DIGNITY (PLANET CONDITION)
+// ============================================================================
+
+export type DignityType = 'domicile' | 'exaltation' | 'detriment' | 'fall' | 'peregrine';
+
+export interface HourRulerDignityResult extends LayerAnalysisResult {
+  planet: string;
+  dignityType?: DignityType;
+}
+
+// ============================================================================
 // ENGINE CONFIGURATION
 // ============================================================================
 
@@ -315,6 +327,9 @@ export interface AsrariyaEngineConfig {
   
   /** Weight for planetary resonance (0-1) */
   planetaryWeight: number;
+
+  /** Weight for hour ruler dignity (0-1) */
+  dignityWeight: number;
   
   /** Weight for manazil alignment (0-1) */
   manazilWeight: number;
@@ -341,6 +356,7 @@ export interface AsrariyaEngineConfig {
 export const DEFAULT_ENGINE_CONFIG: AsrariyaEngineConfig = {
   elementWeight: 0.30,
   planetaryWeight: 0.30,
+  dignityWeight: 0.15,
   manazilWeight: 0.20,
   practiceWeight: 0.20,
   minimumProceedScore: 50,
@@ -356,24 +372,28 @@ export const PRACTICE_WEIGHT_CONFIGS: Partial<Record<PracticeCategory, Partial<A
   protection: {
     elementWeight: 0.25,
     planetaryWeight: 0.40, // Mars/Saturn hours more important
+    dignityWeight: 0.15,
     manazilWeight: 0.20,
     practiceWeight: 0.15,
   },
   healing: {
     elementWeight: 0.35, // Water element harmony important
     planetaryWeight: 0.25,
+    dignityWeight: 0.15,
     manazilWeight: 0.25,
     practiceWeight: 0.15,
   },
   manifestation: {
     elementWeight: 0.20,
     planetaryWeight: 0.30,
+    dignityWeight: 0.15,
     manazilWeight: 0.30, // Manazil timing critical
     practiceWeight: 0.20,
   },
   knowledge: {
     elementWeight: 0.25,
     planetaryWeight: 0.35, // Mercury/Jupiter hours important
+    dignityWeight: 0.15,
     manazilWeight: 0.20,
     practiceWeight: 0.20,
   },

@@ -71,11 +71,16 @@ export interface DivineTimingInput {
 
 /**
  * Overall timing quality assessment
+ * 
+ * Classical Planetary Ruling (ʿIlm al-Nujūm):
+ * - favorable: Benefic rulers (Sun, Jupiter, Venus) → Excellent Time
+ * - neutral: Variable rulers (Moon, Mercury) → Neutral
+ * - cautious: Malefic rulers (Saturn, Mars) → Proceed Mindfully
  */
 export type TimingQuality = 
-  | 'favorable'  // Conditions align well
-  | 'neutral'    // Mixed or balanced conditions
-  | 'delicate';  // Proceed with caution
+  | 'favorable'  // Benefics - conditions align well
+  | 'neutral'    // Variable - mixed or balanced conditions
+  | 'cautious';  // Malefics - proceed with mindfulness
 
 /**
  * Cycle state based on Hadad (mod 4)

@@ -22,6 +22,7 @@ export const translations = {
       tools: "TOOLS",
       abjadCalculator: "Abjad Calculator",
       nameDestiny: "Name Destiny",
+      zikr: "Dhikr & Wird",
       compatibility: "Compatibility",
       istikhara: "Istikharah",
       divineTiming: "Divine Timing",
@@ -41,6 +42,27 @@ export const translations = {
       levelBasic: "BASIC",
       levelEnhanced: "ENHANCED",
       levelFull: "FULL",
+    },
+
+    planetCondition: {
+      label: "Planet condition",
+      scoreLabel: "Score",
+      status: {
+        Favorable: "Favorable",
+        Neutral: "Neutral",
+        Restricted: "Restricted",
+        Avoid: "Avoid",
+      },
+      reasons: {
+        DIGNITY_EXALTATION: "Exaltation (Sharaf): strongest support.",
+        DIGNITY_DOMICILE: "Domicile (Bayt): steady and reliable.",
+        DIGNITY_DETRIMENT: "Detriment (Wabāl): friction and instability.",
+        DIGNITY_FALL: "Fall (Hubūṭ): weakened expression.",
+        DIGNITY_NEUTRAL: "Neutral: balanced tone.",
+        DEGREE_EXALTATION_PEAK_NEAR: "Near the exaltation peak (±3°): extra lift.",
+        DEGREE_EXALTATION_NEAR: "Close to the exaltation peak (±7°): slight lift.",
+        DEGREE_CRITICAL_TRANSITION: "Critical degree (0–1° or 29–30°): transitional instability.",
+      },
     },
 
     // Manazil Screen (Detail)
@@ -797,6 +819,51 @@ export const translations = {
         title: "Dhikr Counter",
         description: "Digital tasbih for counting dhikr and remembrance",
       },
+      zikr: {
+        title: "Dhikr & Wird",
+        description: "Remembrance of Allah for inner peace",
+      },
+    },
+
+    // Zikr Module
+    zikr: {
+      title: "Dhikr & Wird",
+      subtitle: "Remembrance of Allah for inner peace",
+      todayProgress: "Today",
+      allTimeProgress: "All Time",
+      favorites: "Favorites",
+      noFavorites: "No Favorites Yet",
+      noFavoritesHint: "Tap the heart on any dhikr to add it to your favorites",
+      goalReached: "Goal reached!",
+      categories: {
+        all: "All",
+        favorites: "Favorites",
+        istighfar: "Istighfār",
+        salawat: "Ṣalawāt",
+        divineNames: "Divine Names",
+        morningEvening: "Morning & Evening",
+        custom: "Custom",
+      },
+      sessions: {
+        fajr: "Fajr",
+        morning: "Morning",
+        dhuhr: "Ẓuhr",
+        asr: "ʿAṣr",
+        maghrib: "Maghrib",
+        isha: "ʿIshāʾ",
+        tahajjud: "Tahajjud",
+        other: "Other",
+      },
+      stats: {
+        streak: "day streak",
+        total: "total",
+      },
+      actions: {
+        add: "Add",
+        cancel: "Cancel",
+        customAmount: "Custom Amount",
+        enterNumber: "Enter a number...",
+      },
     },
 
     // Prayer Times Screen
@@ -949,14 +1016,14 @@ export const translations = {
         you: "You",
         now: "Now",
         status: {
-          act: "ACT",
-          maintain: "MAINTAIN",
-          hold: "HOLD",
+          act: "Excellent Time",
+          maintain: "Neutral",
+          hold: "Proceed Mindfully",
         },
         hint: {
-          act: "Aligned — good to initiate",
-          maintain: "Supportive — keep steady",
-          hold: "Not aligned — avoid rushing",
+          act: "Sun, Jupiter, or Venus hour — proceed with confidence",
+          maintain: "Moon or Mercury hour — steady as you go",
+          hold: "Saturn or Mars hour — exercise patience",
         },
         updated: {
           justNow: "Updated just now",
@@ -2463,6 +2530,12 @@ export const translations = {
 
     // Daily Energy (shared keys)
     dailyEnergy: {
+      // Classical Day Status (distinct from Moment Alignment's hourly "Time")
+      status: {
+        favorable: "Favorable Day",
+        neutral: "Balanced Day",
+        cautious: "Mindful Day",
+      },
       planets: {
         sun: "Sun",
         moon: "Moon",
@@ -3462,6 +3535,7 @@ export const translations = {
           planetaryFriendship: "Planetary Friendship",
           planetaryResonance: "Planetary Resonance",
           samePlanet: "Same Planet",
+          highIntensity: "High intensity",
           elementalHarmony: "Elemental Harmony",
           transitStrength: "Current Hour Power",
           strong: "Strong",
@@ -6602,6 +6676,128 @@ export const translations = {
         venus: "Venus",
         saturn: "Saturn",
       },
+
+      wording: {
+        shared: {
+          powerVsPermission: "Power is not permission: a strong hour can magnify both benefit and harm.",
+          samePlanetIntensity: "If this hour is ruled by your planet, intensity increases — act with restraint.",
+        },
+
+        sun: {
+          status: "Radiant Time",
+          meaning: "Visibility, authority, and clear intention; what is begun is seen.",
+          bestFor: [
+            "Leadership and setting direction",
+            "Public matters and reputation",
+            "Invocations for clarity and purpose",
+            "Honoring elders and rightful authority",
+          ],
+          avoid: [
+            "Pride and self-display",
+            "Overpromising",
+            "Acting without sincerity",
+          ],
+          note: "Increase in power; guard the heart from vanity and harshness.",
+        },
+
+        moon: {
+          status: "Reflective Time",
+          meaning: "Receptive, changing currents; suited to tending, listening, and returning.",
+          bestFor: [
+            "Purification and gentle devotion",
+            "Care of home, family, and needs",
+            "Dream-work, reflection, and duʿāʾ",
+          ],
+          avoid: [
+            "Irreversible decisions",
+            "Binding vows made in haste",
+          ],
+          note: "Changeability increases; seek steadiness and avoid wavering promises.",
+        },
+
+        mercury: {
+          status: "Mutable Time",
+          meaning: "Movement of mind and message; swift exchange, craft, and calculation.",
+          bestFor: [
+            "Study, writing, and memorization",
+            "Trade, errands, and short travel",
+            "Planning and problem-solving",
+            "Learning languages and skills",
+          ],
+          avoid: [
+            "Gossip and needless argument",
+            "Hasty agreements",
+            "Deception and double-speech",
+          ],
+          note: "Quickness increases; verify words and keep intentions clean.",
+        },
+
+        venus: {
+          status: "Harmonious Time",
+          meaning: "Union, affection, and beauty; hearts soften and manners refine.",
+          bestFor: [
+            "Reconciliation and mending ties",
+            "Art, adornment, and pleasant gatherings",
+            "Kindness, charity, and gifts",
+            "Marriage discussions and mutual consent",
+          ],
+          avoid: [
+            "Indulgence and distraction",
+            "Vanity",
+            "Neglecting obligations",
+          ],
+          note: "Ease increases; keep modesty and do not trade duty for pleasure.",
+        },
+
+        mars: {
+          status: "Forceful Time",
+          meaning: "Heat, severing, and courage; actions cut quickly and consequences follow.",
+          bestFor: [
+            "Disciplined effort and training",
+            "Protection and guarding boundaries",
+            "Decisive action with restraint",
+          ],
+          avoid: [
+            "Anger and quarrels",
+            "Reckless risks",
+            "Starting conflict",
+          ],
+          note: "Force increases; do not confuse strength with permission.",
+        },
+
+        jupiter: {
+          status: "Expansive Time",
+          meaning: "Increase, ease, and generosity; openings in counsel and learning.",
+          bestFor: [
+            "Teaching and seeking knowledge",
+            "Counsel, mediation, and wise planning",
+            "Charity and widening provision",
+            "Blessed beginnings with gratitude",
+          ],
+          avoid: [
+            "Arrogance",
+            "Excess and waste",
+          ],
+          note: "Expansion increases; keep gratitude and avoid swelling of the ego.",
+        },
+
+        saturn: {
+          status: "Restrictive Time",
+          meaning: "Constraint, patience, and endurance; what is built is slow and tested.",
+          bestFor: [
+            "Long work requiring stamina",
+            "Sobriety, repentance, and restraint",
+            "Planning, boundaries, and structure",
+            "Ending what must end cleanly",
+          ],
+          avoid: [
+            "Haste",
+            "Beginning pleasures that dull the heart",
+            "Hard-heartedness",
+          ],
+          note: "Restriction increases; accept the pace and keep mercy in the intention.",
+        },
+      },
     },
 
     // Planet names
@@ -9123,6 +9319,48 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       formInstruction: "Enter your name and mother's name for deep self-analysis",
       description: "Discover your element, personality, career path, and spiritual practices through the sacred science of ʿIlm al-Ḥurūf.",
       
+      // Method Selector
+      methodSelector: {
+        label: "Choose Calculation Method:",
+        nameBased: {
+          title: "Name-Based",
+          badge: "CLASSICAL",
+          description: "Traditional ʿIlm al-Ḥurūf method using your name + mother's name",
+        },
+        birthDate: {
+          title: "Birth Date",
+          badge: "QUICK",
+          description: "Simpler method using only your date of birth",
+        },
+      },
+      
+      // Birth date form
+      birthDateForm: {
+        selectDate: "Select Your Birth Date",
+        tapToSelect: "Tap to select your birth date",
+        pleaseSelect: "Please select your birth date",
+        birthTime: "Birth Time (Optional)",
+        birthTimeHint: "Add your birth time to unlock Ascendant & Descendant calculations",
+        tapToSetTime: "Tap to set birth time (if known)",
+        birthLocation: "Birth Location (Optional)",
+        birthLocationHint: "Add your birth city for accurate Ascendant calculation",
+        searchCity: "Search for a city...",
+        whatYouDiscover: "What You'll Discover:",
+        sunSign: "Your Sun Sign (Burj)",
+        elementalNature: "Your elemental nature",
+        moonSign: "Moon Sign (lunar placement)",
+        ascendant: "Ascendant (Rising Sign)",
+        descendant: "Descendant Sign",
+        unlockHint: "Add birth time & location above to unlock Ascendant & Descendant",
+        yearNotNeeded: "Year is not needed for basic calculations",
+        monthLabel: "Month (1-12)",
+        dayLabel: "Day (1-31)",
+        useFullDate: "Use Full Birth Date",
+        useMonthDayOnly: "Just Month & Day",
+        fullDateDesc: "For complete analysis with Moon Sign",
+        monthDayDesc: "Quick Burj calculation only",
+      },
+
       // Collapsible sections
       educationTitle: "What is Ilm al-Ḥurūf?",
       educationText: "Ilm al-Ḥurūf (Science of Letters) is an ancient Islamic mystical tradition that explores the spiritual significance of Arabic letters and their numerical values. This sacred science has been practiced for centuries by scholars and Sufis to gain deeper insights into personality, destiny, and spiritual alignment.",
@@ -9665,6 +9903,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       tools: "OUTILS",
       abjadCalculator: "Calculatrice Abjad",
       nameDestiny: "Destinée des Noms",
+      zikr: "Dhikr & Wird",
       compatibility: "Compatibilité",
       istikhara: "Istikharah",
       divineTiming: "Moment Divin",
@@ -9684,6 +9923,27 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       levelBasic: "BASIQUE",
       levelEnhanced: "AMÉLIORÉ",
       levelFull: "COMPLET",
+    },
+
+    planetCondition: {
+      label: "Condition de la planète",
+      scoreLabel: "Score",
+      status: {
+        Favorable: "Favorable",
+        Neutral: "Neutre",
+        Restricted: "Restreint",
+        Avoid: "À éviter",
+      },
+      reasons: {
+        DIGNITY_EXALTATION: "Exaltation (Sharaf) : soutien maximal.",
+        DIGNITY_DOMICILE: "Domicile (Bayt) : stable et fiable.",
+        DIGNITY_DETRIMENT: "Exil (Wabāl) : friction et instabilité.",
+        DIGNITY_FALL: "Chute (Hubūṭ) : expression affaiblie.",
+        DIGNITY_NEUTRAL: "Neutre : ton équilibré.",
+        DEGREE_EXALTATION_PEAK_NEAR: "Proche du degré de pic d'exaltation (±3°) : bonus.",
+        DEGREE_EXALTATION_NEAR: "Près du pic d'exaltation (±7°) : léger bonus.",
+        DEGREE_CRITICAL_TRANSITION: "Degré critique (0–1° ou 29–30°) : instabilité de transition.",
+      },
     },
 
     // Écran Manazil (détail)
@@ -10440,6 +10700,51 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         title: "Compteur de Dhikr",
         description: "Tasbih numérique pour compter le dhikr et le souvenir",
       },
+      zikr: {
+        title: "Dhikr & Wird",
+        description: "Souvenir d'Allah pour la paix intérieure",
+      },
+    },
+
+    // Zikr Module
+    zikr: {
+      title: "Dhikr & Wird",
+      subtitle: "Souvenir d'Allah pour la paix intérieure",
+      todayProgress: "Aujourd'hui",
+      allTimeProgress: "Total",
+      favorites: "Favoris",
+      noFavorites: "Pas de favoris",
+      noFavoritesHint: "Appuyez sur le cœur sur n'importe quel dhikr pour l'ajouter à vos favoris",
+      goalReached: "Objectif atteint !",
+      categories: {
+        all: "Tous",
+        favorites: "Favoris",
+        istighfar: "Istighfār",
+        salawat: "Ṣalawāt",
+        divineNames: "Noms Divins",
+        morningEvening: "Matin & Soir",
+        custom: "Personnalisé",
+      },
+      sessions: {
+        fajr: "Fajr",
+        morning: "Matin",
+        dhuhr: "Ẓuhr",
+        asr: "ʿAṣr",
+        maghrib: "Maghrib",
+        isha: "ʿIshāʾ",
+        tahajjud: "Tahajjud",
+        other: "Autre",
+      },
+      stats: {
+        streak: "jours consécutifs",
+        total: "total",
+      },
+      actions: {
+        add: "Ajouter",
+        cancel: "Annuler",
+        customAmount: "Montant personnalisé",
+        enterNumber: "Entrez un nombre...",
+      },
     },
 
     // Prayer Times Screen
@@ -10594,14 +10899,14 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         you: "Vous",
         now: "Maintenant",
         status: {
-          act: "AGIR",
-          maintain: "MAINTENIR",
-          hold: "ATTENDRE",
+          act: "Excellent",
+          maintain: "Neutre",
+          hold: "Prudence",
         },
         hint: {
-          act: "Aligné — bon moment pour initier",
-          maintain: "Supportif — avance régulière",
-          hold: "Pas aligné — éviter la précipitation",
+          act: "Heure de Soleil, Jupiter ou Vénus — procédez avec confiance",
+          maintain: "Heure de Lune ou Mercure — continuez sereinement",
+          hold: "Heure de Saturne ou Mars — faites preuve de patience",
         },
         updated: {
           justNow: "Mis à jour à l'instant",
@@ -12094,6 +12399,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
 
     // Énergie du Jour (clés partagées)
     dailyEnergy: {
+      // Statut classique du jour (distinct de "Time" pour l'alignement horaire)
+      status: {
+        favorable: "Jour Favorable",
+        neutral: "Jour Équilibré",
+        cautious: "Jour Prudent",
+      },
       planets: {
         sun: "Soleil",
         moon: "Lune",
@@ -13090,6 +13401,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           planetaryFriendship: "Amitié Planétaire",
           planetaryResonance: "Résonance Planétaire",
           samePlanet: "Même Planète",
+          highIntensity: "Intensité élevée",
           elementalHarmony: "Harmonie Élémentaire",
           transitStrength: "Puissance de l'heure actuelle",
           strong: "Fort",
@@ -16392,6 +16704,374 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         venus: "Vénus",
         saturn: "Saturne",
       },
+
+      wording: {
+        shared: {
+          powerVsPermission: "La puissance n’est pas la permission : une heure forte peut amplifier le bien comme le tort.",
+          samePlanetIntensity: "Si cette heure est gouvernée par votre planète, l’intensité augmente — agissez avec retenue.",
+        },
+
+        sun: {
+          status: "Temps Rayonnant",
+          meaning: "Visibilité, autorité et intention claire; ce qui commence se voit.",
+          bestFor: [
+            "Diriger et fixer une direction",
+            "Affaires publiques et réputation",
+            "Invocations pour la clarté et le but",
+            "Honorer les anciens et l’autorité légitime",
+          ],
+          avoid: [
+            "Orgueil et mise en scène",
+            "Promettre trop",
+            "Agir sans sincérité",
+          ],
+          note: "La puissance augmente; protégez le cœur de la vanité et de la dureté.",
+        },
+
+        moon: {
+          status: "Temps Réfléchissant",
+          meaning: "Courants réceptifs et changeants; propice au soin, à l’écoute et au retour.",
+          bestFor: [
+            "Purification et dévotion douce",
+            "Soins du foyer, de la famille et des besoins",
+            "Rêves, réflexion et duʿāʾ",
+          ],
+          avoid: [
+            "Décisions irréversibles",
+            "Vœux conclus dans la hâte",
+          ],
+          note: "La variabilité augmente; recherchez la stabilité et évitez les promesses hésitantes.",
+        },
+
+        mercury: {
+          status: "Temps Mutable",
+          meaning: "Mouvement de l’esprit et du message; échange rapide, artisanat et calcul.",
+          bestFor: [
+            "Étude, écriture et mémorisation",
+            "Commerce, courses et courts déplacements",
+            "Planification et résolution de problèmes",
+            "Apprentissage des langues et des compétences",
+          ],
+          avoid: [
+            "Bavardage et dispute inutile",
+            "Accords hâtifs",
+            "Tromperie et double discours",
+          ],
+          note: "La rapidité augmente; vérifiez les mots et gardez l’intention pure.",
+        },
+
+        venus: {
+          status: "Temps Harmonieux",
+          meaning: "Union, affection et beauté; les cœurs s’adoucissent et les manières se raffinent.",
+          bestFor: [
+            "Réconciliation et réparation des liens",
+            "Art, parure et rencontres agréables",
+            "Bonté, charité et dons",
+            "Discussions de mariage et consentement mutuel",
+          ],
+          avoid: [
+            "Indulgence et distraction",
+            "Vanité",
+            "Négliger les obligations",
+          ],
+          note: "L’aisance augmente; gardez la modestie et ne troquez pas le devoir contre le plaisir.",
+        },
+
+        mars: {
+          status: "Temps Impérieux",
+          meaning: "Chaleur, coupure et courage; l’action tranche vite et les conséquences suivent.",
+          bestFor: [
+            "Effort discipliné et entraînement",
+            "Protection et garde des limites",
+            "Action décisive avec retenue",
+          ],
+          avoid: [
+            "Colère et querelles",
+            "Risques imprudents",
+            "Déclencher un conflit",
+          ],
+          note: "La force augmente; ne confondez pas puissance et permission.",
+        },
+
+        jupiter: {
+          status: "Temps Expansif",
+          meaning: "Accroissement, aisance et générosité; ouvertures dans le conseil et l’étude.",
+          bestFor: [
+            "Enseigner et rechercher la connaissance",
+            "Conseil, médiation et planification sage",
+            "Charité et élargir la subsistance",
+            "Bons commencements avec gratitude",
+          ],
+          avoid: [
+            "Arrogance",
+            "Excès et gaspillage",
+          ],
+          note: "L’expansion augmente; gardez la gratitude et évitez l’enflure de l’ego.",
+        },
+
+        saturn: {
+          status: "Temps Restrictif",
+          meaning: "Contrainte, patience et endurance; ce qui se bâtit est lent et éprouvé.",
+          bestFor: [
+            "Travail long demandant de l’endurance",
+            "Sobriété, repentir et retenue",
+            "Planification, limites et structure",
+            "Clore proprement ce qui doit se terminer",
+          ],
+          avoid: [
+            "Hâte",
+            "Commencer des plaisirs qui émoussent le cœur",
+            "Dureté du cœur",
+          ],
+          note: "La restriction augmente; acceptez le rythme et gardez la miséricorde dans l’intention.",
+        },
+      },
+    },
+
+    // Moon Phase System
+    moon: {
+      phases: {
+        new: "Nouvelle Lune",
+        waxing_crescent: "Premier croissant (croissante)",
+        first_quarter: "Premier quartier",
+        waxing_gibbous: "Gibbeuse croissante",
+        full: "Pleine Lune",
+        waning_gibbous: "Gibbeuse décroissante",
+        last_quarter: "Dernier quartier",
+        waning_crescent: "Dernier croissant (décroissante)",
+      },
+
+      phasesArabic: {
+        new: "المحاق",
+        waxing_crescent: "الهلال المتزايد",
+        first_quarter: "التربيع الأول",
+        waxing_gibbous: "الأحدب المتزايد",
+        full: "البدر",
+        waning_gibbous: "الأحدب المتناقص",
+        last_quarter: "التربيع الثاني",
+        waning_crescent: "الهلال المتناقص",
+      },
+
+      new: {
+        title: "Temps de repos et d’intention",
+        description: "Comme l’heure la plus sombre avant l’aube, c’est un temps de calme, de réflexion, et de fixation d’intentions. Économisez votre énergie.",
+        suitable: {
+          category: "Pratique spirituelle",
+          activity1: "Repos et restauration",
+          activity2: "Contemplation profonde",
+          activity3: "Travail intérieur",
+          spiritual1: "Prières de nuit (Tahajjud)",
+          spiritual2: "Tawbah (repentir)",
+          spiritual3: "Jeûne",
+        },
+        notSuitable: {
+          category: "Action extérieure",
+          activity1: "Démarrer de nouveaux projets",
+          activity2: "Lancements majeurs",
+          activity3: "Accords d’affaires",
+          reason: "La Lune sombre manque de lumière et d’élan pour les commencements extérieurs. Attendez le retour de la lumière.",
+        },
+      },
+
+      waxing_crescent: {
+        title: "Temps de nouveaux départs",
+        description: "Comme une graine qui perce la terre, l’intention devient visible. La lumière croissante soutient le lancement, la mise en route et l’élan.",
+        suitable: {
+          category: "Croissance et nouveaux projets",
+          activity1: "Démarrer une activité",
+          activity2: "Nouvelles relations",
+          activity3: "Apprendre de nouvelles compétences",
+          activity4: "Projets créatifs",
+          spiritual1: "Duʿāʾ pour l’augmentation",
+          spiritual2: "Invocations (adhkār)",
+          spiritual3: "Fixer des objectifs",
+        },
+        notSuitable: {
+          category: "Fins et libération",
+          activity1: "Grandes ruptures",
+          activity2: "Dissipation/éloignement",
+          activity3: "Couper les liens",
+          reason: "La lumière croissante s’oppose au relâchement et à la clôture. La Lune veut bâtir, non diminuer.",
+        },
+      },
+
+      first_quarter: {
+        title: "Temps d’action et de croissance",
+        description: "La Lune est à moitié éclairée et l’énergie monte. Agissez avec décision, traversez les obstacles et avancez avec confiance.",
+        suitable: {
+          category: "Défi et progression",
+          activity1: "Agir sur les plans lancés",
+          activity2: "Surmonter les obstacles",
+          activity3: "Décisions importantes",
+          activity4: "Activité physique",
+          spiritual1: "Pratiques de protection",
+          spiritual2: "Dhikr de force et de fermeté",
+          spiritual3: "Travail de volonté",
+        },
+        notSuitable: {
+          category: "Affaires délicates",
+          activity1: "Négociations de paix",
+          activity2: "Guérison douce",
+          activity3: "Travail réceptif",
+          reason: "La lumière croissante apporte tension et effort. Préférez le travail doux pendant la phase décroissante.",
+        },
+      },
+
+      waxing_gibbous: {
+        title: "Temps de raffinement",
+        description: "Presque pleine, la lumière révèle ce qui demande ajustement. Idéal pour améliorer, affiner et préparer l’achèvement.",
+        suitable: {
+          category: "Manifestation et achèvement",
+          activity1: "Terminer des projets",
+          activity2: "Dernière poussée vers les objectifs",
+          activity3: "Travail de manifestation",
+          activity4: "Événements importants",
+          spiritual1: "Pratiques de pleine Lune",
+          spiritual2: "Intention et concrétisation",
+          spiritual3: "Rituels d’énergie élevée",
+        },
+        notSuitable: {
+          category: "Travail discret/caché",
+          activity1: "Travail secret",
+          activity2: "Réflexion silencieuse",
+          activity3: "Pratiques cachées",
+          reason: "La Lune presque pleine est brillante et exposée. Si la discrétion est nécessaire, choisissez une phase plus sombre.",
+        },
+      },
+
+      full: {
+        title: "Temps d’aboutissement",
+        description: "Comme un arbre chargé de fruits mûrs, c’est un pic de manifestation. Célébrez, finalisez des jalons, et annoncez avec sagesse.",
+        suitable: {
+          category: "Culmination et guérison",
+          activity1: "Travail de guérison",
+          activity2: "Clarté et dévoilement",
+          activity3: "Cérémonies d’achèvement",
+          activity4: "Rassemblements",
+          activity5: "Rituels de pleine Lune",
+          spiritual1: "Prières de pleine Lune",
+          spiritual2: "Rituels de guérison",
+          spiritual3: "Pratiques communautaires",
+          spiritual4: "Clarté de vision",
+        },
+        notSuitable: {
+          category: "Nouveaux commencements",
+          activity1: "Démarrer de nouveaux projets",
+          activity2: "Introspection silencieuse",
+          activity3: "Travail secret",
+          reason: "L’énergie de la pleine Lune est extérieure et révélatrice. Pour commencer, préférez le croissant croissant.",
+        },
+      },
+
+      waning_gibbous: {
+        title: "Temps de gratitude et de partage",
+        description: "La lumière décroît. Partagez ce que vous avez créé, remerciez pour ce qui a été reçu, et commencez à relâcher ce qui ne sert plus.",
+        suitable: {
+          category: "Achèvement et gratitude",
+          activity1: "Finir des projets",
+          activity2: "Exprimer la gratitude",
+          activity3: "Enseigner/partager",
+          activity4: "Organiser",
+          spiritual1: "Pratiques de gratitude",
+          spiritual2: "Shukr (remerciement)",
+          spiritual3: "Travail de bénédiction",
+          spiritual4: "Enseignement",
+        },
+        notSuitable: {
+          category: "Grandes nouvelles entreprises",
+          activity1: "Commencer de grands projets",
+          activity2: "Initier des relations",
+          activity3: "Nouveaux engagements",
+          reason: "La Lune décroissante va vers la clôture. Les nouveaux départs appartiennent à la phase croissante.",
+        },
+      },
+
+      last_quarter: {
+        title: "Temps de libération et de nettoyage",
+        description: "La moitié de la lumière demeure. Libérez activement ce qui freine, clarifiez, rompez d’anciens schémas, et faites place au nouveau.",
+        suitable: {
+          category: "Libération et purification",
+          activity1: "Rompre des schémas négatifs",
+          activity2: "Nettoyage",
+          activity3: "Pardon",
+          activity4: "Mettre fin avec respect",
+          spiritual1: "Rituels de purification",
+          spiritual2: "Pratiques de pardon",
+          spiritual3: "Cérémonies de libération",
+          spiritual4: "Travail de tawbah (repentir)",
+        },
+        notSuitable: {
+          category: "Nouvelle croissance",
+          activity1: "Démarrer de nouveaux projets",
+          activity2: "Expansion",
+          activity3: "Nouveaux engagements",
+          reason: "L’énergie décroissante soutient la libération, non la croissance. Les nouveaux projets prospèrent pendant la phase croissante.",
+        },
+      },
+
+      waning_crescent: {
+        title: "Temps d’achèvement et d’abandon",
+        description: "Le dernier filet de lumière. Terminez, fermez les boucles, pratiquez le pardon, et préparez le repos. Lâchez prise avec grâce.",
+        suitable: {
+          category: "Réflexion profonde",
+          activity1: "Méditation",
+          activity2: "Introspection",
+          activity3: "Clôtures finales",
+          activity4: "Retraite spirituelle",
+          spiritual1: "Prières de nuit",
+          spiritual2: "Dhikr profond",
+          spiritual3: "Iʿtikāf (retraite)",
+          spiritual4: "Jeûne",
+        },
+        notSuitable: {
+          category: "Entreprises actives",
+          activity1: "Commencer des projets",
+          activity2: "Activités majeures",
+          activity3: "Travail public",
+          reason: "La Lune presque sombre appelle au repos. Attendez la nouvelle lumière pour commencer de nouvelles entreprises.",
+        },
+      },
+
+      harmony: {
+        waxing_active: "Alignement parfait ! La lumière croissante s’accorde avec l’énergie active de {{dayRuler}}. Bon timing pour initier et avancer.",
+        waxing_active_rec: "Propice à l’action mesurée, aux débuts, et à l’élan.",
+
+        waning_reflective: "Alignement parfait ! La lumière décroissante s’harmonise avec la nature réfléchie de {{dayRuler}}. Bon timing pour terminer et revenir vers l’intérieur.",
+        waning_reflective_rec: "Concentrez-vous sur l’achèvement, le lâcher-prise, et le travail intérieur.",
+
+        waxing_reflective: "Timing mixte. La Lune croissante veut construire, mais {{dayRuler}} appelle à la réflexion. Choisissez avec soin.",
+        waxing_reflective_rec: "Préférez les projets doux et intérieurs; évitez l’agressivité.",
+
+        waning_active: "Timing mixte. La Lune décroissante veut relâcher, mais {{dayRuler}} appelle à l’action. Avancez avec discernement.",
+        waning_active_rec: "Finissez l’essentiel plutôt que de commencer trop de nouveau.",
+
+        neutral: "Alignement modéré. La Lune et {{dayRuler}} donnent des conditions équilibrées.",
+        neutral_rec: "Avancez avec attention; démarrer et terminer sont possibles avec mesure.",
+      },
+
+      ui: {
+        lunarTiming: "Timing Lunaire",
+        moonPhase: "Phase Lunaire",
+        lunarDay: "Jour Lunaire",
+        dayOfMonth: "Jour {{day}} sur 30",
+        moonPower: "Puissance Lunaire",
+        waxing: "Croissante (en croissance)",
+        waning: "Décroissante (en diminution)",
+        learnMore: "En savoir plus",
+        fullGuide: "Guide lunaire complet",
+        moonDayHarmony: "Harmonie Lune-Jour",
+        perfectAlignment: "Alignement parfait",
+        goodAlignment: "Bon alignement",
+        neutralAlignment: "Alignement neutre",
+        challengingAlignment: "Alignement difficile",
+        suitableFor: "Meilleur pour",
+        notSuitableFor: "À éviter",
+        whyThisMatters: "Pourquoi cela compte",
+        traditionalWisdom: "Sagesse traditionnelle",
+        practicalExample: "Exemple pratique",
+        spiritualGuidance: "Guidance spirituelle",
+        rest: "Repos",
+      },
     },
 
     // Planet names
@@ -18807,6 +19487,48 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       formInstruction: "Entrez votre nom et celui de votre mère pour une analyse approfondie",
       description: "Découvrez votre élément, personnalité, chemin de carrière et pratiques spirituelles à travers la science sacrée du ʿIlm al-Ḥurūf.",
       
+      // Sélecteur de méthode
+      methodSelector: {
+        label: "Choisissez la méthode de calcul :",
+        nameBased: {
+          title: "Par le Nom",
+          badge: "CLASSIQUE",
+          description: "Méthode traditionnelle ʿIlm al-Ḥurūf utilisant votre nom + nom de la mère",
+        },
+        birthDate: {
+          title: "Date de Naissance",
+          badge: "RAPIDE",
+          description: "Méthode simplifiée utilisant uniquement votre date de naissance",
+        },
+      },
+      
+      // Formulaire date de naissance
+      birthDateForm: {
+        selectDate: "Sélectionnez Votre Date de Naissance",
+        tapToSelect: "Appuyez pour sélectionner votre date de naissance",
+        pleaseSelect: "Veuillez sélectionner votre date de naissance",
+        birthTime: "Heure de Naissance (Optionnel)",
+        birthTimeHint: "Ajoutez votre heure de naissance pour débloquer les calculs d'Ascendant et Descendant",
+        tapToSetTime: "Appuyez pour définir l'heure de naissance (si connue)",
+        birthLocation: "Lieu de Naissance (Optionnel)",
+        birthLocationHint: "Ajoutez votre ville de naissance pour un calcul précis de l'Ascendant",
+        searchCity: "Rechercher une ville...",
+        whatYouDiscover: "Ce Que Vous Découvrirez :",
+        sunSign: "Votre Signe Solaire (Burj)",
+        elementalNature: "Votre nature élémentaire",
+        moonSign: "Signe Lunaire (placement lunaire)",
+        ascendant: "Ascendant (Signe Montant)",
+        descendant: "Signe Descendant",
+        unlockHint: "Ajoutez l'heure et le lieu de naissance ci-dessus pour débloquer l'Ascendant et le Descendant",
+        yearNotNeeded: "L'année n'est pas nécessaire pour les calculs de base",
+        monthLabel: "Mois (1-12)",
+        dayLabel: "Jour (1-31)",
+        useFullDate: "Utiliser la Date Complète",
+        useMonthDayOnly: "Juste Mois & Jour",
+        fullDateDesc: "Pour une analyse complète avec le Signe Lunaire",
+        monthDayDesc: "Calcul rapide Burj uniquement",
+      },
+
       // Éducation & Introduction
       educationTitle: "Qu'est-ce que Ilm al-Ḥurūf ?",
       educationText: "Ilm al-Ḥurūf (Science des Lettres) est une tradition mystique islamique ancienne qui explore la signification spirituelle des lettres arabes et de leurs valeurs numériques. Chaque lettre possède des qualités sacrées qui révèlent des vérités plus profondes sur les noms et leur résonance cosmique.",
@@ -19330,6 +20052,27 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       },
     },
 
+    planetCondition: {
+      label: "حالة الكوكب",
+      scoreLabel: "النتيجة",
+      status: {
+        Favorable: "مُواتٍ",
+        Neutral: "محايد",
+        Restricted: "مُقيَّد",
+        Avoid: "تجنّب",
+      },
+      reasons: {
+        DIGNITY_EXALTATION: "شرف (Exaltation): دعم قوي للغاية.",
+        DIGNITY_DOMICILE: "بيت (Domicile): ثبات وارتياح.",
+        DIGNITY_DETRIMENT: "وبال (Detriment): احتكاك وعدم استقرار.",
+        DIGNITY_FALL: "هبوط (Fall): ضعف في التعبير.",
+        DIGNITY_NEUTRAL: "محايد: توازن عام.",
+        DEGREE_EXALTATION_PEAK_NEAR: "قريب من ذروة الشرف (±3°): زيادة قوة.",
+        DEGREE_EXALTATION_NEAR: "قريب من ذروة الشرف (±7°): زيادة بسيطة.",
+        DEGREE_CRITICAL_TRANSITION: "درجة حرجة (0–1° أو 29–30°): عدم استقرار انتقالي.",
+      },
+    },
+
     // شاشة المنازل (التفاصيل)
     manazilScreen: {
       currentMoonPosition: "موقع القمر الحالي",
@@ -19438,6 +20181,128 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         jupiter: "المشتري",
         venus: "الزهرة",
         saturn: "زحل",
+      },
+
+      wording: {
+        shared: {
+          powerVsPermission: "القوّة ليست إذنًا: قد تُعظّم الساعة القوية النفع والضرر معًا.",
+          samePlanetIntensity: "إذا كانت هذه الساعة محكومة بكوكبك، تزداد الكثافة — فاعمل بضبطٍ للنفس.",
+        },
+
+        sun: {
+          status: "وقت إشراق",
+          meaning: "ظهورٌ وسلطانٌ ووضوحُ نيّة؛ ما يُبتدأ يُرى.",
+          bestFor: [
+            "القيادة وتحديد الاتجاه",
+            "الأمور العلنية والسمعة",
+            "أذكار/دعاء لصفاء القصد",
+            "تعظيم الكبار والسلطة بحق",
+          ],
+          avoid: [
+            "الكِبر وحبّ الظهور",
+            "الإفراط في الوعود",
+            "العمل بلا إخلاص",
+          ],
+          note: "تعلو القوّة؛ فاحرس القلب من العُجب والغلظة.",
+        },
+
+        moon: {
+          status: "وقت انعكاس",
+          meaning: "تياراتٌ قابلةٌ ومتبدّلة؛ تصلح للرعاية والإنصات والرجوع.",
+          bestFor: [
+            "الطهارة وعبادةٌ بلطف",
+            "شؤون البيت والأهل والحوائج",
+            "تأمّلٌ ورؤى ودعاء",
+          ],
+          avoid: [
+            "قرارات لا رجعة فيها",
+            "نذورٌ وعهودٌ على عَجَل",
+          ],
+          note: "يزداد التبدّل؛ فالزم الثبات وتجنّب وعدًا متردّدًا.",
+        },
+
+        mercury: {
+          status: "وقت تحوّل",
+          meaning: "حركةُ الذهن والرسالة؛ سرعةُ تبادلٍ وصنعةٌ وحساب.",
+          bestFor: [
+            "الدراسة والكتابة والحفظ",
+            "التجارة والحوائج والتنقّل القريب",
+            "التخطيط وحلّ المشكلات",
+            "تعلّم اللغات والمهارات",
+          ],
+          avoid: [
+            "اللغو والجدال بلا فائدة",
+            "اتفاقاتٌ على استعجال",
+            "خداعٌ وازدواجُ كلام",
+          ],
+          note: "تزيد السرعة؛ فَثَبِّت اللفظ وتحقّق من الخبر.",
+        },
+
+        venus: {
+          status: "وقت انسجام",
+          meaning: "ألفةٌ ومودّةٌ وجمال؛ تلين القلوب وتتهذّب الطباع.",
+          bestFor: [
+            "الإصلاح وجبر الخواطر",
+            "الفنون والزينة ومجالس السكينة",
+            "الإحسان والصدقة والهدية",
+            "حديثُ زواجٍ برضا الطرفين",
+          ],
+          avoid: [
+            "انغماسٌ ولهو",
+            "زهوٌ وتفاخر",
+            "تضييع الواجبات",
+          ],
+          note: "تزيد السهولة؛ فاحفظ الحياء ولا تُبدّل الواجب بالمتعة.",
+        },
+
+        mars: {
+          status: "وقت شدّة",
+          meaning: "حرارةٌ وقطعٌ وبأس؛ الفعل يُحسم سريعًا وتتبعه العواقب.",
+          bestFor: [
+            "سعيٌ منضبطٌ وتدريب",
+            "حراسةٌ وصونُ الحدود",
+            "حسمٌ مع ضبط النفس",
+          ],
+          avoid: [
+            "غضبٌ وخصومة",
+            "مخاطرةٌ طائشة",
+            "ابتداءُ نزاع",
+          ],
+          note: "تزيد القوّة؛ فلا تجعل الشدّة إذنًا.",
+        },
+
+        jupiter: {
+          status: "وقت اتّساع",
+          meaning: "زيادةٌ ولُطفٌ وسخاء؛ انفتاحٌ في المشورة والعلم.",
+          bestFor: [
+            "تعليمٌ وطلبُ علم",
+            "مشورةٌ ووساطةٌ وتدبيرٌ حكيم",
+            "صدقةٌ وتوسعةُ رزق",
+            "بداياتٌ مع شكر",
+          ],
+          avoid: [
+            "تَعالٍ",
+            "إسرافٌ وتبذير",
+          ],
+          note: "يزداد الاتساع؛ فاثبت على الشكر وتجنّب تضخّم النفس.",
+        },
+
+        saturn: {
+          status: "وقت تقييد",
+          meaning: "قيدٌ وصبرٌ وجلَد؛ ما يُبنى بطيءٌ وممحوص.",
+          bestFor: [
+            "عملٌ طويلٌ يحتاج صبرًا",
+            "زهدٌ وتوبةٌ وكفّ النفس",
+            "تخطيطٌ وحدودٌ ونظام",
+            "ختمُ ما يجب ختمه بصفاء",
+          ],
+          avoid: [
+            "العَجَلة",
+            "ابتداءُ لذّات تُضعف القلب",
+            "قسوةُ القلب",
+          ],
+          note: "يزداد القيد؛ فاقبل الإيقاع واحمل الرحمة في النية.",
+        },
       },
     },
 
@@ -19989,6 +20854,49 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       titleArabic: "مَن أنا",
       subtitle: "اكتشف ذاتك الحقيقية",
       formInstruction: "أدخل اسمك واسم والدتك للتحليل العميق",
+      
+      // محدد الطريقة
+      methodSelector: {
+        label: "اختر طريقة الحساب:",
+        nameBased: {
+          title: "بالاسم",
+          badge: "كلاسيكي",
+          description: "الطريقة التقليدية لعلم الحروف باستخدام اسمك + اسم الأم",
+        },
+        birthDate: {
+          title: "تاريخ الميلاد",
+          badge: "سريع",
+          description: "طريقة مبسطة باستخدام تاريخ ميلادك فقط",
+        },
+      },
+      
+      // نموذج تاريخ الميلاد
+      birthDateForm: {
+        selectDate: "اختر تاريخ ميلادك",
+        tapToSelect: "اضغط لاختيار تاريخ ميلادك",
+        pleaseSelect: "يرجى اختيار تاريخ ميلادك",
+        birthTime: "وقت الميلاد (اختياري)",
+        birthTimeHint: "أضف وقت ميلادك لفتح حسابات الطالع والغارب",
+        tapToSetTime: "اضغط لتحديد وقت الميلاد (إن كان معروفًا)",
+        birthLocation: "مكان الميلاد (اختياري)",
+        birthLocationHint: "أضف مدينة ميلادك لحساب دقيق للطالع",
+        searchCity: "ابحث عن مدينة...",
+        whatYouDiscover: "ما ستكتشفه:",
+        sunSign: "برجك الشمسي",
+        elementalNature: "طبيعتك العنصرية",
+        moonSign: "برج القمر (الموضع القمري)",
+        ascendant: "الطالع (البرج الصاعد)",
+        descendant: "الغارب",
+        unlockHint: "أضف وقت ومكان الميلاد أعلاه لفتح الطالع والغارب",
+        yearNotNeeded: "السنة ليست مطلوبة للحسابات الأساسية",
+        monthLabel: "الشهر (1-12)",
+        dayLabel: "اليوم (1-31)",
+        useFullDate: "استخدم التاريخ الكامل",
+        useMonthDayOnly: "الشهر واليوم فقط",
+        fullDateDesc: "للتحليل الكامل مع برج القمر",
+        monthDayDesc: "حساب البرج السريع فقط",
+      },
+
       educationTitle: "ما هو علم الحروف؟",
       discoveryTitle: "ما ستكتشفه",
       examplesTitle: "أمثلة على الأسماء",
@@ -20532,12 +21440,12 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         nextHour: "الساعة التالية",
 
         status: {
-          act: "تحرّك",
-          maintain: "استمر",
-          hold: "انتظر",
-          act_desc: "الظروف مواتية — تحرّك بوعي",
-          maintain_desc: "الظروف مواتية — تقدّم بثبات",
-          hold_desc: "الظروف صعبة — انتظر وقتًا أفضل",
+          act: "وقت ممتاز",
+          maintain: "محايد",
+          hold: "تابع بحذر",
+          act_desc: "ساعة الشمس أو المشتري أو الزهرة — تابع بثقة",
+          maintain_desc: "ساعة القمر أو عطارد — استمر بثبات",
+          hold_desc: "ساعة زحل أو المريخ — تحلَّ بالصبر",
         },
 
         transit: {
@@ -20565,6 +21473,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           planetaryFriendship: "الانسجام الكوكبي",
           planetaryResonance: "الرنين الكوكبي",
           samePlanet: "نفس الكوكب",
+          highIntensity: "كثافة عالية",
           elementalHarmony: "الانسجام العنصري",
           transitStrength: "قوة الساعة الحالية",
           strong: "قوية",
@@ -20724,14 +21633,14 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     // Moon Phase System
     moon: {
       phases: {
-        new: "New Moon",
-        waxing_crescent: "Waxing Crescent",
-        first_quarter: "First Quarter",
-        waxing_gibbous: "Waxing Gibbous",
-        full: "Full Moon",
-        waning_gibbous: "Waning Gibbous",
-        last_quarter: "Last Quarter",
-        waning_crescent: "Waning Crescent",
+        new: "المحاق",
+        waxing_crescent: "الهلال المتزايد",
+        first_quarter: "التربيع الأول",
+        waxing_gibbous: "الأحدب المتزايد",
+        full: "البدر",
+        waning_gibbous: "الأحدب المتناقص",
+        last_quarter: "التربيع الثاني",
+        waning_crescent: "الهلال المتناقص",
       },
       
       phasesArabic: {
@@ -20746,88 +21655,235 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       },
       
       new: {
-        title: "Time for Rest & Intention",
-        description: "Like the darkest hour before dawn, this is a time for quiet reflection, setting intentions, and preparing for the cycle ahead. Conserve your energy.",
+        title: "وقت للراحة والنية",
+        description: "مثل أحلك ساعة قبل الفجر، هذا وقت للهدوء والتأمل وتحديد النية والاستعداد للدورة القادمة. احفظ طاقتك.",
+        suitable: {
+          category: "ممارسة روحية",
+          activity1: "راحة واستعادة",
+          activity2: "تأمل عميق",
+          activity3: "عمل داخلي",
+          spiritual1: "قيام الليل (تهجد)",
+          spiritual2: "توبة",
+          spiritual3: "صيام",
+        },
+        notSuitable: {
+          category: "عمل خارجي",
+          activity1: "بدء مشاريع جديدة",
+          activity2: "إطلاقات كبيرة",
+          activity3: "اتفاقات عمل",
+          reason: "المحاق يفتقر إلى الضوء والزخم للبدايات الخارجية. انتظر عودة النور.",
+        },
       },
       
       waxing_crescent: {
-        title: "Time for New Beginnings",
-        description: "Like a seed breaking through soil, this is when intentions become visible. The Moon's growing light supports starting projects, planting seeds, and building momentum.",
+        title: "وقت لبدايات جديدة",
+        description: "مثل بذرة تشقّ التراب، تصبح النوايا مرئية. ضوء القمر المتزايد يدعم البدء وغرس البذور وبناء الزخم.",
+        suitable: {
+          category: "النمو والبدايات",
+          activity1: "بدء عمل أو مشروع",
+          activity2: "علاقات جديدة",
+          activity3: "تعلّم مهارات جديدة",
+          activity4: "مشاريع إبداعية",
+          spiritual1: "دعاء للزيادة",
+          spiritual2: "أذكار",
+          spiritual3: "تثبيت الأهداف",
+        },
+        notSuitable: {
+          category: "إنهاء وتخلٍّ",
+          activity1: "قطيعات كبيرة",
+          activity2: "تفكيك وترك",
+          activity3: "قطع الروابط",
+          reason: "الضوء المتزايد يناسب البناء لا الإغلاق. للتخلّي والإنهاء اختر مراحل التناقص.",
+        },
       },
       
       first_quarter: {
-        title: "Time for Action & Growth",
-        description: "The Moon is half-illuminated and energy is rising. This is the time to take decisive action, overcome obstacles, and push your projects forward with confidence.",
+        title: "وقت للعمل والنمو",
+        description: "القمر نصف مضيء والطاقة في صعود. وقت للحسم وتجاوز العقبات ودفع المشاريع للأمام بثقة.",
+        suitable: {
+          category: "تحدٍ وتقدّم",
+          activity1: "العمل على الخطط القائمة",
+          activity2: "تجاوز العقبات",
+          activity3: "قرارات مهمة",
+          activity4: "نشاط بدني",
+          spiritual1: "ممارسات الحماية",
+          spiritual2: "ذكر للقوة والثبات",
+          spiritual3: "عمل الإرادة والانضباط",
+        },
+        notSuitable: {
+          category: "أمور لطيفة/حساسة",
+          activity1: "مفاوضات سلام",
+          activity2: "شفاء لطيف",
+          activity3: "عمل استقبال وسكون",
+          reason: "يزداد التوتر والجهد مع الضوء المتزايد. العمل اللطيف ينسجم أكثر مع مرحلة التناقص.",
+        },
       },
       
       waxing_gibbous: {
-        title: "Time for Refinement",
-        description: "Nearly full, the Moon's light illuminates what needs adjustment. Perfect for refining your work, making improvements, and preparing for completion.",
+        title: "وقت للتهذيب والتحسين",
+        description: "قريب من الامتلاء، يكشف ضوء القمر ما يحتاج تعديلًا. مناسب لتنقيح العمل وتحسينه والاستعداد للإتمام.",
+        suitable: {
+          category: "تحقّق وإتمام",
+          activity1: "إنهاء المشاريع",
+          activity2: "دفعة أخيرة نحو الأهداف",
+          activity3: "عمل التجلي والتحقّق",
+          activity4: "أحداث مهمة",
+          spiritual1: "ممارسات ما قبل البدر",
+          spiritual2: "نية وتثبيت",
+          spiritual3: "طقوس طاقة عالية",
+        },
+        notSuitable: {
+          category: "عمل خفي/سري",
+          activity1: "عمل سري",
+          activity2: "تأمل صامت",
+          activity3: "ممارسات في الخفاء",
+          reason: "القمر شبه الكامل ساطع ومكشوف. إن لزمك الكتمان فاختر مرحلة أغمق.",
+        },
       },
       
       full: {
-        title: "Time for Culmination",
-        description: "Like a tree heavy with ripe fruit, this is the peak of manifestation. Celebrate achievements, complete major milestones, and make important announcements.",
+        title: "وقت للذروة",
+        description: "كشجرة مثقلة بثمر ناضج، هذا ذروة الظهور. احتفل بالإنجازات، وأتمّ المحطات الكبرى، وأعلن بحكمة.",
+        suitable: {
+          category: "اكتمال وشفاء",
+          activity1: "عمل الشفاء",
+          activity2: "وضوح وانكشاف",
+          activity3: "مراسم إتمام",
+          activity4: "تجمعات",
+          activity5: "طقوس البدر",
+          spiritual1: "أدعية البدر",
+          spiritual2: "طقوس الشفاء",
+          spiritual3: "ممارسات جماعية",
+          spiritual4: "وضوح البصيرة",
+        },
+        notSuitable: {
+          category: "بدايات جديدة",
+          activity1: "بدء مشاريع جديدة",
+          activity2: "استبطان صامت",
+          activity3: "عمل سري",
+          reason: "طاقة البدر خارجية وكاشفة. للبدايات اختر الهلال المتزايد.",
+        },
       },
       
       waning_gibbous: {
-        title: "Time for Gratitude & Sharing",
-        description: "The light begins to decrease. This is the time to share what you've created, express gratitude for what's been received, and begin releasing what no longer serves.",
+        title: "وقت للشكر والمشاركة",
+        description: "يبدأ الضوء بالتناقص. وقت لمشاركة ما صنعت، وشكر ما أُعطي، والبدء في ترك ما لم يعد ينفع.",
+        suitable: {
+          category: "إتمام وشكر",
+          activity1: "إنهاء أعمال",
+          activity2: "إظهار الامتنان",
+          activity3: "تعليم/مشاركة",
+          activity4: "تنظيم",
+          spiritual1: "ممارسات الامتنان",
+          spiritual2: "شكر",
+          spiritual3: "عمل البركة",
+          spiritual4: "التعليم",
+        },
+        notSuitable: {
+          category: "مشاريع جديدة كبيرة",
+          activity1: "بدء مشاريع كبيرة",
+          activity2: "بدء علاقات",
+          activity3: "التزامات جديدة",
+          reason: "القمر المتناقص يميل إلى الإغلاق. البدايات أنسب في مرحلة التزايد.",
+        },
       },
       
       last_quarter: {
-        title: "Time for Release & Clearing",
-        description: "Half the light remains. Actively release what's holding you back, clear away obstacles, break old patterns, and make space for the new cycle ahead.",
+        title: "وقت للتحرير والتنقية",
+        description: "يبقى نصف الضوء. اترك ما يعيقك، وأزل العوائق، واقطع العادات القديمة، وافتح مساحة للدورة الجديدة.",
+        suitable: {
+          category: "تحرير وتطهير",
+          activity1: "كسر أنماط سلبية",
+          activity2: "تنظيف",
+          activity3: "مغفرة",
+          activity4: "إنهاء باحترام",
+          spiritual1: "طقوس التطهير",
+          spiritual2: "ممارسات المغفرة",
+          spiritual3: "مراسم التحرير",
+          spiritual4: "عمل التوبة",
+        },
+        notSuitable: {
+          category: "نمو جديد",
+          activity1: "بدء مشاريع جديدة",
+          activity2: "توسّع",
+          activity3: "التزامات جديدة",
+          reason: "طاقة التناقص تدعم التحرير لا النمو. المشاريع الجديدة تزدهر في مرحلة التزايد.",
+        },
       },
       
       waning_crescent: {
-        title: "Time for Completion & Surrender",
-        description: "The final sliver of light. Finish what remains, tie up loose ends, practice forgiveness, and prepare for the rest period ahead. Let go with grace.",
+        title: "وقت للإتمام والتسليم",
+        description: "آخر خيط من الضوء. أتمّ ما تبقى، وأغلق الأطراف، وتمرّن على العفو، واستعدّ لمرحلة الراحة. اترك بلطف.",
+        suitable: {
+          category: "تأمل عميق",
+          activity1: "تأمل",
+          activity2: "استبطان",
+          activity3: "إغلاقات نهائية",
+          activity4: "خلوة روحية",
+          spiritual1: "قيام الليل",
+          spiritual2: "ذكر عميق",
+          spiritual3: "اعتكاف",
+          spiritual4: "صيام",
+        },
+        notSuitable: {
+          category: "مبادرات نشطة",
+          activity1: "بدء مشاريع",
+          activity2: "أنشطة كبيرة",
+          activity3: "عمل علني",
+          reason: "القمر القريب من المحاق يدعو للراحة. انتظر ولادة الهلال لبدء أمور جديدة.",
+        },
       },
       
       harmony: {
-        waxing_active: "Perfect alignment! The Moon's growing light beautifully matches {{dayRuler}}'s active energy. Excellent timing for launching projects and taking initiative.",
-        waxing_active_rec: "This is ideal timing for bold action, starting ventures, and making your mark.",
+        waxing_active: "انسجامٌ ممتاز! ضوء القمر المتزايد يوافق طاقة {{dayRuler}} النشطة. توقيت مناسب للبدايات والمبادرة.",
+        waxing_active_rec: "يناسب العمل المنضبط والبدايات وبناء الزخم.",
         
-        waning_reflective: "Perfect alignment! The Moon's decreasing light harmonizes with {{dayRuler}}'s reflective nature. Excellent timing for completion and inner work.",
-        waning_reflective_rec: "Focus on finishing projects, releasing what's done, and inner spiritual practices.",
+        waning_reflective: "انسجامٌ ممتاز! ضوء القمر المتناقص ينسجم مع طبيعة {{dayRuler}} التأملية. وقت مناسب للإتمام والعمل الداخلي.",
+        waning_reflective_rec: "ركّز على إنهاء ما بدأته، وترك ما انتهى، وممارساتٍ روحية داخلية.",
         
-        waxing_reflective: "Mixed timing. The waxing Moon wants to build, but {{dayRuler}} calls for reflection. Choose your actions carefully.",
-        waxing_reflective_rec: "Start inner-focused or gentle projects. Avoid aggressive outward action.",
+        waxing_reflective: "توقيتٌ مختلط. القمر المتزايد يدعو للبناء، لكن {{dayRuler}} يدعو للتأمل. اختر أفعالك بحذر.",
+        waxing_reflective_rec: "ابدأ أعمالًا لطيفة أو داخلية، وتجنّب الاندفاع الخارجي.",
         
-        waning_active: "Mixed timing. The waning Moon wants to release, but {{dayRuler}} calls for action. Navigate this tension wisely.",
-        waning_active_rec: "Focus on completing active projects rather than starting new ones.",
+        waning_active: "توقيتٌ مختلط. القمر المتناقص يدعو للترك، لكن {{dayRuler}} يدعو للفعل. وازن هذا التوتر بحكمة.",
+        waning_active_rec: "ركّز على إتمام الأعمال بدل بدء الكثير من الجديد.",
         
-        neutral: "Moderate alignment. The Moon and {{dayRuler}} create balanced conditions.",
-        neutral_rec: "Proceed with awareness. Both starting and completing are possible with care.",
+        neutral: "توافقٌ متوسط. القمر و{{dayRuler}} يوجدان توازنًا عامًا.",
+        neutral_rec: "تقدّم بوعي؛ البدء والإتمام ممكنان مع رعايةٍ وحذر.",
       },
       
       ui: {
-        lunarTiming: "Lunar Timing",
-        moonPhase: "Moon Phase",
-        lunarDay: "Lunar Day",
-        dayOfMonth: "Day {{day}} of 30",
-        moonPower: "Moon Power",
-        waxing: "Waxing (Growing)",
-        waning: "Waning (Decreasing)",
-        learnMore: "Learn More",
-        fullGuide: "Full Lunar Guide",
-        moonDayHarmony: "Moon-Day Harmony",
-        perfectAlignment: "Perfect Alignment",
-        goodAlignment: "Good Alignment",
-        neutralAlignment: "Neutral Alignment",
-        challengingAlignment: "Challenging Alignment",
-        suitableFor: "Best For",
-        notSuitableFor: "Avoid",
-        whyThisMatters: "Why This Matters",
-        traditionalWisdom: "Traditional Wisdom",
-        practicalExample: "Practical Example",
-        spiritualGuidance: "Spiritual Guidance",
+        lunarTiming: "التوقيت القمري",
+        moonPhase: "طور القمر",
+        lunarDay: "اليوم القمري",
+        dayOfMonth: "اليوم {{day}} من 30",
+        moonPower: "قوة القمر",
+        waxing: "متزايد (ينمو)",
+        waning: "متناقص (ينخفض)",
+        learnMore: "اعرف المزيد",
+        fullGuide: "الدليل القمري الكامل",
+        moonDayHarmony: "انسجام القمر واليوم",
+        perfectAlignment: "انسجام ممتاز",
+        goodAlignment: "انسجام جيد",
+        neutralAlignment: "انسجام محايد",
+        challengingAlignment: "انسجام متعب",
+        suitableFor: "أنسب لـ",
+        notSuitableFor: "تجنّب",
+        whyThisMatters: "لماذا يهم هذا",
+        traditionalWisdom: "حكمة تقليدية",
+        practicalExample: "مثال عملي",
+        spiritualGuidance: "إرشاد روحي",
+        rest: "راحة",
       },
     },
 
     // Daily Energy - نظام السرد الجديد
     dailyEnergy: {
+      // حالة اليوم الكلاسيكية (مختلفة عن "الوقت" في محاذاة اللحظة)
+      status: {
+        favorable: "يوم مواتٍ",
+        neutral: "يوم متوازن",
+        cautious: "يوم يستدعي التأني",
+      },
       // عناوين الأقسام
       todaysRuler: "حاكم اليوم الكوكبي",
       yourPlanet: "كوكبك الشخصي",
@@ -20947,6 +22003,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         default: "افتراضي (الشمس)",
       },
 
+      // محرّك حالة الكوكب (منزلة + ذروة الشرف بالدرجات + الدرجات الحرجة)
       // بطاقة الحكم الكوكبي
       planetaryJudgment: {
         title: "الحكم الكوكبي",

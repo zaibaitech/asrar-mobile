@@ -9,9 +9,11 @@
     "web": "expo start --web",
     "typecheck:app": "tsc -p tsconfig.app.json --noEmit",
     "typecheck:caching": "tsc -p tsconfig.caching.json --noEmit",
-    "test:tier1": "ts-node scripts/test-tier1-cosmic-quality.ts"
+    "test:tier1": "ts-node scripts/test-tier1-cosmic-quality.ts",
+    "test:planet-condition": "ts-node scripts/test-planet-condition-engine.ts"
   },
   "dependencies": {
+    "@expo/ngrok": "^4.1.3",
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "8.4.4",
