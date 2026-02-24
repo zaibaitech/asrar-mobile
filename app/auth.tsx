@@ -14,7 +14,7 @@
 import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { checkAuthBackendHealth, getAuthBackendPrereq, loadProfileFromCloud, requestPasswordReset, signIn, signUp } from '@/services/AuthService';
+import { checkAuthBackendHealth, getAuthBackendPrereq, loadProfileFromCloud, requestPasswordReset, signIn, signUp, signInWithOAuth, OAuthProvider, getConfiguredOAuthProviders } from '@/services/AuthService';
 import { clearGuestMode } from '@/services/SessionModeService';
 import { evaluatePasswordStrength, getPasswordStrengthLabel } from '@/utils/passwordStrength';
 import { Ionicons } from '@expo/vector-icons';
@@ -55,6 +55,7 @@ export default function AuthScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
 
   const [backendStatus, setBackendStatus] = useState<BackendStatus>({
     configured: true,
@@ -63,6 +64,9 @@ export default function AuthScreen() {
     error: null,
     checking: false,
   });
+  
+  // Get configured OAuth providers
+  const configuredOAuthProviders = getConfiguredOAuthProviders();
   
   // Password strength indicator
   const passwordStrength = evaluatePasswordStrength(password);
@@ -348,6 +352,87 @@ export default function AuthScreen() {
       setLoading(false);
     }
   };
+
+  const handleOAuthSignIn = async (provider: OAuthProvider) => {
+    try {
+      setOauthLoading(provider);
+      
+      if (__DEV__) {
+        console.log('[AuthScreen] Starting OAuth sign in with:', provider);
+      }
+      
+      const result = await signInWithOAuth(provider);
+      
+      if (__DEV__) {
+        console.log('[AuthScreen] OAuth result:', result.session ? 'Session created' : 'No session', result.error?.code);
+      }
+
+      if (result.session) {
+        // Clear guest mode on successful OAuth sign in
+        await clearGuestMode();
+
+        // Try to load profile from cloud
+        const cloudResult = await loadProfileFromCloud(result.session);
+
+        if (__DEV__) {
+          console.log('[AuthScreen] OAuth cloud profile result:', cloudResult.profile ? 'Found' : 'Not found');
+        }
+
+        if (cloudResult.profile) {
+          // Cloud profile found - restore it
+          await setProfile({
+            ...cloudResult.profile,
+            mode: 'account',
+            account: {
+              ...cloudResult.profile.account,
+              email: result.session.email,
+              userId: result.session.userId,
+            },
+          });
+
+          Alert.alert(
+            'Welcome Back!',
+            'Your profile has been restored.',
+            [
+              {
+                text: 'Continue',
+                onPress: () => router.replace('/(tabs)'),
+              },
+            ]
+          );
+        } else {
+          // No cloud profile - user needs to set up profile
+          await setProfile({
+            mode: 'account',
+            account: {
+              email: result.session.email,
+              userId: result.session.userId,
+            },
+          });
+
+          Alert.alert(
+            'Welcome!',
+            'Please complete your profile to unlock personalized features.',
+            [
+              {
+                text: 'Continue',
+                onPress: () => router.replace('/profile?postSave=home'),
+              },
+            ]
+          );
+        }
+      } else {
+        if (result.error?.code !== 'OAUTH_CANCELLED') {
+          Alert.alert('Error', result.error?.message || 'Failed to sign in with OAuth');
+        }
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred');
+      console.error('OAuth sign in error:', error);
+    } finally {
+      setOauthLoading(null);
+    }
+  };
   
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -560,6 +645,70 @@ export default function AuthScreen() {
                 <TouchableOpacity style={styles.forgotButton} onPress={handleForgotPassword}>
                   <Text style={styles.forgotText}>{t('auth.forgotPassword')}</Text>
                 </TouchableOpacity>
+              )}
+
+              {/* OAuth Sign In Buttons */}
+              {configuredOAuthProviders.length > 0 && (
+                <>
+                  <View style={styles.oauthDivider}>
+                    <View style={styles.oauthDividerLine} />
+                    <Text style={styles.oauthDividerText}>or continue with</Text>
+                    <View style={styles.oauthDividerLine} />
+                  </View>
+
+                  <View style={styles.oauthButtons}>
+                    {configuredOAuthProviders.includes('google') && (
+                      <TouchableOpacity
+                        style={styles.oauthButton}
+                        onPress={() => handleOAuthSignIn('google')}
+                        disabled={oauthLoading !== null || loading}
+                      >
+                        {oauthLoading === 'google' ? (
+                          <ActivityIndicator color="#4285F4" size="small" />
+                        ) : (
+                          <>
+                            <Ionicons name="logo-google" size={24} color="#4285F4" />
+                            <Text style={styles.oauthButtonText}>Google</Text>
+                          </>
+                        )}
+                      </TouchableOpacity>
+                    )}
+
+                    {configuredOAuthProviders.includes('apple') && (
+                      <TouchableOpacity
+                        style={styles.oauthButton}
+                        onPress={() => handleOAuthSignIn('apple')}
+                        disabled={oauthLoading !== null || loading}
+                      >
+                        {oauthLoading === 'apple' ? (
+                          <ActivityIndicator color="#000" size="small" />
+                        ) : (
+                          <>
+                            <Ionicons name="logo-apple" size={24} color="#000" />
+                            <Text style={styles.oauthButtonText}>Apple</Text>
+                          </>
+                        )}
+                      </TouchableOpacity>
+                    )}
+
+                    {configuredOAuthProviders.includes('facebook') && (
+                      <TouchableOpacity
+                        style={styles.oauthButton}
+                        onPress={() => handleOAuthSignIn('facebook')}
+                        disabled={oauthLoading !== null || loading}
+                      >
+                        {oauthLoading === 'facebook' ? (
+                          <ActivityIndicator color="#1877F2" size="small" />
+                        ) : (
+                          <>
+                            <Ionicons name="logo-facebook" size={24} color="#1877F2" />
+                            <Text style={styles.oauthButtonText}>Facebook</Text>
+                          </>
+                        )}
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </>
               )}
             </View>
             
@@ -833,6 +982,51 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: DarkTheme.textSecondary,
+  },
+  
+  // OAuth
+  oauthDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 16,
+  },
+  oauthDividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  oauthDividerText: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
+    marginHorizontal: 12,
+  },
+  oauthButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 8,
+  },
+  oauthButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  oauthButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2937',
   },
   
   // Privacy

@@ -1,9 +1,24 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { Link, Stack, usePathname } from 'expo-router';
+import { ActivityIndicator, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
 
 export default function NotFoundScreen() {
+  const pathname = usePathname();
+
+  // OAuth callbacks may briefly land here while AuthService processes the redirect.
+  // Show a silent loading state instead of the "Oops" error.
+  if (pathname?.includes('auth/callback') || pathname?.includes('auth%2Fcallback')) {
+    return (
+      <>
+        <Stack.Screen options={{ title: '', headerShown: false }} />
+        <View style={styles.container}>
+          <ActivityIndicator size="large" />
+        </View>
+      </>
+    );
+  }
+
   return (
     <>
       <Stack.Screen options={{ title: 'Oops!' }} />

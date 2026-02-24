@@ -20,6 +20,9 @@
 import { UserProfile } from '@/types/user-profile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
+import * as AuthSession from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
+import * as Crypto from 'expo-crypto';
 
 // ============================================================================
 // CONFIGURATION
@@ -1217,6 +1220,335 @@ export async function isAuthenticated(): Promise<boolean> {
 export async function getCurrentUserId(): Promise<string | null> {
   const session = await getSession();
   return session?.userId || null;
+}
+
+// ============================================================================
+// OAUTH AUTHENTICATION (EXPO AUTH SESSION)
+// ============================================================================
+
+// Complete the web browser authentication session immediately after the user returns to the app
+WebBrowser.maybeCompleteAuthSession();
+
+// OAuth Provider Types
+export type OAuthProvider = 'google' | 'apple' | 'facebook';
+
+// Generate the correct redirect URI for the current environment
+// In Expo Go: returns exp://xxx:port/--/auth/callback  
+// In standalone builds: returns asrariya://auth/callback
+const getRedirectUri = () => {
+  const uri = AuthSession.makeRedirectUri({
+    scheme: 'asrariya',
+    path: 'auth/callback',
+  });
+  if (__DEV__) {
+    console.log('[AuthService] Generated redirect URI:', uri);
+  }
+  return uri;
+};
+
+// OAuth Configuration from environment variables
+const OAUTH_CONFIG = {
+  google: {
+    clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '',
+  },
+  apple: {
+    clientId: process.env.EXPO_PUBLIC_APPLE_CLIENT_ID || '',
+  },
+  facebook: {
+    appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || '',
+  },
+};
+
+/**
+ * Sign in with OAuth provider (Google, Apple, Facebook)
+ * Uses expo-auth-session for secure browser-based OAuth flow
+ */
+export async function signInWithOAuth(provider: OAuthProvider): Promise<{
+  session: AuthSession | null;
+  error: AuthError | null;
+}> {
+  try {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      return {
+        session: null,
+        error: {
+          code: 'NOT_CONFIGURED',
+          message: 'OAuth is not available. Backend not configured.',
+        },
+      };
+    }
+
+    // Check if provider is configured
+    if (provider === 'google' && !OAUTH_CONFIG.google.clientId) {
+      return {
+        session: null,
+        error: {
+          code: 'NOT_CONFIGURED',
+          message: 'Google OAuth not configured. Add EXPO_PUBLIC_GOOGLE_CLIENT_ID to .env',
+        },
+      };
+    }
+
+    if (provider === 'apple' && !OAUTH_CONFIG.apple.clientId) {
+      return {
+        session: null,
+        error: {
+          code: 'NOT_CONFIGURED',
+          message: 'Apple OAuth not configured. Add EXPO_PUBLIC_APPLE_CLIENT_ID to .env',
+        },
+      };
+    }
+
+    if (provider === 'facebook' && !OAUTH_CONFIG.facebook.appId) {
+      return {
+        session: null,
+        error: {
+          code: 'NOT_CONFIGURED',
+          message: 'Facebook OAuth not configured. Add EXPO_PUBLIC_FACEBOOK_APP_ID to .env',
+        },
+      };
+    }
+
+    // Get the correct redirect URI for current environment (Expo Go vs standalone)
+    const redirectUri = getRedirectUri();
+
+    if (__DEV__) {
+      console.log(`[AuthService] Starting OAuth flow for ${provider}`);
+      console.log('[AuthService] Redirect URI:', redirectUri);
+    }
+
+    // Generate code verifier and challenge for PKCE
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
+
+    // Build Supabase OAuth URL with the correct redirect
+    const oauthParams = new URLSearchParams({
+      provider,
+      redirect_to: redirectUri,
+      code_challenge: codeChallenge,
+      code_challenge_method: 'S256',
+    });
+    const authUrl = `${SUPABASE_URL}/auth/v1/authorize?${oauthParams.toString()}`;
+
+    if (__DEV__) {
+      console.log('[AuthService] OAuth URL:', authUrl);
+    }
+
+    // Open browser for OAuth - openAuthSessionAsync monitors for the redirect URI
+    const result = await WebBrowser.openAuthSessionAsync(
+      authUrl,
+      redirectUri
+    );
+
+    if (__DEV__) {
+      console.log('[AuthService] Browser result type:', result.type);
+      if (result.type === 'success') {
+        console.log('[AuthService] Callback URL:', result.url);
+      }
+    }
+
+    if (result.type !== 'success') {
+      return {
+        session: null,
+        error: {
+          code: 'OAUTH_CANCELLED',
+          message: 'Authentication was cancelled',
+        },
+      };
+    }
+
+    // Extract code from callback URL
+    const params = extractParamsFromUrl(result.url);
+    
+    if (__DEV__) {
+      console.log('[AuthService] Extracted params:', JSON.stringify(params, null, 2));
+    }
+
+    if (params.error) {
+      return {
+        session: null,
+        error: {
+          code: params.error,
+          message: params.error_description || 'OAuth authentication failed',
+        },
+      };
+    }
+
+    if (!params.code) {
+      return {
+        session: null,
+        error: {
+          code: 'INVALID_CALLBACK',
+          message: 'Missing authorization code in callback',
+        },
+      };
+    }
+
+    // Exchange code for tokens
+    if (__DEV__) {
+      console.log('[AuthService] Exchanging code for tokens...');
+      console.log('[AuthService] Auth code:', params.code?.substring(0, 20) + '...');
+    }
+    
+    const tokenResponse = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=pkce`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({
+        auth_code: params.code,
+        code_verifier: codeVerifier,
+      }),
+    });
+
+    const tokenData = await tokenResponse.json();
+
+    if (!tokenResponse.ok) {
+      if (__DEV__) {
+        console.error('[AuthService] Token exchange failed:', tokenData);
+      }
+      return {
+        session: null,
+        error: {
+          code: tokenData.error_code || 'TOKEN_EXCHANGE_FAILED',
+          message: tokenData.error_description || 'Failed to exchange authorization code',
+        },
+      };
+    }
+
+    // Create session from OAuth tokens
+    const session: AuthSession = {
+      userId: tokenData.user.id,
+      email: tokenData.user.email || '',
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      expiresAt: Date.now() + (tokenData.expires_in * 1000),
+    };
+
+    await saveSession(session);
+
+    if (__DEV__) {
+      console.log('[AuthService] OAuth sign in successful:', session.userId);
+    }
+
+    return { session, error: null };
+
+  } catch (error) {
+    if (__DEV__) {
+      console.error('[AuthService] OAuth error:', error);
+    }
+
+    return {
+      session: null,
+      error: {
+        code: 'NETWORK_ERROR',
+        message: error instanceof Error ? error.message : 'OAuth authentication failed',
+      },
+    };
+  }
+}
+
+/**
+ * Generate a random code verifier for PKCE
+ */
+function generateCodeVerifier(): string {
+  const randomBytes = Crypto.getRandomBytes(32);
+  return base64URLEncode(randomBytes);
+}
+
+/**
+ * Generate code challenge from verifier for PKCE
+ */
+async function generateCodeChallenge(verifier: string): Promise<string> {
+  const digest = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    verifier
+  );
+  return base64URLEncode(hexStringToUint8Array(digest));
+}
+
+/**
+ * Base64 URL encode (without padding)
+ */
+function base64URLEncode(buffer: Uint8Array): string {
+  const base64 = btoa(String.fromCharCode(...buffer));
+  return base64
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+}
+
+/**
+ * Convert hex string to Uint8Array
+ */
+function hexStringToUint8Array(hexString: string): Uint8Array {
+  const bytes = new Uint8Array(hexString.length / 2);
+  for (let i = 0; i < hexString.length; i += 2) {
+    bytes[i / 2] = parseInt(hexString.substr(i, 2), 16);
+  }
+  return bytes;
+}
+
+/**
+ * Extract parameters from OAuth callback URL
+ */
+function extractParamsFromUrl(url: string): {
+  code?: string;
+  error?: string;
+  error_description?: string;
+} {
+  try {
+    const urlObj = new URL(url);
+    // Check both search params and hash fragment (Supabase may use either)
+    const code = urlObj.searchParams.get('code') || 
+      new URLSearchParams(urlObj.hash.replace('#', '?')).get('code') || undefined;
+    const error = urlObj.searchParams.get('error') || 
+      new URLSearchParams(urlObj.hash.replace('#', '?')).get('error') || undefined;
+    const error_description = urlObj.searchParams.get('error_description') || 
+      new URLSearchParams(urlObj.hash.replace('#', '?')).get('error_description') || undefined;
+    return { code, error, error_description };
+  } catch {
+    // Fallback: try to extract from the URL string directly
+    const codeMatch = url.match(/[?&#]code=([^&]*)/);
+    const errorMatch = url.match(/[?&#]error=([^&]*)/);
+    const descMatch = url.match(/[?&#]error_description=([^&]*)/);
+    return {
+      code: codeMatch ? decodeURIComponent(codeMatch[1]) : undefined,
+      error: errorMatch ? decodeURIComponent(errorMatch[1]) : undefined,
+      error_description: descMatch ? decodeURIComponent(descMatch[1]) : undefined,
+    };
+  }
+}
+
+/**
+ * Check if OAuth provider is configured
+ */
+export function isOAuthProviderConfigured(provider: OAuthProvider): boolean {
+  switch (provider) {
+    case 'google':
+      return !!OAUTH_CONFIG.google.clientId;
+    case 'apple':
+      return !!OAUTH_CONFIG.apple.clientId;
+    case 'facebook':
+      return !!OAUTH_CONFIG.facebook.appId;
+    default:
+      return false;
+  }
+}
+
+/**
+ * Get list of configured OAuth providers
+ */
+export function getConfiguredOAuthProviders(): OAuthProvider[] {
+  const providers: OAuthProvider[] = [];
+  
+  if (OAUTH_CONFIG.google.clientId) providers.push('google');
+  if (OAUTH_CONFIG.apple.clientId) providers.push('apple');
+  if (OAUTH_CONFIG.facebook.appId) providers.push('facebook');
+  
+  return providers;
 }
 
 /**

@@ -188,13 +188,22 @@ function DeepLinkHandler() {
 
         // Check if it's auth callback
         if (path === 'auth/callback' || path?.includes('auth/callback')) {
-          const { access_token, refresh_token, type, error, error_description } = (queryParams || {}) as {
+          const { access_token, refresh_token, type, error, error_description, code } = (queryParams || {}) as {
             access_token?: string;
             refresh_token?: string;
             type?: string;
             error?: string;
             error_description?: string;
+            code?: string;
           };
+
+          // If this is an OAuth callback (has 'code' parameter), 
+          // the Linking listener in AuthService will handle it
+          // Just return and don't interfere
+          if (code && !type) {
+            console.log('📱 OAuth callback detected - handled by AuthService');
+            return;
+          }
 
           // Handle errors from email verification
           if (error) {
