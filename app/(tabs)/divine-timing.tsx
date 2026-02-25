@@ -11,6 +11,8 @@
  * PREMIUM: AI Guidance, Personalized recommendations, Advanced analysis
  */
 
+import { AdBanner } from '@/components/ads';
+import { useAds } from '@/contexts/AdContext';
 import { AdvancedAnalysisCard } from '@/components/divine-timing/AdvancedAnalysisCard';
 import { AdvancedDivineTimingGuidanceCard } from '@/components/divine-timing/AdvancedDivineTimingGuidanceCard';
 import { DivineTimingCard } from '@/components/divine-timing/DivineTimingCard';
@@ -115,6 +117,7 @@ export default function DivineTimingScreen() {
   const colors = Colors[colorScheme];
   const { profile } = useProfile();
   const { language, t } = useLanguage();
+  const { recordCalculation, showInterstitialIfReady } = useAds();
 
   const userAbjad: UserAbjadResult =
     getUserAbjadResultFromProfile(profile) ?? PLACEHOLDER_USER_ABJAD;
@@ -257,6 +260,10 @@ export default function DivineTimingScreen() {
       }
       
       setReflection(verseReflection);
+
+      // Show interstitial ad after computing timing
+      recordCalculation();
+      showInterstitialIfReady();
     } finally {
       setLoading(false);
     }
@@ -778,6 +785,8 @@ export default function DivineTimingScreen() {
           </>
         )}
         
+        <AdBanner />
+
         {/* Bottom Padding */}
         <View style={{ height: 40 }} />
       </ScrollView>

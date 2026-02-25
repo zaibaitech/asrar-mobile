@@ -11,6 +11,7 @@
  * interacts with USER'S personal nature
  */
 
+import { AdBanner } from '@/components/ads';
 import CollapsibleSection from '@/components/common/CollapsibleSection';
 import CollapsibleEducationalSection from '@/components/timing/CollapsibleEducationalSection';
 import { DailyPlanetaryAnalysisDisplay } from '@/components/timing/DailyPlanetaryAnalysisDisplay';
@@ -910,6 +911,9 @@ export default function DailyGuidanceDetailsScreen() {
               {t('home.dailyGuidanceDetails.disclaimer')}
             </Text>
           </View>
+
+          <AdBanner />
+          <View style={{ height: 16 }} />
         </ScrollView>
       </LinearGradient>
     </SafeAreaView>

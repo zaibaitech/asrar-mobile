@@ -1,3 +1,4 @@
+import { AdBanner } from '@/components/ads';
 import { ConstellationMap } from '@/components/manazil/ConstellationMap';
 import { ElementalSigil } from '@/components/manazil/ElementalSigil';
 import { LunarPhaseIndicator } from '@/components/manazil/LunarPhaseIndicator';
@@ -1194,6 +1195,7 @@ export default function ManazilScreen() {
             <Text style={styles.timingGuidanceNote}>{t('manazilScreen.timingGuidanceNote')}</Text>
           </View>
 
+          <AdBanner />
           <View style={{ height: 24 }} />
         </ScrollView>
       </LinearGradient>

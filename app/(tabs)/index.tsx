@@ -21,6 +21,7 @@
  * - Optimized animations
  */
 
+import { AdBanner } from '@/components/ads';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -650,7 +651,9 @@ export default function HomeScreen() {
    * List footer with spacing for safe area
    */
   const ListFooterComponent = useMemo(() => (
-    <View style={{ height: Spacing.xxxl + insets.bottom }} />
+    <View style={{ paddingBottom: Spacing.xxxl + insets.bottom }}>
+      <AdBanner />
+    </View>
   ), [insets.bottom]);
 
   /**

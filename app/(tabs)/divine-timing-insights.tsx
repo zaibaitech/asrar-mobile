@@ -11,6 +11,7 @@
  * - Recommendations
  */
 
+import { AdBanner } from '@/components/ads';
 import { WeeklyHeatmap } from '@/components/divine-timing/WeeklyHeatmap';
 import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -469,6 +470,8 @@ export default function DivineTimingInsightsScreen() {
           </View>
         )}
         
+        <AdBanner />
+
         {/* Bottom Padding */}
         <View style={{ height: 40 }} />
       </ScrollView>

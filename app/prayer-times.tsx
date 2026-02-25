@@ -8,6 +8,7 @@
  * - Minimal initial load time
  */
 
+import { AdBanner } from '@/components/ads';
 import { getBestLocation } from '@/services/LocationCacheService';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -469,6 +470,7 @@ export default function PrayerTimesScreen() {
           <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
         </TouchableOpacity>
 
+        <AdBanner />
         <View style={{ height: 40 }} />
       </ScrollView>
       </View>

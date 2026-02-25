@@ -1,3 +1,4 @@
+import { AdBanner } from '@/components/ads';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -89,7 +90,9 @@ export default function TabTwoScreen() {
   );
 
   const ListFooterComponent = () => (
-    <View style={{ height: Spacing.xxxl + insets.bottom }} />
+    <View style={{ paddingBottom: Spacing.xxxl + insets.bottom }}>
+      <AdBanner />
+    </View>
   );
 
   const keyExtractor = useCallback((item: ModuleCardProps) => item.title, []);

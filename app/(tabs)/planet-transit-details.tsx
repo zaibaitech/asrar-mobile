@@ -1,3 +1,4 @@
+import { AdBanner } from '@/components/ads';
 import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -4860,6 +4861,9 @@ export default function PlanetTransitDetailsScreen() {
           <Ionicons name="information-circle" size={14} color={DarkTheme.textMuted} />
           <Text style={styles.disclaimerText}>{t('home.planetTransitDetails.disclaimer')}</Text>
         </View>
+
+        <AdBanner />
+        <View style={{ height: 16 }} />
       </ScrollView>
     </SafeAreaView>
   );

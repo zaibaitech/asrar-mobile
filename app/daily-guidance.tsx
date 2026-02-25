@@ -14,6 +14,7 @@
  * - Classical wisdom
  */
 
+import { AdBanner } from '@/components/ads';
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -436,6 +437,8 @@ export default function DailyGuidanceScreen() {
           <Text style={styles.disclaimerText}>{t('momentDetail.disclaimer')}</Text>
         </View>
         
+        <AdBanner />
+
         {/* Bottom Padding */}
         <View style={{ height: 40 }} />
       </ScrollView>

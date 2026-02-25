@@ -19,6 +19,7 @@
 
 import { SimpleSlider } from '@/components/SimpleSlider';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { useAds } from '@/contexts/AdContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { loadUserTimingProfile, saveCheckIn as saveEnhancedCheckIn } from '@/services/CheckInStorage';
@@ -101,6 +102,7 @@ function getElementEmoji(element?: string): string {
 export default function DailyCheckInV2Screen() {
   const { t } = useLanguage();
   const { profile } = useProfile();
+  const { recordCalculation, showInterstitialIfReady } = useAds();
   
   // State
   const [detailsExpanded, setDetailsExpanded] = useState(false);
@@ -210,6 +212,10 @@ export default function DailyCheckInV2Screen() {
       await saveEnhancedCheckIn(checkInEntry);
       
       setCompleted(true);
+
+      // Show interstitial ad after ritual completion
+      recordCalculation();
+      showInterstitialIfReady();
       
       // Auto-close after success
       setTimeout(() => {

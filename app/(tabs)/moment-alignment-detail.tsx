@@ -8,6 +8,7 @@
  * PREMIUM: What actions are favored now, What to avoid, Suggested dhikr, Deeper guidance
  */
 
+import { AdBanner } from '@/components/ads';
 import CollapsibleSection from '@/components/common/CollapsibleSection';
 import { MomentAnalysisCard } from '@/components/momentAlignment/MomentAnalysisCard';
 import { MomentGuidanceCard } from '@/components/momentAlignment/MomentGuidanceCard';
@@ -1163,6 +1164,9 @@ export default function MomentAlignmentDetailScreen() {
           <Ionicons name="shield-checkmark-outline" size={16} color={DarkTheme.textTertiary} />
           <Text style={styles.disclaimerText}>{t('momentDetail.disclaimer')}</Text>
         </View>
+
+        <AdBanner />
+        <View style={{ height: 16 }} />
       </ScrollView>
     </SafeAreaView>
   );
