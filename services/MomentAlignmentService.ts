@@ -439,7 +439,7 @@ function computeAlignmentStatus(
 export async function getMomentAlignment(
   profile?: UserProfile,
   now: Date = new Date(),
-  options?: { location?: { latitude: number; longitude: number }; method?: CalculationMethod }
+  options?: { location?: { latitude: number; longitude: number }; method?: CalculationMethod; lightweight?: boolean }
 ): Promise<MomentAlignment | null> {
   // Check if user has a name
   const userName = profile?.nameAr || profile?.nameLatin;
@@ -494,10 +494,11 @@ export async function getMomentAlignment(
   // TIER 1: OBJECTIVE COSMIC QUALITY
   // ========================================
   // Analyze cosmic conditions independent of user
+  // Skip in lightweight mode (home screen widget) — not needed for badge/element display
   let cosmicQuality: CosmicQuality | undefined;
   let hourRulerCondition: PlanetaryCondition | undefined;
   
-  if (location?.latitude != null && location?.longitude != null) {
+  if (!options?.lightweight && location?.latitude != null && location?.longitude != null) {
     try {
       cosmicQuality = await analyzeCosmicQuality(now, {
         latitude: location.latitude,

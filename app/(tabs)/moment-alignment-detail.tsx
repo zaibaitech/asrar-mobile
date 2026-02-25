@@ -252,8 +252,9 @@ export default function MomentAlignmentDetailScreen() {
   // Track whether we've loaded alignment with location data
   const hasLoadedWithLocationRef = useRef(false);
 
-  const loadAlignment = useCallback(async (options?: { silent?: boolean }) => {
-    const hasLocation = !!coords;
+  const loadAlignment = useCallback(async (options?: { silent?: boolean; overrideCoords?: { latitude: number; longitude: number } }) => {
+    const effectiveCoords = options?.overrideCoords ?? coords;
+    const hasLocation = !!effectiveCoords;
     
     // If already loaded with location and no location now, skip (avoid downgrade)
     // If location available now, always reload to get proper hourRulerCondition
@@ -271,7 +272,7 @@ export default function MomentAlignmentDetailScreen() {
       const result = await getMomentAlignment(
         profile,
         new Date(),
-        coords ? { location: coords } : undefined
+        effectiveCoords ? { location: effectiveCoords } : undefined
       );
       setAlignment(result);
       if (hasLocation) {
@@ -298,18 +299,29 @@ export default function MomentAlignmentDetailScreen() {
     }
   }, []);
 
+  // On mount: load lightweight alignment immediately (no location), then upgrade
   useEffect(() => {
+    // 1. Load alignment immediately without location (fast — no cosmic quality call)
+    (async () => {
+      alignmentInFlightRef.current = true;
+      setLoading(true);
+      try {
+        const result = await getMomentAlignment(profile, new Date(), { lightweight: true });
+        setAlignment(result);
+      } finally {
+        alignmentInFlightRef.current = false;
+        setLoading(false);
+      }
+    })();
+    // 2. In parallel, start loading location + prayer times
     void loadPrayerTimes();
-  }, [loadPrayerTimes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  useEffect(() => {
-    void loadAlignment();
-  }, [loadAlignment]);
-
-  // Explicitly reload when coords become available (ensures hourRulerCondition is populated)
+  // When coords arrive, reload with full analysis (silent — content already on screen)
   useEffect(() => {
     if (coords && !hasLoadedWithLocationRef.current) {
-      void loadAlignment({ silent: true });
+      void loadAlignment({ silent: true, overrideCoords: coords });
     }
   }, [coords, loadAlignment]);
 

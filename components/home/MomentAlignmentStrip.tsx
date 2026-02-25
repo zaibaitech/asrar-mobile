@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import {
     Borders,
@@ -100,9 +100,18 @@ export function MomentAlignmentStrip({
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.loadingText}>{t('home.tapToViewDetails') || 'Tap to view details'}</Text>
-      </View>
+      <Pressable
+        style={styles.container}
+        onPress={handlePress}
+        android_ripple={{ color: 'rgba(139, 115, 85, 0.2)', borderless: false }}
+      >
+        <View style={styles.loadingRow}>
+          <ActivityIndicator size="small" color="#8B7355" />
+          <Text style={styles.loadingText}>
+            {t('home.cards.momentAlignment.title')}
+          </Text>
+        </View>
+      </Pressable>
     );
   }
 
@@ -231,6 +240,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.lg,
     gap: Spacing.md,
+  },
+  loadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: Spacing.sm,
   },
   loadingText: {
     fontSize: Typography.caption,

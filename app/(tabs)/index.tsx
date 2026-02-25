@@ -274,8 +274,8 @@ export default function HomeScreen() {
       currentProfile,
       new Date(),
       typeof lat === 'number' && typeof lon === 'number'
-        ? { location: { latitude: lat, longitude: lon } }
-        : undefined
+        ? { location: { latitude: lat, longitude: lon }, lightweight: true }
+        : { lightweight: true }
     );
     setMomentAlignment(alignment);
   }, [prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude]);
