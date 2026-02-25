@@ -12,7 +12,6 @@
  */
 
 import { AdBanner } from '@/components/ads';
-import { useAds } from '@/contexts/AdContext';
 import { AdvancedAnalysisCard } from '@/components/divine-timing/AdvancedAnalysisCard';
 import { AdvancedDivineTimingGuidanceCard } from '@/components/divine-timing/AdvancedDivineTimingGuidanceCard';
 import { DivineTimingCard } from '@/components/divine-timing/DivineTimingCard';
@@ -22,6 +21,7 @@ import { ManualVerseSelector } from '@/components/divine-timing/ManualVerseSelec
 import { QuranReflectionCard } from '@/components/divine-timing/QuranReflectionCard';
 import { PremiumSection } from '@/components/subscription/PremiumSection';
 import Colors from '@/constants/Colors';
+import { useAds } from '@/contexts/AdContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import {

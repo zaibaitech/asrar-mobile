@@ -103,107 +103,12 @@ export function PremiumSection({
   compact = false,
   ctaText,
 }: PremiumSectionProps) {
-  const { canAccess, showPaywall } = usePremiumFeature(featureId);
-  const { language } = useLanguage();
-  
-  const isRTL = language === 'ar';
-  const copy = PREMIUM_COPY[language] || PREMIUM_COPY.en;
-
-  // If user has access, show the actual content
-  if (canAccess) {
-    return <>{children}</>;
-  }
-
-  // Show locked state with preview and upgrade prompt
-  if (compact) {
-    return (
-      <TouchableOpacity
-        style={[styles.compactContainer, style]}
-        onPress={showPaywall}
-        activeOpacity={0.8}
-      >
-        <LinearGradient
-          colors={['rgba(139,92,246,0.15)', 'rgba(99,102,241,0.08)']}
-          style={StyleSheet.absoluteFillObject}
-        />
-        <View style={[styles.compactContent, isRTL && styles.contentRTL]}>
-          <View style={styles.compactIconContainer}>
-            <Text style={styles.compactIcon}>{icon}</Text>
-            <View style={styles.lockBadge}>
-              <Ionicons name="sparkles" size={10} color="#FFF" />
-            </View>
-          </View>
-          <View style={styles.compactTextContainer}>
-            <Text style={[styles.compactTitle, isRTL && styles.rtlText]} numberOfLines={1}>
-              {title}
-            </Text>
-            <Text style={[styles.compactCta, isRTL && styles.rtlText]}>
-              {ctaText || copy.ctaCompact} →
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  }
-
-  // Full card with preview
-  return (
-    <View style={[styles.container, style]}>
-      <LinearGradient
-        colors={['rgba(139,92,246,0.12)', 'rgba(99,102,241,0.06)']}
-        style={StyleSheet.absoluteFillObject}
-      />
-      
-      {/* Preview Content (blurred) */}
-      {previewContent && (
-        <View style={styles.previewContainer}>
-          <View style={styles.previewBlur}>
-            {previewContent}
-          </View>
-          <View style={styles.previewOverlay} />
-        </View>
-      )}
-      
-      {/* Upgrade Card */}
-      <View style={styles.upgradeCard}>
-        <View style={[styles.upgradeHeader, isRTL && styles.contentRTL]}>
-          <View style={styles.iconContainer}>
-            <Text style={styles.icon}>{icon}</Text>
-            <View style={styles.premiumBadge}>
-              <Ionicons name="star" size={10} color="#FFF" />
-            </View>
-          </View>
-          <View style={styles.textContainer}>
-            <Text style={[styles.title, isRTL && styles.rtlText]}>
-              {title}
-            </Text>
-            <Text style={[styles.description, isRTL && styles.rtlText]}>
-              {description || copy.description}
-            </Text>
-          </View>
-        </View>
-        
-        <TouchableOpacity
-          style={styles.upgradeButton}
-          onPress={showPaywall}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={['#8B5CF6', '#6366F1']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.upgradeButtonGradient}
-          >
-            <Ionicons name="sparkles" size={16} color="#FFF" style={{ marginRight: 6 }} />
-            <Text style={styles.upgradeButtonText}>
-              {ctaText || copy.cta}
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  // V1: All content is free (ad-supported). Premium gates disabled.
+  // To re-enable for V2, remove this early return and uncomment the
+  // canAccess/showPaywall logic that was here previously.
+  return <>{children}</>;
 }
+
 
 // ============================================================================
 // INLINE UPGRADE BANNER
@@ -226,36 +131,9 @@ export function InlineUpgradeBanner({
   icon = '✨',
   style,
 }: InlineUpgradeBannerProps) {
-  const { canAccess, showPaywall } = usePremiumFeature(featureId);
-  const { language } = useLanguage();
-  
-  if (canAccess) return null;
-  
-  const isRTL = language === 'ar';
-  const copy = PREMIUM_COPY[language] || PREMIUM_COPY.en;
-
-  return (
-    <TouchableOpacity
-      style={[styles.inlineBanner, style]}
-      onPress={showPaywall}
-      activeOpacity={0.8}
-    >
-      <View style={[styles.inlineBannerContent, isRTL && styles.contentRTL]}>
-        <Text style={styles.inlineBannerIcon}>{icon}</Text>
-        <Text style={[styles.inlineBannerText, isRTL && styles.rtlText]}>
-          {message}
-        </Text>
-        <View style={styles.inlineBannerCta}>
-          <Text style={styles.inlineBannerCtaText}>{copy.ctaCompact}</Text>
-          <Ionicons 
-            name={isRTL ? "chevron-back" : "chevron-forward"} 
-            size={14} 
-            color="#8B5CF6" 
-          />
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+  // V1: All content is free (ad-supported). Premium gates disabled.
+  // To re-enable for V2, restore the canAccess/showPaywall logic.
+  return null;
 }
 
 // ============================================================================

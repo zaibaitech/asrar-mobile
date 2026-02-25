@@ -5,17 +5,17 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import type { Element } from '@/services/MomentAlignmentService';
 import {
-  calculatePlanetaryHours,
-  getPlanetaryDayBoundariesForNow,
-  type Planet,
-  type PlanetaryHourData
+    calculatePlanetaryHours,
+    getPlanetaryDayBoundariesForNow,
+    type Planet,
+    type PlanetaryHourData
 } from '@/services/PlanetaryHoursService';
 import {
-  getDegreeStageColor,
-  getDegreeStageIcon,
-  getInfluenceTypeColor,
-  getPersonalizedInfluence,
-  type PersonalizedInfluence
+    getDegreeStageColor,
+    getDegreeStageIcon,
+    getInfluenceTypeColor,
+    getPersonalizedInfluence,
+    type PersonalizedInfluence
 } from '@/services/PlanetaryInfluenceService';
 import { calculateEnhancedPlanetaryPower } from '@/services/PlanetaryStrengthService';
 import { ZODIAC_DATA, type PlanetTransitInfo, type ZodiacSign as ZodiacKey } from '@/services/PlanetTransitService';
@@ -31,19 +31,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Animated,
-  AppState,
-  LayoutAnimation,
-  Platform,
-  RefreshControl,
-  SafeAreaView,
-  ScrollView,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
+    Animated,
+    AppState,
+    LayoutAnimation,
+    Platform,
+    RefreshControl,
+    SafeAreaView,
+    ScrollView,
+    StyleProp,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
