@@ -41,7 +41,11 @@ const prayerTimesCache = new Map<string, PrayerTimes>();
  * Convert time string (HH:MM) to Date object
  */
 function parseTimeString(timeStr: string, date: Date = new Date()): Date {
-  const [hours, minutes] = timeStr.split(':').map(Number);
+  // Strip timezone suffix e.g. "12:45 (EET)" → "12:45"
+  const cleaned = timeStr.replace(/\s*\([^)]*\)\s*/, '').trim();
+  const parts = cleaned.split(':');
+  const hours = parseInt(parts[0], 10) || 0;
+  const minutes = parseInt(parts[1], 10) || 0;
   const result = new Date(date);
   result.setHours(hours, minutes, 0, 0);
   return result;
@@ -280,6 +284,7 @@ export async function isWithinPrayerWindow(
  * Format prayer time as human-readable string
  */
 export function formatPrayerTime(date: Date): string {
+  if (!date || isNaN(date.getTime())) return '—';
   return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',

@@ -18,18 +18,12 @@
  */
 
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { PremiumFeatureId, usePremiumFeature } from '@/hooks/usePremiumFeature';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { PremiumFeatureId } from '@/hooks/usePremiumFeature';
 import React from 'react';
 import {
     StyleProp,
     StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    ViewStyle,
+    ViewStyle
 } from 'react-native';
 
 // ============================================================================
