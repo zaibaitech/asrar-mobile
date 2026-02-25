@@ -549,16 +549,16 @@ export default function MomentAlignmentDetailScreen() {
   const getDignityLabel = useCallback((dignityType?: string) => {
     switch (dignityType) {
       case 'domicile':
-        return t('dignityDomicile');
+        return t('momentDetail.cards.analysis.statuses.dignityDomicile');
       case 'exaltation':
-        return t('dignityExalted');
+        return t('momentDetail.cards.analysis.statuses.dignityExalted');
       case 'detriment':
-        return t('dignityDetriment');
+        return t('momentDetail.cards.analysis.statuses.dignityDetriment');
       case 'fall':
-        return t('dignityFall');
+        return t('momentDetail.cards.analysis.statuses.dignityFall');
       case 'peregrine':
       default:
-        return t('dignityNeutral');
+        return t('momentDetail.cards.analysis.statuses.dignityNeutral');
     }
   }, [t]);
 
