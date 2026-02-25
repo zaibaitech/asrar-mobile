@@ -1,174 +1,117 @@
 /**
- * Animated Splash Screen Component
- * Mobile Implementation - Expo Go 54
- * Enhanced Welcome Screen with Get Started
+ * Animated Splash Screen
+ * ======================
+ * Clean, spiritual auto-dismissing splash.
+ * Gentle fade-in of logo + app name + Bismillah, then auto-fade-out.
+ * No interaction needed — transitions seamlessly into the app.
  */
 
-import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Image, StyleSheet, Text } from 'react-native';
 
 const appLogo = require('../assets/images/logo_1024_transparent.png');
-
-const { width, height } = Dimensions.get('window');
 
 interface AnimatedSplashProps {
   onFinish: () => void;
 }
 
 export function AnimatedSplash({ onFinish }: AnimatedSplashProps) {
-  const { t } = useLanguage();
-  const [showWelcome, setShowWelcome] = useState(false);
-  
-  // Phase 1: Logo animation
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1.5)).current;
-  const logoRotateAnim = useRef(new Animated.Value(0)).current;
-  
-  // Phase 2: Welcome screen
-  const welcomeFadeAnim = useRef(new Animated.Value(0)).current;
-  const buttonSlideAnim = useRef(new Animated.Value(50)).current;
+  const logoFade = useRef(new Animated.Value(0)).current;
+  const logoScale = useRef(new Animated.Value(0.85)).current;
+  const textFade = useRef(new Animated.Value(0)).current;
+  const bismillahFade = useRef(new Animated.Value(0)).current;
+  const containerFade = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     SplashScreen.preventAutoHideAsync();
 
-    // Phase 1: Logo zoom out animation
+    // Stage 1: Logo gently fades in and scales up (0–800ms)
     Animated.parallel([
-      Animated.timing(fadeAnim, {
+      Animated.timing(logoFade, {
         toValue: 1,
-        duration: 600,
+        duration: 800,
         useNativeDriver: true,
       }),
-      Animated.spring(scaleAnim, {
+      Animated.timing(logoScale, {
         toValue: 1,
-        friction: 8,
-        tension: 40,
-        useNativeDriver: true,
-      }),
-      Animated.timing(logoRotateAnim, {
-        toValue: 1,
-        duration: 1200,
+        duration: 900,
         useNativeDriver: true,
       }),
     ]).start();
 
-    // Transition to welcome screen after 1.5s
-    const timer = setTimeout(async () => {
-      await SplashScreen.hideAsync();
-      setShowWelcome(true);
-      
-      // Fade in welcome content
-      Animated.parallel([
-        Animated.timing(welcomeFadeAnim, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-        Animated.spring(buttonSlideAnim, {
-          toValue: 0,
-          friction: 8,
-          tension: 40,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }, 1500);
+    // Stage 2: Bismillah appears (400ms delay)
+    const bismillahTimer = setTimeout(() => {
+      Animated.timing(bismillahFade, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }).start();
+    }, 400);
 
-    return () => clearTimeout(timer);
+    // Stage 3: App name appears (700ms delay)
+    const textTimer = setTimeout(() => {
+      Animated.timing(textFade, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }).start();
+    }, 700);
+
+    // Stage 4: Hide native splash, then auto-dismiss after 2.2s total
+    const dismissTimer = setTimeout(async () => {
+      await SplashScreen.hideAsync();
+
+      // Fade out the entire splash
+      Animated.timing(containerFade, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => {
+        onFinish();
+      });
+    }, 2200);
+
+    return () => {
+      clearTimeout(bismillahTimer);
+      clearTimeout(textTimer);
+      clearTimeout(dismissTimer);
+    };
   }, []);
 
-  const logoRotate = logoRotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
   return (
-    <Animated.View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity: containerFade }]}>
       <LinearGradient
-        colors={['#0f172a', '#1e1b4b', '#1a1625']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        colors={['#0f172a', '#1a1040', '#1a1625']}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
         style={styles.gradient}
       >
-        {!showWelcome ? (
-          // Phase 1: Animated Logo
-          <Animated.View
-            style={{
-              opacity: fadeAnim,
-              transform: [
-                { scale: scaleAnim },
-                { rotate: logoRotate },
-              ],
-            }}
-          >
-            <Image source={appLogo} style={styles.logo} resizeMode="contain" />
-            <Animated.Text
-              style={[
-                styles.appName,
-                {
-                  opacity: fadeAnim,
-                  transform: [{ scale: scaleAnim }],
-                },
-              ]}
-            >
-              <Text style={styles.welcomeTitle}>{t('onboarding.splash.appName')}</Text>
-            </Animated.Text>
-          </Animated.View>
-        ) : (
-          // Phase 2: Welcome Screen
-          <Animated.View style={[styles.welcomeContainer, { opacity: welcomeFadeAnim }]}>
-            <Image source={appLogo} style={styles.welcomeLogo} resizeMode="contain" />
-            
-            <Text style={styles.welcomeTitle}>{t('onboarding.splash.appName')}</Text>
-            <Text style={styles.welcomeSubtitle}>{t('onboarding.splash.subtitle')}</Text>
-            
-            <View style={styles.descriptionContainer}>
-              <Text style={styles.welcomeDescription}>
-                {t('onboarding.splash.description')}
-              </Text>
-              
-              <View style={styles.featuresContainer}>
-                <FeatureItem icon="✨" text={t('onboarding.splash.features.calculator')} />
-                <FeatureItem icon="🌙" text={t('onboarding.splash.features.timing')} />
-                <FeatureItem icon="🔮" text={t('onboarding.splash.features.insights')} />
-              </View>
-            </View>
+        {/* Bismillah — subtle, above the logo */}
+        <Animated.Text style={[styles.bismillah, { opacity: bismillahFade }]}>
+          بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+        </Animated.Text>
 
-            <Animated.View
-              style={{
-                transform: [{ translateY: buttonSlideAnim }],
-                opacity: welcomeFadeAnim,
-              }}
-            >
-              <TouchableOpacity
-                style={styles.getStartedButton}
-                onPress={onFinish}
-                activeOpacity={0.8}
-              >
-                <LinearGradient
-                  colors={['#8B5CF6', '#7C3AED']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.buttonGradient}
-                >
-                  <Text style={styles.buttonText}>{t('onboarding.splash.getStarted')}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </Animated.View>
-          </Animated.View>
-        )}
+        {/* Logo — gentle fade + scale */}
+        <Animated.View
+          style={{
+            opacity: logoFade,
+            transform: [{ scale: logoScale }],
+          }}
+        >
+          <Image source={appLogo} style={styles.logo} resizeMode="contain" />
+        </Animated.View>
+
+        {/* App name + tagline */}
+        <Animated.View style={[styles.textContainer, { opacity: textFade }]}>
+          <Text style={styles.appName}>Asrariya</Text>
+          <Text style={styles.tagline}>أسراريّة</Text>
+        </Animated.View>
       </LinearGradient>
     </Animated.View>
   );
 }
-
-const FeatureItem = ({ icon, text }: { icon: string; text: string }) => (
-  <View style={styles.featureItem}>
-    <Text style={styles.featureIcon}>{icon}</Text>
-    <Text style={styles.featureText}>{text}</Text>
-  </View>
-);
 
 const styles = StyleSheet.create({
   container: {
@@ -183,110 +126,37 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    paddingHorizontal: 24,
   },
-  // Phase 1: Logo Animation
+  bismillah: {
+    fontSize: 18,
+    color: 'rgba(196, 181, 253, 0.7)',
+    fontWeight: '400',
+    letterSpacing: 0.5,
+    marginBottom: 32,
+    textAlign: 'center',
+  },
   logo: {
-    width: 140,
-    height: 140,
-    alignSelf: 'center',
-    marginBottom: 20,
+    width: 120,
+    height: 120,
+    marginBottom: 24,
+  },
+  textContainer: {
+    alignItems: 'center',
   },
   appName: {
-    fontSize: 48,
-    fontWeight: '800',
+    fontSize: 38,
+    fontWeight: '700',
     color: '#ffffff',
     letterSpacing: 2,
     textAlign: 'center',
-    textShadowColor: 'rgba(139, 92, 246, 0.5)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 10,
+    marginBottom: 6,
   },
-  // Phase 2: Welcome Screen
-  welcomeContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    paddingHorizontal: 24,
-  },
-  welcomeLogo: {
-    width: 100,
-    height: 100,
-    marginBottom: 16,
-  },
-  welcomeTitle: {
-    fontSize: 42,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 1.5,
-    marginBottom: 8,
-    textShadowColor: 'rgba(139, 92, 246, 0.4)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
-  },
-  welcomeSubtitle: {
-    fontSize: 16,
-    color: '#c4b5fd',
-    letterSpacing: 1.2,
-    marginBottom: 40,
+  tagline: {
+    fontSize: 22,
+    color: 'rgba(196, 181, 253, 0.8)',
     fontWeight: '500',
-  },
-  descriptionContainer: {
-    width: '100%',
-    marginBottom: 40,
-  },
-  welcomeDescription: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.85)',
+    letterSpacing: 1,
     textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 32,
-    paddingHorizontal: 8,
-  },
-  featuresContainer: {
-    width: '100%',
-    gap: 16,
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
-  },
-  featureIcon: {
-    fontSize: 24,
-    marginRight: 12,
-  },
-  featureText: {
-    fontSize: 15,
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontWeight: '600',
-    flex: 1,
-  },
-  getStartedButton: {
-    width: width - 48,
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#8B5CF6',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  buttonGradient: {
-    paddingVertical: 18,
-    paddingHorizontal: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#ffffff',
-    letterSpacing: 0.5,
   },
 });
