@@ -103,15 +103,16 @@ const getModules = (t: any): (Omit<ModuleCardProps, 'onPress'> & { id: string })
     element: 'air',
     comingSoon: false,
   },
-  {
-    id: 'divineTiming',
-    title: t('modules.divineTiming.title'),
-    titleArabic: 'التوقيت الإلهي',
-    description: t('modules.divineTiming.description'),
-    icon: '🕰️',
-    element: 'fire',
-    comingSoon: false,
-  },
+  // Divine Timing module hidden for V1 launch
+  // {
+  //   id: 'divineTiming',
+  //   title: t('modules.divineTiming.title'),
+  //   titleArabic: 'التوقيت الإلهي',
+  //   description: t('modules.divineTiming.description'),
+  //   icon: '🕰️',
+  //   element: 'fire',
+  //   comingSoon: false,
+  // },
   {
     id: 'prayerTimes',
     title: t('modules.prayerTimes.title'),

@@ -29,14 +29,15 @@ const GUIDANCE_MODULES: ModuleCardProps[] = [
     element: 'water',
     comingSoon: false,
   },
-  {
-    title: 'Divine Timing',
-    titleArabic: 'التوقيت الإلهي',
-    description: 'Spiritual reflection on timing quality and Qur\'an guidance',
-    icon: '🕰️',
-    element: 'fire',
-    comingSoon: false,
-  },
+  // Divine Timing hidden for V1 launch
+  // {
+  //   title: 'Divine Timing',
+  //   titleArabic: 'التوقيت الإلهي',
+  //   description: 'Spiritual reflection on timing quality and Qur\'an guidance',
+  //   icon: '🕰️',
+  //   element: 'fire',
+  //   comingSoon: false,
+  // },
   {
     title: 'Guided Istikhārah',
     titleArabic: 'الاستخارة الموجهة',

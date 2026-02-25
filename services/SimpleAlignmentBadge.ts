@@ -17,8 +17,8 @@
  * @module SimpleAlignmentBadge
  */
 
-import type { Planet } from './PlanetaryHoursService';
 import { getCachedEphemerisData } from './EphemerisDataCache';
+import type { Planet } from './PlanetaryHoursService';
 
 // ============================================================================
 // TYPES
