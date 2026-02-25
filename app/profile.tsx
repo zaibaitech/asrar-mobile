@@ -29,6 +29,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
+    Linking,
     Modal,
     Platform,
     ScrollView,
@@ -1093,7 +1094,7 @@ export default function ProfileScreen() {
           <View style={styles.legalLinks}>
             <TouchableOpacity 
               style={styles.legalLink}
-              onPress={() => router.push('https://zaibaitech.github.io/asrar-mobile/privacy.html' as any)}
+              onPress={() => Linking.openURL('https://zaibaitech.github.io/asrar-mobile/privacy.html')}
             >
               <Ionicons name="document-text-outline" size={18} color={DarkTheme.textSecondary} />
               <Text style={styles.legalLinkText}>{t('profile.privacyPolicy')}</Text>
@@ -1102,7 +1103,7 @@ export default function ProfileScreen() {
             
             <TouchableOpacity 
               style={styles.legalLink}
-              onPress={() => router.push('https://zaibaitech.github.io/asrar-mobile/terms.html' as any)}
+              onPress={() => Linking.openURL('https://zaibaitech.github.io/asrar-mobile/terms.html')}
             >
               <Ionicons name="document-text-outline" size={18} color={DarkTheme.textSecondary} />
               <Text style={styles.legalLinkText}>{t('profile.termsOfService')}</Text>
