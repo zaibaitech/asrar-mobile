@@ -4,6 +4,7 @@
  * Integrated with tab navigation
  */
 
+import { useAds } from '@/contexts/AdContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -26,6 +27,7 @@ import { CompatibilityType } from '../../services/compatibility/types';
 
 export default function CompatibilityTabScreen() {
   const { language, t } = useLanguage();
+  const { recordCalculation, showInterstitialIfReady } = useAds();
   const [selectedType, setSelectedType] = useState<CompatibilityType>('person-person');
   const [result, setResult] = useState<UniversalCompatibilityResult | null>(null);
   const [activeTab, setActiveTab] = useState<'input' | 'results'>('input');
@@ -34,6 +36,9 @@ export default function CompatibilityTabScreen() {
   const handleCalculate = (calculationResult: UniversalCompatibilityResult) => {
     setResult(calculationResult);
     setActiveTab('results');
+    // Show interstitial ad (throttled)
+    const shouldShow = recordCalculation();
+    if (shouldShow) showInterstitialIfReady();
   };
 
   const handleReset = () => {

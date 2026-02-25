@@ -42,16 +42,9 @@ const initNotifications = async () => {
     Notifications = notifModule;
     SchedulableTriggerInputTypes = notifModule.SchedulableTriggerInputTypes;
     
-    // Configure notification handler for local notifications
-    Notifications.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-        shouldShowBanner: true,
-        shouldShowList: true,
-      }),
-    });
+    // NOTE: Do NOT call setNotificationHandler here.
+    // The global handler is set once by NotificationService.initializeNotifications()
+    // to avoid a conflict where the last-initialized service silently overrides the other.
 
     // Setup Android notification channels (required for production builds)
     if (Platform.OS === 'android' && !channelsInitialized) {

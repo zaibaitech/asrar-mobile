@@ -3,6 +3,7 @@
  * Professional UI with dynamic theming and simplified explanations
  */
 
+import { AdBanner } from '@/components/ads/AdBanner';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
@@ -261,6 +262,9 @@ function PersonPersonResultView({ result, language }: { result: PersonPersonComp
             />
           </PremiumSection>
         )}
+
+        {/* Ad Banner */}
+        <AdBanner />
       </ScrollView>
     </View>
   );
@@ -295,68 +299,82 @@ function OverviewTab({ rc, theme, language, getQualityGradient, relationshipCont
   // Get context-aware glimpse key
   const glimpseKey = getSoulGlimpseKey(soulNumber, relationshipContext as RelationshipContext);
   const glimpseText = safeT(t, glimpseKey, 'Spiritual connection pattern');
+  
+  // Get archetype title
+  const archetypeTitleKey = getArchetypeTitle(soulNumber);
+  const archetypeTitle = safeT(t, archetypeTitleKey, soulArchetype.titleEn);
 
   return (
     <View style={styles.section}>
-      {/* Two KPIs Side by Side */}
-      <View style={styles.twoKpiContainer}>
-        {/* LEFT KPI: Harmony Index */}
-        <View style={styles.kpiCard}>
-          <LinearGradient
-            colors={getQualityGradient(rc.overallScore)}
-            style={styles.kpiGradient}
-          >
-            <Text style={styles.kpiLabel}>
-              {safeT(t, 'compatibility.results.overview.overallCompatibility', 'Overall Compatibility')}
-            </Text>
-            <CompatibilityGauge
-              score={rc.overallScore}
-              label=""
-              color="#fff"
-              size={100}
-            />
-            <Text style={styles.kpiQuality}>
-              {safeT(t, `compatibility.results.enums.quality.${rc.overallQuality}`, rc.overallQuality).toUpperCase()}
-            </Text>
-            <Text style={styles.kpiMicroLabel}>
-              {safeT(t, 'compatibility.results.overview.harmonyDesc', 'Harmony Index')}
-            </Text>
-          </LinearGradient>
-        </View>
-
-        {/* RIGHT KPI: Soul Connection */}
-        <View style={styles.kpiCard}>
-          <View style={styles.soulConnectionKpi}>
-            <Text style={styles.kpiLabel}>
-              {safeT(t, 'compatibility.soul.title', 'Soul Connection')}
-            </Text>
+      {/* HERO: Soul Connection - Full Width Primary KPI */}
+      <View style={styles.soulHeroCard}>
+        <LinearGradient
+          colors={['rgba(99, 102, 241, 0.15)', 'rgba(139, 92, 246, 0.08)']}
+          style={styles.soulHeroGradient}
+        >
+          <Text style={styles.soulHeroLabel}>
+            {safeT(t, 'compatibility.soul.title', 'Soul Connection')}
+          </Text>
+          
+          <View style={styles.soulHeroContent}>
             <SoulConnectionRing 
               value={soulNumber}
-              size={100}
+              size={130}
               activeColor={severityColor}
             />
-            <Text style={[styles.soulConnectionNumber, { color: severityColor }]}>
-              {soulNumber}
-            </Text>
-            <Text style={[styles.soulConnectionMeaning, { color: '#cbd5e1' }]} numberOfLines={2}>
-              {glimpseText}
-            </Text>
-            <View style={styles.independentBadge}>
-              <Text style={styles.independentBadgeText}>
-                {safeT(t, 'compatibility.soul.independentChip', 'Independent metric')}
+            <View style={styles.soulHeroInfo}>
+              <Text style={[styles.soulHeroNumber, { color: severityColor }]}>
+                {soulNumber}
+              </Text>
+              <Text style={styles.soulHeroArchetype}>
+                {archetypeTitle}
+              </Text>
+              <Text style={styles.soulHeroGlimpse} numberOfLines={3}>
+                {glimpseText}
               </Text>
             </View>
           </View>
-        </View>
+          
+          {/* "Learn More" teaser for premium */}
+          <TouchableOpacity 
+            style={[styles.learnMoreButton, { borderColor: `${severityColor}40` }]}
+            onPress={() => {}}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="sparkles" size={14} color={severityColor} />
+            <Text style={[styles.learnMoreText, { color: severityColor }]}>
+              {safeT(t, 'compatibility.soul.learnMore', 'Unlock full Soul Connection analysis')}
+            </Text>
+            <Ionicons name="lock-closed" size={12} color={severityColor} />
+          </TouchableOpacity>
+        </LinearGradient>
       </View>
 
-      {/* Explanation Card */}
-      <View style={styles.explanationCard}>
-        <Ionicons name="information-circle" size={20} color={theme.primary[0]} />
-        <View style={{ flex: 1, marginLeft: 10 }}>
-          <Text style={styles.explanationCardText}>
-            {safeT(t, 'compatibility.results.overview.twoMetricsExplanation', 'Two independent compatibility metrics')}
-          </Text>
+      {/* SECONDARY: Harmony Index - Compact Bar */}
+      <View style={styles.harmonyBarCard}>
+        <View style={styles.harmonyBarContent}>
+          <View style={styles.harmonyBarLeft}>
+            <Text style={styles.harmonyBarLabel}>
+              {safeT(t, 'compatibility.results.overview.harmonyDesc', 'Harmony Index')}
+            </Text>
+            <Text style={styles.harmonyBarQuality}>
+              {safeT(t, `compatibility.results.enums.quality.${rc.overallQuality}`, rc.overallQuality)}
+            </Text>
+          </View>
+          <View style={styles.harmonyBarRight}>
+            <Text style={[styles.harmonyBarScore, { color: getQualityGradient(rc.overallScore)[0] }]}>
+              {rc.overallScore}%
+            </Text>
+          </View>
+        </View>
+        {/* Progress bar */}
+        <View style={styles.harmonyProgressBg}>
+          <LinearGradient
+            colors={getQualityGradient(rc.overallScore)}
+            style={[styles.harmonyProgressFill, { width: `${rc.overallScore}%` as any }]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
         </View>
       </View>
 
@@ -1840,6 +1858,9 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
             </View>
           </PremiumSection>
         )}
+
+        {/* Ad Banner */}
+        <AdBanner />
       </ScrollView>
     </View>
   );
@@ -2290,6 +2311,9 @@ function DivineIntentionResultView({ result, language }: { result: DivineNameInt
             </View>
           </PremiumSection>
         )}
+
+        {/* Ad Banner */}
+        <AdBanner />
       </ScrollView>
     </View>
   );
@@ -3104,7 +3128,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  // Two-KPI Layout Styles
+  // Two-KPI Layout Styles (legacy)
   twoKpiContainer: {
     flexDirection: 'row',
     gap: 12,
@@ -3117,6 +3141,122 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
+  },
+  
+  // ============================================================================
+  // SOUL HERO CARD (Overview - Primary KPI)
+  // ============================================================================
+  soulHeroCard: {
+    marginBottom: 16,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  soulHeroGradient: {
+    padding: 24,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.25)',
+    alignItems: 'center',
+  },
+  soulHeroLabel: {
+    color: '#e0e7ff',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    marginBottom: 16,
+  },
+  soulHeroContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 20,
+    marginBottom: 16,
+  },
+  soulHeroInfo: {
+    flex: 1,
+    gap: 4,
+  },
+  soulHeroNumber: {
+    fontSize: 36,
+    fontWeight: '800',
+  },
+  soulHeroArchetype: {
+    color: '#e0e7ff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  soulHeroGlimpse: {
+    color: '#94a3b8',
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 4,
+  },
+  learnMoreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+  },
+  learnMoreText: {
+    fontSize: 13,
+    fontWeight: '600',
+    flex: 1,
+  },
+  
+  // ============================================================================
+  // HARMONY BAR (Overview - Secondary KPI)
+  // ============================================================================
+  harmonyBarCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  harmonyBarContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  harmonyBarLeft: {
+    flex: 1,
+    gap: 2,
+  },
+  harmonyBarLabel: {
+    color: '#94a3b8',
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  harmonyBarQuality: {
+    color: '#cbd5e1',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  harmonyBarRight: {
+    flexShrink: 0,
+    marginLeft: 12,
+  },
+  harmonyBarScore: {
+    fontSize: 24,
+    fontWeight: '800',
+  },
+  harmonyProgressBg: {
+    height: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  harmonyProgressFill: {
+    height: 6,
+    borderRadius: 3,
   },
   
   // ============================================================================

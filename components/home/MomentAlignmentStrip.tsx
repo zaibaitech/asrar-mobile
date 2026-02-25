@@ -11,8 +11,9 @@ import {
     Spacing,
     Typography,
 } from '@/constants/DarkTheme';
-import { AlignmentStatus, Element, getAlignmentStatusFromPlanet } from '@/services/MomentAlignmentService';
+import { Element } from '@/services/MomentAlignmentService';
 import { PlanetaryHourData } from '@/services/PlanetaryHoursService';
+import { getAlignmentBadge, getAlignmentLabelKey, getRulingPlanetFromBurj } from '@/services/SimpleAlignmentBadge';
 
 interface MomentAlignmentStripProps {
   zahirElement?: Element;
@@ -21,34 +22,9 @@ interface MomentAlignmentStripProps {
   hasProfileName?: boolean;
   t: (key: string) => string;
   planetaryData?: PlanetaryHourData | null;
-  /** @deprecated No longer used - classical planetary ruling is derived from planetaryData */
-  timingScore?: number | null;
+  /** User's zodiac sign index (1–12) for personalized alignment */
+  userBurjIndex?: number | null;
 }
-
-/**
- * Classical planetary ruling badge configuration
- * Based on traditional ʿIlm al-Nujūm categorization
- */
-const CLASSICAL_BADGE_CONFIG: Record<AlignmentStatus, { color: string; bgColor: string; icon: string; labelKey: string }> = {
-  ACT: {
-    color: '#10b981',
-    bgColor: 'rgba(16, 185, 129, 0.15)',
-    icon: '✨',
-    labelKey: 'home.moment.status.act',
-  },
-  MAINTAIN: {
-    color: '#f59e0b',
-    bgColor: 'rgba(245, 158, 11, 0.15)',
-    icon: '○',
-    labelKey: 'home.moment.status.maintain',
-  },
-  HOLD: {
-    color: '#7C3AED',
-    bgColor: 'rgba(124, 58, 237, 0.15)',
-    icon: '⚡',
-    labelKey: 'home.moment.status.hold',
-  },
-};
 
 function getElementLabel(element: Element | undefined, t: (key: string) => string) {
   if (!element) {
@@ -73,18 +49,27 @@ export function MomentAlignmentStrip({
   hasProfileName,
   t,
   planetaryData,
+  userBurjIndex,
 }: MomentAlignmentStripProps) {
   const router = useRouter();
 
-  // Use classical planetary ruling (based on current hour planet)
+  // Simplified alignment badge — single source of truth (SimpleAlignmentBadge)
   const currentPlanet = planetaryData?.currentHour?.planet;
-  const classicalStatus: AlignmentStatus | undefined = currentPlanet 
-    ? getAlignmentStatusFromPlanet(currentPlanet) 
-    : undefined;
-  const badgeConfig = classicalStatus ? CLASSICAL_BADGE_CONFIG[classicalStatus] : undefined;
-  const badgeLabel = classicalStatus && badgeConfig
-    ? t(badgeConfig.labelKey) || classicalStatus
-    : undefined;
+
+  const { badgeColor, badgeBg, badgeIcon, badgeLabel } = React.useMemo(() => {
+    if (currentPlanet) {
+      const userRuler = userBurjIndex ? getRulingPlanetFromBurj(userBurjIndex) : undefined;
+      const badge = getAlignmentBadge(currentPlanet, userRuler);
+      const labelKey = getAlignmentLabelKey(badge.tier);
+      return {
+        badgeColor: badge.color,
+        badgeBg: badge.bgColor,
+        badgeIcon: badge.icon,
+        badgeLabel: t(labelKey) || badge.label,
+      };
+    }
+    return { badgeColor: undefined, badgeBg: undefined, badgeIcon: undefined, badgeLabel: undefined };
+  }, [currentPlanet, userBurjIndex, t]);
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -173,11 +158,11 @@ export function MomentAlignmentStrip({
             {t('home.cards.momentAlignment.title')}
           </Text>
         </View>
-        {classicalStatus && badgeConfig && badgeLabel && (
-          <View style={[styles.statusChip, { borderColor: badgeConfig.color, backgroundColor: badgeConfig.bgColor }]}>
-            <View style={[styles.statusDot, { backgroundColor: badgeConfig.color }]} />
-            <Text style={[styles.statusLabel, { color: badgeConfig.color }]} numberOfLines={1}>
-              {badgeConfig.icon} {badgeLabel}
+        {badgeColor && badgeLabel && (
+          <View style={[styles.statusChip, { borderColor: badgeColor, backgroundColor: badgeBg }]}>
+            <View style={[styles.statusDot, { backgroundColor: badgeColor }]} />
+            <Text style={[styles.statusLabel, { color: badgeColor }]} numberOfLines={1}>
+              {badgeIcon} {badgeLabel}
             </Text>
           </View>
         )}

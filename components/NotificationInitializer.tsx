@@ -53,6 +53,19 @@ export function NotificationInitializer() {
 
       console.log('✅ Notification permissions granted');
 
+      // Set the global notification handler ONCE here.
+      // This is the single source of truth — neither NotificationService nor
+      // AdhanNotificationService should set it again to avoid conflicts.
+      Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge: true,
+          shouldShowBanner: true,
+          shouldShowList: true,
+        }),
+      });
+
       // Clear ALL old scheduled notifications to remove stale Expo Go notifications
       // This ensures tapping notifications opens the APK, not Expo Go
       try {

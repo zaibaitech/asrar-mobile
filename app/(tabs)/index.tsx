@@ -30,7 +30,6 @@ import { FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 're
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RealTimeDailyGuidance } from '../../components/divine-timing/RealTimeDailyGuidance';
 import { ModuleCard } from '../../components/home';
-import { ManazilWidget } from '../../components/home/ManazilWidget';
 import { MomentAlignmentStrip } from '../../components/home/MomentAlignmentStrip';
 import { RightStackWidgets } from '../../components/home/RightStackWidgets';
 import { RotatingCardContent } from '../../components/home/RotatingCardContent';
@@ -44,7 +43,6 @@ import {
     getNextPrayer,
     getTimeUntilPrayer
 } from '../../services/api/prayerTimes';
-import { quickTimingCheck } from '../../services/AsrariyaTimingEngine';
 import { DailyGuidance, getDailyGuidance } from '../../services/DailyGuidanceService';
 import { getTodayBlessing } from '../../services/DayBlessingService';
 import { getBestLocation } from '../../services/LocationCacheService';
@@ -140,24 +138,25 @@ const getModules = (t: any): (Omit<ModuleCardProps, 'onPress'> & { id: string })
     element: 'earth',
     comingSoon: false,
   },
-  {
-    id: 'dhikrCounter',
-    title: t('modules.dhikrCounter.title'),
-    titleArabic: 'عداد الأذكار',
-    description: t('modules.dhikrCounter.description'),
-    icon: '📿',
-    element: 'air',
-    comingSoon: false,
-  },
-  {
-    id: 'zikr',
-    title: t('modules.zikr.title'),
-    titleArabic: 'مركز الأذكار',
-    description: t('modules.zikr.description'),
-    icon: '🤲',
-    element: 'spirit',
-    comingSoon: false,
-  },
+  // Dhikr modules hidden temporarily for V1 launch
+  // {
+  //   id: 'dhikrCounter',
+  //   title: t('modules.dhikrCounter.title'),
+  //   titleArabic: 'عداد الأذكار',
+  //   description: t('modules.dhikrCounter.description'),
+  //   icon: '📿',
+  //   element: 'air',
+  //   comingSoon: false,
+  // },
+  // {
+  //   id: 'zikr',
+  //   title: t('modules.zikr.title'),
+  //   titleArabic: 'مركز الأذكار',
+  //   description: t('modules.zikr.description'),
+  //   icon: '🤲',
+  //   element: 'spirit',
+  //   comingSoon: false,
+  // },
 ];
 
 export default function HomeScreen() {
@@ -182,7 +181,6 @@ export default function HomeScreen() {
   
   const [dailyGuidance, setDailyGuidance] = useState<DailyGuidance | null>(null);
   const [momentAlignment, setMomentAlignment] = useState<MomentAlignment | null>(null);
-  const [momentTimingScore, setMomentTimingScore] = useState<number | null>(null);
   const [modulesExpanded, setModulesExpanded] = useState(false);
 
   // Prefer zodiac-derived (DOB) element for the "You" pill in Moment Alignment.
@@ -216,8 +214,6 @@ export default function HomeScreen() {
   const nextPrayerRef = React.useRef<typeof nextPrayer>(null);
   const lastPrayerLoadAtRef = React.useRef<number>(0);
   const lastRefreshAtRef = React.useRef<number>(0);
-  // BATTERY OPTIMIZATION: Track last timing check to avoid redundant calls
-  const lastTimingCheckRef = React.useRef<number>(0);
   const lastBoundaryCheckRef = React.useRef<string>('');
 
   useEffect(() => {
@@ -282,34 +278,6 @@ export default function HomeScreen() {
     setMomentAlignment(alignment);
   }, [prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude]);
 
-  // Single source of truth for the Moment Alignment badge/score.
-  // Uses the same Asrariya timing engine as the detail screen (category: 'general').
-  // BATTERY OPTIMIZATION: Throttle to max once per 5 minutes.
-  const loadMomentTiming = useCallback(async () => {
-    const nowMs = Date.now();
-    // Skip if we checked within the last 5 minutes
-    if (nowMs - lastTimingCheckRef.current < 5 * 60 * 1000 && momentTimingScore !== null) {
-      return;
-    }
-    lastTimingCheckRef.current = nowMs;
-
-    const currentProfile = profileRef.current;
-    const lat = prayerTimesData?.meta?.latitude ?? currentProfile.location?.latitude;
-    const lon = prayerTimesData?.meta?.longitude ?? currentProfile.location?.longitude;
-    const location =
-      typeof lat === 'number' && typeof lon === 'number'
-        ? { latitude: lat, longitude: lon }
-        : undefined;
-
-    try {
-      const quick = await quickTimingCheck(currentProfile, 'general', location);
-      setMomentTimingScore(quick.score);
-    } catch (error) {
-      console.error('Error loading moment timing:', error);
-      setMomentTimingScore(null);
-    }
-  }, [prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude, momentTimingScore]);
-  
   // Load prayer times
   const loadPrayerTimes = useCallback(async () => {
     try {
@@ -353,12 +321,10 @@ export default function HomeScreen() {
   }, []);
   
   // BATTERY OPTIMIZATION: Single initial load effect with stable deps.
-  // Removed loadMomentTiming from deps to prevent re-runs when score changes.
   useEffect(() => {
     // Initial load (best effort). Subsequent focus refresh is throttled below.
     loadDailyGuidance();
     loadMomentAlignment();
-    loadMomentTiming();
     loadPrayerTimes();
     
     // Calculate tomorrow's blessing (sync, no state dependency)
@@ -405,17 +371,15 @@ export default function HomeScreen() {
 
       // Stagger the calls to avoid concurrent async pressure
       loadDailyGuidance();
-      // Delay alignment/timing by 500ms to reduce concurrent load
+      // Delay alignment by 500ms to reduce concurrent load
       setTimeout(() => {
         loadMomentAlignment();
-        loadMomentTiming();
       }, 500);
       loadPrayerTimes();
-    }, [loadDailyGuidance, loadMomentAlignment, loadMomentTiming, loadPrayerTimes])
+    }, [loadDailyGuidance, loadMomentAlignment, loadPrayerTimes])
   );
 
-  // REMOVED: Duplicate loadMomentTiming call that ran on minuteNow.
-  // The 5-min throttle in loadMomentTiming handles periodic refresh.
+  // Badge is now computed synchronously via SimpleAlignmentBadge (no async timing call needed).
 
   /**
    * Handle module card press - navigate to appropriate screen
@@ -516,12 +480,13 @@ export default function HomeScreen() {
                   dayLabel={getDayName()}
                   showDetailsHint
                 />,
-                <ManazilWidget
-                  key="manazil"
-                  compact
-                  showDayLabel
-                  dayLabel={getDayName()}
-                />,
+                // Manazil widget hidden temporarily for V1 launch
+                // <ManazilWidget
+                //   key="manazil"
+                //   compact
+                //   showDayLabel
+                //   dayLabel={getDayName()}
+                // />,
               ]}
               intervalMs={9000}
               showDots={false}
@@ -549,11 +514,11 @@ export default function HomeScreen() {
           hasProfileName={hasProfileName}
           t={t}
           planetaryData={planetaryData}
-          timingScore={momentTimingScore}
+          userBurjIndex={profile?.derived?.burjIndex ?? (profile?.dobISO ? deriveBurjFromDOB(profile.dobISO)?.burjIndex : undefined)}
         />
         
-        {/* 2. Action Pills - Inline Buttons */}
-        <View style={styles.actionPills}>
+        {/* Action Pills hidden temporarily for V1 launch */}
+        {/* <View style={styles.actionPills}>
           <TouchableOpacity 
             style={styles.pillButton}
             onPress={() => router.push('/daily-checkin')}
@@ -571,7 +536,7 @@ export default function HomeScreen() {
             <Ionicons name="trending-up-outline" size={16} color="#6366f1" />
             <Text style={styles.pillText}>{t('home.actions.viewInsights')}</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
 
       {/* Spiritual Modules: Unified Grid */}

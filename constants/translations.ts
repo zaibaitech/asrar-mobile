@@ -1019,6 +1019,9 @@ export const translations = {
           act: "Excellent Time",
           maintain: "Neutral",
           hold: "Proceed Mindfully",
+          aligned: "Aligned",
+          steady: "Steady",
+          mindful: "Mindful",
         },
         hint: {
           act: "Sun, Jupiter, or Venus hour — proceed with confidence",
@@ -10902,6 +10905,9 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           act: "Excellent",
           maintain: "Neutre",
           hold: "Prudence",
+          aligned: "Aligné",
+          steady: "Stable",
+          mindful: "Prudence",
         },
         hint: {
           act: "Heure de Soleil, Jupiter ou Vénus — procédez avec confiance",

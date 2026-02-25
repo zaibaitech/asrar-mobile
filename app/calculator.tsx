@@ -1,3 +1,4 @@
+import { useAds } from '@/contexts/AdContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -16,6 +17,7 @@ import { BirthInsights, CalculationType, EnhancedCalculationResult } from '../ty
 export default function CalculatorScreen() {
   const colors = CalculatorColors;
   const { t } = useLanguage();
+  const { recordCalculation, showInterstitialIfReady } = useAds();
 
   // Enhanced Calculator State
   const [calculationType, setCalculationType] = useState<CalculationType>('name');
@@ -181,6 +183,7 @@ export default function CalculatorScreen() {
           setBirthInsights(insights);
           setActiveTab('results');
           setIsLoading(false);
+          { const s = recordCalculation(); if (s) showInterstitialIfReady(); }
           return;
 
         default:
@@ -192,6 +195,7 @@ export default function CalculatorScreen() {
       if (calculationType === 'quran' && selectedSurah && selectedAyah) {
         lastQuranSelectionRef.current = `${selectedSurah}:${selectedAyah}:${system}`;
       }
+      { const s = recordCalculation(); if (s) showInterstitialIfReady(); }
     } catch (error) {
       console.error('Calculation error:', error);
       setCurrentResult(null);

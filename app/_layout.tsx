@@ -14,6 +14,7 @@ import { AppErrorBoundary } from '@/components/AppErrorBoundary';
 import { NotificationInitializer } from '@/components/NotificationInitializer';
 import { NotificationTapHandler } from '@/components/NotificationTapHandler';
 import { useColorScheme } from '@/components/useColorScheme';
+import { AdProvider } from '@/contexts/AdContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ProfileProvider, useProfile } from '@/contexts/ProfileContext';
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
@@ -82,13 +83,15 @@ function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: { showAnim
     <SafeAreaProvider>
       <ProfileProvider>
         <SubscriptionProvider>
-          <LanguageProvider>
-            <ZikrProvider>
-              <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                <RootLayoutContent showAnimatedSplash={showAnimatedSplash} setShowAnimatedSplash={setShowAnimatedSplash} />
-              </ThemeProvider>
-            </ZikrProvider>
-          </LanguageProvider>
+          <AdProvider>
+            <LanguageProvider>
+              <ZikrProvider>
+                <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                  <RootLayoutContent showAnimatedSplash={showAnimatedSplash} setShowAnimatedSplash={setShowAnimatedSplash} />
+                </ThemeProvider>
+              </ZikrProvider>
+            </LanguageProvider>
+          </AdProvider>
         </SubscriptionProvider>
       </ProfileProvider>
     </SafeAreaProvider>

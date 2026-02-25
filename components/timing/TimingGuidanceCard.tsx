@@ -102,10 +102,10 @@ function getWindowColor(quality?: string): string {
 
 /**
  * Labels matching Moment Alignment (Hour-based)
- * Uses home.moment.status.* translations:
- * - ACT = "Excellent Time"
- * - MAINTAIN = "Neutral"
- * - HOLD = "Proceed Mindfully"
+ * Uses home.moment.status.* translations with new unified tiers:
+ * - favorable → "Aligned"
+ * - neutral → "Steady"  
+ * - cautious → "Mindful"
  */
 function getWindowLabel(
   quality: string | undefined,
@@ -113,12 +113,12 @@ function getWindowLabel(
 ): string {
   switch (quality) {
     case 'favorable':
-      return t('home.moment.status.act');      // "Excellent Time"
+      return t('home.moment.status.aligned');      // "Aligned"
     case 'cautious':
-      return t('home.moment.status.hold');     // "Proceed Mindfully"
+      return t('home.moment.status.mindful');      // "Mindful"
     case 'neutral':
     default:
-      return t('home.moment.status.maintain'); // "Neutral"
+      return t('home.moment.status.steady');       // "Steady"
   }
 }
 

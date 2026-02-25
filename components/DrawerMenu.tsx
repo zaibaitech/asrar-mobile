@@ -110,13 +110,14 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
           icon: 'book',
           route: '/(tabs)/name-destiny',
         },
-        {
-          id: 'zikr',
-          label: t('drawer.zikr') || 'Dhikr & Wird',
-          icon: 'sparkles',
-          route: '/zikr',
-          color: '#FBBF24',
-        },
+        // Dhikr hidden temporarily for V1 launch
+        // {
+        //   id: 'zikr',
+        //   label: t('drawer.zikr') || 'Dhikr & Wird',
+        //   icon: 'sparkles',
+        //   route: '/zikr',
+        //   color: '#FBBF24',
+        // },
         {
           id: 'compatibility',
           label: t('drawer.compatibility'),

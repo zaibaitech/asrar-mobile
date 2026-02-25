@@ -180,7 +180,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
           </View>
 
           {/* Latin Name Autocomplete */}
-          <View style={styles.inputWrapper}>
+          <View style={[styles.inputWrapper, { zIndex: 10 }]}>
             <Text style={styles.label}>
               {t('compatibility.form.latinName')}
             </Text>
@@ -198,7 +198,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
           </View>
 
           {/* Arabic Name Input */}
-          <View style={styles.inputWrapper}>
+          <View style={[styles.inputWrapper, { zIndex: 1 }]}>
             <View style={styles.labelRow}>
               <Text style={styles.label}>
                 {t('compatibility.form.arabicName')} *
@@ -246,7 +246,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
           </View>
 
           {/* Latin Name Autocomplete */}
-          <View style={styles.inputWrapper}>
+          <View style={[styles.inputWrapper, { zIndex: 10 }]}>
             <Text style={styles.label}>
               {t('compatibility.form.latinName')}
             </Text>
@@ -264,7 +264,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
           </View>
 
           {/* Arabic Name Input */}
-          <View style={styles.inputWrapper}>
+          <View style={[styles.inputWrapper, { zIndex: 1 }]}>
             <View style={styles.labelRow}>
               <Text style={styles.label}>
                 {t('compatibility.form.arabicName')} *
@@ -340,6 +340,7 @@ const styles = StyleSheet.create({
   inputGradient: {
     borderRadius: 16,
     padding: 18,
+    overflow: 'visible' as const,
   },
   sectionTitle: {
     color: '#ffffff',

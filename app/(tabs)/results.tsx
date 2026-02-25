@@ -7,6 +7,7 @@
  * PREMIUM: Personality, Career, Blessed Day, Spiritual Practice tabs (interpretive content)
  */
 
+import { AdBanner } from '@/components/ads/AdBanner';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import * as Haptics from 'expo-haptics';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
@@ -352,6 +353,9 @@ export default function IstikharaResults() {
           )}
         </Tab.Screen>
       </Tab.Navigator>
+
+      {/* Ad Banner */}
+      <AdBanner />
       
       {/* History Modal */}
       <HistoryModal

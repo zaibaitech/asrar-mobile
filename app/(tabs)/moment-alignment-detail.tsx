@@ -32,6 +32,7 @@ import { getPlanetaryCondition, type PlanetaryCondition } from '@/services/Plane
 import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, PlanetaryHourData, type Planet, type PlanetaryDayBoundaries } from '@/services/PlanetaryHoursService';
 import { calculateEnhancedPlanetaryPower } from '@/services/PlanetaryStrengthService';
 import { deriveBurjFromDOB, deriveElementFromBurj, derivePlanetaryRulerFromBurj } from '@/services/ProfileDerivationService';
+import { getAlignmentBadge, getAlignmentLabelKey, getRulingPlanetFromBurj } from '@/services/SimpleAlignmentBadge';
 import { getAllTransits } from '@/services/TransitService';
 import { getPlanetaryHourWordingKeys } from '@/utils/planetaryHourWording';
 import { adaptTransitToLegacyFormat } from '@/utils/transitAdapters';
@@ -119,10 +120,19 @@ export default function MomentAlignmentDetailScreen() {
   const [userTransitLink, setUserTransitLink] = useState<OverallTransitLink | null>(null);
   const [currentHourTransitData, setCurrentHourTransitData] = useState<OverallTransitLink | null>(null);
 
-  // Unified timing state - this is the single source of truth for badges
+  // Unified timing state - used for deep analysis breakdown sections
   const [timingResult, setTimingResult] = useState<AsrariyaTimingResult | null>(null);
 
-  // Get unified badge from timing analysis (single source of truth)
+  // ── Header badge: SimpleAlignmentBadge (single source of truth, matches widget) ──
+  const simpleBadge = useMemo(() => {
+    const planet = planetaryData?.currentHour?.planet;
+    if (!planet) return null;
+    const burjIndex = dobZodiacDerived?.burjIndex ?? profile?.derived?.burjIndex;
+    const userRuler = typeof burjIndex === 'number' ? getRulingPlanetFromBurj(burjIndex) : undefined;
+    return getAlignmentBadge(planet, userRuler);
+  }, [planetaryData?.currentHour?.planet, dobZodiacDerived?.burjIndex, profile?.derived?.burjIndex]);
+
+  // Keep legacy badge derivation for deep analysis sections that still reference it
   const unifiedBadge: UnifiedBadge = timingResult
     ? getBadgeFromScore(timingResult.overallScore)
     : 'MAINTAIN';
@@ -659,21 +669,11 @@ export default function MomentAlignmentDetailScreen() {
     return getPlanetaryHourWordingKeys(planet);
   }, [planetaryData?.currentHour?.planet]);
 
-  // UNIFIED: Prioritize timingResult (engine score) over classicalJudgment for consistent badge display
-  // This ensures the badge matches the widget on Daily Guidance Details (both use same engine)
+  // UNIFIED: Use SimpleAlignmentBadge for consistent badge display with widget
   const statusColor = useMemo(() => {
-    // Prioritize unified timing engine result
-    if (timingResult) {
-      const colorByBadge: Record<UnifiedBadge, string> = {
-        OPTIMAL: '#10b981',
-        ACT: '#10b981',
-        MAINTAIN: '#f59e0b',
-        CAREFUL: '#f59e0b',
-        HOLD: '#ef4444',
-      };
-      return colorByBadge[unifiedBadge] || '#f59e0b';
-    }
-    // Fallback to classical judgment if engine not loaded yet
+    // Primary: Simple alignment badge (matches widget)
+    if (simpleBadge) return simpleBadge.color;
+    // Fallback to classical judgment if planetary data not loaded yet
     if (classicalJudgment) {
       switch (classicalJudgment.restrictionLevel) {
         case 0:
@@ -688,21 +688,17 @@ export default function MomentAlignmentDetailScreen() {
       }
     }
     return getStatusColor(alignment?.status);
-  }, [alignment?.status, classicalJudgment, timingResult, unifiedBadge]);
+  }, [alignment?.status, classicalJudgment, simpleBadge]);
 
   const statusSubtitle = (() => {
-    // Prioritize unified timing engine result
-    if (timingResult) {
-      const keyByBadge: Record<UnifiedBadge, string> = {
-        ACT: 'momentDetail.cards.status.act_desc',
-        MAINTAIN: 'momentDetail.cards.status.maintain_desc',
-        HOLD: 'momentDetail.cards.status.hold_desc',
-        OPTIMAL: 'momentDetail.cards.status.act_desc',
-        CAREFUL: 'momentDetail.cards.status.maintain_desc',
+    // Primary: Simple alignment badge description
+    if (simpleBadge) {
+      const descKeyMap: Record<string, string> = {
+        aligned: 'momentDetail.cards.status.act_desc',
+        steady: 'momentDetail.cards.status.maintain_desc',
+        mindful: 'momentDetail.cards.status.hold_desc',
       };
-      const key = keyByBadge[unifiedBadge];
-      const translated = t(key);
-      return translated || timingResult.shortSummary || getLocalizedLayerReasoning(timingResult);
+      return t(descKeyMap[simpleBadge.tier]) || '';
     }
     // Fallback to classical judgment
     if (classicalJudgment) {
@@ -721,16 +717,10 @@ export default function MomentAlignmentDetailScreen() {
   })();
 
   const statusBadgeText = (() => {
-    // Prioritize unified timing engine result (same as widget)
-    if (timingResult) {
-      const emojiByBadge: Record<UnifiedBadge, string> = {
-        OPTIMAL: '🟢',
-        ACT: '🟢',
-        MAINTAIN: '🟡',
-        CAREFUL: '🟡',
-        HOLD: '🟣',
-      };
-      return `${emojiByBadge[unifiedBadge]} ${t(badgeConfig.labelKey) || unifiedBadge}`;
+    // Primary: Simple alignment badge (matches widget)
+    if (simpleBadge) {
+      const labelKey = getAlignmentLabelKey(simpleBadge.tier);
+      return `${simpleBadge.icon} ${t(labelKey) || simpleBadge.label}`;
     }
     // Fallback to classical judgment
     if (classicalJudgment) {
@@ -1128,16 +1118,22 @@ export default function MomentAlignmentDetailScreen() {
             {alignment.nextWindows && alignment.nextWindows.length > 0 ? (
               alignment.nextWindows
                 .slice(0, 12)
-                .map((window, idx) => (
+                .map((window, idx) => {
+                  // Use SimpleAlignmentBadge for each timeline window (consistent with header)
+                  const burjIdx = dobZodiacDerived?.burjIndex ?? profile?.derived?.burjIndex;
+                  const windowUserRuler = typeof burjIdx === 'number' ? getRulingPlanetFromBurj(burjIdx) : undefined;
+                  const windowBadge = getAlignmentBadge(window.planet, windowUserRuler);
+                  const windowLabelKey = getAlignmentLabelKey(windowBadge.tier);
+                  return (
                   <View key={idx} style={styles.timelineItem}>
                     <View
                       style={[
                         styles.timelineStatus,
-                        { backgroundColor: window.status === 'ACT' ? '#10b981' : window.status === 'MAINTAIN' ? '#f59e0b' : '#7C3AED' },
+                        { backgroundColor: windowBadge.color },
                       ]}
                     >
                       <Text style={styles.timelineStatusText}>
-                        {t(window.status === 'ACT' ? 'home.moment.status.act' : window.status === 'MAINTAIN' ? 'home.moment.status.maintain' : 'home.moment.status.hold')}
+                        {t(windowLabelKey) || windowBadge.label}
                       </Text>
                     </View>
                     <View style={styles.timelineContent}>
@@ -1154,7 +1150,8 @@ export default function MomentAlignmentDetailScreen() {
                       </Text>
                     </View>
                   </View>
-                ))
+                  );
+                })
             ) : (
               <Text style={styles.noWindows}>{t('momentDetail.timeline.noOptimalWindows')}</Text>
             )}

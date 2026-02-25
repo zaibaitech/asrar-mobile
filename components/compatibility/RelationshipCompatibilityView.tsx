@@ -1,3 +1,4 @@
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { enhanceCompatibilityWithAI, isAIAvailable, loadAISettings } from '@/services/AIReflectionService';
@@ -24,6 +25,7 @@ export function RelationshipCompatibilityView({
   language = 'en',
   onReset
 }: RelationshipCompatibilityViewProps) {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'overview' | 'spiritual' | 'elemental' | 'planetary' | 'recommendations'>('overview');
   const isFrench = language === 'fr';
   const isArabic = language === 'ar';

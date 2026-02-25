@@ -6,6 +6,7 @@
  * PREMIUM: Meaning & explanation, Quran Resonance, AI enhancement, Divine Name, Practical guidance
  */
 
+import { AdBanner } from '@/components/ads/AdBanner';
 import { AIBadge } from '@/components/divine-timing/AIBadge';
 import {
     AccordionSection,
@@ -839,6 +840,9 @@ export default function ResultsScreen() {
               {t('nameDestiny.results.disclaimer')}
             </Text>
           </View>
+
+          {/* Ad Banner */}
+          <AdBanner />
         </ScrollView>
       </LinearGradient>
     </SafeAreaView>

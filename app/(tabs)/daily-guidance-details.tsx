@@ -44,13 +44,13 @@ import {
 } from '@/services/PlanetaryHoursService';
 // New Daily Energy Services
 import { buildDestiny } from '@/features/name-destiny/services/nameDestinyCalculator';
-import { quickTimingCheck } from '@/services/AsrariyaTimingEngine';
 import { getClassicalJudgment } from '@/services/ClassicalJudgmentService';
 import { getDailyGuidance, type DailyGuidance } from '@/services/DailyGuidanceService';
 import { generateDailySynthesis, getUserPlanet, type DailySynthesis } from '@/services/DailySynthesisService';
 import { getBestLocation } from '@/services/LocationCacheService';
 import { getElementRelationship as getClassicalElementRelationship, getPlanetaryRelationship } from '@/services/PlanetaryRelationshipService';
 import { BURJ_NAMES_EN } from '@/services/ProfileDerivationService';
+import { getAlignmentBadge, getRulingPlanetFromBurj, type AlignmentTier } from '@/services/SimpleAlignmentBadge';
 import {
     buildSpiritualPracticeGuidance,
     type DailyPracticeStatus,
@@ -168,8 +168,19 @@ export default function DailyGuidanceDetailsScreen() {
   const [synthesisLoading, setSynthesisLoading] = useState(false);
   const [synthesisError, setSynthesisError] = useState<string | null>(null);
 
-  // UNIFIED: Current moment timing score from Asrariya Engine (same as home screen)
-  const [unifiedTimingScore, setUnifiedTimingScore] = useState<number | null>(null);
+  // Planetary data state (hoisted before useMemos that reference it)
+  const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
+  const [planetaryData, setPlanetaryData] = useState<PlanetaryHourData | null>(null);
+  const [planetaryHours, setPlanetaryHours] = useState<PlanetaryHour[] | null>(null);
+
+  // UNIFIED: Current moment badge from SimpleAlignmentBadge (matches home widget)
+  const currentHourBadgeTier = useMemo((): AlignmentTier | null => {
+    if (!planetaryData?.currentHour?.planet) return null;
+    const burjIdx = profile?.derived?.burjIndex;
+    const userRuler = typeof burjIdx === 'number' ? getRulingPlanetFromBurj(burjIdx) : undefined;
+    const badge = getAlignmentBadge(planetaryData.currentHour.planet, userRuler);
+    return badge.tier;
+  }, [planetaryData?.currentHour?.planet, profile?.derived?.burjIndex]);
 
   // Keep the same day-level window status as the Home "Daily Energy" widget
   const [dailyGuidance, setDailyGuidance] = useState<DailyGuidance | null>(null);
@@ -195,37 +206,6 @@ export default function DailyGuidanceDetailsScreen() {
     };
   }, [profile]);
 
-  // UNIFIED: Load current moment timing score using same engine as home screen
-  useEffect(() => {
-    if (!profile) return;
-    let cancelled = false;
-
-    (async () => {
-      try {
-        const lat = profile.location?.latitude;
-        const lon = profile.location?.longitude;
-        const location =
-          typeof lat === 'number' && typeof lon === 'number'
-            ? { latitude: lat, longitude: lon }
-            : undefined;
-
-        const quick = await quickTimingCheck(profile, 'general', location);
-        if (!cancelled) {
-          setUnifiedTimingScore(quick.score);
-        }
-      } catch (error) {
-        console.error('Error loading unified timing score:', error);
-        if (!cancelled) {
-          setUnifiedTimingScore(null);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [profile]);
-  
   // NEW: Generate daily synthesis when data is available
   useEffect(() => {
     if (profile && dailyAnalysis && dailyAnalysis.moonPhase) {
@@ -311,10 +291,6 @@ export default function DailyGuidanceDetailsScreen() {
     const element = ((profile as any).zahirElement || (profile.derived as any)?.element || 'fire') as PlanetElement;
     return { planet, element, source };
   }, [profile]);
-
-  const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
-  const [planetaryData, setPlanetaryData] = useState<PlanetaryHourData | null>(null);
-  const [planetaryHours, setPlanetaryHours] = useState<PlanetaryHour[] | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -499,17 +475,17 @@ export default function DailyGuidanceDetailsScreen() {
   
   const windowQuality: TimingQuality = (dailyGuidance?.timingQuality as TimingQuality) || timingQuality;
 
-  // Convert unified timing score to window quality for current hour display
+  // Convert SimpleAlignmentBadge tier to window quality for current hour display
   // Simplified to match classical system: favorable/neutral/cautious
-  const getTimingQualityFromScore = (score: number | null): TimingQuality => {
-    if (score === null) return 'neutral';
-    if (score >= 60) return 'favorable';  // Good Time / Excellent
-    if (score >= 40) return 'neutral';    // Neutral
-    return 'cautious';                    // Proceed Mindfully
+  const getTimingQualityFromBadge = (tier: AlignmentTier | null): TimingQuality => {
+    if (!tier) return 'neutral';
+    if (tier === 'aligned') return 'favorable';
+    if (tier === 'steady') return 'neutral';
+    return 'cautious'; // mindful
   };
 
-  // Use unified score for current hour timing quality (matches widget/moment alignment)
-  const currentHourTimingQuality = getTimingQualityFromScore(unifiedTimingScore);
+  // Use SimpleAlignmentBadge for current hour timing quality (matches home widget)
+  const currentHourTimingQuality = getTimingQualityFromBadge(currentHourBadgeTier);
 
   /**
    * Colors matching Moment Alignment for consistency:
@@ -634,9 +610,11 @@ export default function DailyGuidanceDetailsScreen() {
   const timingGuidanceProps = useMemo(() => {
     if (!planetaryData) return null;
     const current = planetaryData.currentHour;
-    // UNIFIED: Use the same score as home screen for current hour
-    // Fall back to legacy calculation only if unified score not yet loaded
-    const currentPower = unifiedTimingScore ?? getHourPowerForUser(current.planet);
+    // Use SimpleAlignmentBadge score for current hour (consistent with home widget)
+    const burjIdx = profile?.derived?.burjIndex;
+    const userRuler = typeof burjIdx === 'number' ? getRulingPlanetFromBurj(burjIdx) : undefined;
+    const currentBadge = getAlignmentBadge(current.planet, userRuler);
+    const currentPower = currentBadge.score;
 
     const candidates: PlanetaryHour[] = planetaryHours?.length
       ? planetaryHours.filter((h) => h.startTime.getTime() >= now.getTime()).slice(0, 6)
@@ -663,7 +641,7 @@ export default function DailyGuidanceDetailsScreen() {
           }
         : undefined,
     };
-  }, [planetaryData, planetaryHours, now, unifiedTimingScore]);
+  }, [planetaryData, planetaryHours, now, profile?.derived?.burjIndex]);
   
   function getElementRelationship(a?: Element, b?: Element): 'harmonious' | 'complementary' | 'transformative' | 'neutral' {
     if (!a || !b) return 'neutral';

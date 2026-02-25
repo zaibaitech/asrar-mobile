@@ -8,6 +8,7 @@ import { Search, X } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
     Keyboard,
+    Pressable,
     ScrollView,
     StyleSheet,
     Text,
@@ -88,7 +89,7 @@ export default function NameAutocomplete({
     setTimeout(() => {
       setIsFocused(false);
       setShowDropdown(false);
-    }, 200);
+    }, 300);
   };
 
   const dismissDropdown = () => {
@@ -133,14 +134,13 @@ export default function NameAutocomplete({
               showsVerticalScrollIndicator={true}
             >
               {matches.slice(0, 8).map((item, index) => (
-                <TouchableOpacity
+                <Pressable
                   key={`${item.arabic}-${index}`}
                   style={[
                     styles.dropdownItem,
                     index === matches.slice(0, 8).length - 1 && styles.dropdownItemLast
                   ]}
-                  onPress={() => handleSelectName(item)}
-                  activeOpacity={0.7}
+                  onPressIn={() => handleSelectName(item)}
                 >
                   <Text style={styles.dropdownItemLatin}>
                     {getNameDisplayLabel(item)}
@@ -148,7 +148,7 @@ export default function NameAutocomplete({
                   <Text style={styles.dropdownItemArabic}>
                     {item.arabic}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               ))}
             </ScrollView>
           </View>

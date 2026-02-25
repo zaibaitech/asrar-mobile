@@ -3,6 +3,7 @@
  * Reorganized with jump navigation
  */
 
+import { AdBanner } from '@/components/ads/AdBanner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { enhanceCalculatorWithAI, isAIAvailable, loadAISettings } from '@/services/AIReflectionService';
@@ -307,6 +308,9 @@ export const EnhancedResultsDisplay: React.FC<EnhancedResultsDisplayProps> = ({ 
             ℹ️ {t('calculator.results.disclaimer')}
           </Text>
         </View>
+
+        {/* Ad Banner */}
+        <AdBanner />
       </ScrollView>
     </View>
   );

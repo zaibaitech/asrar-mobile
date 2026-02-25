@@ -2,6 +2,7 @@
  * Who Am I Tab - Personal Analysis Calculator
  * Deep self-discovery through sacred numerology (name + mother's name analysis)
  */
+import { useAds } from '@/contexts/AdContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -45,6 +46,7 @@ type BirthInputMode = 'full' | 'monthDay';
 export default function WhoAmICalculator() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { recordCalculation, showInterstitialIfReady } = useAds();
   const { profile } = useProfile();
   const { calculate, loading, error, result } = useIstikhara();
   
@@ -265,6 +267,10 @@ export default function WhoAmICalculator() {
           },
         });
       }
+
+      // Show interstitial ad (throttled)
+      const shouldShow = recordCalculation();
+      if (shouldShow) showInterstitialIfReady();
     } catch (err) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     }

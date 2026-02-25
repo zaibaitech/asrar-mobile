@@ -6,6 +6,8 @@
 import ArabicKeyboard from '@/components/istikhara/ArabicKeyboard';
 import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
+import { useAds } from '@/contexts/AdContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState } from 'react';
 import {
@@ -31,6 +33,8 @@ import { NameDestinyResult } from '../types';
 type ReadingType = 'explore' | 'personal';
 
 export default function NameDestinyHomeScreen() {
+  const { recordCalculation, showInterstitialIfReady } = useAds();
+  const { t } = useLanguage();
   const { abjadSystem } = useAbjad();
   const insets = useSafeAreaInsets();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -85,6 +89,10 @@ export default function NameDestinyHomeScreen() {
     // Calculate destiny
     const calculatedResult = buildDestiny(finalName, finalMotherName, abjadMap);
     setResult(calculatedResult);
+
+    // Show interstitial ad (throttled)
+    const shouldShow = recordCalculation();
+    if (shouldShow) showInterstitialIfReady();
 
     // Scroll to results after a brief delay
     setTimeout(() => {
