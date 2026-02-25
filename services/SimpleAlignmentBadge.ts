@@ -18,6 +18,7 @@
  */
 
 import type { Planet } from './PlanetaryHoursService';
+import { getCachedEphemerisData } from './EphemerisDataCache';
 
 // ============================================================================
 // TYPES
@@ -168,6 +169,49 @@ export function getRulingPlanetFromBurj(burjIndex: number): string | undefined {
 }
 
 // ============================================================================
+// DIGNITY — Classical Planet Dignities (auto-computed from ephemeris cache)
+// ============================================================================
+
+/**
+ * Classical dignities: domicile (+3), exaltation (+4), detriment (-3), fall (-4)
+ * Maps planet → { domicile: sign[], exaltation: sign, detriment: sign[], fall: sign }
+ * Sign indices: 0=Aries .. 11=Pisces
+ */
+const PLANET_DIGNITY: Record<string, { domicile: number[]; exaltation: number; detriment: number[]; fall: number }> = {
+  sun:     { domicile: [4],      exaltation: 0,  detriment: [10],    fall: 6 },
+  moon:    { domicile: [3],      exaltation: 1,  detriment: [9],     fall: 7 },
+  mercury: { domicile: [2, 5],   exaltation: 5,  detriment: [8, 11], fall: 11 },
+  venus:   { domicile: [1, 6],   exaltation: 11, detriment: [0, 7],  fall: 5 },
+  mars:    { domicile: [0, 7],   exaltation: 9,  detriment: [1, 6],  fall: 3 },
+  jupiter: { domicile: [8, 11],  exaltation: 3,  detriment: [2, 5],  fall: 9 },
+  saturn:  { domicile: [9, 10],  exaltation: 6,  detriment: [3, 4],  fall: 0 },
+};
+
+/**
+ * Auto-compute a 0–100 dignity score for a planet from the embedded ephemeris cache.
+ * Returns undefined if no cache data is available for today.
+ */
+function getQuickDignityScore(planet: string): number | undefined {
+  const today = new Date().toISOString().slice(0, 10);
+  const cached = getCachedEphemerisData(today);
+  if (!cached) return undefined;
+
+  const key = planet.toLowerCase() as keyof typeof cached;
+  const pos = cached[key];
+  if (!pos || typeof pos.sign !== 'number') return undefined;
+
+  const dignity = PLANET_DIGNITY[key];
+  if (!dignity) return 50; // Unknown planet → peregrine
+
+  const sign = pos.sign;
+  if (sign === dignity.exaltation) return 90;  // Exalted
+  if (dignity.domicile.includes(sign)) return 80; // Domicile
+  if (sign === dignity.fall) return 10;          // Fall
+  if (dignity.detriment.includes(sign)) return 20; // Detriment
+  return 50; // Peregrine
+}
+
+// ============================================================================
 // CORE FUNCTION
 // ============================================================================
 
@@ -211,11 +255,12 @@ export function getAlignmentBadge(
     }
   }
 
-  // ── Factor 3: Dignity (optional, when ephemeris available) ──
-  if (dignityScore != null) {
+  // ── Factor 3: Dignity (auto-computed from ephemeris if not provided) ──
+  const effectiveDignity = dignityScore ?? getQuickDignityScore(hourPlanet as string);
+  if (effectiveDignity != null) {
     // Map 0-100 dignity to a -10 to +10 modifier
     // 50 = peregrine (no modifier), 100 = exalted (+10), 0 = fall (-10)
-    const dignityModifier = Math.round(((dignityScore - 50) / 50) * 10);
+    const dignityModifier = Math.round(((effectiveDignity - 50) / 50) * 10);
     score += dignityModifier;
   }
 
