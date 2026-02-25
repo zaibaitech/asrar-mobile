@@ -143,30 +143,45 @@ function RootLayoutContent({ showAnimatedSplash, setShowAnimatedSplash }: { show
   );
 }
 
-// Onboarding Gate - Redirect to onboarding if not completed
+// Onboarding Gate - Handle initial routing based on onboarding completion
+// If onboarding is done, always go to (tabs). Auth is optional (cloud sync only).
+// The app works fully offline with local profile — no reason to force re-login.
 function OnboardingGate() {
   const router = useRouter();
   const segments = useSegments();
-  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
+  const [hasChecked, setHasChecked] = useState(false);
 
   useEffect(() => {
-    checkOnboarding();
+    // Small delay to let expo-router finish initial mount before navigating
+    const timer = setTimeout(() => {
+      checkInitialRoute();
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
-  const checkOnboarding = async () => {
+  const checkInitialRoute = async () => {
     try {
       const completed = await getOnboardingCompleted();
       const inOnboarding = segments[0] === '(onboarding)';
+      const inTabs = segments[0] === '(tabs)';
       
-      // If onboarding not completed and not already in onboarding, redirect
-      if (!completed && !inOnboarding) {
-        router.replace('/(onboarding)');
+      if (!completed) {
+        // Onboarding not finished → show onboarding
+        if (!inOnboarding) {
+          router.replace('/(onboarding)');
+        }
+      } else {
+        // Onboarding completed → always go to main app
+        // Auth/sign-in is available from profile screen, not forced on startup
+        if (!inTabs) {
+          router.replace('/(tabs)');
+        }
       }
-      
-      setIsCheckingOnboarding(false);
     } catch (error) {
-      console.error('Error checking onboarding:', error);
-      setIsCheckingOnboarding(false);
+      console.error('Error checking initial route:', error);
+      // Fallback: if anything fails, go to onboarding
+    } finally {
+      setHasChecked(true);
     }
   };
 
