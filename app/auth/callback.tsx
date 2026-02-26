@@ -1,9 +1,8 @@
+import { Text, View } from '@/components/Themed';
+import { handleAuthCallback } from '@/services/AuthService';
+import { useGlobalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
-import { useRouter, useLocalSearchParams, useGlobalSearchParams } from 'expo-router';
-import * as Linking from 'expo-linking';
-import { View, Text } from '@/components/Themed';
-import { handleAuthCallback } from '@/services/AuthService';
 
 /**
  * OAuth / Email-verification callback screen.

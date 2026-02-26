@@ -19,10 +19,10 @@
 
 import { UserProfile } from '@/types/user-profile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
 import * as ExpoAuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
 import * as Crypto from 'expo-crypto';
+import * as SecureStore from 'expo-secure-store';
+import * as WebBrowser from 'expo-web-browser';
 
 // ============================================================================
 // CONFIGURATION
