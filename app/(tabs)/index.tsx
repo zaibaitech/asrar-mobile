@@ -267,17 +267,21 @@ export default function HomeScreen() {
   
   // Load moment alignment
   const loadMomentAlignment = useCallback(async () => {
-    const currentProfile = profileRef.current;
-    const lat = prayerTimesData?.meta?.latitude ?? currentProfile.location?.latitude;
-    const lon = prayerTimesData?.meta?.longitude ?? currentProfile.location?.longitude;
-    const alignment = await getMomentAlignment(
-      currentProfile,
-      new Date(),
-      typeof lat === 'number' && typeof lon === 'number'
-        ? { location: { latitude: lat, longitude: lon }, lightweight: true }
-        : { lightweight: true }
-    );
-    setMomentAlignment(alignment);
+    try {
+      const currentProfile = profileRef.current;
+      const lat = prayerTimesData?.meta?.latitude ?? currentProfile.location?.latitude;
+      const lon = prayerTimesData?.meta?.longitude ?? currentProfile.location?.longitude;
+      const alignment = await getMomentAlignment(
+        currentProfile,
+        new Date(),
+        typeof lat === 'number' && typeof lon === 'number'
+          ? { location: { latitude: lat, longitude: lon }, lightweight: true }
+          : { lightweight: true }
+      );
+      setMomentAlignment(alignment);
+    } catch (error) {
+      console.error('Error loading moment alignment:', error);
+    }
   }, [prayerTimesData?.meta?.latitude, prayerTimesData?.meta?.longitude]);
 
   // Load prayer times
@@ -335,6 +339,16 @@ export default function HomeScreen() {
     setTomorrowBlessing(getTodayBlessing(tomorrow));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Re-trigger moment alignment once profile name becomes available.
+  // The initial load may run before the profile is loaded from storage,
+  // causing getMomentAlignment to return null (no name). This effect
+  // re-triggers once the async profile load completes.
+  useEffect(() => {
+    if (hasProfileName && !momentAlignment) {
+      loadMomentAlignment();
+    }
+  }, [hasProfileName, momentAlignment, loadMomentAlignment]);
   
   // Update countdown every minute
   useEffect(() => {
