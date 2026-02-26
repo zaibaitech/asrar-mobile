@@ -87,6 +87,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "./plugins/withDisableExtraTranslationLint.js",
       "expo-router",
       [
         "expo-font",
