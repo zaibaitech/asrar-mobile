@@ -20,7 +20,7 @@
 import { UserProfile } from '@/types/user-profile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
-import * as AuthSession from 'expo-auth-session';
+import * as ExpoAuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import * as Crypto from 'expo-crypto';
 
@@ -1236,7 +1236,7 @@ export type OAuthProvider = 'google' | 'apple' | 'facebook';
 // In Expo Go: returns exp://xxx:port/--/auth/callback  
 // In standalone builds: returns asrariya://auth/callback
 const getRedirectUri = () => {
-  const uri = AuthSession.makeRedirectUri({
+  const uri = ExpoAuthSession.makeRedirectUri({
     scheme: 'asrariya',
     path: 'auth/callback',
   });
