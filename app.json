@@ -122,6 +122,7 @@
       ]
     ],
     "locales": {
+      "en": "./locales/en.json",
       "ar": "./locales/ar.json",
       "fr": "./locales/fr.json"
     },
