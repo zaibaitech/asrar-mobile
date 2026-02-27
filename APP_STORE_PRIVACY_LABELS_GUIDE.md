@@ -42,10 +42,18 @@
   - **Used for tracking:** No
   - **Permission:** User must grant
 
+#### 🆔 Identifiers (AdMob)
+- **Advertising Identifier**
+  - ✅ Collected automatically by AdMob
+  - **Purpose:** Ad personalization and measurement
+  - **Linked to user:** No (AdMob handles this)
+  - **Used for tracking:** Yes (by Google AdMob)
+  - **Control:** Users can reset in device settings
+
 #### 📊 Usage Data (Minimal)
 - **Product Interaction**
-  - ❌ Not collected
-  - **Note:** No analytics, no crash reporting to third parties
+  - ✅ Ad impressions and clicks (via AdMob)
+  - **Note:** AdMob collects ad interaction data automatically
 
 ---
 
@@ -69,6 +77,12 @@ For each data type collected, select:
 - ✅ **App Functionality** (prayer times)
 - ❌ Developer's Advertising
 - ❌ Third-Party Advertising
+- ❌ Analytics
+
+#### Advertising Identifier:
+- ❌ App Functionality
+- ❌ Developer's Advertising
+- ✅ **Third-Party Advertising** (Google AdMob)
 - ❌ Analytics
 
 ---
@@ -124,6 +138,24 @@ For each data type collected, select:
 
 **Location:** Google Play Console → App Content → Data Safety
 
+---
+
+## ⚠️ CRITICAL: Ads Declaration
+
+**Location:** Google Play Console → App Content → Ads
+
+### Question: Does your app contain ads?
+**Answer:** ✅ **YES**
+
+**Why:** Your app uses `react-native-google-mobile-ads` (AdMob)
+
+**Important:** 
+- Failing to declare ads = instant rejection
+- Must match the actual implementation
+- AdMob collects device identifiers automatically
+
+---
+
 ### Step 1: Data Collection & Security
 
 **Does your app collect or share user data?**  
@@ -138,6 +170,13 @@ For each data type collected, select:
 ---
 
 ### Step 2: Data Types & Purposes
+
+#### Device or Other IDs
+- **Advertising ID**
+  - ✅ Collected (by Google AdMob)
+  - **Why:** Advertising or marketing
+  - **Optional:** No (automatic)
+  - **Ephemeral:** No
 
 #### Personal Info
 - **Name**
@@ -192,6 +231,13 @@ For each data type, select purposes:
 - ❌ Personalization
 - ❌ Analytics
 
+#### Advertising ID:
+- ❌ App functionality
+- ✅ **Advertising or marketing** (Google AdMob)
+- ❌ Fraud prevention, security, and compliance
+- ❌ Personalization
+- ❌ Analytics
+
 ---
 
 ### Step 4: Data Sharing
@@ -206,7 +252,12 @@ For each data type, select purposes:
    - **Purpose:** Account management
    - **Account mode only**
 
-2. **AI Service Provider** (Groq)
+2. **Advertising Network** (Google AdMob)
+   - Advertising ID, device info, ad interactions
+   - **Purpose:** Advertising or marketing
+   - **Both modes**
+
+3. **AI Service Provider** (Groq)
    - Names, dates, user questions
    - **Purpose:** App functionality (Islamic guidance)
    - **Both modes**
@@ -307,19 +358,23 @@ Before clicking "Submit for Review":
 
 ### Documentation:
 - [ ] Privacy Policy live at GitHub Pages
+- [ ] Privacy Policy mentions AdMob/advertising
 - [ ] Terms of Service live at GitHub Pages
 - [ ] Both URLs accessible without login
 - [ ] Both URLs match in-app links
 
 ### App Store Connect:
 - [ ] All data types marked correctly
-- [ ] Third-party sharing disclosed (Supabase, Groq)
+- [ ] Advertising Identifier declared
+- [ ] Third-party sharing disclosed (Supabase, AdMob, Groq)
 - [ ] Privacy Policy URL added
 - [ ] Screenshots show legal links in Profile
 - [ ] App description mentions privacy modes
 
 ### Google Play Console:
+- [ ] **App Content → Ads: YES** ⚠️ CRITICAL
 - [ ] Data Safety form completed
+- [ ] Advertising ID included in data types
 - [ ] All purposes selected correctly
 - [ ] Privacy Policy URL added
 - [ ] Data deletion available (confirmed)

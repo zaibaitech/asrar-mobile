@@ -16,8 +16,9 @@ Asrariya ("we", "our", or "us") respects your privacy and is committed to protec
 
 ### Information We Collect Automatically
 - **Device Information**: Device type, OS version, app version
+- **Advertising Identifiers**: Google Advertising ID (for personalized ads)
 - **Usage Analytics**: Feature usage, crash reports (via Expo)
-- **No Tracking**: We do NOT use third-party tracking or advertising networks
+- **Ad Performance**: Ad impressions, clicks (collected by Google AdMob)
 
 ## How We Use Your Data
 
@@ -45,8 +46,8 @@ Asrariya ("we", "our", or "us") respects your privacy and is committed to protec
 
 ### Access Control
 - **Row Level Security**: Supabase enforces user-level access control
-- **No Sharing**: We never sell or share your data with third parties
-- **No Advertising**: We do not use your data for advertising purposes
+- **No Data Selling**: We never sell your personal data to third parties
+- **Limited Advertising**: Advertising identifiers shared with Google AdMob for ad serving only
 
 ## Your Rights
 
@@ -60,12 +61,33 @@ Asrariya ("we", "our", or "us") respects your privacy and is committed to protec
 - **Delete Locally**: Uninstall app to delete local data
 - **No Cloud Data**: Guest mode data is not stored on our servers
 
+## Advertising
+
+### Google AdMob
+Asrariya displays advertisements to support the app's development and maintenance.
+
+- **Ad Provider**: Google AdMob
+- **Data Collected**: Advertising ID, device information, ad interaction data
+- **Purpose**: To serve personalized advertisements
+- **Your Control**: You can reset your advertising ID in device settings
+  - **Android**: Settings → Google → Ads → Reset advertising ID
+- **Privacy Policy**: https://policies.google.com/privacy
+- **Ad Choices**: Opt out of personalized ads at https://adssettings.google.com
+
+**Note**: We do not control the ads shown or the data collected by AdMob. Please review Google's privacy policy for details on how they use your data.
+
 ## Third-Party Services
 
 ### Supabase (Backend)
 - **Purpose**: Authentication, profile sync (account mode only)
 - **Location**: US-based servers
 - **Privacy Policy**: https://supabase.com/privacy
+
+### Google AdMob (Advertising)
+- **Purpose**: Display advertisements in the app
+- **Data Collected**: Advertising ID, device info, ad interactions
+- **Privacy Policy**: https://policies.google.com/privacy
+- **Opt-Out**: https://adssettings.google.com
 
 ### Groq (AI)
 - **Purpose**: Istikhara question interpretation
