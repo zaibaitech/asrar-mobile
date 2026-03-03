@@ -132,7 +132,6 @@ function RootLayoutContent({ showAnimatedSplash, setShowAnimatedSplash }: { show
         />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         <Stack.Screen name="email-verification" options={{ headerShown: false }} />
-        <Stack.Screen name="auth" options={{ headerShown: false }} />
         <Stack.Screen name="reset-password" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ headerShown: false }} />
       </Stack>

@@ -86,13 +86,14 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
           route: '/profile',
           badge: `${completionStatus.completionPercent}%`,
         },
-        {
-          id: 'ai-settings',
-          label: t('drawer.aiSettings'),
-          icon: 'sparkles',
-          route: '/ai-settings',
-          color: '#6366f1',
-        },
+        // AI Settings hidden for v1 - feature not ready
+        // {
+        //   id: 'ai-settings',
+        //   label: t('drawer.aiSettings'),
+        //   icon: 'sparkles',
+        //   route: '/ai-settings',
+        //   color: '#6366f1',
+        // },
       ],
     },
     {
@@ -125,17 +126,18 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
           route: '/compatibility',
         },
         {
-          id: 'istikhara',
-          label: t('drawer.istikhara'),
-          icon: 'moon',
-          route: '/(tabs)/istikhara',
+          id: 'who-am-i',
+          label: t('drawer.whoAmI'),
+          icon: 'user',
+          route: '/(tabs)/who-am-i',
         },
-        {
-          id: 'divine-timing',
-          label: t('drawer.divineTiming'),
-          icon: 'time',
-          route: '/divine-timing',
-        },
+        // Divine Timing hidden for v1 - screen still exists but not exposed in navigation
+        // {
+        //   id: 'divine-timing',
+        //   label: t('drawer.divineTiming'),
+        //   icon: 'time',
+        //   route: '/divine-timing',
+        // },
       ],
     },
     {
@@ -150,29 +152,30 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
         },
       ],
     },
-    {
-      title: t('drawer.app'),
-      items: [
-        {
-          id: 'about',
-          label: t('drawer.about'),
-          icon: 'information-circle',
-          action: () => {
-            onClose();
-            // TODO: Open about modal or screen
-          },
-        },
-        {
-          id: 'help',
-          label: t('drawer.helpTutorial'),
-          icon: 'help-circle',
-          action: () => {
-            onClose();
-            // TODO: Open help/tutorial
-          },
-        },
-      ],
-    },
+    // About & Help hidden for v1 - screens not implemented
+    // {
+    //   title: t('drawer.app'),
+    //   items: [
+    //     {
+    //       id: 'about',
+    //       label: t('drawer.about'),
+    //       icon: 'information-circle',
+    //       action: () => {
+    //         onClose();
+    //         // TODO: Open about modal or screen
+    //       },
+    //     },
+    //     {
+    //       id: 'help',
+    //       label: t('drawer.helpTutorial'),
+    //       icon: 'help-circle',
+    //       action: () => {
+    //         onClose();
+    //         // TODO: Open help/tutorial
+    //       },
+    //     },
+    //   ],
+    // },
   ];
   
   return (
@@ -298,11 +301,11 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                   </View>
                 ))}
                 
-                {/* Language Selector */}
+                {/* Language Selector - Arabic hidden for v1 */}
                 <View style={styles.menuSection}>
                   <Text style={styles.sectionTitle}>{t('drawer.language')}</Text>
                   <View style={styles.languageSelector}>
-                    {['en', 'fr', 'ar'].map((lang) => (
+                    {['en', 'fr'].map((lang) => (
                       <TouchableOpacity
                         key={lang}
                         style={[
@@ -319,7 +322,6 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                         >
                           {lang === 'en' && t('drawer.langEnglish')}
                           {lang === 'fr' && t('drawer.langFrench')}
-                          {lang === 'ar' && t('drawer.langArabic')}
                         </Text>
                       </TouchableOpacity>
                     ))}

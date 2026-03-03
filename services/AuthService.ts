@@ -331,11 +331,15 @@ async function refreshSession(refreshToken: string): Promise<AuthSession | null>
     });
     
     if (!response.ok) {
-      const errorData = await response.text();
-      if (__DEV__) {
-        console.error('[AuthService] Refresh token failed:', response.status, errorData);
+      // Token expired or invalid - this is a normal scenario, clear session silently
+      // Only log if it's a server error (5xx) or unexpected status
+      if (response.status >= 500 && __DEV__) {
+        const errorData = await response.text();
+        console.error('[AuthService] Server error refreshing token:', response.status, errorData);
       }
-      throw new Error(`Failed to refresh token: ${response.status}`);
+      // For 400/401 (expired/invalid tokens), silently clear and return null
+      await clearSession();
+      return null;
     }
     
     const data = await response.json();
@@ -353,6 +357,7 @@ async function refreshSession(refreshToken: string): Promise<AuthSession | null>
     return newSession;
     
   } catch (error) {
+    // Network errors or unexpected issues
     if (__DEV__) {
       console.error('[AuthService] Error refreshing session:', error);
     }

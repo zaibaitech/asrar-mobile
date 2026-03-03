@@ -471,7 +471,7 @@ export default function HomeScreen() {
             <View style={styles.profileBannerText}>
               <Text style={styles.profileBannerTitle}>Complete Your Profile</Text>
               <Text style={styles.profileBannerSubtitle}>
-                Add your DOB to unlock Divine Timing personalization
+                Add your DOB to unlock personalized features
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />

@@ -1,14 +1,20 @@
-import { Text, View } from '@/components/Themed';
 import { handleAuthCallback } from '@/services/AuthService';
 import { useGlobalSearchParams, useRouter } from 'expo-router';
-import { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, StyleSheet, Text, View } from 'react-native';
 
 /**
  * OAuth / Email-verification callback screen.
  *
  * Route: asrariya://auth/callback  (deep link)
  *        /auth/callback            (in-app)
+ *
+ * Enterprise-grade branded loading screen with:
+ * - Full-screen dark background matching app theme
+ * - Smooth fade animation
+ * - Single execution guarantee
+ * - Instant redirect after session processing
+ * - No headers, no fallback UI, no flashing
  *
  * For Google OAuth (PKCE):
  *   WebBrowser.openAuthSessionAsync() already intercepts the redirect,
@@ -30,13 +36,31 @@ export default function AuthCallbackScreen() {
     error_description?: string;
   }>();
 
+  // Prevent double execution (Android re-render protection)
+  const hasProcessed = useRef(false);
+  
+  // Fade animation for smooth entrance
+  const [fadeAnim] = useState(new Animated.Value(0));
+
   useEffect(() => {
+    // Start fade-in animation
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+
+    // Process callback only once
+    if (hasProcessed.current) {
+      return;
+    }
+    hasProcessed.current = true;
+
     async function process() {
       try {
         // OAuth PKCE flow — has `code`, handled by AuthService's WebBrowser listener
         if (params.code && !params.type) {
-          // AuthService already exchanged the code. Just wait briefly and go home.
-          await new Promise((r) => setTimeout(r, 500));
+          // AuthService already exchanged the code. Redirect instantly.
           router.replace('/(tabs)');
           return;
         }
@@ -85,8 +109,10 @@ export default function AuthCallbackScreen() {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#6366f1" />
-      <Text style={styles.text}>Completing sign-in…</Text>
+      <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+        <ActivityIndicator size="large" color="#8B5CF6" />
+        <Text style={styles.text}>Completing secure sign-in…</Text>
+      </Animated.View>
     </View>
   );
 }
@@ -96,11 +122,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#070A1A', // App dark theme background
+  },
+  content: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   text: {
-    marginTop: 16,
+    marginTop: 20,
     fontSize: 16,
-    color: '#94a3b8',
+    fontWeight: '500',
+    color: '#94A3B8',
+    letterSpacing: 0.3,
   },
 });
