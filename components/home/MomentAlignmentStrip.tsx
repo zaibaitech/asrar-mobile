@@ -12,6 +12,7 @@ import {
     Typography,
 } from '@/constants/DarkTheme';
 import { Element } from '@/services/MomentAlignmentService';
+import { type PlanetaryCondition } from '@/services/PlanetaryConditionService';
 import { PlanetaryHourData } from '@/services/PlanetaryHoursService';
 import { getAlignmentBadge, getAlignmentLabelKey, getRulingPlanetFromBurj } from '@/services/SimpleAlignmentBadge';
 
@@ -24,6 +25,8 @@ interface MomentAlignmentStripProps {
   planetaryData?: PlanetaryHourData | null;
   /** User's zodiac sign index (1–12) for personalized alignment */
   userBurjIndex?: number | null;
+  /** Hour ruler planetary condition (includes full dignity calculation) */
+  hourRulerCondition?: PlanetaryCondition;
 }
 
 function getElementLabel(element: Element | undefined, t: (key: string) => string) {
@@ -50,6 +53,7 @@ export function MomentAlignmentStrip({
   t,
   planetaryData,
   userBurjIndex,
+  hourRulerCondition,
 }: MomentAlignmentStripProps) {
   const router = useRouter();
 
@@ -59,7 +63,9 @@ export function MomentAlignmentStrip({
   const { badgeColor, badgeBg, badgeIcon, badgeLabel } = React.useMemo(() => {
     if (currentPlanet) {
       const userRuler = userBurjIndex ? getRulingPlanetFromBurj(userBurjIndex) : undefined;
-      const badge = getAlignmentBadge(currentPlanet, userRuler);
+      // Use full dignity score from planetary condition if available
+      const dignityScore = hourRulerCondition?.dignity?.score;
+      const badge = getAlignmentBadge(currentPlanet, userRuler, dignityScore);
       const labelKey = getAlignmentLabelKey(badge.tier);
       return {
         badgeColor: badge.color,
@@ -69,7 +75,7 @@ export function MomentAlignmentStrip({
       };
     }
     return { badgeColor: undefined, badgeBg: undefined, badgeIcon: undefined, badgeLabel: undefined };
-  }, [currentPlanet, userBurjIndex, t]);
+  }, [currentPlanet, userBurjIndex, hourRulerCondition?.dignity?.score, t]);
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

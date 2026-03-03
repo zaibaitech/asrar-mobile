@@ -135,6 +135,7 @@ export default function CompatibilityScreen() {
             ref={scrollViewRef}
             style={styles.container}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="always"
           >
             <RelationshipInputForm
               onCalculate={handleCalculate}
@@ -149,6 +150,7 @@ export default function CompatibilityScreen() {
           <ScrollView 
             style={styles.container}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="always"
           >
             <RelationshipCompatibilityView
               analysis={result}

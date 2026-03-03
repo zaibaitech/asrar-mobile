@@ -275,8 +275,8 @@ export default function HomeScreen() {
         currentProfile,
         new Date(),
         typeof lat === 'number' && typeof lon === 'number'
-          ? { location: { latitude: lat, longitude: lon }, lightweight: true }
-          : { lightweight: true }
+          ? { location: { latitude: lat, longitude: lon } }
+          : undefined
       );
       setMomentAlignment(alignment);
     } catch (error) {
@@ -531,6 +531,7 @@ export default function HomeScreen() {
           t={t}
           planetaryData={planetaryData}
           userBurjIndex={profile?.derived?.burjIndex ?? (profile?.dobISO ? deriveBurjFromDOB(profile.dobISO)?.burjIndex : undefined)}
+          hourRulerCondition={momentAlignment?.hourRulerCondition}
         />
         
         {/* Action Pills hidden temporarily for V1 launch */}

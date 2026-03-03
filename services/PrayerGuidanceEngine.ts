@@ -19,6 +19,7 @@ import type { DivineNamePlanetary, Element, Prayer, Temperament } from '@/data/d
 import { DIVINE_NAMES_PLANETARY, getDivineNamesByPlanet, getDivineNamesForPrayer } from '@/data/divine-names-planetary';
 import type { Dhikr } from '@/data/prayer-adhkar';
 import { getAdhkarForPrayer, getSunnahAdhkarForPrayer } from '@/data/prayer-adhkar';
+import { getAlignmentBadge, getRulingPlanetFromBurj, type AlignmentTier } from './SimpleAlignmentBadge';
 
 // ============================================================================
 // TYPES
@@ -33,7 +34,9 @@ export interface UserProfile {
     temperament: Temperament;
     reduction: number; // 1-9
     planet?: Planet;
-    /** Optional zodiac sign for Scorpio special case (Mars-ruled water with fire affinity) */
+    /** Zodiac sign index (0-11) for planetary ruler determination */
+    burjIndex?: number;
+    /** Optional zodiac sign key for Scorpio special case (Mars-ruled water with fire affinity) */
     burjKey?: string;
   };
 }
@@ -149,18 +152,21 @@ export class PrayerGuidanceEngine {
       planetaryHour.hourNumber
     );
     
-    // 2. Calculate elemental alignment between user and current hour
-    // Pass burjKey for Scorpio special case (Mars-ruled water with fire affinity)
-    const alignment = this.calculateAlignment(
-      userProfile.derived.element,
-      planetaryHour.element,
-      userProfile.derived.burjKey
-    );
+    // 2. Calculate alignment using comprehensive SimpleAlignmentBadge system
+    // This considers planet nature (benefic/malefic), personal ruler, and dignity
+    const userRuler = userProfile.derived.burjIndex !== undefined 
+      ? getRulingPlanetFromBurj(userProfile.derived.burjIndex)
+      : undefined;
+    
+    const badge = getAlignmentBadge(planetaryHour.planet, userRuler);
+    const alignment = this.mapBadgeToAlignment(badge.tier, badge.score);
     
     const alignmentDescription = this.getAlignmentDescription(
       alignment,
       userProfile.derived.element,
-      planetaryHour.element
+      planetaryHour.element,
+      planetaryHour.planet,
+      badge.tier
     );
     
     // 3. Select optimal Divine Name based on all factors
@@ -280,24 +286,50 @@ export class PrayerGuidanceEngine {
   }
   
   // ==========================================================================
-  // ELEMENTAL ALIGNMENT
+  // ALIGNMENT CALCULATION (using SimpleAlignmentBadge)
   // ==========================================================================
   
   /**
-   * Calculate elemental alignment strength
+   * Map SimpleAlignmentBadge tier to prayer guidance alignment categories
    * 
-   * Determines how well user's element harmonizes with current hour's element.
-   * Based on classical elemental theory:
-   * - Same element = exceptional alignment
-   * - Compatible (Fire-Air, Water-Earth) = strong
-   * - Neutral = favorable/moderate
-   * - Opposite (Fire-Water, Air-Earth) = challenging (requires extra care)
+   * Badge tiers consider:
+   * - Planet nature (benefic/malefic)
+   * - Personal ruler compatibility 
+   * - Planetary dignity (sign position, retrograde, combustion, etc.)
    * 
-   * SPECIAL CASES:
-   * - Scorpio (Mars-ruled water) shares fire's intensity → strong with fire
-   * - Aquarius (Saturn-ruled cold air) shares coolness with water → favorable, not challenging
+   * This provides much more accurate alignment than elemental-only calculation.
    */
-  private static calculateAlignment(
+  private static mapBadgeToAlignment(
+    tier: AlignmentTier,
+    score: number
+  ): 'exceptional' | 'strong' | 'favorable' | 'moderate' | 'balanced' | 'challenging' {
+    // aligned tier (70+)
+    if (tier === 'aligned') {
+      if (score >= 85) return 'exceptional';  // Very high score
+      return 'strong';  // Good score
+    }
+    
+    // steady tier (45-69)
+    if (tier === 'steady') {
+      if (score >= 60) return 'favorable';  // Upper steady range
+      return 'moderate';  // Lower steady range
+    }
+    
+    // mindful tier (<45)
+    if (score >= 35) return 'balanced';  // Not too weak
+    return 'challenging';  // Very weak
+  }
+  
+  /**
+   * DEPRECATED: Old elemental-only alignment calculation
+   * Kept for reference but no longer used.
+   * 
+   * Now using SimpleAlignmentBadge which considers:
+   * - Planet nature (Sa'd/Nahs)
+   * - Personal ruler (same planet = +35 points!)
+   * - Dignity score (0-100 from ephemeris)
+   */
+  private static calculateAlignment_DEPRECATED(
     userElement: Element,
     hourElement: Element,
     userBurjKey?: string
@@ -354,22 +386,42 @@ export class PrayerGuidanceEngine {
   
   /**
    * Get human-readable alignment description
+   * Now enhanced to include planetary considerations
    */
   private static getAlignmentDescription(
     alignment: string,
     userElement: Element,
-    hourElement: Element
+    hourElement: Element,
+    hourPlanet: Planet,
+    badgeTier: AlignmentTier
   ): string {
+    const planetNature = this.getPlanetNatureDescription(hourPlanet);
+    const tierDescription = badgeTier === 'aligned' ? 'highly supportive' : 
+                           badgeTier === 'steady' ? 'balanced' : 
+                           'requires mindfulness';
+    
     const descriptions: Record<string, string> = {
-      exceptional: `Your ${userElement} nature perfectly aligns with this ${hourElement} hour. Optimal time for spiritual work.`,
-      strong: `Your ${userElement} nature harmonizes strongly with this ${hourElement} hour. Excellent conditions for practice.`,
-      favorable: `Your ${userElement} nature works well with this ${hourElement} hour. Good time for spiritual activities.`,
-      moderate: `Your ${userElement} nature has moderate compatibility with this ${hourElement} hour. Steady practice recommended.`,
-      balanced: `Your ${userElement} nature seeks balance with this ${hourElement} hour. Focus on equilibrium in practice.`,
-      challenging: `Your ${userElement} nature meets its opposite in this ${hourElement} hour. Keep practices gentle, grounded, and consistent.`
+      exceptional: `This ${hourPlanet} hour (${planetNature}) is ${tierDescription} and perfectly aligns with your spiritual practice. Exceptional time for deep work.`,
+      strong: `This ${hourPlanet} hour (${planetNature}) is ${tierDescription} and harmonizes well with your nature. Excellent conditions for practice.`,
+      favorable: `This ${hourPlanet} hour (${planetNature}) is ${tierDescription} and works favorably. Good time for spiritual activities.`,
+      moderate: `This ${hourPlanet} hour (${planetNature}) is ${tierDescription}. Steady practice recommended.`,
+      balanced: `This ${hourPlanet} hour (${planetNature}) is ${tierDescription}. Focus on equilibrium in practice.`,
+      challenging: `This ${hourPlanet} hour (${planetNature}) is ${tierDescription}. Keep practices gentle, grounded, and consistent.`
     };
     
     return descriptions[alignment] || descriptions.favorable;
+  }
+  
+  /**
+   * Get human-friendly planet nature description
+   */
+  private static getPlanetNatureDescription(planet: Planet): string {
+    const benefics = ['Sun', 'Jupiter', 'Venus'];
+    const malefics = ['Saturn', 'Mars'];
+    
+    if (benefics.includes(planet)) return 'benefic';
+    if (malefics.includes(planet)) return 'malefic';
+    return 'neutral';
   }
   
   // ==========================================================================

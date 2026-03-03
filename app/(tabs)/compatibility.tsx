@@ -77,7 +77,11 @@ export default function CompatibilityTabScreen() {
         </TouchableOpacity>
       </LinearGradient>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="always"
+      >
         {activeTab === 'input' ? (
           <>
             {/* Compatibility Type Selector */}

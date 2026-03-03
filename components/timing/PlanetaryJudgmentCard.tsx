@@ -4,7 +4,7 @@ import type { Planet } from '@/services/PlanetaryHoursService';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-type JudgmentStatus = 'supportive' | 'neutral' | 'restrictive';
+type JudgmentStatus = 'supportive' | 'neutral' | 'cautious';
 
 type MoonPhaseName =
   | 'new'
@@ -30,7 +30,7 @@ function getStatusForRuler(ruler: Planet): JudgmentStatus {
       return 'supportive';
     case 'Saturn':
     case 'Mars':
-      return 'restrictive';
+      return 'cautious';
     case 'Moon':
     case 'Mercury':
     default:
@@ -56,8 +56,8 @@ function getStatusColor(status: JudgmentStatus): string {
   switch (status) {
     case 'supportive':
       return '#10b981';
-    case 'restrictive':
-      return '#ef4444';
+    case 'cautious':
+      return '#7C3AED';
     default:
       return '#64B5F6';
   }

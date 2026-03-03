@@ -1605,26 +1605,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {activeTab === 'resonance' && (
           <View style={styles.section}>
-            {/* Resonance Score */}
-            <LinearGradient
-              colors={['rgba(139, 92, 246, 0.2)', 'rgba(167, 139, 250, 0.2)']}
-              style={styles.resonanceCard}
-            >
-              <Text style={styles.resonanceTitle}>
-                {t('compatibility.divineNameResults.resonance.title')}
-              </Text>
-              <CompatibilityGauge
-                score={evaluation.resonanceScore}
-                label=""
-                color={divineTheme.accent}
-                size={130}
-              />
-              <Text style={styles.resonanceSubtext}>
-                {t('compatibility.divineNameResults.resonance.subtitle', { person: person.name, name: divineName.transliteration })}
-              </Text>
-            </LinearGradient>
-
-            {/* Spiritual Destiny (Mod-9) - PRIMARY METRIC */}
+            {/* Spiritual Destiny (Mod-9) - PRIMARY METRIC FOR DIVINE NAME COMPATIBILITY */}
             <LinearGradient
               colors={['rgba(139, 92, 246, 0.15)', 'rgba(167, 139, 250, 0.15)']}
               style={styles.detailCard}

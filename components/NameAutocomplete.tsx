@@ -85,11 +85,12 @@ export default function NameAutocomplete({
   };
 
   const handleBlur = () => {
-    // Delay to allow tap on dropdown item to register
+    // Longer delay to allow tap on dropdown item to register
+    // Even when keyboard is showing
     setTimeout(() => {
       setIsFocused(false);
       setShowDropdown(false);
-    }, 300);
+    }, 500);
   };
 
   const dismissDropdown = () => {
@@ -129,7 +130,7 @@ export default function NameAutocomplete({
           <View style={styles.dropdownContainer}>
             <ScrollView 
               style={styles.dropdown}
-              keyboardShouldPersistTaps="handled"
+              keyboardShouldPersistTaps="always"
               nestedScrollEnabled={true}
               showsVerticalScrollIndicator={true}
             >
@@ -140,7 +141,7 @@ export default function NameAutocomplete({
                     styles.dropdownItem,
                     index === matches.slice(0, 8).length - 1 && styles.dropdownItemLast
                   ]}
-                  onPressIn={() => handleSelectName(item)}
+                  onPress={() => handleSelectName(item)}
                 >
                   <Text style={styles.dropdownItemLatin}>
                     {getNameDisplayLabel(item)}

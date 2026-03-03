@@ -87,7 +87,11 @@ export default function UniversalCompatibilityScreen() {
           </TouchableOpacity>
         </LinearGradient>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false} 
+          keyboardShouldPersistTaps="always"
+        >
           {activeTab === 'input' ? (
             <>
               {/* Compatibility Type Selector */}

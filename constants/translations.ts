@@ -263,6 +263,7 @@ export const translations = {
               0: "Delicate negotiations",
               1: "Emotional conversations",
               2: "Patience-requiring tasks",
+              3: "Passive or overly cautious approaches",
             },
           },
           mercury: {
@@ -346,12 +347,12 @@ export const translations = {
           status: {
             supportive: "Supportive Day",
             neutral: "Neutral Day",
-            restrictive: "Restrictive Day",
+            cautious: "Mindful Day",
           },
           classicalTerms: {
             supportive: "Benefic",
             neutral: "Neutral",
-            restrictive: "Malefic",
+            cautious: "Malefic",
           },
           intro: "Today is ruled by {planet}.",
           rulerTone: {
@@ -2571,6 +2572,7 @@ export const translations = {
           excellent: "Excellent",
           good: "Good",
           moderate: "Moderate",
+          weak: "Weak",
         },
         rulerAdvice: {
           veryStrong: "{planet} is strongly supported today — act with clarity and confidence.",
@@ -2611,12 +2613,12 @@ export const translations = {
         status: {
           supportive: "Supportive Day",
           neutral: "Neutral Day",
-          restrictive: "Restrictive Day",
+          cautious: "Mindful Day",
         },
         classicalTerms: {
           supportive: "Benefic",
           neutral: "Neutral",
-          restrictive: "Malefic",
+          cautious: "Malefic",
         },
         intro: "Today is ruled by {planet}.",
         rulerTone: {
@@ -9851,6 +9853,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       "Water-Earth": "Earth grounds Water — emotions find stable, nourishing form",
       "Water-Air": "Water and Air create mist — feelings meet thoughts adaptably",
       "Water-Fire": "Water and Fire create steam — emotional depth meets passionate intensity",
+      "water-fire": "Water and Fire create steam — emotional depth meets passionate intensity",
 
       "Air-Air": "Air amplifies Air — mental clarity and communication multiply",
       "Air-Fire": "Fire energizes Air — thoughts ignite into inspired action",
@@ -10147,6 +10150,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
               0: "Négociations délicates",
               1: "Conversations émotionnelles",
               2: "Tâches nécessitant de la patience",
+              3: "Approches passives ou trop prudentes",
             },
           },
           mercury: {
@@ -10230,12 +10234,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           status: {
             supportive: "Jour Favorable",
             neutral: "Jour Neutre",
-            restrictive: "Jour Restrictif",
+            cautious: "Jour Prudent",
           },
           classicalTerms: {
             supportive: "Bénéfique",
             neutral: "Neutre",
-            restrictive: "Maléfique",
+            cautious: "Maléfique",
           },
           intro: "Aujourd'hui est régi par {planet}.",
           rulerTone: {
@@ -12443,6 +12447,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           excellent: "Excellente",
           good: "Bonne",
           moderate: "Modérée",
+          weak: "Faible",
         },
         rulerAdvice: {
           veryStrong: "{planet} est fortement soutenu aujourd’hui — agissez avec clarté et confiance.",
@@ -12483,12 +12488,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         status: {
           supportive: "Jour Favorable",
           neutral: "Jour Neutre",
-          restrictive: "Jour Restrictif",
+          cautious: "Jour Prudent",
         },
         classicalTerms: {
           supportive: "Bénéfique",
           neutral: "Neutre",
-          restrictive: "Maléfique",
+          cautious: "Maléfique",
         },
         intro: "Aujourd'hui est régi par {planet}.",
         rulerTone: {
@@ -19999,6 +20004,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       "Water-Earth": "La Terre ancre l'Eau — émotions stabilisées",
       "Water-Air": "L'Eau et l'Air créent de la brume — adaptable",
       "Water-Fire": "L'Eau et le Feu créent de la vapeur — intensité",
+      "water-fire": "L'Eau et le Feu créent de la vapeur — intensité",
       "Air-Air": "L'Air amplifie l'Air — clarté mentale multipliée",
       "Air-Fire": "Le Feu énergise l'Air — pensées enflammées",
       "Air-Earth": "L'Air et la Terre travaillent ensemble — idées pratiques",
@@ -22017,12 +22023,12 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         status: {
           supportive: "يوم داعم",
           neutral: "يوم محايد",
-          restrictive: "يوم مقيّد",
+          cautious: "يوم يستدعي التأني",
         },
         classicalTerms: {
           supportive: "سعد",
           neutral: "محايد",
-          restrictive: "نحس",
+          cautious: "نحس",
         },
         intro: "اليوم يحكمه {planet}.",
         rulerTone: {
@@ -22254,6 +22260,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       "Water-Earth": "الأرض تثبت الماء — عواطف مستقرة",
       "Water-Air": "الماء والهواء يخلقان ضبابًا — قابل للتكيف",
       "Water-Fire": "الماء والنار يخلقان بخارًا — شدة",
+      "water-fire": "الماء والنار يخلقان بخارًا — شدة",
       "Air-Air": "الهواء يضخم الهواء — وضوح ذهني مضاعف",
       "Air-Fire": "النار تمد الهواء بالطاقة — أفكار ملتهبة",
       "Air-Earth": "الهواء والأرض يعملان معًا — أفكار عملية",

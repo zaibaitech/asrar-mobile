@@ -3,7 +3,7 @@
     "name": "Asrariya",
     "slug": "asrar-mobile",
     "description": "Asrariya – Your Islamic spiritual companion. Discover daily energy alignment, Abjad numerology, Quran guidance, prayer times, compatibility insights, and AI-powered Istikhara support. Built for seekers of divine wisdom.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "sdkVersion": "54.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -48,7 +48,7 @@
         "backgroundColor": "#0f172a"
       },
       "package": "com.zaibaitech.asrariya",
-      "versionCode": 8,
+      "versionCode": 9,
       "edgeToEdgeEnabled": true,
       "intentFilters": [
         {

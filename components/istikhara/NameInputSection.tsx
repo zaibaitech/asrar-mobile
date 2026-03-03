@@ -94,7 +94,7 @@ export default function NameInputSection({
             placeholder={t('istikhara.form.personNamePlaceholder') || 'e.g., Rahim, Ahmed'}
             placeholderTextColor="#9CA3AF"
             onFocus={() => setShowSuggestions(true)}
-            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 500)}
           />
           {latinValue.length > 0 && (
             <TouchableOpacity onPress={() => onLatinChange('')}>
@@ -112,7 +112,7 @@ export default function NameInputSection({
             <ScrollView
               style={styles.suggestionsList}
               nestedScrollEnabled
-              keyboardShouldPersistTaps="handled"
+              keyboardShouldPersistTaps="always"
             >
               {suggestions.map((item, index) => (
                 <TouchableOpacity

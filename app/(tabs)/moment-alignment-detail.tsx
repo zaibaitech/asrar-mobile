@@ -130,8 +130,10 @@ export default function MomentAlignmentDetailScreen() {
     if (!planet) return null;
     const burjIndex = dobZodiacDerived?.burjIndex ?? profile?.derived?.burjIndex;
     const userRuler = typeof burjIndex === 'number' ? getRulingPlanetFromBurj(burjIndex) : undefined;
-    return getAlignmentBadge(planet, userRuler);
-  }, [planetaryData?.currentHour?.planet, dobZodiacDerived?.burjIndex, profile?.derived?.burjIndex]);
+    // Use full dignity score from planetary condition if available
+    const dignityScore = hourPlanetCondition?.dignity?.score ?? alignment?.hourRulerCondition?.dignity?.score;
+    return getAlignmentBadge(planet, userRuler, dignityScore);
+  }, [planetaryData?.currentHour?.planet, dobZodiacDerived?.burjIndex, profile?.derived?.burjIndex, hourPlanetCondition?.dignity?.score, alignment?.hourRulerCondition?.dignity?.score]);
 
   // Keep legacy badge derivation for deep analysis sections that still reference it
   const unifiedBadge: UnifiedBadge = timingResult
@@ -1135,7 +1137,16 @@ export default function MomentAlignmentDetailScreen() {
                   // Use SimpleAlignmentBadge for each timeline window (consistent with header)
                   const burjIdx = dobZodiacDerived?.burjIndex ?? profile?.derived?.burjIndex;
                   const windowUserRuler = typeof burjIdx === 'number' ? getRulingPlanetFromBurj(burjIdx) : undefined;
-                  const windowBadge = getAlignmentBadge(window.planet, windowUserRuler);
+                  
+                  // Use full dignity score if this planet matches current hour ruler
+                  // (dignity changes slowly - only when planet changes signs, so current dignity applies to future hours)
+                  const currentPlanetCondition = hourPlanetCondition ?? alignment?.hourRulerCondition;
+                  const windowDignityScore = 
+                    currentPlanetCondition?.planet?.toLowerCase() === window.planet.toLowerCase()
+                      ? currentPlanetCondition.dignity?.score
+                      : undefined;
+                  
+                  const windowBadge = getAlignmentBadge(window.planet, windowUserRuler, windowDignityScore);
                   const windowLabelKey = getAlignmentLabelKey(windowBadge.tier);
                   return (
                   <View key={idx} style={styles.timelineItem}>

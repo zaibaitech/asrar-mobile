@@ -126,7 +126,7 @@ export function RelationshipInputForm({
           styles.contentContainer,
           showKeyboard && styles.contentContainerWithKeyboard
         ]}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps="always"
       >
         
         {/* Header */}
