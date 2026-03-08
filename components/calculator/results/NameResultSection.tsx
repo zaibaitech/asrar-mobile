@@ -20,7 +20,7 @@ export const NameResultSection: React.FC<NameResultSectionProps> = ({ insights }
     <View style={styles.container}>
       {/* Archetype Card */}
       <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.archetypeCard}>
-        <Text style={styles.archetypeTitle}>{insights.archetypeTitle}</Text>
+        <Text style={styles.archetypeTitle}>{t(insights.archetypeTitle)}</Text>
         <Text style={styles.archetypeSubtitle}>{t('calculator.results.nameInsights.yourSpiritualArchetype')}</Text>
       </LinearGradient>
       
@@ -70,7 +70,7 @@ export const NameResultSection: React.FC<NameResultSectionProps> = ({ insights }
           </View>
           <View style={styles.timingItem}>
             <Text style={styles.timingLabel}>{t('calculator.results.nameInsights.powerDays')}</Text>
-            <Text style={styles.timingValue}>{insights.powerDay}</Text>
+            <Text style={styles.timingValue}>{t(insights.powerDay)}</Text>
           </View>
         </View>
         <Text style={styles.timingNote}>

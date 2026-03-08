@@ -4579,6 +4579,13 @@ export const translations = {
             air: "Morning and afternoon (Dhuhr to Asr) - when air circulates",
             earth: "Maghrib and grounding moments - when earth stabilizes",
           },
+          // Power Days by Element
+          powerDay: {
+            fire: "Tuesday (Mars) and Sunday (Sun)",
+            water: "Monday (Moon) and Friday (Venus)",
+            air: "Wednesday (Mercury)",
+            earth: "Thursday (Jupiter) and Saturday (Saturn)",
+          },
         },
         
         // Advanced Methods Section
@@ -14444,6 +14451,13 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             water: "Nuit et avant de dormir (temps d'Isha) - quand l'énergie de l'eau coule",
             air: "Matin et après-midi (Dhuhr à Asr) - quand l'air circule",
             earth: "Maghrib et moments d'ancrage - quand la terre se stabilise",
+          },
+          // Power Days by Element
+          powerDay: {
+            fire: "Mardi (Mars) et Dimanche (Soleil)",
+            water: "Lundi (Lune) et Vendredi (Vénus)",
+            air: "Mercredi (Mercure)",
+            earth: "Jeudi (Jupiter) et Samedi (Saturne)",
           },
         },
         

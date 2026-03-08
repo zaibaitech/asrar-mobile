@@ -39,7 +39,7 @@ export interface LegacyPlanetTransitInfo {
 /**
  * Planet info for display
  */
-const PLANET_INFO: Record<Planet, { name: string; arabicName: string; symbol: string }> = {
+const PLANET_INFO_EN: Record<Planet, { name: string; arabicName: string; symbol: string }> = {
   Sun: { name: 'Sun', arabicName: 'الشمس', symbol: '☉' },
   Moon: { name: 'Moon', arabicName: 'القمر', symbol: '☽' },
   Mercury: { name: 'Mercury', arabicName: 'عطارد', symbol: '☿' },
@@ -49,14 +49,47 @@ const PLANET_INFO: Record<Planet, { name: string; arabicName: string; symbol: st
   Saturn: { name: 'Saturn', arabicName: 'زحل', symbol: '♄' },
 };
 
+const PLANET_INFO_FR: Record<Planet, { name: string; arabicName: string; symbol: string }> = {
+  Sun: { name: 'Soleil', arabicName: 'الشمس', symbol: '☉' },
+  Moon: { name: 'Lune', arabicName: 'القمر', symbol: '☽' },
+  Mercury: { name: 'Mercure', arabicName: 'عطارد', symbol: '☿' },
+  Venus: { name: 'Vénus', arabicName: 'الزهرة', symbol: '♀' },
+  Mars: { name: 'Mars', arabicName: 'المريخ', symbol: '♂' },
+  Jupiter: { name: 'Jupiter', arabicName: 'المشتري', symbol: '♃' },
+  Saturn: { name: 'Saturne', arabicName: 'زحل', symbol: '♄' },
+};
+
+const PLANET_INFO_AR: Record<Planet, { name: string; arabicName: string; symbol: string }> = {
+  Sun: { name: 'الشمس', arabicName: 'الشمس', symbol: '☉' },
+  Moon: { name: 'القمر', arabicName: 'القمر', symbol: '☽' },
+  Mercury: { name: 'عطارد', arabicName: 'عطارد', symbol: '☿' },
+  Venus: { name: 'الزهرة', arabicName: 'الزهرة', symbol: '♀' },
+  Mars: { name: 'المريخ', arabicName: 'المريخ', symbol: '♂' },
+  Jupiter: { name: 'المشتري', arabicName: 'المشتري', symbol: '♃' },
+  Saturn: { name: 'زحل', arabicName: 'زحل', symbol: '♄' },
+};
+
+/**
+ * Get planet info based on language
+ */
+function getPlanetInfo(planet: Planet, language: 'en' | 'ar' | 'fr' = 'en'): { name: string; arabicName: string; symbol: string } {
+  if (language === 'ar') {
+    return PLANET_INFO_AR[planet];
+  } else if (language === 'fr') {
+    return PLANET_INFO_FR[planet];
+  }
+  return PLANET_INFO_EN[planet];
+}
+
 /**
  * Convert new PlanetTransit to legacy PlanetTransitInfo format
  * Used for backward compatibility with existing widgets
  */
 export function adaptTransitToLegacyFormat(
-  transit: PlanetTransit
+  transit: PlanetTransit,
+  language: 'en' | 'ar' | 'fr' = 'en'
 ): LegacyPlanetTransitInfo {
-  const planetInfo = PLANET_INFO[transit.planet];
+  const planetInfo = getPlanetInfo(transit.planet, language);
   const zodiacInfo = ZODIAC_DATA[transit.sign];
   
   return {

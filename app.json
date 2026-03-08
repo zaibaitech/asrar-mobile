@@ -39,7 +39,8 @@
         "UIBackgroundModes": [
           "audio",
           "fetch"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

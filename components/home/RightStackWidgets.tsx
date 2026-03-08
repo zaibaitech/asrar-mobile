@@ -37,6 +37,7 @@ interface RightStackWidgetsProps {
   nextDayBlessing?: DayBlessing | null;
   planetaryData?: PlanetaryHourData | null;
   t: (key: string) => string;
+  language?: 'en' | 'ar' | 'fr';
 }
 
 export function RightStackWidgets({
@@ -46,6 +47,7 @@ export function RightStackWidgets({
   nextDayBlessing,
   planetaryData,
   t,
+  language = 'en',
 }: RightStackWidgetsProps) {
   const router = useRouter();
   const [prayerSlide, setPrayerSlide] = useState(0);
@@ -125,7 +127,7 @@ const selectedTransit = useMemo(() => {
   }, [transits, myZodiacKey]);
 
   // Convert new transit format to legacy format for widget
-  const legacyTransit = selectedTransit?.transit ? adaptTransitToLegacyFormat(selectedTransit.transit) : null;
+  const legacyTransit = selectedTransit?.transit ? adaptTransitToLegacyFormat(selectedTransit.transit, language) : null;
   const isPersonalTransit = selectedTransit?.isPersonal ?? false;
   const nextDayBlessingWithElement = nextDayBlessing
     ? {

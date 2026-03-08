@@ -23,16 +23,16 @@ import { ElementType } from '../utils/types';
 // NAME ADAPTER
 // ============================================================================
 
-const NAME_ARCHETYPES: Record<number, string> = {
-  1: 'The Pioneer',
-  2: 'The Harmonizer',
-  3: 'The Creator',
-  4: 'The Builder',
-  5: 'The Explorer',
-  6: 'The Nurturer',
-  7: 'The Seeker',
-  8: 'The Achiever',
-  9: 'The Sage',
+const NAME_ARCHETYPE_KEYS: Record<number, string> = {
+  1: 'calculator.results.archetypes.1.title',
+  2: 'calculator.results.archetypes.2.title',
+  3: 'calculator.results.archetypes.3.title',
+  4: 'calculator.results.archetypes.4.title',
+  5: 'calculator.results.archetypes.5.title',
+  6: 'calculator.results.archetypes.6.title',
+  7: 'calculator.results.archetypes.7.title',
+  8: 'calculator.results.archetypes.8.title',
+  9: 'calculator.results.archetypes.9.title',
 };
 
 // Element guidance keys (to be translated via t())
@@ -50,25 +50,25 @@ const ELEMENT_BEST_TIME_KEYS: Record<ElementType, string> = {
   earth: 'calculator.results.nameInsights.bestTime.earth',
 };
 
-const ELEMENT_POWER_DAY: Record<ElementType, string> = {
-  fire: 'Tuesday (Mars) and Sunday (Sun)',
-  water: 'Monday (Moon) and Friday (Venus)',
-  air: 'Wednesday (Mercury)',
-  earth: 'Thursday (Jupiter) and Saturday (Saturn)',
+const ELEMENT_POWER_DAY_KEYS: Record<ElementType, string> = {
+  fire: 'calculator.results.nameInsights.powerDay.fire',
+  water: 'calculator.results.nameInsights.powerDay.water',
+  air: 'calculator.results.nameInsights.powerDay.air',
+  earth: 'calculator.results.nameInsights.powerDay.earth',
 };
 
 export function computeNameInsights(
   core: CoreResults,
   analytics: ElementalAnalytics
 ): NameInsights {
-  const archetype = NAME_ARCHETYPES[core.saghir] || 'The Traveler';
+  const archetype = NAME_ARCHETYPE_KEYS[core.saghir] || 'calculator.results.archetypes.1.title';
   
   // Store the translation key instead of translated text
   // Components will translate this using t(spiritualGuidance)
   const guidanceKey = ELEMENT_GUIDANCE_KEYS[core.element];
   
   const bestTime = ELEMENT_BEST_TIME_KEYS[core.element];
-  const powerDay = ELEMENT_POWER_DAY[core.element];
+  const powerDay = ELEMENT_POWER_DAY_KEYS[core.element];
   
   // Enhanced: Find divine names with matching or near values
   const matchingNames = findDivineNamesByValue(core.kabir, 50)

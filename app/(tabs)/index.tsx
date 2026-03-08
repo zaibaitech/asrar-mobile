@@ -162,7 +162,7 @@ const getModules = (t: any): (Omit<ModuleCardProps, 'onPress'> & { id: string })
 ];
 
 export default function HomeScreen() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile, completionStatus } = useProfile();
@@ -336,9 +336,16 @@ export default function HomeScreen() {
     // Calculate tomorrow's blessing (sync, no state dependency)
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    setTomorrowBlessing(getTodayBlessing(tomorrow));
+    setTomorrowBlessing(getTodayBlessing(tomorrow, language));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Update tomorrow's blessing when language changes
+  useEffect(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setTomorrowBlessing(getTodayBlessing(tomorrow, language));
+  }, [language]);
 
   // Re-trigger moment alignment once profile name becomes available.
   // The initial load may run before the profile is loaded from storage,
@@ -518,6 +525,7 @@ export default function HomeScreen() {
               nextDayBlessing={tomorrowBlessing}
               planetaryData={planetaryData}
               t={t}
+              language={language}
             />
           </View>
         </View>

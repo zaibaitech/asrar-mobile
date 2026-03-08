@@ -256,7 +256,7 @@ const PLANET_EMOJIS: Record<Planet, string> = {
  * Get today's blessing based on current weekday
  * Uses authentic Maghribi planetary ruler system
  */
-export function getTodayBlessing(date: Date = new Date()): DayBlessing {
+export function getTodayBlessing(date: Date = new Date(), language: 'en' | 'ar' | 'fr' = 'en'): DayBlessing {
   // Get day of week (0 = Sunday, 6 = Saturday)
   const dayOfWeek = date.getDay();
   
@@ -264,9 +264,19 @@ export function getTodayBlessing(date: Date = new Date()): DayBlessing {
   const planet = WEEKDAY_PLANETS[dayOfWeek];
   const planetData = PLANETARY_DATA[planet];
   
-  // Get weekday name
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const dayName = dayNames[dayOfWeek];
+  // Get weekday name based on language
+  const dayNamesEn = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dayNamesFr = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  const dayNamesAr = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  
+  let dayName: string;
+  if (language === 'ar') {
+    dayName = dayNamesAr[dayOfWeek];
+  } else if (language === 'fr') {
+    dayName = dayNamesFr[dayOfWeek];
+  } else {
+    dayName = dayNamesEn[dayOfWeek];
+  }
   
   return {
     planet: planetData.planet,
