@@ -17,12 +17,14 @@ export interface QuranAyah {
     recommended: boolean;
     obligatory: boolean;
   };
+  audio?: string; // Audio URL for audio editions
 }
 
 export interface QuranAyahWithTranslation {
   arabic: QuranAyah;
   translation: QuranAyah;
   numberInSurah: number;
+  audioUrl?: string; // Audio URL from reciter
 }
 
 export interface QuranSurah {
@@ -33,6 +35,7 @@ export interface QuranSurah {
   revelationType: 'Meccan' | 'Medinan';
   numberOfAyahs: number;
   ayahs: QuranAyahWithTranslation[];
+  reciter?: string; // Reciter identifier if audio is included
 }
 
 export interface QuranEdition {

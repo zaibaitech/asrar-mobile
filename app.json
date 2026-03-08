@@ -112,8 +112,7 @@
             "./assets/sounds/adhan_mecca.mp3",
             "./assets/sounds/adhan_medina.mp3",
             "./assets/sounds/adhan_fajr.mp3"
-          ],
-          "mode": "default"
+          ]
         }
       ],
       "expo-secure-store",

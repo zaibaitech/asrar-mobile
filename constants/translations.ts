@@ -596,7 +596,7 @@ export const translations = {
       },
       guidedIstikhara: {
         title: "Guided Istikhārah",
-        description: "Learn the authentic prayer method and track your spiritual decisions",
+        description: "Learn the traditional prayer method and track your spiritual decisions",
         // Common navigation
         common: {
           back: "Back",
@@ -810,7 +810,7 @@ export const translations = {
       },
       quran: {
         title: "Quran",
-        description: "Read the complete Quran with translations and bookmarks",
+        description: "Read the Quran with translations and bookmarks",
       },
       qibla: {
         title: "Qibla",
@@ -3459,7 +3459,7 @@ export const translations = {
 
     quran: {
       title: "Quran",
-      subtitle: "The Noble Quran - Complete with translations",
+      subtitle: "The Noble Quran with translations",
       allSurahs: "All Surahs (114)",
       surah: "Surah",
       ayah: "Ayah",
@@ -3477,6 +3477,10 @@ export const translations = {
       removeBookmark: "Remove Bookmark",
       removeBookmarkConfirm: "Are you sure you want to remove this bookmark?",
       bookmarkError: "Could not save bookmark. Please try again.",
+      playAudio: "Play Audio",
+      pauseAudio: "Pause Audio",
+      reciter: "Reciter: Mishary Alafasy",
+      audioLoading: "Loading audio...",
     },
     
     // Moment Alignment Detail
@@ -7557,8 +7561,8 @@ export const translations = {
       motherNameTooltip: `💡 Your mother's name reveals your emotional blueprint × the subconscious patterns, feelings, and needs you inherited. This is the foundation beneath your personality.
 
 📊 Analysis depth:
-• With names only: 70% accuracy
-• With mothers' names: 90-95% accuracy
+• Names only: Quick method
+• With mothers' names: Traditional method (recommended)
 
 🌍 This is the traditional method preserved by West African Islamic scholars for serious marriage compatibility.
 
@@ -7568,10 +7572,10 @@ export const translations = {
       analysisMode: "Analysis Mode",
       quickAnalysis: "Quick Analysis (Names Only)",
       quickAnalysisDesc: "See how your conscious personalities interact in daily life. Good for initial curiosity.",
-      quickAccuracy: "70-75% accuracy",
+      quickAccuracy: "Quick method",
       completeAnalysis: "Complete Analysis (Names + Mothers) ⭐ Recommended",
       completeAnalysisDesc: "The traditional West African method. Reveals both surface chemistry and deep emotional compatibility. Essential for serious relationships.",
-      completeAccuracy: "90-95% accuracy",
+      completeAccuracy: "Traditional method",
       
       // Overall Score Section
       overallCompatibilityTitle: "Overall Compatibility",
@@ -10490,7 +10494,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       },
       guidedIstikhara: {
         title: "Istikharah Guidée",
-        description: "Apprenez la méthode authentique de prière et suivez vos décisions spirituelles",
+        description: "Apprenez la méthode traditionnelle de prière et suivez vos décisions spirituelles",
         // Common navigation
         common: {
           back: "Retour",
@@ -13356,6 +13360,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       removeBookmark: "Supprimer le Favori",
       removeBookmarkConfirm: "Êtes-vous sûr de vouloir supprimer ce favori?",
       bookmarkError: "Impossible d'enregistrer le favori. Veuillez réessayer.",
+      playAudio: "Écouter l'Audio",
+      pauseAudio: "Mettre en Pause",
+      reciter: "Récitateur: Mishary Alafasy",
+      audioLoading: "Chargement de l'audio...",
     },
     
     // Moment Alignment Detail
@@ -17739,8 +17747,8 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       motherNameTooltip: `💡 Le nom de votre mère révèle votre empreinte émotionnelle × les schémas subconscients, les sentiments et les besoins que vous avez hérités. C'est la fondation sous votre personnalité.
 
 📊 Profondeur de l'analyse :
-• Avec les noms seulement : 70% de précision
-• Avec les noms des mères : 90-95% de précision
+• Avec les noms seulement : Méthode rapide
+• Avec les noms des mères : Méthode traditionnelle (recommandée)
 
 🌍 C'est la méthode traditionnelle préservée par les érudits islamiques d'Afrique de l'Ouest pour la compatibilité matrimoniale sérieuse.
 
@@ -17750,10 +17758,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       analysisMode: "Mode d'Analyse",
       quickAnalysis: "Analyse Rapide (Noms Seulement)",
       quickAnalysisDesc: "Voyez comment vos personnalités conscientes interagissent dans la vie quotidienne. Bon pour la curiosité initiale.",
-      quickAccuracy: "70-75% de précision",
+      quickAccuracy: "Méthode rapide",
       completeAnalysis: "Analyse Complète (Noms + Mères) ⭐ Recommandé",
       completeAnalysisDesc: "La méthode traditionnelle d'Afrique de l'Ouest. Révèle à la fois la chimie de surface et la compatibilité émotionnelle profonde. Essentiel pour les relations sérieuses.",
-      completeAccuracy: "90-95% de précision",
+      completeAccuracy: "Méthode traditionnelle",
       
       // Section du score global
       overallCompatibilityTitle: "Compatibilité Globale",

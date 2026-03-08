@@ -326,8 +326,8 @@ export function IstikharaForm({ onCalculate }: IstikharaFormProps) {
                       </h4>
                       <p className="text-[10px] sm:text-xs text-gray-100">
                         {language === 'en'
-                          ? 'The mother\'s influence shapes the soul\'s entry into this world, making her name essential for accurate spiritual calculation.'
-                          : 'L\'influence de la mère façonne l\'entrée de l\'âme dans ce monde, rendant son nom essentiel pour un calcul spirituel précis.'}
+                          ? 'The mother\'s influence shapes the soul\'s entry into this world, making her name essential for traditional spiritual calculation.'
+                          : 'L\'influence de la mère façonne l\'entrée de l\'âme dans ce monde, rendant son nom essentiel pour un calcul spirituel traditionnel.'}
                       </p>
                     </div>
                   </div>
@@ -474,8 +474,8 @@ export function IstikharaForm({ onCalculate }: IstikharaFormProps) {
           </h3>
           <p className="text-xs text-white px-2">
             {language === 'en' 
-              ? 'Both names must be in Arabic script for accurate spiritual analysis'
-              : 'Les deux noms doivent être en écriture arabe pour une analyse spirituelle précise'}
+              ? 'Both names must be in Arabic script for traditional spiritual analysis'
+              : 'Les deux noms doivent être en écriture arabe pour une analyse spirituelle traditionnelle'}
           </p>
         </div>
 

@@ -1,8 +1,9 @@
 /**
  * Surah Detail Screen
- * Display full surah with Arabic text and translation
+ * Display full surah with Arabic text, translation, and audio
  */
 
+import { AudioPlayer } from '@/components/quran/AudioPlayer';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { QURAN_SURAHS } from '@/data/quran-surahs';
@@ -30,7 +31,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SurahDetailScreen() {
-  const { surahNumber, scrollToAyah } = useLocalSearchParams();
+  const { surahNumber, scrollToAyah, autoPlay } = useLocalSearchParams();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t, language } = useLanguage();
@@ -40,6 +41,8 @@ export default function SurahDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
+  const [currentlyPlayingAyah, setCurrentlyPlayingAyah] = useState<number | null>(null);
+  const [continuousPlayback, setContinuousPlayback] = useState(autoPlay === 'true');
 
   const surahNum = parseInt(surahNumber as string, 10);
   const surahMeta = QURAN_SURAHS[surahNum - 1];
@@ -64,6 +67,30 @@ export default function SurahDetailScreen() {
       }, 500);
     }
   }, [surah, scrollToAyah]);
+
+  // Auto-start playback if continuous mode is active and surah just loaded
+  useEffect(() => {
+    if (surah && autoPlay === 'true' && !currentlyPlayingAyah) {
+      // Start playing from ayah 1 when navigating to new surah in auto-play mode
+      setTimeout(() => {
+        setCurrentlyPlayingAyah(1);
+      }, 300); // Small delay to ensure UI is ready
+    }
+  }, [surah]); // Only run when surah loads, not when continuousPlayback changes
+
+  // Auto-scroll to currently playing ayah in continuous mode
+  useEffect(() => {
+    if (currentlyPlayingAyah && continuousPlayback && surah && flatListRef.current) {
+      const ayahIndex = currentlyPlayingAyah - 1;
+      setTimeout(() => {
+        flatListRef.current?.scrollToIndex({
+          index: ayahIndex,
+          animated: true,
+          viewPosition: 0.3, // Show ayah in upper third of screen
+        });
+      }, 200);
+    }
+  }, [currentlyPlayingAyah, continuousPlayback, surah]);
 
   const loadSurah = async () => {
     try {
@@ -125,6 +152,31 @@ export default function SurahDetailScreen() {
   };
 
   /**
+   * Handle ayah playback completion
+   * If continuous playback is enabled, auto-play the next ayah or move to next surah
+   */
+  const handleAyahComplete = useCallback((currentAyahNumber: number) => {
+    if (continuousPlayback && surah) {
+      const nextAyahNumber = currentAyahNumber + 1;
+      if (nextAyahNumber <= surah.ayahs.length) {
+        // Auto-play next ayah in current surah
+        setCurrentlyPlayingAyah(nextAyahNumber);
+      } else {
+        // End of current surah reached - move to next surah
+        const nextSurahNumber = surahNum + 1;
+        if (nextSurahNumber <= 114) {
+          // Navigate to next surah with autoPlay enabled
+          router.push(`/quran/${nextSurahNumber}?autoPlay=true`);
+        } else {
+          // Completed all 114 surahs
+          setCurrentlyPlayingAyah(null);
+          setContinuousPlayback(false);
+        }
+      }
+    }
+  }, [continuousPlayback, surah, surahNum, router]);
+
+  /**
    * Get clean Arabic text for display (Mushaf-compliant)
    * 
    * BASMALAH STRIPPING RULES:
@@ -164,36 +216,60 @@ export default function SurahDetailScreen() {
 
   const renderAyah = useCallback(({ item: ayah }: { item: QuranAyahWithTranslation }) => {
     const isBookmarked = bookmarkedAyahs.has(ayah.numberInSurah);
+    const isPlaying = currentlyPlayingAyah === ayah.numberInSurah;
     const cleanArabicText = getCleanArabicText(ayah);
 
     return (
-      <TouchableOpacity
-        style={styles.ayahContainer}
-        onPress={() => handleAyahPress(ayah)}
-        onLongPress={() => handleBookmarkToggle(ayah)}
-        activeOpacity={0.9}
-      >
-        {/* Arabic Text - Full width, prominent */}
-        <View style={styles.arabicSection}>
-          <Text style={styles.arabicText}>
-            {cleanArabicText}
-            {' '}
-            <Text style={styles.ayahNumberInline}>﴿{ayah.numberInSurah}﴾</Text>
-          </Text>
+      <View style={[
+        styles.ayahWrapper,
+        isPlaying && styles.ayahWrapperPlaying
+      ]}>
+        {/* Top row: Ayah number and Audio button */}
+        <View style={styles.ayahTopRow}>
+          <View style={styles.ayahNumberContainer}>
+            <Text style={styles.ayahNumber}>﴿{ayah.numberInSurah}﴾</Text>
+          </View>
+          
+          {ayah.audioUrl && (
+            <AudioPlayer
+              audioUrl={ayah.audioUrl}
+              ayahNumber={ayah.numberInSurah}
+              autoPlay={isPlaying}
+              onPlaybackStatusUpdate={(playing) => {
+                setCurrentlyPlayingAyah(playing ? ayah.numberInSurah : null);
+              }}
+              onFinished={() => handleAyahComplete(ayah.numberInSurah)}
+            />
+          )}
         </View>
 
-        {/* Translation - Secondary, clearly separated */}
-        <Text style={styles.translationText}>{ayah.translation.text}</Text>
-
-        {/* Bookmark indicator - minimal */}
-        {isBookmarked && (
-          <View style={styles.bookmarkIndicator}>
-            <Ionicons name="bookmark" size={14} color="#3b82f6" />
+        {/* Main content: Arabic and Translation */}
+        <TouchableOpacity
+          style={styles.ayahContainer}
+          onPress={() => handleAyahPress(ayah)}
+          onLongPress={() => handleBookmarkToggle(ayah)}
+          activeOpacity={0.9}
+        >
+          {/* Arabic Text - Full width, prominent */}
+          <View style={styles.arabicSection}>
+            <Text style={styles.arabicText}>
+              {cleanArabicText}
+            </Text>
           </View>
-        )}
-      </TouchableOpacity>
+
+          {/* Translation - Secondary, clearly separated */}
+          <Text style={styles.translationText}>{ayah.translation.text}</Text>
+
+          {/* Bookmark indicator - minimal */}
+          {isBookmarked && (
+            <View style={styles.bookmarkIndicator}>
+              <Ionicons name="bookmark" size={14} color="#3b82f6" />
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
     );
-  }, [bookmarkedAyahs, handleBookmarkToggle, handleAyahPress, surahNum]);
+  }, [bookmarkedAyahs, currentlyPlayingAyah, handleBookmarkToggle, handleAyahPress, surahNum]);
 
   const ListHeaderComponent = useMemo(() => (
     <View style={styles.surahHeader}>
@@ -206,6 +282,11 @@ export default function SurahDetailScreen() {
         <Text style={styles.surahMeta}>
           {surahMeta?.revelationType} · {surahMeta?.totalAyahs} {t('quran.ayahs')}
         </Text>
+        {surah?.reciter && (
+          <Text style={styles.reciter}>
+            <Ionicons name="musical-notes" size={12} color="#3b82f6" /> {t('quran.reciter')}
+          </Text>
+        )}
       </View>
 
       {/* Bismillah - Centered, Elegant (except for Surah 9 / At-Tawbah) */}
@@ -218,7 +299,7 @@ export default function SurahDetailScreen() {
       {/* Visual separator before ayahs */}
       <View style={styles.separator} />
     </View>
-  ), [surahMeta, language, t, surahNum]);
+  ), [surahMeta, language, t, surahNum, surah]);
 
   if (loading) {
     return (
@@ -228,7 +309,7 @@ export default function SurahDetailScreen() {
             <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('quran.loading')}</Text>
-          <View style={styles.headerSpacer} />
+          <View style={styles.playAllButton} />
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3b82f6" />
@@ -246,7 +327,7 @@ export default function SurahDetailScreen() {
             <Ionicons name="arrow-back" size={24} color={DarkTheme.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('common.error')}</Text>
-          <View style={styles.headerSpacer} />
+          <View style={styles.playAllButton} />
         </View>
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle-outline" size={64} color={DarkTheme.textTertiary} />
@@ -268,7 +349,26 @@ export default function SurahDetailScreen() {
         <Text style={styles.headerTitle}>
           {t('quran.surah')} {surahNum}
         </Text>
-        <View style={styles.headerSpacer} />
+        <TouchableOpacity 
+          onPress={() => {
+            if (continuousPlayback) {
+              // Stop continuous playback
+              setContinuousPlayback(false);
+              setCurrentlyPlayingAyah(null);
+            } else {
+              // Start continuous playback from ayah 1
+              setContinuousPlayback(true);
+              setCurrentlyPlayingAyah(1);
+            }
+          }} 
+          style={styles.playAllButton}
+        >
+          <Ionicons 
+            name={continuousPlayback ? 'stop-circle' : 'play-circle'} 
+            size={28} 
+            color="#3b82f6" 
+          />
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -322,6 +422,12 @@ const styles = StyleSheet.create({
   headerSpacer: {
     width: 40,
   },
+  playAllButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   listContent: {
     paddingHorizontal: Spacing.screenPadding,
   },
@@ -356,6 +462,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: Spacing.xs / 2,
   },
+  reciter: {
+    fontSize: 12,
+    color: '#3b82f6',
+    textAlign: 'center',
+    marginTop: Spacing.xs,
+    opacity: 0.8,
+  },
   
   // Bismillah - Centered, Elegant
   bismillahContainer: {
@@ -379,8 +492,43 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   
+  // Ayah Wrapper - Contains top row and content
+  ayahWrapper: {
+    marginBottom: Spacing.xs,
+  },
+
+  // Currently playing ayah highlight
+  ayahWrapperPlaying: {
+    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#3b82f6',
+  },
+
+  // Ayah Top Row - Number and Audio Player
+  ayahTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    marginBottom: Spacing.xs,
+  },
+
+  ayahNumberContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  ayahNumber: {
+    fontSize: 18,
+    color: '#3b82f6',
+    fontWeight: Typography.weightBold,
+  },
+
   // Ayah Container - Clean, Breathable
   ayahContainer: {
+    paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.03)',

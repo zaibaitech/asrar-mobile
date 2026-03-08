@@ -294,7 +294,7 @@ export default function WhoAmIForm() {
             >
               <Text style={styles.formTitle}>Enter Names for Calculation</Text>
               <Text style={styles.formSubtitle}>
-                Both names must be in Arabic script for accurate spiritual analysis
+                Both names must be in Arabic script for traditional spiritual analysis
               </Text>
 
               {/* Person's Name Input */}

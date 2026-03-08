@@ -708,7 +708,7 @@ export function analyzeFourLayerCompatibility(
     overallQualityFrench = 'TRÈS DIFFICILE';
   }
   
-  const accuracyPercentage = analysisMode === 'complete' ? '90-95%' : '70-75%';
+  const accuracyPercentage = analysisMode === 'complete' ? 'Traditional method' : 'Quick method';
   
   // Generate summary (placeholder - will be enhanced with translations)
   const summary = `${person1Name} and ${person2Name || 'Person 2'} have ${overallQuality} compatibility (${overallScore}%).`;

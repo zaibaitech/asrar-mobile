@@ -1,6 +1,6 @@
 /**
  * Quran Service
- * Fetch and cache complete Quran text with translations from Alquran Cloud API
+ * Fetch and cache Quran text with translations from Alquran Cloud API
  * 
  * API Documentation: https://alquran.cloud/api
  */
@@ -22,22 +22,41 @@ const STORAGE_KEY_PREFIX = 'quran_surah_';
 const STORAGE_KEY_BOOKMARKS = 'quran_bookmarks';
 const STORAGE_KEY_PROGRESS = 'quran_progress';
 
+// Default audio reciter (Mishary Alafasy - most popular)
+const DEFAULT_RECITER = 'ar.alafasy';
+
 /**
- * Fetch a surah with Arabic text and translation
+ * Fetch a surah with Arabic text, translation, and audio
  */
 export async function fetchSurah(
   surahNumber: number,
-  translationEdition: QuranTranslationEdition = 'en.sahih'
+  translationEdition: QuranTranslationEdition = 'en.sahih',
+  includeAudio: boolean = true
 ): Promise<QuranSurah> {
   // Check cache first
   const cached = await getCachedSurah(surahNumber, translationEdition);
-  if (cached) {
+  if (cached && includeAudio) {
+    // Add audio URLs back (they weren't cached to save space)
+    const ayahsWithAudio = cached.ayahs.map((ayah, index) => ({
+      ...ayah,
+      audioUrl: `https://cdn.islamic.network/quran/audio/128/${DEFAULT_RECITER}/${ayah.arabic.number}.mp3`,
+    }));
+    return {
+      ...cached,
+      ayahs: ayahsWithAudio,
+      reciter: DEFAULT_RECITER,
+    };
+  } else if (cached) {
     return cached;
   }
 
   try {
-    // Fetch both Arabic and translation in one request
-    const url = `${API_BASE_URL}/surah/${surahNumber}/editions/quran-uthmani,${translationEdition}`;
+    // Fetch Arabic, translation, and optionally audio in one request
+    const editions = includeAudio
+      ? `quran-uthmani,${translationEdition},${DEFAULT_RECITER}`
+      : `quran-uthmani,${translationEdition}`;
+    
+    const url = `${API_BASE_URL}/surah/${surahNumber}/editions/${editions}`;
     const response = await fetch(url);
     
     if (!response.ok) {
@@ -46,17 +65,20 @@ export async function fetchSurah(
 
     const data: QuranAPIResponse = await response.json();
 
-    if (data.code !== 200 || !data.data || data.data.length !== 2) {
+    if (data.code !== 200 || !data.data) {
       throw new Error('Invalid API response');
     }
 
-    const [arabicData, translationData] = data.data;
+    const arabicData = data.data[0];
+    const translationData = data.data[1];
+    const audioData = includeAudio ? data.data[2] : null;
 
-    // Combine Arabic and translation
+    // Combine Arabic, translation, and audio
     const ayahs: QuranAyahWithTranslation[] = arabicData.ayahs.map((arabicAyah, index) => ({
       arabic: arabicAyah,
       translation: translationData.ayahs[index],
       numberInSurah: arabicAyah.numberInSurah,
+      audioUrl: audioData?.ayahs[index]?.audio,
     }));
 
     const surah: QuranSurah = {
@@ -67,10 +89,20 @@ export async function fetchSurah(
       revelationType: arabicData.revelationType,
       numberOfAyahs: arabicData.numberOfAyahs,
       ayahs,
+      reciter: includeAudio ? DEFAULT_RECITER : undefined,
     };
 
-    // Cache the result
-    await cacheSurah(surah, translationEdition);
+    // Cache the result WITHOUT audio URLs to reduce storage size
+    // Audio URLs are static CDN links, no need to cache them
+    const surahToCache: QuranSurah = {
+      ...surah,
+      ayahs: surah.ayahs.map(ayah => ({
+        ...ayah,
+        audioUrl: undefined, // Don't cache audio URLs
+      })),
+      reciter: undefined, // Don't cache reciter info
+    };
+    await cacheSurah(surahToCache, translationEdition);
 
     return surah;
   } catch (error) {

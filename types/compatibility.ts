@@ -241,7 +241,7 @@ export interface FourLayerCompatibility {
   overallQuality: 'excellent' | 'very-good' | 'good' | 'challenging' | 'difficult';
   overallQualityArabic: string;
   overallQualityFrench: string;
-  accuracyPercentage: string; // "70-75%" or "90-95%"
+  accuracyPercentage: string; // "Quick method" or "Traditional method"
   
   // Summary and recommendations
   summary: string;
