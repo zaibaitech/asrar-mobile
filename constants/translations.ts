@@ -616,10 +616,10 @@ export const translations = {
             text: "\"When one of you is concerned about a matter, let him pray two rak'ahs...\"",
             source: "— Sahih al-Bukhari 1162",
           },
-          learnTitle: "📖 LEARN THE AUTHENTIC METHOD",
+          learnTitle: "📖 LEARN THE TRADITIONAL METHOD",
           guide: {
-            title: "Complete Prayer Guide",
-            subtitle: "Step-by-step instructions • Authentic duʿā • Prerequisites • Post-prayer guidance",
+            title: "Prayer Guide",
+            subtitle: "Step-by-step instructions • Traditional duʿā • Prerequisites • Post-prayer guidance",
           },
           infoCard: "Istikhārah is performed when facing an important decision. The prayer consists of 2 rak'ahs followed by a specific supplication taught by the Prophet Muhammad ﷺ.",
           when: {
@@ -10514,10 +10514,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             text: "\"Lorsque l'un d'entre vous s'inquiète d'une affaire, qu'il prie deux rak'ahs...\"",
             source: "— Sahih al-Bukhari 1162",
           },
-          learnTitle: "📖 APPRENDRE LA MÉTHODE AUTHENTIQUE",
+          learnTitle: "📖 APPRENDRE LA MÉTHODE TRADITIONNELLE",
           guide: {
-            title: "Guide Complet de Prière",
-            subtitle: "Instructions étape par étape • Duʿā authentique • Prérequis • Guidance post-prière",
+            title: "Guide de Prière",
+            subtitle: "Instructions étape par étape • Duʿā traditionnelle • Prérequis • Guidance post-prière",
           },
           infoCard: "L'Istikhārah est effectuée face à une décision importante. La prière se compose de 2 rak'ahs suivies d'une supplication spécifique enseignée par le Prophète Muhammad ﷺ.",
           when: {
