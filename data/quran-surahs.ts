@@ -23,7 +23,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ ٱلْفَاتِحَةِ",
       "transliteration": "Al-Faatiha",
       "en": "The Opening",
-      "fr": ""
+      "fr": "L'Ouverture"
     },
     "totalAyahs": 7,
     "revelationType": "Meccan",
@@ -35,7 +35,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ البَقَرَةِ",
       "transliteration": "Al-Baqara",
       "en": "The Cow",
-      "fr": ""
+      "fr": "La Vache"
     },
     "totalAyahs": 286,
     "revelationType": "Medinan",
@@ -47,7 +47,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ آلِ عِمۡرَانَ",
       "transliteration": "Aal-i-Imraan",
       "en": "The Family of Imraan",
-      "fr": ""
+      "fr": "La Famille d'Imran"
     },
     "totalAyahs": 200,
     "revelationType": "Medinan",
@@ -59,7 +59,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ النِّسَاءِ",
       "transliteration": "An-Nisaa",
       "en": "The Women",
-      "fr": ""
+      "fr": "Les Femmes"
     },
     "totalAyahs": 176,
     "revelationType": "Medinan",
@@ -71,7 +71,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المَائـِدَةِ",
       "transliteration": "Al-Maaida",
       "en": "The Table",
-      "fr": ""
+      "fr": "La Table Servie"
     },
     "totalAyahs": 120,
     "revelationType": "Medinan",
@@ -83,7 +83,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الأَنۡعَامِ",
       "transliteration": "Al-An'aam",
       "en": "The Cattle",
-      "fr": ""
+      "fr": "Les Bestiaux"
     },
     "totalAyahs": 165,
     "revelationType": "Meccan",
@@ -95,7 +95,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الأَعۡرَافِ",
       "transliteration": "Al-A'raaf",
       "en": "The Heights",
-      "fr": ""
+      "fr": "Les Murailles"
     },
     "totalAyahs": 206,
     "revelationType": "Meccan",
@@ -107,7 +107,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الأَنفَالِ",
       "transliteration": "Al-Anfaal",
       "en": "The Spoils of War",
-      "fr": ""
+      "fr": "Le Butin"
     },
     "totalAyahs": 75,
     "revelationType": "Medinan",
@@ -119,7 +119,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ التَّوۡبَةِ",
       "transliteration": "At-Tawba",
       "en": "The Repentance",
-      "fr": ""
+      "fr": "Le Repentir"
     },
     "totalAyahs": 129,
     "revelationType": "Medinan",
@@ -131,7 +131,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ يُونُسَ",
       "transliteration": "Yunus",
       "en": "Jonas",
-      "fr": ""
+      "fr": "Jonas"
     },
     "totalAyahs": 109,
     "revelationType": "Meccan",
@@ -143,7 +143,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ هُودٍ",
       "transliteration": "Hud",
       "en": "Hud",
-      "fr": ""
+      "fr": "Houd"
     },
     "totalAyahs": 123,
     "revelationType": "Meccan",
@@ -155,7 +155,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ يُوسُفَ",
       "transliteration": "Yusuf",
       "en": "Joseph",
-      "fr": ""
+      "fr": "Joseph"
     },
     "totalAyahs": 111,
     "revelationType": "Meccan",
@@ -167,7 +167,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الرَّعۡدِ",
       "transliteration": "Ar-Ra'd",
       "en": "The Thunder",
-      "fr": ""
+      "fr": "Le Tonnerre"
     },
     "totalAyahs": 43,
     "revelationType": "Medinan",
@@ -179,7 +179,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ إِبۡرَاهِيمَ",
       "transliteration": "Ibrahim",
       "en": "Abraham",
-      "fr": ""
+      "fr": "Abraham"
     },
     "totalAyahs": 52,
     "revelationType": "Meccan",
@@ -191,7 +191,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الحِجۡرِ",
       "transliteration": "Al-Hijr",
       "en": "The Rock",
-      "fr": ""
+      "fr": "Al-Hijr"
     },
     "totalAyahs": 99,
     "revelationType": "Meccan",
@@ -203,7 +203,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ النَّحۡلِ",
       "transliteration": "An-Nahl",
       "en": "The Bee",
-      "fr": ""
+      "fr": "Les Abeilles"
     },
     "totalAyahs": 128,
     "revelationType": "Meccan",
@@ -215,7 +215,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الإِسۡرَاءِ",
       "transliteration": "Al-Israa",
       "en": "The Night Journey",
-      "fr": ""
+      "fr": "Le Voyage Nocturne"
     },
     "totalAyahs": 111,
     "revelationType": "Meccan",
@@ -227,7 +227,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الكَهۡفِ",
       "transliteration": "Al-Kahf",
       "en": "The Cave",
-      "fr": ""
+      "fr": "La Caverne"
     },
     "totalAyahs": 110,
     "revelationType": "Meccan",
@@ -239,7 +239,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ مَرۡيَمَ",
       "transliteration": "Maryam",
       "en": "Mary",
-      "fr": ""
+      "fr": "Marie"
     },
     "totalAyahs": 98,
     "revelationType": "Meccan",
@@ -251,7 +251,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ طه",
       "transliteration": "Taa-Haa",
       "en": "Taa-Haa",
-      "fr": ""
+      "fr": "Ta-Ha"
     },
     "totalAyahs": 135,
     "revelationType": "Meccan",
@@ -263,7 +263,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الأَنبِيَاءِ",
       "transliteration": "Al-Anbiyaa",
       "en": "The Prophets",
-      "fr": ""
+      "fr": "Les Prophètes"
     },
     "totalAyahs": 112,
     "revelationType": "Meccan",
@@ -275,7 +275,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الحَجِّ",
       "transliteration": "Al-Hajj",
       "en": "The Pilgrimage",
-      "fr": ""
+      "fr": "Le Pèlerinage"
     },
     "totalAyahs": 78,
     "revelationType": "Medinan",
@@ -287,7 +287,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المُؤۡمِنُونَ",
       "transliteration": "Al-Muminoon",
       "en": "The Believers",
-      "fr": ""
+      "fr": "Les Croyants"
     },
     "totalAyahs": 118,
     "revelationType": "Meccan",
@@ -299,7 +299,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ النُّورِ",
       "transliteration": "An-Noor",
       "en": "The Light",
-      "fr": ""
+      "fr": "La Lumière"
     },
     "totalAyahs": 64,
     "revelationType": "Medinan",
@@ -311,7 +311,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الفُرۡقَانِ",
       "transliteration": "Al-Furqaan",
       "en": "The Criterion",
-      "fr": ""
+      "fr": "Le Discernement"
     },
     "totalAyahs": 77,
     "revelationType": "Meccan",
@@ -323,7 +323,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الشُّعَرَاءِ",
       "transliteration": "Ash-Shu'araa",
       "en": "The Poets",
-      "fr": ""
+      "fr": "Les Poètes"
     },
     "totalAyahs": 227,
     "revelationType": "Meccan",
@@ -335,7 +335,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ النَّمۡلِ",
       "transliteration": "An-Naml",
       "en": "The Ant",
-      "fr": ""
+      "fr": "Les Fourmis"
     },
     "totalAyahs": 93,
     "revelationType": "Meccan",
@@ -347,7 +347,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ القَصَصِ",
       "transliteration": "Al-Qasas",
       "en": "The Stories",
-      "fr": ""
+      "fr": "Le Récit"
     },
     "totalAyahs": 88,
     "revelationType": "Meccan",
@@ -359,7 +359,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ العَنكَبُوتِ",
       "transliteration": "Al-Ankaboot",
       "en": "The Spider",
-      "fr": ""
+      "fr": "L'Araignée"
     },
     "totalAyahs": 69,
     "revelationType": "Meccan",
@@ -371,7 +371,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الرُّومِ",
       "transliteration": "Ar-Room",
       "en": "The Romans",
-      "fr": ""
+      "fr": "Les Romains"
     },
     "totalAyahs": 60,
     "revelationType": "Meccan",
@@ -383,7 +383,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ لُقۡمَانَ",
       "transliteration": "Luqman",
       "en": "Luqman",
-      "fr": ""
+      "fr": "Luqman"
     },
     "totalAyahs": 34,
     "revelationType": "Meccan",
@@ -395,7 +395,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ السَّجۡدَةِ",
       "transliteration": "As-Sajda",
       "en": "The Prostration",
-      "fr": ""
+      "fr": "La Prosternation"
     },
     "totalAyahs": 30,
     "revelationType": "Meccan",
@@ -407,7 +407,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الأَحۡزَابِ",
       "transliteration": "Al-Ahzaab",
       "en": "The Clans",
-      "fr": ""
+      "fr": "Les Coalisés"
     },
     "totalAyahs": 73,
     "revelationType": "Medinan",
@@ -419,7 +419,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ سَبَإٍ",
       "transliteration": "Saba",
       "en": "Sheba",
-      "fr": ""
+      "fr": "Saba"
     },
     "totalAyahs": 54,
     "revelationType": "Meccan",
@@ -431,7 +431,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ فَاطِرٍ",
       "transliteration": "Faatir",
       "en": "The Originator",
-      "fr": ""
+      "fr": "Le Créateur"
     },
     "totalAyahs": 45,
     "revelationType": "Meccan",
@@ -443,7 +443,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ يسٓ",
       "transliteration": "Yaseen",
       "en": "Yaseen",
-      "fr": ""
+      "fr": "Ya-Sin"
     },
     "totalAyahs": 83,
     "revelationType": "Meccan",
@@ -455,7 +455,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الصَّافَّاتِ",
       "transliteration": "As-Saaffaat",
       "en": "Those drawn up in Ranks",
-      "fr": ""
+      "fr": "Les Rangées"
     },
     "totalAyahs": 182,
     "revelationType": "Meccan",
@@ -467,7 +467,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ صٓ",
       "transliteration": "Saad",
       "en": "The letter Saad",
-      "fr": ""
+      "fr": "Sad"
     },
     "totalAyahs": 88,
     "revelationType": "Meccan",
@@ -479,7 +479,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الزُّمَرِ",
       "transliteration": "Az-Zumar",
       "en": "The Groups",
-      "fr": ""
+      "fr": "Les Groupes"
     },
     "totalAyahs": 75,
     "revelationType": "Meccan",
@@ -491,7 +491,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ غَافِرٍ",
       "transliteration": "Ghafir",
       "en": "The Forgiver",
-      "fr": ""
+      "fr": "Le Pardonneur"
     },
     "totalAyahs": 85,
     "revelationType": "Meccan",
@@ -503,7 +503,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ فُصِّلَتۡ",
       "transliteration": "Fussilat",
       "en": "Explained in detail",
-      "fr": ""
+      "fr": "Les Versets Détaillés"
     },
     "totalAyahs": 54,
     "revelationType": "Meccan",
@@ -515,7 +515,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الشُّورَىٰ",
       "transliteration": "Ash-Shura",
       "en": "Consultation",
-      "fr": ""
+      "fr": "La Consultation"
     },
     "totalAyahs": 53,
     "revelationType": "Meccan",
@@ -527,7 +527,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الزُّخۡرُفِ",
       "transliteration": "Az-Zukhruf",
       "en": "Ornaments of gold",
-      "fr": ""
+      "fr": "L'Ornement"
     },
     "totalAyahs": 89,
     "revelationType": "Meccan",
@@ -539,7 +539,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الدُّخَانِ",
       "transliteration": "Ad-Dukhaan",
       "en": "The Smoke",
-      "fr": ""
+      "fr": "La Fumée"
     },
     "totalAyahs": 59,
     "revelationType": "Meccan",
@@ -551,7 +551,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الجَاثِيَةِ",
       "transliteration": "Al-Jaathiya",
       "en": "Crouching",
-      "fr": ""
+      "fr": "L'Agenouillée"
     },
     "totalAyahs": 37,
     "revelationType": "Meccan",
@@ -563,7 +563,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الأَحۡقَافِ",
       "transliteration": "Al-Ahqaf",
       "en": "The Dunes",
-      "fr": ""
+      "fr": "Al-Ahqaf"
     },
     "totalAyahs": 35,
     "revelationType": "Meccan",
@@ -575,7 +575,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ مُحَمَّدٍ",
       "transliteration": "Muhammad",
       "en": "Muhammad",
-      "fr": ""
+      "fr": "Muhammad"
     },
     "totalAyahs": 38,
     "revelationType": "Medinan",
@@ -587,7 +587,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الفَتۡحِ",
       "transliteration": "Al-Fath",
       "en": "The Victory",
-      "fr": ""
+      "fr": "La Victoire Éclatante"
     },
     "totalAyahs": 29,
     "revelationType": "Medinan",
@@ -599,7 +599,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الحُجُرَاتِ",
       "transliteration": "Al-Hujuraat",
       "en": "The Inner Apartments",
-      "fr": ""
+      "fr": "Les Appartements"
     },
     "totalAyahs": 18,
     "revelationType": "Medinan",
@@ -611,7 +611,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ قٓ",
       "transliteration": "Qaaf",
       "en": "The letter Qaaf",
-      "fr": ""
+      "fr": "Qaf"
     },
     "totalAyahs": 45,
     "revelationType": "Meccan",
@@ -623,7 +623,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الذَّارِيَاتِ",
       "transliteration": "Adh-Dhaariyat",
       "en": "The Winnowing Winds",
-      "fr": ""
+      "fr": "Qui Éparpillent"
     },
     "totalAyahs": 60,
     "revelationType": "Meccan",
@@ -635,7 +635,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الطُّورِ",
       "transliteration": "At-Tur",
       "en": "The Mount",
-      "fr": ""
+      "fr": "At-Tur"
     },
     "totalAyahs": 49,
     "revelationType": "Meccan",
@@ -647,7 +647,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ النَّجۡمِ",
       "transliteration": "An-Najm",
       "en": "The Star",
-      "fr": ""
+      "fr": "L'Étoile"
     },
     "totalAyahs": 62,
     "revelationType": "Meccan",
@@ -659,7 +659,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ القَمَرِ",
       "transliteration": "Al-Qamar",
       "en": "The Moon",
-      "fr": ""
+      "fr": "La Lune"
     },
     "totalAyahs": 55,
     "revelationType": "Meccan",
@@ -671,7 +671,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الرَّحۡمَٰن",
       "transliteration": "Ar-Rahmaan",
       "en": "The Beneficent",
-      "fr": ""
+      "fr": "Le Tout Miséricordieux"
     },
     "totalAyahs": 78,
     "revelationType": "Medinan",
@@ -683,7 +683,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الوَاقِعَةِ",
       "transliteration": "Al-Waaqia",
       "en": "The Inevitable",
-      "fr": ""
+      "fr": "L'Événement"
     },
     "totalAyahs": 96,
     "revelationType": "Meccan",
@@ -695,7 +695,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الحَدِيدِ",
       "transliteration": "Al-Hadid",
       "en": "The Iron",
-      "fr": ""
+      "fr": "Le Fer"
     },
     "totalAyahs": 29,
     "revelationType": "Medinan",
@@ -707,7 +707,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المُجَادلَةِ",
       "transliteration": "Al-Mujaadila",
       "en": "The Pleading Woman",
-      "fr": ""
+      "fr": "La Discussion"
     },
     "totalAyahs": 22,
     "revelationType": "Medinan",
@@ -719,7 +719,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الحَشۡرِ",
       "transliteration": "Al-Hashr",
       "en": "The Exile",
-      "fr": ""
+      "fr": "L'Exode"
     },
     "totalAyahs": 24,
     "revelationType": "Medinan",
@@ -731,7 +731,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المُمۡتَحنَةِ",
       "transliteration": "Al-Mumtahana",
       "en": "She that is to be examined",
-      "fr": ""
+      "fr": "L'Éprouvée"
     },
     "totalAyahs": 13,
     "revelationType": "Medinan",
@@ -743,7 +743,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الصَّفِّ",
       "transliteration": "As-Saff",
       "en": "The Ranks",
-      "fr": ""
+      "fr": "Le Rang"
     },
     "totalAyahs": 14,
     "revelationType": "Medinan",
@@ -755,7 +755,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الجُمُعَةِ",
       "transliteration": "Al-Jumu'a",
       "en": "Friday",
-      "fr": ""
+      "fr": "Le Vendredi"
     },
     "totalAyahs": 11,
     "revelationType": "Medinan",
@@ -767,7 +767,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المُنَافِقُونَ",
       "transliteration": "Al-Munaafiqoon",
       "en": "The Hypocrites",
-      "fr": ""
+      "fr": "Les Hypocrites"
     },
     "totalAyahs": 11,
     "revelationType": "Medinan",
@@ -779,7 +779,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ التَّغَابُنِ",
       "transliteration": "At-Taghaabun",
       "en": "Mutual Disillusion",
-      "fr": ""
+      "fr": "La Grande Perte"
     },
     "totalAyahs": 18,
     "revelationType": "Medinan",
@@ -791,7 +791,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الطَّلَاقِ",
       "transliteration": "At-Talaaq",
       "en": "Divorce",
-      "fr": ""
+      "fr": "Le Divorce"
     },
     "totalAyahs": 12,
     "revelationType": "Medinan",
@@ -803,7 +803,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ التَّحۡرِيمِ",
       "transliteration": "At-Tahrim",
       "en": "The Prohibition",
-      "fr": ""
+      "fr": "L'Interdiction"
     },
     "totalAyahs": 12,
     "revelationType": "Medinan",
@@ -815,7 +815,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المُلۡكِ",
       "transliteration": "Al-Mulk",
       "en": "The Sovereignty",
-      "fr": ""
+      "fr": "La Royauté"
     },
     "totalAyahs": 30,
     "revelationType": "Meccan",
@@ -827,7 +827,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ القَلَمِ",
       "transliteration": "Al-Qalam",
       "en": "The Pen",
-      "fr": ""
+      "fr": "La Plume"
     },
     "totalAyahs": 52,
     "revelationType": "Meccan",
@@ -839,7 +839,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الحَاقَّةِ",
       "transliteration": "Al-Haaqqa",
       "en": "The Reality",
-      "fr": ""
+      "fr": "Celle qui Montre la Vérité"
     },
     "totalAyahs": 52,
     "revelationType": "Meccan",
@@ -851,7 +851,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المَعَارِجِ",
       "transliteration": "Al-Ma'aarij",
       "en": "The Ascending Stairways",
-      "fr": ""
+      "fr": "Les Voies d'Ascension"
     },
     "totalAyahs": 44,
     "revelationType": "Meccan",
@@ -863,7 +863,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ نُوحٍ",
       "transliteration": "Nooh",
       "en": "Noah",
-      "fr": ""
+      "fr": "Noé"
     },
     "totalAyahs": 28,
     "revelationType": "Meccan",
@@ -875,7 +875,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الجِنِّ",
       "transliteration": "Al-Jinn",
       "en": "The Jinn",
-      "fr": ""
+      "fr": "Les Djinns"
     },
     "totalAyahs": 28,
     "revelationType": "Meccan",
@@ -887,7 +887,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المُزَّمِّلِ",
       "transliteration": "Al-Muzzammil",
       "en": "The Enshrouded One",
-      "fr": ""
+      "fr": "L'Enveloppé"
     },
     "totalAyahs": 20,
     "revelationType": "Meccan",
@@ -899,7 +899,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المُدَّثِّرِ",
       "transliteration": "Al-Muddaththir",
       "en": "The Cloaked One",
-      "fr": ""
+      "fr": "Le Revêtu d'un Manteau"
     },
     "totalAyahs": 56,
     "revelationType": "Meccan",
@@ -911,7 +911,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ القِيَامَةِ",
       "transliteration": "Al-Qiyaama",
       "en": "The Resurrection",
-      "fr": ""
+      "fr": "La Résurrection"
     },
     "totalAyahs": 40,
     "revelationType": "Meccan",
@@ -923,7 +923,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الإِنسَانِ",
       "transliteration": "Al-Insaan",
       "en": "Man",
-      "fr": ""
+      "fr": "L'Homme"
     },
     "totalAyahs": 31,
     "revelationType": "Medinan",
@@ -935,7 +935,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المُرۡسَلَاتِ",
       "transliteration": "Al-Mursalaat",
       "en": "The Emissaries",
-      "fr": ""
+      "fr": "Les Envoyés"
     },
     "totalAyahs": 50,
     "revelationType": "Meccan",
@@ -947,7 +947,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ النَّبَإِ",
       "transliteration": "An-Naba",
       "en": "The Announcement",
-      "fr": ""
+      "fr": "La Nouvelle"
     },
     "totalAyahs": 40,
     "revelationType": "Meccan",
@@ -959,7 +959,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ النَّازِعَاتِ",
       "transliteration": "An-Naazi'aat",
       "en": "Those who drag forth",
-      "fr": ""
+      "fr": "Les Anges qui Arrachent"
     },
     "totalAyahs": 46,
     "revelationType": "Meccan",
@@ -971,7 +971,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ عَبَسَ",
       "transliteration": "Abasa",
       "en": "He frowned",
-      "fr": ""
+      "fr": "Il S'est Renfrogné"
     },
     "totalAyahs": 42,
     "revelationType": "Meccan",
@@ -983,7 +983,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ التَّكۡوِيرِ",
       "transliteration": "At-Takwir",
       "en": "The Overthrowing",
-      "fr": ""
+      "fr": "L'Obscurcissement"
     },
     "totalAyahs": 29,
     "revelationType": "Meccan",
@@ -995,7 +995,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الانفِطَارِ",
       "transliteration": "Al-Infitaar",
       "en": "The Cleaving",
-      "fr": ""
+      "fr": "La Rupture"
     },
     "totalAyahs": 19,
     "revelationType": "Meccan",
@@ -1007,7 +1007,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المُطَفِّفِينَ",
       "transliteration": "Al-Mutaffifin",
       "en": "Defrauding",
-      "fr": ""
+      "fr": "Les Fraudeurs"
     },
     "totalAyahs": 36,
     "revelationType": "Meccan",
@@ -1019,7 +1019,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الانشِقَاقِ",
       "transliteration": "Al-Inshiqaaq",
       "en": "The Splitting Open",
-      "fr": ""
+      "fr": "La Déchirure"
     },
     "totalAyahs": 25,
     "revelationType": "Meccan",
@@ -1031,7 +1031,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ البُرُوجِ",
       "transliteration": "Al-Burooj",
       "en": "The Constellations",
-      "fr": ""
+      "fr": "Les Constellations"
     },
     "totalAyahs": 22,
     "revelationType": "Meccan",
@@ -1043,7 +1043,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الطَّارِقِ",
       "transliteration": "At-Taariq",
       "en": "The Morning Star",
-      "fr": ""
+      "fr": "L'Astre Nocturne"
     },
     "totalAyahs": 17,
     "revelationType": "Meccan",
@@ -1055,7 +1055,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الأَعۡلَىٰ",
       "transliteration": "Al-A'laa",
       "en": "The Most High",
-      "fr": ""
+      "fr": "Le Très-Haut"
     },
     "totalAyahs": 19,
     "revelationType": "Meccan",
@@ -1067,7 +1067,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الغَاشِيَةِ",
       "transliteration": "Al-Ghaashiya",
       "en": "The Overwhelming",
-      "fr": ""
+      "fr": "L'Enveloppante"
     },
     "totalAyahs": 26,
     "revelationType": "Meccan",
@@ -1079,7 +1079,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الفَجۡرِ",
       "transliteration": "Al-Fajr",
       "en": "The Dawn",
-      "fr": ""
+      "fr": "L'Aube"
     },
     "totalAyahs": 30,
     "revelationType": "Meccan",
@@ -1091,7 +1091,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ البَلَدِ",
       "transliteration": "Al-Balad",
       "en": "The City",
-      "fr": ""
+      "fr": "La Cité"
     },
     "totalAyahs": 20,
     "revelationType": "Meccan",
@@ -1103,7 +1103,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الشَّمۡسِ",
       "transliteration": "Ash-Shams",
       "en": "The Sun",
-      "fr": ""
+      "fr": "Le Soleil"
     },
     "totalAyahs": 15,
     "revelationType": "Meccan",
@@ -1115,7 +1115,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ اللَّيۡلِ",
       "transliteration": "Al-Lail",
       "en": "The Night",
-      "fr": ""
+      "fr": "La Nuit"
     },
     "totalAyahs": 21,
     "revelationType": "Meccan",
@@ -1127,7 +1127,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الضُّحَىٰ",
       "transliteration": "Ad-Dhuhaa",
       "en": "The Morning Hours",
-      "fr": ""
+      "fr": "Le Jour Montant"
     },
     "totalAyahs": 11,
     "revelationType": "Meccan",
@@ -1139,7 +1139,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الشَّرۡحِ",
       "transliteration": "Ash-Sharh",
       "en": "The Consolation",
-      "fr": ""
+      "fr": "L'Ouverture de la Poitrine"
     },
     "totalAyahs": 8,
     "revelationType": "Meccan",
@@ -1151,7 +1151,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ التِّينِ",
       "transliteration": "At-Tin",
       "en": "The Fig",
-      "fr": ""
+      "fr": "Le Figuier"
     },
     "totalAyahs": 8,
     "revelationType": "Meccan",
@@ -1163,7 +1163,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ العَلَقِ",
       "transliteration": "Al-Alaq",
       "en": "The Clot",
-      "fr": ""
+      "fr": "L'Adhérence"
     },
     "totalAyahs": 19,
     "revelationType": "Meccan",
@@ -1175,7 +1175,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ القَدۡرِ",
       "transliteration": "Al-Qadr",
       "en": "The Power, Fate",
-      "fr": ""
+      "fr": "La Destinée"
     },
     "totalAyahs": 5,
     "revelationType": "Meccan",
@@ -1187,7 +1187,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ البَيِّنَةِ",
       "transliteration": "Al-Bayyina",
       "en": "The Evidence",
-      "fr": ""
+      "fr": "La Preuve"
     },
     "totalAyahs": 8,
     "revelationType": "Medinan",
@@ -1199,7 +1199,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الزَّلۡزَلَةِ",
       "transliteration": "Az-Zalzala",
       "en": "The Earthquake",
-      "fr": ""
+      "fr": "La Secousse"
     },
     "totalAyahs": 8,
     "revelationType": "Medinan",
@@ -1211,7 +1211,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ العَادِيَاتِ",
       "transliteration": "Al-Aadiyaat",
       "en": "The Chargers",
-      "fr": ""
+      "fr": "Les Coursiers"
     },
     "totalAyahs": 11,
     "revelationType": "Meccan",
@@ -1223,7 +1223,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ القَارِعَةِ",
       "transliteration": "Al-Qaari'a",
       "en": "The Calamity",
-      "fr": ""
+      "fr": "Le Fracas"
     },
     "totalAyahs": 11,
     "revelationType": "Meccan",
@@ -1235,7 +1235,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ التَّكَاثُرِ",
       "transliteration": "At-Takaathur",
       "en": "Competition",
-      "fr": ""
+      "fr": "La Course aux Richesses"
     },
     "totalAyahs": 8,
     "revelationType": "Meccan",
@@ -1247,7 +1247,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ العَصۡرِ",
       "transliteration": "Al-Asr",
       "en": "The Declining Day, Epoch",
-      "fr": ""
+      "fr": "Le Temps"
     },
     "totalAyahs": 3,
     "revelationType": "Meccan",
@@ -1259,7 +1259,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الهُمَزَةِ",
       "transliteration": "Al-Humaza",
       "en": "The Traducer",
-      "fr": ""
+      "fr": "Les Calomniateurs"
     },
     "totalAyahs": 9,
     "revelationType": "Meccan",
@@ -1271,7 +1271,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الفِيلِ",
       "transliteration": "Al-Fil",
       "en": "The Elephant",
-      "fr": ""
+      "fr": "L'Éléphant"
     },
     "totalAyahs": 5,
     "revelationType": "Meccan",
@@ -1283,7 +1283,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ قُرَيۡشٍ",
       "transliteration": "Quraish",
       "en": "Quraysh",
-      "fr": ""
+      "fr": "Quraych"
     },
     "totalAyahs": 4,
     "revelationType": "Meccan",
@@ -1295,7 +1295,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المَاعُونِ",
       "transliteration": "Al-Maa'un",
       "en": "Almsgiving",
-      "fr": ""
+      "fr": "L'Ustensile"
     },
     "totalAyahs": 7,
     "revelationType": "Meccan",
@@ -1307,7 +1307,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الكَوۡثَرِ",
       "transliteration": "Al-Kawthar",
       "en": "Abundance",
-      "fr": ""
+      "fr": "L'Abondance"
     },
     "totalAyahs": 3,
     "revelationType": "Meccan",
@@ -1319,7 +1319,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الكَافِرُونَ",
       "transliteration": "Al-Kaafiroon",
       "en": "The Disbelievers",
-      "fr": ""
+      "fr": "Les Infidèles"
     },
     "totalAyahs": 6,
     "revelationType": "Meccan",
@@ -1331,7 +1331,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ النَّصۡرِ",
       "transliteration": "An-Nasr",
       "en": "Divine Support",
-      "fr": ""
+      "fr": "Les Secours"
     },
     "totalAyahs": 3,
     "revelationType": "Medinan",
@@ -1343,7 +1343,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ المَسَدِ",
       "transliteration": "Al-Masad",
       "en": "The Palm Fibre",
-      "fr": ""
+      "fr": "Les Fibres"
     },
     "totalAyahs": 5,
     "revelationType": "Meccan",
@@ -1355,7 +1355,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الإِخۡلَاصِ",
       "transliteration": "Al-Ikhlaas",
       "en": "Sincerity",
-      "fr": ""
+      "fr": "Le Monothéisme Pur"
     },
     "totalAyahs": 4,
     "revelationType": "Meccan",
@@ -1367,7 +1367,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ الفَلَقِ",
       "transliteration": "Al-Falaq",
       "en": "The Dawn",
-      "fr": ""
+      "fr": "L'Aube Naissante"
     },
     "totalAyahs": 5,
     "revelationType": "Meccan",
@@ -1379,7 +1379,7 @@ export const QURAN_SURAHS: Surah[] = [
       "arabic": "سُورَةُ النَّاسِ",
       "transliteration": "An-Naas",
       "en": "Mankind",
-      "fr": ""
+      "fr": "Les Hommes"
     },
     "totalAyahs": 6,
     "revelationType": "Meccan",
