@@ -14,9 +14,10 @@ interface AudioPlayerProps {
   autoPlay?: boolean;
   onPlaybackStatusUpdate?: (isPlaying: boolean) => void;
   onFinished?: () => void; // Called when audio finishes playing
+  onPress?: () => void; // Called when user taps the button
 }
 
-export function AudioPlayer({ audioUrl, ayahNumber, autoPlay = false, onPlaybackStatusUpdate, onFinished }: AudioPlayerProps) {
+export function AudioPlayer({ audioUrl, ayahNumber, autoPlay = false, onPlaybackStatusUpdate, onFinished, onPress }: AudioPlayerProps) {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,31 +39,28 @@ export function AudioPlayer({ audioUrl, ayahNumber, autoPlay = false, onPlayback
     if (autoPlay && audioUrl) {
       playAudio();
     }
+    // Stop playing if autoPlay becomes false (another ayah started playing)
+    else if (!autoPlay && isPlaying) {
+      stopAudio();
+    }
   }, [autoPlay, audioUrl]);
 
   const playAudio = async () => {
     try {
       setError(null);
 
-      // If already playing, stop it
-      if (sound && isPlaying) {
-        setIsLoading(true);
-        await sound.stopAsync();
-        await sound.unloadAsync();
-        setSound(null);
-        setIsPlaying(false);
-        onPlaybackStatusUpdate?.(false);
-        setIsLoading(false);
-        return;
-      }
-
-      // If paused, resume
+      // If already have a sound object and it's paused, resume it
       if (sound && !isPlaying) {
         setIsLoading(true);
         await sound.playAsync();
         setIsPlaying(true);
         onPlaybackStatusUpdate?.(true);
         setIsLoading(false);
+        return;
+      }
+
+      // If already playing, do nothing (parent controls stop via autoPlay prop)
+      if (isPlaying) {
         return;
       }
 
@@ -120,7 +118,12 @@ export function AudioPlayer({ audioUrl, ayahNumber, autoPlay = false, onPlayback
   return (
     <TouchableOpacity 
       style={styles.container} 
-      onPress={playAudio}
+      onPress={() => {
+        // Notify parent first
+        onPress?.();
+        // Then handle play/pause
+        playAudio();
+      }}
       disabled={isLoading}
       activeOpacity={0.7}
     >

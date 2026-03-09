@@ -235,8 +235,20 @@ export default function SurahDetailScreen() {
               audioUrl={ayah.audioUrl}
               ayahNumber={ayah.numberInSurah}
               autoPlay={isPlaying}
+              onPress={() => {
+                // Toggle: if this ayah is currently playing, stop it. Otherwise, start it.
+                if (currentlyPlayingAyah === ayah.numberInSurah) {
+                  setCurrentlyPlayingAyah(null);
+                  setContinuousPlayback(false); // Stop continuous mode when user manually stops
+                } else {
+                  setCurrentlyPlayingAyah(ayah.numberInSurah);
+                }
+              }}
               onPlaybackStatusUpdate={(playing) => {
-                setCurrentlyPlayingAyah(playing ? ayah.numberInSurah : null);
+                // Update state based on actual playback status
+                if (!playing && currentlyPlayingAyah === ayah.numberInSurah) {
+                  setCurrentlyPlayingAyah(null);
+                }
               }}
               onFinished={() => handleAyahComplete(ayah.numberInSurah)}
             />
