@@ -282,22 +282,25 @@ export default function IstikharaResults() {
         </Tab.Screen>
 
         {/* PREMIUM: Health Awareness - Traditional guidance */}
-        <Tab.Screen name={t('istikhara.results.tabs.health') || 'Health'}>
-          {() => (
-            <PremiumTabWrapper
-              featureId="spiritualGuidance"
-              title={t('istikhara.health.title') || 'Health Awareness'}
-              description={t('istikhara.health.subtitle') || 'Traditional wisdom for your spiritual nature (not medical advice)'}
-              icon="⚕️"
-            >
-              <HealthAwarenessTab result={{
-                personName: params.personName as string,
-                motherName: params.motherName as string,
-                ...data
-              }} />
-            </PremiumTabWrapper>
-          )}
-        </Tab.Screen>
+        {/* Hidden in production for initial App Store approval - can be re-enabled later */}
+        {__DEV__ && (
+          <Tab.Screen name={t('istikhara.results.tabs.health') || 'Health'}>
+            {() => (
+              <PremiumTabWrapper
+                featureId="spiritualGuidance"
+                title={t('istikhara.health.title') || 'Health Awareness'}
+                description={t('istikhara.health.subtitle') || 'Traditional wisdom for your spiritual nature (not medical advice)'}
+                icon="⚕️"
+              >
+                <HealthAwarenessTab result={{
+                  personName: params.personName as string,
+                  motherName: params.motherName as string,
+                  ...data
+                }} />
+              </PremiumTabWrapper>
+            )}
+          </Tab.Screen>
+        )}
 
         {/* PREMIUM: Zodiac Stones - Crystal guidance */}
         <Tab.Screen name={language === 'en' ? 'Zodiac Stones' : language === 'fr' ? 'Pierres' : 'الأحجار'}>
