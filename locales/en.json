@@ -1,5 +1,6 @@
 {
   "CFBundleDisplayName": "Asrariya",
   "CFBundleName": "Asrariya",
+  "NSLocationWhenInUseUsageDescription": "We use your location to calculate accurate prayer times and Qibla direction for your area.",
   "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
 }

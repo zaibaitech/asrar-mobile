@@ -25,6 +25,7 @@
       ],
       "infoPlist": {
         "CFBundleDisplayName": "Asrariya",
+        "NSLocationWhenInUseUsageDescription": "We use your location to calculate accurate prayer times and Qibla direction for your area.",
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": false,
           "NSExceptionDomains": {

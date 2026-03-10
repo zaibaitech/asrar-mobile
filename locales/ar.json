@@ -1,5 +1,6 @@
 {
   "CFBundleDisplayName": "أسرارية",
   "CFBundleName": "أسرارية",
+  "NSLocationWhenInUseUsageDescription": "نستخدم موقعك لحساب أوقات الصلاة الدقيقة واتجاه القبلة لمنطقتك.",
   "NSUserTrackingUsageDescription": "سيتم استخدام هذا المعرف لتقديم إعلانات مخصصة لك."
 }
