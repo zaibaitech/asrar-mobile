@@ -430,6 +430,12 @@ export default function WhoAmICalculator() {
             </TouchableOpacity>
           </View>
 
+          {/* METHOD NOTE */}
+          <View style={styles.methodNoteContainer}>
+            <Text style={styles.methodNoteIcon}>ℹ️</Text>
+            <Text style={styles.methodNoteText}>{t('istikhara.methodNote')}</Text>
+          </View>
+
           {/* MAIN FORM - Conditional based on method */}
           <View style={styles.formCard}>
             <LinearGradient
@@ -969,6 +975,29 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.6)', // More faded
     textAlign: 'center',
     paddingHorizontal: 20,
+  },
+
+  methodNoteContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(167, 139, 250, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(167, 139, 250, 0.25)',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
+    gap: 8,
+  },
+  methodNoteIcon: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  methodNoteText: {
+    flex: 1,
+    fontSize: 12,
+    color: 'rgba(196, 181, 253, 0.85)',
+    lineHeight: 18,
   },
 
   // Main form - HERO ELEMENT with enhanced visual prominence

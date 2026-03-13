@@ -141,7 +141,7 @@ export default function HealthAwarenessTab({ result }: HealthAwarenessTabProps) 
 
   const title =
     t('istikhara.health.title') ||
-    (language === 'ar' ? 'التنبيه الصحي' : language === 'fr' ? 'Vigilance santé' : 'Health Awareness');
+    (language === 'ar' ? 'الصحة والعافية' : language === 'fr' ? 'Santé & Bien-être' : 'Health & Wellness');
   const subtitle =
     t('istikhara.health.subtitle') ||
     (language === 'ar'
@@ -197,10 +197,10 @@ export default function HealthAwarenessTab({ result }: HealthAwarenessTabProps) 
           accessibilityLabel={
             t('istikhara.health.a11y.toggle') ||
             (language === 'ar'
-              ? 'توسيع أو طي قسم التنبيه الصحي'
+              ? 'توسيع أو طي قسم الصحة والعافية'
               : language === 'fr'
-                ? 'Développer ou réduire la section vigilance santé'
-                : 'Expand or collapse health awareness')
+                ? 'Développer ou réduire la section santé & bien-être'
+                : 'Expand or collapse health & wellness')
           }
         >
           <View style={styles.cardHeaderLeft}>
@@ -215,7 +215,7 @@ export default function HealthAwarenessTab({ result }: HealthAwarenessTabProps) 
         {expanded && (
           <View style={styles.sections}>
             <Section
-              title={t('istikhara.health.sections.watchOutFor') || '⚠️ Watch Out For'}
+              title={t('istikhara.health.sections.watchOutFor') || '✨ Cosmic Sensitivities'}
               items={(health.watchOutFor[langKey] || health.watchOutFor.en) ?? []}
             />
             <Section

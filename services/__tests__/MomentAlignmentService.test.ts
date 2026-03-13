@@ -108,9 +108,10 @@ export function testTimeElement() {
 export async function testFullAlignment() {
   console.log('\n=== MOMENT ALIGNMENT: Integration Test ===\n');
   
+  // Use a DOB that maps to Scorpio (Water element) — born Nov 5
   const testProfile = {
     mode: 'guest' as const,
-    nameAr: 'محمد', // If motherName is not provided, uses name-only baseline
+    dobISO: '1990-11-05', // Scorpio → Water element
     timezone: 'UTC',
     createdAt: Date.now(),
     updatedAt: Date.now(),
@@ -120,7 +121,7 @@ export async function testFullAlignment() {
   const mondayDate = new Date(2024, 0, 1); // Jan 1, 2024 is Monday
   const mondayAlignment = await getMomentAlignment(testProfile, mondayDate);
   
-  console.log('Test Profile: محمد (Water element)');
+  console.log('Test Profile: DOB 1990-11-05 (Scorpio → Water element)');
   console.log('Test Date: Monday (Water day)');
   console.log('Expected: ACT (perfect alignment)');
   console.log('Result:', mondayAlignment ? {
@@ -133,9 +134,9 @@ export async function testFullAlignment() {
   const wednesdayDate = new Date(2024, 0, 3);
   const wednesdayAlignment = await getMomentAlignment(testProfile, wednesdayDate);
   
-  console.log('\nTest Profile: محمد (Water element)');
+  console.log('\nTest Profile: DOB 1990-11-05 (Scorpio → Water element)');
   console.log('Test Date: Wednesday (Air day)');
-  console.log('Expected: HOLD (not aligned)');
+  console.log('Expected: HOLD or MAINTAIN (not aligned)');
   console.log('Result:', wednesdayAlignment ? {
     status: wednesdayAlignment.status,
     zahir: wednesdayAlignment.zahirElement,

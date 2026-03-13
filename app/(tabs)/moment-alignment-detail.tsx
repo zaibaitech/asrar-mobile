@@ -975,15 +975,15 @@ export default function MomentAlignmentDetailScreen() {
         </View>
 
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>✨</Text>
-          <Text style={styles.emptyTitle}>{t('momentDetail.noName')}</Text>
-          <Text style={styles.emptyMessage}>{t('momentDetail.addNameMessage')}</Text>
+          <Text style={styles.emptyIcon}>📅</Text>
+          <Text style={styles.emptyTitle}>{t('momentDetail.noDob')}</Text>
+          <Text style={styles.emptyMessage}>{t('momentDetail.addDobMessage')}</Text>
           <TouchableOpacity
             style={styles.addNameButton}
-            onPress={() => router.push('/(tabs)/name-destiny')}
+            onPress={() => router.push('/profile')}
             activeOpacity={0.7}
           >
-            <Text style={styles.addNameButtonText}>{t('momentDetail.goToNameDestiny')}</Text>
+            <Text style={styles.addNameButtonText}>{t('momentDetail.goToProfile')}</Text>
             <Ionicons name="arrow-forward" size={20} color="#fff" />
           </TouchableOpacity>
         </View>

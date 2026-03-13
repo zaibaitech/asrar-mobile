@@ -8,14 +8,17 @@ import HistoryModal from '@/components/istikhara/HistoryModal';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useResponsive } from '@/hooks/useResponsive';
 import { SavedCalculation } from '@/services/HistoryService';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
+  size?: number;
 }) {
-  return <FontAwesome size={22} style={{ marginBottom: -2 }} {...props} />;
+  const { size = 22, ...rest } = props;
+  return <FontAwesome size={size} style={{ marginBottom: -2 }} {...rest} />;
 }
 
 // Custom header component for tabs
@@ -71,6 +74,12 @@ function CustomHeader() {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { t } = useLanguage();
+  const { isTablet, isDesktop } = useResponsive();
+
+  const tabBarHeight = isTablet || isDesktop ? 70 : undefined; // default on mobile
+  const tabIconSize = isTablet || isDesktop ? 28 : 22;
+  const tabLabelSize = isTablet || isDesktop ? 11 : 9;
+  const tabItemPadding = isTablet || isDesktop ? 8 : 4;
 
   return (
     <Tabs
@@ -85,13 +94,14 @@ export default function TabLayout() {
           borderTopColor: 'rgba(255, 255, 255, 0.1)', // Subtle border
           elevation: 0, // Remove Android shadow
           shadowOpacity: 0, // Remove iOS shadow
+          ...(tabBarHeight ? { height: tabBarHeight } : {}),
         },
         tabBarLabelStyle: {
-          fontSize: 9,
+          fontSize: tabLabelSize,
           fontWeight: '600',
         },
         tabBarItemStyle: {
-          paddingVertical: 4,
+          paddingVertical: tabItemPadding,
         },
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
@@ -102,42 +112,42 @@ export default function TabLayout() {
         name="index"
         options={{
           title: t('nav.home'),
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} size={tabIconSize} />,
         }}
       />
       <Tabs.Screen
         name="istikhara"
         options={{
           title: t('nav.advanced'),
-          tabBarIcon: ({ color }) => <TabBarIcon name="moon-o" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="moon-o" color={color} size={tabIconSize} />,
         }}
       />
       <Tabs.Screen
         name="calculator"
         options={{
           title: t('nav.calculator'),
-          tabBarIcon: ({ color }) => <TabBarIcon name="calculator" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="calculator" color={color} size={tabIconSize} />,
         }}
       />
       <Tabs.Screen
         name="who-am-i"
         options={{
           title: t('nav.whoAmI') || 'Who Am I',
-          tabBarIcon: ({ color }) => <TabBarIcon name="user-circle-o" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="user-circle-o" color={color} size={tabIconSize} />,
         }}
       />
       <Tabs.Screen
         name="compatibility"
         options={{
           title: t('nav.compatibility') || 'Compatibility',
-          tabBarIcon: ({ color }) => <TabBarIcon name="balance-scale" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="balance-scale" color={color} size={tabIconSize} />,
         }}
       />
       <Tabs.Screen
         name="quran"
         options={{
           title: 'Quran',
-          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} size={tabIconSize} />,
         }}
       />
       <Tabs.Screen

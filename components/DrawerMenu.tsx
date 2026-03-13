@@ -128,7 +128,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
         {
           id: 'who-am-i',
           label: t('drawer.whoAmI'),
-          icon: 'user',
+          icon: 'person',
           route: '/(tabs)/who-am-i',
         },
         // Divine Timing hidden for v1 - screen still exists but not exposed in navigation

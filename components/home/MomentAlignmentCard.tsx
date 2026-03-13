@@ -26,7 +26,7 @@ interface MomentAlignmentCardProps {
   timeElement?: Element;
   updatedAt?: string;
   loading?: boolean;
-  hasProfileName?: boolean;
+  hasDateOfBirth?: boolean;
   t: (key: string) => string;
   planetaryData?: PlanetaryHourData | null;
   causeText?: string; // Cause-based explanation text
@@ -115,7 +115,7 @@ export function MomentAlignmentCard({
   timeElement,
   updatedAt,
   loading,
-  hasProfileName,
+  hasDateOfBirth,
   t,
   planetaryData,
   causeText,
@@ -146,11 +146,11 @@ export function MomentAlignmentCard({
     });
   };
 
-  const goToProfileName = async () => {
+  const goToProfile = async () => {
     try {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch (error) {}
-    router.push('/(tabs)/name-destiny');
+    router.push('/profile');
   };
 
   const theme = status ? STATUS_THEME[status] : DEFAULT_THEME;
@@ -181,12 +181,12 @@ export function MomentAlignmentCard({
     };
   })();
 
-  // Empty state when user has no name configured
-  if (!hasProfileName && !loading) {
+  // Empty state when user has no date of birth configured
+  if (!hasDateOfBirth && !loading) {
     return (
       <Pressable
         style={styles.container}
-        onPress={goToProfileName}
+        onPress={goToProfile}
         android_ripple={{ color: 'rgba(139, 115, 85, 0.2)', borderless: false }}
       >
         <LinearGradient
@@ -210,7 +210,7 @@ export function MomentAlignmentCard({
               </View>
             </View>
             <Text style={styles.emptyHint} numberOfLines={2} ellipsizeMode="tail">
-              {t('home.moment.addNamePrompt')}
+              {t('home.moment.addDobPrompt')}
             </Text>
           </View>
         </LinearGradient>

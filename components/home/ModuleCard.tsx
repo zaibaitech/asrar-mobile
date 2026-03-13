@@ -30,6 +30,7 @@ export function ModuleCard({
   element,
   onPress,
   comingSoon = false,
+  cardWidth,
 }: ModuleCardProps) {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
@@ -56,7 +57,7 @@ export function ModuleCard({
       onPress={comingSoon ? undefined : onPress}
       onPressIn={comingSoon ? undefined : handlePressIn}
       onPressOut={comingSoon ? undefined : handlePressOut}
-      style={[styles.container, animatedStyle]}
+      style={[styles.container, cardWidth ? { width: cardWidth, marginHorizontal: 6 } : undefined, animatedStyle]}
       disabled={comingSoon}
     >
       {/* Glassmorphism background with gradient */}

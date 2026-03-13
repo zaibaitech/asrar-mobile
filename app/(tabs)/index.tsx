@@ -39,6 +39,7 @@ import { DarkTheme, ElementAccents, Spacing, Typography } from '../../constants/
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useProfile } from '../../contexts/ProfileContext';
 import { useNowTicker } from '../../hooks/useNowTicker';
+import { useResponsive } from '../../hooks/useResponsive';
 import {
     fetchPrayerTimes,
     getNextPrayer,
@@ -166,7 +167,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile, completionStatus } = useProfile();
-  const hasProfileName = Boolean(profile?.nameAr || profile?.nameLatin);
+  const hasDateOfBirth = Boolean(profile?.dobISO);
 
   const profileRef = React.useRef(profile);
   useEffect(() => {
@@ -175,7 +176,9 @@ export default function HomeScreen() {
   
   // Get modules with translations
   const MODULES = useMemo(() => getModules(t), [t]);
-  
+
+  const responsive = useResponsive();
+
   // BATTERY OPTIMIZATION: Use 30s ticker for home screen.
   // Planetary hour countdown doesn't need sub-minute precision.
   // Detail screens can use 1s precision if needed.
@@ -347,15 +350,15 @@ export default function HomeScreen() {
     setTomorrowBlessing(getTodayBlessing(tomorrow, language));
   }, [language]);
 
-  // Re-trigger moment alignment once profile name becomes available.
+  // Re-trigger moment alignment once DOB becomes available.
   // The initial load may run before the profile is loaded from storage,
-  // causing getMomentAlignment to return null (no name). This effect
+  // causing getMomentAlignment to return null (no DOB). This effect
   // re-triggers once the async profile load completes.
   useEffect(() => {
-    if (hasProfileName && !momentAlignment) {
+    if (hasDateOfBirth && !momentAlignment) {
       loadMomentAlignment();
     }
-  }, [hasProfileName, momentAlignment, loadMomentAlignment]);
+  }, [hasDateOfBirth, momentAlignment, loadMomentAlignment]);
   
   // Update countdown every minute
   useEffect(() => {
@@ -454,9 +457,11 @@ export default function HomeScreen() {
   const renderModuleCard = useCallback(({ item }: { item: typeof MODULES[0] }) => (
     <ModuleCard
       {...item}
+      cardWidth={responsive.numColumns === 2 ? responsive.cardWidth : undefined}
       onPress={() => handleModulePress(item.id)}
     />
-  ), [handleModulePress]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ), [handleModulePress, responsive.numColumns, responsive.cardWidth]);
 
   /**
    * List header with welcome message and widget bar
@@ -534,8 +539,8 @@ export default function HomeScreen() {
         <MomentAlignmentStrip
           zahirElement={momentAlignmentUserElement}
           timeElement={momentAlignment?.timeElement}
-          loading={!momentAlignment && hasProfileName}
-          hasProfileName={hasProfileName}
+          loading={!momentAlignment && hasDateOfBirth}
+          hasDateOfBirth={hasDateOfBirth}
           t={t}
           planetaryData={planetaryData}
           userBurjIndex={profile?.derived?.burjIndex ?? (profile?.dobISO ? deriveBurjFromDOB(profile.dobISO)?.burjIndex : undefined)}
@@ -579,10 +584,10 @@ export default function HomeScreen() {
           />
         </TouchableOpacity>
         
-        {/* Compact Preview: Show first 4 modules when collapsed */}
+        {/* Compact Preview: Show first N modules when collapsed (extra on tablet) */}
         {!modulesExpanded && (
           <View style={styles.modulesCompactPreview}>
-            {MODULES.slice(0, 4).map((module) => (
+            {MODULES.slice(0, responsive.compactIconCount - 1).map((module) => (
               <TouchableOpacity
                 key={module.id}
                 style={styles.moduleCompactItem}
@@ -661,7 +666,7 @@ export default function HomeScreen() {
     getDayName,
     momentAlignment,
     planetaryData,
-    hasProfileName,
+    hasDateOfBirth,
     prayerCardSlide,
     blessingCardSlide,
   ]);
@@ -698,6 +703,8 @@ export default function HomeScreen() {
         data={data}
         renderItem={renderModuleCard}
         keyExtractor={keyExtractor}
+        key={String(responsive.numColumns)}
+        numColumns={responsive.numColumns}
         ListHeaderComponent={ListHeaderComponent}
         ListFooterComponent={ListFooterComponent}
         showsVerticalScrollIndicator={false}

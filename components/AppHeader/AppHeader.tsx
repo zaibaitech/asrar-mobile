@@ -3,18 +3,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { History, Menu, User } from 'lucide-react-native';
 import React from 'react';
 import {
-    Dimensions,
     Image,
     ImageSourcePropType,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View
+    View,
+    useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsrarLogo, { ElementType } from '../AsrarLogo';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface AppHeaderProps {
   logoSource?: ImageSourcePropType;
@@ -43,6 +41,7 @@ export default function AppHeader({
   showSubtitle = false,
   showProfileIcon = true,
 }: AppHeaderProps) {
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
   const isSmallScreen = SCREEN_WIDTH < 350;
   const insets = useSafeAreaInsets();
   const { profile } = useProfile();

@@ -12,6 +12,8 @@ export interface ModuleCardProps {
   element: ElementType;
   onPress: () => void;
   comingSoon?: boolean;
+  /** On tablet+, pass a calculated pixel width so the card fills its column */
+  cardWidth?: number;
 }
 
 export interface WidgetProps {

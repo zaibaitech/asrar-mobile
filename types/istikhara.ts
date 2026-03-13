@@ -3,6 +3,23 @@ import type { BurujProfile } from '../services/istikhara/types';
 
 export type Language = 'en' | 'fr' | 'ar';
 
+export interface BirthProfile {
+  dobISO: string;
+  birthTime: string | null;
+  hasBirthTime: boolean;
+  timezone: string;
+  birthLocation: {
+    latitude: number;
+    longitude: number;
+    label?: string;
+  } | null;
+  sunSign: {
+    burjAr: string;
+    burjEn: string;
+    burjIndex: number;
+  };
+}
+
 export interface IstikharaRequest {
   personName: string;
   motherName: string;
@@ -18,6 +35,7 @@ export interface IstikharaData {
   burujRemainder: number;
   burujProfile: BurujProfile;
   repetitionCount: number;
+  birthProfile?: BirthProfile;
 }
 
 export interface IstikharaResponse {

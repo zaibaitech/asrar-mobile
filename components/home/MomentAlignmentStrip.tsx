@@ -20,7 +20,7 @@ interface MomentAlignmentStripProps {
   zahirElement?: Element;
   timeElement?: Element;
   loading?: boolean;
-  hasProfileName?: boolean;
+  hasDateOfBirth?: boolean;
   t: (key: string) => string;
   planetaryData?: PlanetaryHourData | null;
   /** User's zodiac sign index (1–12) for personalized alignment */
@@ -49,7 +49,7 @@ export function MomentAlignmentStrip({
   zahirElement,
   timeElement,
   loading,
-  hasProfileName,
+  hasDateOfBirth,
   t,
   planetaryData,
   userBurjIndex,
@@ -95,13 +95,26 @@ export function MomentAlignmentStrip({
     });
   };
 
-  const goToProfileName = () => {
+  const goToProfile = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.push('/name-destiny');
+    router.push('/profile');
   };
 
-  if (!hasProfileName && !loading) {
-    return null; // Don't show strip if no profile name
+  if (!hasDateOfBirth && !loading) {
+    return (
+      <Pressable
+        style={styles.container}
+        onPress={goToProfile}
+        android_ripple={{ color: 'rgba(139, 115, 85, 0.2)', borderless: false }}
+      >
+        <View style={styles.loadingRow}>
+          <Ionicons name="calendar-outline" size={16} color="#8B7355" />
+          <Text style={[styles.loadingText, { flex: 1 }]} numberOfLines={2}>
+            {t('home.moment.addDobPrompt')}
+          </Text>
+        </View>
+      </Pressable>
+    );
   }
 
   if (loading) {

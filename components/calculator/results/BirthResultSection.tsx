@@ -6,9 +6,10 @@
 import { InfoTooltip } from '@/components/InfoTooltip';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { BirthInsights } from '@/types/calculator-enhanced';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ActionCard } from './ActionCard';
 import { CosmicBlueprintCard } from './CosmicBlueprintCard';
 
@@ -18,6 +19,7 @@ interface BirthProfileResultsProps {
 
 export const BirthProfileResults: React.FC<BirthProfileResultsProps> = ({ insights }) => {
   const { t, tSafe, language } = useLanguage();
+  const [moonExpanded, setMoonExpanded] = useState(false);
 
   const getElementColor = (element: string): string => {
     const colors = {
@@ -45,6 +47,35 @@ export const BirthProfileResults: React.FC<BirthProfileResultsProps> = ({ insigh
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      {/* Summary chips banner — quick-glance key facts */}
+      <View style={styles.chipsBanner}>
+        <View style={styles.chip}>
+          <Text style={styles.chipLabel}>☀️</Text>
+          <Text style={styles.chipValue}>{getZodiacLabel(insights.chartBasics.sunSign.sign)}</Text>
+        </View>
+        <View style={styles.chip}>
+          <Text style={styles.chipLabel}>🌙</Text>
+          <Text style={styles.chipValue}>{getZodiacLabel(insights.chartBasics.moonSign.sign)}</Text>
+        </View>
+        {insights.chartBasics.ascendant && (
+          <View style={styles.chip}>
+            <Text style={styles.chipLabel}>⬆️</Text>
+            <Text style={styles.chipValue}>
+              {getZodiacLabel(insights.chartBasics.ascendant.sign)}{' '}
+              {tSafe('birth.summaryBanner.rising', 'Rising')}
+            </Text>
+          </View>
+        )}
+        <View style={[styles.chip, styles.chipAccent]}>
+          <Text style={styles.chipValue}>
+            {t(`common.elements.${insights.spiritualImprint.dominantElement}`)}
+          </Text>
+        </View>
+        <View style={[styles.chip, styles.chipAccent]}>
+          <Text style={styles.chipValue}>{getPlanetLabel(insights.spiritualImprint.dominantPlanet)}</Text>
+        </View>
+      </View>
+
       {/* Cosmic Blueprint - "What This Means For You" summary */}
       <CosmicBlueprintCard insights={insights} />
 
@@ -166,42 +197,52 @@ export const BirthProfileResults: React.FC<BirthProfileResultsProps> = ({ insigh
       >
         <Text style={styles.cardTitle}>🪐 {t('calculator.birth.results.planets')}</Text>
         
-        {insights.planets.map((planet: any, index: number) => (
-          <View key={index} style={styles.planetRow}>
-            <View style={styles.planetHeader}>
-              <View style={styles.labelWithTooltip}>
-                <Text style={styles.planetName}>{getPlanetLabel(planet.planet)}</Text>
-                <InfoTooltip tooltipKey={planet.planet.toLowerCase()} size={14} />
-              </View>
-              {planet.retrograde && (
-                <Text style={styles.retroBadge}>℞</Text>
-              )}
-            </View>
-            
-            <View style={styles.planetDetails}>
-              <View style={styles.valueWithTooltip}>
-                <Text style={styles.planetSign}>
-                  {getZodiacLabel(planet.sign)} {planet.degree.toFixed(1)}°
-                </Text>
-                <InfoTooltip tooltipKey={planet.sign.toLowerCase()} size={12} />
-              </View>
-              <View style={styles.conditionWithTooltip}>
-                <View style={[styles.conditionBadge, { 
-                  backgroundColor: planet.condition.label === 'strong' ? '#22c55e33' : 
-                                 planet.condition.label === 'weak' ? '#ef444433' : '#64748b33' 
-                }]}>
-                  <Text style={[styles.conditionText, {
-                    color: planet.condition.label === 'strong' ? '#22c55e' : 
-                           planet.condition.label === 'weak' ? '#ef4444' : '#94a3b8'
-                  }]}>
-                    {t(`calculator.birth.condition.${planet.condition.label}`)} ({planet.condition.score})
-                  </Text>
+        {insights.planets.map((planet: any, index: number) => {
+          const insightText = tSafe(
+            `birth.planetInsight.${planet.planet.toLowerCase()}.${planet.condition.label}`,
+            ''
+          );
+          return (
+            <View key={index} style={styles.planetRow}>
+              <View style={styles.planetHeader}>
+                <View style={styles.labelWithTooltip}>
+                  <Text style={styles.planetName}>{getPlanetLabel(planet.planet)}</Text>
+                  <InfoTooltip tooltipKey={planet.planet.toLowerCase()} size={14} />
                 </View>
-                <InfoTooltip tooltipKey={planet.condition.label} size={12} />
+                {planet.retrograde && (
+                  <Text style={styles.retroBadge}>℞</Text>
+                )}
               </View>
+
+              <View style={styles.planetDetails}>
+                <View style={styles.valueWithTooltip}>
+                  <Text style={styles.planetSign}>
+                    {getZodiacLabel(planet.sign)} {planet.degree.toFixed(1)}°
+                  </Text>
+                  <InfoTooltip tooltipKey={planet.sign.toLowerCase()} size={12} />
+                </View>
+                <View style={styles.conditionWithTooltip}>
+                  <View style={[styles.conditionBadge, {
+                    backgroundColor: planet.condition.label === 'strong' ? '#22c55e33' :
+                                     planet.condition.label === 'weak' ? '#ef444433' : '#64748b33'
+                  }]}>
+                    <Text style={[styles.conditionText, {
+                      color: planet.condition.label === 'strong' ? '#22c55e' :
+                             planet.condition.label === 'weak' ? '#ef4444' : '#94a3b8'
+                    }]}>
+                      {t(`calculator.birth.condition.${planet.condition.label}`)} ({planet.condition.score})
+                    </Text>
+                  </View>
+                  <InfoTooltip tooltipKey={planet.condition.label} size={12} />
+                </View>
+              </View>
+
+              {insightText ? (
+                <Text style={styles.planetInsightText}>💡 {insightText}</Text>
+              ) : null}
             </View>
-          </View>
-        ))}
+          );
+        })}
       </LinearGradient>
 
       {/* Card 4: Moon Timing */}
@@ -209,8 +250,23 @@ export const BirthProfileResults: React.FC<BirthProfileResultsProps> = ({ insigh
         colors={['#1e293b', '#0f172a']}
         style={styles.card}
       >
-        <Text style={styles.cardTitle}>🌙 {t('calculator.birth.results.moonTiming')}</Text>
-        
+        <View style={styles.moonCardHeader}>
+          <Text style={[styles.cardTitle, styles.moonCardTitle]}>🌙 {t('calculator.birth.results.moonTiming')}</Text>
+          <Pressable onPress={() => setMoonExpanded(!moonExpanded)} style={styles.moonToggle}>
+            <Text style={styles.moonToggleText}>
+              {moonExpanded
+                ? tSafe('birth.results.hideMoonDetails', 'Hide details')
+                : tSafe('birth.results.showMoonDetails', 'See lunar details')}
+            </Text>
+            <Ionicons
+              name={moonExpanded ? 'chevron-up' : 'chevron-down'}
+              size={14}
+              color="#8B7BF7"
+            />
+          </Pressable>
+        </View>
+
+        {/* Phase — always visible */}
         <View style={styles.dataRow}>
           <View style={styles.labelWithTooltip}>
             <Text style={styles.label}>{t('calculator.birth.results.phase')}</Text>
@@ -221,36 +277,41 @@ export const BirthProfileResults: React.FC<BirthProfileResultsProps> = ({ insigh
           </Text>
         </View>
 
-        <View style={styles.dataRow}>
-          <View style={styles.labelWithTooltip}>
-            <Text style={styles.label}>{t('calculator.birth.results.lunarDay')}</Text>
-            <InfoTooltip tooltipKey="lunarDay" />
-          </View>
-          <Text style={styles.value}>
-            {t('calculator.birth.results.dayNumber', { day: insights.moonTiming.lunarDay })}
-          </Text>
-        </View>
+        {/* Expand: Lunar Day, Illumination, Direction */}
+        {moonExpanded && (
+          <>
+            <View style={styles.dataRow}>
+              <View style={styles.labelWithTooltip}>
+                <Text style={styles.label}>{t('calculator.birth.results.lunarDay')}</Text>
+                <InfoTooltip tooltipKey="lunarDay" />
+              </View>
+              <Text style={styles.value}>
+                {t('calculator.birth.results.dayNumber', { day: insights.moonTiming.lunarDay })}
+              </Text>
+            </View>
 
-        <View style={styles.dataRow}>
-          <View style={styles.labelWithTooltip}>
-            <Text style={styles.label}>{t('calculator.birth.results.illumination')}</Text>
-            <InfoTooltip tooltipKey="illumination" />
-          </View>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: `${insights.moonTiming.illumination}%` }]} />
-            <Text style={styles.progressText}>{insights.moonTiming.illumination}%</Text>
-          </View>
-        </View>
+            <View style={styles.dataRow}>
+              <View style={styles.labelWithTooltip}>
+                <Text style={styles.label}>{t('calculator.birth.results.illumination')}</Text>
+                <InfoTooltip tooltipKey="illumination" />
+              </View>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${insights.moonTiming.illumination}%` }]} />
+                <Text style={styles.progressText}>{insights.moonTiming.illumination}%</Text>
+              </View>
+            </View>
 
-        <View style={styles.dataRow}>
-          <View style={styles.labelWithTooltip}>
-            <Text style={styles.label}>{t('calculator.birth.results.direction')}</Text>
-            <InfoTooltip tooltipKey={insights.moonTiming.isWaxing ? 'waxingMoon' : 'waningMoon'} />
-          </View>
-          <Text style={styles.value}>
-            {insights.moonTiming.isWaxing ? t('moon.ui.waxing') : t('moon.ui.waning')}
-          </Text>
-        </View>
+            <View style={styles.dataRow}>
+              <View style={styles.labelWithTooltip}>
+                <Text style={styles.label}>{t('calculator.birth.results.direction')}</Text>
+                <InfoTooltip tooltipKey={insights.moonTiming.isWaxing ? 'waxingMoon' : 'waningMoon'} />
+              </View>
+              <Text style={styles.value}>
+                {insights.moonTiming.isWaxing ? t('moon.ui.waxing') : t('moon.ui.waning')}
+              </Text>
+            </View>
+          </>
+        )}
       </LinearGradient>
 
       {/* Card 5: Spiritual Imprint */}
@@ -418,6 +479,75 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+  },
+
+  planetInsightText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#94a3b8',
+    fontStyle: 'italic',
+    marginTop: 8,
+    lineHeight: 17,
+  },
+
+  moonCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  moonCardTitle: {
+    marginBottom: 0,
+  },
+
+  moonToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+
+  moonToggleText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#8B7BF7',
+  },
+
+  chipsBanner: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    backgroundColor: '#1e1b4b',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#4c1d95',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#312e81',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 4,
+  },
+
+  chipAccent: {
+    backgroundColor: '#4c1d95',
+  },
+
+  chipLabel: {
+    fontSize: 12,
+  },
+
+  chipValue: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#e0e7ff',
   },
 
   valueContainer: {

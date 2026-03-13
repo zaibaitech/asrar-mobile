@@ -37,6 +37,7 @@ import CareerTabAdvanced from '../../components/istikhara/tabs/CareerTabAdvanced
 import HealthAwarenessTab from '../../components/istikhara/tabs/HealthAwarenessTab';
 import OverviewTab from '../../components/istikhara/tabs/OverviewTab';
 import PersonalityTab from '../../components/istikhara/tabs/PersonalityTab';
+import SadaqahTab from '../../components/istikhara/tabs/SadaqahTab';
 import SpiritualPracticeTab from '../../components/istikhara/tabs/SpiritualPracticeTab';
 import ZodiacStonesTab from '../../components/istikhara/tabs/ZodiacStonesTab';
 
@@ -88,6 +89,7 @@ function getTabKey(routeName: string, language: string): string {
     'zodiac stones': ['zodiac stones', 'الأحجار', 'pierres'],
     'career': ['career', 'المهنة', 'carrière'],
     'blessed day': ['blessed day', 'اليوم المبارك', 'jour béni'],
+    'sadaqah': ['sadaqah', 'الصدقة', 'sadaqah'],
   };
   
   const lowerRoute = routeName.toLowerCase();
@@ -281,26 +283,23 @@ export default function IstikharaResults() {
           )}
         </Tab.Screen>
 
-        {/* PREMIUM: Health Awareness - Traditional guidance */}
-        {/* Hidden in production for initial App Store approval - can be re-enabled later */}
-        {__DEV__ && (
-          <Tab.Screen name={t('istikhara.results.tabs.health') || 'Health'}>
-            {() => (
-              <PremiumTabWrapper
-                featureId="spiritualGuidance"
-                title={t('istikhara.health.title') || 'Health Awareness'}
-                description={t('istikhara.health.subtitle') || 'Traditional wisdom for your spiritual nature (not medical advice)'}
-                icon="⚕️"
-              >
-                <HealthAwarenessTab result={{
-                  personName: params.personName as string,
-                  motherName: params.motherName as string,
-                  ...data
-                }} />
-              </PremiumTabWrapper>
-            )}
-          </Tab.Screen>
-        )}
+        {/* PREMIUM: Health & Wellness - Traditional guidance */}
+        <Tab.Screen name={t('istikhara.results.tabs.health') || 'Health'}>
+          {() => (
+            <PremiumTabWrapper
+              featureId="spiritualGuidance"
+              title={t('istikhara.health.title') || 'Health & Wellness'}
+              description={t('istikhara.health.subtitle') || 'Traditional wisdom for your spiritual nature (not medical advice)'}
+              icon="⚕️"
+            >
+              <HealthAwarenessTab result={{
+                personName: params.personName as string,
+                motherName: params.motherName as string,
+                ...data
+              }} />
+            </PremiumTabWrapper>
+          )}
+        </Tab.Screen>
 
         {/* PREMIUM: Zodiac Stones - Crystal guidance */}
         <Tab.Screen name={language === 'en' ? 'Zodiac Stones' : language === 'fr' ? 'Pierres' : 'الأحجار'}>
@@ -352,6 +351,24 @@ export default function IstikharaResults() {
               icon="📅"
             >
               <BlessedDayTab data={data} elementColor={elementColor} />
+            </PremiumTabWrapper>
+          )}
+        </Tab.Screen>
+
+        {/* PREMIUM: Sadaqah - Charity guidance */}
+        <Tab.Screen name={language === 'en' ? 'Sadaqah' : language === 'fr' ? 'Sadaqah' : 'الصدقة'}>
+          {() => (
+            <PremiumTabWrapper
+              featureId="spiritualGuidance"
+              title={language === 'en' ? 'Recommended Sadaqah' : 
+                     language === 'fr' ? 'Sadaqah Recommandé' : 
+                     'الصدقة الموصى بها'}
+              description={language === 'en' ? 'Personalized charity practices for blessing and spiritual protection' : 
+                          language === 'fr' ? 'Pratiques de charité personnalisées pour la bénédiction et la protection spirituelle' : 
+                          'ممارسات الصدقة الشخصية للبركة والحماية الروحية'}
+              icon="🤲"
+            >
+              <SadaqahTab data={data} elementColor={elementColor} />
             </PremiumTabWrapper>
           )}
         </Tab.Screen>

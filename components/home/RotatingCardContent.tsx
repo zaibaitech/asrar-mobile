@@ -33,6 +33,7 @@ export function RotatingCardContent({
   paused = false,
 }: RotatingCardContentProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const activeIndexRef = useRef(0);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   // BATTERY OPTIMIZATION: Track app state to pause when backgrounded
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
@@ -68,11 +69,10 @@ export function RotatingCardContent({
         useNativeDriver: true,
       }).start(() => {
         // Switch slide
-        setActiveIndex((prev) => {
-          const next = prev === 0 ? 1 : 0;
-          onSlideChange?.(next);
-          return next;
-        });
+        const next = activeIndexRef.current === 0 ? 1 : 0;
+        activeIndexRef.current = next;
+        setActiveIndex(next);
+        onSlideChange?.(next);
         
         // Fade in
         Animated.timing(fadeAnim, {

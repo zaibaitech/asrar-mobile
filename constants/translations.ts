@@ -1013,6 +1013,7 @@ export const translations = {
       moment: {
         title: "Moment Alignment",
         addNamePrompt: "Add name to enable",
+        addDobPrompt: "Add your date of birth to unlock personalized alignment.",
         details: "DETAILS",
         you: "You",
         now: "Now",
@@ -3487,8 +3488,11 @@ export const translations = {
     momentDetail: {
       title: "Moment Alignment",
       noName: "No Name Set",
+      noDob: "Date of Birth Required",
       addNameMessage: "Add your name in Name Destiny to unlock moment alignment guidance.",
+      addDobMessage: "Add your date of birth to unlock personalized alignment.",
       goToNameDestiny: "Go to Name Destiny",
+      goToProfile: "Go to Profile",
       updated: "Updated",
       zahirOutward: "Name + Mother (Personal)",
       hourQuality: "Hour Quality",
@@ -9377,6 +9381,8 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         monthDayDesc: "Quick Burj calculation only",
       },
 
+      methodNote: "These two methods use different formulas — Name calculation uses Islamic numerology (Abjad), while Birth Date uses the solar zodiac. Results may differ, and that is expected.",
+
       // Collapsible sections
       educationTitle: "What is Ilm al-Ḥurūf?",
       educationText: "Ilm al-Ḥurūf (Science of Letters) is an ancient Islamic mystical tradition that explores the spiritual significance of Arabic letters and their numerical values. This sacred science has been practiced for centuries by scholars and Sufis to gain deeper insights into personality, destiny, and spiritual alignment.",
@@ -9461,12 +9467,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         },
       },
 
-      // Health Awareness Tab
+      // Health & Wellness Tab
       health: {
-        title: "Health Awareness",
+        title: "Health & Wellness",
         subtitle: "Traditional wisdom for your spiritual nature (not medical advice)",
         sections: {
-          watchOutFor: "⚠️ Watch Out For",
+          watchOutFor: "✨ Cosmic Sensitivities",
           thingsToAvoid: "🚫 Things to Avoid",
           foodsThatHelpYou: "🍎 Foods That Help You",
           spiritualProtection: "🛡️ Spiritual Protection",
@@ -9474,11 +9480,11 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         },
         disclaimer: "💡 This is traditional spiritual guidance, not medical advice. For health concerns, consult a qualified clinician.",
         empty: {
-          title: "Health Awareness",
+          title: "Health & Wellness",
           text: "No data is available for this sign yet.",
         },
         a11y: {
-          toggle: "Expand or collapse health awareness",
+          toggle: "Expand or collapse health & wellness",
         },
       },
       
@@ -9875,6 +9881,55 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       "Earth-Water": "Water nourishes Earth — emotional depth enriches practical growth",
       "Earth-Fire": "Earth grounds Fire — structure channels passionate energy",
       "Earth-Air": "Earth and Air work together — grounding abstract ideas into form",
+    },
+
+    // Birth Profile Results — summary banner + planet insights + moon timing toggle
+    birth: {
+      summaryBanner: {
+        rising: "Rising",
+      },
+      results: {
+        showMoonDetails: "See lunar details",
+        hideMoonDetails: "Hide lunar details",
+      },
+      // Plain-language insights per planet × condition
+      planetInsight: {
+        sun: {
+          strong: "Your identity and willpower shine brightly — you lead with natural confidence.",
+          neutral: "Your sense of self is steady — purpose emerges through conscious intention.",
+          weak: "Finding your sense of purpose takes practice — self-trust is your lifelong path.",
+        },
+        moon: {
+          strong: "Your emotional world flows naturally — intuition and empathy are your gifts.",
+          neutral: "Your emotional life is balanced — feelings guide you when you listen inward.",
+          weak: "Emotional sensitivity may feel intense — learning to honor your feelings is key.",
+        },
+        mercury: {
+          strong: "Your mind is sharp and expressive — ideas and communication flow with clarity.",
+          neutral: "Your thinking is clear and practical — listening well serves you as much as talking.",
+          weak: "Expressing ideas clearly may need effort — writing and reflection open new channels.",
+        },
+        venus: {
+          strong: "Harmony, beauty, and deep connections come naturally to you.",
+          neutral: "You appreciate beauty and closeness — relationships reward consistent warmth.",
+          weak: "Love and harmony require intentional care — patience builds lasting bonds.",
+        },
+        mars: {
+          strong: "Your drive and courage are powerful — you act with decisive, sustained energy.",
+          neutral: "Your energy is well-directed — steady effort over time yields solid results.",
+          weak: "Motivation may ebb and flow — honoring rest is just as important as pushing forward.",
+        },
+        jupiter: {
+          strong: "Abundance and wisdom flow toward you naturally — opportunity has a way of finding you.",
+          neutral: "Growth comes through steady optimism and staying open to new possibilities.",
+          weak: "Expansion requires conscious effort — seek growth through small, consistent steps.",
+        },
+        saturn: {
+          strong: "Discipline and structure are your allies — you build things designed to last.",
+          neutral: "Responsibility comes naturally — clear boundaries help you keep your rhythm.",
+          weak: "Routines and structure may feel challenging — building them gradually pays off.",
+        },
+      },
     },
   },
 
@@ -10913,6 +10968,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       moment: {
         title: "Alignement du moment",
         addNamePrompt: "Ajoutez un nom pour activer",
+        addDobPrompt: "Ajoutez votre date de naissance pour débloquer l'alignement personnalisé.",
         details: "DÉTAILS",
         you: "Vous",
         now: "Maintenant",
@@ -13370,8 +13426,11 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
     momentDetail: {
       title: "Alignement du Moment",
       noName: "Aucun Nom Défini",
+      noDob: "Date de Naissance Requise",
       addNameMessage: "Ajoutez votre nom dans Destinée du Nom pour débloquer l'alignement du moment.",
+      addDobMessage: "Ajoutez votre date de naissance pour débloquer l'alignement personnalisé.",
       goToNameDestiny: "Aller à Destinée du Nom",
+      goToProfile: "Aller au Profil",
       updated: "Mis à jour",
       zahirOutward: "Nom + Mère (Personnel)",
       hourQuality: "Qualité de l'heure",
@@ -19562,6 +19621,8 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         monthDayDesc: "Calcul rapide Burj uniquement",
       },
 
+      methodNote: "Ces deux méthodes utilisent des formules différentes — le calcul par Nom utilise la numérologie islamique (Abjad), tandis que la Date de naissance utilise le zodiaque solaire. Les résultats peuvent différer, c'est tout à fait normal.",
+
       // Éducation & Introduction
       educationTitle: "Qu'est-ce que Ilm al-Ḥurūf ?",
       educationText: "Ilm al-Ḥurūf (Science des Lettres) est une tradition mystique islamique ancienne qui explore la signification spirituelle des lettres arabes et de leurs valeurs numériques. Chaque lettre possède des qualités sacrées qui révèlent des vérités plus profondes sur les noms et leur résonance cosmique.",
@@ -19650,12 +19711,12 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         },
       },
 
-      // Onglet Vigilance santé
+      // Onglet Santé & Bien-être
       health: {
-        title: "Vigilance santé",
+        title: "Santé & Bien-être",
         subtitle: "Sagesse traditionnelle pour ta nature spirituelle (pas un avis médical)",
         sections: {
-          watchOutFor: "⚠️ Points d'attention",
+          watchOutFor: "✨ Sensibilités cosmiques",
           thingsToAvoid: "🚫 Choses à éviter",
           foodsThatHelpYou: "🍎 Aliments qui t'aident",
           spiritualProtection: "🛡️ Protection spirituelle",
@@ -19663,11 +19724,11 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         },
         disclaimer: "💡 Ceci est une guidance spirituelle traditionnelle, pas un avis médical. En cas de souci de santé, consultez un professionnel qualifié.",
         empty: {
-          title: "Vigilance santé",
+          title: "Santé & Bien-être",
           text: "Aucune donnée n'est disponible pour ce signe pour l'instant.",
         },
         a11y: {
-          toggle: "Développer ou réduire la section vigilance santé",
+          toggle: "Développer ou réduire la section santé & bien-être",
         },
       },
       
@@ -20035,6 +20096,54 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       "Earth-Water": "L'Eau nourrit la Terre — croissance enrichie",
       "Earth-Fire": "La Terre ancre le Feu — énergie canalisée",
       "Earth-Air": "La Terre et l'Air travaillent ensemble — idées concrétisées",
+    },
+
+    // Birth Profile Results — bannière récapitulative + aperçus des planètes + bascule lune
+    birth: {
+      summaryBanner: {
+        rising: "Ascendant",
+      },
+      results: {
+        showMoonDetails: "Voir les détails lunaires",
+        hideMoonDetails: "Masquer les détails",
+      },
+      planetInsight: {
+        sun: {
+          strong: "Votre identité et votre volonté brillent naturellement — vous guidez avec assurance.",
+          neutral: "Votre sens de vous-même est stable — la détermination émerge par l'intention consciente.",
+          weak: "Trouver votre sens du but demande de la pratique — la confiance en soi est votre chemin de vie.",
+        },
+        moon: {
+          strong: "Votre monde émotionnel coule naturellement — l'intuition et l'empathie sont vos dons.",
+          neutral: "Votre vie émotionnelle est équilibrée — les sentiments vous guident quand vous les écoutez.",
+          weak: "La sensibilité émotionnelle peut être intense — apprendre à honorer vos sentiments est essentiel.",
+        },
+        mercury: {
+          strong: "Votre esprit est vif et expressif — les idées et la communication coulent avec clarté.",
+          neutral: "Votre pensée est claire et pratique — bien écouter vous sert autant que parler.",
+          weak: "Exprimer clairement vos idées peut demander des efforts — l'écriture et la réflexion ouvrent de nouveaux canaux.",
+        },
+        venus: {
+          strong: "L'harmonie, la beauté et les liens profonds vous viennent naturellement.",
+          neutral: "Vous appréciez la beauté et la proximité — les relations récompensent la chaleur constante.",
+          weak: "L'amour et l'harmonie nécessitent un soin intentionnel — la patience construit des liens durables.",
+        },
+        mars: {
+          strong: "Votre dynamisme et votre courage sont puissants — vous agissez avec une énergie décisive.",
+          neutral: "Votre énergie est bien orientée — un effort soutenu dans le temps donne des résultats solides.",
+          weak: "La motivation peut fluctuer — honorer le repos est aussi important que d'avancer.",
+        },
+        jupiter: {
+          strong: "L'abondance et la sagesse vous viennent naturellement — les opportunités semblent vous trouver.",
+          neutral: "La croissance vient d'un optimisme constant et d'une ouverture aux nouvelles possibilités.",
+          weak: "L'expansion demande un effort conscient — cherchez la croissance par de petites étapes cohérentes.",
+        },
+        saturn: {
+          strong: "La discipline et la structure sont vos alliées — vous construisez des choses destinées à durer.",
+          neutral: "La responsabilité vient naturellement — des limites claires vous aident à garder votre rythme.",
+          weak: "Les routines et la structure peuvent sembler difficiles — les construire graduellement porte ses fruits.",
+        },
+      },
     },
   },
   ar: {
@@ -20931,6 +21040,8 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         monthDayDesc: "حساب البرج السريع فقط",
       },
 
+      methodNote: "هاتان الطريقتان تستخدمان صيغاً مختلفة — حساب الاسم يعتمد على علم الحروف والأبجد الإسلامي، بينما تاريخ الميلاد يعتمد على الأبراج الشمسية. قد تختلف النتائج وهذا أمر طبيعي تماماً.",
+
       educationTitle: "ما هو علم الحروف؟",
       discoveryTitle: "ما ستكتشفه",
       examplesTitle: "أمثلة على الأسماء",
@@ -20960,12 +21071,12 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         },
       },
 
-      // تبويب التنبيه الصحي
+      // تبويب الصحة والعافية
       health: {
-        title: "التنبيه الصحي",
+        title: "الصحة والعافية",
         subtitle: "حكمة تقليدية لطبيعتك الروحية (ليست نصيحة طبية)",
         sections: {
-          watchOutFor: "⚠️ انتبه لـ",
+          watchOutFor: "✨ الحساسيات الكونية",
           thingsToAvoid: "🚫 تجنّب",
           foodsThatHelpYou: "🍎 أطعمة نافعة لك",
           spiritualProtection: "🛡️ حماية روحية",
@@ -20973,11 +21084,11 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         },
         disclaimer: "💡 هذه إرشادات روحية تقليدية وليست نصيحة طبية. للمشكلات الصحية استشر مختصًا مؤهلًا.",
         empty: {
-          title: "التنبيه الصحي",
+          title: "الصحة والعافية",
           text: "لا توجد بيانات لهذا البرج بعد.",
         },
         a11y: {
-          toggle: "توسيع أو طي قسم التنبيه الصحي",
+          toggle: "توسيع أو طي قسم الصحة والعافية",
         },
       },
     },
@@ -21461,6 +21572,9 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     },
 
     momentDetail: {
+      noDob: "تاريخ الميلاد مطلوب",
+      addDobMessage: "أضف تاريخ ميلادك لتفعيل محاذاة اللحظة الشخصية.",
+      goToProfile: "الذهاب إلى الملف الشخصي",
       cards: {
         currentHour: "الساعة الكوكبية الحالية",
         yourPlanet: "كوكبك",
@@ -22292,8 +22406,57 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       "Earth-Fire": "الأرض تثبت النار — طاقة موجهة",
       "Earth-Air": "الأرض والهواء يعملان معًا — أفكار متجسدة",
     },
+
+    // نتائج الملف الروحي — لافتة ملخص + رؤى الكواكب + تبديل القمر
+    birth: {
+      summaryBanner: {
+        rising: "الطالع",
+      },
+      results: {
+        showMoonDetails: "عرض التفاصيل القمرية",
+        hideMoonDetails: "إخفاء التفاصيل",
+      },
+      planetInsight: {
+        sun: {
+          strong: "هويتك وإرادتك تتألقان بشكل طبيعي — تقود بثقة فطرية.",
+          neutral: "إحساسك بذاتك ثابت — تظهر الغاية من خلال النية الواعية.",
+          weak: "إيجاد هدفك يتطلب ممارسة — الثقة بالنفس هي درب حياتك.",
+        },
+        moon: {
+          strong: "عالمك العاطفي يتدفق بسلاسة — الحدس والتعاطف هبتك.",
+          neutral: "حياتك العاطفية متوازنة — تقودك المشاعر حين تُصغي لداخلك.",
+          weak: "قد تبدو الحساسية العاطفية شديدة — تعلّم تكريم مشاعرك هو المفتاح.",
+        },
+        mercury: {
+          strong: "عقلك حاد وتعبيري — تتدفق الأفكار والتواصل بوضوح.",
+          neutral: "تفكيرك واضح وعملي — حسن الإصغاء يخدمك بقدر الكلام.",
+          weak: "التعبير عن أفكارك بوضوح قد يحتاج جهدًا — الكتابة والتأمل يفتحان آفاقًا جديدة.",
+        },
+        venus: {
+          strong: "الانسجام والجمال والروابط العميقة تأتيك بشكل طبيعي.",
+          neutral: "تقدّر الجمال والقرب — تكافئ العلاقاتُ الدفءَ المستمر.",
+          weak: "المحبة والانسجام يحتاجان عناية واعية — الصبر يبني روابط دائمة.",
+        },
+        mars: {
+          strong: "طاقتك وشجاعتك قويتان — تتصرف بطاقة حاسمة ومستدامة.",
+          neutral: "طاقتك موجهة جيدًا — الجهد المنتظم عبر الزمن يؤتي ثمارًا.",
+          weak: "قد تتقلب الدوافع — احترام الراحة مهم بقدر المضي قدمًا.",
+        },
+        jupiter: {
+          strong: "الوفرة والحكمة تتدفقان نحوك طبيعيًا — الفرص تجدك.",
+          neutral: "يأتي النمو بالتفاؤل المستمر والانفتاح على الإمكانيات الجديدة.",
+          weak: "يتطلب التوسع جهدًا واعيًا — ابحث عن النمو بخطوات صغيرة ومنتظمة.",
+        },
+        saturn: {
+          strong: "الانضباط والبنية حليفاك — تبني أشياء مصمّمة للدوام.",
+          neutral: "تأتيك المسؤولية بشكل طبيعي — الحدود الواضحة تساعدك على إيقاعك.",
+          weak: "قد تبدو الروتين والبنية تحديًا — بناؤها تدريجيًا يؤتي ثماره.",
+        },
+      },
+    },
   },
 };
+
 
 export type Language = keyof typeof translations;
 export type TranslationKeys = typeof translations.en;
