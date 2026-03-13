@@ -79,8 +79,7 @@ function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: { showAnim
   useEffect(() => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { registerPlaybackService } = require('@/services/TrackPlayerService') as typeof import('@/services/TrackPlayerService');
-      registerPlaybackService();
+      (require('@/services/TrackPlayerService') as { registerPlaybackService: () => void }).registerPlaybackService();
     } catch (e) {
       // Non-fatal: background audio controls will be unavailable
       console.warn('[TrackPlayer] Playback service registration failed:', e);
