@@ -73,19 +73,6 @@ function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: { showAnim
     installGlobalErrorHandlers();
   }, []);
 
-  // Register TrackPlayer playback service lazily (after RN is fully initialized).
-  // Must NOT be called at module-eval time — that crashes on New Architecture
-  // because NativeModules are not yet bridged during initial JS module loading.
-  useEffect(() => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      (require('@/services/TrackPlayerService') as { registerPlaybackService: () => void }).registerPlaybackService();
-    } catch (e) {
-      // Non-fatal: background audio controls will be unavailable
-      console.warn('[TrackPlayer] Playback service registration failed:', e);
-    }
-  }, []);
-
   // Best-effort prefetch so tabs/widgets can render instantly.
   // Avoids repeated network bursts during transitions.
   useEffect(() => {

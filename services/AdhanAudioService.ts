@@ -1,20 +1,14 @@
 /**
  * Adhan Audio Service
- * Plays Adhan (call to prayer) audio using react-native-track-player for background playback
- * 
- * Features:
- * - Plays adhan audio in background (continues when app is minimized/locked)
- * - Integrates with notification system
- * - Persists across app kill on Android (foreground service)
- * - Shows playback controls on lock screen and notification
+ * Plays Adhan (call to prayer) audio using expo-av.
+ * (react-native-track-player removed due to New Architecture incompatibility)
  */
 
 import { Asset } from 'expo-asset';
-import TrackPlayer, { Event, RepeatMode, State } from 'react-native-track-player';
+import { Audio } from 'expo-av';
 import { AdhanSettings } from './AdhanNotificationService';
-import { isTrackPlayerAvailable, setupTrackPlayer } from './TrackPlayerService';
 
-// Adhan audio assets - lazy loaded to avoid bundler issues
+// Adhan audio assets
 const ADHAN_ASSETS = {
   default: require('../assets/sounds/adhan_default.mp3'),
   mishary: require('../assets/sounds/adhan_mishary.mp3'),
@@ -23,96 +17,54 @@ const ADHAN_ASSETS = {
   fajr: require('../assets/sounds/adhan_fajr.mp3'),
 };
 
-// Get adhan asset URI by type
+let _currentSound: Audio.Sound | null = null;
+
 async function getAdhanAssetUri(adhanType: 'default' | 'mishary' | 'mecca' | 'medina' | 'fajr'): Promise<string> {
   try {
     const assetModule = ADHAN_ASSETS[adhanType] || ADHAN_ASSETS.default;
     const asset = Asset.fromModule(assetModule);
-    
     if (!asset.downloaded) {
       await asset.downloadAsync();
     }
-    
     return asset.localUri || asset.uri;
-  } catch (error) {
-    console.error('[AdhanAudio] Failed to load asset:', error);
-    // Fallback to default asset
-    const defaultAsset = Asset.fromModule(ADHAN_ASSETS.default);
-    if (!defaultAsset.downloaded) {
-      await defaultAsset.downloadAsync();
-    }
-    return defaultAsset.localUri || defaultAsset.uri;
+  } catch {
+    const fallback = Asset.fromModule(ADHAN_ASSETS.default);
+    if (!fallback.downloaded) await fallback.downloadAsync();
+    return fallback.localUri || fallback.uri;
   }
 }
 
-interface AdhanTrack {
-  prayerName: string;
-  prayerNameArabic: string;
-  adhanType: 'default' | 'mishary' | 'mecca' | 'medina' | 'fajr';
-}
-
-/**
- * Play adhan audio for a specific prayer
- * This is called when a prayer notification is triggered
- */
 export async function playAdhanAudio(
-  prayerName: string,
-  prayerNameArabic: string,
+  _prayerName: string,
+  _prayerNameArabic: string,
   isFajr: boolean,
   settings: AdhanSettings
 ): Promise<boolean> {
-  // Check if Track Player is available (not in Expo Go)
-  if (!isTrackPlayerAvailable) {
-    console.warn('[AdhanAudio] Track Player not available, cannot play adhan');
-    return false;
-  }
-
-  // Don't play if sound is disabled
-  if (!settings.playSound) {
-    return false;
-  }
+  if (!settings.playSound) return false;
 
   try {
-    // Ensure Track Player is initialized
-    const ready = await setupTrackPlayer();
-    if (!ready) {
-      console.warn('[AdhanAudio] Track Player setup failed');
-      return false;
-    }
+    await stopAdhanAudio();
 
-    // Determine which adhan to play
-    const adhanType = isFajr ? settings.fajrAdhan : settings.otherAdhan;
-    const adhanAssetUri = await getAdhanAssetUri(adhanType);
-
-    // Reset queue and add adhan track
-    await TrackPlayer.reset();
-    await TrackPlayer.add({
-      id: `adhan-${prayerName.toLowerCase()}-${Date.now()}`,
-      url: adhanAssetUri,
-      title: `${prayerName} - ${prayerNameArabic}`,
-      artist: 'Adhan',
-      album: 'Prayer Call',
-      artwork: undefined, // You can add app icon or custom artwork here
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      staysActiveInBackground: true,
+      shouldDuckAndroid: false,
     });
 
-    // Set volume from settings
-    await TrackPlayer.setVolume(settings.volume);
+    const adhanType = isFajr ? settings.fajrAdhan : settings.otherAdhan;
+    const uri = await getAdhanAssetUri(adhanType);
 
-    // Play once (no repeat for adhan)
-    await TrackPlayer.setRepeatMode(RepeatMode.Off);
+    const { sound } = await Audio.Sound.createAsync(
+      { uri },
+      { shouldPlay: true, volume: settings.volume }
+    );
 
-    // Start playback
-    await TrackPlayer.play();
+    _currentSound = sound;
 
-    console.log(`✅ Playing ${prayerName} adhan (${adhanType})`);
-
-    // Set up listener to stop after adhan finishes
-    const subscription = TrackPlayer.addEventListener(Event.PlaybackQueueEnded, async () => {
-      try {
-        await TrackPlayer.reset();
-        subscription.remove();
-      } catch (error) {
-        console.error('[AdhanAudio] Error cleaning up after playback:', error);
+    sound.setOnPlaybackStatusUpdate((status) => {
+      if (status.isLoaded && status.didJustFinish) {
+        sound.unloadAsync().catch(() => {});
+        _currentSound = null;
       }
     });
 
@@ -123,95 +75,53 @@ export async function playAdhanAudio(
   }
 }
 
-/**
- * Stop currently playing adhan
- */
 export async function stopAdhanAudio(): Promise<void> {
-  if (!isTrackPlayerAvailable) {
-    return;
-  }
-
-  try {
-    const state = await TrackPlayer.getPlaybackState();
-    if (state.state === State.Playing || state.state === State.Buffering) {
-      await TrackPlayer.stop();
-      await TrackPlayer.reset();
-    }
-  } catch (error) {
-    console.error('[AdhanAudio] Failed to stop adhan:', error);
+  if (_currentSound) {
+    try {
+      await _currentSound.stopAsync();
+      await _currentSound.unloadAsync();
+    } catch {}
+    _currentSound = null;
   }
 }
 
-/**
- * Check if adhan is currently playing
- */
 export async function isAdhanPlaying(): Promise<boolean> {
-  if (!isTrackPlayerAvailable) {
-    return false;
-  }
-
+  if (!_currentSound) return false;
   try {
-    const state = await TrackPlayer.getPlaybackState();
-    const track = await TrackPlayer.getActiveTrack();
-    
-    // Check if playing and if the track is an adhan track
-    return (
-      (state.state === State.Playing || state.state === State.Buffering) &&
-      track?.id?.startsWith('adhan-')
-    );
-  } catch (error) {
+    const status = await _currentSound.getStatusAsync();
+    return status.isLoaded && status.isPlaying;
+  } catch {
     return false;
   }
 }
 
-/**
- * Test adhan playback (for settings/preview)
- */
 export async function playAdhanPreview(
   adhanType: 'default' | 'mishary' | 'mecca' | 'medina' | 'fajr',
   volume: number = 0.8
 ): Promise<boolean> {
-  if (!isTrackPlayerAvailable) {
-    console.warn('[AdhanAudio] Track Player not available');
-    return false;
-  }
-
   try {
-    const ready = await setupTrackPlayer();
-    if (!ready) {
-      return false;
-    }
+    await stopAdhanAudio();
 
-    const adhanAssetUri = await getAdhanAssetUri(adhanType);
-
-    await TrackPlayer.reset();
-    await TrackPlayer.add({
-      id: `adhan-preview-${Date.now()}`,
-      url: adhanAssetUri,
-      title: `Adhan Preview - ${adhanType}`,
-      artist: 'Adhan',
-      album: 'Preview',
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      staysActiveInBackground: false,
+      shouldDuckAndroid: true,
     });
 
-    await TrackPlayer.setVolume(volume);
-    await TrackPlayer.setRepeatMode(RepeatMode.Off);
-    await TrackPlayer.play();
+    const uri = await getAdhanAssetUri(adhanType);
+    const { sound } = await Audio.Sound.createAsync(
+      { uri },
+      { shouldPlay: true, volume }
+    );
+
+    _currentSound = sound;
 
     // Auto-stop after 30 seconds for preview
-    setTimeout(async () => {
-      try {
-        const currentTrack = await TrackPlayer.getActiveTrack();
-        if (currentTrack?.id?.startsWith('adhan-preview')) {
-          await stopAdhanAudio();
-        }
-      } catch (error) {
-        console.error('[AdhanAudio] Preview auto-stop failed:', error);
-      }
-    }, 30000);
+    setTimeout(() => stopAdhanAudio(), 30000);
 
     return true;
   } catch (error) {
-    console.error('[AdhanAudio] Failed to play adhan preview:', error);
+    console.error('[AdhanAudio] Preview failed:', error);
     return false;
   }
 }
