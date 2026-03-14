@@ -79,10 +79,14 @@ export function QuranAudioPlayer({
   async function cleanupSound() {
     if (sound) {
       try {
-        await sound.stopAsync();
-        await sound.unloadAsync();
+        const status = await sound.getStatusAsync();
+        if (status.isLoaded) {
+          await sound.stopAsync();
+          await sound.unloadAsync();
+        }
       } catch (err) {
-        console.error('Error cleaning up sound:', err);
+        // Silently fail cleanup - sound might already be unloaded
+        console.log('Sound cleanup (non-critical):', err);
       }
       setSound(null);
       setIsPlaying(false);
@@ -98,6 +102,7 @@ export function QuranAudioPlayer({
 
     // Try multiple sources
     for (let i = 0; i < AUDIO_SOURCES.length; i++) {
+      let attemptSound: Audio.Sound | null = null;
       try {
         const baseUrl = AUDIO_SOURCES[i];
         // EveryAyah uses 6-digit format (000001.mp3), others use plain number
@@ -114,6 +119,7 @@ export function QuranAudioPlayer({
           onPlaybackStatusUpdate
         );
 
+        attemptSound = newSound;
         setSound(newSound);
         setIsPlaying(true);
         setIsLoading(false);
@@ -121,6 +127,19 @@ export function QuranAudioPlayer({
         return; // Success, exit the loop
       } catch (err) {
         console.error(`[Audio] Failed source ${i + 1}:`, err);
+        
+        // Clean up failed sound if it was created
+        if (attemptSound) {
+          try {
+            const status = await attemptSound.getStatusAsync();
+            if (status.isLoaded) {
+              await attemptSound.unloadAsync();
+            }
+          } catch (cleanupErr) {
+            // Ignore cleanup errors
+          }
+        }
+        
         // Continue to next source
         if (i === AUDIO_SOURCES.length - 1) {
           // Last source failed
