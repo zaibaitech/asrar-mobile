@@ -2,7 +2,9 @@
  * Quran Audio Player Component
  * Uses expo-av for background audio playback with lock screen controls
  * 
- * Audio source: https://cdn.islamic.network/quran/audio/128/ar.alafasy/{ayah_number}.mp3
+ * Audio sources (with fallbacks):
+ * 1. EveryAyah.com - Primary (reliable CDN)
+ * 2. Alquran.cloud - Fallback
  * Reciter: Mishary Rashid Alafasy
  */
 
@@ -12,7 +14,11 @@ import { Audio } from 'expo-av';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const AUDIO_BASE_URL = 'https://cdn.islamic.network/quran/audio/128/ar.alafasy';
+// Multiple CDN sources for reliability
+const AUDIO_SOURCES = [
+  'https://everyayah.com/data/Alafasy_128kbps', // Primary - EveryAyah
+  'https://cdn.islamic.network/quran/audio/128/ar.alafasy', // Fallback
+];
 
 interface QuranAudioPlayerProps {
   ayahNumber: number; // Global ayah number (1-6236)
@@ -90,26 +96,41 @@ export function QuranAudioPlayer({
     // Cleanup existing sound
     await cleanupSound();
 
-    try {
-      const audioUrl = `${AUDIO_BASE_URL}/${ayahNumber}.mp3`;
-      
-      console.log(`Loading audio: Surah ${surahNumber}, Ayah ${ayahInSurah} (${audioUrl})`);
-      
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: audioUrl },
-        { shouldPlay: true },
-        onPlaybackStatusUpdate
-      );
+    // Try multiple sources
+    for (let i = 0; i < AUDIO_SOURCES.length; i++) {
+      try {
+        const baseUrl = AUDIO_SOURCES[i];
+        // EveryAyah uses 6-digit format (000001.mp3), others use plain number
+        const filename = baseUrl.includes('everyayah') 
+          ? `${String(ayahNumber).padStart(6, '0')}.mp3`
+          : `${ayahNumber}.mp3`;
+        const audioUrl = `${baseUrl}/${filename}`;
+        
+        console.log(`[Audio] Attempt ${i + 1}: Loading Surah ${surahNumber}, Ayah ${ayahInSurah} from ${audioUrl}`);
+        
+        const { sound: newSound } = await Audio.Sound.createAsync(
+          { uri: audioUrl },
+          { shouldPlay: true },
+          onPlaybackStatusUpdate
+        );
 
-      setSound(newSound);
-      setIsPlaying(true);
-    } catch (err) {
-      console.error('Failed to load audio:', err);
-      setError('فشل تحميل الصوت');
-      setIsPlaying(false);
-    } finally {
-      setIsLoading(false);
+        setSound(newSound);
+        setIsPlaying(true);
+        setIsLoading(false);
+        console.log(`[Audio] Success: Loaded from source ${i + 1}`);
+        return; // Success, exit the loop
+      } catch (err) {
+        console.error(`[Audio] Failed source ${i + 1}:`, err);
+        // Continue to next source
+        if (i === AUDIO_SOURCES.length - 1) {
+          // Last source failed
+          setError('لا يمكن تحميل الصوت');
+          setIsPlaying(false);
+        }
+      }
     }
+    
+    setIsLoading(false);
   }
 
   function onPlaybackStatusUpdate(status: any) {
@@ -181,7 +202,10 @@ export function QuranAudioPlayer({
       )}
 
       {error && (
-        <Text style={styles.errorText}>{error}</Text>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <Text style={styles.errorHint}>Check internet connection</Text>
+        </View>
       )}
     </View>
   );
@@ -217,9 +241,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: DarkTheme.borderSubtle,
   },
+  errorContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    marginLeft: Spacing.xs,
+  },
   errorText: {
     fontSize: 10,
     color: '#ef4444',
-    marginLeft: Spacing.xs,
+  },
+  errorHint: {
+    fontSize: 9,
+    color: '#9ca3af',
+    marginTop: 2,
   },
 });
