@@ -67,7 +67,7 @@ export default function QuranBookmarksScreen() {
 
   const handleBookmarkPress = (bookmark: QuranBookmark) => {
     router.push({
-      pathname: '/quran/[surahNumber]',
+      pathname: '/(tabs)/quran/[surahNumber]',
       params: {
         surahNumber: bookmark.surahNumber.toString(),
         scrollToAyah: bookmark.ayahNumber.toString(),

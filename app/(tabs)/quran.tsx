@@ -55,7 +55,7 @@ export default function QuranReaderScreen() {
 
   const handleSurahPress = useCallback((surah: Surah) => {
     router.push({
-      pathname: '/quran/[surahNumber]',
+      pathname: '/(tabs)/quran/[surahNumber]',
       params: { surahNumber: surah.number.toString() },
     });
   }, [router]);
@@ -131,7 +131,7 @@ export default function QuranReaderScreen() {
         <TouchableOpacity
           style={styles.continueCard}
           onPress={() => router.push({
-            pathname: '/quran/[surahNumber]',
+            pathname: '/(tabs)/quran/[surahNumber]',
             params: { 
               surahNumber: lastRead.surah.toString(),
               scrollToAyah: lastRead.ayah.toString(),
