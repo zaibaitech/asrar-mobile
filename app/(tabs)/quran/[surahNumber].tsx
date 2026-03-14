@@ -1,12 +1,13 @@
 /**
  * Surah Detail Screen
- * Display full surah with Arabic text, translation, and audio
+ * Display full surah with Arabic text, translation, and audio playback
  */
 
-import { AudioPlayer } from '@/components/quran/AudioPlayer';
+import { AyahAudioButton } from '@/components/quran/AyahAudioButton';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { QURAN_SURAHS } from '@/data/quran-surahs';
+import { useSurahAudio } from '@/hooks/useSurahAudio';
 import {
     addBookmark,
     fetchSurah,
@@ -41,12 +42,16 @@ export default function SurahDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
-  const [currentlyPlayingAyah, setCurrentlyPlayingAyah] = useState<number | null>(null);
-  const [continuousPlayback, setContinuousPlayback] = useState(autoPlay === 'true');
 
   const surahNum = parseInt(surahNumber as string, 10);
   const surahMeta = QURAN_SURAHS[surahNum - 1];
   const translationEdition: QuranTranslationEdition = language === 'fr' ? 'fr.hamidullah' : 'en.sahih';
+
+  // Audio controller hook - loads full surah audio once
+  const { state: audioState, controls: audioControls } = useSurahAudio(
+    surahNum,
+    surahMeta?.totalAyahs || 0
+  );
 
   // Load surah data
   useEffect(() => {
@@ -68,29 +73,28 @@ export default function SurahDetailScreen() {
     }
   }, [surah, scrollToAyah]);
 
-  // Auto-start playback if continuous mode is active and surah just loaded
+  // Auto-start playback if autoPlay param is set
   useEffect(() => {
-    if (surah && autoPlay === 'true' && !currentlyPlayingAyah) {
-      // Start playing from ayah 1 when navigating to new surah in auto-play mode
+    if (surah && autoPlay === 'true') {
       setTimeout(() => {
-        setCurrentlyPlayingAyah(1);
-      }, 300); // Small delay to ensure UI is ready
+        audioControls.playAyah(1);
+      }, 300);
     }
-  }, [surah]); // Only run when surah loads, not when continuousPlayback changes
+  }, [surah]);
 
-  // Auto-scroll to currently playing ayah in continuous mode
+  // Auto-scroll to currently playing ayah
   useEffect(() => {
-    if (currentlyPlayingAyah && continuousPlayback && surah && flatListRef.current) {
-      const ayahIndex = currentlyPlayingAyah - 1;
+    if (audioState.currentAyah && surah && flatListRef.current) {
+      const ayahIndex = audioState.currentAyah - 1;
       setTimeout(() => {
         flatListRef.current?.scrollToIndex({
           index: ayahIndex,
           animated: true,
-          viewPosition: 0.3, // Show ayah in upper third of screen
+          viewPosition: 0.3,
         });
       }, 200);
     }
-  }, [currentlyPlayingAyah, continuousPlayback, surah]);
+  }, [audioState.currentAyah, surah]);
 
   const loadSurah = async () => {
     try {
@@ -151,30 +155,6 @@ export default function SurahDetailScreen() {
     saveProgress(surahNum, ayah.numberInSurah);
   };
 
-  /**
-   * Handle ayah playback completion
-   * If continuous playback is enabled, auto-play the next ayah or move to next surah
-   */
-  const handleAyahComplete = useCallback((currentAyahNumber: number) => {
-    if (continuousPlayback && surah) {
-      const nextAyahNumber = currentAyahNumber + 1;
-      if (nextAyahNumber <= surah.ayahs.length) {
-        // Auto-play next ayah in current surah
-        setCurrentlyPlayingAyah(nextAyahNumber);
-      } else {
-        // End of current surah reached - move to next surah
-        const nextSurahNumber = surahNum + 1;
-        if (nextSurahNumber <= 114) {
-          // Navigate to next surah with autoPlay enabled
-          router.push(`/quran/${nextSurahNumber}?autoPlay=true`);
-        } else {
-          // Completed all 114 surahs
-          setCurrentlyPlayingAyah(null);
-          setContinuousPlayback(false);
-        }
-      }
-    }
-  }, [continuousPlayback, surah, surahNum, router]);
 
   /**
    * Get clean Arabic text for display (Mushaf-compliant)
@@ -216,53 +196,27 @@ export default function SurahDetailScreen() {
 
   const renderAyah = useCallback(({ item: ayah }: { item: QuranAyahWithTranslation }) => {
     const isBookmarked = bookmarkedAyahs.has(ayah.numberInSurah);
-    const isPlaying = currentlyPlayingAyah === ayah.numberInSurah;
+    const isCurrentAyah = audioState.currentAyah === ayah.numberInSurah;
     const cleanArabicText = getCleanArabicText(ayah);
-    const isCurrentlyPlaying = currentlyPlayingAyah === ayah.numberInSurah;
-
-    const handleAyahFinish = () => {
-      // Auto-play next ayah if continuous playback is enabled
-      if (continuousPlayback && surah && ayah.numberInSurah < surah.numberOfAyahs) {
-        setCurrentlyPlayingAyah(ayah.numberInSurah + 1);
-      } else {
-        setCurrentlyPlayingAyah(null);
-      }
-    };
 
     return (
       <View style={[
         styles.ayahWrapper,
-        isPlaying && styles.ayahWrapperPlaying
+        isCurrentAyah && styles.ayahWrapperPlaying
       ]}>
         {/* Top row: Ayah number and Audio button */}
         <View style={styles.ayahTopRow}>
           <View style={styles.ayahNumberContainer}>
             <Text style={styles.ayahNumber}>﴿{ayah.numberInSurah}﴾</Text>
           </View>
-          
-          {ayah.audioUrl && (
-            <AudioPlayer
-              audioUrl={ayah.audioUrl}
-              ayahNumber={ayah.numberInSurah}
-              autoPlay={isPlaying}
-              onPress={() => {
-                // Toggle: if this ayah is currently playing, stop it. Otherwise, start it.
-                if (currentlyPlayingAyah === ayah.numberInSurah) {
-                  setCurrentlyPlayingAyah(null);
-                  setContinuousPlayback(false); // Stop continuous mode when user manually stops
-                } else {
-                  setCurrentlyPlayingAyah(ayah.numberInSurah);
-                }
-              }}
-              onPlaybackStatusUpdate={(playing) => {
-                // Update state based on actual playback status
-                if (!playing && currentlyPlayingAyah === ayah.numberInSurah) {
-                  setCurrentlyPlayingAyah(null);
-                }
-              }}
-              onFinished={() => handleAyahComplete(ayah.numberInSurah)}
-            />
-          )}
+
+          <AyahAudioButton
+            ayahNumber={ayah.numberInSurah}
+            isPlaying={audioState.isPlaying}
+            isCurrentAyah={isCurrentAyah}
+            onPlay={() => audioControls.playAyah(ayah.numberInSurah)}
+            onPause={audioControls.pause}
+          />
         </View>
 
         {/* Main content: Arabic and Translation */}
@@ -282,7 +236,7 @@ export default function SurahDetailScreen() {
           {/* Translation - Secondary, clearly separated */}
           <Text style={styles.translationText}>{ayah.translation.text}</Text>
 
-          {/* Bookmark indicator - minimal */}
+          {/* Bookmark indicator */}
           {isBookmarked && (
             <View style={styles.bookmarkIndicator}>
               <Ionicons name="bookmark" size={14} color="#3b82f6" />
@@ -291,7 +245,7 @@ export default function SurahDetailScreen() {
         </TouchableOpacity>
       </View>
     );
-  }, [bookmarkedAyahs, currentlyPlayingAyah, continuousPlayback, handleBookmarkToggle, handleAyahPress, surahNum, surah]);
+  }, [bookmarkedAyahs, audioState.currentAyah, audioState.isPlaying, audioControls, handleBookmarkToggle, handleAyahPress, surahNum, surah]);
 
   const ListHeaderComponent = useMemo(() => (
     <View style={styles.surahHeader}>
@@ -314,20 +268,35 @@ export default function SurahDetailScreen() {
       {/* Continuous Playback Toggle */}
       <TouchableOpacity
         style={styles.continuousPlaybackToggle}
-        onPress={() => setContinuousPlayback(!continuousPlayback)}
+        onPress={audioControls.toggleContinuous}
       >
         <Ionicons
-          name={continuousPlayback ? 'repeat' : 'repeat-outline'}
+          name={audioControls.isContinuous ? 'repeat' : 'repeat-outline'}
           size={20}
-          color={continuousPlayback ? '#3b82f6' : DarkTheme.textTertiary}
+          color={audioControls.isContinuous ? '#3b82f6' : DarkTheme.textTertiary}
         />
         <Text style={[
           styles.continuousPlaybackText,
-          continuousPlayback && styles.continuousPlaybackTextActive
+          audioControls.isContinuous && styles.continuousPlaybackTextActive
         ]}>
           {t('quran.continuousPlayback')}
         </Text>
       </TouchableOpacity>
+
+      {/* Audio Loading Indicator */}
+      {audioState.isLoading && (
+        <View style={styles.audioLoadingContainer}>
+          <ActivityIndicator size="small" color="#3b82f6" />
+          <Text style={styles.audioLoadingText}>Loading surah audio...</Text>
+        </View>
+      )}
+
+      {/* Audio Error */}
+      {audioState.error && (
+        <View style={styles.audioErrorContainer}>
+          <Text style={styles.audioErrorText}>{audioState.error}</Text>
+        </View>
+      )}
 
       {/* Bismillah - Centered, Elegant (except for Surah 9 / At-Tawbah) */}
       {shouldDisplayBasmalah(surahNum) && (
@@ -339,7 +308,7 @@ export default function SurahDetailScreen() {
       {/* Visual separator before ayahs */}
       <View style={styles.separator} />
     </View>
-  ), [surahMeta, language, t, surahNum, surah, continuousPlayback]);
+  ), [surahMeta, language, t, surahNum, surah, audioControls, audioState.isLoading, audioState.error]);
 
   if (loading) {
     return (
@@ -389,24 +358,20 @@ export default function SurahDetailScreen() {
         <Text style={styles.headerTitle}>
           {t('quran.surah')} {surahNum}
         </Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => {
-            if (continuousPlayback) {
-              // Stop continuous playback
-              setContinuousPlayback(false);
-              setCurrentlyPlayingAyah(null);
+            if (audioState.isPlaying) {
+              audioControls.pause();
             } else {
-              // Start continuous playback from ayah 1
-              setContinuousPlayback(true);
-              setCurrentlyPlayingAyah(1);
+              audioControls.playAyah(audioState.currentAyah || 1);
             }
-          }} 
+          }}
           style={styles.playAllButton}
         >
-          <Ionicons 
-            name={continuousPlayback ? 'stop-circle' : 'play-circle'} 
-            size={28} 
-            color="#3b82f6" 
+          <Ionicons
+            name={audioState.isPlaying ? 'stop-circle' : 'play-circle'}
+            size={28}
+            color="#3b82f6"
           />
         </TouchableOpacity>
       </View>
@@ -526,6 +491,35 @@ const styles = StyleSheet.create({
   continuousPlaybackTextActive: {
     color: '#3b82f6',
     fontWeight: Typography.weightSemibold,
+  },
+  
+  // Audio Loading
+  audioLoadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderRadius: 8,
+    marginVertical: Spacing.sm,
+  },
+  audioLoadingText: {
+    fontSize: 13,
+    color: '#3b82f6',
+  },
+  
+  // Audio Error
+  audioErrorContainer: {
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderRadius: 8,
+    marginVertical: Spacing.sm,
+  },
+  audioErrorText: {
+    fontSize: 12,
+    color: '#ef4444',
   },
   
   // Bismillah - Centered, Elegant
