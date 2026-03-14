@@ -3,7 +3,7 @@
     "name": "Asrariya",
     "slug": "asrar-mobile",
     "description": "Asrariya – Your Islamic spiritual companion. Discover daily energy alignment, Abjad numerology, Quran guidance, prayer times, compatibility insights, and AI-powered Istikhara support. Built for seekers of divine wisdom.",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "sdkVersion": "54.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -11,7 +11,7 @@
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#0f172a",
     "primaryColor": "#6366f1",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
@@ -25,7 +25,6 @@
       ],
       "infoPlist": {
         "CFBundleDisplayName": "Asrariya",
-        "NSLocationWhenInUseUsageDescription": "We use your location to calculate accurate prayer times and Qibla direction for your area.",
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": false,
           "NSExceptionDomains": {
@@ -113,7 +112,8 @@
             "./assets/sounds/adhan_mecca.mp3",
             "./assets/sounds/adhan_medina.mp3",
             "./assets/sounds/adhan_fajr.mp3"
-          ]
+          ],
+          "mode": "default"
         }
       ],
       "expo-secure-store",
