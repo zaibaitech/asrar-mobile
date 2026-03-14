@@ -7,7 +7,7 @@
 import { useAds } from '@/contexts/AdContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     ScrollView,
     StyleSheet,
@@ -32,10 +32,15 @@ export default function CompatibilityTabScreen() {
   const [result, setResult] = useState<UniversalCompatibilityResult | null>(null);
   const [activeTab, setActiveTab] = useState<'input' | 'results'>('input');
   const router = useRouter();
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const handleCalculate = (calculationResult: UniversalCompatibilityResult) => {
     setResult(calculationResult);
     setActiveTab('results');
+    // Scroll to top when showing results
+    setTimeout(() => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    }, 100);
     // Show interstitial ad (throttled)
     const shouldShow = recordCalculation();
     if (shouldShow) showInterstitialIfReady();
@@ -44,6 +49,10 @@ export default function CompatibilityTabScreen() {
   const handleReset = () => {
     setResult(null);
     setActiveTab('input');
+    // Scroll to top when resetting to input
+    setTimeout(() => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    }, 100);
   };
 
   return (
@@ -55,7 +64,13 @@ export default function CompatibilityTabScreen() {
       >
         <TouchableOpacity
           style={[styles.tab, activeTab === 'input' && styles.tabActive]}
-          onPress={() => setActiveTab('input')}
+          onPress={() => {
+            setActiveTab('input');
+            // Scroll to top when switching to input tab
+            setTimeout(() => {
+              scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+            }, 100);
+          }}
         >
           <Text style={[styles.tabText, activeTab === 'input' && styles.tabTextActive]}>
             {t('compatibility.tabs.calculate')}
@@ -64,7 +79,15 @@ export default function CompatibilityTabScreen() {
         
         <TouchableOpacity
           style={[styles.tab, activeTab === 'results' && styles.tabActive]}
-          onPress={() => result && setActiveTab('results')}
+          onPress={() => {
+            if (result) {
+              setActiveTab('results');
+              // Scroll to top when switching to results tab
+              setTimeout(() => {
+                scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+              }, 100);
+            }
+          }}
           disabled={!result}
         >
           <Text style={[
@@ -78,6 +101,7 @@ export default function CompatibilityTabScreen() {
       </LinearGradient>
 
       <ScrollView 
+        ref={scrollViewRef}
         style={styles.content} 
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="always"

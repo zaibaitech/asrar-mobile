@@ -153,16 +153,22 @@ export default function DailyGuidanceDetailsScreen() {
   const dayRuler = getDayRuler(now);
   const dayRulerInfo = getPlanetInfo(dayRuler);
 
+  // Get zodiac data - prefer ascendant (if available), fallback to sun sign from DOB
   const ascendantBurjIndex = profile?.derived?.ascendantBurjIndex;
+  const sunSignBurjIndex = profile?.derived?.burjIndex; // Sun sign from DOB alone
+  
   const zodiacSign = useMemo(() => {
-    if (typeof ascendantBurjIndex !== 'number') return undefined;
-    return ZODIAC_SIGNS[ascendantBurjIndex + 1];
-  }, [ascendantBurjIndex]);
+    const burjIdx = ascendantBurjIndex ?? sunSignBurjIndex;
+    if (typeof burjIdx !== 'number') return undefined;
+    return ZODIAC_SIGNS[burjIdx + 1];
+  }, [ascendantBurjIndex, sunSignBurjIndex]);
 
+  // User's zodiac ruling planet - prefer ascendant ruler, fallback to sun sign ruler
   const userZodiacRuler = useMemo(() => {
-    if (typeof ascendantBurjIndex !== 'number') return undefined;
-    return getZodiacRulingPlanet(ascendantBurjIndex);
-  }, [ascendantBurjIndex]);
+    const burjIdx = ascendantBurjIndex ?? sunSignBurjIndex;
+    if (typeof burjIdx !== 'number') return undefined;
+    return getZodiacRulingPlanet(burjIdx);
+  }, [ascendantBurjIndex, sunSignBurjIndex]);
   
   // NEW: Daily Synthesis State
   const [dailySynthesis, setDailySynthesis] = useState<DailySynthesis | null>(null);
@@ -208,6 +214,8 @@ export default function DailyGuidanceDetailsScreen() {
   }, [profile]);
 
   // NEW: Generate daily synthesis when data is available
+  // Requires: profile with DOB (for burj/element) OR dailyAnalysis
+  // Name is optional - synthesis will work with DOB alone
   useEffect(() => {
     if (profile && dailyAnalysis && dailyAnalysis.moonPhase) {
       // Start loading
@@ -217,11 +225,11 @@ export default function DailyGuidanceDetailsScreen() {
       // Use setTimeout to simulate async and allow UI to show loading state
       const timer = setTimeout(() => {
         try {
-          // Get user's planet (for alignment): prefer Name + Mother's Name derived planet
+          // Get user's planet (for alignment): prefer Name + Mother's Name derived planet, fallback to zodiac ruler
           let nameMotherPlanet: Planet | undefined;
           try {
             if (profile.nameAr) {
-              const destiny = buildDestiny(profile.nameAr, profile.motherName);
+              const destiny = buildDestiny(profile.nameAr, profile.motherName || undefined);
               const p = destiny?.burj?.planet;
               const ok = p === 'Sun' || p === 'Moon' || p === 'Mercury' || p === 'Venus' || p === 'Mars' || p === 'Jupiter' || p === 'Saturn';
               if (ok) nameMotherPlanet = p;
@@ -232,8 +240,8 @@ export default function DailyGuidanceDetailsScreen() {
           const fallback = getUserPlanet(undefined, nameMotherPlanet);
           const userPlanet = fallback.planet;
           
-          // Get user's element
-          const userElement = ((profile as any).zahirElement || (profile.derived as any)?.element || 'fire') as PlanetElement;
+          // Get user's element (safely with fallback)
+          const userElement = ((profile as any)?.zahirElement || profile.derived?.element || 'fire') as PlanetElement;
           
           // Get day element from day ruler
           const dayElement = dayRulerInfo.element as PlanetElement;
@@ -245,8 +253,8 @@ export default function DailyGuidanceDetailsScreen() {
           const transitPower = dailyAnalysis.dayRulingStrength ?? 50;
           
           // Get user's zodiac sign for special harmony rules (Scorpio+Fire, Aquarius+Water)
-          // Use burjIndex to get English name since derived.burj is in Arabic
-          const burjIndex = profile?.derived?.burjIndex;
+          // Prefer sun sign from DOB (burjIndex), use ascendant if somehow present
+          const burjIndex = profile?.derived?.burjIndex ?? profile?.derived?.ascendantBurjIndex;
           const synthesisUserSignKey = burjIndex !== undefined ? BURJ_NAMES_EN[burjIndex]?.toLowerCase() : undefined;
           
           // Generate synthesis
@@ -274,12 +282,15 @@ export default function DailyGuidanceDetailsScreen() {
   }, [profile, dailyAnalysis, dayRuler, dayRulerInfo, t, userZodiacRuler]);
   
   // Get user planet info for display
+  // Works with or without name - uses zodiac ruler if name unavailable
   const userPlanetInfo = useMemo(() => {
     if (!profile) return null;
+    
+    // Try to get planet from name if available
     let nameMotherPlanet: Planet | undefined;
     try {
       if (profile.nameAr) {
-        const destiny = buildDestiny(profile.nameAr, profile.motherName);
+        const destiny = buildDestiny(profile.nameAr, profile.motherName || undefined);
         const p = destiny?.burj?.planet;
         const ok = p === 'Sun' || p === 'Moon' || p === 'Mercury' || p === 'Venus' || p === 'Mars' || p === 'Jupiter' || p === 'Saturn';
         if (ok) nameMotherPlanet = p;
@@ -288,10 +299,14 @@ export default function DailyGuidanceDetailsScreen() {
       nameMotherPlanet = undefined;
     }
 
+    // Get planet (prefers name-based, falls back to zodiac ruler)
     const { planet, source } = getUserPlanet(undefined, nameMotherPlanet);
-    const element = ((profile as any).zahirElement || (profile.derived as any)?.element || 'fire') as PlanetElement;
+    
+    // Get element (with safe fallback)
+    const element = (profile?.zahirElement || profile?.derived?.element || 'fire') as PlanetElement;
+    
     return { planet, element, source };
-  }, [profile]);
+  }, [profile, profile?.nameAr, profile?.motherName, profile?.zahirElement, profile?.derived?.element]);
 
   useEffect(() => {
     let cancelled = false;
@@ -762,8 +777,9 @@ export default function DailyGuidanceDetailsScreen() {
                 <Text style={styles.refreshButtonText}>{t('dailyEnergy.actions.refresh')}</Text>
               </TouchableOpacity>
             </View>
-          ) : dailySynthesis && (userPlanetInfo || userZodiacRuler) ? (
-            // Success State - Show Full Synthesis
+          ) : dailySynthesis && (profile?.dobISO || profile?.nameAr) ? (
+            // Success State - Show Full Synthesis if we have DOB or name
+            // DOB alone is sufficient for moment alignment features
             <>
               {/* Main Analysis Card - Today's Ruler + Your Planet + Alignment */}
               <View style={styles.analysisCard}>
@@ -806,12 +822,12 @@ export default function DailyGuidanceDetailsScreen() {
               <WhatThisMeansCard synthesis={dailySynthesis} />
             </>
           ) : dailySynthesis ? (
-            // Fallback - No user profile, show generic guidance
+            // Fallback - No DOB or name in profile
             <View style={styles.genericCard}>
-              <Text style={styles.genericTitle}>{t('dailyEnergy.generic.title')}</Text>
+              <Text style={styles.genericTitle}>Daily Energy Overview</Text>
               <Text style={styles.genericText}>{dailySynthesis.summaryText}</Text>
               <Text style={styles.genericNote}>
-                {t('dailyEnergy.generic.completeProfileNote')}
+                Add your date of birth to unlock personalized alignment guidance
               </Text>
             </View>
           ) : null}

@@ -430,10 +430,13 @@ export default function WhoAmICalculator() {
             </TouchableOpacity>
           </View>
 
-          {/* METHOD NOTE */}
-          <View style={styles.methodNoteContainer}>
-            <Text style={styles.methodNoteIcon}>ℹ️</Text>
-            <Text style={styles.methodNoteText}>{t('istikhara.methodNote')}</Text>
+          {/* INFORMATIONAL NOTE ABOUT DIFFERENT METHODS */}
+          <View style={styles.methodInfoBanner}>
+            <Lightbulb size={16} color="#fbbf24" style={styles.methodInfoIcon} />
+            <Text style={styles.methodInfoText}>
+              {t('istikhara.methodSelector.differenceNote') || 
+                'These methods use different calculation systems (Abjad numerology vs. Zodiac astrology) and may produce different results.'}
+            </Text>
           </View>
 
           {/* MAIN FORM - Conditional based on method */}
@@ -1255,6 +1258,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#8b5cf6',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  // Method Info Banner Styles
+  methodInfoBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(251, 191, 36, 0.1)',
+    borderLeftWidth: 3,
+    borderLeftColor: '#fbbf24',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 20,
+    gap: 10,
+  },
+  methodInfoIcon: {
+    marginTop: 2,
+    flexShrink: 0,
+  },
+  methodInfoText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+    color: 'rgba(255, 255, 255, 0.85)',
+    fontWeight: '500',
   },
 
   // Birth Date Form Styles

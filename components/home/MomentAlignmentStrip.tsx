@@ -20,7 +20,7 @@ interface MomentAlignmentStripProps {
   zahirElement?: Element;
   timeElement?: Element;
   loading?: boolean;
-  hasDateOfBirth?: boolean;
+  hasProfileDOB?: boolean;  // DOB-based features don't require name
   t: (key: string) => string;
   planetaryData?: PlanetaryHourData | null;
   /** User's zodiac sign index (1–12) for personalized alignment */
@@ -49,7 +49,7 @@ export function MomentAlignmentStrip({
   zahirElement,
   timeElement,
   loading,
-  hasDateOfBirth,
+  hasProfileDOB,
   t,
   planetaryData,
   userBurjIndex,
@@ -97,21 +97,23 @@ export function MomentAlignmentStrip({
 
   const goToProfile = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.push('/profile');
+    router.push('/profile');  // Navigate to profile to add DOB
   };
 
-  if (!hasDateOfBirth && !loading) {
+  // Empty state when user has no DOB configured
+  if (!hasProfileDOB && !loading) {
     return (
       <Pressable
-        style={styles.container}
+        style={styles.emptyContainer}
         onPress={goToProfile}
         android_ripple={{ color: 'rgba(139, 115, 85, 0.2)', borderless: false }}
       >
-        <View style={styles.loadingRow}>
-          <Ionicons name="calendar-outline" size={16} color="#8B7355" />
-          <Text style={[styles.loadingText, { flex: 1 }]} numberOfLines={2}>
-            {t('home.moment.addDobPrompt')}
+        <View style={styles.emptyContent}>
+          <Ionicons name="calendar-outline" size={18} color="#8B7355" />
+          <Text style={styles.emptyText}>
+            Add DOB for Moment Alignment
           </Text>
+          <Ionicons name="chevron-forward" size={18} color="#64748b" />
         </View>
       </Pressable>
     );
@@ -451,5 +453,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: DarkTheme.textSecondary,
     fontWeight: Typography.weightMedium,
+  },
+  emptyContainer: {
+    width: '100%',
+    backgroundColor: 'rgba(139, 115, 85, 0.08)',
+    borderRadius: Borders.radiusLg,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 115, 85, 0.15)',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+  },
+  emptyContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+  },
+  emptyText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: Typography.weightMedium,
+    color: '#8B7355',
+    letterSpacing: 0.2,
   },
 });

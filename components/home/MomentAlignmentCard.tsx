@@ -26,7 +26,7 @@ interface MomentAlignmentCardProps {
   timeElement?: Element;
   updatedAt?: string;
   loading?: boolean;
-  hasDateOfBirth?: boolean;
+  hasProfileDOB?: boolean;  // DOB-based features don't require name
   t: (key: string) => string;
   planetaryData?: PlanetaryHourData | null;
   causeText?: string; // Cause-based explanation text
@@ -115,7 +115,7 @@ export function MomentAlignmentCard({
   timeElement,
   updatedAt,
   loading,
-  hasDateOfBirth,
+  hasProfileDOB,
   t,
   planetaryData,
   causeText,
@@ -150,7 +150,7 @@ export function MomentAlignmentCard({
     try {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch (error) {}
-    router.push('/profile');
+    router.push('/profile');  // Navigate to profile to add DOB
   };
 
   const theme = status ? STATUS_THEME[status] : DEFAULT_THEME;
@@ -181,8 +181,8 @@ export function MomentAlignmentCard({
     };
   })();
 
-  // Empty state when user has no date of birth configured
-  if (!hasDateOfBirth && !loading) {
+  // Empty state when user has no DOB configured
+  if (!hasProfileDOB && !loading) {
     return (
       <Pressable
         style={styles.container}
@@ -210,7 +210,7 @@ export function MomentAlignmentCard({
               </View>
             </View>
             <Text style={styles.emptyHint} numberOfLines={2} ellipsizeMode="tail">
-              {t('home.moment.addDobPrompt')}
+              Add your date of birth to unlock personalized alignment
             </Text>
           </View>
         </LinearGradient>

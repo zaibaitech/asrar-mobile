@@ -9343,6 +9343,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       // Method Selector
       methodSelector: {
         label: "Choose Calculation Method:",
+        differenceNote: "These methods use different calculation systems (Abjad numerology vs. Zodiac astrology) and may produce different results.",
         nameBased: {
           title: "Name-Based",
           badge: "CLASSICAL",
@@ -19584,6 +19585,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       // Sélecteur de méthode
       methodSelector: {
         label: "Choisissez la méthode de calcul :",
+        differenceNote: "Ces méthodes utilisent différents systèmes de calcul (numérologie Abjad vs. astrologie du Zodiaque) et peuvent produire des résultats différents.",
         nameBased: {
           title: "Par le Nom",
           badge: "CLASSIQUE",
@@ -21003,6 +21005,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       // محدد الطريقة
       methodSelector: {
         label: "اختر طريقة الحساب:",
+        differenceNote: "تستخدم هذه الطرق أنظمة حسابية مختلفة (علم الحروف الأبجدية مقابل علم الفلك البروجي) وقد تنتج نتائج مختلفة.",
         nameBased: {
           title: "بالاسم",
           badge: "كلاسيكي",

@@ -167,7 +167,9 @@ export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile, completionStatus } = useProfile();
-  const hasDateOfBirth = Boolean(profile?.dobISO);
+  
+  // Moment alignment and daily energy features require DOB, not name
+  const hasProfileDOB = Boolean(profile?.dobISO);
 
   const profileRef = React.useRef(profile);
   useEffect(() => {
@@ -350,15 +352,15 @@ export default function HomeScreen() {
     setTomorrowBlessing(getTodayBlessing(tomorrow, language));
   }, [language]);
 
-  // Re-trigger moment alignment once DOB becomes available.
+  // Re-trigger moment alignment once profile DOB becomes available.
   // The initial load may run before the profile is loaded from storage,
   // causing getMomentAlignment to return null (no DOB). This effect
   // re-triggers once the async profile load completes.
   useEffect(() => {
-    if (hasDateOfBirth && !momentAlignment) {
+    if (hasProfileDOB && !momentAlignment) {
       loadMomentAlignment();
     }
-  }, [hasDateOfBirth, momentAlignment, loadMomentAlignment]);
+  }, [hasProfileDOB, momentAlignment, loadMomentAlignment]);
   
   // Update countdown every minute
   useEffect(() => {
@@ -539,8 +541,8 @@ export default function HomeScreen() {
         <MomentAlignmentStrip
           zahirElement={momentAlignmentUserElement}
           timeElement={momentAlignment?.timeElement}
-          loading={!momentAlignment && hasDateOfBirth}
-          hasDateOfBirth={hasDateOfBirth}
+          loading={!momentAlignment && hasProfileDOB}
+          hasProfileDOB={hasProfileDOB}
           t={t}
           planetaryData={planetaryData}
           userBurjIndex={profile?.derived?.burjIndex ?? (profile?.dobISO ? deriveBurjFromDOB(profile.dobISO)?.burjIndex : undefined)}
@@ -666,7 +668,7 @@ export default function HomeScreen() {
     getDayName,
     momentAlignment,
     planetaryData,
-    hasDateOfBirth,
+    hasProfileDOB,
     prayerCardSlide,
     blessingCardSlide,
   ]);

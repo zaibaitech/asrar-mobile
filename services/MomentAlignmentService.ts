@@ -432,29 +432,46 @@ function computeAlignmentStatus(
 /**
  * Compute complete moment alignment for the user
  * 
- * @param profile - User profile (requires dobISO for personalized alignment)
+ * @param profile - User profile (optional, for personalization)
  * @param now - Current time (optional, for testing)
- * @returns MomentAlignment or null if user has no date of birth
+ * @returns MomentAlignment or null if user has neither name nor DOB
  */
 export async function getMomentAlignment(
   profile?: UserProfile,
   now: Date = new Date(),
   options?: { location?: { latitude: number; longitude: number }; method?: CalculationMethod; lightweight?: boolean }
 ): Promise<MomentAlignment | null> {
-  // Gate on dateOfBirth — Moment Alignment is DOB-based only
-  if (!profile?.dobISO) {
+  // Check if user has a name (preferred) or DOB (fallback for element)
+  const userName = profile?.nameAr || profile?.nameLatin;
+  const hasDOB = Boolean(profile?.dobISO);
+  
+  // Need at least name OR DOB for personalization
+  if (!userName && !hasDOB) {
     return null;
   }
 
-  // Derive user element from zodiac sign (DOB-based)
-  const burjData = deriveBurjFromDOB(profile.dobISO);
-  if (!burjData) {
+  const motherName = profile?.motherName || '';
+  
+  // Compute user element:
+  // 1. If name available: use name + mother (traditional)
+  // 2. If only DOB available: use zodiac element as fallback
+  let zahirElement: Element;
+  
+  if (userName && userName.trim().length > 0) {
+    // Traditional: compute from name
+    zahirElement = computeZahirElement(userName, motherName);
+  } else if (hasDOB && profile?.derived?.element) {
+    // Fallback: use zodiac element from DOB
+    zahirElement = profile.derived.element as Element;
+  } else {
+    // No valid data source
     return null;
   }
-  const zahirElement = deriveElementFromBurj(burjData.burjIndex);
 
   // Extract user sign for special harmony logic (Scorpio+Fire, Aquarius+Water)
-  const userSignKey = BURJ_NAMES_EN[burjData.burjIndex]?.toLowerCase();
+  const userSignKey = profile?.derived?.burjIndex != null
+    ? BURJ_NAMES_EN[profile.derived.burjIndex]?.toLowerCase()
+    : undefined;
 
   // Prefer accurate planetary-hour element when we have a location.
   const location = options?.location ?? profile?.location;
