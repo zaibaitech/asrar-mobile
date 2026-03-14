@@ -164,19 +164,19 @@ export function QuranAudioPlayer({
         disabled={isLoading}
       >
         {isLoading ? (
-          <ActivityIndicator size="small" color={DarkTheme.colors.primary} />
+          <ActivityIndicator size="small" color="#3b82f6" />
         ) : (
           <Ionicons
             name={isPlaying ? 'pause' : 'play'}
             size={20}
-            color={isPlaying ? DarkTheme.colors.primary : DarkTheme.colors.text}
+            color={isPlaying ? '#3b82f6' : DarkTheme.textPrimary}
           />
         )}
       </TouchableOpacity>
       
       {isPlaying && (
         <TouchableOpacity style={styles.stopButton} onPress={handleStop}>
-          <Ionicons name="stop" size={16} color={DarkTheme.colors.textSecondary} />
+          <Ionicons name="stop" size={16} color={DarkTheme.textSecondary} />
         </TouchableOpacity>
       )}
 
@@ -197,29 +197,29 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: DarkTheme.colors.surface,
+    backgroundColor: DarkTheme.cardBackground,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: DarkTheme.colors.border,
+    borderColor: DarkTheme.borderSubtle,
   },
   buttonActive: {
-    backgroundColor: DarkTheme.colors.primaryDark,
-    borderColor: DarkTheme.colors.primary,
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    borderColor: '#3b82f6',
   },
   stopButton: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: DarkTheme.colors.surface,
+    backgroundColor: DarkTheme.cardBackground,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: DarkTheme.colors.border,
+    borderColor: DarkTheme.borderSubtle,
   },
   errorText: {
     fontSize: 10,
-    color: DarkTheme.colors.error,
+    color: '#ef4444',
     marginLeft: Spacing.xs,
   },
 });

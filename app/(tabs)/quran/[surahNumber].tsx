@@ -319,7 +319,7 @@ export default function SurahDetailScreen() {
         <Ionicons
           name={continuousPlayback ? 'repeat' : 'repeat-outline'}
           size={20}
-          color={continuousPlayback ? DarkTheme.colors.primary : DarkTheme.colors.textSecondary}
+          color={continuousPlayback ? '#3b82f6' : DarkTheme.textTertiary}
         />
         <Text style={[
           styles.continuousPlaybackText,
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.5)',
   },
   continuousPlaybackTextActive: {
-    color: DarkTheme.colors.primary,
+    color: '#3b82f6',
     fontWeight: Typography.weightSemibold,
   },
   
