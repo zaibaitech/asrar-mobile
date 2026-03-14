@@ -3482,6 +3482,7 @@ export const translations = {
       pauseAudio: "Pause Audio",
       reciter: "Reciter: Mishary Alafasy",
       audioLoading: "Loading audio...",
+      continuousPlayback: "Continuous Playback",
     },
     
     // Moment Alignment Detail
@@ -13420,6 +13421,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       pauseAudio: "Mettre en Pause",
       reciter: "Récitateur: Mishary Alafasy",
       audioLoading: "Chargement de l'audio...",
+      continuousPlayback: "Lecture Continue",
     },
     
     // Moment Alignment Detail

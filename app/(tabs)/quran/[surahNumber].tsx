@@ -218,6 +218,16 @@ export default function SurahDetailScreen() {
     const isBookmarked = bookmarkedAyahs.has(ayah.numberInSurah);
     const isPlaying = currentlyPlayingAyah === ayah.numberInSurah;
     const cleanArabicText = getCleanArabicText(ayah);
+    const isCurrentlyPlaying = currentlyPlayingAyah === ayah.numberInSurah;
+
+    const handleAyahFinish = () => {
+      // Auto-play next ayah if continuous playback is enabled
+      if (continuousPlayback && surah && ayah.numberInSurah < surah.numberOfAyahs) {
+        setCurrentlyPlayingAyah(ayah.numberInSurah + 1);
+      } else {
+        setCurrentlyPlayingAyah(null);
+      }
+    };
 
     return (
       <View style={[
@@ -281,7 +291,7 @@ export default function SurahDetailScreen() {
         </TouchableOpacity>
       </View>
     );
-  }, [bookmarkedAyahs, currentlyPlayingAyah, handleBookmarkToggle, handleAyahPress, surahNum]);
+  }, [bookmarkedAyahs, currentlyPlayingAyah, continuousPlayback, handleBookmarkToggle, handleAyahPress, surahNum, surah]);
 
   const ListHeaderComponent = useMemo(() => (
     <View style={styles.surahHeader}>
@@ -301,6 +311,24 @@ export default function SurahDetailScreen() {
         )}
       </View>
 
+      {/* Continuous Playback Toggle */}
+      <TouchableOpacity
+        style={styles.continuousPlaybackToggle}
+        onPress={() => setContinuousPlayback(!continuousPlayback)}
+      >
+        <Ionicons
+          name={continuousPlayback ? 'repeat' : 'repeat-outline'}
+          size={20}
+          color={continuousPlayback ? DarkTheme.colors.primary : DarkTheme.colors.textSecondary}
+        />
+        <Text style={[
+          styles.continuousPlaybackText,
+          continuousPlayback && styles.continuousPlaybackTextActive
+        ]}>
+          {t('quran.continuousPlayback')}
+        </Text>
+      </TouchableOpacity>
+
       {/* Bismillah - Centered, Elegant (except for Surah 9 / At-Tawbah) */}
       {shouldDisplayBasmalah(surahNum) && (
         <View style={styles.bismillahContainer}>
@@ -311,7 +339,7 @@ export default function SurahDetailScreen() {
       {/* Visual separator before ayahs */}
       <View style={styles.separator} />
     </View>
-  ), [surahMeta, language, t, surahNum, surah]);
+  ), [surahMeta, language, t, surahNum, surah, continuousPlayback]);
 
   if (loading) {
     return (
@@ -482,6 +510,24 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   
+  // Continuous Playback Toggle
+  continuousPlaybackToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+    paddingVertical: Spacing.md,
+    marginVertical: Spacing.sm,
+  },
+  continuousPlaybackText: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.5)',
+  },
+  continuousPlaybackTextActive: {
+    color: DarkTheme.colors.primary,
+    fontWeight: Typography.weightSemibold,
+  },
+  
   // Bismillah - Centered, Elegant
   bismillahContainer: {
     alignItems: 'center',
@@ -575,11 +621,18 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.sm,
   },
   
+  // Ayah Actions Row (Audio + Bookmark)
+  ayahActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: Spacing.md,
+  },
+  
   // Bookmark Indicator - Minimal
   bookmarkIndicator: {
-    position: 'absolute',
-    top: Spacing.md,
-    left: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   
   // Loading & Error States
