@@ -40,28 +40,53 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
   const soundRef = useRef<Audio.Sound | null>(null);
   const timingData = getSurahAudioTiming(surahNumber);
   const currentSourceIndex = useRef(0);
+  const didJustFinishRef = useRef(false);
+  const loadedSurahRef = useRef<number | null>(null);
 
-  // Configure audio mode on mount
+  // Configure audio mode on mount and cleanup on unmount
   useEffect(() => {
     configureAudio();
     return () => {
+      console.log('[SurahAudio] Component unmounting, cleaning up...');
       cleanup();
     };
   }, []);
 
+  // Cleanup and reload when surah number changes
+  useEffect(() => {
+    // If audio is loaded for a different surah, clean up
+    if (loadedSurahRef.current !== null && loadedSurahRef.current !== surahNumber) {
+      console.log(`[SurahAudio] Surah changed from ${loadedSurahRef.current} to ${surahNumber}, cleaning up...`);
+      cleanup();
+      setState({
+        isLoading: false,
+        isPlaying: false,
+        currentAyah: null,
+        error: null,
+        duration: 0,
+        position: 0,
+      });
+      loadedSurahRef.current = null;
+    }
+  }, [surahNumber]);
+
   // Auto-advance to next ayah if continuous playback is enabled
   useEffect(() => {
-    if (state.currentAyah && isContinuous && !state.isPlaying) {
+    if (didJustFinishRef.current && state.currentAyah && isContinuous) {
+      didJustFinishRef.current = false;
+      
       // Current ayah finished, play next
       const nextAyah = state.currentAyah + 1;
       if (nextAyah <= numberOfAyahs) {
+        console.log(`[SurahAudio] Auto-advancing to ayah ${nextAyah}`);
         playAyah(nextAyah);
       } else {
         // End of surah
-        setState(prev => ({ ...prev, currentAyah: null }));
+        console.log('[SurahAudio] Reached end of surah');
+        setState(prev => ({ ...prev, currentAyah: null, isPlaying: false }));
       }
     }
-  }, [state.isPlaying, state.currentAyah, isContinuous, numberOfAyahs]);
+  }, [didJustFinishRef.current, state.currentAyah, isContinuous, numberOfAyahs]);
 
   async function configureAudio() {
     try {
@@ -90,6 +115,7 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
       }
       soundRef.current = null;
     }
+    loadedSurahRef.current = null;
   }
 
   async function loadSurahAudio(): Promise<boolean> {
@@ -109,6 +135,7 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
 
         soundRef.current = sound;
         currentSourceIndex.current = i;
+        loadedSurahRef.current = surahNumber;
         
         const status = await sound.getStatusAsync();
         if (status.isLoaded) {
@@ -170,6 +197,8 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
 
       // Handle playback completion
       if (status.didJustFinish) {
+        console.log('[SurahAudio] Playback finished');
+        didJustFinishRef.current = true;
         setState(prev => ({ ...prev, isPlaying: false }));
       }
     } else if (status.error) {
@@ -181,9 +210,12 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
   async function playAyah(ayahNumber: number): Promise<void> {
     console.log(`[SurahAudio] playAyah called for ayah ${ayahNumber}`);
     
+    // Reset finish flag
+    didJustFinishRef.current = false;
+    
     // Load surah audio if not already loaded
-    if (!soundRef.current) {
-      console.log(`[SurahAudio] Audio not loaded, loading now...`);
+    if (!soundRef.current || loadedSurahRef.current !== surahNumber) {
+      console.log(`[SurahAudio] Audio not loaded for surah ${surahNumber}, loading now...`);
       const loaded = await loadSurahAudio();
       if (!loaded) {
         console.error(`[SurahAudio] Failed to load audio for surah ${surahNumber}`);
@@ -218,10 +250,11 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
   }
 
   async function pause(): Promise<void> {
-    if (soundRef.current) {
+    if (soundRef.current && loadedSurahRef.current === surahNumber) {
       try {
         await soundRef.current.pauseAsync();
         setState(prev => ({ ...prev, isPlaying: false }));
+        console.log('[SurahAudio] Paused playback');
       } catch (err) {
         console.error('[SurahAudio] Pause error:', err);
       }
@@ -229,10 +262,11 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
   }
 
   async function resume(): Promise<void> {
-    if (soundRef.current) {
+    if (soundRef.current && loadedSurahRef.current === surahNumber) {
       try {
         await soundRef.current.playAsync();
         setState(prev => ({ ...prev, isPlaying: true }));
+        console.log('[SurahAudio] Resumed playback');
       } catch (err) {
         console.error('[SurahAudio] Resume error:', err);
       }
@@ -245,6 +279,7 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
         await soundRef.current.stopAsync();
         await soundRef.current.setPositionAsync(0);
         setState(prev => ({ ...prev, isPlaying: false, currentAyah: null, position: 0 }));
+        console.log('[SurahAudio] Stopped playback');
       } catch (err) {
         console.error('[SurahAudio] Stop error:', err);
       }

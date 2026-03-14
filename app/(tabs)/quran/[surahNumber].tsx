@@ -384,7 +384,7 @@ export default function SurahDetailScreen() {
         ListHeaderComponent={ListHeaderComponent}
         contentContainerStyle={[
           styles.listContent,
-          { paddingBottom: insets.bottom + Spacing.xl }
+          { paddingBottom: insets.bottom + Spacing.xl + (audioState.isPlaying || audioState.isLoading ? 80 : 0) }
         ]}
         showsVerticalScrollIndicator={false}
         onScrollToIndexFailed={(info) => {
@@ -396,6 +396,46 @@ export default function SurahDetailScreen() {
           }, 100);
         }}
       />
+
+      {/* Mini Audio Player - Floats at bottom when audio is active */}
+      {(audioState.isPlaying || audioState.isLoading || audioState.currentAyah) && (
+        <View style={[styles.miniPlayer, { bottom: insets.bottom }]}>
+          <View style={styles.miniPlayerContent}>
+            {/* Current Ayah Info */}
+            <View style={styles.miniPlayerInfo}>
+              <Text style={styles.miniPlayerTitle}>
+                {t('quran.surah')} {surahNum} · {t('quran.ayah')} {audioState.currentAyah || 1}
+              </Text>
+              <Text style={styles.miniPlayerSubtitle}>
+                {audioState.isLoading ? 'Loading...' : surahMeta?.name.en}
+              </Text>
+            </View>
+
+            {/* Playback Controls */}
+            <View style={styles.miniPlayerControls}>
+              {audioState.isLoading ? (
+                <ActivityIndicator size="small" color="#3b82f6" />
+              ) : (
+                <>
+                  {audioState.isPlaying ? (
+                    <TouchableOpacity onPress={audioControls.pause} style={styles.miniPlayerButton}>
+                      <Ionicons name="pause" size={24} color={DarkTheme.textPrimary} />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity onPress={audioControls.resume} style={styles.miniPlayerButton}>
+                      <Ionicons name="play" size={24} color={DarkTheme.textPrimary} />
+                    </TouchableOpacity>
+                  )}
+                  
+                  <TouchableOpacity onPress={audioControls.stop} style={styles.miniPlayerButton}>
+                    <Ionicons name="stop" size={24} color={DarkTheme.textPrimary} />
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -663,5 +703,54 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: Typography.weightSemibold,
     color: '#fff',
+  },
+  
+  // Mini Audio Player - Floating at Bottom
+  miniPlayer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(15, 23, 42, 0.98)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(59, 130, 246, 0.3)',
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.screenPadding,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  miniPlayerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  miniPlayerInfo: {
+    flex: 1,
+    marginRight: Spacing.md,
+  },
+  miniPlayerTitle: {
+    fontSize: 14,
+    fontWeight: Typography.weightSemibold,
+    color: DarkTheme.textPrimary,
+    marginBottom: 2,
+  },
+  miniPlayerSubtitle: {
+    fontSize: 12,
+    color: DarkTheme.textSecondary,
+  },
+  miniPlayerControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  miniPlayerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
