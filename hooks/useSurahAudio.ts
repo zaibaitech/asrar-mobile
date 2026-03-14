@@ -96,14 +96,14 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     // Try loading from different sources
-    for (let i = currentSourceIndex.current; i < 2; i++) {
+    for (let i = 0; i < 2; i++) {
       try {
         const audioUrl = getFullSurahAudioUrl(surahNumber, i);
         console.log(`[SurahAudio] Loading surah ${surahNumber} from source ${i + 1}: ${audioUrl}`);
 
         const { sound } = await Audio.Sound.createAsync(
           { uri: audioUrl },
-          { shouldPlay: false },
+          { shouldPlay: false, progressUpdateIntervalMillis: 500 },
           onPlaybackStatusUpdate
         );
 
@@ -117,20 +117,23 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
             isLoading: false,
             duration: status.durationMillis ? status.durationMillis / 1000 : 0,
           }));
-          console.log(`[SurahAudio] Success: Loaded surah ${surahNumber} (${status.durationMillis}ms)`);
+          console.log(`[SurahAudio] Success: Loaded surah ${surahNumber} (duration: ${status.durationMillis}ms) from source ${i + 1}`);
           return true;
         }
       } catch (err) {
-        console.error(`[SurahAudio] Failed source ${i + 1}:`, err);
+        console.error(`[SurahAudio] Failed source ${i + 1} for surah ${surahNumber}:`, err);
         await cleanup();
+        
+        // Continue to next source
       }
     }
 
     // All sources failed
+    console.error(`[SurahAudio] All sources failed for surah ${surahNumber}`);
     setState(prev => ({
       ...prev,
       isLoading: false,
-      error: 'لا يمكن تحميل صوت السورة',
+      error: 'Cannot load audio',
     }));
     return false;
   }
@@ -176,10 +179,16 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
   }
 
   async function playAyah(ayahNumber: number): Promise<void> {
+    console.log(`[SurahAudio] playAyah called for ayah ${ayahNumber}`);
+    
     // Load surah audio if not already loaded
     if (!soundRef.current) {
+      console.log(`[SurahAudio] Audio not loaded, loading now...`);
       const loaded = await loadSurahAudio();
-      if (!loaded) return;
+      if (!loaded) {
+        console.error(`[SurahAudio] Failed to load audio for surah ${surahNumber}`);
+        return;
+      }
     }
 
     try {
@@ -190,13 +199,21 @@ export function useSurahAudio(surahNumber: number, numberOfAyahs: number) {
         const startTimeMs = timingData.ayahTimings[ayahNumber] * 1000;
         await sound.setPositionAsync(startTimeMs);
         console.log(`[SurahAudio] Seeking to ayah ${ayahNumber} at ${startTimeMs}ms`);
+      } else {
+        // No timing data - play from current position or beginning
+        console.log(`[SurahAudio] No timing data for surah ${surahNumber}, playing full audio`);
+        if (ayahNumber === 1) {
+          await sound.setPositionAsync(0);
+          console.log(`[SurahAudio] Starting from beginning (ayah 1)`);
+        }
       }
 
       await sound.playAsync();
-      setState(prev => ({ ...prev, currentAyah: ayahNumber, isPlaying: true }));
+      setState(prev => ({ ...prev, currentAyah: ayahNumber, isPlaying: true, error: null }));
+      console.log(`[SurahAudio] Started playback for ayah ${ayahNumber}`);
     } catch (err) {
       console.error('[SurahAudio] Failed to play ayah:', err);
-      setState(prev => ({ ...prev, error: 'خطأ في التشغيل' }));
+      setState(prev => ({ ...prev, error: 'Playback error', isPlaying: false }));
     }
   }
 
