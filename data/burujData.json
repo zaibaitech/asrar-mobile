@@ -5,7 +5,11 @@
       "element": "fire",
       "element_emoji": "🔥",
       "element_number": 1,
-      "colors": ["#FF6B35", "#F7931E", "#DC143C"],
+      "colors": [
+        "#FF6B35",
+        "#F7931E",
+        "#DC143C"
+      ],
       "personality": {
         "en": {
           "temperament": "Slow to anger, but explosive when provoked—impossible to calm down once ignited",
@@ -274,12 +278,12 @@
       "spiritual_practice": {
         "practice_night": {
           "primary": {
-            "en": "Tuesday",
-            "fr": "Mardi"
+            "en": "Saturday night",
+            "fr": "Nuit du samedi"
           },
           "note": {
-            "en": "Tuesday during the day, OR Thursday midnight, OR Sunday midnight",
-            "fr": "Mardi pendant la journée, OU jeudi minuit, OU dimanche minuit"
+            "en": "Day of Mars: Tuesday · Night of Mars: Saturday night (after midnight → Fajr)",
+            "fr": "Jour de Mars : Mardi · Nuit de Mars : Nuit du samedi (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
@@ -355,7 +359,11 @@
       "element": "earth",
       "element_emoji": "🌍",
       "element_number": 2,
-      "colors": ["#8B4513", "#6B8E23", "#D2691E"],
+      "colors": [
+        "#8B4513",
+        "#6B8E23",
+        "#D2691E"
+      ],
       "personality": {
         "en": {
           "temperament": "Exceptionally patient and enduring - can bear tremendous hardship without complaint",
@@ -654,12 +662,12 @@
       "spiritual_practice": {
         "practice_night": {
           "primary": {
-            "en": "Friday",
-            "fr": "Vendredi"
+            "en": "Tuesday night",
+            "fr": "Nuit du mardi"
           },
           "note": {
-            "en": "Friday, OR Sunday night (Monday night)",
-            "fr": "Vendredi, OU nuit de dimanche (nuit de lundi)"
+            "en": "Day of Venus: Friday · Night of Venus: Tuesday night (after midnight → Fajr)",
+            "fr": "Jour de Vénus : Vendredi · Nuit de Vénus : Nuit du mardi (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
@@ -735,7 +743,11 @@
       "element": "air",
       "element_emoji": "💨",
       "element_number": 3,
-      "colors": ["#87CEEB", "#4682B4", "#B0E0E6"],
+      "colors": [
+        "#87CEEB",
+        "#4682B4",
+        "#B0E0E6"
+      ],
       "personality": {
         "en": {
           "temperament": "Quick-tempered and easily provoked - anger rises swiftly like a storm wind",
@@ -1058,12 +1070,12 @@
       "spiritual_practice": {
         "practice_night": {
           "primary": {
-            "en": "Wednesday",
-            "fr": "Mercredi"
+            "en": "Sunday night",
+            "fr": "Nuit du dimanche"
           },
           "note": {
-            "en": "Wednesday, OR Monday night (Sunday night), OR Friday night (Thursday midnight)",
-            "fr": "Mercredi, OU nuit de lundi (nuit de dimanche), OU nuit de vendredi (jeudi minuit)"
+            "en": "Day of Mercury: Wednesday · Night of Mercury: Sunday night (after midnight → Fajr)",
+            "fr": "Jour de Mercure : Mercredi · Nuit de Mercure : Nuit du dimanche (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
@@ -1144,7 +1156,11 @@
       "element": "water",
       "element_emoji": "💧",
       "element_number": 4,
-      "colors": ["#1E90FF", "#000080", "#4169E1"],
+      "colors": [
+        "#1E90FF",
+        "#000080",
+        "#4169E1"
+      ],
       "personality": {
         "en": {
           "temperament": "Extremely patient - mistaken for being foolish or weak due to extraordinary tolerance",
@@ -1456,12 +1472,12 @@
       "spiritual_practice": {
         "practice_night": {
           "primary": {
-            "en": "Monday",
-            "fr": "Lundi"
+            "en": "Friday night",
+            "fr": "Nuit du vendredi"
           },
           "note": {
-            "en": "Monday during the day, OR Thursday midnight (Friday night)",
-            "fr": "Lundi pendant la journée, OU jeudi minuit (nuit de vendredi)"
+            "en": "Day of the Moon: Monday · Night of the Moon: Friday night (after midnight → Fajr)",
+            "fr": "Jour de la Lune : Lundi · Nuit de la Lune : Nuit du vendredi (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
@@ -1538,7 +1554,11 @@
       "element": "fire",
       "element_emoji": "🔥",
       "element_number": 1,
-      "colors": ["#FF6B35", "#FFFFFF", "#F7931E"],
+      "colors": [
+        "#FF6B35",
+        "#FFFFFF",
+        "#F7931E"
+      ],
       "personality": {
         "en": {
           "temperament": "Passionate and dynamic - driven by inner fire and enthusiasm for life",
@@ -1817,12 +1837,12 @@
       "spiritual_practice": {
         "practice_night": {
           "primary": {
-            "en": "Sunday",
-            "fr": "Dimanche"
+            "en": "Thursday night",
+            "fr": "Nuit du jeudi"
           },
           "note": {
-            "en": "Sunday during the day, OR Sunday night (midnight/before Fajr), OR Thursday night (midnight/before Fajr)",
-            "fr": "Dimanche pendant la journée, OU nuit de dimanche (minuit/avant Fajr), OU nuit de jeudi (minuit/avant Fajr)"
+            "en": "Day of the Sun: Sunday · Night of the Sun: Thursday night (after midnight → Fajr)",
+            "fr": "Jour du Soleil : Dimanche · Nuit du Soleil : Nuit du jeudi (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
@@ -1902,7 +1922,11 @@
       "element": "earth",
       "element_emoji": "🌍",
       "element_number": 2,
-      "colors": ["#8B4513", "#000000", "#6B8E23"],
+      "colors": [
+        "#8B4513",
+        "#000000",
+        "#6B8E23"
+      ],
       "personality": {
         "en": {
           "temperament": "Deeply grounded and practical - embodies stability and reliability",
@@ -2196,12 +2220,12 @@
       "spiritual_practice": {
         "practice_night": {
           "primary": {
-            "en": "Saturday",
-            "fr": "Samedi"
+            "en": "Sunday night",
+            "fr": "Nuit du dimanche"
           },
           "note": {
-            "en": "Saturday, OR Sunday midnight (Monday night)",
-            "fr": "Samedi, OU dimanche minuit (nuit de lundi)"
+            "en": "Day of Mercury: Wednesday · Night of Mercury: Sunday night (after midnight → Fajr)",
+            "fr": "Jour de Mercure : Mercredi · Nuit de Mercure : Nuit du dimanche (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
@@ -2278,7 +2302,11 @@
       "element": "air",
       "element_emoji": "💨",
       "element_number": 3,
-      "colors": ["#87CEEB", "#FFFFFF", "#4682B4"],
+      "colors": [
+        "#87CEEB",
+        "#FFFFFF",
+        "#4682B4"
+      ],
       "personality": {
         "en": {
           "temperament": "Quick-minded and intellectually agile - thrives on mental stimulation",
@@ -2555,12 +2583,12 @@
       "spiritual_practice": {
         "practice_night": {
           "primary": {
-            "en": "Monday night",
-            "fr": "Lundi soir"
+            "en": "Tuesday night",
+            "fr": "Nuit du mardi"
           },
           "note": {
-            "en": "After Isha, when the air is still and receptive",
-            "fr": "Après l'Isha, quand l'air est calme et réceptif"
+            "en": "Day of Venus: Friday · Night of Venus: Tuesday night (after midnight → Fajr)",
+            "fr": "Jour de Vénus : Vendredi · Nuit de Vénus : Nuit du mardi (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
@@ -2637,7 +2665,11 @@
       "element": "water",
       "element_emoji": "💧",
       "element_number": 4,
-      "colors": ["#8B0000", "#DC143C", "#1E90FF"],
+      "colors": [
+        "#8B0000",
+        "#DC143C",
+        "#1E90FF"
+      ],
       "personality": {
         "en": {
           "temperament": "Intense and transformative - deep emotional currents run beneath calm surface",
@@ -2939,11 +2971,11 @@
         "practice_night": {
           "primary": {
             "en": "Saturday night",
-            "fr": "Samedi soir"
+            "fr": "Nuit du samedi"
           },
           "note": {
-            "en": "Deep night hours, after midnight for maximum depth",
-            "fr": "Heures profondes de la nuit, après minuit pour profondeur maximale"
+            "en": "Day of Mars: Tuesday · Night of Mars: Saturday night (after midnight → Fajr)",
+            "fr": "Jour de Mars : Mardi · Nuit de Mars : Nuit du samedi (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
@@ -3019,7 +3051,11 @@
       "element": "fire",
       "element_emoji": "🔥",
       "element_number": 1,
-      "colors": ["#FF6B35", "#F7931E", "#FFD700"],
+      "colors": [
+        "#FF6B35",
+        "#F7931E",
+        "#FFD700"
+      ],
       "personality": {
         "en": {
           "temperament": "Optimistic and adventurous - seeks expansion and truth",
@@ -3268,12 +3304,12 @@
       "spiritual_practice": {
         "practice_night": {
           "primary": {
-            "en": "Thursday",
-            "fr": "Jeudi"
+            "en": "Monday night",
+            "fr": "Nuit du lundi"
           },
           "note": {
-            "en": "Thursday, OR Thursday night, OR Sunday midnight (Monday night)",
-            "fr": "Jeudi, OU nuit de jeudi, OU dimanche minuit (nuit de lundi)"
+            "en": "Day of Jupiter: Thursday · Night of Jupiter: Monday night (after midnight → Fajr)",
+            "fr": "Jour de Jupiter : Jeudi · Nuit de Jupiter : Nuit du lundi (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
@@ -3349,7 +3385,11 @@
       "element": "earth",
       "element_emoji": "🌍",
       "element_number": 2,
-      "colors": ["#000000", "#8B4513", "#2F4F4F"],
+      "colors": [
+        "#000000",
+        "#8B4513",
+        "#2F4F4F"
+      ],
       "personality": {
         "en": {
           "temperament": "Disciplined and ambitious - seeks achievement and mastery",
@@ -3661,11 +3701,11 @@
         "practice_night": {
           "primary": {
             "en": "Wednesday night",
-            "fr": "Mercredi soir"
+            "fr": "Nuit du mercredi"
           },
           "note": {
-            "en": "After Isha prayer",
-            "fr": "Après la prière de l'Isha"
+            "en": "Day of Saturn: Saturday · Night of Saturn: Wednesday night (after midnight → Fajr)",
+            "fr": "Jour de Saturne : Samedi · Nuit de Saturne : Nuit du mercredi (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
@@ -3741,7 +3781,11 @@
       "element": "air",
       "element_emoji": "💨",
       "element_number": 3,
-      "colors": ["#87CEEB", "#4682B4", "#00CED1"],
+      "colors": [
+        "#87CEEB",
+        "#4682B4",
+        "#00CED1"
+      ],
       "personality": {
         "en": {
           "temperament": "Innovative and humanitarian - seeks to serve the collective",
@@ -3992,12 +4036,12 @@
       "spiritual_practice": {
         "practice_night": {
           "primary": {
-            "en": "Sunday night",
-            "fr": "Dimanche soir"
+            "en": "Wednesday night",
+            "fr": "Nuit du mercredi"
           },
           "note": {
-            "en": "After Isha prayer",
-            "fr": "Après la prière de l'Isha"
+            "en": "Day of Saturn: Saturday · Night of Saturn: Wednesday night (after midnight → Fajr)",
+            "fr": "Jour de Saturne : Samedi · Nuit de Saturne : Nuit du mercredi (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
@@ -4073,7 +4117,11 @@
       "element": "water",
       "element_emoji": "💧",
       "element_number": 4,
-      "colors": ["#1E90FF", "#7B68EE", "#9370DB"],
+      "colors": [
+        "#1E90FF",
+        "#7B68EE",
+        "#9370DB"
+      ],
       "personality": {
         "en": {
           "temperament": "Compassionate and intuitive - deeply sensitive to others' pain",
@@ -4372,12 +4420,12 @@
       "spiritual_practice": {
         "practice_night": {
           "primary": {
-            "en": "Saturday night",
-            "fr": "Samedi soir"
+            "en": "Monday night",
+            "fr": "Nuit du lundi"
           },
           "note": {
-            "en": "After Isha prayer, in the last third of night for deeper connection",
-            "fr": "Après la prière de l'Isha, dans le dernier tiers de la nuit pour connexion plus profonde"
+            "en": "Day of Jupiter: Thursday · Night of Jupiter: Monday night (after midnight → Fajr)",
+            "fr": "Jour de Jupiter : Jeudi · Nuit de Jupiter : Nuit du lundi (après minuit → Fajr)"
           }
         },
         "zodiac_sign": {
