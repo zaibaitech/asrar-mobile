@@ -3,6 +3,7 @@
  * Handles history and favorites persistence
  */
 
+import { setItemWithRetry } from '@/utils/storageErrorHandler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NameDestinyResult } from '../types';
 
@@ -17,8 +18,8 @@ export interface StoredCalculation {
 
 const HISTORY_KEY = '@name_destiny_history';
 const FAVORITES_KEY = '@name_destiny_favorites';
-const MAX_HISTORY = 50;
-const MAX_FAVORITES = 20;
+const MAX_HISTORY = 30; // Reduced from 50 to prevent storage issues
+const MAX_FAVORITES = 15; // Reduced from 20
 
 export class NameDestinyStorageService {
   /**
@@ -31,7 +32,8 @@ export class NameDestinyStorageService {
   ): Promise<void> {
     try {
       const calculation: StoredCalculation = {
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+
         personName,
         motherName,
         result,
@@ -41,8 +43,9 @@ export class NameDestinyStorageService {
       const history = await this.getHistory();
       const updated = [calculation, ...history].slice(0, MAX_HISTORY);
       
-      await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-    } catch (error) {
+      // Use setItemWithRetry for automatic error handling
+      await setItemWithRetry(HISTORY_KEY, JSON.stringify(updated));
+    } catch (error: unknown) {
       console.error('Failed to save to history:', error);
     }
   }
@@ -67,7 +70,7 @@ export class NameDestinyStorageService {
     try {
       const history = await this.getHistory();
       const updated = history.filter(calc => calc.id !== id);
-      await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
+      await setItemWithRetry(HISTORY_KEY, JSON.stringify(updated));
     } catch (error) {
       console.error('Failed to delete from history:', error);
     }
@@ -101,8 +104,9 @@ export class NameDestinyStorageService {
         ...favorites
       ].slice(0, MAX_FAVORITES);
       
-      await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
-    } catch (error) {
+      // Use setItemWithRetry for automatic error handling
+      await setItemWithRetry(FAVORITES_KEY, JSON.stringify(updated));
+    } catch (error: unknown) {
       console.error('Failed to add to favorites:', error);
     }
   }
@@ -114,7 +118,7 @@ export class NameDestinyStorageService {
     try {
       const favorites = await this.getFavorites();
       const updated = favorites.filter(fav => fav.id !== id);
-      await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+      await setItemWithRetry(FAVORITES_KEY, JSON.stringify(updated));
     } catch (error) {
       console.error('Failed to remove from favorites:', error);
     }
@@ -140,7 +144,7 @@ export class NameDestinyStorageService {
     try {
       const favorites = await this.getFavorites();
       return favorites.some(fav => fav.id === id);
-    } catch (error) {
+    } catch (error: unknown) {
       return false;
     }
   }

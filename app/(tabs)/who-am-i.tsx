@@ -968,16 +968,19 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   headerTitleMinimal: {
-    fontSize: 24, // Reduced from 28
-    fontWeight: '700', // Changed from 'bold'
+    fontSize: 20,
+    fontWeight: '700',
     color: '#ffffff',
-    marginBottom: 6, // Reduced from 8
+    marginBottom: 6,
+    textAlign: 'center',
+    paddingHorizontal: 16,
   },
   headerSubtitleMinimal: {
-    fontSize: 13, // Reduced from 14
-    color: 'rgba(255, 255, 255, 0.6)', // More faded
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.6)',
     textAlign: 'center',
     paddingHorizontal: 20,
+    lineHeight: 18,
   },
 
   methodNoteContainer: {
@@ -1050,13 +1053,14 @@ const styles = StyleSheet.create({
   collapsibleTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8, // Reduced from 10
+    gap: 8,
     flex: 1,
   },
   collapsibleTitleCompact: {
-    fontSize: 13, // Reduced from 15
+    fontSize: 13,
     fontWeight: '600',
-    color: 'rgba(255, 255, 255, 0.8)', // Slightly faded
+    color: 'rgba(255, 255, 255, 0.8)',
+    flex: 1,
   },
   collapsibleContent: {
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
@@ -1183,11 +1187,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   methodSelectorLabel: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: '#ffffff',
     marginBottom: 12,
     textAlign: 'center',
+    paddingHorizontal: 16,
   },
   methodButton: {
     marginBottom: 12,
@@ -1212,12 +1217,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
+    flex: 1,
   },
   methodButtonTextContainer: {
     flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
   },
   methodButtonTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     color: 'rgba(255, 255, 255, 0.7)',
     marginBottom: 6,
@@ -1226,7 +1234,7 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   methodButtonDescription: {
-    fontSize: 13,
+    fontSize: 12,
     color: 'rgba(255, 255, 255, 0.6)',
     lineHeight: 18,
     marginTop: 4,

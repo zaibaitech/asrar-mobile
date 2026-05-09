@@ -9,7 +9,7 @@ import type { LegacyPlanetTransitInfo } from "@/utils/transitAdapters";
 import { formatZodiacWithArabic, resolveUserZodiacKey } from "@/utils/translationHelpers";
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { RotatingCardContent } from "./RotatingCardContent";
 
@@ -26,6 +26,38 @@ interface PlanetTransitWidgetProps {
   nextDayBlessing?: DayBlessing | null;
   compact?: boolean;
   isPersonal?: boolean;
+}
+
+type DayKey = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
+
+function resolveDayKey(dayName: string): DayKey | null {
+  const normalized = dayName.trim().toLowerCase();
+  const dayMap: Record<string, DayKey> = {
+    sunday: 'sunday',
+    monday: 'monday',
+    tuesday: 'tuesday',
+    wednesday: 'wednesday',
+    thursday: 'thursday',
+    friday: 'friday',
+    saturday: 'saturday',
+    dimanche: 'sunday',
+    lundi: 'monday',
+    mardi: 'tuesday',
+    mercredi: 'wednesday',
+    jeudi: 'thursday',
+    vendredi: 'friday',
+    samedi: 'saturday',
+    الأحد: 'sunday',
+    الإثنين: 'monday',
+    الاثنين: 'monday',
+    الثلاثاء: 'tuesday',
+    الأربعاء: 'wednesday',
+    الخميس: 'thursday',
+    الجمعة: 'friday',
+    السبت: 'saturday',
+  };
+
+  return dayMap[normalized] ?? null;
 }
 
 type HarmonyLevel = 'harmonious' | 'supportive' | 'neutral' | 'challenging';
@@ -118,10 +150,9 @@ function getPlanetGradient(planetKey?: string): [string, string] {
   }
 }
 
-export default function PlanetTransitWidget({ transitData, nextDayBlessing, compact = false, isPersonal = true }: PlanetTransitWidgetProps) {
+export default function PlanetTransitWidget({ transitData, nextDayBlessing, compact = false, isPersonal = true }: Readonly<PlanetTransitWidgetProps>) {
   const { t, tSafe, language } = useLanguage();
   const { profile } = useProfile();
-  const [activeSlide, setActiveSlide] = useState(0);
 
   const myZodiacKey: ZodiacKey | null = (() => {
     const fromDerived = resolveUserZodiacKey({
@@ -148,28 +179,30 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
   };
 
   const hasTransit = Boolean(transitData);
-  const fallbackMessage = !myZodiacKey
-    ? 'Set your zodiac sign to personalize.'
-    : 'No current transit for your sign';
+  const fallbackMessage = myZodiacKey
+    ? tSafe('widgets.planetTransit.fallback.noTransit', 'No current transit for your sign')
+    : tSafe('widgets.planetTransit.fallback.setZodiac', 'Set your zodiac sign to personalize.');
 
-  // Short labels: "Your Sign" for personal, "Sky Now" for fallback
-  const transitTypeLabel = hasTransit 
-    ? (isPersonal ? (language === 'ar' ? 'برجك' : language === 'fr' ? 'Ton signe' : 'Your Sign') 
-                  : (language === 'ar' ? 'السماء' : language === 'fr' ? 'Ciel' : 'Sky Now'))
-    : '';
-  
-  const subtitleText = hasTransit 
-    ? (transitTypeLabel ? `${transitTypeLabel} • ${t('widgets.planetTransit.subtitle')}` : t('widgets.planetTransit.subtitle'))
+  // Short labels for personal vs collective transit context
+  let transitTypeLabel = '';
+  if (hasTransit) {
+    transitTypeLabel = isPersonal
+      ? tSafe('widgets.planetTransit.labels.yourSign', 'Your Sign')
+      : tSafe('widgets.planetTransit.labels.skyNow', 'Sky Now');
+  }
+
+  const subtitleText = hasTransit
+    ? `${transitTypeLabel} • ${t('widgets.planetTransit.subtitle')}`
     : fallbackMessage;
 
   const planetName = transitData?.planetName ?? fallbackMessage;
   const planetNameAr = transitData?.planetNameAr ?? '';
   const planetSymbol = transitData?.planetSymbol ?? '✦';
-  const zodiacKey: ZodiacKey = (transitData?.zodiacKey as ZodiacKey) ?? myZodiacKey ?? 'aries';
+  const zodiacKey: ZodiacKey = transitData?.zodiacKey ?? myZodiacKey ?? 'aries';
   const zodiacSymbol = transitData?.zodiacSymbol ?? (myZodiacKey ? ZODIAC_DATA[myZodiacKey].symbol : '✦');
-  const elementKey = (transitData?.elementKey ?? (myZodiacKey ? ZODIAC_DATA[myZodiacKey].element : 'earth')) as Element;
+  const elementKey = transitData?.elementKey ?? (myZodiacKey ? ZODIAC_DATA[myZodiacKey].element : 'earth');
 
-  const elementKeySafe = (elementKey as Element) ?? 'earth';
+  const elementKeySafe = elementKey ?? 'earth';
   const elementAccent = ElementAccents[elementKeySafe];
   const planetGradient = getPlanetGradient(transitData?.planetKey);
   const userElement = (profile.derived?.element as Element | undefined) ?? null;
@@ -252,6 +285,11 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
 
   // Add Next Day Ruler slide if available
   if (nextDayBlessing) {
+    const dayKey = resolveDayKey(nextDayBlessing.dayName);
+    const localizedDayName = dayKey
+      ? tSafe(`days.${dayKey}`, nextDayBlessing.dayName)
+      : nextDayBlessing.dayName;
+
     const handleNextDayPress = () => {
       router.push({
         pathname: '/(tabs)/planet-transit-details',
@@ -276,7 +314,7 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
         </View>
 
         <View style={styles.mainContent}>
-          <Text style={styles.dayName} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{nextDayBlessing.dayName}</Text>
+          <Text style={styles.dayName} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{localizedDayName}</Text>
           <Text style={styles.dayNameArabic} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{nextDayBlessing.dayNameArabic}</Text>
 
           <View style={styles.nextDayRulerRow}>
@@ -289,7 +327,7 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
           </View>
           <View style={[styles.elementChip, { backgroundColor: ElementAccents[nextDayBlessing.element].glow }]}>
             <Text style={[styles.elementChipText, { color: ElementAccents[nextDayBlessing.element].primary }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
-              {tSafe(`elements.${nextDayBlessing.element}`, nextDayBlessing.element).toUpperCase()}
+              {tSafe(`elements.${String(nextDayBlessing.element).toLowerCase()}`, nextDayBlessing.element).toUpperCase()}
             </Text>
           </View>
         </View>
@@ -307,7 +345,6 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
         slides={slides}
         intervalMs={8000}
         showDots={true}
-        onSlideChange={setActiveSlide}
       />
     </View>
   );

@@ -127,6 +127,13 @@ export const translations = {
         messageTension: "Today's {moonElement} Moon creates dynamic tension with your {personalElement} nature. This isn't bad — it's growth through balance. Move mindfully and stay present.",
         messageBalanced: "Today's {moonElement} Moon brings neutral energy to your {personalElement} essence. This creates space for conscious choice — you can lean into either energy as needed.",
       },
+      practicesCard: {
+        title: "Spiritual Practices",
+        tabAdhkar: "Adhkār",
+        tabAngels: "Angels",
+        tabQuran: "Qur'an",
+        tabWafq: "Wafq",
+      },
     },
 
     notifications: {
@@ -197,6 +204,182 @@ export const translations = {
         openDailyGuidance: "Open Daily Energy",
       },
     },
+
+    authScreen: {
+      brand: {
+        title: "Asrariya ✦",
+        subtitle: "Sacred Numerology & Mysticism",
+      },
+      or: "or",
+      privacyNotice: "Your data is encrypted and secure. We never share your personal information.",
+      actions: {
+        continue: "Continue",
+        signIn: "Sign In",
+        creatingAccount: "Creating Account...",
+        signingIn: "Signing In...",
+      },
+      backend: {
+        unreachableTitle: "Backend Unreachable",
+        notAvailableTitle: "Accounts Not Available",
+        unreachableMessage: "We could not reach the backend. You can still try signing in/up to see the exact error.",
+        notConfiguredMessage: "Missing backend configuration. You can still try signing in/up to see the exact error.",
+        missingPrefix: "Missing",
+      },
+      benefits: {
+        signupTitle: "Create an Account",
+        signinTitle: "Welcome Back",
+        signupSubtitle: "Unlock premium features and sync across devices",
+        signinSubtitle: "Sign in to access your account",
+        items: {
+          sync: "Cloud sync across devices",
+          backup: "Secure backup of your data",
+          premium: "Access to premium features",
+        },
+      },
+      oauth: {
+        continueWith: "or continue with",
+      },
+      alerts: {
+        accountCreated: {
+          title: "✅ Account Created!",
+          message: "Please complete your profile to unlock personalized features.",
+        },
+        accountExists: {
+          title: "Account Exists",
+          message: "This email is already registered. Please sign in instead.",
+        },
+        emailVerificationRequired: {
+          title: "Email Verification Required",
+          message: "Please verify your email address, then return and sign in. If this keeps happening, email verification is still enabled on the backend.",
+        },
+        emailNotConfirmed: {
+          title: "Email Not Confirmed",
+          message: "Please check your email and click the confirmation link before signing in. Check your spam folder if you don't see it.",
+        },
+        emailRequired: {
+          title: "Email required",
+          message: "Please enter your email first.",
+        },
+        resetLinkSent: {
+          title: "Reset link sent",
+          message: "Check your email for a password reset link. Open it on this device to continue in the app.",
+        },
+        welcomeBack: {
+          title: "Welcome Back!",
+          profileRestored: "Your profile has been restored.",
+          completeProfile: "Please complete your profile to unlock personalized features.",
+        },
+        welcome: {
+          title: "Welcome!",
+          completeProfile: "Please complete your profile to unlock personalized features.",
+        },
+      },
+      errors: {
+        emailExists: "This email is already registered. Try signing in instead.",
+        invalidEmail: "Please enter a valid email address.",
+        passwordMin: "Password must be at least 6 characters.",
+        network: "No internet connection. Please check your network.",
+        notConfigured: "Backend is not configured. Please check environment variables.",
+        timeout: "Backend check timed out. Please try again.",
+        healthFailed: "Backend is unreachable. Please check your network and try again.",
+        default: "Something went wrong. Please try again.",
+        fillFields: "Please fill in all fields",
+        passwordMismatch: "Passwords do not match",
+        unexpected: "An unexpected error occurred",
+        signInFailed: "Failed to sign in",
+        resetEmailFailed: "Failed to send reset email",
+        oauthFailed: "Failed to sign in with OAuth",
+      },
+    },
+
+    profileScreen: {
+      actions: {
+        goHome: "Go Home",
+      },
+      completion: {
+        missingFields: "Add {fields} to unlock full personalization",
+      },
+      location: {
+        permissionTitle: "Location Permission",
+        permissionMessage: "Location permission is required to auto-detect your location.",
+        errorTitle: "Location Error",
+        errorMessage: "Failed to get location",
+        updatedTitle: "Location Updated",
+        updatedMessage: "Set to: {location}",
+      },
+      birthLocation: {
+        permissionTitle: "Location Permission",
+        permissionMessage: "Location permission is required to auto-detect your birth location coordinates.",
+        errorTitle: "Location Error",
+        errorMessage: "Failed to get birth location",
+        updatedTitle: "Birth Location Updated",
+        updatedMessage: "Set to: {location}",
+        invalidTitle: "Birth Location",
+        invalidMessage: "Please enter valid numeric latitude and longitude.",
+      },
+      save: {
+        chooseNextTitle: "Profile Saved",
+        chooseNextMessage: "Would you like to sign in/create an account, or continue to the app?",
+        successTitle: "Profile Saved",
+        successMessage: "Your personalization data has been updated.",
+        errorMessage: "Failed to save profile. Please try again.",
+      },
+      deleteAccount: {
+        deletedMessage: "Your account has been deleted. You can continue using Asrariya as a guest.",
+      },
+    },
+
+    notificationSettingsScreen: {
+      loading: "Loading preferences...",
+      permissions: {
+        requiredTitle: "Permissions Required",
+        requiredMessage: "Please enable notifications in your device settings to receive spiritual guidance and prayer reminders.",
+        disabledTitle: "Notifications Disabled",
+        disabledMessage: "Enable notifications to receive prayer reminders, harmony hour alerts, and spiritual guidance",
+        enableButton: "Enable Notifications",
+      },
+      prayer: {
+        title: "Prayer Notifications",
+        info: "Prayer notifications are managed in Adhan Settings",
+      },
+      harmony: {
+        title: "Harmony Hours",
+        enable: "Enable Harmony Notifications",
+        favorable: {
+          label: "Favorable Hours",
+          subtitle: "Notify when highly favorable timing begins",
+        },
+        transformative: {
+          label: "Transformative Hours",
+          subtitle: "Notify for growth opportunities",
+        },
+        delicate: {
+          label: "Delicate Periods",
+          subtitle: "Warn about challenging periods",
+        },
+      },
+      divineTiming: {
+        title: "Divine Timing",
+        enable: "Enable Divine Timing",
+        morning: {
+          label: "Morning Spiritual Briefing",
+          subtitle: "Daily energy at {time}",
+        },
+        element: {
+          label: "Element Alignment Alerts",
+          subtitle: "When your element is powerfully activated",
+        },
+      },
+      quietHours: {
+        title: "Quiet Hours",
+        info: "No notifications (except prayers) between {start} - {end}",
+      },
+      rateLimit: {
+        title: "Rate Limiting",
+        info: "Maximum {count} notifications per day to avoid overwhelm",
+      },
+      footer: "Notifications use your device's Do Not Disturb settings",
+    },
     
     // Widgets (Home Screen Cards)
     widgets: {
@@ -206,6 +389,14 @@ export const translations = {
         cta: "See your impact →",
         timeScale: "Long-term (weeks/months)",
         updated: "Updated {time} ago",
+        labels: {
+          yourSign: "Your Sign",
+          skyNow: "Sky Now",
+        },
+        fallback: {
+          setZodiac: "Set your zodiac sign to personalize.",
+          noTransit: "No current transit for your sign",
+        },
       },
       dailyEnergy: {
         title: "Daily Energy",
@@ -833,6 +1024,13 @@ export const translations = {
       todayProgress: "Today",
       allTimeProgress: "All Time",
       favorites: "Favorites",
+      practices: "Practices",
+      myPractices: "My Practices",
+      addDhikr: "Add Dhikr",
+      emptyState: {
+        title: "Start Your Practice",
+        subtitle: "Add a dhikr to begin your spiritual journey",
+      },
       noFavorites: "No Favorites Yet",
       noFavoritesHint: "Tap the heart on any dhikr to add it to your favorites",
       goalReached: "Goal reached!",
@@ -864,6 +1062,29 @@ export const translations = {
         cancel: "Cancel",
         customAmount: "Custom Amount",
         enterNumber: "Enter a number...",
+      },
+      modal: {
+        newDhikr: "New Dhikr",
+        back: "Back",
+        chooseType: "Choose Dhikr Type",
+        chooseTypeSubtitle: "Select the type of spiritual practice",
+        chooseSalawat: "Choose a Ṣalawāt",
+        chooseSalawatSubtitle: "Prayers upon the Prophet ﷺ from various traditions",
+        chooseDivineName: "Choose a Divine Name",
+        chooseDivineNameSubtitle: "Allah's Beautiful Names for invocation",
+        customWird: "Custom Wird",
+        customWirdSubtitle: "Create your own dhikr practice",
+        recommendedPerDay: "Recommended: {count}/day",
+        fields: {
+          title: "Title *",
+          titlePlaceholder: "E.g., My Dhikr",
+          arabicText: "Arabic Text *",
+          transliteration: "Transliteration",
+          meaning: "Meaning",
+          meaningPlaceholder: "In the name of God",
+          dailyTarget: "Daily Target",
+          addWird: "Add Wird",
+        },
       },
     },
 
@@ -1006,6 +1227,10 @@ export const translations = {
     
     // Home Screen
     home: {
+      profileBanner: {
+        title: "Complete Your Profile",
+        subtitle: "Add your DOB to unlock personalized features",
+      },
       daily: {
         summary: "Balanced energies today",
         bestFor: "Routine tasks",
@@ -1086,6 +1311,10 @@ export const translations = {
           summaryTemplate: "{a} and {b} align — {tone}",
           youLabel: "You",
           momentLabel: "Moment",
+          addDobPrompt: "Add your DOB to unlock moment alignment",
+        },
+        nextPrayer: {
+          inTime: "in {duration}",
         },
         nextPlanetaryHour: {
           title: "Next Planetary Hour",
@@ -2510,6 +2739,7 @@ export const translations = {
       nextPrayer: "Next Prayer",
           ascendantLens: "Ascendant Lens",
       nextPlanetHour: "Next Planet Hour",
+      tapToViewDetails: "Tap to view details",
 
         ascendant: {
           title: "Ascendant (Rising Sign)",
@@ -2903,6 +3133,29 @@ export const translations = {
         headerSubtitle: "Long-term",
         explanation: "Shows where a planet is in the zodiac — its long-term position that changes over weeks, months, or years.",
         personalizedNote: "Personalized to your elemental nature",
+        approximationUnreliable: "Approximation (unreliable)",
+        transitType: {
+          personal: "In Your Sign",
+          collective: "Cosmic Weather",
+        },
+        zodiacSystem: {
+          label: "Zodiac",
+          tropical: "Tropical",
+          sidereal: "Sidereal (Lahiri)",
+          signSuffix: "sign",
+        },
+        degreeStage: {
+          full: {
+            entry: "🔵 Entry Phase",
+            stabilization: "🟢 Peak Phase",
+            completion: "🟠 Closing Phase",
+          },
+          badge: {
+            entry: "Entry",
+            stabilization: "Peak",
+            completion: "Closing",
+          },
+        },
         practices: {
           title: "Planet-Specific Practices",
           minutesShort: "min",
@@ -2949,9 +3202,61 @@ export const translations = {
             },
           },
         },
+        advancedPractice: {
+          essences: {
+            title: "Recommended Essences",
+            description: "Use these fragrances to enhance your {planet} practices",
+            howToLabel: "💡 How to Use:",
+            step1: "Burn as incense before practice",
+            step2: "Apply as natural perfume",
+            step3: "Keep in practice space",
+          },
+          talisman: {
+            title: "Talisman Guidance (Optional)",
+            description: "For advanced practitioners working with written spiritual tools:",
+            format: "Format:",
+            bestDay: "🗓️ Best Day:",
+            bestHour: "⏰ Best Hour:",
+            warning: "Talisman creation requires proper knowledge and authorization. Consult a qualified teacher (shaykh) before attempting.",
+          },
+          timing: {
+            title: "Optimal Timing",
+            description: "Best times for {planet} practices:",
+          },
+          preparation: {
+            title: "Preparation Steps",
+            description: "Follow these steps to prepare for your practice:",
+          },
+          angels: {
+            title: "👼 Advanced: Angelic Connection",
+            warning: "For experienced practitioners only",
+            description: "Working with spiritual intermediaries:",
+            prerequisites: {
+              label: "📚 Prerequisites:",
+              study: "Study under qualified teacher",
+              mastery: "Mastery of basic practices",
+              protection: "Understanding of spiritual protection",
+              permission: "Permission from shaykh",
+            },
+          },
+        },
         summary: {
           bestNow: "Strongest now",
           weakNow: "Weakest now",
+        },
+        allTransits: {
+          title: "All Planet Transits",
+          description: "Current position of all planets in the zodiac signs",
+          yourSign: "Your sign",
+        },
+        nextDay: {
+          aboutDayRuler: "About the Day Ruler",
+          dayRulerDescription: "The {dayName} will be ruled by {planet}, carrying the energy of the {element} element.",
+          elementalEnergy: "Elemental Energy",
+          spiritualFocus: "Spiritual Focus",
+          bestActivities: "Best Activities",
+          howToPrepare: "How to Prepare",
+          preparationBody: "Plan your day tomorrow with these energies in mind. Set your intentions the night before and reflect on how to align your actions with the day ruler.",
         },
         
         currentTransit: "Current Transit",
@@ -3005,6 +3310,13 @@ export const translations = {
             neutral: "Neutral",
             growth: "Growth",
             challenge: "Challenge",
+          },
+          labels: {
+            harmonious: "Harmonious",
+            supportive: "Supportive",
+            neutral: "Neutral",
+            challenging: "Challenging",
+            titleSuffix: "RESONANCE",
           },
           arabicTerms: {
             harmonious: "سَكِينَة",
@@ -3331,6 +3643,8 @@ export const translations = {
           },
           status: {
             entry: "The influence is forming. Focus on purification, not action.",
+            strengthModerate: "This transit has moderate strength. Spiritual work is supported with steady effort.",
+            strengthWeak: "This transit is weak. Spiritual work requires extra patience and discipline.",
             strength: "This transit is at full strength. Spiritual work is supported.",
             exit: "The influence is fading. Seal and protect, do not initiate.",
           },
@@ -3357,6 +3671,7 @@ export const translations = {
             jupiter: "Arrogance, excess",
             saturn: "Heavy works unless guided, despair",
           },
+          avoidLabel: "Avoid",
           recommendedDhikr: "Recommended Dhikr",
           entryNote: "During entry phase, focus on general dhikr like lā ilāha illa Llāh",
           exitNote: "During exit phase, focus on protective dhikr and ṣalawāt",
@@ -3368,6 +3683,7 @@ export const translations = {
         // ─────────────────────────────────────────────────────────────────────
         practice: {
           title: "Spiritual Practice",
+          transitStrength: "Transit Strength",
           phase: {
             entry: "Entering",
             strength: "Active",
@@ -3389,6 +3705,10 @@ export const translations = {
             tomorrow: "Tomorrow",
             activeNow: "Active now until {end}",
             unavailable: "Planetary hour data unavailable",
+            units: {
+              hourShort: "h",
+              minuteShort: "min",
+            },
           },
           strength: {
             peak: "Peak",
@@ -3483,6 +3803,24 @@ export const translations = {
       reciter: "Reciter: Mishary Alafasy",
       audioLoading: "Loading audio...",
       continuousPlayback: "Continuous Playback",
+      shareAyah: "Share Ayah",
+      sajda: "Sajda",
+      loadingSurahAudio: "Loading surah audio...",
+      changeFontSize: "Change font size",
+      chooseReciter: "Choose reciter",
+      share: {
+        title: "Share the Quran",
+        subtitle: "Spread this ayah with goodness and remembrance.",
+        whatsapp: "WhatsApp",
+        facebook: "Facebook",
+        x: "X",
+        system: "System Share",
+        copyLink: "Copy Link",
+        copyText: "Copy Text",
+        copiedLink: "Link copied",
+        copiedText: "Text copied",
+        error: "Unable to complete share action.",
+      },
     },
     
     // Moment Alignment Detail
@@ -3675,6 +4013,52 @@ export const translations = {
           best3: "Patience with timing",
           avoid1: "Rushed decisions or commitments",
           avoid2: "Forcing action when flow is absent",
+        },
+      },
+    },
+
+    planetaryZikr: {
+      recommendedTitle: '{planet} - Recommended Zikr',
+      planets: {
+        sun: {
+          label: '☀️ Sun',
+          entries: {
+            yaAllah: { benefit: 'General remembrance and divine connection.' },
+            yaRahman: { benefit: 'For rizq (wealth and provision).' },
+            yaRaheem: { benefit: 'For fulfilling needs and resolving difficulties.' },
+            yaMalik: { benefit: 'For support and success in endeavors.' },
+            yaQuddus: { benefit: 'For purification, forgiveness, and spiritual cleansing.' },
+            yaSalam: { benefit: 'For inner peace and forgiveness.' },
+            yaMumin: { benefit: 'For protection from enemies.' },
+            yaHakim: { benefit: 'For wisdom, shahada, and blessings.' },
+            yaAdl: { benefit: 'For tawfiq and avoiding sinful actions.' },
+            yaBari: { benefit: 'For strength and overcoming enemies.' },
+            yaMusawwir: { benefit: 'To stay consistent in good deeds.' },
+            yaRafi: { benefit: 'For elevation, respect, and being loved.' },
+            yaHalim: { benefit: 'For calmness and patience.' },
+            yaBasir: { benefit: 'For clarity and insight.' },
+          },
+        },
+        venus: {
+          label: '♀️ Venus',
+          entries: {
+            yaGhaffar: { benefit: 'Increase in blessings and goodness.' },
+            yaWahhab: { benefit: 'For wealth and prosperity.' },
+            yaRazzaq: { benefit: 'For sustenance and provision.' },
+            yaQabid: { benefit: 'For abundance in different forms of wealth.' },
+            yaLatif: { benefit: 'For resolving difficulties and subtle ease.' },
+            yaJami: { benefit: 'For fixing relationships and marriage.' },
+          },
+        },
+        mars: {
+          label: '♂️ Mars',
+          sectionNote: 'Used for protection, defense, and overcoming enemies.',
+          entries: {
+            yaKhafid: { benefit: 'Protection from enemies and their plots.' },
+            yaMuzil: { benefit: 'To overcome and humble enemies.' },
+            yaJabbar: { benefit: 'For strength against oppression or harm.', note: 'especially Tuesday' },
+            yaQahhar: { benefit: 'For overpowering enemies.' },
+          },
         },
       },
     },
@@ -3926,6 +4310,8 @@ export const translations = {
       mother: {
         title: "Mother's Name (Optional)",
         subtitle: "Used for enhanced calculations in some features",
+        latin: "Mother's Latin Name",
+        latinPlaceholder: "e.g., Fatima, Khadija, Aisha",
         arabic: "Mother's Arabic Name",
         arabicPlaceholder: "أدخل اسم والدتك بالعربية",
       },
@@ -6378,6 +6764,47 @@ export const translations = {
           selectIntention: "Please select an intention",
           calculationFailed: "Calculation failed. Please check your inputs.",
         },
+      },
+
+      resultsView: {
+        overview: "Overview",
+        spiritual: "Spiritual",
+        elemental: "Elemental",
+        planetary: "Planetary",
+        advice: "Advice",
+        compatibilityOverview: "Compatibility Overview",
+        overallScore: "Overall Compatibility Score",
+        whatThisMeans: "What This Means",
+        enhancing: "Guidance to enhance your harmony",
+        personalizeAnalysis: "✨ Personalize Analysis",
+        yourPersonalInsight: "💫 Your Personal Insight",
+        spiritualLabel: "Spiritual",
+        elementalLabel: "Elemental",
+        planetaryLabel: "Planetary",
+        spiritualDestiny: "Spiritual Destiny",
+        spiritualDestinyDesc: "Spiritual path and harmony",
+        quality: "Quality",
+        sacredNumber: "Sacred Number",
+        elementalTemperament: "Elemental Temperament",
+        elementalTemperamentDesc: "Balance of natural energies",
+        cosmicHarmony: "Cosmic Harmony",
+        cosmicHarmonyDesc: "Planetary influences",
+        recommendations: "Recommendations",
+        enterTwoNames: "Enter Two Names",
+        enterTwoNamesSubtitle: "Calculate compatibility using traditional Islamic numerology",
+        abjadSystem: "Abjad System",
+        person1: "Person 1",
+        person2: "Person 2",
+        latinName: "Latin Name (English/French)",
+        arabicNameRequired: "Arabic Name (Required)",
+        keyboard: "Keyboard",
+        arabicNamesRequired: "Arabic names are required for both people",
+        calculating: "Calculating...",
+        calculateCompatibility: "Calculate Compatibility",
+        transitMode: "Transit Mode",
+        planetaryHours: "Planetary Hours",
+        relationshipMode: "Relationship Mode",
+        nameCompatibility: "Name Compatibility",
       },
     },
 
@@ -9747,6 +10174,15 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           or: "or",
         },
       },
+
+      // Home screen result cards
+      yourSpiritualEssence: "Your Spiritual Essence",
+      coreSpiritualPattern: "Core Spiritual Pattern",
+      spiritualIndicators: "Spiritual Indicators",
+      element: "Element",
+      celestial: "Celestial",
+      hour: "Hour",
+      spiritualGuidance: "Spiritual Guidance",
     },
 
     // Day ruler labels
@@ -9859,6 +10295,116 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       "Saturn-Mars": "Saturn and Mars work together neutrally, tempering action with caution",
       "Saturn-Sun": "Saturn and the Sun face challenges between limitation and self-expression",
       "Saturn-Moon": "Saturn and the Moon struggle between emotional warmth and cold reserve",
+    },
+
+    // AI Settings screen
+    aiSettingsScreen: {
+      headerTitle: "✨ AI Settings",
+      headerSubtitle: "Optional reflection assistance",
+      loadingSettings: "Loading settings...",
+      unavailableNotice: "AI features are currently unavailable. Please check your configuration.",
+      aiUnavailable: "AI is currently unavailable",
+      toggle: {
+        title: "AI Reflection",
+        desc: "Improve wording clarity with AI",
+      },
+      whatAIDoes: {
+        title: "What AI Does",
+        item1: "Improves wording clarity",
+        item2: "Adds warmth and reflection",
+        item3: "Expands reflection questions",
+        item4: "Adapts tone to your preference",
+      },
+      whatAIDoesNot: {
+        title: "What AI Does NOT Do",
+        item1: "Predict outcomes or make decisions",
+        item2: "Give religious rulings (fatwā)",
+        item3: "Replace prayer or istikhārah",
+        item4: "Compute timing, elements, or cycles",
+      },
+      disclaimer: {
+        title: "Important: AI Assistance",
+        body: "AI helps rephrase guidance text for clarity. It does NOT:\n\n• Make predictions or decisions\n• Give religious rulings\n• Replace prayer or istikhārah\n• Add new interpretations\n\nAI only polishes wording based on calculations already made by the app.\n\nAll your data stays local. No cloud storage.",
+        cancel: "Cancel",
+        enable: "Enable AI",
+      },
+      tonePreference: {
+        title: "Tone Preference",
+        concise: "Concise",
+        conciseDesc: "Short and direct. Clear, simple language.",
+        calm: "Calm",
+        calmDesc: "Gentle and soothing. Peaceful reflection.",
+        reflective: "Reflective",
+        reflectiveDesc: "Deeper contemplation. Thoughtful questions.",
+        poetic: "Poetic",
+        poeticDesc: "Beautiful, elevated language. Light metaphors.",
+      },
+      privacy: {
+        title: "Your Privacy",
+        body: "• All data stays on your device\n• No cloud storage of personal reflections\n• No logging of your questions\n• No training on your data\n• If AI fails, app uses local text",
+      },
+      reset: {
+        button: "Reset to Default",
+        title: "Reset AI Settings",
+        message: "This will turn off AI and reset all preferences. Continue?",
+        cancel: "Cancel",
+        confirm: "Reset",
+      },
+      errors: {
+        loadFailed: "Failed to load AI settings.",
+      },
+    },
+
+    // Email Verification screen
+    emailVerificationScreen: {
+      title: "Verify Your Email",
+      sentMessage: "We've sent a verification link to:",
+      nextSteps: "Next Steps:",
+      step1: "Check your inbox (and spam folder)",
+      step2: "Click the verification link in the email",
+      step3: "Return here and sign in with your email",
+      resendButton: "Resend Email",
+      resendCountdown: "Resend in {seconds}s",
+      backToSignIn: "Back to Sign In",
+      securityNote: "Your data is encrypted and secure. We never share your personal information.",
+      emailSentTitle: "✅ Email Sent!",
+      emailSentMessage: "Please check your inbox (and spam folder).",
+      errorTitle: "Error",
+      resendFailed: "Failed to resend email. Please try again later.",
+    },
+
+    // Name Destiny Home screen
+    nameDestinyHome: {
+      headerTitle: "Discover Your Name Destiny",
+      headerSubtitle: "Discover the spiritual essence encoded in your name",
+      chooseReadingType: "Choose Your Reading Type",
+      exploreName: "Explore a Name",
+      exploreDesc: "Discover the spiritual meaning and general characteristics of any name",
+      exploreBest: "Best for: Learning about names, cultural exploration, general insights",
+      personalReading: "My Personal Reading",
+      personalDesc: "Get YOUR unique spiritual profile - personalized to your exact soul blueprint",
+      personalBest: "Best for: Self-discovery, spiritual guidance, personal transformation",
+      recommended: "⭐ Recommended",
+      nameLatinLabel: "Name (Latin script)",
+      nameLatinRequired: "Name is required",
+      nameLatinPlaceholder: "e.g., Fatima, Ibrahima, Amadou",
+      nameLatinHelper: "Type your name in Latin letters - we'll show the Arabic equivalent",
+      arabicOptional: "Or in Arabic (Optional)",
+      showKeyboard: "⌨️ Show Keyboard",
+      hideKeyboard: "⌨️ Hide",
+      motherNameLabel: "Mother's Name",
+      motherNameRequired: "Mother's name is required for personal reading",
+      motherNameNote: "Your unique reading - requires mother's name",
+      motherLatinLabel: "Type in Latin letters",
+      motherLatinPlaceholder: "e.g., Fatima, Khadija, Aisha",
+      motherArabicOptional: "Or in Arabic (Optional)",
+      analyzeButton: "Analyze Name ✨",
+      advancedOptions: "Advanced Options",
+      abjadSystem: "Abjad System",
+      mashriqi: "Mashriqi",
+      mashriqiDesc: "Used in the Eastern Arab world",
+      maghribi: "Maghribi",
+      maghribiDesc: "Used in North Africa",
     },
 
     // Elemental relationship descriptions
@@ -10082,6 +10628,13 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         messageTension: "La Lune {moonElement} d'aujourd'hui crée une tension dynamique avec votre nature {personalElement}. Ce n'est pas négatif — c'est une croissance par l'équilibre. Avancez avec présence.",
         messageBalanced: "La Lune {moonElement} d'aujourd'hui apporte une énergie neutre à votre essence {personalElement}. Cela ouvre un espace de choix conscient — adaptez-vous selon le besoin.",
       },
+      practicesCard: {
+        title: "Pratiques Spirituelles",
+        tabAdhkar: "Adhkār",
+        tabAngels: "Anges",
+        tabQuran: "Coran",
+        tabWafq: "Wafq",
+      },
     },
 
     notifications: {
@@ -10152,6 +10705,182 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         openDailyGuidance: "Ouvrir Énergie du Jour",
       },
     },
+
+    authScreen: {
+      brand: {
+        title: "Asrariya ✦",
+        subtitle: "Numérologie sacrée et mysticisme",
+      },
+      or: "ou",
+      privacyNotice: "Vos données sont chiffrées et sécurisées. Nous ne partageons jamais vos informations personnelles.",
+      actions: {
+        continue: "Continuer",
+        signIn: "Se Connecter",
+        creatingAccount: "Création du compte...",
+        signingIn: "Connexion...",
+      },
+      backend: {
+        unreachableTitle: "Backend inaccessible",
+        notAvailableTitle: "Comptes indisponibles",
+        unreachableMessage: "Impossible de joindre le backend. Vous pouvez tout de même tenter l'inscription/connexion pour voir l'erreur exacte.",
+        notConfiguredMessage: "Configuration backend manquante. Vous pouvez tout de même tenter l'inscription/connexion pour voir l'erreur exacte.",
+        missingPrefix: "Manquant",
+      },
+      benefits: {
+        signupTitle: "Créer un Compte",
+        signinTitle: "Bon retour",
+        signupSubtitle: "Débloquez les fonctionnalités premium et la synchronisation multi-appareils",
+        signinSubtitle: "Connectez-vous pour accéder à votre compte",
+        items: {
+          sync: "Synchronisation cloud entre appareils",
+          backup: "Sauvegarde sécurisée de vos données",
+          premium: "Accès aux fonctionnalités premium",
+        },
+      },
+      oauth: {
+        continueWith: "ou continuer avec",
+      },
+      alerts: {
+        accountCreated: {
+          title: "✅ Compte créé !",
+          message: "Veuillez compléter votre profil pour débloquer des fonctionnalités personnalisées.",
+        },
+        accountExists: {
+          title: "Compte existant",
+          message: "Cet email est déjà enregistré. Veuillez vous connecter.",
+        },
+        emailVerificationRequired: {
+          title: "Vérification email requise",
+          message: "Veuillez vérifier votre adresse email, puis revenez vous connecter. Si cela persiste, la vérification email est encore activée côté backend.",
+        },
+        emailNotConfirmed: {
+          title: "Email non confirmé",
+          message: "Veuillez vérifier votre email et cliquer sur le lien de confirmation avant de vous connecter. Vérifiez vos spams si nécessaire.",
+        },
+        emailRequired: {
+          title: "Email requis",
+          message: "Veuillez d'abord saisir votre email.",
+        },
+        resetLinkSent: {
+          title: "Lien de réinitialisation envoyé",
+          message: "Vérifiez votre email pour le lien de réinitialisation. Ouvrez-le sur cet appareil pour continuer dans l'application.",
+        },
+        welcomeBack: {
+          title: "Bon retour !",
+          profileRestored: "Votre profil a été restauré.",
+          completeProfile: "Veuillez compléter votre profil pour débloquer des fonctionnalités personnalisées.",
+        },
+        welcome: {
+          title: "Bienvenue !",
+          completeProfile: "Veuillez compléter votre profil pour débloquer des fonctionnalités personnalisées.",
+        },
+      },
+      errors: {
+        emailExists: "Cet email est déjà enregistré. Essayez plutôt de vous connecter.",
+        invalidEmail: "Veuillez saisir une adresse email valide.",
+        passwordMin: "Le mot de passe doit contenir au moins 6 caractères.",
+        network: "Pas de connexion Internet. Vérifiez votre réseau.",
+        notConfigured: "Le backend n'est pas configuré. Vérifiez les variables d'environnement.",
+        timeout: "La vérification backend a expiré. Veuillez réessayer.",
+        healthFailed: "Le backend est inaccessible. Vérifiez votre réseau et réessayez.",
+        default: "Une erreur s'est produite. Veuillez réessayer.",
+        fillFields: "Veuillez remplir tous les champs",
+        passwordMismatch: "Les mots de passe ne correspondent pas",
+        unexpected: "Une erreur inattendue s'est produite",
+        signInFailed: "Échec de la connexion",
+        resetEmailFailed: "Échec de l'envoi de l'email de réinitialisation",
+        oauthFailed: "Échec de la connexion avec OAuth",
+      },
+    },
+
+    profileScreen: {
+      actions: {
+        goHome: "Accueil",
+      },
+      completion: {
+        missingFields: "Ajoutez {fields} pour débloquer toute la personnalisation",
+      },
+      location: {
+        permissionTitle: "Permission de localisation",
+        permissionMessage: "La permission de localisation est requise pour détecter automatiquement votre position.",
+        errorTitle: "Erreur de localisation",
+        errorMessage: "Impossible d'obtenir la localisation",
+        updatedTitle: "Localisation mise à jour",
+        updatedMessage: "Définie sur : {location}",
+      },
+      birthLocation: {
+        permissionTitle: "Permission de localisation",
+        permissionMessage: "La permission de localisation est requise pour détecter automatiquement les coordonnées de votre lieu de naissance.",
+        errorTitle: "Erreur de localisation",
+        errorMessage: "Impossible d'obtenir le lieu de naissance",
+        updatedTitle: "Lieu de naissance mis à jour",
+        updatedMessage: "Défini sur : {location}",
+        invalidTitle: "Lieu de naissance",
+        invalidMessage: "Veuillez saisir une latitude et une longitude valides.",
+      },
+      save: {
+        chooseNextTitle: "Profil enregistré",
+        chooseNextMessage: "Souhaitez-vous vous connecter/créer un compte, ou continuer vers l'application ?",
+        successTitle: "Profil enregistré",
+        successMessage: "Vos données de personnalisation ont été mises à jour.",
+        errorMessage: "Échec de l'enregistrement du profil. Veuillez réessayer.",
+      },
+      deleteAccount: {
+        deletedMessage: "Votre compte a été supprimé. Vous pouvez continuer à utiliser Asrariya en mode invité.",
+      },
+    },
+
+    notificationSettingsScreen: {
+      loading: "Chargement des préférences...",
+      permissions: {
+        requiredTitle: "Permissions requises",
+        requiredMessage: "Veuillez activer les notifications dans les paramètres de votre appareil pour recevoir les rappels et la guidance spirituelle.",
+        disabledTitle: "Notifications désactivées",
+        disabledMessage: "Activez les notifications pour recevoir les rappels de prière, alertes d'heures harmonieuses et guidance spirituelle",
+        enableButton: "Activer les notifications",
+      },
+      prayer: {
+        title: "Notifications de prière",
+        info: "Les notifications de prière sont gérées dans les paramètres Adhan",
+      },
+      harmony: {
+        title: "Heures harmonieuses",
+        enable: "Activer les notifications d'harmonie",
+        favorable: {
+          label: "Heures favorables",
+          subtitle: "Notifier quand un timing très favorable commence",
+        },
+        transformative: {
+          label: "Heures transformatrices",
+          subtitle: "Notifier pour les opportunités de croissance",
+        },
+        delicate: {
+          label: "Périodes délicates",
+          subtitle: "Alerter sur les périodes difficiles",
+        },
+      },
+      divineTiming: {
+        title: "Moment divin",
+        enable: "Activer le Moment divin",
+        morning: {
+          label: "Briefing spirituel du matin",
+          subtitle: "Énergie quotidienne à {time}",
+        },
+        element: {
+          label: "Alertes d'alignement élémentaire",
+          subtitle: "Quand votre élément est fortement activé",
+        },
+      },
+      quietHours: {
+        title: "Heures calmes",
+        info: "Aucune notification (sauf prières) entre {start} - {end}",
+      },
+      rateLimit: {
+        title: "Limitation",
+        info: "Maximum de {count} notifications par jour pour éviter la surcharge",
+      },
+      footer: "Les notifications utilisent les réglages Ne pas déranger de votre appareil",
+    },
     
     // Widgets (Cartes de la Page d'Accueil)
     widgets: {
@@ -10161,6 +10890,14 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         cta: "Voir impact →",
         timeScale: "Long terme (semaines/mois)",
         updated: "Mis à jour il y a {time}",
+        labels: {
+          yourSign: "Ton signe",
+          skyNow: "Ciel",
+        },
+        fallback: {
+          setZodiac: "Définissez votre signe pour personnaliser.",
+          noTransit: "Aucun transit actuel pour votre signe",
+        },
       },
       dailyEnergy: {
         title: "Énergie du Jour",
@@ -10788,6 +11525,13 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       todayProgress: "Aujourd'hui",
       allTimeProgress: "Total",
       favorites: "Favoris",
+      practices: "Pratiques",
+      myPractices: "Mes Pratiques",
+      addDhikr: "Ajouter un Dhikr",
+      emptyState: {
+        title: "Commencez votre pratique",
+        subtitle: "Ajoutez un dhikr pour commencer votre voyage spirituel",
+      },
       noFavorites: "Pas de favoris",
       noFavoritesHint: "Appuyez sur le cœur sur n'importe quel dhikr pour l'ajouter à vos favoris",
       goalReached: "Objectif atteint !",
@@ -10819,6 +11563,29 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         cancel: "Annuler",
         customAmount: "Montant personnalisé",
         enterNumber: "Entrez un nombre...",
+      },
+      modal: {
+        newDhikr: "Nouveau Dhikr",
+        back: "Retour",
+        chooseType: "Choisir un type de Dhikr",
+        chooseTypeSubtitle: "Sélectionnez le type de pratique spirituelle",
+        chooseSalawat: "Choisir une Ṣalawāt",
+        chooseSalawatSubtitle: "Prières sur le Prophète ﷺ de différentes traditions",
+        chooseDivineName: "Choisir un Nom Divin",
+        chooseDivineNameSubtitle: "Les Beaux Noms d'Allah pour l'invocation",
+        customWird: "Wird Personnalisé",
+        customWirdSubtitle: "Créez votre propre pratique de dhikr",
+        recommendedPerDay: "Recommandé : {count}/jour",
+        fields: {
+          title: "Titre *",
+          titlePlaceholder: "Ex: Mon Dhikr",
+          arabicText: "Texte Arabe *",
+          transliteration: "Translittération",
+          meaning: "Signification",
+          meaningPlaceholder: "Au nom de Dieu",
+          dailyTarget: "Objectif Quotidien",
+          addWird: "Ajouter le Wird",
+        },
       },
     },
 
@@ -10963,6 +11730,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
     
     // Home Screen
     home: {
+      profileBanner: {
+        title: "Complétez votre profil",
+        subtitle: "Ajoutez votre date de naissance pour débloquer les fonctionnalités personnalisées",
+      },
       daily: {
         summary: "Énergies équilibrées",
         bestFor: "Tâches routinières",
@@ -11020,6 +11791,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           summaryTemplate: "{a} et {b} — {tone}",
           youLabel: "Vous",
           momentLabel: "Moment",
+          addDobPrompt: "Ajoutez votre date de naissance pour activer l'alignement du moment",
+        },
+        nextPrayer: {
+          inTime: "dans {duration}",
         },
         nextPlanetaryHour: {
           title: "Prochaine heure planétaire",
@@ -12474,6 +13249,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       todayBlessing: "Bénédiction d'Aujourd'hui",
       tomorrow: "Demain",
       tapToSetLocation: "Appuyez pour définir l'emplacement",
+      tapToViewDetails: "Appuyez pour voir les détails",
     },
 
     // Énergie du Jour (clés partagées)
@@ -12846,6 +13622,29 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         headerSubtitle: "Long terme",
         explanation: "Indique où se trouve une planète dans le zodiaque — sa position à long terme qui change sur des semaines, des mois ou des années.",
         personalizedNote: "Personnalisé à votre nature élémentaire",
+        approximationUnreliable: "Approximation (non fiable)",
+        transitType: {
+          personal: "Dans ton signe",
+          collective: "Météo cosmique",
+        },
+        zodiacSystem: {
+          label: "Zodiaque",
+          tropical: "Tropical",
+          sidereal: "Sidéreal (Lahiri)",
+          signSuffix: "signe",
+        },
+        degreeStage: {
+          full: {
+            entry: "🔵 Phase d’entrée",
+            stabilization: "🟢 Phase de pointe",
+            completion: "🟠 Phase de clôture",
+          },
+          badge: {
+            entry: "Entrée",
+            stabilization: "Pic",
+            completion: "Clôture",
+          },
+        },
         practices: {
           title: "Pratiques Planétaires Spécifiques",
           minutesShort: "min",
@@ -12892,9 +13691,61 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             },
           },
         },
+        advancedPractice: {
+          essences: {
+            title: "Essences Recommandées",
+            description: "Utiliser ces parfums pour améliorer vos pratiques {planet}",
+            howToLabel: "💡 Comment Utiliser:",
+            step1: "Brûler comme encens avant la pratique",
+            step2: "Appliquer comme parfum naturel",
+            step3: "Garder dans l'espace de pratique",
+          },
+          talisman: {
+            title: "Orientation Talisman (Optionnel)",
+            description: "Pour les praticiens avancés travaillant avec des outils spirituels écrits:",
+            format: "Format:",
+            bestDay: "🗓️ Meilleur Jour:",
+            bestHour: "⏰ Meilleure Heure:",
+            warning: "La création de talismans nécessite des connaissances et une autorisation appropriées. Consultez un enseignant qualifié avant de tenter.",
+          },
+          timing: {
+            title: "Timing Optimal",
+            description: "Meilleurs moments pour les pratiques {planet}:",
+          },
+          preparation: {
+            title: "Étapes de Préparation",
+            description: "Suivez ces étapes pour préparer votre pratique:",
+          },
+          angels: {
+            title: "👼 Avancé: Connexion Angélique",
+            warning: "Pour praticiens expérimentés uniquement",
+            description: "Travailler avec des intermédiaires spirituels:",
+            prerequisites: {
+              label: "📚 Prérequis:",
+              study: "Étude sous un enseignant qualifié",
+              mastery: "Maîtrise des pratiques de base",
+              protection: "Compréhension de la protection spirituelle",
+              permission: "Permission du shaykh",
+            },
+          },
+        },
         summary: {
           bestNow: "Les plus fortes maintenant",
           weakNow: "Les plus faibles maintenant",
+        },
+        allTransits: {
+          title: "Tous les Transits",
+          description: "Position actuelle de toutes les planètes dans les signes",
+          yourSign: "Ton signe",
+        },
+        nextDay: {
+          aboutDayRuler: "À Propos du Dirigeant",
+          dayRulerDescription: "{planet} gouverne {dayName} et porte l'énergie de l'élément {element}.",
+          elementalEnergy: "Énergie Élémentaire",
+          spiritualFocus: "Focus Spirituel",
+          bestActivities: "Meilleures Activités",
+          howToPrepare: "Comment se Préparer",
+          preparationBody: "Planifiez votre journée de demain en tenant compte de ces énergies. Fixez vos intentions la veille au soir et réfléchissez à la façon d'aligner vos actions avec le dirigeant du jour.",
         },
         
         currentTransit: "Transit Actuel",
@@ -12948,6 +13799,13 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             neutral: "Neutre",
             growth: "Croissance",
             challenge: "Défi",
+          },
+          labels: {
+            harmonious: "Harmonieux",
+            supportive: "Supportif",
+            neutral: "Neutre",
+            challenging: "Transformateur",
+            titleSuffix: "RÉSONANCE",
           },
           arabicTerms: {
             harmonious: "سَكِينَة",
@@ -13271,6 +14129,8 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           },
           status: {
             entry: "L'influence se forme. Concentrez-vous sur la purification, pas l'action.",
+            strengthModerate: "Ce transit a une force modérée. Le travail spirituel est soutenu avec un effort régulier.",
+            strengthWeak: "Ce transit est faible. Le travail spirituel demande plus de patience et de discipline.",
             strength: "Ce transit est à pleine puissance. Le travail spirituel est soutenu.",
             exit: "L'influence s'estompe. Sceller et protéger, ne pas initier.",
           },
@@ -13297,6 +14157,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             jupiter: "Arrogance, excès",
             saturn: "Travaux lourds sans guidance, désespoir",
           },
+          avoidLabel: "À éviter",
           recommendedDhikr: "Dhikr Recommandé",
           entryNote: "En phase d'entrée, concentrez-vous sur le dhikr général comme lā ilāha illa Llāh",
           exitNote: "En phase de sortie, concentrez-vous sur le dhikr protecteur et les ṣalawāt",
@@ -13308,6 +14169,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         // ─────────────────────────────────────────────────────────────────────
         practice: {
           title: "Pratique Spirituelle",
+          transitStrength: "Force du transit",
           phase: {
             entry: "Entrée",
             strength: "Actif",
@@ -13329,6 +14191,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             tomorrow: "Demain",
             activeNow: "Actif maintenant jusqu'à {end}",
             unavailable: "Données d'heure planétaire indisponibles",
+            units: {
+              hourShort: "h",
+              minuteShort: "min",
+            },
           },
           strength: {
             peak: "Pic",
@@ -13423,6 +14289,24 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       reciter: "Récitateur: Mishary Alafasy",
       audioLoading: "Chargement de l'audio...",
       continuousPlayback: "Lecture Continue",
+      shareAyah: "Partager le verset",
+      sajda: "Sajda",
+      loadingSurahAudio: "Chargement de l'audio de la sourate...",
+      changeFontSize: "Changer la taille de police",
+      chooseReciter: "Choisir un récitateur",
+      share: {
+        title: "Partager le Coran",
+        subtitle: "Diffusez ce verset avec bienveillance et rappel.",
+        whatsapp: "WhatsApp",
+        facebook: "Facebook",
+        x: "X",
+        system: "Partage système",
+        copyLink: "Copier le lien",
+        copyText: "Copier le texte",
+        copiedLink: "Lien copié",
+        copiedText: "Texte copié",
+        error: "Impossible d'effectuer ce partage.",
+      },
     },
     
     // Moment Alignment Detail
@@ -13615,6 +14499,52 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           best3: "Patience avec le timing",
           avoid1: "Décisions ou engagements précipités",
           avoid2: "Forcer l'action quand le flux est absent",
+        },
+      },
+    },
+
+    planetaryZikr: {
+      recommendedTitle: 'Dhikr recommande - {planet}',
+      planets: {
+        sun: {
+          label: '☀️ Soleil',
+          entries: {
+            yaAllah: { benefit: 'Rappel general et connexion divine.' },
+            yaRahman: { benefit: 'Pour le rizq, la richesse et la subsistance.' },
+            yaRaheem: { benefit: 'Pour l accomplissement des besoins et la resolution des difficultes.' },
+            yaMalik: { benefit: 'Pour le soutien et la reussite dans les entreprises.' },
+            yaQuddus: { benefit: 'Pour la purification, le pardon et le nettoyage spirituel.' },
+            yaSalam: { benefit: 'Pour la paix interieure et le pardon.' },
+            yaMumin: { benefit: 'Pour la protection contre les ennemis.' },
+            yaHakim: { benefit: 'Pour la sagesse, la shahada et les benedictions.' },
+            yaAdl: { benefit: 'Pour le tawfiq et l eloignement des actes fautifs.' },
+            yaBari: { benefit: 'Pour la force et le depassement des ennemis.' },
+            yaMusawwir: { benefit: 'Pour rester constant dans les bonnes oeuvres.' },
+            yaRafi: { benefit: 'Pour l elevation, le respect et l affection des gens.' },
+            yaHalim: { benefit: 'Pour le calme et la patience.' },
+            yaBasir: { benefit: 'Pour la clarte et la perspicacite.' },
+          },
+        },
+        venus: {
+          label: '♀️ Venus',
+          entries: {
+            yaGhaffar: { benefit: 'Augmentation des benedictions et du bien.' },
+            yaWahhab: { benefit: 'Pour la richesse et la prosperite.' },
+            yaRazzaq: { benefit: 'Pour la subsistance et la provision.' },
+            yaQabid: { benefit: 'Pour l abondance sous differentes formes de richesse.' },
+            yaLatif: { benefit: 'Pour resoudre les difficultes avec douceur et subtilite.' },
+            yaJami: { benefit: 'Pour reparer les relations et faciliter le mariage.' },
+          },
+        },
+        mars: {
+          label: '♂️ Mars',
+          sectionNote: 'Utilise pour la protection, la defense et le depassement des ennemis.',
+          entries: {
+            yaKhafid: { benefit: 'Protection contre les ennemis et leurs intrigues.' },
+            yaMuzil: { benefit: 'Pour vaincre et humilier les ennemis.' },
+            yaJabbar: { benefit: 'Pour la force face a l oppression ou au prejudice.', note: 'surtout le mardi' },
+            yaQahhar: { benefit: 'Pour dominer les ennemis.' },
+          },
         },
       },
     },
@@ -13865,6 +14795,8 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       mother: {
         title: "Nom de la mère (optionnel)",
         subtitle: "Utilisé pour des calculs avancés dans certaines fonctionnalités",
+        latin: "Nom latin de la mère",
+        latinPlaceholder: "p. ex., Fatima, Khadija, Aisha",
         arabic: "Nom arabe de la mère",
         arabicPlaceholder: "أدخل اسم والدتك بالعربية",
       },
@@ -16481,6 +17413,47 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
             },
           },
         },
+      },
+
+      resultsView: {
+        overview: "Vue d'ensemble",
+        spiritual: "Spirituel",
+        elemental: "Élémental",
+        planetary: "Planétaire",
+        advice: "Conseils",
+        compatibilityOverview: "Vue de Compatibilité",
+        overallScore: "Score Global de Compatibilité",
+        whatThisMeans: "Ce que cela signifie",
+        enhancing: "Conseils pour améliorer votre harmonie",
+        personalizeAnalysis: "✨ Personnaliser l'Analyse",
+        yourPersonalInsight: "💫 Perspective Personnelle",
+        spiritualLabel: "Spirituel",
+        elementalLabel: "Élémental",
+        planetaryLabel: "Planétaire",
+        spiritualDestiny: "Destinée Spirituelle",
+        spiritualDestinyDesc: "Chemin spirituel et harmonie",
+        quality: "Qualité",
+        sacredNumber: "Nombre Sacré",
+        elementalTemperament: "Tempérament Élémental",
+        elementalTemperamentDesc: "Équilibre des énergies naturelles",
+        cosmicHarmony: "Harmonie Cosmique",
+        cosmicHarmonyDesc: "Influences planétaires",
+        recommendations: "Recommandations",
+        enterTwoNames: "Entrez Deux Noms",
+        enterTwoNamesSubtitle: "Calculez la compatibilité en utilisant la numérologie islamique traditionnelle",
+        abjadSystem: "Système Abjad",
+        person1: "Personne 1",
+        person2: "Personne 2",
+        latinName: "Nom Latin (Anglais/Français)",
+        arabicNameRequired: "Nom Arabe (Requis)",
+        keyboard: "Clavier",
+        arabicNamesRequired: "Les noms arabes sont requis pour les deux personnes",
+        calculating: "Calcul...",
+        calculateCompatibility: "Calculer la Compatibilité",
+        transitMode: "Mode Transit",
+        planetaryHours: "Heures Planétaires",
+        relationshipMode: "Mode Relation",
+        nameCompatibility: "Compatibilité des Noms",
       },
     },
 
@@ -19980,6 +20953,15 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           or: "ou",
         },
       },
+
+      // Cartes de résultats de l'écran d'accueil
+      yourSpiritualEssence: "Votre Essence Spirituelle",
+      coreSpiritualPattern: "Schéma Spirituel Principal",
+      spiritualIndicators: "Indicateurs Spirituels",
+      element: "Élément",
+      celestial: "Céleste",
+      hour: "Heure",
+      spiritualGuidance: "Guidance Spirituelle",
     },
 
     // Labels des maîtres des jours
@@ -20081,6 +21063,116 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       "Saturn-Moon": "Saturne et la Lune luttent entre chaleur et réserve",
     },
 
+    // Écran Paramètres IA
+    aiSettingsScreen: {
+      headerTitle: "✨ Paramètres IA",
+      headerSubtitle: "Assistance optionnelle à la réflexion",
+      loadingSettings: "Chargement des paramètres...",
+      unavailableNotice: "Les fonctionnalités IA sont actuellement indisponibles. Veuillez vérifier votre configuration.",
+      aiUnavailable: "L'IA est actuellement indisponible",
+      toggle: {
+        title: "Réflexion IA",
+        desc: "Améliorer la clarté de la formulation avec l'IA",
+      },
+      whatAIDoes: {
+        title: "Ce que fait l'IA",
+        item1: "Améliore la clarté de la formulation",
+        item2: "Ajoute de la chaleur et de la réflexion",
+        item3: "Développe les questions de réflexion",
+        item4: "Adapte le ton à votre préférence",
+      },
+      whatAIDoesNot: {
+        title: "Ce que l'IA NE fait PAS",
+        item1: "Prédire les résultats ou prendre des décisions",
+        item2: "Donner des avis religieux (fatwā)",
+        item3: "Remplacer la prière ou l'istikhārah",
+        item4: "Calculer le timing, les éléments ou les cycles",
+      },
+      disclaimer: {
+        title: "Important : Assistance IA",
+        body: "L'IA aide à reformuler le texte d'orientation pour plus de clarté. Elle NE fait PAS :\n\n• De prédictions ou décisions\n• D'avis religieux\n• Remplacer la prière ou l'istikhārah\n• Ajouter de nouvelles interprétations\n\nL'IA ne fait que peaufiner la formulation basée sur les calculs déjà effectués par l'application.\n\nToutes vos données restent locales. Pas de stockage cloud.",
+        cancel: "Annuler",
+        enable: "Activer l'IA",
+      },
+      tonePreference: {
+        title: "Préférence de Ton",
+        concise: "Concis",
+        conciseDesc: "Court et direct. Langage clair et simple.",
+        calm: "Calme",
+        calmDesc: "Doux et apaisant. Réflexion paisible.",
+        reflective: "Réflexif",
+        reflectiveDesc: "Contemplation plus profonde. Questions réfléchies.",
+        poetic: "Poétique",
+        poeticDesc: "Langage beau et élevé. Métaphores légères.",
+      },
+      privacy: {
+        title: "Votre Confidentialité",
+        body: "• Toutes les données restent sur votre appareil\n• Pas de stockage cloud de vos réflexions personnelles\n• Pas de journalisation de vos questions\n• Pas d'entraînement sur vos données\n• Si l'IA échoue, l'application utilise le texte local",
+      },
+      reset: {
+        button: "Réinitialiser par défaut",
+        title: "Réinitialiser les Paramètres IA",
+        message: "Cela désactivera l'IA et réinitialisera toutes les préférences. Continuer ?",
+        cancel: "Annuler",
+        confirm: "Réinitialiser",
+      },
+      errors: {
+        loadFailed: "Échec du chargement des paramètres IA.",
+      },
+    },
+
+    // Écran Vérification Email
+    emailVerificationScreen: {
+      title: "Vérifiez votre email",
+      sentMessage: "Nous avons envoyé un lien de vérification à :",
+      nextSteps: "Prochaines étapes :",
+      step1: "Vérifiez votre boîte de réception (et les spams)",
+      step2: "Cliquez sur le lien de vérification dans l'email",
+      step3: "Revenez ici et connectez-vous avec votre email",
+      resendButton: "Renvoyer l'email",
+      resendCountdown: "Renvoi dans {seconds}s",
+      backToSignIn: "Retour à la connexion",
+      securityNote: "Vos données sont chiffrées et sécurisées. Nous ne partageons jamais vos informations personnelles.",
+      emailSentTitle: "✅ Email envoyé !",
+      emailSentMessage: "Veuillez vérifier votre boîte de réception (et les spams).",
+      errorTitle: "Erreur",
+      resendFailed: "Échec de renvoi de l'email. Veuillez réessayer plus tard.",
+    },
+
+    // Écran Destinée du Nom - Accueil
+    nameDestinyHome: {
+      headerTitle: "Découvrez la Destinée de votre Nom",
+      headerSubtitle: "Découvrez l'essence spirituelle encodée dans votre nom",
+      chooseReadingType: "Choisissez votre type de lecture",
+      exploreName: "Explorer un nom",
+      exploreDesc: "Découvrez la signification spirituelle et les caractéristiques générales de tout nom",
+      exploreBest: "Idéal pour : apprendre les noms, exploration culturelle, insights généraux",
+      personalReading: "Ma lecture personnelle",
+      personalDesc: "Obtenez VOTRE profil spirituel unique - personnalisé selon votre plan d'âme exact",
+      personalBest: "Idéal pour : connaissance de soi, guidance spirituelle, transformation personnelle",
+      recommended: "⭐ Recommandé",
+      nameLatinLabel: "Nom (en lettres latines)",
+      nameLatinRequired: "Le nom est requis",
+      nameLatinPlaceholder: "ex. Fatima, Ibrahim, Khadija",
+      nameLatinHelper: "Tapez votre nom en lettres latines - nous afficherons l'équivalent arabe",
+      arabicOptional: "Ou en arabe (Optionnel)",
+      showKeyboard: "⌨️ Afficher le clavier",
+      hideKeyboard: "⌨️ Masquer",
+      motherNameLabel: "Nom de la mère",
+      motherNameRequired: "Le nom de la mère est requis pour une lecture personnelle",
+      motherNameNote: "Votre lecture unique - nécessite le nom de la mère",
+      motherLatinLabel: "Tapez en lettres latines",
+      motherLatinPlaceholder: "ex. Fatima, Khadija, Aisha",
+      motherArabicOptional: "Ou en arabe (Optionnel)",
+      analyzeButton: "Analyser le nom ✨",
+      advancedOptions: "Options avancées",
+      abjadSystem: "Système Abjad",
+      mashriqi: "Mashriqi",
+      mashriqiDesc: "Utilisé dans le monde arabe oriental",
+      maghribi: "Maghribi",
+      maghribiDesc: "Utilisé en Afrique du Nord",
+    },
+
     // Relations élémentaires (French - simplified)
     elementalRelations: {
       "Fire-Fire": "Le Feu renforce le Feu — passion amplifiée",
@@ -20164,8 +21256,552 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     nav: {
       home: "الرئيسية",
       calculator: "الحاسبة",
+      letterCalculator: "حاسبة الحروف",
+      compatibility: "التوافق",
+      planetaryHours: "الساعات الكوكبية",
+      about: "حول التطبيق",
+      guidance: "الإرشاد",
       whoAmI: "مَن أنا",
       advanced: "الاستخارة",
+      menu: "القائمة",
+      quran: "القرآن",
+    },
+
+    drawer: {
+      profileSettings: "الملف الشخصي والإعدادات",
+      myProfile: "ملفي الشخصي",
+      aiSettings: "إعدادات الذكاء الاصطناعي",
+      tools: "الأدوات",
+      abjadCalculator: "حاسبة الأبجد",
+      nameDestiny: "قدر الاسم",
+      zikr: "الذكر والورد",
+      compatibility: "التوافق",
+      whoAmI: "مَن أنا",
+      divineTiming: "التوقيت الإلهي",
+      notifications: "الإشعارات",
+      notificationSettings: "إعدادات الإشعارات",
+      notificationTest: "اختبار الإشعارات",
+      app: "التطبيق",
+      about: "حول أسرار",
+      helpTutorial: "المساعدة والدليل",
+      language: "اللغة",
+      langEnglish: "English",
+      langFrench: "Français",
+      langArabic: "العربية",
+      guestMode: "وضع الضيف",
+      guestUser: "مستخدم ضيف",
+      levelGuest: "ضيف",
+      levelBasic: "أساسي",
+      levelEnhanced: "محسّن",
+      levelFull: "كامل",
+    },
+
+    // الحاسبة
+    calculator: {
+      title: "الحاسبة",
+      subtitle: "علم الأعداد الإسلامي بناءً على نظام الأبجد",
+      calculateLetterValues: "احسب قيم الحروف",
+      enterYourName: "أدخل اسمك",
+      namePlaceholder: "محمد",
+      calculateButton: "احسب",
+      latinText: "النص اللاتيني (إنجليزي/فرنسي)",
+      arabicText: "النص العربي",
+      autoTransliterates: "تحويل تلقائي إلى العربية • يدعم الأسماء الإنجليزية/الفرنسية",
+      showKeyboard: "إظهار لوحة المفاتيح",
+      hideKeyboard: "إخفاء لوحة المفاتيح",
+      examples: "أمثلة",
+      tabs: {
+        input: "الإدخال",
+        results: "النتائج",
+      },
+      form: {
+        calculationType: "نوع الحساب",
+        calculationTypeHelper: "ماذا تريد أن تحسب؟",
+        abjadSystem: "نظام الأبجد",
+        name: "الاسم",
+        yourName: "اسمك",
+        motherName: "اسم الأم",
+        phraseOrSentence: "عبارة أو جملة",
+        anyText: "أي نص",
+        pasteArabicText: "الصق النص العربي",
+      },
+      types: {
+        name: { title: "الاسم", subtitle: "تحليل اسم واحد" },
+        lineage: { title: "النسب", subtitle: "الاسم + الأم" },
+        phrase: { title: "العبارة", subtitle: "جملة أو نص" },
+        quran: { title: "القرآن", subtitle: "سورة + آية" },
+        dhikr: { title: "الذكر", subtitle: "الأسماء الإلهية" },
+        general: { title: "عام", subtitle: "حروف خام" },
+        birth: { title: "ملف الميلاد", subtitle: "التاريخ • الوقت • المكان" },
+      },
+      abjad: {
+        maghribi: "مغربي",
+        mashriqi: "مشرقي",
+      },
+      inputs: {
+        latinName: "الاسم اللاتيني (إنجليزي/فرنسي)",
+        latinNamePlaceholder: "مثال: Ibrahim, Amadou, Ousmane",
+        motherLatinPlaceholder: "مثال: Fatima, Khadija, Aisha",
+        arabicName: "الاسم العربي",
+        arabicNameRequired: "الاسم العربي *",
+        keyboard: "لوحة المفاتيح",
+        selectSurahAyah: "اختر السورة والآية",
+        selectDivineName: "اختر اسمًا إلهيًا",
+        orDivider: "— أو —",
+      },
+      options: {
+        removeVowels: "إزالة التشكيل",
+        ignorePunctuation: "تجاهل علامات الترقيم",
+        ignoreSpaces: "تجاهل المسافات",
+      },
+      actions: {
+        calculate: "احسب",
+        calculating: "جارٍ الحساب...",
+        close: "إغلاق",
+      },
+      results: {
+        tabs: {
+          core: "الأساسي",
+          insights: "الرؤى",
+          elements: "العناصر",
+          advanced: "متقدم",
+        },
+        sections: {
+          coreResults: "النتائج الأساسية",
+          nameInsights: "رؤى الاسم",
+          lineageInsights: "رؤى النسب",
+          phraseAnalysis: "تحليل العبارة",
+          quranResonance: "الرنين القرآني",
+          dhikrPractice: "ممارسة الذكر",
+          generalInsights: "رؤى عامة",
+          elementalAnalysis: "التحليل العنصري",
+          advancedMethods: "الطرق المتقدمة",
+        },
+        core: {
+          kabir: "كبير",
+          saghir: "صغير",
+          hadad: "حداد",
+          burj: "البرج",
+          grandTotal: "المجموع الكلي",
+          digitalRoot: "الجذر الرقمي",
+          mod4: "قسمة 4",
+          zodiac: "البروج",
+        },
+        labels: {
+          calculatedFrom: "محسوب من",
+          calculation: "الحساب",
+          intermediate: "وسيط",
+          value: "القيمة",
+          distance: "المسافة",
+          letter: "حرف",
+          letters: "حروف",
+        },
+        badges: {
+          maghribi: "مغربي",
+          mashriqi: "مشرقي",
+        },
+        types: {
+          name: "الاسم",
+          lineage: "النسب",
+          phrase: "العبارة",
+          quran: "القرآن",
+          dhikr: "الذكر",
+          general: "عام",
+        },
+        disclaimer: "هذه الرؤى للتأمل الروحي فقط. ليست بديلاً عن التوجيه الديني المتخصص.",
+        elements: {
+          fire: "النار",
+          water: "الماء",
+          air: "الهواء",
+          earth: "الأرض",
+        },
+        modalities: {
+          cardinal: "كاردينال",
+          fixed: "ثابت",
+          mutable: "متحول",
+        },
+        zodiac: {
+          element: "العنصر",
+          modality: "الطريقة",
+          planetaryRuler: "الكوكب الحاكم",
+          temperament: "المزاج",
+          spiritualQuality: "الجودة الروحية",
+          classicalReference: "المرجع الكلاسيكي",
+          calculation: "الحساب",
+          burjSign: "البرج",
+          intermediate: "وسيط",
+        },
+        essence: {
+          yourNumericalEssence: "جوهرك الرقمي",
+          coreNumberMeaning: "معنى الرقم الأساسي",
+          dominantElement: "العنصر الغالب",
+          spiritualGuidance: "الإرشاد الروحي",
+        },
+      },
+      noText: "لا نص للحساب",
+      awaitingCalculation: "في انتظار الحساب",
+    },
+
+    // التوافق
+    compatibility: {
+      title: "توافق العلاقات",
+      person1: "الشخص 1",
+      person2: "الشخص 2",
+      checkCompatibility: "تحقق من التوافق",
+      overallScore: "درجة الانسجام الكلية",
+      harmonyIndex: "مؤشر الانسجام",
+      harmonyIndexDesc: "التوافق العملي المعاش",
+      soulConnection: "الارتباط الروحي",
+      soulConnectionDesc: "رنين القدر الروحي",
+      independentMetric: "مقياس مستقل — لا يُحتسب ضمن الدرجة الكلية",
+      soulConnectionExplanation: "يصف الارتباط الروحي التناسب العميق بين الاسمين",
+      harmonyExplanation: "يصف الانسجام كيفية سير الحياة اليومية عملياً",
+      metricsNote: "قد يتطلب الارتباط الروحي القوي مجهوداً لتحقيق الانسجام",
+      spiritualHarmony: "الانسجام الروحي",
+      elementalHarmony: "الانسجام العنصري",
+      planetaryCompatibility: "التوافق الكوكبي",
+      coreCompatibility: "التوافق الأساسي (الأسماء الشخصية)",
+      coreCompatibilityDesc: "كيف تتفاعل شخصياتكم الواعية",
+      cosmicLayer: "الطبقة الكونية (التأثيرات الأمومية)",
+      cosmicLayerDesc: "كيف تتفاعل طاقاتكم الموروثة معاً",
+      cosmicLayerExplanation: "عنصر والدتك يمثل الظروف الكونية المؤثرة في ارتباطك الروحي. يتعلق هذا بالأنماط العاطفية الموروثة، وليس بشخصيتك الجوهرية.",
+      ratings: {
+        excellent: "ممتاز",
+        good: "جيد",
+        moderate: "متوسط",
+        challenging: "صعب",
+      },
+      tabs: {
+        calculate: "الحساب",
+        results: "النتائج",
+      },
+      form: {
+        chooseType: "اختر نوع التوافق",
+        type: {
+          personPerson: "شخص ↔ شخص",
+          personPersonDesc: "التوافق العام لأي علاقة",
+          personDivineName: "شخص ↔ اسم إلهي",
+          personDivineNameDesc: "كيف يتناسب الاسم الإلهي معك",
+          divineIntention: "اسم إلهي ↔ نية",
+          divineIntentionDesc: "مطابقة الأسماء لأهدافك الروحية",
+        },
+        context: {
+          title: "سياق العلاقة",
+          universal: "عام",
+          marriage: "زواج",
+          friendship: "صداقة",
+          family: "عائلة",
+          work: "عمل",
+        },
+        person1: "الشخص الأول",
+        person2: "الشخص الثاني",
+        displayNameOptional: "اسم العرض (اختياري)",
+        latinName: "الاسم اللاتيني (إنجليزي/فرنسي)",
+        arabicName: "الاسم العربي",
+        keyboard: "لوحة المفاتيح",
+        exampleAhmed: "مثال: أحمد",
+        exampleFatima: "مثال: فاطمة، إبراهيم، أمادو",
+        exampleKhadija: "مثال: فاطمة، خديجة، عائشة",
+        cta: "احسب التوافق",
+        newCalculation: "حساب جديد",
+        reflectionOnly: "⚖️ للتأمل فقط",
+        disclaimer: "هذا التحليل للتأمل الروحي ضمن علوم عِلم الأسرار التقليدية. لا يُشكّل أحكامًا دينية أو تنبؤات بالمستقبل أو ضمانات للنتائج.",
+        personInfo: {
+          title: "معلوماتك",
+          displayName: { label: "اسم العرض (اختياري)", placeholder: "مثال: أحمد" },
+          latinName: { label: "الاسم اللاتيني (إنجليزي/فرنسي)", placeholder: "مثال: فاطمة، إبراهيم، أمادو" },
+          arabicName: { label: "الاسم العربي *", placeholder: "أحمد" },
+          keyboard: "لوحة المفاتيح",
+        },
+        divineName: {
+          title: "اختر اسمًا إلهيًا",
+          placeholder: "اختر اسمًا إلهيًا",
+        },
+        cta2: {
+          calculateResonance: "احسب الرنين",
+          calculateCompatibility: "احسب التوافق",
+        },
+        disclaimer2: {
+          title: "⚖️ للتأمل فقط",
+          body: "هذا التحليل للتأمل الروحي ضمن علوم عِلم الأسرار التقليدية. لا يُشكّل أحكامًا دينية أو تنبؤات بالمستقبل أو ضمانات للنتائج.",
+        },
+        errors: {
+          arabicNameRequired: "الاسم العربي مطلوب",
+          divineNameRequired: "يرجى اختيار اسم إلهي",
+          calculationFailed: "فشل الحساب. يرجى مراجعة المدخلات.",
+          intentionRequired: "يرجى اختيار نية",
+        },
+        divineNameIntention: {
+          helper: "طابق اسمًا إلهيًا مع نيتك الروحية للحصول على إرشاد تقليدي.",
+          intentionSection: {
+            title: "نيتك الروحية",
+            placeholder: "اختر نيتك",
+            description: "ما هو هدفك الروحي؟",
+          },
+          divineNameSection: {
+            title: "الاسم الإلهي للتقييم",
+            placeholder: "اختر اسمًا إلهيًا",
+            hint: "اختر الاسم الإلهي الذي تريد مواءمته مع هذه النية.",
+          },
+          intentionPicker: { title: "اختر النية" },
+          divineNamePicker: { title: "اختر الاسم الإلهي" },
+          cta: "قيّم التوافق",
+          whyMatters: "تُرشد المصادر التقليدية إلى أي الأسماء يتوافق مع نوايا معينة.",
+          results: {
+            title: "الاسم الإلهي لنيتك",
+            tabs: {
+              alignment: "التوافق",
+              alternatives: "البدائل",
+              guidance: "الإرشاد",
+            },
+            alignment: {
+              optimal: "مثالي",
+              suitable: "مناسب",
+              neutral: "محايد",
+              notRecommended: "غير موصى به",
+            },
+            alignmentSubtext: {
+              optimal: "تطابق مثالي لنيتك",
+              suitable: "اختيار جيد لنيتك",
+              neutral: "قد يصلح، لكن فكر في البدائل",
+              notRecommended: "غير موصى به لهذه النية",
+            },
+            sections: {
+              aboutName: "عن هذا الاسم الإلهي",
+              traditionalUses: "📖 الاستخدامات التقليدية",
+              spiritualInfluence: "🌟 التأثير الروحي",
+              alternatives: "✨ أسماء إلهية بديلة",
+              alternativesDesc: "قد تدعم هذه الأسماء نيتك بشكل أفضل:",
+              recommended: "موصى به",
+            },
+            intentions: {
+              clarity: "الوضوح",
+              patience: "الصبر",
+              provision: "الرزق",
+              healing: "الشفاء",
+              protection: "الحماية",
+              guidance: "الهداية",
+              strength: "القوة",
+              peace: "السلام",
+              knowledge: "العلم",
+              forgiveness: "المغفرة",
+            },
+            speed: {
+              fast: "سريع",
+              gradual: "تدريجي",
+              subtle: "خفي",
+              hidden: "مستور",
+            },
+            expectation: { title: "ماذا تتوقع" },
+            guidance: {
+              title: "🧭 الإرشاد الروحي",
+              howToUse: { title: "🙏 كيفية التعامل مع هذا الاسم" },
+              steps: {
+                step1: { title: "طهّر نيتك", desc: "ابدأ بنية صادقة لا تبتغي إلا رضا الله." },
+                step2: { title: "تأمل المعنى", desc: "تأمل كيف يتجلى هذا الاسم في حياتك والخلق." },
+                step3: { title: "ادعُ بخشوع", desc: "ادعُ الله بهذا الاسم بتواضع وتوكل." },
+              },
+              disclaimer: "هذا إرشاد روحي فقط. الأسماء الإلهية لله وحده. تعتمد النتائج على الإخلاص والصبر وحكمة الله.",
+            },
+          },
+        },
+      },
+      tags: {
+        strength: "القوة",
+        protection: "الحماية",
+        provision: "الرزق",
+        guidance: "الهداية",
+        clarity: "الوضوح",
+        patience: "الصبر",
+        peace: "السلام",
+        healing: "الشفاء",
+        knowledge: "العلم",
+        forgiveness: "المغفرة",
+      },
+
+      // نتائج التوافق - عناوين الأقسام
+      resultsView: {
+        overview: "نظرة عامة",
+        spiritual: "روحي",
+        elemental: "عنصري",
+        planetary: "كوكبي",
+        advice: "نصائح",
+        compatibilityOverview: "نظرة عامة على التوافق",
+        overallScore: "درجة التوافق الكلية",
+        whatThisMeans: "ما يعنيه هذا",
+        enhancing: "جارٍ التحسين...",
+        personalizeAnalysis: "✨ خصّص التحليل",
+        yourPersonalInsight: "💫 رؤيتك الشخصية",
+        spiritualLabel: "روحي",
+        elementalLabel: "عنصري",
+        planetaryLabel: "كوكبي",
+        spiritualDestiny: "القدر الروحي",
+        spiritualDestinyDesc: "المسار الروحي والانسجام",
+        quality: "الجودة",
+        sacredNumber: "الرقم المقدس",
+        elementalTemperament: "المزاج العنصري",
+        elementalTemperamentDesc: "توازن الطاقات الطبيعية",
+        cosmicHarmony: "الانسجام الكوني",
+        cosmicHarmonyDesc: "التأثيرات الكوكبية",
+        recommendations: "التوصيات",
+        elementalRelationship: "العلاقة العنصرية",
+        enterTwoNames: "أدخل اسمين",
+        enterTwoNamesSubtitle: "احسب التوافق باستخدام علم الأعداد الإسلامي التقليدي",
+        abjadSystem: "نظام الأبجد",
+        person1: "الشخص 1",
+        person2: "الشخص 2",
+        latinName: "الاسم اللاتيني (إنجليزي/فرنسي)",
+        arabicNameRequired: "الاسم العربي (مطلوب)",
+        keyboard: "⌨️ لوحة المفاتيح",
+        arabicNamesRequired: "الأسماء العربية مطلوبة لكلا الشخصين",
+        calculating: "جارٍ الحساب...",
+        calculateCompatibility: "احسب التوافق",
+        transitMode: "وضع العبور",
+        planetaryHours: "الساعات الكوكبية",
+        relationshipMode: "وضع العلاقة",
+        nameCompatibility: "توافق الأسماء",
+      },
+    },
+
+    // Planet names
+    planets: {
+      sun: "الشمس",
+      moon: "القمر",
+      mars: "المريخ",
+      mercury: "عطارد",
+      jupiter: "المشتري",
+      venus: "الزهرة",
+      saturn: "زحل",
+      sunArabic: "الشمس",
+      moonArabic: "القمر",
+      marsArabic: "المريخ",
+      mercuryArabic: "عطارد",
+      jupiterArabic: "المشتري",
+      venusArabic: "الزهرة",
+      saturnArabic: "زحل",
+    },
+
+    // Day names
+    days: {
+      sunday: "الأحد",
+      monday: "الإثنين",
+      tuesday: "الثلاثاء",
+      wednesday: "الأربعاء",
+      thursday: "الخميس",
+      friday: "الجمعة",
+      saturday: "السبت",
+    },
+
+    quran: {
+      title: "القرآن",
+      subtitle: "القرآن الكريم - كامل مع الترجمات",
+      allSurahs: "جميع السور (114)",
+      surah: "سورة",
+      ayah: "آية",
+      ayahs: "آيات",
+      searchPlaceholder: "ابحث بالاسم أو الرقم...",
+      results: "النتائج",
+      continueReading: "متابعة القراءة",
+      lastRead: "آخر قراءة",
+      loading: "جارٍ التحميل...",
+      loadingSurah: "جارٍ تحميل السورة...",
+      loadingSurahAudio: "جارٍ تحميل صوت السورة...",
+      errorLoading: "تعذر تحميل القرآن. يرجى التحقق من الاتصال والمحاولة مرة أخرى.",
+      bookmarks: "العلامات المرجعية",
+      noBookmarks: "لا توجد علامات مرجعية بعد",
+      noBookmarksDesc: "اضغط مطولًا على أي آية لإضافتها إلى العلامات المرجعية",
+      removeBookmark: "إزالة العلامة المرجعية",
+      removeBookmarkConfirm: "هل أنت متأكد أنك تريد إزالة هذه العلامة المرجعية؟",
+      bookmarkError: "تعذر حفظ العلامة المرجعية. يرجى المحاولة مرة أخرى.",
+      continuousPlayback: "تشغيل مستمر",
+      shareAyah: "مشاركة الآية",
+      sajda: "سجدة",
+      changeFontSize: "تغيير حجم الخط",
+      chooseReciter: "اختر القارئ",
+      share: {
+        title: "مشاركة القرآن",
+        subtitle: "انشر هذه الآية بالخير والذكر.",
+        whatsapp: "واتساب",
+        facebook: "فيسبوك",
+        x: "X",
+        system: "مشاركة النظام",
+        copyLink: "نسخ الرابط",
+        copyText: "نسخ النص",
+        copiedLink: "تم نسخ الرابط",
+        copiedText: "تم نسخ النص",
+        error: "تعذر إتمام عملية المشاركة.",
+      },
+    },
+
+    // Zikr Module
+    zikr: {
+      title: "الذكر والورد",
+      subtitle: "ذكر الله لسكينة القلب",
+      todayProgress: "اليوم",
+      allTimeProgress: "الإجمالي",
+      favorites: "المفضلة",
+      practices: "الممارسات",
+      myPractices: "ممارساتي",
+      addDhikr: "إضافة ذكر",
+      emptyState: {
+        title: "ابدأ ممارستك",
+        subtitle: "أضف ذكرًا لبدء رحلتك الروحية",
+      },
+      noFavorites: "لا توجد مفضلات بعد",
+      noFavoritesHint: "اضغط على القلب في أي ذكر لإضافته إلى المفضلة",
+      goalReached: "تم بلوغ الهدف!",
+      categories: {
+        all: "الكل",
+        favorites: "المفضلة",
+        istighfar: "الاستغفار",
+        salawat: "الصلاة على النبي",
+        divineNames: "الأسماء الإلهية",
+        morningEvening: "الصباح والمساء",
+        custom: "مخصص",
+      },
+      sessions: {
+        fajr: "الفجر",
+        morning: "الصباح",
+        dhuhr: "الظهر",
+        asr: "العصر",
+        maghrib: "المغرب",
+        isha: "العشاء",
+        tahajjud: "التهجد",
+        other: "أخرى",
+      },
+      stats: {
+        streak: "أيام متتالية",
+        total: "الإجمالي",
+      },
+      actions: {
+        add: "إضافة",
+        cancel: "إلغاء",
+        customAmount: "مقدار مخصص",
+        enterNumber: "أدخل رقمًا...",
+      },
+      modal: {
+        newDhikr: "ذكر جديد",
+        back: "رجوع",
+        chooseType: "اختر نوع الذكر",
+        chooseTypeSubtitle: "اختر نوع الممارسة الروحية",
+        chooseSalawat: "اختر صيغة صلاة على النبي",
+        chooseSalawatSubtitle: "صلوات على النبي ﷺ من تقاليد مختلفة",
+        chooseDivineName: "اختر اسمًا إلهيًا",
+        chooseDivineNameSubtitle: "أسماء الله الحسنى للذكر والدعاء",
+        customWird: "ورد مخصص",
+        customWirdSubtitle: "أنشئ ممارستك الخاصة من الذكر",
+        recommendedPerDay: "الموصى به: {count}/يوم",
+        fields: {
+          title: "العنوان *",
+          titlePlaceholder: "مثال: ذكري اليومي",
+          arabicText: "النص العربي *",
+          transliteration: "الكتابة الصوتية",
+          meaning: "المعنى",
+          meaningPlaceholder: "باسم الله",
+          dailyTarget: "الهدف اليومي",
+          addWird: "إضافة الورد",
+        },
+      },
     },
     
     common: {
@@ -20197,6 +21833,22 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         moderate: "معتدل",
         weak: "ضعيف",
       },
+    },
+
+    // Elements (root-level keys used across multiple screens)
+    elements: {
+      fire: "نار",
+      water: "ماء",
+      air: "هواء",
+      earth: "أرض",
+      fireDesc: "حار وجاف - عاطفي ونشيط",
+      waterDesc: "بارد ورطب - عاطفي وحدسي",
+      airDesc: "حار ورطب - فكري وتواصلي",
+      earthDesc: "بارد وجاف - ثابت ومتجذر",
+      fireArabic: "نار",
+      waterArabic: "ماء",
+      airArabic: "هواء",
+      earthArabic: "تراب",
     },
 
     planetCondition: {
@@ -20282,6 +21934,13 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         messageTension: "قمر {moonElement} اليوم يخلق توترًا بنّاءً مع طبيعتك {personalElement}. ليس سيئًا — إنه نمو عبر التوازن. تحرّك بوعي وابق حاضرًا.",
         messageBalanced: "قمر {moonElement} اليوم يجلب طاقة محايدة إلى جوهرك {personalElement}. يفتح ذلك مساحة لاختيار واعٍ — يمكنك الميل لأي طاقة بحسب الحاجة.",
       },
+      practicesCard: {
+        title: "الممارسات الروحية",
+        tabAdhkar: "الأذكار",
+        tabAngels: "الملائكة",
+        tabQuran: "القرآن",
+        tabWafq: "الوفق",
+      },
     },
 
     notifications: {
@@ -20307,6 +21966,182 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         planetaryResonance: "الرنين الكوكبي",
         whatThisMeans: "ما يعني هذا",
       },
+    },
+
+    authScreen: {
+      brand: {
+        title: "Asrariya ✦",
+        subtitle: "علم الأعداد المقدس والتصوف",
+      },
+      or: "أو",
+      privacyNotice: "بياناتك مشفرة وآمنة. لا نشارك معلوماتك الشخصية أبدًا.",
+      actions: {
+        continue: "متابعة",
+        signIn: "تسجيل الدخول",
+        creatingAccount: "جارٍ إنشاء الحساب...",
+        signingIn: "جارٍ تسجيل الدخول...",
+      },
+      backend: {
+        unreachableTitle: "الخادم غير متاح",
+        notAvailableTitle: "الحسابات غير متاحة",
+        unreachableMessage: "تعذّر الوصول إلى الخادم. ما زال بإمكانك محاولة التسجيل/الدخول لرؤية الخطأ الفعلي.",
+        notConfiguredMessage: "إعدادات الخادم غير مكتملة. ما زال بإمكانك محاولة التسجيل/الدخول لرؤية الخطأ الفعلي.",
+        missingPrefix: "مفقود",
+      },
+      benefits: {
+        signupTitle: "إنشاء حساب",
+        signinTitle: "مرحبًا بعودتك",
+        signupSubtitle: "افتح الميزات المتقدمة والمزامنة عبر الأجهزة",
+        signinSubtitle: "سجّل الدخول للوصول إلى حسابك",
+        items: {
+          sync: "مزامنة سحابية عبر الأجهزة",
+          backup: "نسخ احتياطي آمن لبياناتك",
+          premium: "الوصول إلى الميزات المتقدمة",
+        },
+      },
+      oauth: {
+        continueWith: "أو المتابعة عبر",
+      },
+      alerts: {
+        accountCreated: {
+          title: "✅ تم إنشاء الحساب!",
+          message: "يرجى إكمال ملفك الشخصي لفتح الميزات المخصصة.",
+        },
+        accountExists: {
+          title: "الحساب موجود",
+          message: "هذا البريد مسجل بالفعل. يرجى تسجيل الدخول بدلًا من ذلك.",
+        },
+        emailVerificationRequired: {
+          title: "تأكيد البريد الإلكتروني مطلوب",
+          message: "يرجى تأكيد بريدك الإلكتروني ثم العودة لتسجيل الدخول. إذا استمر هذا، فميزة التحقق ما زالت مفعّلة في الخادم.",
+        },
+        emailNotConfirmed: {
+          title: "البريد غير مؤكد",
+          message: "تحقق من بريدك واضغط رابط التأكيد قبل تسجيل الدخول. افحص مجلد الرسائل غير المرغوبة إن لم تجده.",
+        },
+        emailRequired: {
+          title: "البريد مطلوب",
+          message: "يرجى إدخال بريدك الإلكتروني أولًا.",
+        },
+        resetLinkSent: {
+          title: "تم إرسال رابط إعادة التعيين",
+          message: "تحقق من بريدك الإلكتروني لرابط إعادة تعيين كلمة المرور. افتحه على هذا الجهاز للمتابعة داخل التطبيق.",
+        },
+        welcomeBack: {
+          title: "مرحبًا بعودتك!",
+          profileRestored: "تمت استعادة ملفك الشخصي.",
+          completeProfile: "يرجى إكمال ملفك الشخصي لفتح الميزات المخصصة.",
+        },
+        welcome: {
+          title: "مرحبًا!",
+          completeProfile: "يرجى إكمال ملفك الشخصي لفتح الميزات المخصصة.",
+        },
+      },
+      errors: {
+        emailExists: "هذا البريد مسجل بالفعل. جرّب تسجيل الدخول بدلًا من ذلك.",
+        invalidEmail: "يرجى إدخال بريد إلكتروني صالح.",
+        passwordMin: "يجب أن تكون كلمة المرور 6 أحرف على الأقل.",
+        network: "لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة.",
+        notConfigured: "الخادم غير مُعد. يرجى التحقق من متغيرات البيئة.",
+        timeout: "انتهت مهلة التحقق من الخادم. حاول مرة أخرى.",
+        healthFailed: "الخادم غير قابل للوصول. يرجى التحقق من الشبكة ثم المحاولة.",
+        default: "حدث خطأ. يرجى المحاولة مرة أخرى.",
+        fillFields: "يرجى تعبئة جميع الحقول",
+        passwordMismatch: "كلمتا المرور غير متطابقتين",
+        unexpected: "حدث خطأ غير متوقع",
+        signInFailed: "فشل تسجيل الدخول",
+        resetEmailFailed: "فشل إرسال بريد إعادة تعيين كلمة المرور",
+        oauthFailed: "فشل تسجيل الدخول عبر OAuth",
+      },
+    },
+
+    profileScreen: {
+      actions: {
+        goHome: "الصفحة الرئيسية",
+      },
+      completion: {
+        missingFields: "أضف {fields} لفتح التخصيص الكامل",
+      },
+      location: {
+        permissionTitle: "إذن الموقع",
+        permissionMessage: "إذن الموقع مطلوب لاكتشاف موقعك تلقائيًا.",
+        errorTitle: "خطأ في الموقع",
+        errorMessage: "تعذر الحصول على الموقع",
+        updatedTitle: "تم تحديث الموقع",
+        updatedMessage: "تم التعيين إلى: {location}",
+      },
+      birthLocation: {
+        permissionTitle: "إذن الموقع",
+        permissionMessage: "إذن الموقع مطلوب لاكتشاف إحداثيات موقع الميلاد تلقائيًا.",
+        errorTitle: "خطأ في الموقع",
+        errorMessage: "تعذر الحصول على موقع الميلاد",
+        updatedTitle: "تم تحديث موقع الميلاد",
+        updatedMessage: "تم التعيين إلى: {location}",
+        invalidTitle: "موقع الميلاد",
+        invalidMessage: "يرجى إدخال خط عرض وطول صالحين.",
+      },
+      save: {
+        chooseNextTitle: "تم حفظ الملف",
+        chooseNextMessage: "هل تريد تسجيل الدخول/إنشاء حساب أم المتابعة إلى التطبيق؟",
+        successTitle: "تم حفظ الملف",
+        successMessage: "تم تحديث بيانات التخصيص الخاصة بك.",
+        errorMessage: "فشل حفظ الملف. يرجى المحاولة مرة أخرى.",
+      },
+      deleteAccount: {
+        deletedMessage: "تم حذف حسابك. يمكنك متابعة استخدام Asrariya كضيف.",
+      },
+    },
+
+    notificationSettingsScreen: {
+      loading: "جارٍ تحميل التفضيلات...",
+      permissions: {
+        requiredTitle: "الأذونات مطلوبة",
+        requiredMessage: "يرجى تفعيل الإشعارات من إعدادات الجهاز لتلقي التذكيرات والإرشاد الروحي.",
+        disabledTitle: "الإشعارات معطلة",
+        disabledMessage: "فعّل الإشعارات لتلقي تذكيرات الصلاة وتنبيهات الساعات المتناغمة والإرشاد الروحي",
+        enableButton: "تفعيل الإشعارات",
+      },
+      prayer: {
+        title: "إشعارات الصلاة",
+        info: "تتم إدارة إشعارات الصلاة من إعدادات الأذان",
+      },
+      harmony: {
+        title: "ساعات التناغم",
+        enable: "تفعيل إشعارات التناغم",
+        favorable: {
+          label: "الساعات المواتية",
+          subtitle: "تنبيه عند بدء توقيت مواتٍ جدًا",
+        },
+        transformative: {
+          label: "الساعات التحولية",
+          subtitle: "تنبيه لفرص النمو",
+        },
+        delicate: {
+          label: "الفترات الدقيقة",
+          subtitle: "تنبيه حول الفترات الصعبة",
+        },
+      },
+      divineTiming: {
+        title: "التوقيت الإلهي",
+        enable: "تفعيل التوقيت الإلهي",
+        morning: {
+          label: "إحاطة روحية صباحية",
+          subtitle: "الطاقة اليومية عند {time}",
+        },
+        element: {
+          label: "تنبيهات توافق العنصر",
+          subtitle: "عند تنشيط عنصرك بقوة",
+        },
+      },
+      quietHours: {
+        title: "ساعات الهدوء",
+        info: "لا إشعارات (عدا الصلاة) بين {start} - {end}",
+      },
+      rateLimit: {
+        title: "تحديد المعدل",
+        info: "الحد الأقصى {count} إشعارًا يوميًا لتجنب الإزعاج",
+      },
+      footer: "تستخدم الإشعارات إعدادات عدم الإزعاج في جهازك",
     },
 
     planetaryHours: {
@@ -20491,6 +22326,29 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         headerSubtitle: "طويل المدى",
         explanation: "يعرض موقع الكوكب في الأبراج — وهو موضع طويل المدى يتغير خلال أسابيع أو أشهر أو سنوات.",
         personalizedNote: "مُخصّص حسب طبيعتك العنصرية",
+        approximationUnreliable: "تقريب (غير موثوق)",
+        transitType: {
+          personal: "في برجك",
+          collective: "الطقس الكوني",
+        },
+        zodiacSystem: {
+          label: "نظام البروج",
+          tropical: "استوائي",
+          sidereal: "نجمي (لاهيري)",
+          signSuffix: "برج",
+        },
+        degreeStage: {
+          full: {
+            entry: "🔵 مرحلة الدخول",
+            stabilization: "🟢 مرحلة الذروة",
+            completion: "🟠 مرحلة الإغلاق",
+          },
+          badge: {
+            entry: "دخول",
+            stabilization: "ذروة",
+            completion: "إغلاق",
+          },
+        },
         practices: {
           title: "ممارسات خاصة بالكوكب",
           minutesShort: "دقائق",
@@ -20515,9 +22373,61 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
             },
           },
         },
+        advancedPractice: {
+          essences: {
+            title: "العطور الموصى بها",
+            description: "استخدم هذه العطور لتعزيز ممارساتك مع {planet}",
+            howToLabel: "💡 كيفية الاستخدام:",
+            step1: "احرقها كبخور قبل الممارسة",
+            step2: "ضعها كعطر طبيعي",
+            step3: "احتفظ بها في مكان الممارسة",
+          },
+          talisman: {
+            title: "إرشادات التعويذة (اختياري)",
+            description: "للممارسين المتقدمين الذين يعملون مع الأدوات الروحية المكتوبة:",
+            format: "التنسيق:",
+            bestDay: "🗓️ أفضل يوم:",
+            bestHour: "⏰ أفضل ساعة:",
+            warning: "تتطلب صناعة التعويذات المعرفة الصحيحة والإذن. استشر معلمًا مؤهلاً (شيخ) قبل المحاولة.",
+          },
+          timing: {
+            title: "الوقت الأمثل",
+            description: "أفضل الأوقات لممارسات {planet}:",
+          },
+          preparation: {
+            title: "خطوات التحضير",
+            description: "اتبع هذه الخطوات للتحضير لممارستك:",
+          },
+          angels: {
+            title: "👼 متقدم: الاتصال الروحاني",
+            warning: "للممارسين ذوي الخبرة فقط",
+            description: "العمل مع الوسطاء الروحانيين:",
+            prerequisites: {
+              label: "📚 المتطلبات الأساسية:",
+              study: "الدراسة تحت معلم مؤهل",
+              mastery: "إتقان الممارسات الأساسية",
+              protection: "فهم الحماية الروحية",
+              permission: "إذن من الشيخ",
+            },
+          },
+        },
         summary: {
           bestNow: "الأقوى الآن",
           weakNow: "الأضعف الآن",
+        },
+        allTransits: {
+          title: "جميع عبور الكواكب",
+          description: "موقع جميع الكواكب في البروج حالياً",
+          yourSign: "برجك",
+        },
+        nextDay: {
+          aboutDayRuler: "عن حاكم اليوم",
+          dayRulerDescription: "{planet} يحكم {dayName} ويحمل طاقة عنصر {element}.",
+          elementalEnergy: "طاقة العنصر",
+          spiritualFocus: "التركيز الروحي",
+          bestActivities: "أفضل الأنشطة",
+          howToPrepare: "كيف تستعد",
+          preparationBody: "خطط ليومك غداً مع وضع هذه الطاقات في الاعتبار. ضع نواياك في الليلة السابقة وتأمل في كيفية مواءمة أفعالك مع حاكم اليوم.",
         },
 
         currentTransit: "العبور الحالي",
@@ -20571,6 +22481,13 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
             neutral: "متوازن",
             growth: "نمو",
             challenge: "تحدّي",
+          },
+          labels: {
+            harmonious: "منسجم",
+            supportive: "داعمة",
+            neutral: "متوازن",
+            challenging: "تحويلي",
+            titleSuffix: "رنين",
           },
           arabicTerms: {
             harmonious: "سَكِينَة",
@@ -20905,6 +22822,8 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           },
           status: {
             entry: "التأثير يتشكّل. ركّز على التطهير لا الفعل.",
+            strengthModerate: "هذا العبور متوسط القوة. العمل الروحي مدعوم مع جهد ثابت.",
+            strengthWeak: "هذا العبور ضعيف. العمل الروحي يحتاج إلى مزيد من الصبر والانضباط.",
             strength: "هذا العبور في أوج قوته. العمل الروحي مدعوم.",
             exit: "التأثير يتلاشى. اختم واحمِ، لا تبدأ جديدًا.",
           },
@@ -20931,6 +22850,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
             jupiter: "الكبر والإسراف",
             saturn: "الأعمال الثقيلة دون إرشاد واليأس",
           },
+          avoidLabel: "تجنّب",
           recommendedDhikr: "الذكر الموصى به",
           entryNote: "في مرحلة الدخول، ركّز على الذكر العام مثل لا إله إلا الله",
           exitNote: "في مرحلة الخروج، ركّز على الذكر الحامي والصلوات",
@@ -20942,6 +22862,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         // ─────────────────────────────────────────────────────────────────────
         practice: {
           title: "الممارسة الروحية",
+          transitStrength: "قوة العبور",
           phase: {
             entry: "دخول",
             strength: "فعّال",
@@ -20963,6 +22884,10 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
             tomorrow: "غدًا",
             activeNow: "نشط الآن حتى {end}",
             unavailable: "بيانات الساعة الفلكية غير متاحة",
+            units: {
+              hourShort: "س",
+              minuteShort: "د",
+            },
           },
           strength: {
             peak: "ذروة",
@@ -20989,12 +22914,40 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     
     // Home screen modules
     modules: {
+      calculator: {
+        title: "الحاسبة",
+        description: "حسابات الأبجد المتقدمة وتحليل الحروف",
+      },
+      nameDestiny: {
+        title: "قدر الأسماء",
+        description: "اكتشف المعنى الروحي والقدر المُشفَّر في الأسماء",
+      },
       whoAmI: {
         title: "مَن أنا",
         description: "تحليل ذاتي عميق عبر علم الحروف: العنصر والشخصية والمهنة والمسار الروحي",
       },
+      guidedIstikhara: {
+        title: "الاستخارة الموجهة",
+        description: "تعلّم طريقة الصلاة الأصيلة وتتبع قراراتك الروحية",
+      },
+      compatibility: {
+        title: "التوافق",
+        description: "تحليل انسجام العلاقات من خلال التوازن العنصري والعددي",
+      },
+      prayerTimes: {
+        title: "مواقيت الصلاة",
+        description: "مواقيت الصلاة اليومية بناءً على موقعك",
+      },
+      quran: {
+        title: "القرآن الكريم",
+        description: "اقرأ القرآن الكريم كاملاً مع الترجمات والإشارات المرجعية",
+      },
+      qibla: {
+        title: "القبلة",
+        description: "اعثر على اتجاه الكعبة المشرفة للصلاة",
+      },
     },
-    
+
     // Who Am I module (istikhara key for compatibility)
     istikhara: {
       title: "مَن أنا",
@@ -21505,8 +23458,39 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     },
 
     home: {
+      profileBanner: {
+        title: "أكمل ملفك الشخصي",
+        subtitle: "أضف تاريخ ميلادك لفتح الميزات المخصّصة",
+      },
+      nextPrayer: "الصلاة التالية",
       nextPlanetHour: "الساعة الكوكبية التالية",
       startsAt: "تبدأ عند",
+      todayBlessing: "بركة اليوم",
+      tapToSetLocation: "اضغط لتحديد الموقع",
+      tapToViewDetails: "اضغط لعرض التفاصيل",
+      dailyGuidanceDetails: {
+        title: "طاقة اليوم",
+      },
+      cards: {
+        nextPrayer: {
+          inTime: "بعد {duration}",
+        },
+        nextPlanetaryHour: {
+          title: "الساعة الكوكبية التالية",
+          inTime: "بعد {duration}",
+        },
+        nextDayRuler: {
+          title: "حاكم الغد",
+        },
+        momentAlignment: {
+          addDobPrompt: "أضف تاريخ ميلادك لتفعيل محاذاة اللحظة",
+          title: "محاذاة اللحظة",
+          nowLabel: "الآن",
+          cta: "عرض التفاصيل ←",
+          youLabel: "أنت",
+          momentLabel: "اللحظة",
+        },
+      },
       planetTransitDetails: {
         title: "عبور الكواكب",
         explainers: {
@@ -21559,6 +23543,314 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           reflectivePractices: "ممارسات روحية",
         },
       },
+      moment: {
+        title: "محاذاة اللحظة",
+        addNamePrompt: "أضف الاسم للتفعيل",
+        details: "التفاصيل",
+        you: "أنت",
+        now: "الآن",
+        status: {
+          act: "وقت ممتاز",
+          maintain: "محايد",
+          hold: "تابع بحذر",
+          aligned: "متوافق",
+          steady: "ثابت",
+          mindful: "بوعي",
+        },
+        updated: {
+          justNow: "تم التحديث للتو",
+          minute: "تم التحديث منذ دقيقة",
+          minutes: "تم التحديث منذ {count} دقائق",
+          hour: "تم التحديث منذ ساعة",
+          hours: "تم التحديث منذ {count} ساعات",
+        },
+      },
+      sections: {
+        spiritualModules: "الوحدات الروحية",
+      },
+      showAll: "عرض الكل",
+      // Daily Guidance Messages & Content
+      dailyGuidanceContent: {
+        generic: {
+          fire: {
+            message: "طاقة النار في {day} تجلب الحيوية والحركة. إنه يوم مناسب للمبادرة والتعبير الإبداعي.",
+            bestFor: {
+              0: "البدايات الجديدة",
+              1: "المشاريع الإبداعية",
+              2: "القيادة",
+              3: "النشاط البدني",
+            },
+            avoid: {
+              0: "القرارات المتسرعة",
+              1: "النزاع",
+              2: "الإجهاد الزائد",
+            },
+          },
+          water: {
+            message: "طاقة الماء في {day} تجلب السلاسة والحدس. إنه يوم مناسب للتواصل العاطفي والتأمل.",
+            bestFor: {
+              0: "الشفاء العاطفي",
+              1: "العمل الحدسي",
+              2: "العلاقات",
+              3: "الممارسات الروحية",
+            },
+            avoid: {
+              0: "القرارات الكبيرة",
+              1: "التخطيط الجامد",
+              2: "الإفراط في التحليل",
+            },
+          },
+          air: {
+            message: "طاقة الهواء في {day} تجلب الوضوح والتواصل. إنه يوم مناسب للتعلّم والانشغالات الفكرية.",
+            bestFor: {
+              0: "الدراسة",
+              1: "التواصل",
+              2: "التخطيط",
+              3: "التواصل الاجتماعي",
+            },
+            avoid: {
+              0: "المشاعر الثقيلة",
+              1: "العزلة",
+              2: "القرارات المستعجلة",
+            },
+          },
+          earth: {
+            message: "طاقة الأرض في {day} تجلب الثبات والاستقرار. إنه يوم مناسب للعمل العملي وبناء الأساسات.",
+            bestFor: {
+              0: "المهام العملية",
+              1: "التخطيط المالي",
+              2: "العادات الصحية",
+              3: "البناء",
+            },
+            avoid: {
+              0: "التغييرات الكبيرة",
+              1: "المخاطرة",
+              2: "إهمال الأساسيات",
+            },
+          },
+        },
+        harmonious: {
+          fire: {
+            message: "توافق قوي. طبيعتك النارية تنسجم تمامًا مع طاقة {day} الشمسية. وجّه هذه الشدة بنية واضحة.",
+            bestFor: {
+              0: "العمل الجريء",
+              1: "القيادة",
+              2: "الاختراق",
+              3: "التحول",
+            },
+            avoid: {
+              0: "الاحتراق",
+              1: "العدوانية",
+              2: "نفاد الصبر",
+            },
+            peakHours: "من الصباح إلى الظهيرة",
+          },
+          water: {
+            message: "انسجام عميق. عنصر الماء لديك يتدفق مع طاقة {day} القمرية. ثق بحدسك وحكمتك العاطفية.",
+            bestFor: {
+              0: "الشفاء",
+              1: "العمل الحدسي",
+              2: "التواصل العميق",
+              3: "التأمل الروحي",
+            },
+            avoid: {
+              0: "الإفراط في التفكير",
+              1: "العزلة",
+              2: "الغمر العاطفي",
+            },
+            peakHours: "من المساء إلى الليل",
+          },
+          air: {
+            message: "توافق واضح. طبيعتك الهوائية ترقص مع طاقة {day} العطاردية. وقت ممتاز للوضوح الذهني والتواصل.",
+            bestFor: {
+              0: "التعلّم",
+              1: "التعليم",
+              2: "الكتابة",
+              3: "الاستراتيجية",
+            },
+            avoid: {
+              0: "تشتت التركيز",
+              1: "كثرة الالتزامات",
+              2: "السطحية",
+            },
+            peakHours: "من الصباح إلى بعد الظهر",
+          },
+          earth: {
+            message: "أساس متين. عنصر الأرض لديك يرسّخ طاقة {day} المستقرة. ابنِ بصبر وحكمة عملية.",
+            bestFor: {
+              0: "البناء",
+              1: "العادات الصحية",
+              2: "التخطيط المالي",
+              3: "الثبات",
+            },
+            avoid: {
+              0: "العناد",
+              1: "مقاومة التغيير",
+              2: "الإرهاق من العمل",
+            },
+            peakHours: "من بعد الظهر إلى المساء",
+          },
+        },
+        complementary: {
+          fireAir: {
+            message: "الهواء يؤجج نارك. طاقة {day} تضخم حيويتك الطبيعية. وجّه هذا الانسجام بحكمة.",
+            bestFor: {
+              0: "التعبير الإبداعي",
+              1: "التواصل",
+              2: "الابتكار",
+              3: "القيادة الاجتماعية",
+            },
+            avoid: {
+              0: "تشتت الطاقة",
+              1: "كثرة الالتزامات",
+              2: "الاندفاع",
+            },
+          },
+          airFire: {
+            message: "النار تنشّط هواءك. يجلب {day} شغفًا إلى أفكارك. هنا يلتقي الوضوح بالفعل.",
+            bestFor: {
+              0: "العمل الاستراتيجي",
+              1: "التحدث أمام الناس",
+              2: "حل المشكلات",
+              3: "التعليم",
+            },
+            avoid: {
+              0: "شلل التحليل",
+              1: "فرط الحماس",
+              2: "القرارات المتعجلة",
+            },
+          },
+          waterEarth: {
+            message: "الأرض تحتوي ماءك. يمنحك {day} بنية تحتضن تدفقك. هنا يلتقي الحدس بالشكل.",
+            bestFor: {
+              0: "الشفاء المتجذر",
+              1: "الروحانية العملية",
+              2: "بناء العادات",
+              3: "الرعاية",
+            },
+            avoid: {
+              0: "الركود",
+              1: "الحذر الزائد",
+              2: "كبت المشاعر",
+            },
+          },
+          earthWater: {
+            message: "الماء يغذي أرضك. طاقة {day} العاطفية تلطف ثباتك. هنا يلتقي الاستقرار بالتدفق.",
+            bestFor: {
+              0: "التقدم اللطيف",
+              1: "العمل العاطفي",
+              2: "الإبداع",
+              3: "الرحمة",
+            },
+            avoid: {
+              0: "الجمود",
+              1: "الإفراط في التخطيط",
+              2: "إهمال الحدس",
+            },
+          },
+          default: {
+            message: "طاقات داعمة اليوم. يكمّل {day} عنصرك الطبيعي.",
+            bestFor: {
+              0: "العمل المتوازن",
+              1: "الدمج",
+              2: "التقدم الثابت",
+            },
+            avoid: {
+              0: "المبالغة",
+              1: "فرض النتائج",
+            },
+          },
+        },
+        transformative: {
+          fireWater: {
+            message: "توتر تحويلي. نارك تلتقي بطاقة الماء في {day}. هذا التضاد يصنع بخارًا وإمكانًا قويًا للتحول.",
+            bestFor: {
+              0: "الاختراق",
+              1: "الترك",
+              2: "التطهير الروحي",
+              3: "الشفاء العميق",
+            },
+            avoid: {
+              0: "ردود الفعل المندفعة",
+              1: "القرارات العاطفية",
+              2: "فرض النتائج",
+            },
+            peakHours: "المساء (21:00-04:00)",
+          },
+          waterFire: {
+            message: "مقابلة ديناميكية. ماؤك يلتقي بطاقة النار في {day}. سر بوعي، فالتحول ينتظرك.",
+            bestFor: {
+              0: "الكيمياء العاطفية",
+              1: "اختراق إبداعي",
+              2: "عمل الظل",
+              3: "التطهير",
+            },
+            avoid: {
+              0: "رد الفعل السريع",
+              1: "الاستغراق الزائد",
+              2: "الفعل المتعجل",
+            },
+            peakHours: "قبل الفجر (04:00-06:00) والليل (21:00-04:00)",
+          },
+          airEarth: {
+            message: "تحدٍ للتجذير. هواؤك يلتقي بطاقة الأرض في {day}. تمهّل وثبّت أفكارك في الواقع.",
+            bestFor: {
+              0: "تجسيد الأفكار",
+              1: "التطبيق العملي",
+              2: "الانضباط",
+              3: "الصبر",
+            },
+            avoid: {
+              0: "المقاومة الذهنية",
+              1: "التسرع",
+              2: "تجنب التجسيد",
+            },
+            peakHours: "بعد الظهر (14:00-18:00)",
+          },
+          earthAir: {
+            message: "توتر رافع. أرضك تلتقي بطاقة الهواء في {day}. اسمح لنفسك بأن ترتفع إلى آفاق جديدة.",
+            bestFor: {
+              0: "وجهات نظر جديدة",
+              1: "التعلم",
+              2: "المرونة",
+              3: "التوسع الذهني",
+            },
+            avoid: {
+              0: "العناد",
+              1: "التعلق الزائد",
+              2: "مقاومة التغيير",
+            },
+            peakHours: "الصباح (06:00-10:00)",
+          },
+          default: {
+            message: "يوم تحويلي. تنقّل بين الطاقات المتقابلة بوعي وقصد.",
+            bestFor: {
+              0: "التحول",
+              1: "النمو",
+              2: "الاختراق",
+            },
+            avoid: {
+              0: "رد الفعل السريع",
+              1: "المقاومة",
+              2: "الإجبار",
+            },
+          },
+        },
+        neutral: {
+          message: "طاقات اليوم متوازنة. يمنحك {day} أرضية ثابتة للفعل الواعي.",
+          bestFor: {
+            0: "المهام الروتينية",
+            1: "الجهد المستمر",
+            2: "الملاحظة",
+            3: "التوازن",
+          },
+          avoid: {
+            0: "المبالغة",
+            1: "التغييرات الكبيرة",
+            2: "الإجهاد الزائد",
+          },
+        },
+      },
     },
 
     prayerTimes: {
@@ -21580,6 +23872,18 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       noDob: "تاريخ الميلاد مطلوب",
       addDobMessage: "أضف تاريخ ميلادك لتفعيل محاذاة اللحظة الشخصية.",
       goToProfile: "الذهاب إلى الملف الشخصي",
+      title: "محاذاة اللحظة",
+      noName: "لم يتم إدخال الاسم",
+      addNameMessage: "أضف اسمك في قسم قدر الاسم لفتح إرشاد محاذاة اللحظة.",
+      goToNameDestiny: "اذهب إلى قدر الاسم",
+      updated: "تم التحديث",
+      zahirOutward: "الاسم + الأم (شخصي)",
+      hourQuality: "جودة الساعة",
+      whyThisStatus: "لماذا هذا الوضع؟",
+      guidanceTitle: "الإرشاد",
+      bestNow: "الأفضل الآن:",
+      avoidNow: "تجنّب الآن:",
+      disclaimer: "للتأمل فقط • ليس حكمًا شرعيًا",
       cards: {
         currentHour: "الساعة الكوكبية الحالية",
         yourPlanet: "كوكبك",
@@ -21633,6 +23937,13 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           moderate: "متوسطة",
           weak: "ضعيفة",
           exceptional: "استثنائية",
+          statuses: {
+            dignityDomicile: "في بيته: ثابت وموثوق.",
+            dignityExalted: "في شرفه: مدعوم ومرتفع.",
+            dignityDetriment: "في وباله: احتكاك ونتائج مختلطة.",
+            dignityFall: "في هبوطه: أثره خافت، فتمهّل.",
+            dignityNeutral: "محايد: نبرة متوازنة.",
+          },
         },
 
         source: {
@@ -21670,11 +23981,84 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         },
       },
       timeline: {
+        title: "الساعات الأربع والعشرون القادمة",
+        currentWindow: "الساعة الحالية",
+        windowEnds: "تنتهي الساعة",
+        nextOptimal: "الساعات المثلى القادمة",
+        showTimeline: "عرض الجدول الزمني",
+        hideTimeline: "إخفاء الجدول الزمني",
+        noOptimalWindows: "لم يتم العثور على ساعات مثلى خلال الأربع والعشرين ساعة القادمة",
+        daysAway: "بعد {count} أيام",
+        tomorrow: "غدًا",
+        today: "اليوم",
         in: "بعد",
+        hours: "{count} س",
+        minutes: "{count} د",
+      },
+    },
+
+    planetaryZikr: {
+      recommendedTitle: 'ذكر موصى به - {planet}',
+      planets: {
+        sun: {
+          label: '☀️ الشمس',
+          entries: {
+            yaAllah: { benefit: 'للذكر العام والاتصال بالله تعالى.' },
+            yaRahman: { benefit: 'للرزق والمال والسعة.' },
+            yaRaheem: { benefit: 'لقضاء الحاجات وتيسير الشدائد.' },
+            yaMalik: { benefit: 'للعون والنجاح في المساعي.' },
+            yaQuddus: { benefit: 'للطهارة والمغفرة والتنقية الروحية.' },
+            yaSalam: { benefit: 'للسكينة الداخلية ونيل الصفح.' },
+            yaMumin: { benefit: 'للحماية من الاعداء.' },
+            yaHakim: { benefit: 'للحكمة والشهادة والبركة.' },
+            yaAdl: { benefit: 'للتوفيق والابتعاد عن الذنوب.' },
+            yaBari: { benefit: 'للقوة والتغلب على الاعداء.' },
+            yaMusawwir: { benefit: 'للثبات على الاعمال الصالحة.' },
+            yaRafi: { benefit: 'للرفعة والقبول والمحبة.' },
+            yaHalim: { benefit: 'للهدوء والحلم والصبر.' },
+            yaBasir: { benefit: 'للبصيرة والوضوح.' },
+          },
+        },
+        venus: {
+          label: '♀️ الزهرة',
+          entries: {
+            yaGhaffar: { benefit: 'لزيادة البركة والخير.' },
+            yaWahhab: { benefit: 'للغنى والرخاء.' },
+            yaRazzaq: { benefit: 'للسعة في الرزق والنفقة.' },
+            yaQabid: { benefit: 'للوفرة في انواع مختلفة من المال.' },
+            yaLatif: { benefit: 'لتيسير الصعوبات بلطف وخفاء.' },
+            yaJami: { benefit: 'لاصلاح العلاقات وتيسير الزواج.' },
+          },
+        },
+        mars: {
+          label: '♂️ المريخ',
+          sectionNote: 'يستعمل للحماية والدفاع والتغلب على الاعداء.',
+          entries: {
+            yaKhafid: { benefit: 'للحماية من الاعداء ومكرهم.' },
+            yaMuzil: { benefit: 'للتغلب على الاعداء واذلالهم.' },
+            yaJabbar: { benefit: 'للقوة في مواجهة الظلم او الاذى.', note: 'خصوصا يوم الثلاثاء' },
+            yaQahhar: { benefit: 'للقهر والغلبة على الاعداء.' },
+          },
+        },
       },
     },
 
     widgets: {
+      planetTransit: {
+        title: "عبور الكواكب",
+        subtitle: "طويل المدى",
+        cta: "اعرض تأثيرك ←",
+        timeScale: "طويل المدى (أسابيع/أشهر)",
+        updated: "تم التحديث قبل {time}",
+        labels: {
+          yourSign: "برجك",
+          skyNow: "السماء",
+        },
+        fallback: {
+          setZodiac: "حدّد برجك لتفعيل التخصيص.",
+          noTransit: "لا يوجد عبور حالي لبرجك",
+        },
+      },
       dailyEnergy: {
         title: "طاقة اليوم",
         todaysElement: "عنصر اليوم",
@@ -22290,6 +24674,15 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         venus: "الزهرة",
         saturn: "زحل",
       },
+
+      // بطاقات نتائج الشاشة الرئيسية
+      yourSpiritualEssence: "جوهرك الروحي",
+      coreSpiritualPattern: "النمط الروحي الأساسي",
+      spiritualIndicators: "المؤشرات الروحية",
+      element: "العنصر",
+      celestial: "السماوي",
+      hour: "الساعة",
+      spiritualGuidance: "الإرشاد الروحي",
     },
 
     // تسميات حكام الأيام
@@ -22389,6 +24782,116 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       "Saturn-Mars": "زحل والمريخ يعملان معًا بحياد",
       "Saturn-Sun": "زحل والشمس يواجهان تحديات",
       "Saturn-Moon": "زحل والقمر يصارعان بين الدفء والبرودة",
+    },
+
+    // إعدادات الذكاء الاصطناعي
+    aiSettingsScreen: {
+      headerTitle: "✨ إعدادات الذكاء الاصطناعي",
+      headerSubtitle: "مساعدة اختيارية في التأمل",
+      loadingSettings: "جارٍ تحميل الإعدادات...",
+      unavailableNotice: "ميزات الذكاء الاصطناعي غير متاحة حالياً. يرجى التحقق من الإعدادات.",
+      aiUnavailable: "الذكاء الاصطناعي غير متاح حالياً",
+      toggle: {
+        title: "التأمل بالذكاء الاصطناعي",
+        desc: "تحسين وضوح الصياغة بالذكاء الاصطناعي",
+      },
+      whatAIDoes: {
+        title: "ما يفعله الذكاء الاصطناعي",
+        item1: "يحسّن وضوح الصياغة",
+        item2: "يضيف الدفء والتأمل",
+        item3: "يوسّع أسئلة التأمل",
+        item4: "يكيّف النبرة حسب تفضيلك",
+      },
+      whatAIDoesNot: {
+        title: "ما لا يفعله الذكاء الاصطناعي",
+        item1: "التنبؤ بالنتائج أو اتخاذ القرارات",
+        item2: "إصدار أحكام دينية (فتوى)",
+        item3: "إحلال الصلاة أو الاستخارة",
+        item4: "حساب التوقيت أو العناصر أو الدورات",
+      },
+      disclaimer: {
+        title: "تنبيه: مساعدة الذكاء الاصطناعي",
+        body: "يساعد الذكاء الاصطناعي في إعادة صياغة نص الإرشاد للوضوح. لا يقوم بـ:\n\n• إصدار تنبؤات أو قرارات\n• إصدار أحكام دينية\n• إحلال الصلاة أو الاستخارة\n• إضافة تفسيرات جديدة\n\nالذكاء الاصطناعي يُلمّع الصياغة فقط بناءً على الحسابات التي يقوم بها التطبيق.\n\nجميع بياناتك تبقى محلية. لا تخزين سحابي.",
+        cancel: "إلغاء",
+        enable: "تفعيل الذكاء الاصطناعي",
+      },
+      tonePreference: {
+        title: "تفضيل النبرة",
+        concise: "موجز",
+        conciseDesc: "قصير ومباشر. لغة واضحة وبسيطة.",
+        calm: "هادئ",
+        calmDesc: "لطيف ومريح. تأمل سلمي.",
+        reflective: "تأملي",
+        reflectiveDesc: "تأمل أعمق. أسئلة مدروسة.",
+        poetic: "شاعري",
+        poeticDesc: "لغة جميلة ورفيعة. استعارات خفيفة.",
+      },
+      privacy: {
+        title: "خصوصيتك",
+        body: "• تبقى جميع البيانات على جهازك\n• لا يوجد تخزين سحابي لتأملاتك\n• لا تسجيل لأسئلتك\n• لا تدريب على بياناتك\n• في حال فشل الذكاء الاصطناعي، يستخدم التطبيق النص المحلي",
+      },
+      reset: {
+        button: "إعادة التعيين إلى الافتراضي",
+        title: "إعادة تعيين إعدادات الذكاء الاصطناعي",
+        message: "سيتم إيقاف تشغيل الذكاء الاصطناعي وإعادة تعيين جميع التفضيلات. هل تريد المتابعة؟",
+        cancel: "إلغاء",
+        confirm: "إعادة التعيين",
+      },
+      errors: {
+        loadFailed: "فشل تحميل إعدادات الذكاء الاصطناعي.",
+      },
+    },
+
+    // شاشة التحقق من البريد الإلكتروني
+    emailVerificationScreen: {
+      title: "تحقق من بريدك الإلكتروني",
+      sentMessage: "لقد أرسلنا رابط التحقق إلى:",
+      nextSteps: "الخطوات التالية:",
+      step1: "تحقق من صندوق الوارد (ومجلد البريد غير المرغوب فيه)",
+      step2: "انقر على رابط التحقق في البريد الإلكتروني",
+      step3: "عُد هنا وسجّل الدخول ببريدك الإلكتروني",
+      resendButton: "إعادة إرسال البريد الإلكتروني",
+      resendCountdown: "إعادة الإرسال خلال {seconds}ث",
+      backToSignIn: "العودة إلى تسجيل الدخول",
+      securityNote: "بياناتك مشفرة وآمنة. لن نشارك معلوماتك الشخصية أبداً.",
+      emailSentTitle: "✅ تم إرسال البريد!",
+      emailSentMessage: "يرجى التحقق من صندوق الوارد (ومجلد البريد غير المرغوب فيه).",
+      errorTitle: "خطأ",
+      resendFailed: "فشل إعادة إرسال البريد الإلكتروني. يرجى المحاولة مرة أخرى لاحقاً.",
+    },
+
+    // قدر الاسم - الشاشة الرئيسية
+    nameDestinyHome: {
+      headerTitle: "اكتشف قدر اسمك",
+      headerSubtitle: "اكتشف الجوهر الروحي المشفّر في اسمك",
+      chooseReadingType: "اختر نوع القراءة",
+      exploreName: "استكشف اسمًا",
+      exploreDesc: "اكتشف المعنى الروحي والخصائص العامة لأي اسم",
+      exploreBest: "الأفضل لـ: التعرّف على الأسماء، الاستكشاف الثقافي، رؤى عامة",
+      personalReading: "قراءتي الشخصية",
+      personalDesc: "احصل على ملفك الروحي الفريد — مخصّص لخريطة روحك بالضبط",
+      personalBest: "الأفضل لـ: اكتشاف الذات، الإرشاد الروحي، التحوّل الشخصي",
+      recommended: "⭐ موصى به",
+      nameLatinLabel: "الاسم (بالأحرف اللاتينية)",
+      nameLatinRequired: "الاسم مطلوب",
+      nameLatinPlaceholder: "مثال: Fatima, Ibrahim, Khadija",
+      nameLatinHelper: "اكتب اسمك بالأحرف اللاتينية - وسنعرض المقابل العربي",
+      arabicOptional: "أو بالعربية (اختياري)",
+      showKeyboard: "⌨️ إظهار لوحة المفاتيح",
+      hideKeyboard: "⌨️ إخفاء",
+      motherNameLabel: "اسم الأم",
+      motherNameRequired: "اسم الأم مطلوب للقراءة الشخصية",
+      motherNameNote: "قراءتك الفريدة - تتطلب اسم الأم",
+      motherLatinLabel: "اكتب بالأحرف اللاتينية",
+      motherLatinPlaceholder: "مثال: Fatima, Khadija, Aisha",
+      motherArabicOptional: "أو بالعربية (اختياري)",
+      analyzeButton: "تحليل الاسم ✨",
+      advancedOptions: "خيارات متقدمة",
+      abjadSystem: "نظام الأبجد",
+      mashriqi: "مشرقي",
+      mashriqiDesc: "يُستخدم في المشرق العربي",
+      maghribi: "مغربي",
+      maghribiDesc: "يُستخدم في شمال أفريقيا",
     },
 
     // العلاقات العنصرية (العربية - مبسطة)

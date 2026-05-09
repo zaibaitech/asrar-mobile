@@ -36,7 +36,7 @@ export default function AppHeaderTablet({
   onMenuPress,
   showLanguageSelector = true,
   backgroundColor = '#FFFFFF',
-}: AppHeaderTabletProps) {
+}: Readonly<AppHeaderTabletProps>) {
   const { width } = useWindowDimensions();
   const isTablet = width > 768;
   const { profile } = useProfile();
@@ -139,6 +139,38 @@ export default function AppHeaderTablet({
                 FR
               </Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.languageButton,
+                {
+                  paddingHorizontal: 14 * scale,
+                  paddingVertical: 10 * scale,
+                  borderRadius: 12 * scale,
+                  minWidth: 56 * scale,
+                },
+                currentLanguage === 'AR'
+                  ? styles.languageButtonActive
+                  : styles.languageButtonInactive,
+              ]}
+              onPress={() => onLanguageChange('AR')}
+              accessibilityLabel="Arabic language"
+              accessibilityRole="button"
+              accessibilityState={{ selected: currentLanguage === 'AR' }}
+              accessibilityHint="Switch to Arabic language"
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  currentLanguage === 'AR'
+                    ? styles.languageTextActive
+                    : styles.languageTextInactive,
+                  { fontSize: langFontSize },
+                ]}
+              >
+                AR
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -177,7 +209,7 @@ interface TabletLogoProps {
   element: ElementType;
 }
 
-function TabletLogo({ source, size, element }: TabletLogoProps) {
+function TabletLogo({ source, size, element }: Readonly<TabletLogoProps>) {
   const radius = size / 2;
 
   if (source) {

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(node -e \"const t = require\\('./constants/translations.ts'\\)\")",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}

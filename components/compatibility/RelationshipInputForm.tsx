@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { DarkTheme } from '../../constants/DarkTheme';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useProfile } from '../../contexts/ProfileContext';
 import ArabicKeyboard from '../istikhara/ArabicKeyboard';
 import NameAutocomplete from '../NameAutocomplete';
@@ -21,15 +22,15 @@ interface RelationshipInputFormProps {
   errorMessage?: string | null;
 }
 
-export function RelationshipInputForm({ 
-  onCalculate, 
+export function RelationshipInputForm({
+  onCalculate,
   language = 'en',
   system = 'maghribi',
   onSystemChange,
   isLoading = false,
   errorMessage = null
 }: RelationshipInputFormProps) {
-  const isFrench = language === 'fr';
+  const { t } = useLanguage();
   const { profile } = useProfile();
   
   const [person1Name, setPerson1Name] = useState('');
@@ -140,12 +141,10 @@ export function RelationshipInputForm({
             </LinearGradient>
           </View>
           <Text style={styles.title}>
-            {isFrench ? 'Entrez Deux Noms' : 'Enter Two Names'}
+            {t('compatibility.resultsView.enterTwoNames')}
           </Text>
           <Text style={styles.subtitle}>
-            {isFrench 
-              ? 'Calculez la compatibilité en utilisant la numérologie islamique traditionnelle'
-              : 'Calculate compatibility using traditional Islamic numerology'}
+            {t('compatibility.resultsView.enterTwoNamesSubtitle')}
           </Text>
         </View>
         
@@ -153,7 +152,7 @@ export function RelationshipInputForm({
         {onSystemChange && (
           <View style={styles.systemSelector}>
             <Text style={styles.systemLabel}>
-              {isFrench ? 'Système Abjad' : 'Abjad System'}
+              {t('compatibility.resultsView.abjadSystem')}
             </Text>
             <View style={styles.systemButtons}>
               <TouchableOpacity
@@ -162,7 +161,7 @@ export function RelationshipInputForm({
                 disabled={isLoading}
               >
                 <Text style={[styles.systemButtonText, system === 'maghribi' && styles.systemButtonTextActive]}>
-                  {isFrench ? 'Maghribi' : 'Maghribi'}
+                  Maghribi
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -171,7 +170,7 @@ export function RelationshipInputForm({
                 disabled={isLoading}
               >
                 <Text style={[styles.systemButtonText, system === 'mashriqi' && styles.systemButtonTextActive]}>
-                  {isFrench ? 'Mashriqi' : 'Mashriqi'}
+                  Mashriqi
                 </Text>
               </TouchableOpacity>
             </View>
@@ -191,9 +190,7 @@ export function RelationshipInputForm({
           <View style={styles.warningContainer}>
             <Ionicons name="information-circle" size={18} color="#f59e0b" />
             <Text style={styles.warningText}>
-              {isFrench 
-                ? 'Les noms arabes sont requis pour les deux personnes'
-                : 'Arabic names are required for both people'}
+              {t('compatibility.resultsView.arabicNamesRequired')}
             </Text>
           </View>
         ) : null}
@@ -208,14 +205,14 @@ export function RelationshipInputForm({
               <Ionicons name="person" size={16} color="#a78bfa" />
             </View>
             <Text style={styles.personTitle}>
-              {isFrench ? 'Personne 1' : 'Person 1'}
+              {t('compatibility.resultsView.person1')}
             </Text>
           </View>
           
           {/* Latin Name Autocomplete */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>
-              {isFrench ? 'Nom Latin (Anglais/Français)' : 'Latin Name (English/French)'}
+              {t('compatibility.resultsView.latinName')}
             </Text>
             <NameAutocomplete
               value={person1Latin}
@@ -233,14 +230,14 @@ export function RelationshipInputForm({
           <View style={styles.inputGroup}>
             <View style={styles.labelRow}>
               <Text style={styles.label}>
-                {isFrench ? 'Nom Arabe (Requis)' : 'Arabic Name (Required)'} 
+                {t('compatibility.resultsView.arabicNameRequired')}
                 <Text style={styles.required}> *</Text>
               </Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.keyboardButton}
                 onPress={() => openKeyboard('person1')}
               >
-                <Text style={styles.keyboardButtonText}>⌨️ {isFrench ? 'Clavier' : 'Keyboard'}</Text>
+                <Text style={styles.keyboardButtonText}>⌨️ {t('compatibility.resultsView.keyboard')}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.inputContainer}>
@@ -278,14 +275,14 @@ export function RelationshipInputForm({
               <Ionicons name="person" size={16} color="#f9a8d4" />
             </View>
             <Text style={styles.personTitle}>
-              {isFrench ? 'Personne 2' : 'Person 2'}
+              {t('compatibility.resultsView.person2')}
             </Text>
           </View>
           
           {/* Latin Name Autocomplete */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>
-              {isFrench ? 'Nom Latin (Anglais/Français)' : 'Latin Name (English/French)'}
+              {t('compatibility.resultsView.latinName')}
             </Text>
             <NameAutocomplete
               value={person2Latin}
@@ -303,14 +300,14 @@ export function RelationshipInputForm({
           <View style={styles.inputGroup}>
             <View style={styles.labelRow}>
               <Text style={styles.label}>
-                {isFrench ? 'Nom Arabe (Requis)' : 'Arabic Name (Required)'} 
+                {t('compatibility.resultsView.arabicNameRequired')}
                 <Text style={styles.required}> *</Text>
               </Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.keyboardButton}
                 onPress={() => openKeyboard('person2')}
               >
-                <Text style={styles.keyboardButtonText}>⌨️ {isFrench ? 'Clavier' : 'Keyboard'}</Text>
+                <Text style={styles.keyboardButtonText}>⌨️ {t('compatibility.resultsView.keyboard')}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.inputContainer}>
@@ -352,9 +349,9 @@ export function RelationshipInputForm({
               <Ionicons name="calculator" size={20} color="#fff" />
             )}
             <Text style={styles.calculateButtonText}>
-              {isLoading 
-                ? (isFrench ? 'Calcul...' : 'Calculating...') 
-                : (isFrench ? 'Calculer la Compatibilité' : 'Calculate Compatibility')}
+              {isLoading
+                ? t('compatibility.resultsView.calculating')
+                : t('compatibility.resultsView.calculateCompatibility')}
             </Text>
           </LinearGradient>
         </TouchableOpacity>

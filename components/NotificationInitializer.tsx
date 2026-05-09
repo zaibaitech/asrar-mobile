@@ -66,14 +66,9 @@ export function NotificationInitializer() {
         }),
       });
 
-      // Clear ALL old scheduled notifications to remove stale Expo Go notifications
-      // This ensures tapping notifications opens the APK, not Expo Go
-      try {
-        await Notifications.cancelAllScheduledNotificationsAsync();
-        console.log('✅ Cleared all old scheduled notifications');
-      } catch (e) {
-        console.warn('Failed to clear old notifications:', e);
-      }
+      // Do not clear all notifications globally at startup.
+      // Each service (e.g., Adhan) manages its own schedules to avoid
+      // accidental removal and timing races with other notification domains.
 
       // Load user profile
       const profile = await loadProfile();

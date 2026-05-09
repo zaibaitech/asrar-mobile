@@ -1,4 +1,5 @@
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { AngelInvocation, DhikrPractice, ManazilLanguage, ManzilPracticePack, QuranVerse, WafqGuidance } from '@/data/manazilPractices';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
@@ -57,6 +58,7 @@ export function SpiritualPracticesCard(props: {
 }) {
   const { accent, pack, tracking, advancedMode } = props;
   const language: ManazilLanguage = props.language ?? 'en';
+  const { t } = useLanguage();
   const [tab, setTab] = React.useState<TabKey>('adhkar');
   const [playingId, setPlayingId] = React.useState<string | null>(null);
   const [activeDhikr, setActiveDhikr] = React.useState<DhikrPractice | null>(null);
@@ -141,7 +143,7 @@ export function SpiritualPracticesCard(props: {
 
   return (
     <ExpandableCard
-      title="Spiritual Practices"
+      title={t('manazilScreen.practicesCard.title')}
       icon="sparkles-outline"
       accentColor={accent}
       rightMetaText={progress.total > 0 ? `${progress.done}/${progress.total}` : undefined}
@@ -150,11 +152,11 @@ export function SpiritualPracticesCard(props: {
       {pack.disclaimer ? <Text style={styles.disclaimer}>{pack.disclaimer[language] ?? pack.disclaimer.en}</Text> : null}
 
       <View style={styles.tabs}>
-        <TabButton label="Adhkār" active={tab === 'adhkar'} onPress={() => setTab('adhkar')} accent={accent} />
-        <TabButton label="Angels" active={tab === 'angels'} onPress={() => setTab('angels')} accent={accent} />
-        <TabButton label="Qur’an" active={tab === 'quran'} onPress={() => setTab('quran')} accent={accent} />
+        <TabButton label={t('manazilScreen.practicesCard.tabAdhkar')} active={tab === 'adhkar'} onPress={() => setTab('adhkar')} accent={accent} />
+        <TabButton label={t('manazilScreen.practicesCard.tabAngels')} active={tab === 'angels'} onPress={() => setTab('angels')} accent={accent} />
+        <TabButton label={t('manazilScreen.practicesCard.tabQuran')} active={tab === 'quran'} onPress={() => setTab('quran')} accent={accent} />
         {advancedMode ? (
-          <TabButton label="Wafq" active={tab === 'wafq'} onPress={() => setTab('wafq')} accent={accent} />
+          <TabButton label={t('manazilScreen.practicesCard.tabWafq')} active={tab === 'wafq'} onPress={() => setTab('wafq')} accent={accent} />
         ) : null}
       </View>
 

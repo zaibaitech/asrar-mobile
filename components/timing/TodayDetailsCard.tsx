@@ -203,10 +203,10 @@ export default function TodayDetailsCard({
             <Text style={styles.detailLabel}>{t('dailyEnergy.alignmentOverview.elementsLabel')}</Text>
             <View style={styles.detailValueContainer}>
               <Text style={styles.detailEmoji}>{getElementEmoji(userElement)}</Text>
-              <Text style={styles.detailValue}>{t(`home.dailyGuidanceDetails.elements.${userElement}`)}</Text>
+              <Text style={styles.detailValue}>{t(`home.dailyGuidanceDetails.elements.${String(userElement).toLowerCase()}`)}</Text>
               <Text style={styles.detailSeparator}>•</Text>
               <Text style={styles.detailEmoji}>{getElementEmoji(dayElement)}</Text>
-              <Text style={styles.detailValue}>{t(`home.dailyGuidanceDetails.elements.${dayElement}`)}</Text>
+              <Text style={styles.detailValue}>{t(`home.dailyGuidanceDetails.elements.${String(dayElement).toLowerCase()}`)}</Text>
             </View>
           </View>
         )}

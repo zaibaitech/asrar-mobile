@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import * as Localization from 'expo-localization';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { translations } from '../constants/translations';
 
 type Language = 'en' | 'fr' | 'ar';
@@ -21,6 +22,31 @@ const LANGUAGE_STORAGE_KEY = '@asrar_language';
 const missingKeys = new Set<string>();
 
 /**
+ * Get device language from system locale
+ * Normalizes locale codes (e.g., fr-FR -> fr, en-GB -> en)
+ * Returns a supported language or falls back to 'en'
+ */
+const getDeviceLanguage = (): Language => {
+  try {
+    const locales = Localization.getLocales();
+    if (locales && locales.length > 0) {
+      const primaryLocale = locales[0];
+      const languageCode = primaryLocale.languageCode?.toLowerCase() || '';
+      
+      // Normalize and validate against supported languages
+      if (languageCode.startsWith('fr')) return 'fr';
+      if (languageCode.startsWith('ar')) return 'ar';
+      if (languageCode.startsWith('en')) return 'en';
+    }
+  } catch (error) {
+    console.warn('Failed to get device locale:', error);
+  }
+  
+  // Default fallback
+  return 'en';
+};
+
+/**
  * Humanize a translation key into a readable fallback
  * Examples:
  *   "home.now" => "Now"
@@ -33,35 +59,49 @@ const humanizeKey = (key: string): string => {
   
   // Convert camelCase to Title Case with spaces
   const withSpaces = lastSegment
-    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+    .replaceAll(/([A-Z])/g, ' $1') // Add space before capital letters
     .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
     .trim();
   
   return withSpaces;
 };
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('en');
+export function LanguageProvider({ children }: Readonly<{ children: ReactNode }>) {
+  // Initialize with device language - will be overridden by saved preference if it exists
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(() => getDeviceLanguage());
 
   useEffect(() => {
-    loadLanguage();
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
+        if (savedLanguage && ['en', 'fr', 'ar'].includes(savedLanguage)) {
+          // User has explicitly chosen a language - use it
+          setCurrentLanguage(savedLanguage as Language);
+          console.log('[LanguageProvider] Loaded saved language:', savedLanguage);
+          return;
+        }
+
+        // No saved preference - use device language (already set in initial state)
+        const deviceLang = getDeviceLanguage();
+        setCurrentLanguage(deviceLang);
+        console.log('[LanguageProvider] Using device language:', deviceLang);
+      } catch (error) {
+        console.error('Failed to load language:', error);
+        // Keep initial device language if loading fails
+      }
+    };
+
+    loadLanguage().catch((error) => {
+      console.error('Failed to initialize language:', error);
+    });
   }, []);
 
-  const loadLanguage = async () => {
+  const setLanguage = useCallback(async (lang: Language) => {
     try {
-      const savedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
-      if (savedLanguage && ['en', 'fr', 'ar'].includes(savedLanguage)) {
-        setLanguageState(savedLanguage as Language);
-      }
-    } catch (error) {
-      console.error('Failed to load language:', error);
-    }
-  };
-
-  const setLanguage = async (lang: Language) => {
-    try {
+      // Save user's explicit language choice
       await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
-      setLanguageState(lang);
+      setCurrentLanguage(lang);
+      console.log('[LanguageProvider] Language changed to:', lang);
     } catch (error) {
       // Handle storage full error with retry
       if (error instanceof Error && error.message.includes('SQLITE_FULL')) {
@@ -79,8 +119,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
             await AsyncStorage.multiRemove(keysToRemove);
             // Retry saving language
             await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
-            setLanguageState(lang);
-            console.log('Language saved successfully after cleanup');
+            setCurrentLanguage(lang);
+            console.log('[LanguageProvider] Language saved successfully after cleanup');
             return;
           }
         } catch (cleanupError) {
@@ -89,10 +129,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       }
       
       // If we couldn't save to storage, at least update the state
-      setLanguageState(lang);
+      setCurrentLanguage(lang);
       console.error('Failed to save language to storage:', error);
     }
-  };
+  }, []);
 
   // Translation function with nested key support (e.g., "common.calculate")
   const resolveTranslation = (lang: Language, keys: string[]) => {
@@ -147,23 +187,23 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }, text);
   };
 
-  const t = (key: string, params?: TranslationParams) => {
+  const t = useCallback((key: string, params?: TranslationParams) => {
     const keys = key.split('.');
     const fallbackLanguage: Language = 'en';
 
-    const primaryValue = resolveTranslation(language, keys);
+    const primaryValue = resolveTranslation(currentLanguage, keys);
     if (primaryValue) {
       return applyParams(primaryValue, params);
     }
 
-    const fallbackValue = language === fallbackLanguage
+    const fallbackValue = currentLanguage === fallbackLanguage
       ? undefined
       : resolveTranslation(fallbackLanguage, keys);
 
     if (fallbackValue) {
       if (__DEV__ && !missingKeys.has(key)) {
         missingKeys.add(key);
-        console.warn(`[i18n] Missing translation for "${key}" in language "${language}". Falling back to ${fallbackLanguage}.`);
+        console.warn(`[i18n] Missing translation for "${key}" in language "${currentLanguage}". Falling back to ${fallbackLanguage}.`);
       }
       return applyParams(fallbackValue, params);
     }
@@ -177,7 +217,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
 
     return applyParams(humanFallback, params);
-  };
+  }, [currentLanguage]);
 
   /**
    * Safe translation helper - returns fallback if key missing, NEVER shows raw keys
@@ -188,24 +228,24 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
    * @param params - Optional parameters for string interpolation
    * @returns Translated string or fallback (never raw key)
    */
-  const tSafe = (key: string, fallback: string, params?: TranslationParams): string => {
+  const tSafe = useCallback((key: string, fallback: string, params?: TranslationParams): string => {
     const keys = key.split('.');
     const fallbackLanguage: Language = 'en';
 
     // Try primary language
-    const primaryValue = resolveTranslation(language, keys);
+    const primaryValue = resolveTranslation(currentLanguage, keys);
     if (primaryValue) {
       return applyParams(primaryValue, params);
     }
 
     // Try fallback language if different
-    if (language !== fallbackLanguage) {
+    if (currentLanguage !== fallbackLanguage) {
       const fallbackLangValue = resolveTranslation(fallbackLanguage, keys);
       if (fallbackLangValue) {
         // Collect missing key in dev (once only)
         if (__DEV__ && !missingKeys.has(key)) {
           missingKeys.add(key);
-          console.warn(`[tSafe] Missing "${key}" in "${language}", using EN fallback`);
+          console.warn(`[tSafe] Missing "${key}" in "${currentLanguage}", using EN fallback`);
         }
         return applyParams(fallbackLangValue, params);
       }
@@ -218,10 +258,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
 
     return applyParams(fallback, params);
-  };
+  }, [currentLanguage]);
+
+  const contextValue = useMemo(() => ({
+    language: currentLanguage,
+    setLanguage,
+    t,
+    tSafe,
+  }), [currentLanguage, setLanguage, t, tSafe]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, tSafe }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );

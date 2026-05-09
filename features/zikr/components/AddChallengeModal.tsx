@@ -50,48 +50,63 @@ interface AddChallengeModalProps {
 
 // ─── Challenge Type Options ──────────────────────────────────────────────────────
 
-const CHALLENGE_TYPE_OPTIONS: { type: ChallengeType; emoji: string; titleEn: string; titleFr: string; descEn: string; descFr: string }[] = [
+const CHALLENGE_TYPE_OPTIONS: {
+  type: ChallengeType;
+  emoji: string;
+  titleEn: string;
+  titleFr: string;
+  titleAr: string;
+  descEn: string;
+  descFr: string;
+  descAr: string;
+}[] = [
   {
     type: 'ISTIGHFAR',
     emoji: '🤲',
     titleEn: 'Istighfār',
     titleFr: 'Istighfār',
+    titleAr: 'الاستغفار',
     descEn: 'Seek forgiveness from Allah',
     descFr: 'Demander pardon à Allah',
+    descAr: 'طلب المغفرة من الله',
   },
   {
     type: 'SALAWAT',
     emoji: '💚',
     titleEn: 'Ṣalawāt',
     titleFr: 'Ṣalawāt',
+    titleAr: 'الصلاة على النبي',
     descEn: 'Blessings upon the Prophet ﷺ',
     descFr: 'Bénédictions sur le Prophète ﷺ',
+    descAr: 'الصلاة على النبي ﷺ',
   },
   {
     type: 'DIVINE_NAME',
     emoji: '✨',
     titleEn: 'Divine Name',
     titleFr: 'Nom Divin',
+    titleAr: 'اسم إلهي',
     descEn: "Invoke Allah's Beautiful Names",
     descFr: "Invoquer les Beaux Noms d'Allah",
+    descAr: 'ذكر أسماء الله الحسنى',
   },
   {
     type: 'CUSTOM',
     emoji: '📿',
     titleEn: 'Custom Wird',
     titleFr: 'Wird Personnalisé',
+    titleAr: 'ورد مخصص',
     descEn: 'Create your own dhikr practice',
     descFr: 'Créez votre propre pratique de dhikr',
+    descAr: 'أنشئ ممارستك الخاصة من الذكر',
   },
 ];
 
 // ─── Component ───────────────────────────────────────────────────────────────────
 
-function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) {
-  const { t, language } = useLanguage();
+function AddChallengeModal({ visible, onClose, onAdd }: Readonly<AddChallengeModalProps>) {
+  const { tSafe, language } = useLanguage();
   const [step, setStep] = useState<ModalStep>('SELECT_TYPE');
-  const [selectedSalawat, setSelectedSalawat] = useState<SalawatPreset | null>(null);
-  const [selectedDivineName, setSelectedDivineName] = useState<DivineNameOption | null>(null);
   
   // Custom wird form state
   const [customTitle, setCustomTitle] = useState('');
@@ -100,12 +115,16 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
   const [customMeaning, setCustomMeaning] = useState('');
   const [customDailyTarget, setCustomDailyTarget] = useState('100');
 
+  const tr = useCallback((en: string, fr: string, ar: string) => {
+    if (language === 'ar') return ar;
+    if (language === 'fr') return fr;
+    return en;
+  }, [language]);
+
   // ─── Reset Handler ───────────────────────────────────────────────────────────
 
   const handleClose = useCallback(() => {
     setStep('SELECT_TYPE');
-    setSelectedSalawat(null);
-    setSelectedDivineName(null);
     setCustomTitle('');
     setCustomArabic('');
     setCustomTranslit('');
@@ -174,7 +193,7 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
     if (!customTitle.trim() || !customArabic.trim()) return;
     
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const dailyTarget = parseInt(customDailyTarget) || 100;
+    const dailyTarget = Number.parseInt(customDailyTarget, 10) || 100;
     const config: ChallengeConfig = {
       title: customTitle.trim(),
       arabicText: customArabic.trim(),
@@ -197,12 +216,10 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
       showsVerticalScrollIndicator={false}
     >
       <Text style={styles.stepTitle}>
-        {language === 'fr' ? 'Choisir un type de Dhikr' : 'Choose Dhikr Type'}
+        {tSafe('zikr.modal.chooseType', 'Choose Dhikr Type')}
       </Text>
       <Text style={styles.stepSubtitle}>
-        {language === 'fr' 
-          ? 'Sélectionnez le type de pratique spirituelle'
-          : 'Select the type of spiritual practice'}
+        {tSafe('zikr.modal.chooseTypeSubtitle', 'Select the type of spiritual practice')}
       </Text>
       
       <View style={styles.typeGrid}>
@@ -217,10 +234,10 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
             >
               <Text style={styles.typeEmoji}>{option.emoji}</Text>
               <Text style={styles.typeTitle}>
-                {language === 'fr' ? option.titleFr : option.titleEn}
+                {tr(option.titleEn, option.titleFr, option.titleAr)}
               </Text>
               <Text style={styles.typeDesc}>
-                {language === 'fr' ? option.descFr : option.descEn}
+                {tr(option.descEn, option.descFr, option.descAr)}
               </Text>
             </TouchableOpacity>
           );
@@ -238,16 +255,14 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
       showsVerticalScrollIndicator={false}
     >
       <TouchableOpacity style={styles.backButton} onPress={() => setStep('SELECT_TYPE')}>
-        <Text style={styles.backText}>← {language === 'fr' ? 'Retour' : 'Back'}</Text>
+        <Text style={styles.backText}>← {tSafe('zikr.modal.back', 'Back')}</Text>
       </TouchableOpacity>
       
       <Text style={styles.stepTitle}>
-        {language === 'fr' ? 'Choisir une Ṣalawāt' : 'Choose a Ṣalawāt'}
+        {tSafe('zikr.modal.chooseSalawat', 'Choose a Ṣalawāt')}
       </Text>
       <Text style={styles.stepSubtitle}>
-        {language === 'fr'
-          ? 'Prières sur le Prophète ﷺ de différentes traditions'
-          : 'Prayers upon the Prophet ﷺ from various traditions'}
+        {tSafe('zikr.modal.chooseSalawatSubtitle', 'Prayers upon the Prophet ﷺ from various traditions')}
       </Text>
       
       <View style={styles.presetList}>
@@ -274,7 +289,9 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
             </Text>
             <View style={styles.presetFooter}>
               <Text style={styles.presetDaily}>
-                {language === 'fr' ? 'Recommandé:' : 'Recommended:'} {preset.recommendedDaily}/day
+                {tSafe('zikr.modal.recommendedPerDay', 'Recommended: {count}/day', {
+                  count: preset.recommendedDaily,
+                })}
               </Text>
             </View>
           </TouchableOpacity>
@@ -292,16 +309,14 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
       showsVerticalScrollIndicator={false}
     >
       <TouchableOpacity style={styles.backButton} onPress={() => setStep('SELECT_TYPE')}>
-        <Text style={styles.backText}>← {language === 'fr' ? 'Retour' : 'Back'}</Text>
+        <Text style={styles.backText}>← {tSafe('zikr.modal.back', 'Back')}</Text>
       </TouchableOpacity>
       
       <Text style={styles.stepTitle}>
-        {language === 'fr' ? 'Choisir un Nom Divin' : 'Choose a Divine Name'}
+        {tSafe('zikr.modal.chooseDivineName', 'Choose a Divine Name')}
       </Text>
       <Text style={styles.stepSubtitle}>
-        {language === 'fr'
-          ? "Les Beaux Noms d'Allah pour l'invocation"
-          : "Allah's Beautiful Names for invocation"}
+        {tSafe('zikr.modal.chooseDivineNameSubtitle', "Allah's Beautiful Names for invocation")}
       </Text>
       
       <View style={styles.nameGrid}>
@@ -331,35 +346,33 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
       style={styles.content}
     >
       <TouchableOpacity style={styles.backButton} onPress={() => setStep('SELECT_TYPE')}>
-        <Text style={styles.backText}>← {language === 'fr' ? 'Retour' : 'Back'}</Text>
+        <Text style={styles.backText}>← {tSafe('zikr.modal.back', 'Back')}</Text>
       </TouchableOpacity>
       
       <Text style={styles.stepTitle}>
-        {language === 'fr' ? 'Wird Personnalisé' : 'Custom Wird'}
+        {tSafe('zikr.modal.customWird', 'Custom Wird')}
       </Text>
       <Text style={styles.stepSubtitle}>
-        {language === 'fr'
-          ? 'Créez votre propre pratique de dhikr'
-          : 'Create your own dhikr practice'}
+        {tSafe('zikr.modal.customWirdSubtitle', 'Create your own dhikr practice')}
       </Text>
       
       <ScrollView style={styles.formScroll} showsVerticalScrollIndicator={false}>
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>
-            {language === 'fr' ? 'Titre *' : 'Title *'}
+            {tSafe('zikr.modal.fields.title', 'Title *')}
           </Text>
           <TextInput
             style={styles.textInput}
             value={customTitle}
             onChangeText={setCustomTitle}
-            placeholder={language === 'fr' ? 'Ex: Mon Dhikr' : 'E.g., My Dhikr'}
+            placeholder={tSafe('zikr.modal.fields.titlePlaceholder', 'E.g., My Dhikr')}
             placeholderTextColor={DarkTheme.textMuted}
           />
         </View>
         
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>
-            {language === 'fr' ? 'Texte Arabe *' : 'Arabic Text *'}
+            {tSafe('zikr.modal.fields.arabicText', 'Arabic Text *')}
           </Text>
           <TextInput
             style={[styles.textInput, styles.arabicInput]}
@@ -373,7 +386,7 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
         
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>
-            {language === 'fr' ? 'Translittération' : 'Transliteration'}
+            {tSafe('zikr.modal.fields.transliteration', 'Transliteration')}
           </Text>
           <TextInput
             style={styles.textInput}
@@ -386,13 +399,13 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
         
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>
-            {language === 'fr' ? 'Signification' : 'Meaning'}
+            {tSafe('zikr.modal.fields.meaning', 'Meaning')}
           </Text>
           <TextInput
             style={[styles.textInput, styles.multilineInput]}
             value={customMeaning}
             onChangeText={setCustomMeaning}
-            placeholder={language === 'fr' ? 'Au nom de Dieu' : 'In the name of God'}
+            placeholder={tSafe('zikr.modal.fields.meaningPlaceholder', 'In the name of God')}
             placeholderTextColor={DarkTheme.textMuted}
             multiline
             numberOfLines={2}
@@ -401,7 +414,7 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
         
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>
-            {language === 'fr' ? 'Objectif Quotidien' : 'Daily Target'}
+            {tSafe('zikr.modal.fields.dailyTarget', 'Daily Target')}
           </Text>
           <TextInput
             style={styles.textInput}
@@ -423,7 +436,7 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
           activeOpacity={0.8}
         >
           <Text style={styles.submitButtonText}>
-            {language === 'fr' ? 'Ajouter le Wird' : 'Add Wird'}
+            {tSafe('zikr.modal.fields.addWird', 'Add Wird')}
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -461,7 +474,7 @@ function AddChallengeModal({ visible, onClose, onAdd }: AddChallengeModalProps) 
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.headerTitle}>
-              {language === 'fr' ? 'Nouveau Dhikr' : 'New Dhikr'}
+              {tSafe('zikr.modal.newDhikr', 'New Dhikr')}
             </Text>
             <TouchableOpacity 
               style={styles.closeButton} 

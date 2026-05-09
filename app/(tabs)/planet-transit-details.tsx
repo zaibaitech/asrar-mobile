@@ -1,6 +1,7 @@
 import { AdBanner } from '@/components/ads';
 import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/DarkTheme';
+import { PLANETARY_ZIKR } from '@/constants/planetaryZikr';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import type { Element } from '@/services/MomentAlignmentService';
@@ -1858,6 +1859,24 @@ export default function PlanetTransitDetailsScreen() {
   );
   const [refreshing, setRefreshing] = useState(false);
 
+  const formatPracticeCountdown = useCallback((minutesUntil: number) => {
+    const minuteUnit = tSafe('screens.planetTransit.practice.timing.units.minuteShort', 'min');
+    const hourUnit = tSafe('screens.planetTransit.practice.timing.units.hourShort', 'h');
+
+    if (minutesUntil < 60) {
+      return `${minutesUntil} ${minuteUnit}`;
+    }
+
+    const hours = Math.floor(minutesUntil / 60);
+    const minutes = minutesUntil % 60;
+
+    if (minutes === 0) {
+      return `${hours}${hourUnit}`;
+    }
+
+    return `${hours}${hourUnit} ${minutes}${minuteUnit}`;
+  }, [tSafe]);
+
   const ZODIAC_SYSTEM_KEY = '@asrar_zodiac_system';
   const [zodiacSystem, setZodiacSystem] = useState<ZodiacSystem>('tropical');
 
@@ -1916,6 +1935,14 @@ export default function PlanetTransitDetailsScreen() {
   
   // Selected dhikr tier for user choice
   const [selectedTier, setSelectedTier] = useState<DhikrTier>('standard');
+
+  // Planet-specific practices accordion state (must stay at component level for stable hook order)
+  const [expandedPractice, setExpandedPractice] = useState<string | null>(null);
+  const [expandedEssences, setExpandedEssences] = useState(false);
+  const [expandedTalisman, setExpandedTalisman] = useState(false);
+  const [expandedAngels, setExpandedAngels] = useState(false);
+  const [expandedTiming, setExpandedTiming] = useState(false);
+  const [expandedPreparation, setExpandedPreparation] = useState(false);
   
   // ScrollView ref for scroll-to-top when tapping transits
   const scrollViewRef = useRef<ScrollView>(null);
@@ -2045,6 +2072,21 @@ export default function PlanetTransitDetailsScreen() {
     };
   }, [detailsType, transitDataRaw, zodiacSystem]);
 
+  const practicesPlanetKey = useMemo(
+    () => ((transitData as LegacyPlanetTransitInfo | PlanetTransitInfo | null)?.planetKey ?? '').toLowerCase(),
+    [transitData]
+  );
+
+  const planetPractices = useMemo(
+    () => (detailsType === 'transit' && practicesPlanetKey ? getPlanetPractices(practicesPlanetKey) : null),
+    [detailsType, practicesPlanetKey]
+  );
+
+  const planetaryZikr = useMemo(
+    () => (practicesPlanetKey ? PLANETARY_ZIKR[practicesPlanetKey as keyof typeof PLANETARY_ZIKR] : undefined),
+    [practicesPlanetKey]
+  );
+
   const contextElement: Element | null = useMemo(() => {
     if (detailsType === 'transit') {
       const transit = transitData as any;
@@ -2173,15 +2215,9 @@ export default function PlanetTransitDetailsScreen() {
     const source = (data as any)?.source as LegacyPlanetTransitInfo['source'] | undefined;
     if (source === 'ephemeris') return t('screens.planetTransit.dataSource.api');
     if (source === 'cached') return t('screens.planetTransit.dataSource.cached');
-    if (source === 'fallback') {
-      return language === 'ar'
-        ? 'تقريب (غير موثوق)'
-        : language === 'fr'
-          ? 'Approximation (non fiable)'
-          : 'Approximation (unreliable)';
-    }
+    if (source === 'fallback') return t('screens.planetTransit.approximationUnreliable');
     return t('common.unknown');
-  }, [transitData, t, language]);
+  }, [transitData, t]);
 
   const handleRefresh = useCallback(async () => {
     if (detailsType !== 'transit' || refreshing) return;
@@ -2223,12 +2259,10 @@ export default function PlanetTransitDetailsScreen() {
   // Transit type labels for personal vs cosmic weather
   const transitTypeLabel = useMemo(() => {
     if (detailsType !== 'transit') return null;
-    if (isPersonalTransit) {
-      return language === 'ar' ? 'في برجك' : language === 'fr' ? 'Dans ton signe' : 'In Your Sign';
-    } else {
-      return language === 'ar' ? 'الطقس الكوني' : language === 'fr' ? 'Météo cosmique' : 'Cosmic Weather';
-    }
-  }, [detailsType, isPersonalTransit, language]);
+    return isPersonalTransit
+      ? t('screens.planetTransit.transitType.personal')
+      : t('screens.planetTransit.transitType.collective');
+  }, [detailsType, isPersonalTransit, t]);
   
   const explainer =
     detailsType === 'transit'
@@ -2525,67 +2559,23 @@ export default function PlanetTransitDetailsScreen() {
 
   const getDegreePhaseLabel = useCallback(
     (stage: 'entry' | 'stabilization' | 'completion') => {
-      if (language === 'fr') {
-        return stage === 'entry'
-          ? '🔵 Phase d’entrée'
-          : stage === 'stabilization'
-            ? '🟢 Phase de pointe'
-            : '🟠 Phase de clôture';
-      }
-      if (language === 'ar') {
-        return stage === 'entry'
-          ? '🔵 مرحلة الدخول'
-          : stage === 'stabilization'
-            ? '🟢 مرحلة الذروة'
-            : '🟠 مرحلة الإغلاق';
-      }
-      return stage === 'entry' ? '🔵 Entry Phase' : stage === 'stabilization' ? '🟢 Peak Phase' : '🟠 Closing Phase';
+      return t(`screens.planetTransit.degreeStage.full.${stage}`);
     },
-    [language]
+    [t]
   );
 
   const getDegreeStageBadgeLabel = useCallback(
     (stage: 'entry' | 'stabilization' | 'completion') => {
-      if (language === 'fr') {
-        return stage === 'entry' ? 'Entrée' : stage === 'stabilization' ? 'Pic' : 'Clôture';
-      }
-      if (language === 'ar') {
-        return stage === 'entry' ? 'دخول' : stage === 'stabilization' ? 'ذروة' : 'إغلاق';
-      }
-      return stage === 'entry' ? 'Entry' : stage === 'stabilization' ? 'Peak' : 'Closing';
+      return t(`screens.planetTransit.degreeStage.badge.${stage}`);
     },
-    [language]
+    [t]
   );
 
   const getElementalResonanceLabel = useCallback(
     (resonance: 'harmonious' | 'supportive' | 'neutral' | 'challenging') => {
-      if (language === 'fr') {
-        return resonance === 'harmonious'
-          ? 'Harmonieux'
-          : resonance === 'supportive'
-            ? 'Supportif'
-            : resonance === 'neutral'
-              ? 'Neutre'
-              : 'Transformateur';
-      }
-      if (language === 'ar') {
-        return resonance === 'harmonious'
-          ? 'منسجم'
-          : resonance === 'supportive'
-            ? 'داعمة'
-            : resonance === 'neutral'
-              ? 'متوازن'
-              : 'تحويلي';
-      }
-      return resonance === 'harmonious'
-        ? 'Harmonious'
-        : resonance === 'supportive'
-          ? 'Supportive'
-          : resonance === 'neutral'
-            ? 'Neutral'
-            : 'Challenging';
+      return t(`screens.planetTransit.resonance.labels.${resonance}`);
     },
-    [language]
+    [t]
   );
   
   // Calculate personalized planetary influence
@@ -2756,7 +2746,7 @@ export default function PlanetTransitDetailsScreen() {
                   <View style={styles.retrogradePill}>
                     <Text style={styles.retrogradePillText}>℞</Text>
                     <Text style={styles.retrogradePillText}>
-                      {language === 'ar' ? 'تراجع' : language === 'fr' ? 'Rétrograde' : 'Retrograde'}
+                      {t('screens.planetTransit.retrograde')}
                     </Text>
                   </View>
                 ) : null}
@@ -2785,13 +2775,13 @@ export default function PlanetTransitDetailsScreen() {
                 <View style={[styles.elementTag, { borderColor: `${accent.primary}30`, backgroundColor: `${accent.primary}15` }]}> 
                   <Ionicons name={getElementIconName(contextElement ?? 'earth')} size={12} color={accent.primary} />
                   <Text style={[styles.elementText, { color: accent.primary }]}> 
-                    {tSafe(`common.elements.${contextElement}`, toTitleCase(contextElement ?? 'earth')).toUpperCase()} SIGN
+                    {tSafe(`common.elements.${contextElement}`, toTitleCase(contextElement ?? 'earth')).toUpperCase() + ' ' + t('screens.planetTransit.zodiacSystem.signSuffix')}
                   </Text>
                 </View>
 
                 <View style={styles.zodiacSystemRow}>
                   <Text style={styles.zodiacSystemLabel}>
-                    {language === 'ar' ? 'نظام البروج' : language === 'fr' ? 'Zodiaque' : 'Zodiac'}
+                    {t('screens.planetTransit.zodiacSystem.label')}
                   </Text>
                   <View style={styles.zodiacSystemToggle}>
                     <TouchableOpacity
@@ -2805,7 +2795,7 @@ export default function PlanetTransitDetailsScreen() {
                       <Text
                         style={[styles.zodiacSystemOptionText, zodiacSystem === 'tropical' && styles.zodiacSystemOptionTextActive]}
                       >
-                        {language === 'fr' ? 'Tropical' : language === 'ar' ? 'استوائي' : 'Tropical'}
+                        {t('screens.planetTransit.zodiacSystem.tropical')}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -2825,7 +2815,7 @@ export default function PlanetTransitDetailsScreen() {
                           zodiacSystem === 'sidereal_lahiri' && styles.zodiacSystemOptionTextActive,
                         ]}
                       >
-                        {language === 'fr' ? 'Sidéreal (Lahiri)' : language === 'ar' ? 'نجمي (لاهيري)' : 'Sidereal (Lahiri)'}
+                        {t('screens.planetTransit.zodiacSystem.sidereal')}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -3397,7 +3387,7 @@ export default function PlanetTransitDetailsScreen() {
                     {(language === 'ar'
                       ? getElementalResonanceLabel(personalizedInfluence.elementalResonance)
                       : getElementalResonanceLabel(personalizedInfluence.elementalResonance).toUpperCase())}{' '}
-                    {(language === 'fr' ? 'RÉSONANCE' : language === 'ar' ? 'رنين' : 'RESONANCE')}
+                    {t('screens.planetTransit.resonance.labels.titleSuffix')}
                   </Text>
                   <Text style={styles.resonanceDescription}>
                     {personalizedInfluence.resonanceExplanation}
@@ -3759,21 +3749,8 @@ export default function PlanetTransitDetailsScreen() {
                     COMPREHENSIVE PLANET-SPECIFIC PRACTICES
                     Divine Names, Essences, Talismans, Angels, Timing, Preparation
                 ───────────────────────────────────────────────────────────────── */}
-                {(() => {
-                  const planetPractices = getPlanetPractices(transitData.planetKey);
-                  if (!planetPractices) return null;
-
-                  const practicesPlanetKey = (transitData.planetKey ?? '').toLowerCase();
-
-                  const [expandedPractice, setExpandedPractice] = React.useState<string | null>(null);
-                  const [expandedEssences, setExpandedEssences] = React.useState(false);
-                  const [expandedTalisman, setExpandedTalisman] = React.useState(false);
-                  const [expandedAngels, setExpandedAngels] = React.useState(false);
-                  const [expandedTiming, setExpandedTiming] = React.useState(false);
-                  const [expandedPreparation, setExpandedPreparation] = React.useState(false);
-
-                  return (
-                    <>
+                {planetPractices ? (
+                  <>
                       <View style={styles.divider}>
                         <Text style={styles.dividerText}>
                           {t('screens.planetTransit.practices.title')}
@@ -3793,6 +3770,12 @@ export default function PlanetTransitDetailsScreen() {
                             planet: language === 'ar' ? planetPractices.planetAr : planetPractices.planet,
                           })}
                         </Text>
+
+                        {planetaryZikr?.sectionNote ? (
+                          <Text style={styles.practicesSectionNote}>
+                            {tSafe(`planetaryZikr.planets.${practicesPlanetKey}.sectionNote`, planetaryZikr.sectionNote)}
+                          </Text>
+                        ) : null}
 
                         {planetPractices.divineNames.map((divineName) => (
                           <TouchableOpacity
@@ -3933,6 +3916,61 @@ export default function PlanetTransitDetailsScreen() {
                             )}
                           </TouchableOpacity>
                         ))}
+
+                        {planetaryZikr?.zikr.map((zikrItem, index) => {
+                          const zikrId = `planetary-zikr-${practicesPlanetKey}-${index}`;
+                          const isExpanded = expandedPractice === zikrId;
+
+                          return (
+                            <TouchableOpacity
+                              key={zikrId}
+                              style={styles.practiceCard}
+                              onPress={() => {
+                                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                                setExpandedPractice(isExpanded ? null : zikrId);
+                              }}
+                              activeOpacity={0.8}
+                            >
+                              <View style={styles.practiceCardHeader}>
+                                <Text style={styles.practiceIcon}>📿</Text>
+                                <View style={styles.practiceCardTitles}>
+                                  <Text style={styles.practiceCardCategory}>
+                                    {tSafe(`planetaryZikr.planets.${practicesPlanetKey}.label`, planetaryZikr.label)}
+                                  </Text>
+                                  <Text style={styles.practiceCardName}>{zikrItem.name}</Text>
+                                </View>
+                                {!!zikrItem.note && (
+                                  <View style={styles.planetaryZikrNoteBadge}>
+                                    <Text style={styles.planetaryZikrNoteBadgeText}>
+                                      {tSafe(`planetaryZikr.planets.${practicesPlanetKey}.entries.${zikrItem.id}.note`, zikrItem.note)}
+                                    </Text>
+                                  </View>
+                                )}
+                              </View>
+
+                              {isExpanded ? (
+                                <View style={styles.practiceCardContent}>
+                                  <View style={styles.practiceCountRow}>
+                                    <Ionicons name="repeat" size={16} color={accent.primary} />
+                                    <Text style={styles.practiceCountLabel}>
+                                      {t('screens.planetTransit.practices.divineNames.repetitionsLabel')}
+                                    </Text>
+                                    <Text style={styles.practiceCountValue}>{zikrItem.count}×</Text>
+                                  </View>
+
+                                  <View style={styles.practicePurposeBox}>
+                                    <Text style={styles.practicePurposeLabel}>
+                                      {t('screens.planetTransit.practices.divineNames.purposeLabel')}
+                                    </Text>
+                                    <Text style={styles.practicePurposeText}>
+                                      {tSafe(`planetaryZikr.planets.${practicesPlanetKey}.entries.${zikrItem.id}.benefit`, zikrItem.benefit)}
+                                    </Text>
+                                  </View>
+                                </View>
+                              ) : null}
+                            </TouchableOpacity>
+                          );
+                        })}
                       </View>
 
                       {/* Essences Section */}
@@ -3948,7 +3986,7 @@ export default function PlanetTransitDetailsScreen() {
                           <View style={styles.practicesSectionHeaderLeft}>
                             <Ionicons name="rose" size={16} color="#F48FB1" />
                             <Text style={styles.practicesSectionTitle}>
-                              {language === 'ar' ? 'العطور الموصى بها' : language === 'fr' ? 'Essences Recommandées' : 'Recommended Essences'}
+                              {t('screens.planetTransit.advancedPractice.essences.title')}
                             </Text>
                           </View>
                           <Ionicons 
@@ -3961,11 +3999,9 @@ export default function PlanetTransitDetailsScreen() {
                         {expandedEssences && (
                           <>
                             <Text style={styles.practicesSectionDesc}>
-                              {language === 'ar' 
-                                ? `استخدم هذه العطور لتعزيز ممارساتك مع ${planetPractices.planetAr}`
-                                : language === 'fr'
-                                ? `Utiliser ces parfums pour améliorer vos pratiques ${planetPractices.planet}`
-                                : `Use these fragrances to enhance your ${planetPractices.planet} practices`}
+                              {t('screens.planetTransit.advancedPractice.essences.description', {
+                                planet: language === 'ar' ? planetPractices.planetAr : planetPractices.planet,
+                              })}
                             </Text>
 
                             <View style={styles.essencesGrid}>
@@ -3981,24 +4017,24 @@ export default function PlanetTransitDetailsScreen() {
 
                             <View style={styles.essenceHowToBox}>
                               <Text style={styles.essenceHowToLabel}>
-                                {language === 'ar' ? '💡 كيفية الاستخدام:' : language === 'fr' ? '💡 Comment Utiliser:' : '💡 How to Use:'}
+                                {t('screens.planetTransit.advancedPractice.essences.howToLabel')}
                               </Text>
                               <View style={styles.essenceHowToItem}>
                                 <Text style={styles.essenceHowToBullet}>•</Text>
                                 <Text style={styles.essenceHowToText}>
-                                  {language === 'ar' ? 'احرقها كبخور قبل الممارسة' : language === 'fr' ? 'Brûler comme encens avant la pratique' : 'Burn as incense before practice'}
+                                  {t('screens.planetTransit.advancedPractice.essences.step1')}
                                 </Text>
                               </View>
                               <View style={styles.essenceHowToItem}>
                                 <Text style={styles.essenceHowToBullet}>•</Text>
                                 <Text style={styles.essenceHowToText}>
-                                  {language === 'ar' ? 'ضعها كعطر طبيعي' : language === 'fr' ? 'Appliquer comme parfum naturel' : 'Apply as natural perfume'}
+                                  {t('screens.planetTransit.advancedPractice.essences.step2')}
                                 </Text>
                               </View>
                               <View style={styles.essenceHowToItem}>
                                 <Text style={styles.essenceHowToBullet}>•</Text>
                                 <Text style={styles.essenceHowToText}>
-                                  {language === 'ar' ? 'احتفظ بها في مكان الممارسة' : language === 'fr' ? 'Garder dans l\'espace de pratique' : 'Keep in practice space'}
+                                  {t('screens.planetTransit.advancedPractice.essences.step3')}
                                 </Text>
                               </View>
                             </View>
@@ -4019,7 +4055,7 @@ export default function PlanetTransitDetailsScreen() {
                           <View style={styles.practicesSectionHeaderLeft}>
                             <Ionicons name="shield-checkmark" size={16} color="#9C27B0" />
                             <Text style={styles.practicesSectionTitle}>
-                              {language === 'ar' ? 'إرشادات التعويذة (اختياري)' : language === 'fr' ? 'Orientation Talisman (Optionnel)' : 'Talisman Guidance (Optional)'}
+                              {t('screens.planetTransit.advancedPractice.talisman.title')}
                             </Text>
                           </View>
                           <Ionicons 
@@ -4032,17 +4068,13 @@ export default function PlanetTransitDetailsScreen() {
                         {expandedTalisman && (
                           <>
                             <Text style={styles.practicesSectionDesc}>
-                              {language === 'ar' 
-                                ? 'للممارسين المتقدمين الذين يعملون مع الأدوات الروحية المكتوبة:'
-                                : language === 'fr'
-                                ? 'Pour les praticiens avancés travaillant avec des outils spirituels écrits:'
-                                : 'For advanced practitioners working with written spiritual tools:'}
+                              {t('screens.planetTransit.advancedPractice.talisman.description')}
                             </Text>
 
                             <View style={styles.talismanInfoBox}>
                               <View style={styles.talismanInfoRow}>
                                 <Text style={styles.talismanInfoLabel}>
-                                  {language === 'ar' ? 'التنسيق:' : language === 'fr' ? 'Format:' : 'Format:'}
+                                  {t('screens.planetTransit.advancedPractice.talisman.format')}
                                 </Text>
                                 <Text style={styles.talismanInfoValue}>
                                   {language === 'ar' ? planetPractices.talisman.formatAr : planetPractices.talisman.format}
@@ -4054,7 +4086,7 @@ export default function PlanetTransitDetailsScreen() {
 
                               <View style={styles.talismanTimingBox}>
                                 <Text style={styles.talismanTimingLabel}>
-                                  {language === 'ar' ? '🗓️ أفضل يوم:' : language === 'fr' ? '🗓️ Meilleur Jour:' : '🗓️ Best Day:'}
+                                  {t('screens.planetTransit.advancedPractice.talisman.bestDay')}
                                 </Text>
                                 <Text style={styles.talismanTimingValue}>
                                   {language === 'ar' ? planetPractices.talisman.bestDayAr : planetPractices.talisman.bestDay}
@@ -4063,7 +4095,7 @@ export default function PlanetTransitDetailsScreen() {
 
                               <View style={styles.talismanTimingBox}>
                                 <Text style={styles.talismanTimingLabel}>
-                                  {language === 'ar' ? '⏰ أفضل ساعة:' : language === 'fr' ? '⏰ Meilleure Heure:' : '⏰ Best Hour:'}
+                                  {t('screens.planetTransit.advancedPractice.talisman.bestHour')}
                                 </Text>
                                 <Text style={styles.talismanTimingValue}>
                                   {language === 'ar' ? planetPractices.talisman.bestHourAr : planetPractices.talisman.bestHour}
@@ -4074,11 +4106,7 @@ export default function PlanetTransitDetailsScreen() {
                             <View style={styles.talismanWarningBox}>
                               <Ionicons name="warning" size={16} color="#FF9800" />
                               <Text style={styles.talismanWarningText}>
-                                {language === 'ar' 
-                                  ? 'تتطلب صناعة التعويذات المعرفة الصحيحة والإذن. استشر معلمًا مؤهلاً (شيخ) قبل المحاولة.'
-                                  : language === 'fr'
-                                  ? 'La création de talismans nécessite des connaissances et une autorisation appropriées. Consultez un enseignant qualifié avant de tenter.'
-                                  : 'Talisman creation requires proper knowledge and authorization. Consult a qualified teacher (shaykh) before attempting.'}
+                                {t('screens.planetTransit.advancedPractice.talisman.warning')}
                               </Text>
                             </View>
                           </>
@@ -4098,7 +4126,7 @@ export default function PlanetTransitDetailsScreen() {
                           <View style={styles.practicesSectionHeaderLeft}>
                             <Ionicons name="time" size={16} color="#FFD700" />
                             <Text style={styles.practicesSectionTitle}>
-                              {language === 'ar' ? 'الوقت الأمثل' : language === 'fr' ? 'Timing Optimal' : 'Optimal Timing'}
+                              {t('screens.planetTransit.advancedPractice.timing.title')}
                             </Text>
                           </View>
                           <Ionicons 
@@ -4111,11 +4139,9 @@ export default function PlanetTransitDetailsScreen() {
                         {expandedTiming && (
                           <>
                             <Text style={styles.practicesSectionDesc}>
-                              {language === 'ar' 
-                                ? `أفضل الأوقات لممارسات ${planetPractices.planetAr}:`
-                                : language === 'fr'
-                                ? `Meilleurs moments pour les pratiques ${planetPractices.planet}:`
-                                : `Best times for ${planetPractices.planet} practices:`}
+                              {t('screens.planetTransit.advancedPractice.timing.description', {
+                                planet: language === 'ar' ? planetPractices.planetAr : planetPractices.planet,
+                              })}
                             </Text>
 
                             <View style={styles.timingList}>
@@ -4145,7 +4171,7 @@ export default function PlanetTransitDetailsScreen() {
                           <View style={styles.practicesSectionHeaderLeft}>
                             <Ionicons name="list" size={16} color="#2196F3" />
                             <Text style={styles.practicesSectionTitle}>
-                              {language === 'ar' ? 'خطوات التحضير' : language === 'fr' ? 'Étapes de Préparation' : 'Preparation Steps'}
+                              {t('screens.planetTransit.advancedPractice.preparation.title')}
                             </Text>
                           </View>
                           <Ionicons 
@@ -4158,11 +4184,7 @@ export default function PlanetTransitDetailsScreen() {
                         {expandedPreparation && (
                           <>
                             <Text style={styles.practicesSectionDesc}>
-                              {language === 'ar' 
-                                ? 'اتبع هذه الخطوات للتحضير لممارستك:'
-                                : language === 'fr'
-                                ? 'Suivez ces étapes pour préparer votre pratique:'
-                                : 'Follow these steps to prepare for your practice:'}
+                              {t('screens.planetTransit.advancedPractice.preparation.description')}
                             </Text>
 
                             <View style={styles.preparationList}>
@@ -4193,7 +4215,7 @@ export default function PlanetTransitDetailsScreen() {
                             <View style={styles.practicesSectionHeaderLeft}>
                               <Ionicons name="planet" size={16} color="#9C27B0" />
                               <Text style={styles.practicesSectionTitle}>
-                                {language === 'ar' ? '👼 متقدم: الاتصال الروحاني' : language === 'fr' ? '👼 Avancé: Connexion Angélique' : '👼 Advanced: Angelic Connection'}
+                                {t('screens.planetTransit.advancedPractice.angels.title')}
                               </Text>
                             </View>
                             <Ionicons 
@@ -4208,20 +4230,12 @@ export default function PlanetTransitDetailsScreen() {
                               <View style={styles.advancedWarningBox}>
                                 <Ionicons name="alert-circle" size={16} color="#FF6B35" />
                                 <Text style={styles.advancedWarningText}>
-                                  {language === 'ar' 
-                                    ? 'للممارسين ذوي الخبرة فقط'
-                                    : language === 'fr'
-                                    ? 'Pour praticiens expérimentés uniquement'
-                                    : 'For experienced practitioners only'}
+                                  {t('screens.planetTransit.advancedPractice.angels.warning')}
                                 </Text>
                               </View>
 
                               <Text style={styles.practicesSectionDesc}>
-                                {language === 'ar' 
-                                  ? 'العمل مع الوسطاء الروحانيين:'
-                                  : language === 'fr'
-                                  ? 'Travailler avec des intermédiaires spirituels:'
-                                  : 'Working with spiritual intermediaries:'}
+                                {t('screens.planetTransit.advancedPractice.angels.description')}
                               </Text>
 
                               {planetPractices.angels.map((angel, index) => (
@@ -4236,30 +4250,30 @@ export default function PlanetTransitDetailsScreen() {
 
                               <View style={styles.angelPrerequisitesBox}>
                                 <Text style={styles.angelPrerequisitesLabel}>
-                                  {language === 'ar' ? '📚 المتطلبات الأساسية:' : language === 'fr' ? '📚 Prérequis:' : '📚 Prerequisites:'}
+                                  {t('screens.planetTransit.advancedPractice.angels.prerequisites.label')}
                                 </Text>
                                 <View style={styles.angelPrerequisiteItem}>
                                   <Text style={styles.angelPrerequisiteBullet}>•</Text>
                                   <Text style={styles.angelPrerequisiteText}>
-                                    {language === 'ar' ? 'الدراسة تحت معلم مؤهل' : language === 'fr' ? 'Étude sous un enseignant qualifié' : 'Study under qualified teacher'}
+                                    {t('screens.planetTransit.advancedPractice.angels.prerequisites.study')}
                                   </Text>
                                 </View>
                                 <View style={styles.angelPrerequisiteItem}>
                                   <Text style={styles.angelPrerequisiteBullet}>•</Text>
                                   <Text style={styles.angelPrerequisiteText}>
-                                    {language === 'ar' ? 'إتقان الممارسات الأساسية' : language === 'fr' ? 'Maîtrise des pratiques de base' : 'Mastery of basic practices'}
+                                    {t('screens.planetTransit.advancedPractice.angels.prerequisites.mastery')}
                                   </Text>
                                 </View>
                                 <View style={styles.angelPrerequisiteItem}>
                                   <Text style={styles.angelPrerequisiteBullet}>•</Text>
                                   <Text style={styles.angelPrerequisiteText}>
-                                    {language === 'ar' ? 'فهم الحماية الروحية' : language === 'fr' ? 'Compréhension de la protection spirituelle' : 'Understanding of spiritual protection'}
+                                    {t('screens.planetTransit.advancedPractice.angels.prerequisites.protection')}
                                   </Text>
                                 </View>
                                 <View style={styles.angelPrerequisiteItem}>
                                   <Text style={styles.angelPrerequisiteBullet}>•</Text>
                                   <Text style={styles.angelPrerequisiteText}>
-                                    {language === 'ar' ? 'إذن من الشيخ' : language === 'fr' ? 'Permission du shaykh' : 'Permission from shaykh'}
+                                    {t('screens.planetTransit.advancedPractice.angels.prerequisites.permission')}
                                   </Text>
                                 </View>
                               </View>
@@ -4267,9 +4281,8 @@ export default function PlanetTransitDetailsScreen() {
                           )}
                         </View>
                       )}
-                    </>
-                  );
-                })()}
+                  </>
+                ) : null}
               </GlassCard>
             ) : null}
 
@@ -4465,16 +4478,14 @@ export default function PlanetTransitDetailsScreen() {
                         <View style={styles.planetHourNext}>
                           <Text style={styles.planetHourNextLabel}>
                             {tSafe('screens.planetTransit.practice.timing.nextPlanetHour', 'Next {planet} hour: {start}–{end}')
-                              .replace('{planet}', transitData?.planetKey ?? 'Planet')
+                              .replace('{planet}', transitData?.planetKey ? (t(`planets.${transitData.planetKey}`) || transitData.planetKey) : t('common.unknown'))
                               .replace('{start}', spiritualGuidance.nextPlanetHour.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
                               .replace('{end}', spiritualGuidance.nextPlanetHour.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}
                           </Text>
                           <Text style={styles.planetHourCountdown}>
                             {spiritualGuidance.nextPlanetHour.isToday 
                               ? tSafe('screens.planetTransit.practice.timing.in', 'in {time}')
-                                  .replace('{time}', spiritualGuidance.nextPlanetHour.minutesUntil < 60 
-                                    ? `${spiritualGuidance.nextPlanetHour.minutesUntil} min`
-                                    : `${Math.floor(spiritualGuidance.nextPlanetHour.minutesUntil / 60)}h ${spiritualGuidance.nextPlanetHour.minutesUntil % 60}m`)
+                                  .replace('{time}', formatPracticeCountdown(spiritualGuidance.nextPlanetHour.minutesUntil))
                               : tSafe('screens.planetTransit.practice.timing.tomorrow', 'Tomorrow')}
                           </Text>
                         </View>
@@ -4503,7 +4514,7 @@ export default function PlanetTransitDetailsScreen() {
                     <View style={styles.spiritualAvoidHeader}>
                       <Ionicons name="warning" size={14} color="#FF6B35" />
                       <Text style={styles.spiritualAvoidLabel}>
-                        {tSafe('screens.planetTransit.spiritual.avoid', 'Avoid')}
+                        {tSafe('screens.planetTransit.spiritual.avoidLabel', 'Avoid')}
                       </Text>
                     </View>
                     <Text style={styles.spiritualAvoidText}>{spiritualGuidance.avoidText}</Text>
@@ -4622,15 +4633,17 @@ export default function PlanetTransitDetailsScreen() {
               <View style={styles.cardHeader}>
                 <Ionicons name="information-circle" size={18} color={accent.primary} />
                 <Text style={styles.cardTitle}>
-                  {language === 'ar' ? 'عن حاكم اليوم' : language === 'fr' ? 'À Propos du Dirigeant' : 'About the Day Ruler'}
+                  {t('screens.planetTransit.nextDay.aboutDayRuler')}
                 </Text>
               </View>
               <Text style={styles.bodyText}>
-                {language === 'ar' 
-                  ? `${nextDayPayload.planetArabic} يحكم ${nextDayPayload.dayNameArabic} ويحمل طاقة عنصر ${tSafe(`common.elements.${nextDayPayload.element}`, toTitleCase(nextDayPayload.element))}.`
-                  : language === 'fr'
-                  ? `${nextDayPayload.planetArabic} gouverne ${nextDayPayload.dayName} et porte l'énergie de l'élément ${tSafe(`common.elements.${nextDayPayload.element}`, toTitleCase(nextDayPayload.element)).toLowerCase()}.`
-                  : `The ${nextDayPayload.dayName} will be ruled by ${nextDayPayload.planetArabic}, carrying the energy of the ${nextDayPayload.element} element.`}
+                {t('screens.planetTransit.nextDay.dayRulerDescription', {
+                  planet: nextDayPayload.planetArabic,
+                  dayName: language === 'ar' ? nextDayPayload.dayNameArabic : nextDayPayload.dayName,
+                  element: language === 'fr'
+                    ? tSafe(`common.elements.${nextDayPayload.element}`, toTitleCase(nextDayPayload.element)).toLowerCase()
+                    : tSafe(`common.elements.${nextDayPayload.element}`, toTitleCase(nextDayPayload.element)),
+                })}
               </Text>
             </GlassCard>
 
@@ -4639,7 +4652,7 @@ export default function PlanetTransitDetailsScreen() {
               <View style={styles.cardHeader}>
                 <Ionicons name={getElementIconName(nextDayPayload.element)} size={18} color={accent.primary} />
                 <Text style={styles.cardTitle}>
-                  {language === 'ar' ? 'طاقة العنصر' : language === 'fr' ? 'Énergie Élémentaire' : 'Elemental Energy'}
+                  {t('screens.planetTransit.nextDay.elementalEnergy')}
                 </Text>
               </View>
               <View style={styles.elementSection}>
@@ -4660,7 +4673,7 @@ export default function PlanetTransitDetailsScreen() {
               <View style={styles.cardHeader}>
                 <Ionicons name="sparkles" size={18} color={accent.primary} />
                 <Text style={styles.cardTitle}>
-                  {language === 'ar' ? 'التركيز الروحي' : language === 'fr' ? 'Focus Spirituel' : 'Spiritual Focus'}
+                  {t('screens.planetTransit.nextDay.spiritualFocus')}
                 </Text>
               </View>
               <Text style={styles.bodyText}>
@@ -4673,7 +4686,7 @@ export default function PlanetTransitDetailsScreen() {
               <View style={styles.cardHeader}>
                 <Ionicons name="checkmark-circle" size={18} color="#10b981" />
                 <Text style={styles.cardTitle}>
-                  {language === 'ar' ? 'أفضل الأنشطة' : language === 'fr' ? 'Meilleures Activités' : 'Best Activities'}
+                  {t('screens.planetTransit.nextDay.bestActivities')}
                 </Text>
               </View>
               <View style={styles.activityList}>
@@ -4691,15 +4704,11 @@ export default function PlanetTransitDetailsScreen() {
               <View style={styles.cardHeader}>
                 <Ionicons name="bulb" size={18} color={accent.primary} />
                 <Text style={styles.cardTitle}>
-                  {language === 'ar' ? 'كيف تستعد' : language === 'fr' ? 'Comment se Préparer' : 'How to Prepare'}
+                  {t('screens.planetTransit.nextDay.howToPrepare')}
                 </Text>
               </View>
               <Text style={styles.bodyText}>
-                {language === 'ar'
-                  ? 'خطط ليومك غداً مع وضع هذه الطاقات في الاعتبار. ضع نواياك في الليلة السابقة وتأمل في كيفية مواءمة أفعالك مع حاكم اليوم.'
-                  : language === 'fr'
-                  ? 'Planifiez votre journée de demain en tenant compte de ces énergies. Fixez vos intentions la veille au soir et réfléchissez à la façon d\'aligner vos actions avec le dirigeant du jour.'
-                  : 'Plan your day tomorrow with these energies in mind. Set your intentions the night before and reflect on how to align your actions with the day ruler.'}
+                {t('screens.planetTransit.nextDay.preparationBody')}
               </Text>
             </GlassCard>
           </>
@@ -4715,15 +4724,11 @@ export default function PlanetTransitDetailsScreen() {
             <View style={styles.cardHeader}>
               <Ionicons name="planet" size={20} color="#9FA9B3" />
               <Text style={styles.cardTitle}>
-                {language === 'ar' ? 'جميع عبور الكواكب' : language === 'fr' ? 'Tous les Transits' : 'All Planet Transits'}
+                {t('screens.planetTransit.allTransits.title')}
               </Text>
             </View>
             <Text style={[styles.bodyText, { marginBottom: Spacing.md }]}>
-              {language === 'ar' 
-                ? 'موقع جميع الكواكب في البروج حالياً'
-                : language === 'fr' 
-                ? 'Position actuelle de toutes les planètes dans les signes'
-                : 'Current position of all planets in the zodiac signs'}
+              {t('screens.planetTransit.allTransits.description')}
             </Text>
 
             {allTransitsStrengthSummary ? (
@@ -4806,7 +4811,7 @@ export default function PlanetTransitDetailsScreen() {
                       <View style={[styles.yourSignBadge, { backgroundColor: elementAcc.primary + '30' }]}>
                         <Ionicons name="star" size={10} color={elementAcc.primary} />
                         <Text style={[styles.yourSignText, { color: elementAcc.primary }]}>
-                          {language === 'ar' ? 'برجك' : language === 'fr' ? 'Ton signe' : 'Your sign'}
+                          {t('screens.planetTransit.allTransits.yourSign')}
                         </Text>
                       </View>
                     )}
@@ -4828,7 +4833,7 @@ export default function PlanetTransitDetailsScreen() {
 
                     {transitInfo.isRetrograde ? (
                       <Text style={styles.miniRetrograde}>
-                        ℞ {language === 'fr' ? 'Rétrograde' : language === 'ar' ? 'تراجع' : 'Retrograde'}
+                        ℞ {t('screens.planetTransit.retrograde')}
                       </Text>
                     ) : null}
                     
@@ -5922,6 +5927,12 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: Spacing.sm,
   },
+  practicesSectionNote: {
+    fontSize: 12,
+    color: DarkTheme.textTertiary,
+    lineHeight: 18,
+    marginBottom: Spacing.md,
+  },
   // Practice Cards
   practiceCard: {
     backgroundColor: 'rgba(255,255,255,0.04)',
@@ -5964,6 +5975,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
+  },
+  planetaryZikrNoteBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255, 215, 0, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.2)',
+  },
+  planetaryZikrNoteBadgeText: {
+    fontSize: 10,
+    color: '#F5D26A',
+    fontWeight: Typography.weightSemibold,
   },
   practiceDifficultyText: {
     fontSize: 10,

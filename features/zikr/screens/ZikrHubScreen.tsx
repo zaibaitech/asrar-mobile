@@ -12,13 +12,13 @@ import { Stack, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
     RefreshControl,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ResponsiveAppHeader from '@/components/AppHeader';
 import BottomTabBar from '@/components/BottomTabBar';
@@ -32,8 +32,19 @@ import { useZikr } from '../contexts/ZikrContext';
 
 // ─── Screen ──────────────────────────────────────────────────────────────────────
 
+function getHeaderLanguage(language: 'en' | 'fr' | 'ar'): 'EN' | 'FR' | 'AR' {
+  switch (language) {
+    case 'ar':
+      return 'AR';
+    case 'fr':
+      return 'FR';
+    default:
+      return 'EN';
+  }
+}
+
 export default function ZikrHubScreen() {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, tSafe } = useLanguage();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -66,12 +77,10 @@ export default function ZikrHubScreen() {
     <View style={styles.emptyState}>
       <Text style={styles.emptyEmoji}>🤲</Text>
       <Text style={styles.emptyTitle}>
-        {language === 'fr' ? 'Commencez votre pratique' : 'Start Your Practice'}
+        {tSafe('zikr.emptyState.title', 'Start Your Practice')}
       </Text>
       <Text style={styles.emptySubtitle}>
-        {language === 'fr'
-          ? 'Ajoutez un dhikr pour commencer votre voyage spirituel'
-          : 'Add a dhikr to begin your spiritual journey'}
+        {tSafe('zikr.emptyState.subtitle', 'Add a dhikr to begin your spiritual journey')}
       </Text>
       <TouchableOpacity
         style={styles.emptyButton}
@@ -79,7 +88,7 @@ export default function ZikrHubScreen() {
         activeOpacity={0.8}
       >
         <Text style={styles.emptyButtonText}>
-          {language === 'fr' ? '+ Ajouter un Dhikr' : '+ Add Dhikr'}
+          + {tSafe('zikr.addDhikr', 'Add Dhikr')}
         </Text>
       </TouchableOpacity>
     </View>
@@ -90,7 +99,7 @@ export default function ZikrHubScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       <SafeAreaView style={styles.safeArea}>
         <ResponsiveAppHeader
-          currentLanguage={language === 'en' ? 'EN' : 'FR'}
+          currentLanguage={getHeaderLanguage(language)}
           onLanguageChange={(lang) => setLanguage(lang.toLowerCase() as 'en' | 'fr' | 'ar')}
           onProfilePress={() => router.push('/profile')}
           onMenuPress={() => {}}
@@ -112,12 +121,10 @@ export default function ZikrHubScreen() {
           <View style={styles.headerSection}>
             <View style={styles.titleRow}>
               <Text style={styles.screenTitle}>
-                {t('zikr.title') || (language === 'fr' ? 'Dhikr & Wird' : 'Dhikr & Wird')}
+                {tSafe('zikr.title', 'Dhikr & Wird')}
               </Text>
               <Text style={styles.screenSubtitle}>
-                {t('zikr.subtitle') || (language === 'fr' 
-                  ? 'Souvenir d\'Allah pour la paix intérieure' 
-                  : 'Remembrance of Allah for inner peace')}
+                {tSafe('zikr.subtitle', 'Remembrance of Allah for inner peace')}
               </Text>
             </View>
           </View>
@@ -130,23 +137,23 @@ export default function ZikrHubScreen() {
             >
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{formatNumber(todayTotal)}</Text>
+                  <Text style={styles.statValue}>{formatNumber(todayTotal, language)}</Text>
                   <Text style={styles.statLabel}>
-                    {language === 'fr' ? "Aujourd'hui" : 'Today'}
+                    {tSafe('zikr.todayProgress', 'Today')}
                   </Text>
                 </View>
                 <View style={styles.statDivider} />
                 <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{formatNumber(totalProgress)}</Text>
+                  <Text style={styles.statValue}>{formatNumber(totalProgress, language)}</Text>
                   <Text style={styles.statLabel}>
-                    {language === 'fr' ? 'Total' : 'All Time'}
+                    {tSafe('zikr.allTimeProgress', 'All Time')}
                   </Text>
                 </View>
                 <View style={styles.statDivider} />
                 <View style={styles.statItem}>
-                  <Text style={styles.statValue}>{challengeCount}</Text>
+                  <Text style={styles.statValue}>{formatNumber(challengeCount, language)}</Text>
                   <Text style={styles.statLabel}>
-                    {language === 'fr' ? 'Pratiques' : 'Practices'}
+                    {tSafe('zikr.practices', 'Practices')}
                   </Text>
                 </View>
               </View>
@@ -164,7 +171,7 @@ export default function ZikrHubScreen() {
           >
             <Text style={styles.addButtonIcon}>+</Text>
             <Text style={styles.addButtonText}>
-              {language === 'fr' ? 'Ajouter un Dhikr' : 'Add Dhikr'}
+              {tSafe('zikr.addDhikr', 'Add Dhikr')}
             </Text>
           </TouchableOpacity>
 
@@ -178,7 +185,7 @@ export default function ZikrHubScreen() {
                 <View style={styles.sectionHeader}>
                   <Text style={styles.sectionIcon}>⭐</Text>
                   <Text style={styles.sectionTitle}>
-                    {language === 'fr' ? 'Favoris' : 'Favorites'}
+                    {tSafe('zikr.favorites', 'Favorites')}
                   </Text>
                 </View>
               )}
@@ -194,11 +201,11 @@ export default function ZikrHubScreen() {
               ))}
 
               {/* All Challenges Section */}
-              {state.challenges.filter(c => !c.isFavorite).length > 0 && (
+              {state.challenges.some((c) => !c.isFavorite) && (
                 <View style={styles.sectionHeader}>
                   <Text style={styles.sectionIcon}>📿</Text>
                   <Text style={styles.sectionTitle}>
-                    {language === 'fr' ? 'Mes Pratiques' : 'My Practices'}
+                    {tSafe('zikr.myPractices', 'My Practices')}
                   </Text>
                 </View>
               )}

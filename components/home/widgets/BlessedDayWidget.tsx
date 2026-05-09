@@ -13,33 +13,36 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { DarkTheme, ElementAccents, Spacing, Typography } from '../../../constants/DarkTheme';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { getTodayBlessing, type DayBlessing } from '../../../services/DayBlessingService';
 
 export function BlessedDayWidget() {
   const [blessing, setBlessing] = useState<DayBlessing | null>(null);
+  const { language, t } = useLanguage();
 
   useEffect(() => {
     // Get today's blessing using authentic Maghribi system
-    const todayBlessing = getTodayBlessing();
+    const todayBlessing = getTodayBlessing(new Date(), language);
     setBlessing(todayBlessing);
-  }, []);
+  }, [language]);
 
   if (!blessing) {
     return null;
   }
 
   const accent = ElementAccents[blessing.element];
+  const localizedElement = t(`elements.${String(blessing.element).toLowerCase()}`);
 
   return (
     <View style={[styles.container, { borderColor: `${accent.primary}40` }]}>
-      <Text style={styles.label}>Today's Blessing</Text>
-      <Text style={styles.dayArabic}>{blessing.dayNameArabic}</Text>
+      <Text style={styles.label}>{t('home.todayBlessing')}</Text>
+      <Text style={styles.dayArabic}>{blessing.dayName}</Text>
       <Text style={[styles.blessing, { color: accent.primary }]}>
         {blessing.emoji} {blessing.planetArabic}
       </Text>
       <View style={[styles.elementBadge, { backgroundColor: accent.glow }]}>
         <Text style={[styles.elementText, { color: accent.primary }]}>
-          {blessing.element.toUpperCase()}
+          {localizedElement.toUpperCase()}
         </Text>
       </View>
     </View>

@@ -4,7 +4,9 @@
  */
 
 import { AyahAudioButton } from '@/components/quran/AyahAudioButton';
+import { ShareAyahModal } from '@/components/quran/ShareAyahModal';
 import { DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
+import { DEFAULT_RECITER_ID, QURAN_RECITERS } from '@/constants/quranReciters';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { QURAN_SURAHS } from '@/data/quran-surahs';
 import { useSurahAudio } from '@/hooks/useSurahAudio';
@@ -18,12 +20,16 @@ import {
 import { QuranAyahWithTranslation, QuranSurah, QuranTranslationEdition } from '@/types/quran';
 import { getBasmalahText, shouldDisplayBasmalah, shouldStripBasmalah, startsWithBasmalah, stripLeadingBasmalah } from '@/utils/basmalah';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
     FlatList,
+    Modal,
+    Pressable,
+    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -31,26 +37,72 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+function getShareLocale(language: 'en' | 'fr' | 'ar'): 'en' | 'fr' | 'ar' {
+  switch (language) {
+    case 'ar':
+      return 'ar';
+    case 'fr':
+      return 'fr';
+    default:
+      return 'en';
+  }
+}
+
+function getLocalizedSurahName(
+  language: 'en' | 'fr' | 'ar',
+  surahMeta: (typeof QURAN_SURAHS)[number] | undefined,
+  fallback = ''
+): string {
+  if (language === 'ar') {
+    return surahMeta?.name.arabic || surahMeta?.name.en || fallback;
+  }
+
+  if (language === 'fr') {
+    return surahMeta?.name.fr || surahMeta?.name.en || fallback;
+  }
+
+  return surahMeta?.name.en || fallback;
+}
+
 export default function SurahDetailScreen() {
   const { surahNumber, scrollToAyah, autoPlay } = useLocalSearchParams();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { t, language } = useLanguage();
+  const { t, tSafe, language } = useLanguage();
   const flatListRef = useRef<FlatList>(null);
 
   const [surah, setSurah] = useState<QuranSurah | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set());
+  const [isShareModalVisible, setIsShareModalVisible] = useState(false);
+  const [selectedAyahForShare, setSelectedAyahForShare] = useState<{
+    ayahNumber: number;
+    arabicText: string;
+    translation: string;
+  } | null>(null);
 
-  const surahNum = parseInt(surahNumber as string, 10);
+  // Reader preferences
+  const FONT_SIZES = [20, 24, 28, 32] as const;
+  const [fontSizeIndex, setFontSizeIndex] = useState(1); // default 24
+  const arabicFontSize = FONT_SIZES[fontSizeIndex];
+  const [selectedReciterId, setSelectedReciterId] = useState(DEFAULT_RECITER_ID);
+  const [isReciterPickerVisible, setIsReciterPickerVisible] = useState(false);
+
+  const surahNum = Number.parseInt(surahNumber as string, 10);
   const surahMeta = QURAN_SURAHS[surahNum - 1];
   const translationEdition: QuranTranslationEdition = language === 'fr' ? 'fr.hamidullah' : 'en.sahih';
+  const shareLocale = getShareLocale(language);
+  const localizedSurahName = useMemo(
+    () => getLocalizedSurahName(language, surahMeta, surah?.englishName || ''),
+    [language, surahMeta, surah?.englishName]
+  );
 
   // Audio controller hook - loads full surah audio once
   const { state: audioState, controls: audioControls } = useSurahAudio(
     surahNum,
-    surahMeta?.totalAyahs || 0
+    surahMeta?.totalAyahs || 0,
+    selectedReciterId
   );
 
   // Load surah data
@@ -59,10 +111,17 @@ export default function SurahDetailScreen() {
     loadBookmarks();
   }, [surahNum, translationEdition]);
 
+  // Load persisted reciter preference
+  useEffect(() => {
+    AsyncStorage.getItem('quran_reciter_id').then(id => {
+      if (id) setSelectedReciterId(id);
+    }).catch(() => {});
+  }, []);
+
   // Scroll to specific ayah if provided
   useEffect(() => {
     if (surah && scrollToAyah && flatListRef.current) {
-      const ayahIndex = parseInt(scrollToAyah as string, 10) - 1;
+      const ayahIndex = Number.parseInt(scrollToAyah as string, 10) - 1;
       setTimeout(() => {
         flatListRef.current?.scrollToIndex({
           index: ayahIndex,
@@ -82,19 +141,36 @@ export default function SurahDetailScreen() {
     }
   }, [surah]);
 
-  // Auto-scroll to currently playing ayah
+  // Auto-scroll to the currently playing ayah
   useEffect(() => {
-    if (audioState.currentAyah && surah && flatListRef.current) {
-      const ayahIndex = audioState.currentAyah - 1;
-      setTimeout(() => {
-        flatListRef.current?.scrollToIndex({
-          index: ayahIndex,
-          animated: true,
-          viewPosition: 0.3,
-        });
-      }, 200);
+    if (audioState.currentAyah && flatListRef.current && surah) {
+      const index = audioState.currentAyah - 1;
+      if (index >= 0 && index < surah.ayahs.length) {
+        flatListRef.current.scrollToIndex({ index, animated: true, viewPosition: 0.3 });
+      }
     }
   }, [audioState.currentAyah, surah]);
+
+  const selectReciter = async (id: string) => {
+    setSelectedReciterId(id);
+    setIsReciterPickerVisible(false);
+    try { await AsyncStorage.setItem('quran_reciter_id', id); } catch { /* non-critical */ }
+  };
+
+  const goToPrevSurah = () => {
+    if (surahNum > 1) {
+      audioControls.stop();
+      router.replace({ pathname: '/(tabs)/quran/[surahNumber]', params: { surahNumber: String(surahNum - 1) } });
+    }
+  };
+
+  const goToNextSurah = () => {
+    if (surahNum < 114) {
+      audioControls.stop();
+      router.replace({ pathname: '/(tabs)/quran/[surahNumber]', params: { surahNumber: String(surahNum + 1) } });
+    }
+  };
+
 
   const loadSurah = async () => {
     try {
@@ -147,6 +223,7 @@ export default function SurahDetailScreen() {
         setBookmarkedAyahs(prev => new Set(prev).add(ayahNum));
       }
     } catch (err) {
+      console.error('Error toggling bookmark:', err);
       Alert.alert(t('common.error'), t('quran.bookmarkError'));
     }
   };
@@ -155,6 +232,14 @@ export default function SurahDetailScreen() {
     saveProgress(surahNum, ayah.numberInSurah);
   };
 
+  const handleShareAyah = (ayah: QuranAyahWithTranslation) => {
+    setSelectedAyahForShare({
+      ayahNumber: ayah.numberInSurah,
+      arabicText: getCleanArabicText(ayah),
+      translation: ayah.translation.text,
+    });
+    setIsShareModalVisible(true);
+  };
 
   /**
    * Get clean Arabic text for display (Mushaf-compliant)
@@ -194,47 +279,60 @@ export default function SurahDetailScreen() {
     return text;
   };
 
-  const renderAyah = useCallback(({ item: ayah }: { item: QuranAyahWithTranslation }) => {
+  const renderAyah = useCallback((ayahEntry: any) => {
+    const ayah = ayahEntry.item as QuranAyahWithTranslation;
     const isBookmarked = bookmarkedAyahs.has(ayah.numberInSurah);
     const isCurrentAyah = audioState.currentAyah === ayah.numberInSurah;
     const cleanArabicText = getCleanArabicText(ayah);
 
     return (
-      <View style={[
-        styles.ayahWrapper,
-        isCurrentAyah && styles.ayahWrapperPlaying
-      ]}>
-        {/* Top row: Ayah number and Audio button */}
-        <View style={styles.ayahTopRow}>
-          <View style={styles.ayahNumberContainer}>
-            <Text style={styles.ayahNumber}>﴿{ayah.numberInSurah}﴾</Text>
-          </View>
-
-          <AyahAudioButton
-            ayahNumber={ayah.numberInSurah}
-            isPlaying={audioState.isPlaying}
-            isCurrentAyah={isCurrentAyah}
-            onPlay={() => audioControls.playAyah(ayah.numberInSurah)}
-            onPause={audioControls.pause}
-          />
+      <TouchableOpacity
+        style={styles.ayahContainer}
+        onPress={() => handleAyahPress(ayah)}
+        onLongPress={() => handleBookmarkToggle(ayah)}
+        activeOpacity={0.9}
+      >
+        {/* Arabic Text - Full width, prominent */}
+        <View style={styles.arabicSection}>
+          <Text style={[styles.arabicText, { fontSize: arabicFontSize, lineHeight: arabicFontSize * 2 }]}>
+            {cleanArabicText}
+            {' '}
+            <Text style={[styles.ayahNumberInline, { fontSize: arabicFontSize - 6 }]}>﴿{ayah.numberInSurah}﴾</Text>
+          </Text>
         </View>
 
-        {/* Main content: Arabic and Translation */}
-        <TouchableOpacity
-          style={styles.ayahContainer}
-          onPress={() => handleAyahPress(ayah)}
-          onLongPress={() => handleBookmarkToggle(ayah)}
-          activeOpacity={0.9}
-        >
-          {/* Arabic Text - Full width, prominent */}
-          <View style={styles.arabicSection}>
-            <Text style={styles.arabicText}>
-              {cleanArabicText}
-            </Text>
-          </View>
+        {/* Translation - Secondary, clearly separated */}
+        <Text style={[styles.translationText, { fontSize: Math.max(13, arabicFontSize - 9) }]}>{ayah.translation.text}</Text>
 
-          {/* Translation - Secondary, clearly separated */}
-          <Text style={styles.translationText}>{ayah.translation.text}</Text>
+        {/* Sajda indicator */}
+        {ayah.arabic.sajda !== false && (
+          <View style={styles.sajdaIndicator}>
+            <Ionicons name="chevron-down-circle-outline" size={12} color="#f59e0b" />
+            <Text style={styles.sajdaText}>{tSafe('quran.sajda', 'Sajda')}</Text>
+          </View>
+        )}
+
+        {/* Audio Button and Bookmark Row */}
+        <View style={styles.ayahActionsRow}>
+          <View style={styles.primaryAyahActions}>
+            <AyahAudioButton
+              ayahNumber={ayah.numberInSurah}
+              isPlaying={audioState.isPlaying}
+              isCurrentAyah={isCurrentAyah}
+              onPlay={() => audioControls.playAyah(ayah.numberInSurah)}
+              onPause={audioControls.pause}
+            />
+
+            <TouchableOpacity
+              style={styles.shareButton}
+              activeOpacity={0.7}
+              onPress={() => handleShareAyah(ayah)}
+              accessibilityRole="button"
+              accessibilityLabel={t('quran.shareAyah')}
+            >
+              <Ionicons name="share-social-outline" size={18} color={DarkTheme.textPrimary} />
+            </TouchableOpacity>
+          </View>
 
           {/* Bookmark indicator */}
           {isBookmarked && (
@@ -242,10 +340,10 @@ export default function SurahDetailScreen() {
               <Ionicons name="bookmark" size={14} color="#3b82f6" />
             </View>
           )}
-        </TouchableOpacity>
-      </View>
+        </View>
+      </TouchableOpacity>
     );
-  }, [bookmarkedAyahs, audioState.currentAyah, audioState.isPlaying, audioControls, handleBookmarkToggle, handleAyahPress, surahNum, surah]);
+  }, [bookmarkedAyahs, audioState.currentAyah, audioState.isPlaying, audioControls, handleBookmarkToggle, handleAyahPress, t]);
 
   const ListHeaderComponent = useMemo(() => (
     <View style={styles.surahHeader}>
@@ -253,7 +351,7 @@ export default function SurahDetailScreen() {
       <View style={styles.surahInfoContainer}>
         <Text style={styles.surahNameAr}>{surahMeta?.name.arabic}</Text>
         <Text style={styles.surahNameEn}>
-          {language === 'fr' && surahMeta?.name.fr ? surahMeta.name.fr : surahMeta?.name.en}
+          {localizedSurahName}
         </Text>
         <Text style={styles.surahMeta}>
           {surahMeta?.revelationType} · {surahMeta?.totalAyahs} {t('quran.ayahs')}
@@ -287,7 +385,7 @@ export default function SurahDetailScreen() {
       {audioState.isLoading && (
         <View style={styles.audioLoadingContainer}>
           <ActivityIndicator size="small" color="#3b82f6" />
-          <Text style={styles.audioLoadingText}>Loading surah audio...</Text>
+          <Text style={styles.audioLoadingText}>{tSafe('quran.loadingSurahAudio', 'Loading surah audio...')}</Text>
         </View>
       )}
 
@@ -308,7 +406,7 @@ export default function SurahDetailScreen() {
       {/* Visual separator before ayahs */}
       <View style={styles.separator} />
     </View>
-  ), [surahMeta, language, t, surahNum, surah, audioControls, audioState.isLoading, audioState.error]);
+  ), [localizedSurahName, surahMeta, t, surahNum, audioControls, audioState.isLoading, audioState.error]);
 
   if (loading) {
     return (
@@ -358,22 +456,38 @@ export default function SurahDetailScreen() {
         <Text style={styles.headerTitle}>
           {t('quran.surah')} {surahNum}
         </Text>
-        <TouchableOpacity
-          onPress={() => {
-            if (audioState.isPlaying) {
-              audioControls.pause();
-            } else {
-              audioControls.playAyah(audioState.currentAyah || 1);
-            }
-          }}
-          style={styles.playAllButton}
-        >
-          <Ionicons
-            name={audioState.isPlaying ? 'stop-circle' : 'play-circle'}
-            size={28}
-            color="#3b82f6"
-          />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={styles.headerIconButton}
+            onPress={() => setFontSizeIndex(prev => (prev + 1) % FONT_SIZES.length)}
+            accessibilityLabel={tSafe('quran.changeFontSize', 'Change font size')}
+          >
+            <Text style={styles.headerIconText}>Aa</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerIconButton}
+            onPress={() => setIsReciterPickerVisible(true)}
+            accessibilityLabel={tSafe('quran.chooseReciter', 'Choose reciter')}
+          >
+            <Ionicons name="musical-notes-outline" size={20} color={DarkTheme.textPrimary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              if (audioState.isPlaying) {
+                audioControls.pause();
+              } else {
+                audioControls.playAyah(audioState.currentAyah || 1);
+              }
+            }}
+            style={styles.headerIconButton}
+          >
+            <Ionicons
+              name={audioState.isPlaying ? 'stop-circle' : 'play-circle'}
+              size={24}
+              color="#3b82f6"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList
@@ -407,7 +521,7 @@ export default function SurahDetailScreen() {
                 {t('quran.surah')} {surahNum} · {t('quran.ayah')} {audioState.currentAyah || 1}
               </Text>
               <Text style={styles.miniPlayerSubtitle}>
-                {audioState.isLoading ? 'Loading...' : surahMeta?.name.en}
+                {audioState.isLoading ? tSafe('quran.loading', 'Loading...') : localizedSurahName}
               </Text>
             </View>
 
@@ -417,6 +531,9 @@ export default function SurahDetailScreen() {
                 <ActivityIndicator size="small" color="#3b82f6" />
               ) : (
                 <>
+                  <TouchableOpacity onPress={goToPrevSurah} disabled={surahNum <= 1} style={styles.miniPlayerButton}>
+                    <Ionicons name="play-skip-back" size={18} color={surahNum <= 1 ? DarkTheme.textTertiary : DarkTheme.textPrimary} />
+                  </TouchableOpacity>
                   {audioState.isPlaying ? (
                     <TouchableOpacity onPress={audioControls.pause} style={styles.miniPlayerButton}>
                       <Ionicons name="pause" size={24} color={DarkTheme.textPrimary} />
@@ -430,12 +547,59 @@ export default function SurahDetailScreen() {
                   <TouchableOpacity onPress={audioControls.stop} style={styles.miniPlayerButton}>
                     <Ionicons name="stop" size={24} color={DarkTheme.textPrimary} />
                   </TouchableOpacity>
+                  <TouchableOpacity onPress={goToNextSurah} disabled={surahNum >= 114} style={styles.miniPlayerButton}>
+                    <Ionicons name="play-skip-forward" size={18} color={surahNum >= 114 ? DarkTheme.textTertiary : DarkTheme.textPrimary} />
+                  </TouchableOpacity>
                 </>
               )}
             </View>
           </View>
         </View>
       )}
+
+      {/* Reciter Picker Modal */}
+      <Modal
+        visible={isReciterPickerVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setIsReciterPickerVisible(false)}
+      >
+        <View style={styles.reciterOverlay}>
+          <Pressable style={styles.reciterBackdrop} onPress={() => setIsReciterPickerVisible(false)} />
+          <View style={[styles.reciterSheet, { paddingBottom: insets.bottom + Spacing.md }]}>
+            <Text style={styles.reciterSheetTitle}>{tSafe('quran.chooseReciter', 'Choose Reciter')}</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {QURAN_RECITERS.map(reciter => (
+                <TouchableOpacity
+                  key={reciter.id}
+                  style={[styles.reciterOption, selectedReciterId === reciter.id && styles.reciterOptionSelected]}
+                  onPress={() => selectReciter(reciter.id)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.reciterOptionInfo}>
+                    <Text style={styles.reciterOptionArabic}>{reciter.arabicName}</Text>
+                    <Text style={styles.reciterOptionName}>{reciter.name}</Text>
+                  </View>
+                  {selectedReciterId === reciter.id && (
+                    <Ionicons name="checkmark-circle" size={22} color="#3b82f6" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      <ShareAyahModal
+        visible={isShareModalVisible && !!selectedAyahForShare}
+        onClose={() => setIsShareModalVisible(false)}
+        surahNumber={surahNum}
+        surahName={localizedSurahName}
+        ayahNumber={selectedAyahForShare?.ayahNumber || 1}
+        arabicText={selectedAyahForShare?.arabicText || ''}
+        translation={selectedAyahForShare?.translation || ''}
+        locale={shareLocale}
+      />
     </View>
   );
 }
@@ -462,6 +626,24 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  headerIconButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  headerIconText: {
+    fontSize: 13,
+    fontWeight: Typography.weightSemibold,
     color: DarkTheme.textPrimary,
   },
   headerSpacer: {
@@ -662,6 +844,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: Spacing.md,
   },
+  primaryAyahActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  shareButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: DarkTheme.cardBackground,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: DarkTheme.borderSubtle,
+  },
   
   // Bookmark Indicator - Minimal
   bookmarkIndicator: {
@@ -752,5 +949,72 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(59, 130, 246, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  // Sajda indicator
+  sajdaIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: Spacing.xs,
+    marginBottom: 2,
+  },
+  sajdaText: {
+    fontSize: 11,
+    color: '#f59e0b',
+    fontWeight: Typography.weightSemibold,
+    letterSpacing: 0.5,
+  },
+
+  // Reciter Picker Modal
+  reciterOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  reciterBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+  },
+  reciterSheet: {
+    backgroundColor: '#1e293b',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: Spacing.lg,
+    paddingHorizontal: Spacing.screenPadding,
+    maxHeight: '60%',
+  },
+  reciterSheetTitle: {
+    fontSize: 16,
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+    textAlign: 'center',
+    marginBottom: Spacing.md,
+  },
+  reciterOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  reciterOptionSelected: {
+    backgroundColor: 'rgba(59,130,246,0.08)',
+    borderRadius: 10,
+    paddingHorizontal: Spacing.sm,
+    marginHorizontal: -Spacing.sm,
+  },
+  reciterOptionInfo: {
+    gap: 2,
+  },
+  reciterOptionArabic: {
+    fontSize: 16,
+    color: DarkTheme.textPrimary,
+    fontWeight: Typography.weightSemibold,
+    textAlign: 'right',
+  },
+  reciterOptionName: {
+    fontSize: 13,
+    color: DarkTheme.textSecondary,
   },
 });

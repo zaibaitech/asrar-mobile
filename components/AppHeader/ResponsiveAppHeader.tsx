@@ -37,7 +37,7 @@ export default function ResponsiveAppHeader({
   tabletBreakpoint = 768,
   showProfileIcon = true,
   ...props
-}: ResponsiveAppHeaderProps) {
+}: Readonly<ResponsiveAppHeaderProps>) {
   const { width } = useWindowDimensions();
   const isTablet = width >= tabletBreakpoint;
   const logoSource: ImageSourcePropType = props.logoSource ?? appLogo;

@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import {
@@ -120,15 +120,11 @@ export function MomentAlignmentCard({
   planetaryData,
   causeText,
   userSignKey,
-}: MomentAlignmentCardProps) {
+}: Readonly<MomentAlignmentCardProps>) {
   const router = useRouter();
 
   const handlePress = async () => {
-    try {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (error) {
-      // Haptics not available - fail silently
-    }
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
     
     // Navigate to moment alignment details with data
     router.push({
@@ -147,14 +143,11 @@ export function MomentAlignmentCard({
   };
 
   const goToProfile = async () => {
-    try {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (error) {}
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
     router.push('/profile');  // Navigate to profile to add DOB
   };
 
   const theme = status ? STATUS_THEME[status] : DEFAULT_THEME;
-  const updatedLabel = useMemo(() => getUpdatedLabel(updatedAt, t), [updatedAt, t]);
 
   const nextHourPreview = (() => {
     if (!planetaryData) return null;
@@ -210,7 +203,7 @@ export function MomentAlignmentCard({
               </View>
             </View>
             <Text style={styles.emptyHint} numberOfLines={2} ellipsizeMode="tail">
-              Add your date of birth to unlock personalized alignment
+              {t('home.cards.momentAlignment.addDobPrompt')}
             </Text>
           </View>
         </LinearGradient>
@@ -292,7 +285,7 @@ export function MomentAlignmentCard({
                 {t('home.nextPlanetHour')}
               </Text>
               <Text style={styles.previewValue} numberOfLines={1} ellipsizeMode="tail">
-                {nextHourPreview.nextPlanetLabel} ({nextHourPreview.nextPlanetArabic}) • {t(`elements.${nextHourPreview.nextElement}`)} • {formatCountdownShort(nextHourPreview.seconds)}
+                {nextHourPreview.nextPlanetLabel} ({nextHourPreview.nextPlanetArabic}) • {t(`elements.${String(nextHourPreview.nextElement).toLowerCase()}`)} • {formatCountdownShort(nextHourPreview.seconds)}
               </Text>
               <View style={[styles.previewStatus, { borderColor: STATUS_THEME[nextHourPreview.nextStatus].accent, backgroundColor: STATUS_THEME[nextHourPreview.nextStatus].pillBackground }]}
               >

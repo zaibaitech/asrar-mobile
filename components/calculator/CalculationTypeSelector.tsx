@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   
   option: {
     width: 110,
-    height: 100,
+    minHeight: 100,
     borderRadius: 12,
     padding: 12,
     alignItems: 'center',
@@ -170,28 +170,32 @@ const styles = StyleSheet.create({
   },
   
   titleSelected: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: '#ffffff',
     textAlign: 'center',
+    flexWrap: 'wrap',
   },
   
   titleInactive: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: '#cbd5e1',
     textAlign: 'center',
+    flexWrap: 'wrap',
   },
   
   subtitleSelected: {
-    fontSize: 11,
+    fontSize: 10,
     color: '#e0e7ff',
     textAlign: 'center',
+    flexWrap: 'wrap',
   },
   
   subtitleInactive: {
-    fontSize: 10,
+    fontSize: 9,
     color: '#64748b',
     textAlign: 'center',
+    flexWrap: 'wrap',
   },
 });

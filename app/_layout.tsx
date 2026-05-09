@@ -22,7 +22,109 @@ import { ZikrProvider } from '@/features/zikr';
 import { prefetchCoreCaches } from '@/services/AppPrefetchService';
 import { handleAuthCallback } from '@/services/AuthService';
 import { getOnboardingCompleted } from '@/services/OnboardingService';
+import type { PartialProfileUpdate, UserProfile } from '@/types/user-profile';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
+import { initializeStorage } from '@/utils/storageInitializer';
+
+type RootLayoutNavProps = Readonly<{
+  showAnimatedSplash: boolean;
+  setShowAnimatedSplash: (val: boolean) => void;
+}>;
+
+type AuthCallbackQueryParams = {
+  access_token?: string;
+  refresh_token?: string;
+  type?: string;
+  error?: string;
+  error_description?: string;
+  code?: string;
+  expires_in?: string;
+  token_type?: string;
+};
+
+const ALLOWED_DEEP_LINK_ROUTES = new Set([
+  'share',
+  'quran',
+  'auth',
+  'email-verification',
+  'reset-password',
+  '(screens)',
+]);
+
+function isAllowedDeepLinkRoute(rootSegment?: string): boolean {
+  return !!rootSegment && ALLOWED_DEEP_LINK_ROUTES.has(rootSegment);
+}
+
+function profileHasEssentialData(profile: { nameAr?: string; nameLatin?: string; dobISO?: string }): boolean {
+  return Boolean(profile.nameAr || profile.nameLatin || profile.dobISO);
+}
+
+function showRouteAlert(
+  title: string,
+  message: string,
+  buttonText: string,
+  onPress: () => void,
+): void {
+  Alert.alert(title, message, [{ text: buttonText, onPress }]);
+}
+
+async function handleRecoveryDeepLink(
+  queryParams: AuthCallbackQueryParams,
+  setProfile: (updates: PartialProfileUpdate) => Promise<void>,
+  router: ReturnType<typeof useRouter>,
+): Promise<boolean> {
+  const { access_token, refresh_token, type, error, error_description, expires_in, token_type } = queryParams;
+  if (type !== 'recovery' || !access_token || !refresh_token) {
+    return false;
+  }
+
+  const result = await handleAuthCallback({
+    access_token,
+    refresh_token,
+    type,
+    error,
+    error_description,
+    expires_in,
+    token_type,
+  });
+
+  if (result.error) {
+    showRouteAlert('Reset Link Invalid', result.error.message, 'OK', () => router.replace('/auth'));
+    return true;
+  }
+
+  await setProfile({ mode: 'account' });
+  router.replace('/reset-password');
+  return true;
+}
+
+async function handleSignupDeepLink(
+  queryParams: AuthCallbackQueryParams,
+  profile: Pick<UserProfile, 'nameAr' | 'nameLatin' | 'dobISO'>,
+  setProfile: (updates: PartialProfileUpdate) => Promise<void>,
+  router: ReturnType<typeof useRouter>,
+): Promise<boolean> {
+  const { access_token, refresh_token, type } = queryParams;
+  if (type !== 'signup' || !access_token || !refresh_token) {
+    return false;
+  }
+
+  console.log('✅ Email verified! Processing...');
+  await setProfile({ mode: 'account' });
+
+  if (profileHasEssentialData(profile)) {
+    showRouteAlert('✅ Welcome!', 'Your email has been verified successfully.', 'Continue', () => router.replace('/(tabs)'));
+    return true;
+  }
+
+  showRouteAlert(
+    '✅ Email Verified!',
+    'Please complete your profile to unlock personalized features.',
+    'Complete Profile',
+    () => router.replace('/profile?postSave=home'),
+  );
+  return true;
+}
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -66,17 +168,23 @@ export default function RootLayout() {
   return <RootLayoutNav showAnimatedSplash={showAnimatedSplash} setShowAnimatedSplash={setShowAnimatedSplash} />;
 }
 
-function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: { showAnimatedSplash: boolean; setShowAnimatedSplash: (val: boolean) => void }) {
+function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: RootLayoutNavProps) {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
     installGlobalErrorHandlers();
+    // Initialize storage with automatic error handling and cleanup
+    initializeStorage().catch((error) => {
+      console.error('Storage initialization failed:', error);
+    });
   }, []);
 
   // Best-effort prefetch so tabs/widgets can render instantly.
   // Avoids repeated network bursts during transitions.
   useEffect(() => {
-    void prefetchCoreCaches();
+    prefetchCoreCaches().catch(() => {
+      // best-effort; ignore
+    });
   }, []);
 
   return (
@@ -98,7 +206,7 @@ function RootLayoutNav({ showAnimatedSplash, setShowAnimatedSplash }: { showAnim
   );
 }
 
-function RootLayoutContent({ showAnimatedSplash, setShowAnimatedSplash }: { showAnimatedSplash: boolean; setShowAnimatedSplash: (val: boolean) => void }) {
+function RootLayoutContent({ showAnimatedSplash, setShowAnimatedSplash }: RootLayoutNavProps) {
   return (
     <AppErrorBoundary>
       <OnboardingGate />
@@ -148,7 +256,6 @@ function RootLayoutContent({ showAnimatedSplash, setShowAnimatedSplash }: { show
 function OnboardingGate() {
   const router = useRouter();
   const segments = useSegments();
-  const [hasChecked, setHasChecked] = useState(false);
 
   useEffect(() => {
     // Small delay to let expo-router finish initial mount before navigating
@@ -161,26 +268,25 @@ function OnboardingGate() {
   const checkInitialRoute = async () => {
     try {
       const completed = await getOnboardingCompleted();
-      const inOnboarding = segments[0] === '(onboarding)';
-      const inTabs = segments[0] === '(tabs)';
-      
+      const rootSegment = segments[0];
+      const inOnboarding = rootSegment === '(onboarding)';
+      const inTabs = rootSegment === '(tabs)';
+      const inAllowedDeepLinkRoute = isAllowedDeepLinkRoute(rootSegment);
+
       if (!completed) {
-        // Onboarding not finished → show onboarding
-        if (!inOnboarding) {
-          router.replace('/(onboarding)');
-        }
-      } else {
-        // Onboarding completed → always go to main app
-        // Auth/sign-in is available from profile screen, not forced on startup
-        if (!inTabs) {
-          router.replace('/(tabs)');
-        }
+        // Onboarding not finished -> show onboarding.
+        if (inOnboarding) return;
+        router.replace('/(onboarding)');
+        return;
       }
+
+      // Onboarding completed -> go to main app unless an explicit deep-link route is active.
+      // Auth/sign-in is available from profile screen, not forced on startup.
+      if (inTabs || inAllowedDeepLinkRoute) return;
+      router.replace('/(tabs)');
     } catch (error) {
       console.error('Error checking initial route:', error);
       // Fallback: if anything fails, go to onboarding
-    } finally {
-      setHasChecked(true);
     }
   };
 
@@ -198,6 +304,7 @@ function DeepLinkHandler() {
     const handleDeepLink = async (event: { url: string }) => {
       try {
         const { path, queryParams } = Linking.parse(event.url);
+        const authParams = (queryParams || {}) as AuthCallbackQueryParams;
 
         console.log('📱 Deep link received:', event.url);
         console.log('📱 Path:', path);
@@ -205,94 +312,27 @@ function DeepLinkHandler() {
 
         // Check if it's auth callback
         if (path === 'auth/callback' || path?.includes('auth/callback')) {
-          const { access_token, refresh_token, type, error, error_description, code } = (queryParams || {}) as {
-            access_token?: string;
-            refresh_token?: string;
-            type?: string;
-            error?: string;
-            error_description?: string;
-            code?: string;
-          };
-
           // If this is an OAuth callback (has 'code' parameter), 
           // the Linking listener in AuthService will handle it
           // Just return and don't interfere
-          if (code && !type) {
+          if (authParams.code && !authParams.type) {
             console.log('📱 OAuth callback detected - handled by AuthService');
             return;
           }
 
           // Handle errors from email verification
-          if (error) {
-            console.error('❌ Auth callback error:', error, error_description);
-            Alert.alert(
-              'Verification Failed',
-              error_description || error,
-              [{ text: 'OK', onPress: () => router.replace('/auth') }]
-            );
+          if (authParams.error) {
+            console.error('❌ Auth callback error:', authParams.error, authParams.error_description);
+            showRouteAlert('Verification Failed', authParams.error_description || authParams.error, 'OK', () => router.replace('/auth'));
             return;
           }
 
-          if (type === 'recovery' && access_token && refresh_token) {
-            // Password reset flow - keep user in app
-            const result = await handleAuthCallback({
-              access_token,
-              refresh_token,
-              type,
-              error,
-              error_description,
-              expires_in: (queryParams as any)?.expires_in,
-              token_type: (queryParams as any)?.token_type,
-            });
-
-            if (result.error) {
-              Alert.alert(
-                'Reset Link Invalid',
-                result.error.message,
-                [{ text: 'OK', onPress: () => router.replace('/auth') }]
-              );
-              return;
-            }
-
-            await setProfile({ mode: 'account' });
-            router.replace('/reset-password');
+          if (await handleRecoveryDeepLink(authParams, setProfile, router)) {
             return;
           }
 
-          if (type === 'signup' && access_token && refresh_token) {
-            console.log('✅ Email verified! Processing...');
-            
-            // Update profile to account mode
-            await setProfile({ mode: 'account' });
-            
-            // Check if profile has essential data
-            const hasEssentialData = profile.nameAr || profile.nameLatin || profile.dobISO;
-            
-            if (!hasEssentialData) {
-              // Redirect to profile screen to complete setup
-              Alert.alert(
-                '✅ Email Verified!',
-                'Please complete your profile to unlock personalized features.',
-                [
-                  {
-                    text: 'Complete Profile',
-                    onPress: () => router.replace('/profile?postSave=home'),
-                  }
-                ]
-              );
-            } else {
-              // Profile already has data, go to home
-              Alert.alert(
-                '✅ Welcome!',
-                'Your email has been verified successfully.',
-                [
-                  {
-                    text: 'Continue',
-                    onPress: () => router.replace('/(tabs)'),
-                  }
-                ]
-              );
-            }
+          if (await handleSignupDeepLink(authParams, profile, setProfile, router)) {
+            return;
           }
         }
       } catch (error) {
@@ -312,7 +352,9 @@ function DeepLinkHandler() {
     Linking.getInitialURL()
       .then((url) => {
         if (url) {
-          void handleDeepLink({ url });
+          handleDeepLink({ url }).catch(() => {
+            // ignore
+          });
         }
       })
       .catch(() => {

@@ -53,8 +53,8 @@ export default function NotificationSettingsScreen() {
     
     if (status !== 'granted') {
       Alert.alert(
-        'Permissions Required',
-        'Please enable notifications in your device settings to receive spiritual guidance and prayer reminders.',
+        tSafe('notificationSettingsScreen.permissions.requiredTitle', 'Permissions Required'),
+        tSafe('notificationSettingsScreen.permissions.requiredMessage', 'Please enable notifications in your device settings to receive spiritual guidance and prayer reminders.'),
         [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
     }
@@ -88,7 +88,7 @@ export default function NotificationSettingsScreen() {
   if (loading || !preferences) {
     return (
       <View style={styles.container}>
-        <Text style={styles.loadingText}>Loading preferences...</Text>
+        <Text style={styles.loadingText}>{tSafe('notificationSettingsScreen.loading', 'Loading preferences...')}</Text>
       </View>
     );
   }
@@ -98,12 +98,12 @@ export default function NotificationSettingsScreen() {
       <View style={styles.container}>
         <View style={styles.permissionCard}>
           <Ionicons name="notifications-off-outline" size={64} color="#999" />
-          <Text style={styles.permissionTitle}>Notifications Disabled</Text>
+          <Text style={styles.permissionTitle}>{tSafe('notificationSettingsScreen.permissions.disabledTitle', 'Notifications Disabled')}</Text>
           <Text style={styles.permissionText}>
-            Enable notifications to receive prayer reminders, harmony hour alerts, and spiritual guidance
+            {tSafe('notificationSettingsScreen.permissions.disabledMessage', 'Enable notifications to receive prayer reminders, harmony hour alerts, and spiritual guidance')}
           </Text>
           <TouchableOpacity style={styles.enableButton} onPress={requestPermissions}>
-            <Text style={styles.enableButtonText}>Enable Notifications</Text>
+            <Text style={styles.enableButtonText}>{tSafe('notificationSettingsScreen.permissions.enableButton', 'Enable Notifications')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -116,11 +116,11 @@ export default function NotificationSettingsScreen() {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="moon-outline" size={24} color="#64B5F6" />
-          <Text style={styles.sectionTitle}>Prayer Notifications</Text>
+          <Text style={styles.sectionTitle}>{tSafe('notificationSettingsScreen.prayer.title', 'Prayer Notifications')}</Text>
         </View>
         
         <Text style={styles.infoText}>
-          Prayer notifications are managed in Adhan Settings
+          {tSafe('notificationSettingsScreen.prayer.info', 'Prayer notifications are managed in Adhan Settings')}
         </Text>
             
       </View>
@@ -129,11 +129,11 @@ export default function NotificationSettingsScreen() {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="star-outline" size={24} color="#FFB74D" />
-          <Text style={styles.sectionTitle}>Harmony Hours</Text>
+          <Text style={styles.sectionTitle}>{tSafe('notificationSettingsScreen.harmony.title', 'Harmony Hours')}</Text>
         </View>
         
         <SettingRow
-          label="Enable Harmony Notifications"
+          label={tSafe('notificationSettingsScreen.harmony.enable', 'Enable Harmony Notifications')}
           value={preferences.harmony.enabled}
           onValueChange={(val) => updatePreference('harmony', 'enabled', val)}
         />
@@ -141,22 +141,22 @@ export default function NotificationSettingsScreen() {
         {preferences.harmony.enabled && (
           <>
             <SettingRow
-              label="Favorable Hours"
+              label={tSafe('notificationSettingsScreen.harmony.favorable.label', 'Favorable Hours')}
               value={preferences.harmony.notifyFavorable}
               onValueChange={(val) => updatePreference('harmony', 'notifyFavorable', val)}
-              subtitle="Notify when highly favorable timing begins"
+              subtitle={tSafe('notificationSettingsScreen.harmony.favorable.subtitle', 'Notify when highly favorable timing begins')}
             />
             <SettingRow
-              label="Transformative Hours"
+              label={tSafe('notificationSettingsScreen.harmony.transformative.label', 'Transformative Hours')}
               value={preferences.harmony.notifyTransformative}
               onValueChange={(val) => updatePreference('harmony', 'notifyTransformative', val)}
-              subtitle="Notify for growth opportunities"
+              subtitle={tSafe('notificationSettingsScreen.harmony.transformative.subtitle', 'Notify for growth opportunities')}
             />
             <SettingRow
-              label="Delicate Periods"
+              label={tSafe('notificationSettingsScreen.harmony.delicate.label', 'Delicate Periods')}
               value={preferences.harmony.notifyDelicate}
               onValueChange={(val) => updatePreference('harmony', 'notifyDelicate', val)}
-              subtitle="Warn about challenging periods"
+              subtitle={tSafe('notificationSettingsScreen.harmony.delicate.subtitle', 'Warn about challenging periods')}
             />
             
           </>
@@ -167,11 +167,11 @@ export default function NotificationSettingsScreen() {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="sunny-outline" size={24} color="#FFA726" />
-          <Text style={styles.sectionTitle}>Divine Timing</Text>
+          <Text style={styles.sectionTitle}>{tSafe('notificationSettingsScreen.divineTiming.title', 'Divine Timing')}</Text>
         </View>
         
         <SettingRow
-          label="Enable Divine Timing"
+          label={tSafe('notificationSettingsScreen.divineTiming.enable', 'Enable Divine Timing')}
           value={preferences.timing.enabled}
           onValueChange={(val) => updatePreference('timing', 'enabled', val)}
         />
@@ -179,16 +179,16 @@ export default function NotificationSettingsScreen() {
         {preferences.timing.enabled && (
           <>
             <SettingRow
-              label="Morning Spiritual Briefing"
+              label={tSafe('notificationSettingsScreen.divineTiming.morning.label', 'Morning Spiritual Briefing')}
               value={preferences.timing.morningBriefing}
               onValueChange={(val) => updatePreference('timing', 'morningBriefing', val)}
-              subtitle={`Daily energy at ${preferences.timing.morningBriefingTime}`}
+              subtitle={tSafe('notificationSettingsScreen.divineTiming.morning.subtitle', 'Daily energy at {time}').replace('{time}', preferences.timing.morningBriefingTime)}
             />
             <SettingRow
-              label="Element Alignment Alerts"
+              label={tSafe('notificationSettingsScreen.divineTiming.element.label', 'Element Alignment Alerts')}
               value={preferences.timing.elementalAlignment}
               onValueChange={(val) => updatePreference('timing', 'elementalAlignment', val)}
-              subtitle="When your element is powerfully activated"
+              subtitle={tSafe('notificationSettingsScreen.divineTiming.element.subtitle', 'When your element is powerfully activated')}
             />
             
           </>
@@ -199,11 +199,13 @@ export default function NotificationSettingsScreen() {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="moon" size={24} color="#9575CD" />
-          <Text style={styles.sectionTitle}>Quiet Hours</Text>
+          <Text style={styles.sectionTitle}>{tSafe('notificationSettingsScreen.quietHours.title', 'Quiet Hours')}</Text>
         </View>
         
         <Text style={styles.infoText}>
-          No notifications (except prayers) between {preferences.general.quietHoursStart} - {preferences.general.quietHoursEnd}
+          {tSafe('notificationSettingsScreen.quietHours.info', 'No notifications (except prayers) between {start} - {end}')
+            .replace('{start}', preferences.general.quietHoursStart)
+            .replace('{end}', preferences.general.quietHoursEnd)}
         </Text>
       </View>
 
@@ -211,17 +213,18 @@ export default function NotificationSettingsScreen() {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="timer-outline" size={24} color="#4DB6AC" />
-          <Text style={styles.sectionTitle}>Rate Limiting</Text>
+          <Text style={styles.sectionTitle}>{tSafe('notificationSettingsScreen.rateLimit.title', 'Rate Limiting')}</Text>
         </View>
         
         <Text style={styles.infoText}>
-          Maximum {preferences.general.maxNotificationsPerDay} notifications per day to avoid overwhelm
+          {tSafe('notificationSettingsScreen.rateLimit.info', 'Maximum {count} notifications per day to avoid overwhelm')
+            .replace('{count}', String(preferences.general.maxNotificationsPerDay))}
         </Text>
       </View>
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Notifications use your device's Do Not Disturb settings
+          {tSafe('notificationSettingsScreen.footer', 'Notifications use your device\'s Do Not Disturb settings')}
         </Text>
       </View>
     </ScrollView>
@@ -235,12 +238,12 @@ interface SettingRowProps {
   subtitle?: string;
 }
 
-function SettingRow({ label, value, onValueChange, subtitle }: SettingRowProps) {
+function SettingRow({ label, value, onValueChange, subtitle }: Readonly<SettingRowProps>) {
   return (
     <View style={styles.settingRow}>
       <View style={styles.settingText}>
         <Text style={styles.settingLabel}>{label}</Text>
-        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+        {!!subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
       </View>
       <Switch
         value={value}

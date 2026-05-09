@@ -86,6 +86,7 @@ function getTabKey(routeName: string, language: string): string {
     'personality': ['personality', 'الشخصية', 'personnalité'],
     'spiritual': ['spiritual', 'الممارسة', 'spirituel'],
     'health': ['health', 'الصحة', 'santé'],
+    'sadaqah': ['sadaqah', 'الصدقة', 'aumône'],
     'zodiac stones': ['zodiac stones', 'الأحجار', 'pierres'],
     'career': ['career', 'المهنة', 'carrière'],
     'blessed day': ['blessed day', 'اليوم المبارك', 'jour béni'],
@@ -228,14 +229,16 @@ export default function IstikharaResults() {
             backgroundColor: '#1a1a2e',
           },
           tabBarLabelStyle: {
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: '600',
             textTransform: 'none',
+            flexWrap: 'wrap',
           },
           tabBarScrollEnabled: true,
           tabBarItemStyle: {
             width: 'auto',
-            minWidth: 90,
+            minWidth: 80,
+            paddingHorizontal: 12,
           },
         }}
       >
@@ -283,12 +286,12 @@ export default function IstikharaResults() {
           )}
         </Tab.Screen>
 
-        {/* PREMIUM: Health & Wellness - Traditional guidance */}
+        {/* PREMIUM: Health Awareness - Traditional guidance */}
         <Tab.Screen name={t('istikhara.results.tabs.health') || 'Health'}>
           {() => (
             <PremiumTabWrapper
               featureId="spiritualGuidance"
-              title={t('istikhara.health.title') || 'Health & Wellness'}
+              title={t('istikhara.health.title') || 'Health Awareness'}
               description={t('istikhara.health.subtitle') || 'Traditional wisdom for your spiritual nature (not medical advice)'}
               icon="⚕️"
             >
@@ -297,6 +300,24 @@ export default function IstikharaResults() {
                 motherName: params.motherName as string,
                 ...data
               }} />
+            </PremiumTabWrapper>
+          )}
+        </Tab.Screen>
+
+        {/* PREMIUM: Sadaqah - Charity guidance */}
+        <Tab.Screen name={language === 'ar' ? 'الصدقة' : language === 'fr' ? 'Aumône' : 'Sadaqah'}>
+          {() => (
+            <PremiumTabWrapper
+              featureId="spiritualGuidance"
+              title={language === 'ar' ? 'الصدقة الموصى بها' : language === 'fr' ? 'Sadaqah Recommandé' : 'Recommended Sadaqah'}
+              description={language === 'ar'
+                ? 'ممارسات الصدقة الشخصية للبركة والحماية الروحية'
+                : language === 'fr'
+                ? 'Pratiques de charité personnalisées pour la bénédiction et la protection spirituelle'
+                : 'Personalized charity practices for blessing and spiritual protection'}
+              icon="💝"
+            >
+              <SadaqahTab data={data} elementColor={elementColor} />
             </PremiumTabWrapper>
           )}
         </Tab.Screen>

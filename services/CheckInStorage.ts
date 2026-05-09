@@ -31,6 +31,9 @@ const STORAGE_KEYS = {
   CHECKINS: 'divineTiming.checkins.v2',
 } as const;
 
+// Keep local history bounded to prevent AsyncStorage growth issues.
+const MAX_CHECKINS = 365;
+
 // ============================================================================
 // PROFILE MANAGEMENT
 // ============================================================================
@@ -167,15 +170,18 @@ export async function saveCheckIn(
     
     // Sort by creation time
     checkins.sort((a, b) => b.createdAt - a.createdAt);
+
+    // Keep only the most recent check-ins
+    const boundedCheckins = checkins.slice(0, MAX_CHECKINS);
     
     // Save updated list
     await AsyncStorage.setItem(
       STORAGE_KEYS.CHECKINS,
-      JSON.stringify(checkins)
+      JSON.stringify(boundedCheckins)
     );
     
     // Update peak window model
-    await updatePeakWindowModelFromCheckIns(checkins);
+    await updatePeakWindowModelFromCheckIns(boundedCheckins);
     
   } catch (error) {
     if (__DEV__) {
@@ -206,15 +212,19 @@ export async function updateCheckIn(
       ...updates,
     };
     
+    // Keep only the most recent check-ins
+    checkins.sort((a, b) => b.createdAt - a.createdAt);
+    const boundedCheckins = checkins.slice(0, MAX_CHECKINS);
+
     // Save updated list
     await AsyncStorage.setItem(
       STORAGE_KEYS.CHECKINS,
-      JSON.stringify(checkins)
+      JSON.stringify(boundedCheckins)
     );
     
     // Re-learn peak windows if outcome was added
     if (updates.outcome) {
-      await updatePeakWindowModelFromCheckIns(checkins);
+      await updatePeakWindowModelFromCheckIns(boundedCheckins);
     }
     
   } catch (error) {

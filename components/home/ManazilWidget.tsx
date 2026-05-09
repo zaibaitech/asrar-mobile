@@ -241,7 +241,7 @@ export function ManazilWidget({
 
   const getElementLabel = (element?: string) => {
     if (!element) return '';
-    return t(`elements.${element}`);
+    return t(`elements.${String(element).toLowerCase()}`);
   };
 
   const handlePress = async () => {

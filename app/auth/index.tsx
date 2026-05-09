@@ -14,7 +14,7 @@
 import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { checkAuthBackendHealth, getAuthBackendPrereq, loadProfileFromCloud, requestPasswordReset, signIn, signUp, signInWithOAuth, OAuthProvider, getConfiguredOAuthProviders } from '@/services/AuthService';
+import { OAuthProvider, checkAuthBackendHealth, getAuthBackendPrereq, getConfiguredOAuthProviders, loadProfileFromCloud, requestPasswordReset, signIn, signInWithOAuth, signUp } from '@/services/AuthService';
 import { clearGuestMode } from '@/services/SessionModeService';
 import { evaluatePasswordStrength, getPasswordStrengthLabel } from '@/utils/passwordStrength';
 import { Ionicons } from '@expo/vector-icons';
@@ -71,9 +71,6 @@ export default function AuthScreen() {
   // Password strength indicator
   const passwordStrength = evaluatePasswordStrength(password);
 
-  const hasEssentialProfileData =
-    !!(profile.nameAr || profile.nameLatin || profile.dobISO);
-
   const runBackendCheck = useCallback(async () => {
     const prereq = getAuthBackendPrereq();
 
@@ -122,48 +119,57 @@ export default function AuthScreen() {
       case 'auth/email-already-in-use':
       case 'User already registered':
       case 'SIGNUP_FAILED':
-        return 'This email is already registered. Try signing in instead.';
+        return tSafe('authScreen.errors.emailExists', 'This email is already registered. Try signing in instead.');
       
       case 'auth/invalid-email':
       case 'Invalid email':
-        return 'Please enter a valid email address.';
+        return tSafe('authScreen.errors.invalidEmail', 'Please enter a valid email address.');
       
       case 'auth/weak-password':
       case 'Password should be at least 6 characters':
-        return 'Password must be at least 6 characters.';
+        return tSafe('authScreen.errors.passwordMin', 'Password must be at least 6 characters.');
       
       case 'auth/network-request-failed':
       case 'Network request failed':
       case 'NETWORK_ERROR':
-        return 'No internet connection. Please check your network.';
+        return tSafe('authScreen.errors.network', 'No internet connection. Please check your network.');
       
       case 'NOT_CONFIGURED':
-        return 'Backend is not configured. Please check environment variables.';
+        return tSafe('authScreen.errors.notConfigured', 'Backend is not configured. Please check environment variables.');
 
       case 'TIMEOUT':
-        return 'Backend check timed out. Please try again.';
+        return tSafe('authScreen.errors.timeout', 'Backend check timed out. Please try again.');
 
       case 'HEALTH_CHECK_FAILED':
-        return 'Backend is unreachable. Please check your network and try again.';
+        return tSafe('authScreen.errors.healthFailed', 'Backend is unreachable. Please check your network and try again.');
       
       default:
-        return 'Something went wrong. Please try again.';
+        return tSafe('authScreen.errors.default', 'Something went wrong. Please try again.');
     }
   };
   
   const handleSignUp = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(
+        tSafe('common.error', 'Error'),
+        tSafe('authScreen.errors.fillFields', 'Please fill in all fields')
+      );
       return;
     }
     
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert(
+        tSafe('common.error', 'Error'),
+        tSafe('authScreen.errors.passwordMismatch', 'Passwords do not match')
+      );
       return;
     }
     
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      Alert.alert(
+        tSafe('common.error', 'Error'),
+        tSafe('authScreen.errors.passwordMin', 'Password must be at least 6 characters')
+      );
       return;
     }
     
@@ -184,11 +190,11 @@ export default function AuthScreen() {
 
         // After signup, always take the user to Profile to complete their details.
         Alert.alert(
-          '✅ Account Created!',
-          'Please complete your profile to unlock personalized features.',
+          tSafe('authScreen.alerts.accountCreated.title', '✅ Account Created!'),
+          tSafe('authScreen.alerts.accountCreated.message', 'Please complete your profile to unlock personalized features.'),
           [
             {
-              text: 'Continue',
+              text: tSafe('authScreen.actions.continue', 'Continue'),
               onPress: () => router.replace('/profile?postSave=home'),
             },
           ]
@@ -198,15 +204,15 @@ export default function AuthScreen() {
                  result.error?.message?.includes('already been registered')) {
         // User already exists
         Alert.alert(
-          'Account Exists',
-          'This email is already registered. Please sign in instead.',
+          tSafe('authScreen.alerts.accountExists.title', 'Account Exists'),
+          tSafe('authScreen.alerts.accountExists.message', 'This email is already registered. Please sign in instead.'),
           [
             {
-              text: 'Sign In',
+              text: tSafe('authScreen.actions.signIn', 'Sign In'),
               onPress: () => setMode('signin'),
             },
             {
-              text: 'OK',
+              text: tSafe('common.buttons.ok', 'OK'),
               style: 'cancel'
             }
           ]
@@ -214,21 +220,21 @@ export default function AuthScreen() {
       } else if (result.error?.code === 'EMAIL_CONFIRMATION_REQUIRED') {
         // Fallback if backend still requires email verification
         Alert.alert(
-          'Email Verification Required',
-          'Please verify your email address, then return and sign in. If this keeps happening, email verification is still enabled on the backend.',
+          tSafe('authScreen.alerts.emailVerificationRequired.title', 'Email Verification Required'),
+          tSafe('authScreen.alerts.emailVerificationRequired.message', 'Please verify your email address, then return and sign in. If this keeps happening, email verification is still enabled on the backend.'),
           [
             {
-              text: 'OK',
+              text: tSafe('common.buttons.ok', 'OK'),
             },
           ]
         );
       } else {
         // ❌ ACTUAL ERROR - Only show error for real failures
         const errorMessage = getErrorMessage(result.error?.code || result.error?.message || '');
-        Alert.alert('Error', errorMessage);
+        Alert.alert(tSafe('common.error', 'Error'), errorMessage);
       }
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
+      Alert.alert(tSafe('common.error', 'Error'), tSafe('authScreen.errors.unexpected', 'An unexpected error occurred'));
       console.error('Sign up error:', error);
     } finally {
       setLoading(false);
@@ -237,7 +243,7 @@ export default function AuthScreen() {
   
   const handleSignIn = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(tSafe('common.error', 'Error'), tSafe('authScreen.errors.fillFields', 'Please fill in all fields'));
       return;
     }
     
@@ -270,11 +276,11 @@ export default function AuthScreen() {
           });
           
           Alert.alert(
-            'Welcome Back!',
-            'Your profile has been restored.',
+            tSafe('authScreen.alerts.welcomeBack.title', 'Welcome Back!'),
+            tSafe('authScreen.alerts.welcomeBack.profileRestored', 'Your profile has been restored.'),
             [
               {
-                text: 'Continue',
+                text: tSafe('authScreen.actions.continue', 'Continue'),
                 onPress: () => router.replace('/(tabs)'),
               },
             ]
@@ -290,11 +296,11 @@ export default function AuthScreen() {
           });
 
           Alert.alert(
-            'Welcome Back!',
-            'Please complete your profile to unlock personalized features.',
+            tSafe('authScreen.alerts.welcomeBack.title', 'Welcome Back!'),
+            tSafe('authScreen.alerts.welcomeBack.completeProfile', 'Please complete your profile to unlock personalized features.'),
             [
               {
-                text: 'Continue',
+                text: tSafe('authScreen.actions.continue', 'Continue'),
                 onPress: () => router.replace('/profile?postSave=home'),
               },
             ]
@@ -303,19 +309,19 @@ export default function AuthScreen() {
       } else if (result.error?.code === 'EMAIL_CONFIRMATION_REQUIRED') {
         // Email not confirmed yet
         Alert.alert(
-          'Email Not Confirmed',
-          'Please check your email and click the confirmation link before signing in. Check your spam folder if you don\'t see it.',
+          tSafe('authScreen.alerts.emailNotConfirmed.title', 'Email Not Confirmed'),
+          tSafe('authScreen.alerts.emailNotConfirmed.message', 'Please check your email and click the confirmation link before signing in. Check your spam folder if you don\'t see it.'),
           [
             {
-              text: 'OK',
+              text: tSafe('common.buttons.ok', 'OK'),
             },
           ]
         );
       } else {
-        Alert.alert('Error', result.error?.message || 'Failed to sign in');
+        Alert.alert(tSafe('common.error', 'Error'), result.error?.message || tSafe('authScreen.errors.signInFailed', 'Failed to sign in'));
       }
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
+      Alert.alert(tSafe('common.error', 'Error'), tSafe('authScreen.errors.unexpected', 'An unexpected error occurred'));
       console.error('Sign in error:', error);
     } finally {
       setLoading(false);
@@ -328,7 +334,10 @@ export default function AuthScreen() {
 
   const handleForgotPassword = async () => {
     if (!email) {
-      Alert.alert('Email required', 'Please enter your email first.');
+      Alert.alert(
+        tSafe('authScreen.alerts.emailRequired.title', 'Email required'),
+        tSafe('authScreen.alerts.emailRequired.message', 'Please enter your email first.')
+      );
       return;
     }
 
@@ -338,15 +347,15 @@ export default function AuthScreen() {
 
       if (result.success) {
         Alert.alert(
-          'Reset link sent',
-          'Check your email for a password reset link. Open it on this device to continue in the app.',
+          tSafe('authScreen.alerts.resetLinkSent.title', 'Reset link sent'),
+          tSafe('authScreen.alerts.resetLinkSent.message', 'Check your email for a password reset link. Open it on this device to continue in the app.'),
           [{ text: tSafe('common.buttons.ok', 'OK') }]
         );
       } else {
-        Alert.alert('Error', result.error?.message || 'Failed to send reset email');
+        Alert.alert(tSafe('common.error', 'Error'), result.error?.message || tSafe('authScreen.errors.resetEmailFailed', 'Failed to send reset email'));
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to send reset email');
+      Alert.alert(tSafe('common.error', 'Error'), tSafe('authScreen.errors.resetEmailFailed', 'Failed to send reset email'));
       console.error('Forgot password error:', error);
     } finally {
       setLoading(false);
@@ -391,11 +400,11 @@ export default function AuthScreen() {
           });
 
           Alert.alert(
-            'Welcome Back!',
-            'Your profile has been restored.',
+            tSafe('authScreen.alerts.welcomeBack.title', 'Welcome Back!'),
+            tSafe('authScreen.alerts.welcomeBack.profileRestored', 'Your profile has been restored.'),
             [
               {
-                text: 'Continue',
+                text: tSafe('authScreen.actions.continue', 'Continue'),
                 onPress: () => router.replace('/(tabs)'),
               },
             ]
@@ -411,23 +420,22 @@ export default function AuthScreen() {
           });
 
           Alert.alert(
-            'Welcome!',
-            'Please complete your profile to unlock personalized features.',
+            tSafe('authScreen.alerts.welcome.title', 'Welcome!'),
+            tSafe('authScreen.alerts.welcome.completeProfile', 'Please complete your profile to unlock personalized features.'),
             [
               {
-                text: 'Continue',
+                text: tSafe('authScreen.actions.continue', 'Continue'),
                 onPress: () => router.replace('/profile?postSave=home'),
               },
             ]
           );
         }
       } else {
-        if (result.error?.code !== 'OAUTH_CANCELLED') {
-          Alert.alert('Error', result.error?.message || 'Failed to sign in with OAuth');
-        }
+        if (result.error?.code === 'OAUTH_CANCELLED') return;
+        Alert.alert(tSafe('common.error', 'Error'), result.error?.message || tSafe('authScreen.errors.oauthFailed', 'Failed to sign in with OAuth'));
       }
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
+      Alert.alert(tSafe('common.error', 'Error'), tSafe('authScreen.errors.unexpected', 'An unexpected error occurred'));
       console.error('OAuth sign in error:', error);
     } finally {
       setOauthLoading(null);
@@ -457,8 +465,8 @@ export default function AuthScreen() {
           >
             {/* Logo & Title */}
             <View style={styles.header}>
-              <Text style={styles.logo}>Asrariya ✦</Text>
-              <Text style={styles.subtitle}>Sacred Numerology & Mysticism</Text>
+              <Text style={styles.logo}>{tSafe('authScreen.brand.title', 'Asrariya ✦')}</Text>
+              <Text style={styles.subtitle}>{tSafe('authScreen.brand.subtitle', 'Sacred Numerology & Mysticism')}</Text>
             </View>
             
             {/* Tab Switcher */}
@@ -488,17 +496,19 @@ export default function AuthScreen() {
                 <Ionicons name="information-circle" size={24} color="#f59e0b" />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.notConfiguredTitle}>
-                    {backendStatus.configured ? 'Backend Unreachable' : 'Accounts Not Available'}
+                    {backendStatus.configured
+                      ? tSafe('authScreen.backend.unreachableTitle', 'Backend Unreachable')
+                      : tSafe('authScreen.backend.notAvailableTitle', 'Accounts Not Available')}
                   </Text>
                   <Text style={styles.notConfiguredText}>
                     {backendStatus.error ||
                       (backendStatus.configured
-                        ? 'We could not reach the backend. You can still try signing in/up to see the exact error.'
-                        : 'Missing backend configuration. You can still try signing in/up to see the exact error.')}
+                        ? tSafe('authScreen.backend.unreachableMessage', 'We could not reach the backend. You can still try signing in/up to see the exact error.')
+                        : tSafe('authScreen.backend.notConfiguredMessage', 'Missing backend configuration. You can still try signing in/up to see the exact error.'))}
                   </Text>
                   {!backendStatus.configured && backendStatus.missing.length > 0 && (
                     <Text style={[styles.notConfiguredText, { marginTop: 6, opacity: 0.85 }]}>
-                      Missing: {backendStatus.missing.join(', ')}
+                      {tSafe('authScreen.backend.missingPrefix', 'Missing')}: {backendStatus.missing.join(', ')}
                     </Text>
                   )}
                 </View>
@@ -520,27 +530,29 @@ export default function AuthScreen() {
             {/* Benefits Card */}
             <View style={styles.benefitsCard}>
               <Text style={styles.benefitsTitle}>
-                {mode === 'signup' ? 'Create an Account' : 'Welcome Back'}
+                {mode === 'signup'
+                  ? tSafe('authScreen.benefits.signupTitle', 'Create an Account')
+                  : tSafe('authScreen.benefits.signinTitle', 'Welcome Back')}
               </Text>
               <Text style={styles.benefitsSubtitle}>
                 {mode === 'signup' 
-                  ? 'Unlock premium features and sync across devices'
-                  : 'Sign in to access your account'}
+                  ? tSafe('authScreen.benefits.signupSubtitle', 'Unlock premium features and sync across devices')
+                  : tSafe('authScreen.benefits.signinSubtitle', 'Sign in to access your account')}
               </Text>
               
               {mode === 'signup' && (
                 <View style={styles.benefitsList}>
                   <View style={styles.benefitItem}>
                     <Ionicons name="cloud-upload" size={20} color="#10b981" />
-                    <Text style={styles.benefitText}>Cloud sync across devices</Text>
+                    <Text style={styles.benefitText}>{tSafe('authScreen.benefits.items.sync', 'Cloud sync across devices')}</Text>
                   </View>
                   <View style={styles.benefitItem}>
                     <Ionicons name="shield-checkmark" size={20} color="#10b981" />
-                    <Text style={styles.benefitText}>Secure backup of your data</Text>
+                    <Text style={styles.benefitText}>{tSafe('authScreen.benefits.items.backup', 'Secure backup of your data')}</Text>
                   </View>
                   <View style={styles.benefitItem}>
                     <Ionicons name="star" size={20} color="#10b981" />
-                    <Text style={styles.benefitText}>Access to premium features</Text>
+                    <Text style={styles.benefitText}>{tSafe('authScreen.benefits.items.premium', 'Access to premium features')}</Text>
                   </View>
                 </View>
               )}
@@ -592,7 +604,7 @@ export default function AuthScreen() {
               
               {mode === 'signup' && (
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Confirm Password</Text>
+                  <Text style={styles.label}>{tSafe('auth.confirmPassword', 'Confirm Password')}</Text>
                   <View style={styles.inputWrapper}>
                     <Ionicons name="lock-closed" size={20} color={DarkTheme.textSecondary} />
                     <TextInput
@@ -622,7 +634,9 @@ export default function AuthScreen() {
                     <>
                       <ActivityIndicator color="#fff" />
                       <Text style={styles.submitText}>
-                        {mode === 'signup' ? 'Creating Account...' : 'Signing In...'}
+                        {mode === 'signup'
+                          ? tSafe('authScreen.actions.creatingAccount', 'Creating Account...')
+                          : tSafe('authScreen.actions.signingIn', 'Signing In...')}
                       </Text>
                     </>
                   ) : (
@@ -633,7 +647,9 @@ export default function AuthScreen() {
                         color="#fff" 
                       />
                       <Text style={styles.submitText}>
-                        {mode === 'signup' ? 'Create Account' : 'Sign In'}
+                        {mode === 'signup'
+                          ? tSafe('auth.createAccountButton', 'Create Account')
+                          : tSafe('auth.signInButton', 'Sign In')}
                       </Text>
                     </>
                   )}
@@ -652,7 +668,7 @@ export default function AuthScreen() {
                 <>
                   <View style={styles.oauthDivider}>
                     <View style={styles.oauthDividerLine} />
-                    <Text style={styles.oauthDividerText}>or continue with</Text>
+                    <Text style={styles.oauthDividerText}>{tSafe('authScreen.oauth.continueWith', 'or continue with')}</Text>
                     <View style={styles.oauthDividerLine} />
                   </View>
 
@@ -715,7 +731,7 @@ export default function AuthScreen() {
             {/* Divider */}
             <View style={styles.divider}>
               <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or</Text>
+              <Text style={styles.dividerText}>{tSafe('authScreen.or', 'or')}</Text>
               <View style={styles.dividerLine} />
             </View>
             
@@ -732,7 +748,7 @@ export default function AuthScreen() {
             <View style={styles.privacyNotice}>
               <Ionicons name="shield-checkmark" size={16} color="#10b981" />
               <Text style={styles.privacyText}>
-                Your data is encrypted and secure. We never share your personal information.
+                {tSafe('authScreen.privacyNotice', 'Your data is encrypted and secure. We never share your personal information.')}
               </Text>
             </View>
           </ScrollView>

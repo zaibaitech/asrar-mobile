@@ -79,6 +79,7 @@ export default function ProfileScreen() {
   const [nameAr, setNameAr] = useState(profile.nameAr || '');
   const [nameLatin, setNameLatin] = useState(profile.nameLatin || '');
   const [motherName, setMotherName] = useState(profile.motherName || '');
+  const [motherNameLatin, setMotherNameLatin] = useState('');
   const [dobISO, setDobISO] = useState(profile.dobISO || '');
   const [birthTime, setBirthTime] = useState(profile.birthTime || '');
   
@@ -227,8 +228,8 @@ export default function ProfileScreen() {
       
       if (!permission.granted) {
         Alert.alert(
-          'Location Permission',
-          'Location permission is required to auto-detect your location.',
+          tSafe('profileScreen.location.permissionTitle', 'Location Permission'),
+          tSafe('profileScreen.location.permissionMessage', 'Location permission is required to auto-detect your location.'),
           [{ text: tSafe('common.buttons.ok', 'OK') }]
         );
         return;
@@ -239,8 +240,8 @@ export default function ProfileScreen() {
       
       if (error || !location) {
         Alert.alert(
-          'Location Error',
-          error || 'Failed to get location',
+          tSafe('profileScreen.location.errorTitle', 'Location Error'),
+          error || tSafe('profileScreen.location.errorMessage', 'Failed to get location'),
           [{ text: tSafe('common.buttons.ok', 'OK') }]
         );
         return;
@@ -251,15 +252,15 @@ export default function ProfileScreen() {
       setLocationLabel(location.label || `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`);
       
       Alert.alert(
-        'Location Updated',
-        `Set to: ${location.label}`,
+        tSafe('profileScreen.location.updatedTitle', 'Location Updated'),
+        tSafe('profileScreen.location.updatedMessage', 'Set to: {location}').replace('{location}', location.label || ''),
         [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
       
     } catch (error) {
       Alert.alert(
-        'Error',
-        'Failed to get location',
+        tSafe('common.error', 'Error'),
+        tSafe('profileScreen.location.errorMessage', 'Failed to get location'),
         [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
     } finally {
@@ -274,8 +275,8 @@ export default function ProfileScreen() {
       const permission = await requestLocationPermission();
       if (!permission.granted) {
         Alert.alert(
-          'Location Permission',
-          'Location permission is required to auto-detect your birth location coordinates.',
+          tSafe('profileScreen.birthLocation.permissionTitle', 'Location Permission'),
+          tSafe('profileScreen.birthLocation.permissionMessage', 'Location permission is required to auto-detect your birth location coordinates.'),
           [{ text: tSafe('common.buttons.ok', 'OK') }]
         );
         return;
@@ -283,7 +284,11 @@ export default function ProfileScreen() {
 
       const { location, error } = await getCurrentLocation();
       if (error || !location) {
-        Alert.alert('Location Error', error || 'Failed to get location', [{ text: tSafe('common.buttons.ok', 'OK') }]);
+        Alert.alert(
+          tSafe('profileScreen.birthLocation.errorTitle', 'Location Error'),
+          error || tSafe('profileScreen.birthLocation.errorMessage', 'Failed to get location'),
+          [{ text: tSafe('common.buttons.ok', 'OK') }]
+        );
         return;
       }
 
@@ -292,12 +297,16 @@ export default function ProfileScreen() {
       setBirthLocationLabel(location.label || '');
 
       Alert.alert(
-        'Birth Location Updated',
-        `Set to: ${location.label}`,
+        tSafe('profileScreen.birthLocation.updatedTitle', 'Birth Location Updated'),
+        tSafe('profileScreen.birthLocation.updatedMessage', 'Set to: {location}').replace('{location}', location.label || ''),
         [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to get birth location', [{ text: tSafe('common.buttons.ok', 'OK') }]);
+      Alert.alert(
+        tSafe('common.error', 'Error'),
+        tSafe('profileScreen.birthLocation.errorMessage', 'Failed to get birth location'),
+        [{ text: tSafe('common.buttons.ok', 'OK') }]
+      );
     } finally {
       setLoadingBirthLocation(false);
     }
@@ -321,7 +330,10 @@ export default function ProfileScreen() {
         const lat = Number(birthLatitude);
         const lon = Number(birthLongitude);
         if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-          Alert.alert('Birth Location', 'Please enter valid numeric latitude and longitude.');
+          Alert.alert(
+            tSafe('profileScreen.birthLocation.invalidTitle', 'Birth Location'),
+            tSafe('profileScreen.birthLocation.invalidMessage', 'Please enter valid numeric latitude and longitude.')
+          );
           return;
         }
 
@@ -355,26 +367,26 @@ export default function ProfileScreen() {
 
       if (postSave === 'choose') {
         Alert.alert(
-          'Profile Saved',
-          'Would you like to sign in/create an account, or continue to the app?',
+          tSafe('profileScreen.save.chooseNextTitle', 'Profile Saved'),
+          tSafe('profileScreen.save.chooseNextMessage', 'Would you like to sign in/create an account, or continue to the app?'),
           [
-            { text: 'Sign In', onPress: () => router.replace('/auth') },
-            { text: 'Go Home', onPress: () => router.replace('/(tabs)') },
+            { text: tSafe('auth.signIn', 'Sign In'), onPress: () => router.replace('/auth') },
+            { text: tSafe('profileScreen.actions.goHome', 'Go Home'), onPress: () => router.replace('/(tabs)') },
           ]
         );
         return;
       }
       
       Alert.alert(
-        'Profile Saved',
-        'Your personalization data has been updated.',
+        tSafe('profileScreen.save.successTitle', 'Profile Saved'),
+        tSafe('profileScreen.save.successMessage', 'Your personalization data has been updated.'),
         [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
       
     } catch (error) {
       Alert.alert(
-        'Error',
-        'Failed to save profile. Please try again.',
+        tSafe('common.error', 'Error'),
+        tSafe('profileScreen.save.errorMessage', 'Failed to save profile. Please try again.'),
         [{ text: tSafe('common.buttons.ok', 'OK') }]
       );
     }
@@ -532,7 +544,7 @@ export default function ProfileScreen() {
 
       Alert.alert(
         t('profile.deleteSuccess'),
-        'Your account has been deleted. You can continue using Asrariya as a guest.',
+        tSafe('profileScreen.deleteAccount.deletedMessage', 'Your account has been deleted. You can continue using Asrariya as a guest.'),
         [{ text: t('common.close'), onPress: () => router.replace('/(tabs)') }]
       );
     } catch (error) {
@@ -636,7 +648,8 @@ export default function ProfileScreen() {
           
           {completionStatus.completionPercent < 100 && (
             <Text style={styles.completionText}>
-              Add {completionStatus.missingFields.join(', ')} to unlock full personalization
+              {tSafe('profileScreen.completion.missingFields', 'Add {fields} to unlock full personalization')
+                .replace('{fields}', completionStatus.missingFields.join(', '))}
             </Text>
           )}
           
@@ -696,7 +709,7 @@ export default function ProfileScreen() {
               style={styles.dateConfirmButton}
               onPress={() => setShowDatePicker(false)}
             >
-              <Text style={styles.dateConfirmText}>Done</Text>
+              <Text style={styles.dateConfirmText}>{tSafe('common.done', 'Done')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -745,7 +758,7 @@ export default function ProfileScreen() {
               style={styles.dateConfirmButton}
               onPress={() => setShowTimePicker(false)}
             >
-              <Text style={styles.dateConfirmText}>Done</Text>
+              <Text style={styles.dateConfirmText}>{tSafe('common.done', 'Done')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -838,6 +851,23 @@ export default function ProfileScreen() {
             {t('profile.mother.subtitle')}
           </Text>
           
+          {/* Latin Mother Name Autocomplete */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>{t('profile.mother.latin')}</Text>
+            <NameAutocomplete
+              value={motherNameLatin}
+              onChange={setMotherNameLatin}
+              onArabicSelect={(arabic, latin) => {
+                setMotherName(arabic);
+                setMotherNameLatin(latin);
+              }}
+              placeholder={t('profile.mother.latinPlaceholder')}
+              showHelper={false}
+              language={language}
+            />
+          </View>
+          
+          {/* Arabic Mother Name Input with Keyboard Button */}
           <View style={styles.inputGroup}>
             <View style={styles.labelWithButton}>
               <Text style={styles.inputLabel}>{t('profile.mother.arabic')}</Text>

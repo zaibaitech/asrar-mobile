@@ -162,7 +162,9 @@ const selectedTransit = useMemo(() => {
                     {nextPrayer.time}
                   </Text>
                   {prayerCountdown && (
-                    <Text style={styles.widgetTertiary} numberOfLines={1}>in {prayerCountdown}</Text>
+                    <Text style={styles.widgetTertiary} numberOfLines={1}>
+                      {t('home.cards.nextPrayer.inTime', { duration: prayerCountdown })}
+                    </Text>
                   )}
                 </>
               ) : (
@@ -207,13 +209,13 @@ const selectedTransit = useMemo(() => {
                       styles.elementText,
                       { color: ElementAccents[planetaryData.nextHour.planetInfo.element].primary }
                     ]} numberOfLines={1}>
-                      {t(`elements.${planetaryData.nextHour.planetInfo.element}`).toUpperCase()}
+                      {t(`elements.${String(planetaryData.nextHour.planetInfo.element).toLowerCase()}`).toUpperCase()}
                     </Text>
                   </View>
                 </>
               ) : (
                 <Text style={styles.widgetTertiary} numberOfLines={2}>
-                  {t('home.tapToViewDetails') || 'Tap to view details'}
+                  {t('home.tapToViewDetails')}
                 </Text>
               )}
             </View>

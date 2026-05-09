@@ -90,6 +90,9 @@ const STORAGE_KEYS = {
   INDEX: (userId: string) => `@prayer_index_${userId}`, // For quick lookups
 } as const;
 
+const MAX_PRACTICES_PER_USER = 600;
+const MAX_NOTES_LENGTH = 500;
+
 // ============================================================================
 // PRAYER PRACTICE STORAGE SERVICE
 // ============================================================================
@@ -123,7 +126,10 @@ export class PrayerPracticeStorage {
           record.completed && record.completedAt
             ? Math.floor((new Date(record.completedAt).getTime() - new Date(record.startedAt).getTime()) / 1000)
             : undefined
-        )
+        ),
+        notes: typeof record.notes === 'string'
+          ? record.notes.slice(0, MAX_NOTES_LENGTH)
+          : record.notes,
       };
       
       // Get existing practices
@@ -140,11 +146,14 @@ export class PrayerPracticeStorage {
       
       // Sort by prayer time (most recent first)
       practices.sort((a, b) => new Date(b.prayerTime).getTime() - new Date(a.prayerTime).getTime());
+
+      // Keep only recent history to avoid unbounded AsyncStorage growth.
+      const boundedPractices = practices.slice(0, MAX_PRACTICES_PER_USER);
       
       // Save updated practices
       await AsyncStorage.setItem(
         STORAGE_KEYS.PRACTICES(record.userId),
-        JSON.stringify(practices)
+        JSON.stringify(boundedPractices)
       );
       
       // Update streak if practice was completed
@@ -184,10 +193,14 @@ export class PrayerPracticeStorage {
       };
       
       practices[index] = updatedRecord;
+
+      // Keep only recent history to avoid unbounded AsyncStorage growth.
+      practices.sort((a, b) => new Date(b.prayerTime).getTime() - new Date(a.prayerTime).getTime());
+      const boundedPractices = practices.slice(0, MAX_PRACTICES_PER_USER);
       
       await AsyncStorage.setItem(
         STORAGE_KEYS.PRACTICES(userId),
-        JSON.stringify(practices)
+        JSON.stringify(boundedPractices)
       );
       
       // Update streak if completion status changed
@@ -689,9 +702,10 @@ export class PrayerPracticeStorage {
       
       // Import practices
       if (data.practices && Array.isArray(data.practices)) {
+        const boundedImportPractices = data.practices.slice(0, MAX_PRACTICES_PER_USER);
         await AsyncStorage.setItem(
           STORAGE_KEYS.PRACTICES(userId),
-          JSON.stringify(data.practices)
+          JSON.stringify(boundedImportPractices)
         );
       }
       

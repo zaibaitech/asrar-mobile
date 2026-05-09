@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { DarkTheme } from '../../constants/DarkTheme';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { CompatibilityMode } from '../../types/compatibility';
 
 interface CompatibilityModeSwitcherProps {
@@ -11,12 +12,12 @@ interface CompatibilityModeSwitcherProps {
   language?: 'en' | 'fr' | 'ar';
 }
 
-export function CompatibilityModeSwitcher({ 
-  currentMode, 
+export function CompatibilityModeSwitcher({
+  currentMode,
   onModeChange,
   language = 'en'
 }: CompatibilityModeSwitcherProps) {
-  const isFrench = language === 'fr';
+  const { t } = useLanguage();
   
   return (
     <View style={styles.container}>
@@ -35,10 +36,10 @@ export function CompatibilityModeSwitcher({
             <Ionicons name="time" size={20} color="#fff" />
             <View style={styles.buttonText}>
               <Text style={styles.buttonTitleActive}>
-                {isFrench ? 'Mode Transit' : 'Transit Mode'}
+                {t('compatibility.resultsView.transitMode')}
               </Text>
               <Text style={styles.buttonSubtitleActive}>
-                {isFrench ? 'Heures Planétaires' : 'Planetary Hours'}
+                {t('compatibility.resultsView.planetaryHours')}
               </Text>
             </View>
           </LinearGradient>
@@ -47,10 +48,10 @@ export function CompatibilityModeSwitcher({
             <Ionicons name="time-outline" size={20} color="#94a3b8" />
             <View style={styles.buttonText}>
               <Text style={styles.buttonTitleInactive}>
-                {isFrench ? 'Mode Transit' : 'Transit Mode'}
+                {t('compatibility.resultsView.transitMode')}
               </Text>
               <Text style={styles.buttonSubtitleInactive}>
-                {isFrench ? 'Heures Planétaires' : 'Planetary Hours'}
+                {t('compatibility.resultsView.planetaryHours')}
               </Text>
             </View>
           </View>
@@ -74,10 +75,10 @@ export function CompatibilityModeSwitcher({
             <Ionicons name="heart" size={20} color="#fff" />
             <View style={styles.buttonText}>
               <Text style={styles.buttonTitleActive}>
-                {isFrench ? 'Mode Relation' : 'Relationship Mode'}
+                {t('compatibility.resultsView.relationshipMode')}
               </Text>
               <Text style={styles.buttonSubtitleActive}>
-                {isFrench ? 'Compatibilité des Noms' : 'Name Compatibility'}
+                {t('compatibility.resultsView.nameCompatibility')}
               </Text>
             </View>
           </LinearGradient>
@@ -86,10 +87,10 @@ export function CompatibilityModeSwitcher({
             <Ionicons name="heart-outline" size={20} color="#94a3b8" />
             <View style={styles.buttonText}>
               <Text style={styles.buttonTitleInactive}>
-                {isFrench ? 'Mode Relation' : 'Relationship Mode'}
+                {t('compatibility.resultsView.relationshipMode')}
               </Text>
               <Text style={styles.buttonSubtitleInactive}>
-                {isFrench ? 'Compatibilité des Noms' : 'Name Compatibility'}
+                {t('compatibility.resultsView.nameCompatibility')}
               </Text>
             </View>
           </View>

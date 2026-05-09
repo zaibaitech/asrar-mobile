@@ -412,12 +412,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
   },
 
   inputLabel: {
     fontSize: 16,
     fontWeight: '700',
     color: '#f1f5f9',
+    flex: 1,
+    flexWrap: 'wrap',
   },
 
   requiredBadge: {
@@ -440,6 +444,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: '#cbd5e1',
+    flexWrap: 'wrap',
+    flexShrink: 1,
   },
 
   inputWrapper: {
@@ -451,6 +457,7 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     fontSize: 14,
     fontWeight: '500',
+    flexWrap: 'wrap',
   },
 
   textInput: {
@@ -518,6 +525,7 @@ const styles = StyleSheet.create({
     color: '#64748b',
     fontStyle: 'italic',
     marginTop: 4,
+    flexWrap: 'wrap',
   },
 
   // Calculate Button

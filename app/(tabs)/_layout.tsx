@@ -6,19 +6,29 @@ import ResponsiveAppHeader from '@/components/AppHeader';
 import DrawerMenu from '@/components/DrawerMenu';
 import HistoryModal from '@/components/istikhara/HistoryModal';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-import { useColorScheme } from '@/components/useColorScheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useResponsive } from '@/hooks/useResponsive';
 import { SavedCalculation } from '@/services/HistoryService';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
+function TabBarIcon(props: Readonly<{
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
   size?: number;
 }) {
   const { size = 22, ...rest } = props;
   return <FontAwesome size={size} style={{ marginBottom: -2 }} {...rest} />;
+}
+
+function getHeaderLanguage(language: 'en' | 'fr' | 'ar'): 'EN' | 'FR' | 'AR' {
+  switch (language) {
+    case 'ar':
+      return 'AR';
+    case 'fr':
+      return 'FR';
+    default:
+      return 'EN';
+  }
 }
 
 // Custom header component for tabs
@@ -52,7 +62,7 @@ function CustomHeader() {
   return (
     <>
       <ResponsiveAppHeader
-        currentLanguage={language === 'en' ? 'EN' : 'FR'}
+        currentLanguage={getHeaderLanguage(language)}
         onLanguageChange={(lang) => setLanguage(lang.toLowerCase() as 'en' | 'fr' | 'ar')}
         onProfilePress={() => router.push('/profile')}
         onHistoryPress={() => setShowHistory(true)}
@@ -72,7 +82,6 @@ function CustomHeader() {
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
   const { t } = useLanguage();
   const { isTablet, isDesktop } = useResponsive();
 
@@ -146,7 +155,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="quran"
         options={{
-          title: 'Quran',
+          title: t('nav.quran') || 'Quran',
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} size={tabIconSize} />,
         }}
       />

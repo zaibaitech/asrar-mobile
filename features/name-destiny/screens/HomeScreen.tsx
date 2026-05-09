@@ -56,15 +56,15 @@ export default function NameDestinyHomeScreen() {
   // Validation
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!nameLatin.trim()) {
-      newErrors.nameLatin = 'Name is required';
+      newErrors.nameLatin = t('nameDestinyHome.nameLatinRequired');
     }
-    
+
     if (readingType === 'personal' && !motherLatin.trim()) {
-      newErrors.motherLatin = "Mother's name is required for personal reading";
+      newErrors.motherLatin = t('nameDestinyHome.motherNameRequired');
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -134,16 +134,16 @@ export default function NameDestinyHomeScreen() {
           {/* Header Section */}
           <View style={styles.header}>
             <Text style={styles.headerEmoji}>📜</Text>
-            <Text style={styles.headerTitle}>Discover Your Name Destiny</Text>
+            <Text style={styles.headerTitle}>{t('nameDestinyHome.headerTitle')}</Text>
             <Text style={styles.headerSubtitle}>
-              Discover the spiritual essence encoded in your name
+              {t('nameDestinyHome.headerSubtitle')}
             </Text>
           </View>
 
           {/* Reading Type Selector */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Choose Your Reading Type</Text>
-            
+            <Text style={styles.sectionTitle}>{t('nameDestinyHome.chooseReadingType')}</Text>
+
             <Pressable
               style={[
                 styles.readingCard,
@@ -159,13 +159,13 @@ export default function NameDestinyHomeScreen() {
                   styles.readingCardTitle,
                   readingType === 'explore' && styles.readingCardTitleSelected,
                 ]}>
-                  Explore a Name
+                  {t('nameDestinyHome.exploreName')}
                 </Text>
                 <Text style={styles.readingCardDescription}>
-                  Discover the spiritual meaning and general characteristics of any name
+                  {t('nameDestinyHome.exploreDesc')}
                 </Text>
                 <Text style={styles.readingCardBest}>
-                  Best for: Learning about names, cultural exploration, general insights
+                  {t('nameDestinyHome.exploreBest')}
                 </Text>
               </View>
             </Pressable>
@@ -180,7 +180,7 @@ export default function NameDestinyHomeScreen() {
               <View style={styles.readingCardIconContainer}>
                 {readingType === 'personal' && (
                   <View style={styles.recommendedBadge}>
-                    <Text style={styles.recommendedText}>⭐ Recommended</Text>
+                    <Text style={styles.recommendedText}>{t('nameDestinyHome.recommended')}</Text>
                   </View>
                 )}
                 <View style={styles.readingCardIcon}>
@@ -192,13 +192,13 @@ export default function NameDestinyHomeScreen() {
                   styles.readingCardTitle,
                   readingType === 'personal' && styles.readingCardTitleSelected,
                 ]}>
-                  My Personal Reading
+                  {t('nameDestinyHome.personalReading')}
                 </Text>
                 <Text style={styles.readingCardDescription}>
-                  Get YOUR unique spiritual profile - personalized to your exact soul blueprint
+                  {t('nameDestinyHome.personalDesc')}
                 </Text>
                 <Text style={styles.readingCardBest}>
-                  Best for: Self-discovery, spiritual guidance, personal transformation
+                  {t('nameDestinyHome.personalBest')}
                 </Text>
               </View>
             </Pressable>
@@ -207,11 +207,11 @@ export default function NameDestinyHomeScreen() {
           {/* Name Input Section */}
           <View style={styles.section}>
             <Text style={styles.label}>
-              Name (Latin script) <Text style={styles.required}>*</Text>
+              {t('nameDestinyHome.nameLatinLabel')} <Text style={styles.required}>*</Text>
             </Text>
             <TextInput
               style={[styles.input, errors.nameLatin && styles.inputError]}
-              placeholder="e.g., Fatima, Ibrahima, Amadou"
+              placeholder={t('nameDestinyHome.nameLatinPlaceholder')}
               placeholderTextColor="#999"
               value={nameLatin}
               onChangeText={(text) => {
@@ -223,14 +223,14 @@ export default function NameDestinyHomeScreen() {
             {errors.nameLatin && (
               <Text style={styles.errorText}>{errors.nameLatin}</Text>
             )}
-            
+
             <Text style={styles.helperText}>
-              Type your name in Latin letters - we'll show the Arabic equivalent
+              {t('nameDestinyHome.nameLatinHelper')}
             </Text>
 
             {/* Arabic Name Input */}
             <View style={styles.arabicInputContainer}>
-              <Text style={styles.label}>Or in Arabic (Optional)</Text>
+              <Text style={styles.label}>{t('nameDestinyHome.arabicOptional')}</Text>
               <View style={styles.arabicInputRow}>
                 <TextInput
                   style={[styles.input, styles.arabicInput]}
@@ -249,7 +249,7 @@ export default function NameDestinyHomeScreen() {
                   }}
                 >
                   <Text style={styles.keyboardButtonText}>
-                    {showNameKeyboard ? '⌨️ Hide' : '⌨️ Show Keyboard'}
+                    {showNameKeyboard ? t('nameDestinyHome.hideKeyboard') : t('nameDestinyHome.showKeyboard')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -261,18 +261,18 @@ export default function NameDestinyHomeScreen() {
             <View style={styles.section}>
               <View style={styles.motherNameHeader}>
                 <Text style={styles.label}>
-                  Mother's Name <Text style={styles.required}>*</Text>
+                  {t('nameDestinyHome.motherNameLabel')} <Text style={styles.required}>*</Text>
                 </Text>
                 <View style={styles.infoBadge}>
-                  <Text style={styles.infoBadgeText}>Required for Personal</Text>
+                  <Text style={styles.infoBadgeText}>{t('nameDestinyHome.motherNameNote')}</Text>
                 </View>
               </View>
-              
+
               <Text style={styles.personalNote}>
-                Your unique reading - requires mother's name
+                {t('nameDestinyHome.motherNameNote')}
               </Text>
 
-              <Text style={styles.subLabel}>Type in Latin letters</Text>
+              <Text style={styles.subLabel}>{t('nameDestinyHome.motherLatinLabel')}</Text>
               <TextInput
                 style={[styles.input, errors.motherLatin && styles.inputError]}
                 placeholder="e.g., Fatima, Khadija, Aisha"
@@ -290,7 +290,7 @@ export default function NameDestinyHomeScreen() {
 
               {/* Arabic Mother Name Input */}
               <View style={styles.arabicInputContainer}>
-                <Text style={styles.label}>Or in Arabic</Text>
+                <Text style={styles.label}>{t('nameDestinyHome.motherArabicOptional')}</Text>
                 <View style={styles.arabicInputRow}>
                   <TextInput
                     style={[styles.input, styles.arabicInput]}
@@ -309,7 +309,7 @@ export default function NameDestinyHomeScreen() {
                     }}
                   >
                     <Text style={styles.keyboardButtonText}>
-                      {showMotherKeyboard ? '⌨️ Hide' : '⌨️ Show Keyboard'}
+                      {showMotherKeyboard ? t('nameDestinyHome.hideKeyboard') : t('nameDestinyHome.showKeyboard')}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -323,7 +323,7 @@ export default function NameDestinyHomeScreen() {
               {/* Hero Section - Spiritual Overview */}
               <View style={styles.heroSection}>
                 <Text style={styles.heroIcon}>✨</Text>
-                <Text style={styles.heroTitle}>Your Spiritual Essence</Text>
+                <Text style={styles.heroTitle}>{t('nameDestiny.yourSpiritualEssence')}</Text>
                 <Text style={styles.heroSubtitle}>
                   {result.personName}
                   {result.motherName && ` • ${result.motherName}`}
@@ -339,15 +339,15 @@ export default function NameDestinyHomeScreen() {
                   <View style={styles.coreInsightIconContainer}>
                     <Text style={styles.coreInsightIcon}>🌙</Text>
                   </View>
-                  <Text style={styles.coreInsightLabel}>Core Spiritual Pattern</Text>
+                  <Text style={styles.coreInsightLabel}>{t('nameDestiny.coreSpiritualPattern')}</Text>
                 </View>
-                
+
                 <Text style={styles.coreInsightValue}>
                   {result.element.en} Nature with {result.burj.en} Influence
                 </Text>
-                
+
                 <Text style={styles.coreInsightDescription}>
-                  The spiritual pattern surrounding your name shows a dominant {result.element.en.toLowerCase()} energy, 
+                  The spiritual pattern surrounding your name shows a dominant {result.element.en.toLowerCase()} energy,
                   guided by the qualities of {result.burj.en}. This combination suggests a path of{' '}
                   {result.element.en === 'Fire' ? 'transformation and spiritual illumination' :
                    result.element.en === 'Water' ? 'emotional depth and intuitive wisdom' :
@@ -358,29 +358,26 @@ export default function NameDestinyHomeScreen() {
 
               {/* Supporting Signs - Compact Cards */}
               <View style={styles.supportingSignsSection}>
-                <Text style={styles.supportingSignsTitle}>Spiritual Indicators</Text>
-                
+                <Text style={styles.supportingSignsTitle}>{t('nameDestiny.spiritualIndicators')}</Text>
+
                 <View style={styles.supportingSignsGrid}>
-                  {/* Element Harmony */}
                   <View style={styles.signCard}>
                     <Text style={styles.signIcon}>🌊</Text>
-                    <Text style={styles.signLabel}>Element</Text>
+                    <Text style={styles.signLabel}>{t('nameDestiny.element')}</Text>
                     <Text style={styles.signValue}>{result.element.en}</Text>
                     <Text style={styles.signArabic}>{result.element.ar}</Text>
                   </View>
 
-                  {/* Celestial Alignment */}
                   <View style={styles.signCard}>
                     <Text style={styles.signIcon}>⭐</Text>
-                    <Text style={styles.signLabel}>Celestial</Text>
+                    <Text style={styles.signLabel}>{t('nameDestiny.celestial')}</Text>
                     <Text style={styles.signValue}>{result.burj.en}</Text>
                     <Text style={styles.signArabic}>{result.burj.ar}</Text>
                   </View>
 
-                  {/* Temporal Quality */}
                   <View style={styles.signCard}>
                     <Text style={styles.signIcon}>🕰️</Text>
-                    <Text style={styles.signLabel}>Hour</Text>
+                    <Text style={styles.signLabel}>{t('nameDestiny.hour')}</Text>
                     <Text style={styles.signValue}>{result.hour.name}</Text>
                     <Text style={styles.signArabic}>{result.hour.ar}</Text>
                   </View>
@@ -395,23 +392,23 @@ export default function NameDestinyHomeScreen() {
                 >
                   <View style={styles.recommendedActionsHeader}>
                     <Text style={styles.recommendedActionsIcon}>🤲</Text>
-                    <Text style={styles.recommendedActionsTitle}>Spiritual Guidance</Text>
+                    <Text style={styles.recommendedActionsTitle}>{t('nameDestiny.spiritualGuidance')}</Text>
                   </View>
-                  
+
                   <View style={styles.guidanceItem}>
                     <Text style={styles.guidanceDot}>•</Text>
                     <Text style={styles.guidanceText}>
                       Reflect during {result.hour.name} hours for enhanced clarity
                     </Text>
                   </View>
-                  
+
                   <View style={styles.guidanceItem}>
                     <Text style={styles.guidanceDot}>•</Text>
                     <Text style={styles.guidanceText}>
                       Embrace {result.element.en.toLowerCase()} qualities through mindful presence
                     </Text>
                   </View>
-                  
+
                   <View style={styles.guidanceItem}>
                     <Text style={styles.guidanceDot}>•</Text>
                     <Text style={styles.guidanceText}>

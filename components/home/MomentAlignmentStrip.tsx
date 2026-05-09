@@ -33,7 +33,7 @@ function getElementLabel(element: Element | undefined, t: (key: string) => strin
   if (!element) {
     return '';
   }
-  return t(`elements.${element}`);
+  return t(`elements.${String(element).toLowerCase()}`);
 }
 
 function formatCountdownShort(seconds: number): string {
@@ -111,7 +111,7 @@ export function MomentAlignmentStrip({
         <View style={styles.emptyContent}>
           <Ionicons name="calendar-outline" size={18} color="#8B7355" />
           <Text style={styles.emptyText}>
-            Add DOB for Moment Alignment
+            {t('home.cards.momentAlignment.addDobPrompt')}
           </Text>
           <Ionicons name="chevron-forward" size={18} color="#64748b" />
         </View>

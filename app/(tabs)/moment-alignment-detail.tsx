@@ -12,13 +12,13 @@ import { AdBanner } from '@/components/ads';
 import CollapsibleSection from '@/components/common/CollapsibleSection';
 import { MomentAnalysisCard } from '@/components/momentAlignment/MomentAnalysisCard';
 import { MomentGuidanceCard } from '@/components/momentAlignment/MomentGuidanceCard';
+import { PlanetaryZikrCard } from '@/components/momentAlignment/PlanetaryZikrCard';
 import { StatusOverviewCard } from '@/components/momentAlignment/StatusOverviewCard';
 import { TimingAnalysisSection } from '@/components/timing';
 import { getPlanetArabicName } from '@/constants/arabicTerms';
 import { DarkTheme, Spacing } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { fetchPrayerTimes } from '@/services/api/prayerTimes';
 import {
     BADGE_CONFIG,
     getBadgeFromScore,
@@ -101,7 +101,6 @@ export default function MomentAlignmentDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [planetaryData, setPlanetaryData] = useState<PlanetaryHourData | null>(null);
   const [allTransits, setAllTransits] = useState<any>(null);
-  const [prayerTimesData, setPrayerTimesData] = useState<any>(null);
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
   const [hourPlanetCondition, setHourPlanetCondition] = useState<PlanetaryCondition | null>(null);
@@ -118,7 +117,6 @@ export default function MomentAlignmentDetailScreen() {
     payload: string;
   };
 
-  const [userTransitLink, setUserTransitLink] = useState<OverallTransitLink | null>(null);
   const [currentHourTransitData, setCurrentHourTransitData] = useState<OverallTransitLink | null>(null);
 
   // Unified timing state - used for deep analysis breakdown sections
@@ -176,12 +174,13 @@ export default function MomentAlignmentDetailScreen() {
 
       const longitude = planetTransit.longitude;
       const sunLongitude = sunTransit?.longitude;
-      const degree =
-        typeof planetTransit.signDegree === 'number'
-          ? planetTransit.signDegree + (planetTransit.signMinute ?? 0) / 60
-          : typeof longitude === 'number'
-            ? ((longitude % 30) + 30) % 30
-            : null;
+        let degree: number | null = null;
+
+        if (typeof planetTransit.signDegree === 'number') {
+          degree = planetTransit.signDegree + (planetTransit.signMinute ?? 0) / 60;
+        } else if (typeof longitude === 'number') {
+          degree = ((longitude % 30) + 30) % 30;
+        }
 
       if (typeof longitude !== 'number' || typeof sunLongitude !== 'number' || typeof degree !== 'number') {
         return { planet, planetKey, qualityLabel: '', finalPower: 0, payload };
@@ -207,21 +206,11 @@ export default function MomentAlignmentDetailScreen() {
         if (!transits) {
           if (!cancelled) {
             setAllTransits(null);
-            setUserTransitLink(null);
             setCurrentHourTransitData(null);
           }
           return;
         }
         if (!cancelled) setAllTransits(transits);
-
-        // Fetch user planet transit
-        const userPlanet = planetFromKey(userPlanetKey);
-        if (userPlanet && userPlanetKey) {
-          const userData = await computeTransitData(userPlanet, userPlanetKey, transits);
-          if (!cancelled) setUserTransitLink(userData);
-        } else {
-          if (!cancelled) setUserTransitLink(null);
-        }
 
         // Fetch current hour planet transit
         const currentHourPlanet = planetaryData?.currentHour?.planet;
@@ -230,16 +219,17 @@ export default function MomentAlignmentDetailScreen() {
           if (hourPlanet) {
             const hourData = await computeTransitData(hourPlanet, currentHourPlanet.toLowerCase(), transits);
             if (!cancelled) setCurrentHourTransitData(hourData);
-          } else {
-            if (!cancelled) setCurrentHourTransitData(null);
+            return;
           }
-        } else {
+
           if (!cancelled) setCurrentHourTransitData(null);
+          return;
         }
+
+        if (!cancelled) setCurrentHourTransitData(null);
       } catch {
         if (!cancelled) {
           setAllTransits(null);
-          setUserTransitLink(null);
           setCurrentHourTransitData(null);
         }
       }
@@ -249,7 +239,7 @@ export default function MomentAlignmentDetailScreen() {
     return () => {
       cancelled = true;
     };
-  }, [t, userPlanetKey, planetaryData?.currentHour?.planet]);
+  }, [t, planetaryData?.currentHour?.planet]);
 
   // Track whether we've loaded alignment with location data
   const hasLoadedWithLocationRef = useRef(false);
@@ -294,8 +284,6 @@ export default function MomentAlignmentDetailScreen() {
       if (!best) return;
       const { latitude, longitude } = best;
       setCoords({ latitude, longitude });
-      const data = await fetchPrayerTimes(latitude, longitude);
-      setPrayerTimesData(data);
     } catch (error) {
       console.error('Error loading prayer times:', error);
     }
@@ -349,16 +337,17 @@ export default function MomentAlignmentDetailScreen() {
   const staleRetryRef = useRef<string | null>(null);
   useEffect(() => {
     if (!currentHourPlanetForRefresh || !conditionPlanet) return;
-    if (currentHourPlanetForRefresh.toLowerCase() !== conditionPlanet.toLowerCase()) {
-      // Prevent infinite retry - only retry once per hour change
-      const retryKey = `${conditionPlanet}->${currentHourPlanetForRefresh}`;
-      if (staleRetryRef.current !== retryKey) {
-        staleRetryRef.current = retryKey;
-        void loadAlignment({ silent: true });
-      }
-    } else {
+    if (currentHourPlanetForRefresh.toLowerCase() === conditionPlanet.toLowerCase()) {
       // Data is fresh, reset retry tracker
       staleRetryRef.current = null;
+      return;
+    }
+
+    // Prevent infinite retry - only retry once per hour change
+    const retryKey = `${conditionPlanet}->${currentHourPlanetForRefresh}`;
+    if (staleRetryRef.current !== retryKey) {
+      staleRetryRef.current = retryKey;
+      void loadAlignment({ silent: true });
     }
   }, [currentHourPlanetForRefresh, conditionPlanet, loadAlignment]);
 
@@ -501,15 +490,8 @@ export default function MomentAlignmentDetailScreen() {
     return t(`elements.${elementKey}` as any) || element.charAt(0).toUpperCase() + element.slice(1);
   };
 
-  const formatTime = () => {
-    const current = new Date();
-    const hours = current.getHours().toString().padStart(2, '0');
-    const minutes = current.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  };
-
   const formatTimeUntil = (targetDate: Date) => {
-    const diffMs = targetDate.getTime() - new Date().getTime();
+    const diffMs = targetDate.getTime() - Date.now();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
@@ -521,20 +503,14 @@ export default function MomentAlignmentDetailScreen() {
 
   const formatWindowDay = (window: any) => {
     const windowDate = new Date(window.startTime);
-    const hoursAway = Math.floor((windowDate.getTime() - new Date().getTime()) / (1000 * 60 * 60));
+    const hoursAway = Math.floor((windowDate.getTime() - Date.now()) / (1000 * 60 * 60));
 
     if (hoursAway === 0) return t('momentDetail.timeline.today');
-    if (hoursAway === 1) return `${t('momentDetail.timeline.in')} 1h`;
-    if (hoursAway < 24) return `${t('momentDetail.timeline.in')} ${hoursAway}h`;
+    if (hoursAway < 24) return `${t('momentDetail.timeline.in')} ${t('momentDetail.timeline.hours', { count: hoursAway })}`;
 
     const daysAway = Math.floor(hoursAway / 24);
     return t('momentDetail.timeline.daysAway', { count: daysAway });
   };
-
-  const currentHourRemainingLabel = useMemo(() => {
-    if (!planetaryData) return null;
-    return formatTimeUntil(planetaryData.currentHour.endTime);
-  }, [planetaryData]);
 
   const getLocalizedLayerReasoning = useCallback((layer: { reasoning: string; reasoningAr?: string; reasoningFr?: string }) => {
     if (language === 'ar' && layer.reasoningAr) return layer.reasoningAr;
@@ -595,9 +571,14 @@ export default function MomentAlignmentDetailScreen() {
     const houseNumber = houseIndex + 1;
     const angular = houseNumber === 1 || houseNumber === 4 || houseNumber === 7 || houseNumber === 10;
     const succedent = houseNumber === 2 || houseNumber === 5 || houseNumber === 8 || houseNumber === 11;
-    const cadent = !angular && !succedent;
+    let sectorKey: 'angular' | 'succedent' | 'cadent' = 'cadent';
 
-    const sectorKey = angular ? 'angular' : succedent ? 'succedent' : 'cadent';
+    if (angular) {
+      sectorKey = 'angular';
+    } else if (succedent) {
+      sectorKey = 'succedent';
+    }
+
     return { houseNumber, sectorKey } as const;
   }, [coords, hourPlanetCondition?.position?.absoluteDegree, alignment?.hourRulerCondition?.position?.absoluteDegree]);
 
@@ -739,14 +720,14 @@ export default function MomentAlignmentDetailScreen() {
     }
     // Fallback to classical judgment
     if (classicalJudgment) {
-      const emoji =
-        classicalJudgment.restrictionLevel === 0
-          ? '🟢'
-          : classicalJudgment.restrictionLevel === 1
-            ? '🟡'
-            : classicalJudgment.restrictionLevel === 2
-              ? '🟠'
-              : '⛔';
+      let emoji = '⛔';
+      if (classicalJudgment.restrictionLevel === 0) {
+        emoji = '🟢';
+      } else if (classicalJudgment.restrictionLevel === 1) {
+        emoji = '🟡';
+      } else if (classicalJudgment.restrictionLevel === 2) {
+        emoji = '🟠';
+      }
       const labelKey = `dailyEnergy.classicalJudgment.labels.${classicalJudgment.classicalLabel.toLowerCase()}`;
       return `${emoji} ${t(labelKey) || classicalJudgment.classicalLabel}`;
     }
@@ -761,6 +742,18 @@ export default function MomentAlignmentDetailScreen() {
     }
     return undefined;
   }, [planetaryData?.currentHour?.endTime, t]);
+
+  const currentHourPlanetKey = planetaryData?.currentHour?.planet?.toLowerCase();
+
+  const isCurrentHourPlanetAuspicious = useMemo(() => {
+    if (!currentHourPlanetKey) return false;
+
+    const condition = hourPlanetCondition ?? alignment?.hourRulerCondition;
+    if (!condition) return false;
+    if (condition.planet.toLowerCase() !== currentHourPlanetKey) return false;
+
+    return condition.ruling === 'excellent' || condition.ruling === 'strong';
+  }, [currentHourPlanetKey, hourPlanetCondition, alignment?.hourRulerCondition]);
 
   const currentHourModel = useMemo(() => {
     if (!planetaryData) {
@@ -814,7 +807,7 @@ export default function MomentAlignmentDetailScreen() {
 
     const engine = condition.conditionEngine;
     const engineStatusLabel = engine ? (t(`planetCondition.status.${engine.status}`) || engine.status) : undefined;
-    const scoreLabel = t('planetCondition.scoreLabel') || 'Score';
+    const scoreLabel = t('planetCondition.scoreLabel');
     const engineDetail = engine ? `${scoreLabel}: ${engine.score >= 0 ? '+' : ''}${engine.score}` : undefined;
     const engineReasons = engine
       ? engine.reasons
@@ -910,7 +903,7 @@ export default function MomentAlignmentDetailScreen() {
     
     // Same-planet hours: higher intensity, not automatic positivity
     const planetLabel = isSamePlanet
-      ? { text: t('momentDetail.cards.analysis.highIntensity') || 'High intensity', color: '#F59E0B' }
+      ? { text: t('momentDetail.cards.analysis.highIntensity'), color: '#F59E0B' }
       : scoreLabel(timingResult.layers.planetaryResonance.score);
     
     const condition = hourPlanetCondition ?? alignment?.hourRulerCondition;
@@ -1056,7 +1049,7 @@ export default function MomentAlignmentDetailScreen() {
                 >
                   <Text style={styles.transitLinkText}>
                     {t('momentDetail.cards.transit.viewFullAnalysis', {
-                      planet: planetaryData?.currentHour?.planet || 'planet',
+                      planet: planetaryData?.currentHour?.planet || t('common.unknown'),
                     })}
                   </Text>
                   <Text style={styles.transitLinkArrow}>→</Text>
@@ -1123,6 +1116,10 @@ export default function MomentAlignmentDetailScreen() {
             ? `${t('momentDetail.cards.nextHour')}: ${t(`planets.${planetaryData.nextHour.planet.toLowerCase()}`)} (${getElementLabel(planetaryData.nextHour.planetInfo.element)}) ${t('momentDetail.timeline.in')} ${formatTimeUntil(planetaryData.currentHour.endTime)}`
             : undefined}
         />
+
+        {isCurrentHourPlanetAuspicious && currentHourPlanetKey ? (
+          <PlanetaryZikrCard planetKey={currentHourPlanetKey} />
+        ) : null}
 
         <CollapsibleSection
           title={`📅 ${t('momentDetail.cards.showTimeline')}`}

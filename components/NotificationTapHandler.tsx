@@ -1,3 +1,4 @@
+import * as Linking from 'expo-linking';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
@@ -5,11 +6,10 @@ import { useEffect } from 'react';
 function coerceString(value: unknown): string {
   if (value == null) return '';
   if (typeof value === 'string') return value;
-  try {
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
     return String(value);
-  } catch {
-    return '';
   }
+  return '';
 }
 
 function coerceJsonString(value: unknown, fallback: string): string {
@@ -42,6 +42,11 @@ export function NotificationTapHandler() {
       const prayer = coerceString(data.prayer);
 
       const explicitAction = coerceString(data.action);
+
+      // Ignore empty/stale payloads that would only open a blank details screen.
+      if (!title && !body && !category && !type && !explicitAction) {
+        return;
+      }
 
       const action = (() => {
         if (explicitAction) return explicitAction;
@@ -94,8 +99,10 @@ export function NotificationTapHandler() {
     };
 
     // Handle cold-start tap
-    Notifications.getLastNotificationResponseAsync()
-      .then((last) => {
+    Promise.all([Linking.getInitialURL(), Promise.resolve(Notifications.getLastNotificationResponse?.() ?? null)])
+      .then(([initialUrl, last]) => {
+        // If app was opened by a deep link, do not let a stale notification tap hijack navigation.
+        if (initialUrl) return;
         if (last) {
           handleResponse(last);
         }

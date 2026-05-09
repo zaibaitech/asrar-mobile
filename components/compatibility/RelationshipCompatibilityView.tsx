@@ -102,11 +102,11 @@ export function RelationshipCompatibilityView({
   };
   
   const tabs = [
-    { id: 'overview' as const, label: isFrench ? 'Vue d\'ensemble' : 'Overview', icon: 'eye' },
-    { id: 'spiritual' as const, label: isFrench ? 'Spirituel' : 'Spiritual', icon: 'sparkles' },
-    { id: 'elemental' as const, label: isFrench ? 'Élémental' : 'Elemental', icon: 'leaf' },
-    { id: 'planetary' as const, label: isFrench ? 'Planétaire' : 'Planetary', icon: 'planet' },
-    { id: 'recommendations' as const, label: isFrench ? 'Conseils' : 'Advice', icon: 'bulb' },
+    { id: 'overview' as const, label: t('compatibility.resultsView.overview'), icon: 'eye' },
+    { id: 'spiritual' as const, label: t('compatibility.resultsView.spiritual'), icon: 'sparkles' },
+    { id: 'elemental' as const, label: t('compatibility.resultsView.elemental'), icon: 'leaf' },
+    { id: 'planetary' as const, label: t('compatibility.resultsView.planetary'), icon: 'planet' },
+    { id: 'recommendations' as const, label: t('compatibility.resultsView.advice'), icon: 'bulb' },
   ];
   
   const getQualityGradient = (score: number): readonly [string, string] => {
@@ -145,7 +145,7 @@ export function RelationshipCompatibilityView({
         </View>
         
         <Text style={styles.headerSubtitle}>
-          {isFrench ? 'Vue de Compatibilité' : 'Compatibility Overview'}
+          {t('compatibility.resultsView.compatibilityOverview')}
         </Text>
       </LinearGradient>
       
@@ -192,7 +192,7 @@ export function RelationshipCompatibilityView({
               style={styles.overallCard}
             >
               <Text style={styles.overallLabel}>
-                {isFrench ? 'Score Global de Compatibilité' : 'Overall Compatibility Score'}
+                {t('compatibility.resultsView.overallScore')}
               </Text>
               <CompatibilityGauge
                 score={analysis.overallScore}
@@ -215,7 +215,7 @@ export function RelationshipCompatibilityView({
                 <View style={styles.summaryHeader}>
                   <Ionicons name="information-circle" size={24} color="#6366f1" />
                   <Text style={styles.summaryTitle}>
-                    {isFrench ? 'Ce que cela signifie' : 'What This Means'}
+                    {t('compatibility.resultsView.whatThisMeans')}
                   </Text>
                 </View>
                 <Text style={styles.summaryText}>
@@ -244,9 +244,9 @@ export function RelationshipCompatibilityView({
                     <Ionicons name="sparkles" size={18} color="#fff" />
                   )}
                   <Text style={styles.aiEnhanceButtonText}>
-                    {aiLoading 
-                      ? (isFrench ? 'Amélioration...' : 'Enhancing...') 
-                      : (isFrench ? '✨ Personnaliser l\'Analyse' : '✨ Personalize Analysis')}
+                    {aiLoading
+                      ? t('compatibility.resultsView.calculating')
+                      : t('compatibility.resultsView.personalizeAnalysis')}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -258,7 +258,7 @@ export function RelationshipCompatibilityView({
                 <View style={styles.insightHeader}>
                   <Ionicons name="person" size={20} color="#8b5cf6" />
                   <Text style={styles.insightTitle}>
-                    {isFrench ? '💫 Perspective Personnelle' : '💫 Your Personal Insight'}
+                    {t('compatibility.resultsView.yourPersonalInsight')}
                   </Text>
                 </View>
                 <Text style={styles.insightText}>{personalizedInsight}</Text>
@@ -275,7 +275,7 @@ export function RelationshipCompatibilityView({
                 <View style={styles.methodHeader}>
                   <Ionicons name="sparkles" size={20} color="#fb923c" />
                   <Text style={styles.methodLabel}>
-                    {isFrench ? 'Spirituel' : 'Spiritual'}
+                    {t('compatibility.resultsView.spiritualLabel')}
                   </Text>
                 </View>
                 <CompatibilityGauge
@@ -293,7 +293,7 @@ export function RelationshipCompatibilityView({
                 <View style={styles.methodHeader}>
                   <Ionicons name="leaf" size={20} color="#22c55e" />
                   <Text style={styles.methodLabel}>
-                    {isFrench ? 'Élémental' : 'Elemental'}
+                    {t('compatibility.resultsView.elementalLabel')}
                   </Text>
                 </View>
                 <CompatibilityGauge
@@ -311,7 +311,7 @@ export function RelationshipCompatibilityView({
                 <View style={styles.methodHeader}>
                   <Ionicons name="planet" size={20} color="#8b5cf6" />
                   <Text style={styles.methodLabel}>
-                    {isFrench ? 'Planétaire' : 'Planetary'}
+                    {t('compatibility.resultsView.planetaryLabel')}
                   </Text>
                 </View>
                 <CompatibilityGauge
@@ -343,10 +343,10 @@ export function RelationshipCompatibilityView({
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.detailTitle}>
-                      {isFrench ? 'Destinée Spirituelle' : 'Spiritual Destiny'}
+                      {t('compatibility.resultsView.spiritualDestiny')}
                     </Text>
                     <Text style={styles.detailSubtitle}>
-                      {isFrench ? 'Chemin spirituel et harmonie' : 'Spiritual path and harmony'}
+                      {t('compatibility.resultsView.spiritualDestinyDesc')}
                     </Text>
                   </View>
                   <CompatibilityGauge
@@ -372,13 +372,13 @@ export function RelationshipCompatibilityView({
               
               <View style={styles.metadataRow}>
                 <View style={styles.metadataItem}>
-                  <Text style={styles.metadataLabel}>{isFrench ? 'Qualité' : 'Quality'}</Text>
+                  <Text style={styles.metadataLabel}>{t('compatibility.resultsView.quality')}</Text>
                   <Text style={[styles.metadataValue, { color: '#fb923c' }]}>
                     {analysis.methods.spiritualDestiny.quality.toUpperCase()}
                   </Text>
                 </View>
                 <View style={styles.metadataItem}>
-                  <Text style={styles.metadataLabel}>{isFrench ? 'Nombre Sacré' : 'Sacred Number'}</Text>
+                  <Text style={styles.metadataLabel}>{t('compatibility.resultsView.sacredNumber')}</Text>
                   <Text style={[styles.metadataValue, { color: '#fb923c' }]}>
                     {analysis.methods.spiritualDestiny.remainder}
                   </Text>
@@ -407,10 +407,10 @@ export function RelationshipCompatibilityView({
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.detailTitle}>
-                    {isFrench ? 'Tempérament Élémental' : 'Elemental Temperament'}
+                    {t('compatibility.resultsView.elementalTemperament')}
                   </Text>
                   <Text style={styles.detailSubtitle}>
-                    {isFrench ? 'Équilibre des énergies naturelles' : 'Balance of natural energies'}
+                    {t('compatibility.resultsView.elementalTemperamentDesc')}
                   </Text>
                 </View>
                 <CompatibilityGauge
@@ -469,10 +469,10 @@ export function RelationshipCompatibilityView({
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.detailTitle}>
-                      {isFrench ? 'Harmonie Cosmique' : 'Cosmic Harmony'}
+                      {t('compatibility.resultsView.cosmicHarmony')}
                     </Text>
                     <Text style={styles.detailSubtitle}>
-                      {isFrench ? 'Influences planétaires' : 'Planetary influences'}
+                      {t('compatibility.resultsView.cosmicHarmonyDesc')}
                     </Text>
                   </View>
                   <CompatibilityGauge
@@ -554,16 +554,14 @@ export function RelationshipCompatibilityView({
                   <Ionicons name="bulb" size={28} color="#fff" />
                 </LinearGradient>
                 <Text style={styles.recommendationsTitle}>
-                  {isFrench ? 'Recommandations' : 'Recommendations'}
+                  {t('compatibility.resultsView.recommendations')}
                 </Text>
                 <Text style={styles.recommendationsSubtitle}>
-                  {isFrench 
-                    ? 'Conseils pour améliorer votre harmonie'
-                    : 'Guidance to enhance your harmony'}
+                  {t('compatibility.resultsView.enhancing')}
                 </Text>
               </View>
-              
-              {(isFrench ? analysis.recommendationsFrench : analysis.recommendations).map((rec, index) => (
+
+              {analysis.recommendations.map((rec, index) => (
                 <View key={index} style={styles.recommendationCard}>
                   <View style={styles.recommendationNumber}>
                     <Text style={styles.recommendationNumberText}>{index + 1}</Text>

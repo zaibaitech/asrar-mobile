@@ -133,6 +133,25 @@ export default function AppHeader({
                       FR
                     </Text>
                   </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.languageButtonMinimal,
+                      currentLanguage === 'AR' && styles.languageButtonMinimalActive,
+                    ]}
+                    onPress={() => onLanguageChange('AR')}
+                    accessibilityLabel="Arabic"
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.languageTextMinimal,
+                        currentLanguage === 'AR' && styles.languageTextMinimalActive,
+                      ]}
+                    >
+                      AR
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               )}
               
@@ -233,6 +252,30 @@ export default function AppHeader({
                   }
                 >
                   FR
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.languageButton,
+                  currentLanguage === 'AR'
+                    ? styles.languageButtonActive
+                    : styles.languageButtonInactive,
+                ]}
+                onPress={() => onLanguageChange('AR')}
+                accessibilityLabel="Arabic language"
+                accessibilityRole="button"
+                accessibilityState={{ selected: currentLanguage === 'AR' }}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={
+                    currentLanguage === 'AR'
+                      ? styles.languageTextActive
+                      : styles.languageTextInactive
+                  }
+                >
+                  AR
                 </Text>
               </TouchableOpacity>
             </View>

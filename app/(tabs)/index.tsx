@@ -162,8 +162,15 @@ const getModules = (t: any): (Omit<ModuleCardProps, 'onPress'> & { id: string })
   // },
 ];
 
+function getModuleAccentColor(element: string): string {
+  if (element === 'fire') return ElementAccents.fire.primary;
+  if (element === 'water') return ElementAccents.water.primary;
+  if (element === 'earth') return ElementAccents.earth.primary;
+  return ElementAccents.air.primary;
+}
+
 export default function HomeScreen() {
-  const { t, language } = useLanguage();
+  const { t, tSafe, language } = useLanguage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile, completionStatus } = useProfile();
@@ -199,10 +206,6 @@ export default function HomeScreen() {
     }
     return momentAlignment?.zahirElement;
   }, [profile?.dobISO, momentAlignment?.zahirElement]);
-  
-  // Rotation state for bottom cards
-  const [prayerCardSlide, setPrayerCardSlide] = useState(0);
-  const [blessingCardSlide, setBlessingCardSlide] = useState(0);
   
   // Prayer times & planetary hours state
   const [nextPrayer, setNextPrayer] = useState<{ name: string; nameArabic: string; time: string } | null>(null);
@@ -483,9 +486,9 @@ export default function HomeScreen() {
           >
             <Ionicons name="calendar" size={20} color={ElementAccents.earth.primary} />
             <View style={styles.profileBannerText}>
-              <Text style={styles.profileBannerTitle}>Complete Your Profile</Text>
+              <Text style={styles.profileBannerTitle}>{tSafe('home.profileBanner.title', 'Complete Your Profile')}</Text>
               <Text style={styles.profileBannerSubtitle}>
-                Add your DOB to unlock personalized features
+                {tSafe('home.profileBanner.subtitle', 'Add your DOB to unlock personalized features')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={DarkTheme.textSecondary} />
@@ -598,10 +601,7 @@ export default function HomeScreen() {
               >
                 <View style={[
                   styles.moduleCompactIcon,
-                  { borderColor: module.element === 'fire' ? ElementAccents.fire.primary :
-                                 module.element === 'water' ? ElementAccents.water.primary :
-                                 module.element === 'earth' ? ElementAccents.earth.primary :
-                                 ElementAccents.air.primary }
+                  { borderColor: getModuleAccentColor(module.element) }
                 ]}>
                   <Text style={styles.moduleCompactEmoji}>{module.icon}</Text>
                 </View>
@@ -620,7 +620,7 @@ export default function HomeScreen() {
                 <Ionicons name="apps" size={24} color={DarkTheme.textSecondary} />
               </View>
               <Text style={styles.moduleCompactLabel} numberOfLines={1}>
-                {t('home.showAll') || 'Show All'}
+                {tSafe('home.showAll', 'Show All')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -638,10 +638,7 @@ export default function HomeScreen() {
               >
                 <View style={[
                   styles.moduleIcon,
-                  { borderColor: module.element === 'fire' ? ElementAccents.fire.primary :
-                                 module.element === 'water' ? ElementAccents.water.primary :
-                                 module.element === 'earth' ? ElementAccents.earth.primary :
-                                 ElementAccents.air.primary }
+                  { borderColor: getModuleAccentColor(module.element) }
                 ]}>
                   <Text style={styles.moduleIconEmoji}>{module.icon}</Text>
                 </View>
@@ -669,8 +666,6 @@ export default function HomeScreen() {
     momentAlignment,
     planetaryData,
     hasProfileDOB,
-    prayerCardSlide,
-    blessingCardSlide,
   ]);
 
   /**

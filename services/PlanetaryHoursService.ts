@@ -535,8 +535,13 @@ export async function preCalculateDailyPlanetaryHours(
       expiresAt: nextSunrise.getTime(),
     };
     
-    // Cache it
+    // Cache it — first evict stale entries to avoid SQLITE_FULL
     try {
+      const allKeys = await AsyncStorage.getAllKeys();
+      const oldPHKeys = allKeys.filter(k => k.startsWith(CACHE_KEY_PREFIX) && k !== cacheKey);
+      if (oldPHKeys.length > 0) {
+        await AsyncStorage.multiRemove(oldPHKeys);
+      }
       await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
     } catch (cacheError) {
       const errorMsg = (cacheError as any)?.message || '';

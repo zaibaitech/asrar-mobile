@@ -34,7 +34,7 @@ export function RealTimeDailyGuidance({
   showDetailsHint = false,
 }: RealTimeDailyGuidanceProps) {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const getElementColor = React.useCallback((element?: string) => {
     switch (element) {
@@ -171,7 +171,7 @@ export function RealTimeDailyGuidance({
   
   const getElementLabel = (element?: string) => {
     if (!element) return '';
-    return t(`elements.${element}`);
+    return t(`elements.${String(element).toLowerCase()}`);
   };
   
   // Get day ruler
@@ -190,7 +190,8 @@ export function RealTimeDailyGuidance({
   const energyDescription = t(`widgets.dailyEnergy.energyDescriptions.${dayRulerInfo.element}`);
 
   const bestForKeys = [0, 1, 3].map(i => `home.dailyGuidanceContent.generic.${dayRulerInfo.element}.bestFor.${i}`);
-  const bestForText = bestForKeys.map(key => t(key)).filter(Boolean).join(', ');
+  const listSeparator = language === 'ar' ? '، ' : ', ';
+  const bestForText = bestForKeys.map(key => t(key)).filter(Boolean).join(listSeparator);
   const hasBestFor = bestForText.length > 0;
   
   return (

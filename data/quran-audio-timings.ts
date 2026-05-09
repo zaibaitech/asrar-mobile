@@ -18,6 +18,8 @@
  * - Or pre-computed from individual ayah audio files
  */
 
+import { QURAN_META } from '@/constants/quranMeta';
+
 export interface SurahAudioTiming {
   duration: number; // Total surah duration in seconds
   ayahTimings: { [ayahNumber: number]: number }; // Start time for each ayah
@@ -95,10 +97,56 @@ export const FULL_SURAH_AUDIO_SOURCES = [
 ];
 
 /**
+ * Individual ayah audio sources (for when timing data is unavailable)
+ * Uses globally unique ayah numbers (1-6236)
+ */
+export const INDIVIDUAL_AYAH_AUDIO_SOURCES = [
+  'https://everyayah.com/data/Alafasy_128kbps', // Primary - EveryAyah (verified working)
+  'https://everyayah.com/data/Ghamadi_40kbps', // Fallback - Ghamadi (lower quality but reliable)
+];
+
+/**
  * Get full surah audio URL with proper formatting
  */
 export function getFullSurahAudioUrl(surahNumber: number, sourceIndex: number = 0): string {
   const baseUrl = FULL_SURAH_AUDIO_SOURCES[sourceIndex];
   const paddedNumber = String(surahNumber).padStart(3, '0');
   return `${baseUrl}/${paddedNumber}.mp3`;
+}
+
+/**
+ * Get individual ayah audio URL
+ * @param surahNumber - Surah number (1-114)
+ * @param ayahInSurah - Ayah number within the surah
+ * @param sourceIndex - Which source to use (0 = primary, 1+ = fallbacks)
+ */
+export function getIndividualAyahAudioUrl(
+  surahNumber: number,
+  ayahInSurah: number,
+  sourceIndex: number = 0
+): string {
+  const baseUrl = INDIVIDUAL_AYAH_AUDIO_SOURCES[sourceIndex];
+  // EveryAyah reciter packs use SSSAAA filenames, e.g. 001002.mp3
+  const filename = `${String(surahNumber).padStart(3, '0')}${String(ayahInSurah).padStart(3, '0')}.mp3`;
+  return `${baseUrl}/${filename}`;
+}
+
+/**
+ * Calculate global ayah number from surah and ayah in surah
+ * @param surahNumber - Surah number (1-114)
+ * @param ayahInSurah - Ayah number within the surah (1-n)
+ * @returns Global ayah number (1-6236)
+ */
+export function calculateGlobalAyahNumber(surahNumber: number, ayahInSurah: number): number {
+  let globalNumber = 0;
+  
+  // Sum all ayahs from previous surahs
+  for (let i = 1; i < surahNumber; i++) {
+    globalNumber += QURAN_META[i].totalAyahs;
+  }
+  
+  // Add the ayah number within the current surah
+  globalNumber += ayahInSurah;
+  
+  return globalNumber;
 }

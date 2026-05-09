@@ -460,7 +460,7 @@ export default function DailyGuidanceDetailsScreen() {
   }
   
   function getElementLabel(element: Element) {
-    return t(`home.dailyGuidanceDetails.elements.${element}`);
+    return t(`home.dailyGuidanceDetails.elements.${String(element).toLowerCase()}`);
   }
   
   // Get color based on synthesis quality

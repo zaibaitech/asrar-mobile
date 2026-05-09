@@ -12,6 +12,7 @@
  */
 
 import { DarkTheme } from '@/constants/DarkTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
@@ -25,7 +26,8 @@ const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 export default function EmailVerificationScreen() {
   const router = useRouter();
   const { email } = useLocalSearchParams<{ email: string }>();
-  
+  const { t } = useLanguage();
+
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
@@ -82,11 +84,11 @@ export default function EmailVerificationScreen() {
       }
       
       setResendCooldown(60);
-      Alert.alert('✅ Email Sent!', 'Please check your inbox (and spam folder).');
-      
+      Alert.alert(t('emailVerificationScreen.emailSentTitle'), t('emailVerificationScreen.emailSentMessage'));
+
     } catch (error) {
       console.error('[EmailVerification] Resend error:', error);
-      Alert.alert('Error', 'Failed to resend email. Please try again later.');
+      Alert.alert(t('emailVerificationScreen.errorTitle'), t('emailVerificationScreen.resendFailed'));
     } finally {
       setIsResending(false);
     }
@@ -115,33 +117,33 @@ export default function EmailVerificationScreen() {
           </View>
 
           {/* Title */}
-          <Text style={styles.title}>Verify Your Email</Text>
+          <Text style={styles.title}>{t('emailVerificationScreen.title')}</Text>
 
           {/* Email */}
           <Text style={styles.message}>
-            We've sent a verification link to:
+            {t('emailVerificationScreen.sentMessage')}
           </Text>
           <Text style={styles.email}>{email}</Text>
 
           {/* Instructions */}
           <View style={styles.instructionsBox}>
-            <Text style={styles.instructionTitle}>Next Steps:</Text>
+            <Text style={styles.instructionTitle}>{t('emailVerificationScreen.nextSteps')}</Text>
             <View style={styles.instructionItem}>
               <Text style={styles.instructionNumber}>1️⃣</Text>
               <Text style={styles.instruction}>
-                Check your inbox (and spam folder)
+                {t('emailVerificationScreen.step1')}
               </Text>
             </View>
             <View style={styles.instructionItem}>
               <Text style={styles.instructionNumber}>2️⃣</Text>
               <Text style={styles.instruction}>
-                Click the verification link in the email
+                {t('emailVerificationScreen.step2')}
               </Text>
             </View>
             <View style={styles.instructionItem}>
               <Text style={styles.instructionNumber}>3️⃣</Text>
               <Text style={styles.instruction}>
-                Return here and sign in with your email
+                {t('emailVerificationScreen.step3')}
               </Text>
             </View>
           </View>
@@ -165,9 +167,9 @@ export default function EmailVerificationScreen() {
                 <>
                   <Ionicons name="mail" size={20} color="#FFFFFF" />
                   <Text style={styles.resendButtonText}>
-                    {resendCooldown > 0 
-                      ? `Resend in ${resendCooldown}s`
-                      : 'Resend Email'}
+                    {resendCooldown > 0
+                      ? t('emailVerificationScreen.resendCountdown').replace('{seconds}', String(resendCooldown))
+                      : t('emailVerificationScreen.resendButton')}
                   </Text>
                 </>
               )}
@@ -175,19 +177,19 @@ export default function EmailVerificationScreen() {
           </TouchableOpacity>
 
           {/* Back Button */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.backButton}
             onPress={handleBackToSignIn}
           >
             <Ionicons name="arrow-back" size={20} color="#8B7355" />
-            <Text style={styles.backButtonText}>Back to Sign In</Text>
+            <Text style={styles.backButtonText}>{t('emailVerificationScreen.backToSignIn')}</Text>
           </TouchableOpacity>
 
           {/* Security Note */}
           <View style={styles.securityNote}>
             <Ionicons name="shield-checkmark" size={20} color="#10B981" />
             <Text style={styles.securityText}>
-              Your data is encrypted and secure. We never share your personal information.
+              {t('emailVerificationScreen.securityNote')}
             </Text>
           </View>
         </View>

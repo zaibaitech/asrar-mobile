@@ -1,7 +1,7 @@
+import { useLanguage } from '@/contexts/LanguageContext';
+import type { Element, Planet } from '@/services/PlanetaryHoursService';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useLanguage } from '@/contexts/LanguageContext';
-import type { Planet, Element } from '@/services/PlanetaryHoursService';
 
 interface UserPlanetSectionProps {
   userPlanet: Planet;
@@ -74,7 +74,7 @@ export default function UserPlanetSection({
           <View style={styles.elementRow}>
             <Text style={styles.elementIcon}>{getElementIcon(userElement)}</Text>
             <Text style={styles.element}>
-              {t(`elements.${userElement}`)}
+              {t(`elements.${String(userElement).toLowerCase()}`)}
             </Text>
           </View>
           <Text style={styles.source}>{getSourceLabel()}</Text>
