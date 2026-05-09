@@ -15,7 +15,7 @@ function TabBarIcon(props: Readonly<{
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
   size?: number;
-}) {
+}>) {
   const { size = 22, ...rest } = props;
   return <FontAwesome size={size} style={{ marginBottom: -2 }} {...rest} />;
 }
