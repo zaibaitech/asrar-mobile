@@ -28,6 +28,7 @@ import {
     GuidedIstikharaSession,
     IstikharaSelfCheck,
 } from '@/types/guided-istikhara';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -55,6 +56,7 @@ type WizardStep = 'decision' | 'selfcheck' | 'timing' | 'intention' | 'ready';
 const INTENTION_TEMPLATE = `O Allah, if this matter is good for me in my religion, life, and outcome, then decree it for me and make it easy for me. And if it is bad for me, then turn it away from me and turn me away from it, and decree for me what is good wherever it may be.`;
 
 export default function IstikharaPreparationScreen() {
+  const { t } = useLanguage();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   
@@ -229,7 +231,7 @@ export default function IstikharaPreparationScreen() {
                   color: colors.text,
                 },
               ]}
-              placeholder="e.g., Accepting a new job opportunity"
+              placeholder={t('istikhara.prepDecisionPlaceholder')}
               placeholderTextColor={colors.textSecondary}
               value={decisionText}
               onChangeText={setDecisionText}
@@ -426,7 +428,7 @@ export default function IstikharaPreparationScreen() {
                       color: colors.text,
                     },
                   ]}
-                  placeholder="Write your own intention..."
+                  placeholder={t('istikhara.prepCustomIntentionPlaceholder')}
                   placeholderTextColor={colors.textSecondary}
                   value={intentionText}
                   onChangeText={setIntentionText}

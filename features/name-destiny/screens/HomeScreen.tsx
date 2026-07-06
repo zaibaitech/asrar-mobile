@@ -275,7 +275,7 @@ export default function NameDestinyHomeScreen() {
               <Text style={styles.subLabel}>{t('nameDestinyHome.motherLatinLabel')}</Text>
               <TextInput
                 style={[styles.input, errors.motherLatin && styles.inputError]}
-                placeholder="e.g., Fatima, Khadija, Aisha"
+                placeholder={t('nameDestinyHome.motherLatinPlaceholder')}
                 placeholderTextColor="#999"
                 value={motherLatin}
                 onChangeText={(text) => {

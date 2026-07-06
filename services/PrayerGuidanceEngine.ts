@@ -303,21 +303,18 @@ export class PrayerGuidanceEngine {
     tier: AlignmentTier,
     score: number
   ): 'exceptional' | 'strong' | 'favorable' | 'moderate' | 'balanced' | 'challenging' {
-    // aligned tier (70+)
-    if (tier === 'aligned') {
-      if (score >= 85) return 'exceptional';  // Very high score
-      return 'strong';  // Good score
+    if (tier === 'excellent') {
+      if (score >= 85) return 'exceptional';
+      return 'strong';
     }
-    
-    // steady tier (45-69)
-    if (tier === 'steady') {
-      if (score >= 60) return 'favorable';  // Upper steady range
-      return 'moderate';  // Lower steady range
+    if (tier === 'neutral') {
+      if (score >= 60) return 'favorable';
+      return 'moderate';
     }
-    
-    // mindful tier (<45)
-    if (score >= 35) return 'balanced';  // Not too weak
-    return 'challenging';  // Very weak
+    if (tier === 'hubut') return 'challenging';
+    // prudence
+    if (score >= 35) return 'balanced';
+    return 'challenging';
   }
   
   /**
@@ -396,8 +393,9 @@ export class PrayerGuidanceEngine {
     badgeTier: AlignmentTier
   ): string {
     const planetNature = this.getPlanetNatureDescription(hourPlanet);
-    const tierDescription = badgeTier === 'aligned' ? 'highly supportive' : 
-                           badgeTier === 'steady' ? 'balanced' : 
+    const tierDescription = badgeTier === 'excellent' ? 'highly supportive' :
+                           badgeTier === 'neutral' ? 'balanced' :
+                           badgeTier === 'hubut' ? 'in fall (extra patience needed)' :
                            'requires mindfulness';
     
     const descriptions: Record<string, string> = {

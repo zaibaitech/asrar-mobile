@@ -139,17 +139,16 @@ export async function emergencyStorageCleanup(): Promise<void> {
       sizeKB: (k.size / 1024).toFixed(2)
     })));
     
-    // Strategy 1: Remove old date-keyed caches (planetary hours, prayer times)
+    // Strategy 1: Remove all date-keyed caches — they are fully regenerable.
     const dateKeyPrefixes = ['@asrar_planetary_hours_', '@asrar_prayer_times_day_', '@asrar_prayer_month_'];
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-    const twoDaysAgoStr = twoDaysAgo.toISOString().split('T')[0]; // YYYY-MM-DD
+    const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
     const oldDateKeys = keys.filter(key => {
       for (const prefix of dateKeyPrefixes) {
         if (key.startsWith(prefix)) {
           const datePart = key.slice(prefix.length); // e.g. "2026-04-01"
-          return datePart < twoDaysAgoStr;
+          // Keep only today's entry; remove everything else (past AND future).
+          return datePart !== todayStr;
         }
       }
       return false;
@@ -157,7 +156,7 @@ export async function emergencyStorageCleanup(): Promise<void> {
 
     if (oldDateKeys.length > 0) {
       await AsyncStorage.multiRemove(oldDateKeys);
-      console.log(`✓ Removed ${oldDateKeys.length} old date-keyed cache entries`);
+      console.log(`✓ Removed ${oldDateKeys.length} date-keyed cache entries`);
     }
 
     // Strategy 2: Clean up history/cache/temp keys

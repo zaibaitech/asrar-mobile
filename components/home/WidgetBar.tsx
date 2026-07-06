@@ -12,15 +12,17 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { DarkTheme, Shadows, Spacing, Typography } from '../../constants/DarkTheme';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { QuickDhikrWidget } from './QuickDhikrWidget';
 import { BlessedDayWidget } from './widgets/BlessedDayWidget';
 import { DailyQuoteWidget } from './widgets/DailyQuoteWidget';
 import { PrayerTimesWidget } from './widgets/PrayerTimesWidget';
 
 export function WidgetBar() {
+  const { t } = useLanguage();
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Quick Access</Text>
+      <Text style={styles.sectionTitle}>{t('home.quickAccess')}</Text>
       
       {/* 2x2 Grid - All visible, no scrolling */}
       <View style={styles.gridContainer}>

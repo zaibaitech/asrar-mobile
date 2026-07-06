@@ -8,6 +8,7 @@
  */
 
 import Colors from '@/constants/Colors';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
     addReflectionEntry,
     calculatePatternSummary,
@@ -72,6 +73,7 @@ const EASE_LEVEL_FIELD: ReflectionField = {
 };
 
 export default function IstikharaReflectionScreen() {
+  const { t } = useLanguage();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>();
@@ -356,7 +358,7 @@ export default function IstikharaReflectionScreen() {
                     borderColor: colors.border,
                   },
                 ]}
-                placeholder="Any additional observations..."
+                placeholder={t('istikhara.prepReflectionObservationsPlaceholder')}
                 placeholderTextColor={colors.textSecondary}
                 value={note}
                 onChangeText={setNote}

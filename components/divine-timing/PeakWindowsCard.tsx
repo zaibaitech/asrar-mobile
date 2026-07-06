@@ -59,7 +59,7 @@ export function PeakWindowsCard({
 }: PeakWindowsCardProps) {
   const router = useRouter();
   const { profile: userProfile } = useProfile();
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const userZodiacKey = useMemo(
     () =>
       resolveUserZodiacKey({
@@ -280,7 +280,7 @@ export function PeakWindowsCard({
         <View style={styles.header}>
           <View style={styles.titleRow}>
             <Ionicons name="sparkles-outline" size={24} color="#8B7355" />
-            <Text style={styles.title}>Your Peak Windows</Text>
+            <Text style={styles.title}>{t('home.peakWindowsTitle')}</Text>
           </View>
         </View>
         <View style={styles.loadingContainer}>
@@ -515,7 +515,7 @@ export function PeakWindowsCard({
               ) : (
                 <View style={styles.emptyContainer}>
                   <Text style={styles.emptyIcon}>✨</Text>
-                  <Text style={styles.emptyText}>AI enhancement unavailable</Text>
+                  <Text style={styles.emptyText}>{t('home.peakWindowsAiUnavailable')}</Text>
                 </View>
               )}
             </ScrollView>

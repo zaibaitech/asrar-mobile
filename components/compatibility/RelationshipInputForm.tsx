@@ -221,7 +221,7 @@ export function RelationshipInputForm({
                 setPerson1Arabic(arabic);
                 setPerson1Latin(latin);
               }}
-              placeholder="e.g., Ibrahima, Amadou, Ousmane"
+              placeholder={t('compatibility.form.exampleFatima')}
               showHelper={false}
               language={language}
             />
@@ -291,7 +291,7 @@ export function RelationshipInputForm({
                 setPerson2Arabic(arabic);
                 setPerson2Latin(latin);
               }}
-              placeholder="e.g., Fatima, Khadija, Aisha"
+              placeholder={t('compatibility.form.exampleKhadija')}
               showHelper={false}
               language={language}
             />

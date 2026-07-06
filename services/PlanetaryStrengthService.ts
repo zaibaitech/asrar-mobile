@@ -22,52 +22,60 @@ import type { ZodiacSign } from '@/types/planetary-systems';
 // ============================================================================
 
 export interface Dignities {
-  own: ZodiacSign[];      // Domicile (البيت) - Planet's home sign(s)
-  exaltation: ZodiacSign; // Exaltation (الشرف) - Planet's highest power
+  own: ZodiacSign[];       // Domicile (البيت) - Planet's home sign(s)
+  exaltation: ZodiacSign;  // Exaltation (الشرف) - Planet's highest power
+  triplicity: ZodiacSign[]; // Triplicity (المثلثات) - Dorothean element rulers
   detriment: ZodiacSign[]; // Detriment (الوبال) - Opposite of home
-  fall: ZodiacSign;       // Fall (الهبوط) - Opposite of exaltation
+  fall: ZodiacSign;        // Fall (الهبوط) - Opposite of exaltation
 }
 
 export const ESSENTIAL_DIGNITIES: Record<Planet, Dignities> = {
   Sun: {
     own: ['leo'],
     exaltation: 'aries',
+    triplicity: ['aries', 'leo', 'sagittarius'],
     detriment: ['aquarius'],
     fall: 'libra',
   },
   Moon: {
     own: ['cancer'],
     exaltation: 'taurus',
+    triplicity: ['taurus', 'virgo', 'capricorn', 'cancer', 'scorpio', 'pisces'],
     detriment: ['capricorn'],
     fall: 'scorpio',
   },
   Mercury: {
     own: ['gemini', 'virgo'],
     exaltation: 'virgo',
+    triplicity: ['gemini', 'libra', 'aquarius'],
     detriment: ['sagittarius', 'pisces'],
     fall: 'pisces',
   },
   Venus: {
     own: ['taurus', 'libra'],
     exaltation: 'pisces',
+    triplicity: ['taurus', 'virgo', 'capricorn', 'cancer', 'scorpio', 'pisces'],
     detriment: ['aries', 'scorpio'],
     fall: 'virgo',
   },
   Mars: {
     own: ['aries', 'scorpio'],
     exaltation: 'capricorn',
+    triplicity: ['taurus', 'virgo', 'capricorn', 'cancer', 'scorpio', 'pisces'],
     detriment: ['libra', 'taurus'],
     fall: 'cancer',
   },
   Jupiter: {
     own: ['sagittarius', 'pisces'],
     exaltation: 'cancer',
+    triplicity: ['aries', 'leo', 'sagittarius', 'gemini', 'libra', 'aquarius'],
     detriment: ['gemini', 'virgo'],
     fall: 'capricorn',
   },
   Saturn: {
     own: ['capricorn', 'aquarius'],
     exaltation: 'libra',
+    triplicity: ['aries', 'leo', 'sagittarius', 'gemini', 'libra', 'aquarius'],
     detriment: ['cancer', 'leo'],
     fall: 'aries',
   },
@@ -146,7 +154,7 @@ export function getDegreeStrength(degree: number): DegreeStrengthInfo {
 
 export interface DignityInfo {
   modifier: number; // Multiplier (0.5 to 1.4)
-  status: 'Domicile' | 'Exalted' | 'Detriment' | 'Fall' | 'Neutral';
+  status: 'Domicile' | 'Exalted' | 'Triplicity' | 'Detriment' | 'Fall' | 'Neutral';
   arabicTerm: string;
   description: string;
 }
@@ -180,7 +188,19 @@ export function getEssentialDignityModifier(
     };
   }
 
-  // Check if in detriment
+  // Check if in fall — debilities override ALL other dignities including triplicity.
+  // e.g. Moon in Scorpio, Venus in Virgo, Mars in Cancer, and Saturn in Aries are each
+  // both a triplicity sign AND that planet's fall; fall wins.
+  if (dignities.fall === sign) {
+    return {
+      modifier: 0.5,
+      status: 'Fall',
+      arabicTerm: 'في هبوطه (Fī Hubūṭihi)',
+      description: `${planet} in fall - very weak, struggles to express.`,
+    };
+  }
+
+  // Check if in detriment (also before triplicity — debility overrides minor dignity)
   if (dignities.detriment.includes(sign)) {
     return {
       modifier: 0.7,
@@ -190,13 +210,13 @@ export function getEssentialDignityModifier(
     };
   }
 
-  // Check if in fall
-  if (dignities.fall === sign) {
+  // Check if in triplicity (Dorothean element rulers)
+  if (dignities.triplicity.includes(sign)) {
     return {
-      modifier: 0.5,
-      status: 'Fall',
-      arabicTerm: 'في هبوطه (Fī Hubūṭihi)',
-      description: `${planet} in fall - very weak, struggles to express.`,
+      modifier: 1.2,
+      status: 'Triplicity',
+      arabicTerm: 'في مثلثته (Fī Muthallathatihi)',
+      description: `${planet} in its triplicity - dignified by element.`,
     };
   }
 
@@ -382,6 +402,12 @@ export function calculateEnhancedPlanetaryPower(
   // Clamp to 0-1 range and convert to percentage
   finalPower = Math.max(0, Math.min(1, finalPower)) * 100;
 
+  // Dignified planets (domicile/exaltation/triplicity) always show ≥70%
+  // so early-degree ×0.4 penalty never misleadingly undercuts a strong placement
+  if (['Domicile', 'Exalted', 'Triplicity'].includes(dignityInfo.status)) {
+    finalPower = Math.max(finalPower, 70);
+  }
+
   // Generate recommendations and warnings
   const recommendations: string[] = [];
   const warnings: string[] = [];
@@ -413,6 +439,8 @@ export function calculateEnhancedPlanetaryPower(
     recommendations.push(`${planet} exalted in ${sign} - highly recommended`);
   } else if (dignityInfo.status === 'Domicile') {
     recommendations.push(`${planet} in own sign - very favorable`);
+  } else if (dignityInfo.status === 'Triplicity') {
+    recommendations.push(`${planet} in its triplicity in ${sign} - favorable`);
   }
 
   // Combustion warnings

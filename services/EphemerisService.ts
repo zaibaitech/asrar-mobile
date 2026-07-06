@@ -525,9 +525,12 @@ export async function getMoonEclipticLongitude(
         const minute = String(bucketedDate.getUTCMinutes()).padStart(2, '0');
         const dateStr = `'${year}-${month}-${day} ${hour}:${minute}'`;
         const stopDate = new Date(bucketedDate.getTime() + 1 * 60 * 60 * 1000);
+        const stopYear = stopDate.getUTCFullYear();
+        const stopMonth = String(stopDate.getUTCMonth() + 1).padStart(2, '0');
+        const stopDay = String(stopDate.getUTCDate()).padStart(2, '0');
         const stopHour = String(stopDate.getUTCHours()).padStart(2, '0');
         const stopMinute = String(stopDate.getUTCMinutes()).padStart(2, '0');
-        const stopStr = `'${year}-${month}-${day} ${stopHour}:${stopMinute}'`;
+        const stopStr = `'${stopYear}-${stopMonth}-${stopDay} ${stopHour}:${stopMinute}'`;
         const position = await fetchSinglePlanetPosition('moon', HORIZONS_PLANET_CODES.moon, dateStr, stopStr);
 
         if (position && typeof position.longitude === 'number') {
@@ -613,10 +616,13 @@ async function fetchPositionsFromHorizons(
     const minute = String(date.getUTCMinutes()).padStart(2, '0');
     const dateStr = `'${year}-${month}-${day} ${hour}:${minute}'`;
     const stopDate = new Date(date.getTime() + 1 * 60 * 60 * 1000);
+    const stopYear = stopDate.getUTCFullYear();
+    const stopMonth = String(stopDate.getUTCMonth() + 1).padStart(2, '0');
+    const stopDay = String(stopDate.getUTCDate()).padStart(2, '0');
     const stopHour = String(stopDate.getUTCHours()).padStart(2, '0');
     const stopMinute = String(stopDate.getUTCMinutes()).padStart(2, '0');
-    const stopStr = `'${year}-${month}-${day} ${stopHour}:${stopMinute}'`;
-    
+    const stopStr = `'${stopYear}-${stopMonth}-${stopDay} ${stopHour}:${stopMinute}'`;
+
     // Fetch each planet sequentially (to avoid rate limits)
     for (const [planetId, horizonsCode] of Object.entries(HORIZONS_PLANET_CODES)) {
       const position = await fetchSinglePlanetPosition(
@@ -790,9 +796,12 @@ async function fetchSinglePlanetPositionWithSpeed(
     
     const stopDate = new Date(startDate);
     stopDate.setHours(stopDate.getHours() + stepHours);
+    const stopYear = stopDate.getUTCFullYear();
+    const stopMonth = String(stopDate.getUTCMonth() + 1).padStart(2, '0');
+    const stopDay = String(stopDate.getUTCDate()).padStart(2, '0');
     const stopHour = String(stopDate.getUTCHours()).padStart(2, '0');
     const stopMinute = String(stopDate.getUTCMinutes()).padStart(2, '0');
-    const stopStr = `'${year}-${month}-${day} ${stopHour}:${stopMinute}'`;
+    const stopStr = `'${stopYear}-${stopMonth}-${stopDay} ${stopHour}:${stopMinute}'`;
 
     const params = new URLSearchParams();
     params.append('format', 'text');

@@ -18,11 +18,13 @@ import Animated, {
     useSharedValue
 } from 'react-native-reanimated';
 import { Borders, DarkTheme, Spacing, Typography } from '../../constants/DarkTheme';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const DHIKR_STORAGE_KEY = '@asrar_dhikr_count';
 
 export function QuickDhikrWidget() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [count, setCount] = useState(0);
   const scale = useSharedValue(1);
@@ -67,8 +69,8 @@ export function QuickDhikrWidget() {
       <View style={styles.counter}>
         <Text style={styles.icon}>📿</Text>
         <Animated.Text style={styles.count}>{count}</Animated.Text>
-        <Text style={styles.label}>Dhikr Counter</Text>
-        <Text style={styles.hint}>Tap to open</Text>
+        <Text style={styles.label}>{t('home.widgetDhikrCounter')}</Text>
+        <Text style={styles.hint}>{t('home.widgetDhikrHint')}</Text>
       </View>
     </Pressable>
   );

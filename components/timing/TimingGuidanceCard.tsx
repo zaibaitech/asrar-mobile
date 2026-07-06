@@ -113,12 +113,12 @@ function getWindowLabel(
 ): string {
   switch (quality) {
     case 'favorable':
-      return t('home.moment.status.aligned');      // "Aligned"
+      return t('home.moment.status.excellent');
     case 'cautious':
-      return t('home.moment.status.mindful');      // "Mindful"
+      return t('home.moment.status.prudence');
     case 'neutral':
     default:
-      return t('home.moment.status.steady');       // "Steady"
+      return t('home.moment.status.neutral');
   }
 }
 

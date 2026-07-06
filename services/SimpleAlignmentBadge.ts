@@ -1,18 +1,13 @@
 /**
  * Simple Alignment Badge — Single Source of Truth
  * ================================================
- * Replaces the 3 competing badge systems with ONE authentic system
- * grounded in classical ʿIlm al-Nujūm.
+ * Classical ʿIlm al-Nujūm method — planet nature is the status.
  *
- * 3 factors (all traditional):
- *   1. Planet Nature  — Sa'd (benefic) vs Nahs (malefic) vs Neutral
- *   2. Personal Ruler — Does this planet resonate with YOUR ruling planet?
- *   3. Dignity        — Is the planet strong or weak in its current position?
- *
- * 3 tiers (clear, no contradictions):
- *   ✨ مُوَافِق  Muwāfiq  — Aligned     (70+)
- *   ⚖️ مُعْتَدِل Muʿtadil — Steady      (45–69)
- *   🌙 تَأَنَّ    Ta'anna  — Mindful     (<45)
+ * 4 states (universal, not personalised):
+ *   ✨ Excellent / ممتاز   — Sa'd (benefic): Sun, Jupiter, Venus
+ *   ⚖️ Neutral  / محايد   — Variable: Moon, Mercury
+ *   🌙 Prudence / تَأَنَّ  — Nahs (malefic): Saturn, Mars
+ *   ⬇️ Hubūṭ   / هبوط    — Any planet in fall (overrides above)
  *
  * @module SimpleAlignmentBadge
  */
@@ -24,7 +19,7 @@ import type { Planet } from './PlanetaryHoursService';
 // TYPES
 // ============================================================================
 
-export type AlignmentTier = 'aligned' | 'steady' | 'mindful';
+export type AlignmentTier = 'excellent' | 'neutral' | 'prudence' | 'hubut';
 
 export interface AlignmentBadge {
   tier: AlignmentTier;
@@ -41,29 +36,37 @@ export interface AlignmentBadge {
 // ============================================================================
 
 const TIER_CONFIG: Record<AlignmentTier, Omit<AlignmentBadge, 'score'>> = {
-  aligned: {
-    tier: 'aligned',
-    label: 'Aligned',
-    labelAr: 'مُوَافِق',
+  excellent: {
+    tier: 'excellent',
+    label: 'Excellent',
+    labelAr: 'ممتاز',
     color: '#10b981',
     bgColor: 'rgba(16, 185, 129, 0.15)',
     icon: '✨',
   },
-  steady: {
-    tier: 'steady',
-    label: 'Steady',
-    labelAr: 'مُعْتَدِل',
+  neutral: {
+    tier: 'neutral',
+    label: 'Neutral',
+    labelAr: 'محايد',
     color: '#f59e0b',
     bgColor: 'rgba(245, 158, 11, 0.15)',
     icon: '⚖️',
   },
-  mindful: {
-    tier: 'mindful',
-    label: 'Mindful',
+  prudence: {
+    tier: 'prudence',
+    label: 'Prudence',
     labelAr: 'تَأَنَّ',
     color: '#7C3AED',
     bgColor: 'rgba(124, 58, 237, 0.15)',
     icon: '🌙',
+  },
+  hubut: {
+    tier: 'hubut',
+    label: 'Hubūṭ',
+    labelAr: 'هبوط',
+    color: '#dc2626',
+    bgColor: 'rgba(220, 38, 38, 0.15)',
+    icon: '⬇️',
   },
 };
 
@@ -94,57 +97,6 @@ function getPlanetNature(planet: string): PlanetNature {
 }
 
 /**
- * Planetary Friendships — Classical Islamic Astrology
- * Determines how the user's ruling planet relates to the hour planet.
- */
-type Friendship = 'same' | 'friend' | 'neutral' | 'enemy';
-
-const FRIENDSHIPS: Record<string, 'friend' | 'enemy'> = {
-  // Sun
-  'sun-moon': 'friend',
-  'sun-mars': 'friend',
-  'sun-jupiter': 'friend',
-  'sun-venus': 'enemy',
-  'sun-saturn': 'enemy',
-  // Moon
-  'moon-sun': 'friend',
-  'moon-mercury': 'friend',
-  // Mars
-  'mars-sun': 'friend',
-  'mars-moon': 'friend',
-  'mars-jupiter': 'friend',
-  'mars-mercury': 'enemy',
-  // Mercury
-  'mercury-sun': 'friend',
-  'mercury-venus': 'friend',
-  'mercury-moon': 'enemy',
-  // Jupiter
-  'jupiter-sun': 'friend',
-  'jupiter-moon': 'friend',
-  'jupiter-mars': 'friend',
-  'jupiter-mercury': 'enemy',
-  'jupiter-venus': 'enemy',
-  // Venus
-  'venus-mercury': 'friend',
-  'venus-saturn': 'friend',
-  'venus-sun': 'enemy',
-  'venus-moon': 'enemy',
-  // Saturn
-  'saturn-mercury': 'friend',
-  'saturn-venus': 'friend',
-  'saturn-sun': 'enemy',
-  'saturn-moon': 'enemy',
-  'saturn-mars': 'enemy',
-};
-
-function getFriendship(userRuler: string, hourPlanet: string): Friendship {
-  const a = userRuler.toLowerCase();
-  const b = hourPlanet.toLowerCase();
-  if (a === b) return 'same';
-  return FRIENDSHIPS[`${a}-${b}`] ?? 'neutral';
-}
-
-/**
  * Zodiac sign index to ruling planet
  * Uses 0-indexed to match ProfileDerivationService convention:
  *   0=Aries, 1=Taurus, ..., 7=Scorpio, 11=Pisces
@@ -169,12 +121,28 @@ export function getRulingPlanetFromBurj(burjIndex: number): string | undefined {
 }
 
 // ============================================================================
-// DIGNITY — Classical Planet Dignities (auto-computed from ephemeris cache)
+// DIGNITY — Hubūṭ (fall) detection from ephemeris cache
 // ============================================================================
 
 /**
- * Classical dignities: domicile (+3), exaltation (+4), detriment (-3), fall (-4)
- * Maps planet → { domicile: sign[], exaltation: sign, detriment: sign[], fall: sign }
+ * Dorothean triplicity rulers mapped to sign indices (0=Aries … 11=Pisces).
+ * Includes all three roles (day/night/participating) without day-chart distinction.
+ * Fire (0,4,8): Sun·Jupiter·Saturn  |  Earth (1,5,9): Venus·Moon·Mars
+ * Air  (2,6,10): Saturn·Mercury·Jupiter  |  Water (3,7,11): Venus·Mars·Moon
+ */
+const TRIPLICITY_SIGNS: Record<string, number[]> = {
+  sun:     [0, 4, 8],              // Fire
+  jupiter: [0, 4, 8, 2, 6, 10],   // Fire (night) + Air (participating)
+  saturn:  [0, 4, 8, 2, 6, 10],   // Fire (participating) + Air (day)
+  venus:   [1, 5, 9, 3, 7, 11],   // Earth (day) + Water (day)
+  moon:    [1, 5, 9, 3, 7, 11],   // Earth (night) + Water (participating)
+  mars:    [1, 5, 9, 3, 7, 11],   // Earth (participating) + Water (night)
+  mercury: [2, 6, 10],             // Air (night)
+};
+
+/**
+ * Classical essential dignities:
+ * domicile, exaltation, detriment, fall (hubūṭ)
  * Sign indices: 0=Aries .. 11=Pisces
  */
 const PLANET_DIGNITY: Record<string, { domicile: number[]; exaltation: number; detriment: number[]; fall: number }> = {
@@ -201,79 +169,65 @@ function getQuickDignityScore(planet: string): number | undefined {
   if (!pos || typeof pos.sign !== 'number') return undefined;
 
   const dignity = PLANET_DIGNITY[key];
-  if (!dignity) return 50; // Unknown planet → peregrine
+  if (!dignity) return 50;
 
   const sign = pos.sign;
-  if (sign === dignity.exaltation) return 90;  // Exalted
-  if (dignity.domicile.includes(sign)) return 80; // Domicile
-  if (sign === dignity.fall) return 10;          // Fall
-  if (dignity.detriment.includes(sign)) return 20; // Detriment
+  if (sign === dignity.exaltation) return 90;
+  if (dignity.domicile.includes(sign)) return 80;
+  if (sign === dignity.fall) return 10;                         // Hubūṭ — checked before detriment
+  if (dignity.detriment.includes(sign)) return 20;
+  if (TRIPLICITY_SIGNS[key]?.includes(sign)) return 70;        // Triplicity
   return 50; // Peregrine
 }
+
 
 // ============================================================================
 // CORE FUNCTION
 // ============================================================================
 
 /**
- * Get the alignment badge for the current moment.
+ * Get the alignment badge for the current planetary hour.
  *
- * @param hourPlanet   - Planet ruling the current planetary hour (e.g. 'Mars')
- * @param userRuler    - User's ruling planet from their zodiac sign (optional)
- * @param dignityScore - Planet's dignity score 0–100 from ephemeris (optional)
- * @returns AlignmentBadge with tier, score, labels, and colors
+ * Essential dignity (from JPL Horizons via PlanetaryConditionService) is the
+ * primary signal. For peregrine planets the sign ruler's nature breaks the tie,
+ * matching the web app's classical method:
+ *   • Moon (neutral) in Pisces (Jupiter = Sa'd) → Excellent
+ *   • Moon (neutral) in Aries  (Mars   = Nahs)  → Prudence
  *
- * @example
- * // Scorpio user (burjIndex 7) during Mars hour
- * getAlignmentBadge('Mars', 'mars')
- * // → { tier: 'aligned', score: 75, label: 'Aligned', ... }
+ * Dignity → tier:
+ *   Fall      (≤ 15) → Hubūṭ
+ *   Detriment (≤ 35) → Prudence
+ *   Peregrine (≤ 65) → sign ruler: Sa'd=Excellent · Nahs=Prudence · neutral→planet nature
+ *   Domicile / Exaltation (> 65) → Excellent
  *
- * // No profile (anonymous user)
- * getAlignmentBadge('Jupiter')
- * // → { tier: 'aligned', score: 65, label: 'Aligned', ... }
+ * @param hourPlanet   - Planet ruling the current planetary hour
+ * @param _userRuler   - Unused (kept for API compatibility)
+ * @param dignityScore - Planet's dignity score 0–100 from PlanetaryConditionService or ephemeris
  */
+/** Peregrine planets have no essential dignity — they map to Neutral (gharīb). */
+function resolvePeregrine(_planet: string, score: number): AlignmentBadge {
+  return { ...TIER_CONFIG.neutral, score };
+}
+
 export function getAlignmentBadge(
-  hourPlanet: Planet | string,
-  userRuler?: string,
+  hourPlanet: Planet,
+  _userRuler?: string,
   dignityScore?: number,
 ): AlignmentBadge {
-  let score = 50; // Baseline: neutral
+  const effectiveDignity = dignityScore ?? getQuickDignityScore(hourPlanet);
 
-  // ── Factor 1: Planet Nature (universal) ──
+  if (effectiveDignity !== undefined) {
+    if (effectiveDignity <= 15) return { ...TIER_CONFIG.hubut,    score: effectiveDignity };
+    if (effectiveDignity <= 35) return { ...TIER_CONFIG.prudence, score: effectiveDignity };
+    if (effectiveDignity  > 65) return { ...TIER_CONFIG.excellent, score: effectiveDignity };
+    return resolvePeregrine(hourPlanet, effectiveDignity);
+  }
+
+  // No ephemeris data at all → planet nature only
   const nature = getPlanetNature(hourPlanet);
-  if (nature === 'saad') score += 15;       // Benefic boost
-  else if (nature === 'nahs') score -= 10;  // Malefic caution
-
-  // ── Factor 2: Personal Ruler Alignment ──
-  if (userRuler) {
-    const friendship = getFriendship(userRuler, hourPlanet as string);
-    switch (friendship) {
-      case 'same':   score += 35; break;  // Your own planet's hour
-      case 'friend': score += 15; break;  // Friendly planet
-      case 'enemy':  score -= 10; break;  // Opposing planet
-      // 'neutral': no change
-    }
-  }
-
-  // ── Factor 3: Dignity (auto-computed from ephemeris if not provided) ──
-  const effectiveDignity = dignityScore ?? getQuickDignityScore(hourPlanet as string);
-  if (effectiveDignity != null) {
-    // Map 0-100 dignity to a -10 to +10 modifier
-    // 50 = peregrine (no modifier), 100 = exalted (+10), 0 = fall (-10)
-    const dignityModifier = Math.round(((effectiveDignity - 50) / 50) * 10);
-    score += dignityModifier;
-  }
-
-  // Clamp
-  score = Math.max(0, Math.min(100, score));
-
-  // ── Determine tier ──
-  let tier: AlignmentTier;
-  if (score >= 70) tier = 'aligned';
-  else if (score >= 45) tier = 'steady';
-  else tier = 'mindful';
-
-  return { ...TIER_CONFIG[tier], score };
+  if (nature === 'saad') return { ...TIER_CONFIG.excellent, score: 80 };
+  if (nature === 'nahs') return { ...TIER_CONFIG.prudence,  score: 25 };
+  return { ...TIER_CONFIG.neutral, score: 50 };
 }
 
 /**
@@ -281,8 +235,9 @@ export function getAlignmentBadge(
  */
 export function getAlignmentLabelKey(tier: AlignmentTier): string {
   switch (tier) {
-    case 'aligned': return 'home.moment.status.aligned';
-    case 'steady':  return 'home.moment.status.steady';
-    case 'mindful': return 'home.moment.status.mindful';
+    case 'excellent': return 'home.moment.status.excellent';
+    case 'neutral':   return 'home.moment.status.neutral';
+    case 'prudence':  return 'home.moment.status.prudence';
+    case 'hubut':     return 'home.moment.status.hubut';
   }
 }

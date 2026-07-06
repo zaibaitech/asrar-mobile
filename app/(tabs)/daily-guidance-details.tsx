@@ -495,8 +495,8 @@ export default function DailyGuidanceDetailsScreen() {
   // Simplified to match classical system: favorable/neutral/cautious
   const getTimingQualityFromBadge = (tier: AlignmentTier | null): TimingQuality => {
     if (!tier) return 'neutral';
-    if (tier === 'aligned') return 'favorable';
-    if (tier === 'steady') return 'neutral';
+    if (tier === 'excellent') return 'favorable';
+    if (tier === 'neutral') return 'neutral';
     return 'cautious'; // mindful
   };
 

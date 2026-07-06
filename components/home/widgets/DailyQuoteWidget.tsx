@@ -14,9 +14,11 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { DarkTheme, Spacing, Typography } from '../../../constants/DarkTheme';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { getDailyReminder, type DailyReminder } from '../../../services/DailyReminderService';
 
 export function DailyQuoteWidget() {
+  const { t } = useLanguage();
   const [reminder, setReminder] = useState<DailyReminder | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -68,7 +70,7 @@ export function DailyQuoteWidget() {
   return (
     <View style={styles.container}>
       <Text style={styles.icon}>{getIcon()}</Text>
-      <Text style={styles.label}>Daily Reminder</Text>
+      <Text style={styles.label}>{t('home.widgetDailyReminder')}</Text>
       <Text style={styles.quoteArabic} numberOfLines={3}>
         {reminder.textArabic}
       </Text>

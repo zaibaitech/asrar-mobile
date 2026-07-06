@@ -23,9 +23,10 @@ export type ZodiacSign =
   | 'Leo' | 'Virgo' | 'Libra' | 'Scorpio'
   | 'Sagittarius' | 'Capricorn' | 'Aquarius' | 'Pisces';
 
-export type DignityType = 
+export type DignityType =
   | 'domicile'      // Planet in its own sign (strongest)
   | 'exaltation'    // Planet exalted (very strong)
+  | 'triplicity'    // Planet is day/night/participating ruler of the sign's element
   | 'detriment'     // Planet opposite its domicile (weak)
   | 'fall'          // Planet in fall (very weak)
   | 'peregrine';    // No essential dignity (neutral)
@@ -108,6 +109,31 @@ export interface PlanetaryCondition {
 // ============================================================================
 // CLASSICAL RULERSHIP TABLES
 // ============================================================================
+
+/**
+ * Dorothean Triplicity Rulers (day / night / participating).
+ * All three rulers receive triplicity dignity in their element's signs —
+ * no day/night chart distinction is applied here for simplicity.
+ *
+ * Fire  (Aries, Leo, Sag):      Sun · Jupiter · Saturn
+ * Earth (Taurus, Virgo, Cap):   Venus · Moon · Mars
+ * Air   (Gemini, Libra, Aqu):   Saturn · Mercury · Jupiter
+ * Water (Cancer, Scorpio, Pis): Venus · Mars · Moon
+ */
+const TRIPLICITY_RULERS: Record<ZodiacSign, Planet[]> = {
+  Aries:       ['Sun', 'Jupiter', 'Saturn'],
+  Leo:         ['Sun', 'Jupiter', 'Saturn'],
+  Sagittarius: ['Sun', 'Jupiter', 'Saturn'],
+  Taurus:      ['Venus', 'Moon', 'Mars'],
+  Virgo:       ['Venus', 'Moon', 'Mars'],
+  Capricorn:   ['Venus', 'Moon', 'Mars'],
+  Gemini:      ['Saturn', 'Mercury', 'Jupiter'],
+  Libra:       ['Saturn', 'Mercury', 'Jupiter'],
+  Aquarius:    ['Saturn', 'Mercury', 'Jupiter'],
+  Cancer:      ['Venus', 'Mars', 'Moon'],
+  Scorpio:     ['Venus', 'Mars', 'Moon'],
+  Pisces:      ['Venus', 'Mars', 'Moon'],
+};
 
 /**
  * Essential Dignities by Sign
@@ -277,7 +303,20 @@ function calculateDignity(planet: Planet, position: ZodiacPosition): Dignity {
     };
   }
   
-  // Check detriment
+  // Check fall before detriment — debilities override ALL other dignities including triplicity.
+  // e.g. Saturn in Aries is a Fire triplicity ruler AND in fall; fall wins.
+  // e.g. Mercury in Pisces is detriment AND fall; fall wins.
+  if (rulership.fall === planet) {
+    return {
+      type: 'fall',
+      score: 10,
+      description: `${planet} in ${position.sign} (fall) - Very weak`,
+      descriptionAr: `${planet} في ${position.sign} (هبوطه) - ضعيف جداً`,
+      descriptionFr: `${planet} en ${position.sign} (chute) - Très faible`,
+    };
+  }
+
+  // Check detriment (also before triplicity — debility overrides minor dignity)
   if (rulership.detriment.includes(planet)) {
     return {
       type: 'detriment',
@@ -287,15 +326,15 @@ function calculateDignity(planet: Planet, position: ZodiacPosition): Dignity {
       descriptionFr: `${planet} en ${position.sign} (exil) - Affaibli`,
     };
   }
-  
-  // Check fall
-  if (rulership.fall === planet) {
+
+  // Check triplicity (Dorothean) — positive dignity below domicile/exaltation
+  if (TRIPLICITY_RULERS[position.sign].includes(planet)) {
     return {
-      type: 'fall',
-      score: 10,
-      description: `${planet} in ${position.sign} (fall) - Very weak`,
-      descriptionAr: `${planet} في ${position.sign} (هبوطه) - ضعيف جداً`,
-      descriptionFr: `${planet} en ${position.sign} (chute) - Très faible`,
+      type: 'triplicity',
+      score: 70,
+      description: `${planet} in ${position.sign} (triplicity) - Supported`,
+      descriptionAr: `${planet} في ${position.sign} (مثلثة) - مدعوم`,
+      descriptionFr: `${planet} en ${position.sign} (triplicité) - Soutenu`,
     };
   }
   

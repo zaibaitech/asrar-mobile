@@ -133,6 +133,47 @@ export default function MomentAlignmentDetailScreen() {
     return getAlignmentBadge(planet, userRuler, dignityScore);
   }, [planetaryData?.currentHour?.planet, dobZodiacDerived?.burjIndex, profile?.derived?.burjIndex, hourPlanetCondition?.dignity?.score, alignment?.hourRulerCondition?.dignity?.score]);
 
+  // Real per-planet dignity scores derived from the same transit data (allTransits) that
+  // powers the Planet Transit screen — so Show Timeline reflects each planet's ACTUAL
+  // current sign dignity instead of falling back to a benefic/malefic "nature" guess.
+  const dignityScoreByPlanet = useMemo(() => {
+    const scores: Partial<Record<Planet, number>> = {};
+    if (!allTransits) return scores;
+
+    const planets: Planet[] = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'];
+    const sunLongitude = typeof allTransits.Sun?.longitude === 'number' ? allTransits.Sun.longitude : undefined;
+    if (typeof sunLongitude !== 'number') return scores;
+
+    for (const planet of planets) {
+      const transit = allTransits[planet];
+      if (!transit || typeof transit.longitude !== 'number' || !transit.sign) continue;
+
+      const degree = typeof transit.signDegree === 'number'
+        ? transit.signDegree + (transit.signMinute ?? 0) / 60
+        : ((transit.longitude % 30) + 30) % 30;
+
+      const enhanced = calculateEnhancedPlanetaryPower(
+        planet,
+        transit.sign,
+        degree,
+        transit.longitude,
+        sunLongitude,
+        !!transit.isRetrograde
+      );
+
+      switch (enhanced.dignityInfo.status) {
+        case 'Exalted': scores[planet] = 90; break;
+        case 'Domicile': scores[planet] = 80; break;
+        case 'Triplicity': scores[planet] = 70; break;
+        case 'Detriment': scores[planet] = 20; break;
+        case 'Fall': scores[planet] = 10; break;
+        default: scores[planet] = 50; // Neutral / peregrine
+      }
+    }
+
+    return scores;
+  }, [allTransits]);
+
   // Keep legacy badge derivation for deep analysis sections that still reference it
   const unifiedBadge: UnifiedBadge = timingResult
     ? getBadgeFromScore(timingResult.overallScore)
@@ -530,6 +571,8 @@ export default function MomentAlignmentDetailScreen() {
         return t('momentDetail.cards.analysis.statuses.dignityDomicile');
       case 'exaltation':
         return t('momentDetail.cards.analysis.statuses.dignityExalted');
+      case 'triplicity':
+        return t('momentDetail.cards.analysis.statuses.dignityTriplicity');
       case 'detriment':
         return t('momentDetail.cards.analysis.statuses.dignityDetriment');
       case 'fall':
@@ -690,11 +733,12 @@ export default function MomentAlignmentDetailScreen() {
     // Primary: Simple alignment badge description
     if (simpleBadge) {
       const descKeyMap: Record<string, string> = {
-        aligned: 'momentDetail.cards.status.act_desc',
-        steady: 'momentDetail.cards.status.maintain_desc',
-        mindful: 'momentDetail.cards.status.hold_desc',
+        excellent: 'momentDetail.cards.status.act_desc',
+        neutral:   'momentDetail.cards.status.maintain_desc',
+        prudence:  'momentDetail.cards.status.hold_desc',
+        hubut:     'momentDetail.cards.status.hold_desc',
       };
-      return t(descKeyMap[simpleBadge.tier]) || '';
+      return t(descKeyMap[simpleBadge.tier] ?? 'momentDetail.cards.status.maintain_desc') || '';
     }
     // Fallback to classical judgment
     if (classicalJudgment) {
@@ -1135,14 +1179,17 @@ export default function MomentAlignmentDetailScreen() {
                   const burjIdx = dobZodiacDerived?.burjIndex ?? profile?.derived?.burjIndex;
                   const windowUserRuler = typeof burjIdx === 'number' ? getRulingPlanetFromBurj(burjIdx) : undefined;
                   
-                  // Use full dignity score if this planet matches current hour ruler
-                  // (dignity changes slowly - only when planet changes signs, so current dignity applies to future hours)
+                  // Prefer the real dignity score computed for this specific planet from
+                  // current transit data (accurate for all 7 planets, not just the hour ruler).
+                  // Fall back to the hour-ruler's condition, then let getAlignmentBadge use
+                  // planet nature as a last resort if transit data hasn't loaded yet.
                   const currentPlanetCondition = hourPlanetCondition ?? alignment?.hourRulerCondition;
-                  const windowDignityScore = 
-                    currentPlanetCondition?.planet?.toLowerCase() === window.planet.toLowerCase()
+                  const windowDignityScore =
+                    dignityScoreByPlanet[window.planet] ??
+                    (currentPlanetCondition?.planet?.toLowerCase() === window.planet.toLowerCase()
                       ? currentPlanetCondition.dignity?.score
-                      : undefined;
-                  
+                      : undefined);
+
                   const windowBadge = getAlignmentBadge(window.planet, windowUserRuler, windowDignityScore);
                   const windowLabelKey = getAlignmentLabelKey(windowBadge.tier);
                   return (

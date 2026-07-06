@@ -12,7 +12,6 @@ const LAST_MAINTENANCE_KEY = '@storage_last_maintenance';
 const MAINTENANCE_INTERVAL = 24 * 60 * 60 * 1000; // 1 day
 const MAX_ITEM_SIZE_BYTES = 200 * 1024; // 200KB per key
 const EMERGENCY_ITEM_SIZE_BYTES = 64 * 1024; // 64KB under recovery
-const STORAGE_SOFT_LIMIT_BYTES = 5 * 1024 * 1024; // 5MB soft cap
 const MAX_ARRAY_ITEMS_DEFAULT = 200;
 
 // Monkey-patch AsyncStorage.setItem to add automatic error handling
@@ -84,46 +83,28 @@ function patchAsyncStorage(): void {
 
     try {
       const preparedValue = reducePayloadToFit(value, MAX_ITEM_SIZE_BYTES);
-
-      // Proactively cleanup before we get SQLITE_FULL.
-      const estimatedSize = await getStorageEstimateBytes();
-      if (estimatedSize + estimateStringBytes(preparedValue) > STORAGE_SOFT_LIMIT_BYTES) {
-        isRecoveryInProgress = true;
-        try {
-          await emergencyStorageCleanup();
-        } finally {
-          isRecoveryInProgress = false;
-        }
-      }
-
-      // Try normal save
       await originalSetItem.call(AsyncStorage, key, preparedValue);
     } catch (error: any) {
-      // Check if it's a storage full error
-      if (isStorageFullError(error)) {
-        console.warn(`⚠️ Storage full detected while saving ${key}, running cleanup...`);
-        
-        try {
-          // Run emergency cleanup
-          isRecoveryInProgress = true;
-          try {
-            await emergencyStorageCleanup();
-          } finally {
-            isRecoveryInProgress = false;
-          }
-          
-          // Try to save aggressively reduced data
-          const reduced = reducePayloadToFit(value, EMERGENCY_ITEM_SIZE_BYTES);
-          await originalSetItem.call(AsyncStorage, key, reduced);
-          
-          console.log(`✓ Successfully saved ${key} after cleanup`);
-        } catch (retryError) {
-          console.error(`Failed to save ${key} even after cleanup:`, retryError);
-          // Rethrow the original error
-          throw error;
-        }
-      } else {
-        // Not a storage full error, rethrow
+      if (!isStorageFullError(error)) {
+        throw error;
+      }
+
+      console.warn(`⚠️ Storage full detected while saving ${key}, running cleanup...`);
+
+      isRecoveryInProgress = true;
+      try {
+        await emergencyStorageCleanup();
+      } finally {
+        isRecoveryInProgress = false;
+      }
+
+      try {
+        const reduced = reducePayloadToFit(value, EMERGENCY_ITEM_SIZE_BYTES);
+        await originalSetItem.call(AsyncStorage, key, reduced);
+        console.log(`✓ Successfully saved ${key} after cleanup`);
+      } catch (retryError) {
+        // Storage still full after cleanup — let the caller decide how to handle it.
+        console.warn(`Storage still full after cleanup, dropping ${key}`);
         throw error;
       }
     }
@@ -269,22 +250,6 @@ function reduceObjectToFit(data: Record<string, unknown>, targetBytes: number): 
 
 function estimateStringBytes(value: string): number {
   return value.length * 2;
-}
-
-async function getStorageEstimateBytes(): Promise<number> {
-  try {
-    const keys = await AsyncStorage.getAllKeys();
-    let total = 0;
-    for (const key of keys) {
-      const value = await AsyncStorage.getItem(key);
-      if (value) {
-        total += estimateStringBytes(value);
-      }
-    }
-    return total;
-  } catch {
-    return 0;
-  }
 }
 
 /**

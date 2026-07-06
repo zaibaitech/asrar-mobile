@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { DivineName, getAllDivineNames } from '../../data/divine-names';
 
 interface DivineNamesPickerProps {
@@ -16,6 +17,7 @@ export const DivineNamesPicker: React.FC<DivineNamesPickerProps> = ({
   onSelect,
   selectedNameNumber,
 }) => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const allNames = getAllDivineNames();
   
@@ -64,7 +66,7 @@ export const DivineNamesPicker: React.FC<DivineNamesPickerProps> = ({
         style={styles.searchInput}
         value={searchQuery}
         onChangeText={setSearchQuery}
-        placeholder="Search by Arabic, transliteration, or meaning..."
+        placeholder={t('calculator.divineNamesPicker.searchPlaceholder')}
         placeholderTextColor="#64748b"
       />
       

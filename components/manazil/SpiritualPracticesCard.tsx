@@ -211,7 +211,7 @@ export function SpiritualPracticesCard(props: {
       ) : null}
 
       {!advancedMode ? (
-        <Text style={styles.advancedHint}>Advanced practices (wafq) are hidden. Enable “Advanced mode” to view.</Text>
+        <Text style={styles.advancedHint}>{t('manazilScreen.practicesCard.advancedHint')}</Text>
       ) : null}
 
       {activeDhikr ? (

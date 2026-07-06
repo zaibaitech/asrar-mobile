@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { PlanetName } from '../../constants/planets';
 
 interface PlanetarySignatureProps {
@@ -123,6 +124,7 @@ const PLANET_DATA: Record<PlanetName, PlanetData> = {
 };
 
 export const PlanetarySignature: React.FC<PlanetarySignatureProps> = ({ kabir }) => {
+  const { t } = useLanguage();
   // Calculate planetary hour from kabir value
   const hourNumber = (kabir % 7) + 1; // 1-7
   const planetNames: PlanetName[] = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
@@ -134,13 +136,13 @@ export const PlanetarySignature: React.FC<PlanetarySignatureProps> = ({ kabir })
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerEmoji}>✨</Text>
-        <Text style={styles.title}>Planetary Signature</Text>
+        <Text style={styles.title}>{t('calculator.planetarySignature')}</Text>
         <View style={[styles.levelBadge, { backgroundColor: planetData.colorHex }]}>
-          <Text style={styles.levelText}>Intermediate</Text>
+          <Text style={styles.levelText}>{t('calculator.intermediate')}</Text>
         </View>
       </View>
-      
-      <Text style={styles.subtitle}>The 7 classical planets</Text>
+
+      <Text style={styles.subtitle}>{t('calculator.sevenPlanets')}</Text>
       
       {/* Planet Main Card */}
       <View style={[styles.planetCard, { backgroundColor: planetData.colorHex + '20', borderColor: planetData.colorHex }]}>
@@ -154,21 +156,21 @@ export const PlanetarySignature: React.FC<PlanetarySignatureProps> = ({ kabir })
       <View style={styles.detailsGrid}>
         {/* Planet */}
         <View style={styles.detailCard}>
-          <Text style={styles.detailLabel}>Planet</Text>
+          <Text style={styles.detailLabel}>{t('calculator.planet')}</Text>
           <Text style={styles.detailEmoji}>{planetData.emoji}</Text>
           <Text style={styles.detailValue}>{planetName}</Text>
         </View>
         
         {/* Day of Week */}
         <View style={styles.detailCard}>
-          <Text style={styles.detailLabel}>Day of Week</Text>
+          <Text style={styles.detailLabel}>{t('calculator.dayOfWeek')}</Text>
           <Text style={styles.detailValue}>{planetData.dayOfWeek}</Text>
           <Text style={styles.detailArabic}>{planetData.dayArabic}</Text>
         </View>
         
         {/* Hour Number */}
         <View style={styles.detailCard}>
-          <Text style={styles.detailLabel}>Hour Number</Text>
+          <Text style={styles.detailLabel}>{t('calculator.hourNumber')}</Text>
           <Text style={styles.detailValueLarge}>{hourNumber}</Text>
         </View>
       </View>
@@ -176,12 +178,12 @@ export const PlanetarySignature: React.FC<PlanetarySignatureProps> = ({ kabir })
       {/* Metal & Color */}
       <View style={styles.detailsGrid}>
         <View style={styles.detailCard}>
-          <Text style={styles.detailLabel}>Metal</Text>
+          <Text style={styles.detailLabel}>{t('calculator.metal')}</Text>
           <Text style={styles.detailValue}>{planetData.metal}</Text>
         </View>
         
         <View style={styles.detailCard}>
-          <Text style={styles.detailLabel}>Color</Text>
+          <Text style={styles.detailLabel}>{t('calculator.color')}</Text>
           <View style={[styles.colorSwatch, { backgroundColor: planetData.colorHex }]} />
           <Text style={styles.detailValue}>{planetData.color}</Text>
         </View>
@@ -189,19 +191,19 @@ export const PlanetarySignature: React.FC<PlanetarySignatureProps> = ({ kabir })
       
       {/* Spiritual Quality */}
       <View style={styles.qualityCard}>
-        <Text style={styles.qualityLabel}>💫 Spiritual Quality</Text>
+        <Text style={styles.qualityLabel}>💫 {t('calculator.spiritualQuality')}</Text>
         <Text style={styles.qualityText}>{planetData.spiritualQuality}</Text>
       </View>
       
       {/* Best Hours */}
       <View style={styles.timingCard}>
-        <Text style={styles.timingLabel}>⏰ Best Hours</Text>
+        <Text style={styles.timingLabel}>⏰ {t('calculator.bestHours')}</Text>
         <Text style={styles.timingValue}>{planetData.bestHours}</Text>
       </View>
       
       {/* Dhikr Recommendation */}
       <View style={[styles.dhikrCard, { backgroundColor: planetData.colorHex + '15', borderColor: planetData.colorHex }]}>
-        <Text style={styles.dhikrTitle}>📿 Dhikr Recommendation</Text>
+        <Text style={styles.dhikrTitle}>📿 {t('calculator.dhikrRecommendation')}</Text>
         <Text style={styles.dhikrTiming}>{planetData.timing}</Text>
       </View>
     </View>

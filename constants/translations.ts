@@ -133,6 +133,7 @@ export const translations = {
         tabAngels: "Angels",
         tabQuran: "Qur'an",
         tabWafq: "Wafq",
+        advancedHint: "Advanced practices (wafq) are hidden. Enable \"Advanced mode\" to view.",
       },
     },
 
@@ -1249,6 +1250,10 @@ export const translations = {
           aligned: "Aligned",
           steady: "Steady",
           mindful: "Mindful",
+          excellent: "Excellent",
+          neutral: "Neutral",
+          prudence: "Prudence",
+          hubut: "Hubūṭ",
         },
         hint: {
           act: "Sun, Jupiter, or Venus hour — proceed with confidence",
@@ -2761,6 +2766,12 @@ export const translations = {
       todayBlessing: "Today's Blessing",
       tomorrow: "Tomorrow",
       tapToSetLocation: "Tap to set location",
+      quickAccess: "Quick Access",
+      widgetDhikrCounter: "Dhikr Counter",
+      widgetDhikrHint: "Tap to open",
+      widgetDailyReminder: "Daily Reminder",
+      peakWindowsTitle: "Your Peak Windows",
+      peakWindowsAiUnavailable: "AI enhancement unavailable",
     },
 
     // Daily Energy (shared keys)
@@ -3097,6 +3108,7 @@ export const translations = {
         degreeWeakening: "Weakening",
         dignityDomicile: "Domicile",
         dignityExalted: "Exalted",
+        dignityTriplicity: "Triplicity",
         dignityDetriment: "Detriment",
         dignityFall: "Fall",
         dignityNeutral: "Neutral",
@@ -3369,14 +3381,14 @@ export const translations = {
           states: {
             sharaf: "Exalted (Sharaf)",
             bayt: "Domicile (Bayt)",
-            qubul: "Neutral (Qubūl)",
+            qubul: "Neutral (Gharīb)",
             wabal: "Detriment (Wabāl)",
             hubut: "Fall (Hubūṭ)",
           },
           explanations: {
             sharaf: "This planet is in a sign where its qualities are elevated and supported, making actions more effective and outcomes clearer.",
             bayt: "This planet is in its home sign, where its nature expresses smoothly and reliably.",
-            qubul: "This placement is balanced: neither strongly supported nor strongly challenged.",
+            qubul: "This planet is a stranger (gharīb) in this sign — neither supported nor opposed. Outcomes depend on choice and effort.",
             wabal: "This placement can create friction or mixed results; move with care and simplify commitments.",
             hubut: "This placement tends to feel heavy or blocked; timing, patience, and gentler goals help.",
           },
@@ -5360,11 +5372,15 @@ export const translations = {
       metal: "Metal",
       color: "Color",
       dhikrRecommendation: "Dhikr Recommendation",
+      bestHours: "Best Hours",
       divineName: "Divine Name",
       count: "Count",
       timing: "Timing",
+      divineNamesPicker: {
+        searchPlaceholder: "Search by Arabic, transliteration, or meaning...",
+      },
     },
-    
+
     // Elemental Composition
     elementalComposition: {
       title: "Elemental Composition",
@@ -10183,6 +10199,9 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       celestial: "Celestial",
       hour: "Hour",
       spiritualGuidance: "Spiritual Guidance",
+      prepDecisionPlaceholder: "e.g., Accepting a new job opportunity",
+      prepCustomIntentionPlaceholder: "Write your own intention...",
+      prepReflectionObservationsPlaceholder: "Any additional observations...",
     },
 
     // Day ruler labels
@@ -10634,6 +10653,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         tabAngels: "Anges",
         tabQuran: "Coran",
         tabWafq: "Wafq",
+        advancedHint: "Les pratiques avancées (wafq) sont masquées. Activez le \"Mode Avancé\" pour les afficher.",
       },
     },
 
@@ -11752,6 +11772,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           aligned: "Aligné",
           steady: "Stable",
           mindful: "Prudence",
+          excellent: "Excellent",
+          neutral: "Neutre",
+          prudence: "Prudence",
+          hubut: "Hubūṭ",
         },
         hint: {
           act: "Heure de Soleil, Jupiter ou Vénus — procédez avec confiance",
@@ -13250,6 +13274,12 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       tomorrow: "Demain",
       tapToSetLocation: "Appuyez pour définir l'emplacement",
       tapToViewDetails: "Appuyez pour voir les détails",
+      quickAccess: "Accès rapide",
+      widgetDhikrCounter: "Compteur de Dhikr",
+      widgetDhikrHint: "Appuyer pour ouvrir",
+      widgetDailyReminder: "Rappel quotidien",
+      peakWindowsTitle: "Vos fenêtres optimales",
+      peakWindowsAiUnavailable: "Amélioration IA indisponible",
     },
 
     // Énergie du Jour (clés partagées)
@@ -13586,6 +13616,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         degreeWeakening: "En baisse",
         dignityDomicile: "Domicile",
         dignityExalted: "Exaltation",
+        dignityTriplicity: "Triplicité",
         dignityDetriment: "Exil",
         dignityFall: "Chute",
         dignityNeutral: "Neutre",
@@ -13858,14 +13889,14 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           states: {
             sharaf: "Exaltation (Sharaf)",
             bayt: "Domicile (Bayt)",
-            qubul: "Neutre (Qubūl)",
+            qubul: "Neutre (Gharīb)",
             wabal: "Exil (Wabāl)",
             hubut: "Chute (Hubūṭ)",
           },
           explanations: {
             sharaf: "La planète est exaltée : ses qualités sont élevées et soutenues, rendant l’action plus efficace.",
             bayt: "La planète est en domicile : son influence s’exprime avec stabilité et fiabilité.",
-            qubul: "Placement neutre : ni fortement soutenu, ni fortement contrarié.",
+            qubul: "Cette planète est étrangère (gharīb) dans ce signe — ni soutenue ni opposée. Les résultats dépendent du choix et de l'effort.",
             wabal: "Placement difficile : friction possible, avancez avec prudence et limites claires.",
             hubut: "Chute : énergie atténuée ; patience et objectifs plus doux aident.",
           },
@@ -15840,11 +15871,15 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       metal: "Métal",
       color: "Couleur",
       dhikrRecommendation: "Recommandation de Dhikr",
+      bestHours: "Meilleures Heures",
       divineName: "Nom Divin",
       count: "Nombre",
       timing: "Moment",
+      divineNamesPicker: {
+        searchPlaceholder: "Rechercher par arabe, translittération ou signification...",
+      },
     },
-    
+
     // Elemental Composition
     elementalComposition: {
       title: "Composition Élémentaire",
@@ -18372,6 +18407,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           degreeWeakening: "يتراجع",
           dignityDomicile: "بيت",
           dignityExalted: "شرف",
+          dignityTriplicity: "مثلثة",
           dignityDetriment: "وبال",
           dignityFall: "هبوط",
           dignityNeutral: "قبول",
@@ -20962,6 +20998,9 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       celestial: "Céleste",
       hour: "Heure",
       spiritualGuidance: "Guidance Spirituelle",
+      prepDecisionPlaceholder: "ex. : Accepter une nouvelle opportunité d'emploi",
+      prepCustomIntentionPlaceholder: "Écrivez votre propre intention...",
+      prepReflectionObservationsPlaceholder: "Toute observation supplémentaire...",
     },
 
     // Labels des maîtres des jours
@@ -21440,6 +21479,21 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       },
       noText: "لا نص للحساب",
       awaitingCalculation: "في انتظار الحساب",
+      planetarySignature: "التوقيع الكوكبي",
+      sevenPlanets: "الكواكب السبعة الكلاسيكية",
+      planet: "الكوكب",
+      dayOfWeek: "يوم الأسبوع",
+      hourNumber: "رقم الساعة",
+      metal: "المعدن",
+      color: "اللون",
+      symbolism: "الرمزية",
+      intermediate: "وسيط",
+      spiritualQuality: "الجودة الروحية",
+      dhikrRecommendation: "توصية الذكر",
+      bestHours: "أفضل الساعات",
+      divineNamesPicker: {
+        searchPlaceholder: "ابحث بالعربية أو النقحرة أو المعنى...",
+      },
     },
 
     // التوافق
@@ -21940,6 +21994,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         tabAngels: "الملائكة",
         tabQuran: "القرآن",
         tabWafq: "الوفق",
+        advancedHint: "الممارسات المتقدمة (الوفق) مخفية. فعّل \"الوضع المتقدم\" للعرض.",
       },
     },
 
@@ -22544,14 +22599,14 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           states: {
             sharaf: "شرف",
             bayt: "بيت",
-            qubul: "قبول",
+            qubul: "غريب",
             wabal: "وبال",
             hubut: "هبوط",
           },
           explanations: {
             sharaf: "الكوكب في شرفه: صفاته مُعزَّزة ومدعومة.",
             bayt: "الكوكب في بيته: تأثيره أكثر ثباتًا وموثوقية.",
-            qubul: "قبول: وضع متوازن لا يدعم ولا يعارض بقوة.",
+            qubul: "الكوكب غريب في هذا البرج — لا مدعوم ولا معارض. النتائج تعتمد على الاختيار والجهد.",
             wabal: "وبال: قد يظهر احتكاك أو نتائج مختلطة؛ امضِ بحذر.",
             hubut: "هبوط: قد تبدو الطاقة أثقل؛ الصبر وأهداف أصغر تساعد.",
           },
@@ -23049,8 +23104,11 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           toggle: "توسيع أو طي قسم الصحة والعافية",
         },
       },
+      prepDecisionPlaceholder: "مثال: قبول فرصة عمل جديدة",
+      prepCustomIntentionPlaceholder: "اكتب نيتك الخاصة...",
+      prepReflectionObservationsPlaceholder: "أي ملاحظات إضافية...",
     },
-    
+
     // Asrariya Practice Timing
     asrariya: {
       title: "توقيت الممارسات",
@@ -23556,6 +23614,10 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           aligned: "متوافق",
           steady: "ثابت",
           mindful: "بوعي",
+          excellent: "ممتاز",
+          neutral: "محايد",
+          prudence: "تَأَنَّ",
+          hubut: "هبوط",
         },
         updated: {
           justNow: "تم التحديث للتو",
@@ -23851,6 +23913,12 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           },
         },
       },
+      quickAccess: "وصول سريع",
+      widgetDhikrCounter: "عداد الذكر",
+      widgetDhikrHint: "اضغط للفتح",
+      widgetDailyReminder: "تذكير يومي",
+      peakWindowsTitle: "نوافذك المثلى",
+      peakWindowsAiUnavailable: "تحسين الذكاء الاصطناعي غير متاح",
     },
 
     prayerTimes: {

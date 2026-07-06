@@ -2010,10 +2010,11 @@ export default function PlanetTransitDetailsScreen() {
   };
 
   const getDignityStateFromStatus = (
-    status: 'Domicile' | 'Exalted' | 'Detriment' | 'Fall' | 'Neutral'
+    status: 'Domicile' | 'Exalted' | 'Triplicity' | 'Detriment' | 'Fall' | 'Neutral'
   ): DignityStateCode => {
     if (status === 'Exalted') return 'sharaf';
     if (status === 'Domicile') return 'bayt';
+    if (status === 'Triplicity') return 'bayt'; // Triplicity maps to the same dignified guidance
     if (status === 'Detriment') return 'wabal';
     if (status === 'Fall') return 'hubut';
     return 'qubul';

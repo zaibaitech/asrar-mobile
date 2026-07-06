@@ -23,11 +23,12 @@ export type Sign =
 
 export type ConditionStatus = 'Favorable' | 'Neutral' | 'Restricted' | 'Avoid';
 
-export type Dignity = 'Exaltation' | 'Domicile' | 'Neutral' | 'Detriment' | 'Fall';
+export type Dignity = 'Exaltation' | 'Domicile' | 'Triplicity' | 'Neutral' | 'Detriment' | 'Fall';
 
 export type PlanetConditionReasonKey =
   | 'DIGNITY_EXALTATION'
   | 'DIGNITY_DOMICILE'
+  | 'DIGNITY_TRIPLICITY'
   | 'DIGNITY_FALL'
   | 'DIGNITY_DETRIMENT'
   | 'DIGNITY_NEUTRAL'
@@ -38,6 +39,7 @@ export type PlanetConditionReasonKey =
 export interface PlanetDignities {
   domicile: Sign[];
   exaltation?: { sign: Sign; degree: number };
+  triplicity: Sign[];
   detriment: Sign[];
   fall: Sign[];
 }
@@ -46,42 +48,49 @@ export const PLANET_DIGNITIES: Record<Planet, PlanetDignities> = {
   Sun: {
     domicile: ['Leo'],
     exaltation: { sign: 'Aries', degree: 19 },
+    triplicity: ['Aries', 'Leo', 'Sagittarius'],
     detriment: ['Aquarius'],
     fall: ['Libra'],
   },
   Moon: {
     domicile: ['Cancer'],
     exaltation: { sign: 'Taurus', degree: 3 },
+    triplicity: ['Taurus', 'Virgo', 'Capricorn', 'Cancer', 'Scorpio', 'Pisces'],
     detriment: ['Capricorn'],
     fall: ['Scorpio'],
   },
   Mercury: {
     domicile: ['Gemini', 'Virgo'],
     exaltation: { sign: 'Virgo', degree: 15 },
+    triplicity: ['Gemini', 'Libra', 'Aquarius'],
     detriment: ['Sagittarius', 'Pisces'],
     fall: ['Pisces'],
   },
   Venus: {
     domicile: ['Taurus', 'Libra'],
     exaltation: { sign: 'Pisces', degree: 27 },
+    triplicity: ['Taurus', 'Virgo', 'Capricorn', 'Cancer', 'Scorpio', 'Pisces'],
     detriment: ['Aries', 'Scorpio'],
     fall: ['Virgo'],
   },
   Mars: {
     domicile: ['Aries', 'Scorpio'],
     exaltation: { sign: 'Capricorn', degree: 28 },
+    triplicity: ['Taurus', 'Virgo', 'Capricorn', 'Cancer', 'Scorpio', 'Pisces'],
     detriment: ['Libra', 'Taurus'],
     fall: ['Cancer'],
   },
   Jupiter: {
     domicile: ['Sagittarius', 'Pisces'],
     exaltation: { sign: 'Cancer', degree: 15 },
+    triplicity: ['Aries', 'Leo', 'Sagittarius', 'Gemini', 'Libra', 'Aquarius'],
     detriment: ['Gemini', 'Virgo'],
     fall: ['Capricorn'],
   },
   Saturn: {
     domicile: ['Capricorn', 'Aquarius'],
     exaltation: { sign: 'Libra', degree: 21 },
+    triplicity: ['Aries', 'Leo', 'Sagittarius', 'Gemini', 'Libra', 'Aquarius'],
     detriment: ['Cancer', 'Leo'],
     fall: ['Aries'],
   },
@@ -99,17 +108,13 @@ export interface PlanetConditionEvaluation {
 
 export function getDignityReasonKey(dignity: Dignity): PlanetConditionReasonKey {
   switch (dignity) {
-    case 'Exaltation':
-      return 'DIGNITY_EXALTATION';
-    case 'Domicile':
-      return 'DIGNITY_DOMICILE';
-    case 'Detriment':
-      return 'DIGNITY_DETRIMENT';
-    case 'Fall':
-      return 'DIGNITY_FALL';
+    case 'Exaltation':  return 'DIGNITY_EXALTATION';
+    case 'Domicile':    return 'DIGNITY_DOMICILE';
+    case 'Triplicity':  return 'DIGNITY_TRIPLICITY';
+    case 'Detriment':   return 'DIGNITY_DETRIMENT';
+    case 'Fall':        return 'DIGNITY_FALL';
     case 'Neutral':
-    default:
-      return 'DIGNITY_NEUTRAL';
+    default:            return 'DIGNITY_NEUTRAL';
   }
 }
 
@@ -149,7 +154,7 @@ export function evaluatePlanetCondition(args: {
   let dignity: Dignity = 'Neutral';
   let score = 0;
 
-  // 1) Determine dignity in specified order
+  // 1) Determine dignity — fall/detriment checked first (debilities override)
   if (dignities.fall.includes(sign)) {
     dignity = 'Fall';
     score = -4;
@@ -162,6 +167,9 @@ export function evaluatePlanetCondition(args: {
   } else if (dignities.domicile.includes(sign)) {
     dignity = 'Domicile';
     score = 3;
+  } else if (dignities.triplicity.includes(sign)) {
+    dignity = 'Triplicity';
+    score = 2;
   }
 
   pushUnique(reasons, getDignityReasonKey(dignity));
