@@ -61,6 +61,8 @@ export const ikhtiyaratCopy = {
     shareButton: 'Share',
     linkCopied: 'Link copied!',
     howScoringWorks: 'How scoring works: each rule adds or subtracts points; the total is scaled to a 0–100 score against that election type\'s own maximum achievable points, so the tier bands (Mumtāz, Jayyid, Maqbūl, Ḍaʿīf, Ijtanib) mean the same thing across marriage, travel, and any future election type.',
+    howScoringWorksExpand: 'How scoring works',
+    howScoringWorksCollapse: 'Hide scoring details',
   },
   fr: {
     title: 'Meilleures Dates',
@@ -107,6 +109,8 @@ export const ikhtiyaratCopy = {
     shareButton: 'Partager',
     linkCopied: 'Lien copié !',
     howScoringWorks: "Comment le score est calculé : chaque règle ajoute ou retire des points ; le total est ramené à une échelle de 0 à 100 par rapport au maximum de points réalisables pour ce type d'élection, afin que les paliers (Mumtāz, Jayyid, Maqbūl, Ḍaʿīf, Ijtanib) aient la même signification pour le mariage, le voyage et tout futur type d'élection.",
+    howScoringWorksExpand: 'Comment le score est calculé',
+    howScoringWorksCollapse: 'Masquer les détails du calcul',
   },
   // DRAFT — new block vs. the source app (which only ships en/fr for this
   // file). Needs native/scholarly review before shipping.
@@ -156,6 +160,8 @@ export const ikhtiyaratCopy = {
     linkCopied: 'تم نسخ الرابط!',
     howScoringWorks:
       'كيف يُحسب التقييم: كل قاعدة تضيف أو تطرح نقاطًا؛ ويُحوَّل المجموع إلى تقييم من 0 إلى 100 بالنسبة إلى أقصى عدد نقاط يمكن تحقيقه لهذا النوع من الاختيار، بحيث تحمل الفئات (ممتاز، جيد، مقبول، ضعيف، اجتناب) نفس المعنى في الزواج والسفر وأي نوع اختيار مستقبلي.',
+    howScoringWorksExpand: 'كيف يُحسب التقييم',
+    howScoringWorksCollapse: 'إخفاء تفاصيل التقييم',
   },
 } as const;
 

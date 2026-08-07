@@ -7,10 +7,12 @@
  */
 
 import React, { useState } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
+import { DarkTheme } from '@/constants/DarkTheme';
 import { ElectionType } from '@/services/ikhtiyaratEngine';
+
+const FEATURE_ACCENT = '#059669';
 
 export interface ElectionTypeOption {
   value: ElectionType;
@@ -24,51 +26,52 @@ export interface ElectionTypeDropdownProps {
   label: string;
 }
 
-export default function ElectionTypeDropdown({ value, options, onChange, label }: ElectionTypeDropdownProps) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+export default function ElectionTypeDropdown({ value, options, onChange, label }: Readonly<ElectionTypeDropdownProps>) {
   const [open, setOpen] = useState(false);
 
   const selected = options.find((o) => o.value === value);
 
   return (
     <View>
-      <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
+      <Text style={[styles.label, { color: DarkTheme.textSecondary }]}>{label}</Text>
       <Pressable
-        style={[styles.trigger, { borderColor: colors.border, backgroundColor: colors.background }]}
+        style={[styles.trigger, { borderColor: DarkTheme.borderSubtle, backgroundColor: DarkTheme.cardBackground }]}
         onPress={() => setOpen(true)}
         accessibilityRole="button"
       >
-        <Text style={[styles.triggerText, { color: colors.text }]}>{selected?.label ?? ''}</Text>
-        <Ionicons name="chevron-down" size={18} color={colors.textSecondary} />
+        <Text style={[styles.triggerText, { color: DarkTheme.textPrimary }]}>{selected?.label ?? ''}</Text>
+        <Ionicons name="chevron-down" size={18} color={DarkTheme.textSecondary} />
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.overlay} onPress={() => setOpen(false)}>
-          <Pressable style={[styles.card, { backgroundColor: colors.card }]} onPress={() => {}}>
+          <Pressable style={[styles.card, { backgroundColor: DarkTheme.cardBackground }]} onPress={() => {}}>
             <FlatList
               data={options}
               keyExtractor={(item) => item.value}
-              renderItem={({ item }) => (
-                <Pressable
-                  style={[styles.option, { borderBottomColor: colors.border }]}
-                  onPress={() => {
-                    onChange(item.value);
-                    setOpen(false);
-                  }}
-                >
-                  <Text
-                    style={[
-                      styles.optionText,
-                      { color: item.value === value ? '#059669' : colors.text },
-                      item.value === value && styles.optionTextSelected,
-                    ]}
+              renderItem={({ item }) => {
+                const isSelected = item.value === value;
+                return (
+                  <Pressable
+                    style={[styles.option, { borderBottomColor: DarkTheme.borderSubtle }]}
+                    onPress={() => {
+                      onChange(item.value);
+                      setOpen(false);
+                    }}
                   >
-                    {item.label}
-                  </Text>
-                  {item.value === value && <Ionicons name="checkmark" size={18} color="#059669" />}
-                </Pressable>
-              )}
+                    <Text
+                      style={[
+                        styles.optionText,
+                        { color: isSelected ? FEATURE_ACCENT : DarkTheme.textPrimary },
+                        isSelected && styles.optionTextSelected,
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                    {isSelected && <Ionicons name="checkmark" size={18} color={FEATURE_ACCENT} />}
+                  </Pressable>
+                );
+              }}
             />
           </Pressable>
         </Pressable>

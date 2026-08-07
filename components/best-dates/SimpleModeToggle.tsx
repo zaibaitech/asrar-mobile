@@ -4,10 +4,11 @@
  */
 
 import React from 'react';
-import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
-import Colors from '@/constants/Colors';
-import { UiLang } from '@/services/ikhtiyaratEngine/copy';
-import { ikhtiyaratCopy } from '@/services/ikhtiyaratEngine/copy';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { DarkTheme } from '@/constants/DarkTheme';
+import { ikhtiyaratCopy, UiLang } from '@/services/ikhtiyaratEngine/copy';
+
+const FEATURE_ACCENT = '#059669';
 
 export interface SimpleModeToggleProps {
   simple: boolean;
@@ -15,26 +16,24 @@ export interface SimpleModeToggleProps {
   language: UiLang;
 }
 
-export default function SimpleModeToggle({ simple, onChange, language }: SimpleModeToggleProps) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+export default function SimpleModeToggle({ simple, onChange, language }: Readonly<SimpleModeToggleProps>) {
   const c = ikhtiyaratCopy[language];
 
   return (
-    <View style={[styles.container, { borderColor: colors.border }]}>
+    <View style={[styles.container, { borderColor: DarkTheme.borderSubtle }]}>
       <Pressable
         onPress={() => onChange(true)}
-        style={[styles.button, simple && { backgroundColor: '#059669' }]}
+        style={[styles.button, simple && { backgroundColor: FEATURE_ACCENT }]}
       >
-        <Text style={[styles.text, { color: simple ? '#fff' : colors.textSecondary }]}>
+        <Text style={[styles.text, { color: simple ? '#fff' : DarkTheme.textSecondary }]}>
           {c.simpleModeLabel}
         </Text>
       </Pressable>
       <Pressable
         onPress={() => onChange(false)}
-        style={[styles.button, !simple && { backgroundColor: '#059669' }]}
+        style={[styles.button, !simple && { backgroundColor: FEATURE_ACCENT }]}
       >
-        <Text style={[styles.text, { color: !simple ? '#fff' : colors.textSecondary }]}>
+        <Text style={[styles.text, { color: !simple ? '#fff' : DarkTheme.textSecondary }]}>
           {c.detailedModeLabel}
         </Text>
       </Pressable>

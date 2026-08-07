@@ -5,8 +5,8 @@
  */
 
 import React, { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
-import Colors from '@/constants/Colors';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { DarkTheme } from '@/constants/DarkTheme';
 import { UiLang } from '@/services/ikhtiyaratEngine/copy';
 
 export interface BadgeLike {
@@ -27,9 +27,7 @@ export interface BadgePillsProps {
   language: UiLang;
 }
 
-export default function BadgePills({ badges, language }: BadgePillsProps) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+export default function BadgePills({ badges, language }: Readonly<BadgePillsProps>) {
   const [openId, setOpenId] = useState<string | null>(null);
 
   if (badges.length === 0) return null;
@@ -56,14 +54,14 @@ export default function BadgePills({ badges, language }: BadgePillsProps) {
 
       <Modal visible={!!openBadge} transparent animationType="fade" onRequestClose={() => setOpenId(null)}>
         <Pressable style={styles.overlay} onPress={() => setOpenId(null)}>
-          <Pressable style={[styles.popover, { backgroundColor: colors.card }]} onPress={() => {}}>
+          <Pressable style={[styles.popover, { backgroundColor: DarkTheme.cardBackground }]} onPress={() => {}}>
             {openBadge && (
               <>
-                <Text style={[styles.noteText, { color: colors.text }]}>
+                <Text style={[styles.noteText, { color: DarkTheme.textPrimary }]}>
                   {openBadge.note[language === 'ar' ? 'ar' : language]}
                 </Text>
                 {language !== 'ar' && (
-                  <Text style={[styles.noteArabic, { color: colors.textTertiary }]}>{openBadge.note.ar}</Text>
+                  <Text style={[styles.noteArabic, { color: DarkTheme.textTertiary }]}>{openBadge.note.ar}</Text>
                 )}
               </>
             )}

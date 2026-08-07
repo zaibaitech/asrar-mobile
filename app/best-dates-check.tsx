@@ -19,7 +19,7 @@ import SimpleModeToggle from '@/components/best-dates/SimpleModeToggle';
 import TierBadge from '@/components/best-dates/TierBadge';
 import UrfBadgeView from '@/components/best-dates/UrfBadge';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
-import Colors from '@/constants/Colors';
+import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   businessElectionConfig,
@@ -62,9 +62,10 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from 'react-native';
+
+const FEATURE_ACCENT = '#059669';
 
 const CONFIG_BY_ELECTION_TYPE: Record<ElectionType, typeof marriageElectionConfig> = {
   marriage: marriageElectionConfig,
@@ -94,8 +95,6 @@ function toUiLang(language: 'en' | 'fr' | 'ar'): UiLang {
 export default function BestDatesCheckScreen() {
   const { language: appLanguage, setLanguage, t } = useLanguage();
   const language = toUiLang(appLanguage);
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
   const c = ikhtiyaratCopy[language];
   const params = useLocalSearchParams<{ date?: string; electionType?: string }>();
 
@@ -237,7 +236,7 @@ export default function BestDatesCheckScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: DarkTheme.screenBackground }]}>
         <ResponsiveAppHeader
           currentLanguage={appLanguage === 'en' ? 'EN' : appLanguage === 'fr' ? 'FR' : 'AR'}
           onLanguageChange={(lang) => setLanguage(lang.toLowerCase() as 'en' | 'fr' | 'ar')}
@@ -246,21 +245,21 @@ export default function BestDatesCheckScreen() {
         />
 
         <View style={styles.infoBar}>
-          <Text style={[styles.screenTitle, { color: colors.text }]}>{c.title}</Text>
+          <Text style={[styles.screenTitle, { color: DarkTheme.textPrimary }]}>{c.title}</Text>
           <TouchableOpacity
             onPress={() => setDisclaimerForceOpen(true)}
             accessibilityLabel={c.aboutLink}
           >
-            <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
+            <Ionicons name="information-circle-outline" size={24} color={FEATURE_ACCENT} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.modeTabRow}>
-          <View style={[styles.modeTab, styles.modeTabActive, { borderColor: '#059669' }]}>
-            <Text style={[styles.modeTabText, { color: '#059669' }]}>{c.tabCheck}</Text>
+          <View style={[styles.modeTab, styles.modeTabActive, { borderColor: FEATURE_ACCENT }]}>
+            <Text style={[styles.modeTabText, { color: FEATURE_ACCENT }]}>{c.tabCheck}</Text>
           </View>
           <TouchableOpacity
-            style={[styles.modeTab, { borderColor: colors.border }]}
+            style={[styles.modeTab, { borderColor: DarkTheme.borderSubtle }]}
             onPress={() =>
               router.replace({
                 pathname: '/best-dates-scan',
@@ -268,7 +267,7 @@ export default function BestDatesCheckScreen() {
               })
             }
           >
-            <Text style={[styles.modeTabText, { color: colors.textSecondary }]}>{c.tabScan}</Text>
+            <Text style={[styles.modeTabText, { color: DarkTheme.textSecondary }]}>{c.tabScan}</Text>
           </TouchableOpacity>
         </View>
 
@@ -280,14 +279,14 @@ export default function BestDatesCheckScreen() {
             label={c.electionTypeLabel}
           />
 
-          <View style={[styles.card, { backgroundColor: colors.card }]}>
-            <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>{c.datePickerLabel}</Text>
+          <View style={[styles.card, { backgroundColor: DarkTheme.cardBackground }]}>
+            <Text style={[styles.cardLabel, { color: DarkTheme.textSecondary }]}>{c.datePickerLabel}</Text>
             <TouchableOpacity
-              style={[styles.dateButton, { borderColor: colors.border }]}
+              style={[styles.dateButton, { borderColor: DarkTheme.borderSubtle }]}
               onPress={() => setShowDatePicker(true)}
             >
-              <Ionicons name="calendar" size={20} color={colors.textSecondary} />
-              <Text style={[styles.dateButtonText, { color: colors.text }]}>{dateStr}</Text>
+              <Ionicons name="calendar" size={20} color={DarkTheme.textSecondary} />
+              <Text style={[styles.dateButtonText, { color: DarkTheme.textPrimary }]}>{dateStr}</Text>
             </TouchableOpacity>
             {showDatePicker && (
               <DateTimePicker
@@ -302,23 +301,23 @@ export default function BestDatesCheckScreen() {
             )}
             {Platform.OS === 'ios' && showDatePicker && (
               <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                <Text style={[styles.doneText, { color: colors.primary }]}>{t('common.done')}</Text>
+                <Text style={[styles.doneText, { color: FEATURE_ACCENT }]}>{t('common.done')}</Text>
               </TouchableOpacity>
             )}
 
-            <Text style={[styles.cardLabel, { color: colors.textSecondary, marginTop: 12 }]}>{c.locationLabel}</Text>
+            <Text style={[styles.cardLabel, { color: DarkTheme.textSecondary, marginTop: 12 }]}>{c.locationLabel}</Text>
             <LocationAutocomplete value={locationLabel} onChange={setLocationLabel} onSelect={handleSelectLocation} />
             <TouchableOpacity style={styles.currentLocationRow} onPress={handleUseCurrentLocation} disabled={locatingCurrent}>
               {locatingCurrent ? (
-                <ActivityIndicator size="small" color={colors.primary} />
+                <ActivityIndicator size="small" color={FEATURE_ACCENT} />
               ) : (
-                <Ionicons name="locate" size={18} color={colors.primary} />
+                <Ionicons name="locate" size={18} color={FEATURE_ACCENT} />
               )}
-              <Text style={[styles.currentLocationText, { color: colors.primary }]}>{c.useMyLocation}</Text>
+              <Text style={[styles.currentLocationText, { color: FEATURE_ACCENT }]}>{c.useMyLocation}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.checkButton, { backgroundColor: '#059669' }]}
+              style={[styles.checkButton, { backgroundColor: FEATURE_ACCENT }]}
               onPress={handleCheck}
               disabled={loading}
             >
@@ -337,7 +336,7 @@ export default function BestDatesCheckScreen() {
           )}
 
           {result && (
-            <View style={[styles.resultCard, { backgroundColor: colors.card }]}>
+            <View style={[styles.resultCard, { backgroundColor: DarkTheme.cardBackground }]}>
               {isOffline && (
                 <View style={styles.offlineBanner}>
                   <Ionicons name="cloud-offline-outline" size={16} color="#f97316" />
@@ -346,7 +345,7 @@ export default function BestDatesCheckScreen() {
               )}
 
               <View style={styles.starsHeaderRow}>
-                <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.starsLabel}</Text>
+                <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.starsLabel}</Text>
                 <TouchableOpacity onPress={handleShare}>
                   <Text style={styles.shareLink}>{shareCopied ? c.linkCopied : c.shareButton}</Text>
                 </TouchableOpacity>
@@ -354,7 +353,7 @@ export default function BestDatesCheckScreen() {
               <View style={styles.tierRow}>
                 <TierBadge tierInfo={result.tierInfo} language={language} score={result.score} />
                 {hijri && (
-                  <Text style={[styles.hijriText, { color: colors.textSecondary }]}>
+                  <Text style={[styles.hijriText, { color: DarkTheme.textSecondary }]}>
                     {c.hijriDate}: {hijri.day} {hijri.monthName[language === 'ar' ? 'ar' : language]} ({hijri.monthName.wolof}) {hijri.year} {c.hijriEra}
                   </Text>
                 )}
@@ -362,34 +361,34 @@ export default function BestDatesCheckScreen() {
 
               {sunnahBadges.length > 0 && (
                 <View>
-                  <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.sunnahBadge}</Text>
+                  <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.sunnahBadge}</Text>
                   <BadgePills badges={sunnahBadges} language={language} />
                 </View>
               )}
               {urfBadge && (
                 <View>
-                  <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.urfLabel}</Text>
+                  <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.urfLabel}</Text>
                   <UrfBadgeView badge={urfBadge} language={language} />
                 </View>
               )}
               {travelBadges.length > 0 && (
                 <View>
-                  <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.sunnahBadge}</Text>
+                  <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.sunnahBadge}</Text>
                   <BadgePills badges={travelBadges} language={language} />
                 </View>
               )}
               {medicalBadges.length > 0 && (
                 <View>
-                  <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.sunnahBadge}</Text>
+                  <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.sunnahBadge}</Text>
                   <BadgePills badges={medicalBadges} language={language} />
                 </View>
               )}
 
-              <View style={[styles.windowCard, { borderColor: colors.border }]}>
-                <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>
+              <View style={[styles.windowCard, { borderColor: DarkTheme.borderSubtle }]}>
+                <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>
                   {result.isLeastAfflicted ? c.leastAfflictedWindow : c.bestWindow}
                 </Text>
-                <Text style={[styles.windowTime, { color: colors.text }]}>
+                <Text style={[styles.windowTime, { color: DarkTheme.textPrimary }]}>
                   {result.bestWindow.time.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
                 </Text>
                 {degradationNote && <Text style={styles.degradationNote}>{degradationNote}</Text>}
@@ -397,19 +396,19 @@ export default function BestDatesCheckScreen() {
 
               <View>
                 <View style={styles.ruleHeaderRow}>
-                  <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.ruleBreakdown}</Text>
+                  <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.ruleBreakdown}</Text>
                   <SimpleModeToggle simple={simpleMode} onChange={setSimpleMode} language={language} />
                 </View>
-                <View style={[styles.rulesCard, { borderColor: colors.border }]}>
+                <View style={[styles.rulesCard, { borderColor: DarkTheme.borderSubtle }]}>
                   {result.rules.map((rule) => (
                     <RuleRow
                       key={rule.id}
                       rule={rule}
                       language={language}
                       simple={simpleMode}
-                      textColor={colors.text}
-                      detailColor={colors.textSecondary}
-                      borderColor={colors.border}
+                      textColor={DarkTheme.textPrimary}
+                      detailColor={DarkTheme.textSecondary}
+                      borderColor={DarkTheme.borderSubtle}
                     />
                   ))}
                 </View>
@@ -417,14 +416,14 @@ export default function BestDatesCheckScreen() {
 
               {nearestBetter.length > 0 && (
                 <View>
-                  <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.nearestBetterDates}</Text>
+                  <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.nearestBetterDates}</Text>
                   {nearestBetter.map((r) => (
                     <TouchableOpacity
                       key={r.date.toISOString()}
-                      style={[styles.nearestRow, { borderColor: colors.border }]}
+                      style={[styles.nearestRow, { borderColor: DarkTheme.borderSubtle }]}
                       onPress={() => setDateStr(toLocalDateString(r.date))}
                     >
-                      <Text style={[styles.nearestDateText, { color: colors.text }]}>
+                      <Text style={[styles.nearestDateText, { color: DarkTheme.textPrimary }]} numberOfLines={1}>
                         {r.date.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })}
                       </Text>
                       <TierBadge tierInfo={r.tierInfo} language={language} score={r.score} />
@@ -435,11 +434,11 @@ export default function BestDatesCheckScreen() {
 
               {nearestBetter.length === 0 && bestAvailable && (
                 <View>
-                  <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+                  <Text style={[styles.helperText, { color: DarkTheme.textSecondary }]}>
                     {c.noAcceptableDatesFound} {c.showingBestAvailable}
                   </Text>
-                  <View style={[styles.nearestRow, { borderColor: colors.border }]}>
-                    <Text style={[styles.nearestDateText, { color: colors.text }]}>
+                  <View style={[styles.nearestRow, { borderColor: DarkTheme.borderSubtle }]}>
+                    <Text style={[styles.nearestDateText, { color: DarkTheme.textPrimary }]} numberOfLines={1}>
                       {bestAvailable.date.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })}
                     </Text>
                     <TierBadge tierInfo={bestAvailable.tierInfo} language={language} score={bestAvailable.score} />
@@ -498,15 +497,27 @@ const styles = StyleSheet.create({
   offlineText: { color: '#f97316', fontSize: 13, flex: 1 },
   starsHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   sectionLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 },
-  shareLink: { color: '#059669', fontSize: 12, fontWeight: '700' },
-  tierRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  hijriText: { fontSize: 12 },
+  shareLink: { color: FEATURE_ACCENT, fontSize: 12, fontWeight: '700' },
+  tierRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', rowGap: 6, columnGap: 8 },
+  hijriText: { fontSize: 12, flexShrink: 1 },
   windowCard: { borderRadius: 12, borderWidth: 1, padding: 12 },
   windowTime: { fontSize: 15, fontWeight: '600' },
   degradationNote: { fontSize: 12, color: '#D97706', marginTop: 8 },
   ruleHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   rulesCard: { borderRadius: 12, borderWidth: 1, paddingHorizontal: 12 },
-  nearestRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 8 },
-  nearestDateText: { fontSize: 14, fontWeight: '600' },
+  nearestRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    rowGap: 6,
+    columnGap: 10,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 8,
+  },
+  nearestDateText: { fontSize: 14, fontWeight: '600', flexShrink: 1 },
   helperText: { fontSize: 12, marginBottom: 8 },
 });

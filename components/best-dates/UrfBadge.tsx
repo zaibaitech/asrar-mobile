@@ -7,8 +7,8 @@
  */
 
 import React, { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
-import Colors from '@/constants/Colors';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { DarkTheme } from '@/constants/DarkTheme';
 import { UiLang } from '@/services/ikhtiyaratEngine/copy';
 import { UrfBadge as UrfBadgeData } from '@/services/ikhtiyaratEngine/urf';
 
@@ -23,9 +23,7 @@ export interface UrfBadgeProps {
   language: UiLang;
 }
 
-export default function UrfBadge({ badge, language }: UrfBadgeProps) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+export default function UrfBadge({ badge, language }: Readonly<UrfBadgeProps>) {
   const [open, setOpen] = useState(false);
   const color = TONE_COLOR[badge.tone];
 
@@ -43,12 +41,12 @@ export default function UrfBadge({ badge, language }: UrfBadgeProps) {
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.overlay} onPress={() => setOpen(false)}>
-          <Pressable style={[styles.popover, { backgroundColor: colors.card }]} onPress={() => {}}>
-            <Text style={[styles.noteText, { color: colors.text }]}>
+          <Pressable style={[styles.popover, { backgroundColor: DarkTheme.cardBackground }]} onPress={() => {}}>
+            <Text style={[styles.noteText, { color: DarkTheme.textPrimary }]}>
               {badge.note[language === 'ar' ? 'ar' : language]}
             </Text>
             {language !== 'ar' && (
-              <Text style={[styles.noteArabic, { color: colors.textTertiary }]}>{badge.note.ar}</Text>
+              <Text style={[styles.noteArabic, { color: DarkTheme.textTertiary }]}>{badge.note.ar}</Text>
             )}
           </Pressable>
         </Pressable>

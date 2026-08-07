@@ -6,9 +6,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
+import { DarkTheme } from '@/constants/DarkTheme';
 import { ElectionResult, getDayDegradationNote, getMedicalBadges, getSunnahBadges, getTravelBadges, gregorianToHijri } from '@/services/ikhtiyaratEngine';
 import { getPlanetPosition } from '@/services/ikhtiyaratEngine/ephemeris';
 import { getUrfBadgeForMonth } from '@/services/ikhtiyaratEngine/urf';
@@ -26,9 +26,7 @@ export interface DetailSheetProps {
   onClose: () => void;
 }
 
-export default function DetailSheet({ result, language, onClose }: DetailSheetProps) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+export default function DetailSheet({ result, language, onClose }: Readonly<DetailSheetProps>) {
   const c = ikhtiyaratCopy[language];
   const hijri = gregorianToHijri(result.date);
 
@@ -55,59 +53,59 @@ export default function DetailSheet({ result, language, onClose }: DetailSheetPr
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable style={[styles.sheet, { backgroundColor: colors.background }]} onPress={() => {}}>
-          <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <Pressable style={[styles.sheet, { backgroundColor: DarkTheme.cardBackground }]} onPress={() => {}}>
+          <View style={[styles.header, { borderBottomColor: DarkTheme.borderSubtle }]}>
             <View style={styles.headerText}>
-              <Text style={[styles.dateTitle, { color: colors.text }]}>
+              <Text style={[styles.dateTitle, { color: DarkTheme.textPrimary }]}>
                 {result.date.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </Text>
-              <Text style={[styles.hijriSubtitle, { color: colors.textSecondary }]}>
+              <Text style={[styles.hijriSubtitle, { color: DarkTheme.textSecondary }]}>
                 {c.hijriDate}: {hijri.day} {hijri.monthName[language === 'ar' ? 'ar' : language]} ({hijri.monthName.wolof}) {hijri.year} {c.hijriEra}
               </Text>
             </View>
             <Pressable onPress={onClose} style={styles.closeButton} accessibilityLabel={c.close}>
-              <Ionicons name="close" size={20} color={colors.textSecondary} />
+              <Ionicons name="close" size={20} color={DarkTheme.textSecondary} />
             </Pressable>
           </View>
 
           <ScrollView contentContainerStyle={styles.body}>
             <View>
-              <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.starsLabel}</Text>
+              <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.starsLabel}</Text>
               <TierBadge tierInfo={result.tierInfo} language={language} score={result.score} />
             </View>
 
             {sunnahBadges.length > 0 && (
               <View>
-                <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.sunnahBadge}</Text>
+                <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.sunnahBadge}</Text>
                 <BadgePills badges={sunnahBadges} language={language} />
               </View>
             )}
 
             {urfBadge && (
               <View>
-                <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.urfLabel}</Text>
+                <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.urfLabel}</Text>
                 <UrfBadgeView badge={urfBadge} language={language} />
               </View>
             )}
 
             {travelBadges.length > 0 && (
               <View>
-                <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.sunnahBadge}</Text>
+                <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.sunnahBadge}</Text>
                 <BadgePills badges={travelBadges} language={language} />
               </View>
             )}
             {medicalBadges.length > 0 && (
               <View>
-                <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.sunnahBadge}</Text>
+                <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.sunnahBadge}</Text>
                 <BadgePills badges={medicalBadges} language={language} />
               </View>
             )}
 
-            <View style={[styles.windowCard, { borderColor: colors.border }]}>
-              <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>
+            <View style={[styles.windowCard, { borderColor: DarkTheme.borderSubtle }]}>
+              <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>
                 {result.isLeastAfflicted ? c.leastAfflictedWindow : c.bestWindow}
               </Text>
-              <Text style={[styles.windowTime, { color: colors.text }]}>
+              <Text style={[styles.windowTime, { color: DarkTheme.textPrimary }]}>
                 {result.bestWindow.time.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
               </Text>
               {degradationNote && <Text style={styles.degradationNote}>{degradationNote}</Text>}
@@ -115,19 +113,19 @@ export default function DetailSheet({ result, language, onClose }: DetailSheetPr
 
             <View>
               <View style={styles.ruleHeaderRow}>
-                <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.ruleBreakdown}</Text>
+                <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.ruleBreakdown}</Text>
                 <SimpleModeToggle simple={simpleMode} onChange={setSimpleMode} language={language} />
               </View>
-              <View style={[styles.rulesCard, { borderColor: colors.border }]}>
+              <View style={[styles.rulesCard, { borderColor: DarkTheme.borderSubtle }]}>
                 {result.rules.map((rule) => (
                   <RuleRow
                     key={rule.id}
                     rule={rule}
                     language={language}
                     simple={simpleMode}
-                    textColor={colors.text}
-                    detailColor={colors.textSecondary}
-                    borderColor={colors.border}
+                    textColor={DarkTheme.textPrimary}
+                    detailColor={DarkTheme.textSecondary}
+                    borderColor={DarkTheme.borderSubtle}
                   />
                 ))}
               </View>

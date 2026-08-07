@@ -13,7 +13,7 @@ import DetailSheet from '@/components/best-dates/DetailSheet';
 import ElectionTypeDropdown from '@/components/best-dates/ElectionTypeDropdown';
 import TierBadge from '@/components/best-dates/TierBadge';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
-import Colors from '@/constants/Colors';
+import { DarkTheme } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   businessElectionConfig,
@@ -41,9 +41,10 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from 'react-native';
+
+const FEATURE_ACCENT = '#059669';
 
 const CONFIG_BY_ELECTION_TYPE: Record<ElectionType, typeof marriageElectionConfig> = {
   marriage: marriageElectionConfig,
@@ -78,8 +79,6 @@ function toUiLang(language: 'en' | 'fr' | 'ar'): UiLang {
 export default function BestDatesScanScreen() {
   const { language: appLanguage, setLanguage } = useLanguage();
   const language = toUiLang(appLanguage);
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
   const c = ikhtiyaratCopy[language];
   const params = useLocalSearchParams<{ electionType?: string }>();
 
@@ -179,7 +178,7 @@ export default function BestDatesScanScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: DarkTheme.screenBackground }]}>
         <ResponsiveAppHeader
           currentLanguage={appLanguage === 'en' ? 'EN' : appLanguage === 'fr' ? 'FR' : 'AR'}
           onLanguageChange={(lang) => setLanguage(lang.toLowerCase() as 'en' | 'fr' | 'ar')}
@@ -188,12 +187,12 @@ export default function BestDatesScanScreen() {
         />
 
         <View style={styles.infoBar}>
-          <Text style={[styles.screenTitle, { color: colors.text }]}>{c.tabScan}</Text>
+          <Text style={[styles.screenTitle, { color: DarkTheme.textPrimary }]}>{c.tabScan}</Text>
         </View>
 
         <View style={styles.modeTabRow}>
           <TouchableOpacity
-            style={[styles.modeTab, { borderColor: colors.border }]}
+            style={[styles.modeTab, { borderColor: DarkTheme.borderSubtle }]}
             onPress={() =>
               router.replace({
                 pathname: '/best-dates-check',
@@ -201,10 +200,10 @@ export default function BestDatesScanScreen() {
               })
             }
           >
-            <Text style={[styles.modeTabText, { color: colors.textSecondary }]}>{c.tabCheck}</Text>
+            <Text style={[styles.modeTabText, { color: DarkTheme.textSecondary }]}>{c.tabCheck}</Text>
           </TouchableOpacity>
-          <View style={[styles.modeTab, styles.modeTabActive, { borderColor: '#059669' }]}>
-            <Text style={[styles.modeTabText, { color: '#059669' }]}>{c.tabScan}</Text>
+          <View style={[styles.modeTab, styles.modeTabActive, { borderColor: FEATURE_ACCENT }]}>
+            <Text style={[styles.modeTabText, { color: FEATURE_ACCENT }]}>{c.tabScan}</Text>
           </View>
         </View>
 
@@ -216,18 +215,18 @@ export default function BestDatesScanScreen() {
             label={c.electionTypeLabel}
           />
 
-          <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <View style={[styles.card, { backgroundColor: DarkTheme.cardBackground }]}>
             <View style={styles.rangeRow}>
               <View style={styles.rangeCol}>
-                <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>{c.scanRangeStart}</Text>
-                <TouchableOpacity style={[styles.dateButton, { borderColor: colors.border }]} onPress={() => setShowStartPicker(true)}>
-                  <Text style={[styles.dateButtonText, { color: colors.text }]}>{startStr}</Text>
+                <Text style={[styles.cardLabel, { color: DarkTheme.textSecondary }]}>{c.scanRangeStart}</Text>
+                <TouchableOpacity style={[styles.dateButton, { borderColor: DarkTheme.borderSubtle }]} onPress={() => setShowStartPicker(true)}>
+                  <Text style={[styles.dateButtonText, { color: DarkTheme.textPrimary }]}>{startStr}</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.rangeCol}>
-                <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>{c.scanRangeEnd}</Text>
-                <TouchableOpacity style={[styles.dateButton, { borderColor: colors.border }]} onPress={() => setShowEndPicker(true)}>
-                  <Text style={[styles.dateButtonText, { color: colors.text }]}>{endStr}</Text>
+                <Text style={[styles.cardLabel, { color: DarkTheme.textSecondary }]}>{c.scanRangeEnd}</Text>
+                <TouchableOpacity style={[styles.dateButton, { borderColor: DarkTheme.borderSubtle }]} onPress={() => setShowEndPicker(true)}>
+                  <Text style={[styles.dateButtonText, { color: DarkTheme.textPrimary }]}>{endStr}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -256,38 +255,38 @@ export default function BestDatesScanScreen() {
             )}
             {Platform.OS === 'ios' && (showStartPicker || showEndPicker) && (
               <TouchableOpacity onPress={() => { setShowStartPicker(false); setShowEndPicker(false); }}>
-                <Text style={[styles.doneText, { color: colors.primary }]}>Done</Text>
+                <Text style={[styles.doneText, { color: FEATURE_ACCENT }]}>Done</Text>
               </TouchableOpacity>
             )}
 
             {rangeError && <Text style={styles.rangeError}>{rangeError}</Text>}
 
-            <Text style={[styles.cardLabel, { color: colors.textSecondary, marginTop: 12 }]}>{c.locationLabel}</Text>
+            <Text style={[styles.cardLabel, { color: DarkTheme.textSecondary, marginTop: 12 }]}>{c.locationLabel}</Text>
             <LocationAutocomplete value={locationLabel} onChange={setLocationLabel} onSelect={handleSelectLocation} />
             <TouchableOpacity style={styles.currentLocationRow} onPress={handleUseCurrentLocation} disabled={locatingCurrent}>
               {locatingCurrent ? (
-                <ActivityIndicator size="small" color={colors.primary} />
+                <ActivityIndicator size="small" color={FEATURE_ACCENT} />
               ) : (
-                <Ionicons name="locate" size={18} color={colors.primary} />
+                <Ionicons name="locate" size={18} color={FEATURE_ACCENT} />
               )}
-              <Text style={[styles.currentLocationText, { color: colors.primary }]}>{c.useMyLocation}</Text>
+              <Text style={[styles.currentLocationText, { color: FEATURE_ACCENT }]}>{c.useMyLocation}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.scanButton, { backgroundColor: '#059669' }]} onPress={handleScan} disabled={loading}>
+            <TouchableOpacity style={[styles.scanButton, { backgroundColor: FEATURE_ACCENT }]} onPress={handleScan} disabled={loading}>
               {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.scanButtonText}>{c.scanButton}</Text>}
             </TouchableOpacity>
           </View>
 
           {topFive.length > 0 && (
-            <View style={[styles.card, { backgroundColor: colors.card }]}>
-              <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{c.topFive}</Text>
+            <View style={[styles.card, { backgroundColor: DarkTheme.cardBackground }]}>
+              <Text style={[styles.sectionLabel, { color: DarkTheme.textTertiary }]}>{c.topFive}</Text>
               {topFive.map((r) => (
                 <TouchableOpacity
                   key={r.date.toISOString()}
-                  style={[styles.top5Row, { borderColor: colors.border }]}
+                  style={[styles.top5Row, { borderColor: DarkTheme.borderSubtle }]}
                   onPress={() => setSelectedDay(r)}
                 >
-                  <Text style={[styles.top5Date, { color: colors.text }]}>
+                  <Text style={[styles.top5Date, { color: DarkTheme.textPrimary }]} numberOfLines={1}>
                     {r.date.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })}
                   </Text>
                   <TierBadge tierInfo={r.tierInfo} language={language} score={r.score} />
@@ -297,7 +296,7 @@ export default function BestDatesScanScreen() {
           )}
 
           {results.length > 0 && (
-            <View style={[styles.card, { backgroundColor: colors.card }]}>
+            <View style={[styles.card, { backgroundColor: DarkTheme.cardBackground }]}>
               <CalendarHeatmap results={results} language={language} onSelectDay={setSelectedDay} />
             </View>
           )}
@@ -340,6 +339,18 @@ const styles = StyleSheet.create({
   scanButton: { borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 14 },
   scanButtonText: { color: '#fff', fontSize: 15, fontWeight: '800' },
   sectionLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 },
-  top5Row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 8 },
-  top5Date: { fontSize: 14, fontWeight: '600' },
+  top5Row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    rowGap: 6,
+    columnGap: 10,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 8,
+  },
+  top5Date: { fontSize: 14, fontWeight: '600', flexShrink: 1 },
 });
