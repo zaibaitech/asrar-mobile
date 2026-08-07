@@ -96,6 +96,15 @@ const getModules = (t: any): (Omit<ModuleCardProps, 'onPress'> & { id: string })
     comingSoon: false,
   },
   {
+    id: 'bestDates',
+    title: t('modules.bestDates.title'),
+    titleArabic: 'الاختيارات',
+    description: t('modules.bestDates.description'),
+    icon: '⭐',
+    element: 'air',
+    comingSoon: false,
+  },
+  {
     id: 'compatibility',
     title: t('modules.compatibility.title'),
     titleArabic: 'التوافق',
@@ -425,6 +434,9 @@ export default function HomeScreen() {
         break;
       case 'guidedIstikhara':
         router.push('/istikhara-sessions');
+        break;
+      case 'bestDates':
+        router.push('/best-dates-check');
         break;
       case 'compatibility':
         router.push('/universal-compatibility');

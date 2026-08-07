@@ -25,6 +25,7 @@ export const translations = {
       zikr: "Dhikr & Wird",
       compatibility: "Compatibility",
       whoAmI: "Who Am I",
+      bestDates: "Best Dates",
       divineTiming: "Divine Timing",
       notifications: "NOTIFICATIONS",
       notificationSettings: "Notification Settings",
@@ -785,6 +786,10 @@ export const translations = {
       whoAmI: {
         title: "Who Am I",
         description: "Deep self-analysis through name numerology: element, personality, career & spiritual path",
+      },
+      bestDates: {
+        title: "Best Dates",
+        description: "Check or find astrologically favorable dates for marriage and travel",
       },
       guidedIstikhara: {
         title: "Guided Istikhārah",
@@ -10545,6 +10550,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       zikr: "Dhikr & Wird",
       compatibility: "Compatibilité",
       whoAmI: "Qui Suis-Je",
+      bestDates: "Meilleures Dates",
       divineTiming: "Moment Divin",
       notifications: "NOTIFICATIONS",
       notificationSettings: "Paramètres de Notifications",
@@ -11305,6 +11311,10 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       whoAmI: {
         title: "Qui Suis-Je",
         description: "Auto-analyse approfondie par numérologie: élément, personnalité, carrière & chemin spirituel",
+      },
+      bestDates: {
+        title: "Meilleures Dates",
+        description: "Vérifiez ou trouvez des dates astrologiquement favorables pour le mariage et le voyage",
       },
       guidedIstikhara: {
         title: "Istikharah Guidée",
@@ -21316,6 +21326,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       zikr: "الذكر والورد",
       compatibility: "التوافق",
       whoAmI: "مَن أنا",
+      bestDates: "أفضل الأوقات",
       divineTiming: "التوقيت الإلهي",
       notifications: "الإشعارات",
       notificationSettings: "إعدادات الإشعارات",
@@ -22980,6 +22991,10 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       whoAmI: {
         title: "مَن أنا",
         description: "تحليل ذاتي عميق عبر علم الحروف: العنصر والشخصية والمهنة والمسار الروحي",
+      },
+      bestDates: {
+        title: "أفضل الأوقات",
+        description: "تحقق من التواريخ المؤاتية فلكياً للزواج والسفر أو ابحث عنها",
       },
       guidedIstikhara: {
         title: "الاستخارة الموجهة",

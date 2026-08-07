@@ -131,6 +131,12 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
           icon: 'person',
           route: '/(tabs)/who-am-i',
         },
+        {
+          id: 'best-dates',
+          label: t('drawer.bestDates'),
+          icon: 'calendar',
+          route: '/best-dates-check',
+        },
         // Divine Timing hidden for v1 - screen still exists but not exposed in navigation
         // {
         //   id: 'divine-timing',

@@ -136,7 +136,9 @@
           "iosAppId": "ca-app-pub-2859699727723534~3062762399",
           "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
         }
-      ]
+      ],
+      "expo-localization",
+      "expo-web-browser"
     ],
     "locales": {
       "en": "./locales/en.json",

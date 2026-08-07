@@ -6,6 +6,7 @@ import Svg, { Circle, Defs, G, Path, Pattern, Rect, Stop, LinearGradient as SvgL
 import { ElementColors } from '../../constants/IstikharaColors';
 import { ZODIAC_SIGNS } from '../../constants/zodiacData';
 import { LUNAR_MANSIONS } from '../../data/lunarMansions';
+import { formatHijriDate } from '../../utils/hijriDate';
 
 interface IstikharaSummaryCardProps {
   result: any;
@@ -24,22 +25,6 @@ function formatGregorianDate(date: Date, language: 'en' | 'fr'): string {
     }).format(date);
   } catch {
     return date.toDateString();
-  }
-}
-
-function formatHijriDate(date: Date, language: 'en' | 'fr'): string {
-  // Best-effort: Intl Islamic calendar support varies by runtime.
-  try {
-    const locale = language === 'fr'
-      ? 'fr-FR-u-ca-islamic'
-      : 'ar-SA-u-ca-islamic';
-    return new Intl.DateTimeFormat(locale, {
-      year: 'numeric',
-      month: 'long',
-      day: '2-digit',
-    }).format(date);
-  } catch {
-    return '';
   }
 }
 
