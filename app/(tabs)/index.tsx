@@ -373,7 +373,22 @@ export default function HomeScreen() {
       loadMomentAlignment();
     }
   }, [hasProfileDOB, momentAlignment, loadMomentAlignment]);
-  
+
+  // Re-trigger moment alignment when the planetary hour rolls over so
+  // hourRulerCondition doesn't lag behind the newly displayed hour's planet
+  // (MomentAlignmentStrip guards against showing a mismatched badge, but we
+  // still want the correct data to arrive promptly rather than waiting for
+  // the next focus-throttled refresh).
+  const prevHourPlanetRef = React.useRef<string | undefined>(undefined);
+  useEffect(() => {
+    const currentHourPlanet = planetaryData?.currentHour?.planet;
+    if (!currentHourPlanet) return;
+    if (prevHourPlanetRef.current && prevHourPlanetRef.current !== currentHourPlanet) {
+      loadMomentAlignment();
+    }
+    prevHourPlanetRef.current = currentHourPlanet;
+  }, [planetaryData?.currentHour?.planet, loadMomentAlignment]);
+
   // Update countdown every minute
   useEffect(() => {
     if (!nextPrayer?.time) return;

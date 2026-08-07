@@ -7,7 +7,7 @@
  *   ✨ Excellent / ممتاز   — Sa'd (benefic): Sun, Jupiter, Venus
  *   ⚖️ Neutral  / محايد   — Variable: Moon, Mercury
  *   🌙 Prudence / تَأَنَّ  — Nahs (malefic): Saturn, Mars
- *   ⬇️ Hubūṭ   / هبوط    — Any planet in fall (overrides above)
+ *   ⬇️ Weak    / هبوط    — Any planet in fall (Hubūṭ) (overrides above)
  *
  * @module SimpleAlignmentBadge
  */
@@ -62,7 +62,7 @@ const TIER_CONFIG: Record<AlignmentTier, Omit<AlignmentBadge, 'score'>> = {
   },
   hubut: {
     tier: 'hubut',
-    label: 'Hubūṭ',
+    label: 'Weak',
     labelAr: 'هبوط',
     color: '#dc2626',
     bgColor: 'rgba(220, 38, 38, 0.15)',

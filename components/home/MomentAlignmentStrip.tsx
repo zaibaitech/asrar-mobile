@@ -63,8 +63,13 @@ export function MomentAlignmentStrip({
   const { badgeColor, badgeBg, badgeIcon, badgeLabel } = React.useMemo(() => {
     if (currentPlanet) {
       const userRuler = userBurjIndex ? getRulingPlanetFromBurj(userBurjIndex) : undefined;
-      // Use full dignity score from planetary condition if available
-      const dignityScore = hourRulerCondition?.dignity?.score;
+      // Only use the dignity score if it belongs to the currently displayed hour's
+      // planet — hourRulerCondition is fetched separately/async and can still be for
+      // the previous hour right after the planetary hour rolls over.
+      const dignityScore =
+        hourRulerCondition?.planet === currentPlanet
+          ? hourRulerCondition?.dignity?.score
+          : undefined;
       const badge = getAlignmentBadge(currentPlanet, userRuler, dignityScore);
       const labelKey = getAlignmentLabelKey(badge.tier);
       return {
@@ -75,7 +80,7 @@ export function MomentAlignmentStrip({
       };
     }
     return { badgeColor: undefined, badgeBg: undefined, badgeIcon: undefined, badgeLabel: undefined };
-  }, [currentPlanet, userBurjIndex, hourRulerCondition?.dignity?.score, t]);
+  }, [currentPlanet, userBurjIndex, hourRulerCondition?.planet, hourRulerCondition?.dignity?.score, t]);
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

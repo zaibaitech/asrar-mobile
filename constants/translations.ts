@@ -1258,7 +1258,7 @@ export const translations = {
           excellent: "Excellent",
           neutral: "Neutral",
           prudence: "Prudence",
-          hubut: "Hubūṭ",
+          hubut: "Weak",
         },
         hint: {
           act: "Sun, Jupiter, or Venus hour — proceed with confidence",
@@ -11785,7 +11785,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           excellent: "Excellent",
           neutral: "Neutre",
           prudence: "Prudence",
-          hubut: "Hubūṭ",
+          hubut: "Faible",
         },
         hint: {
           act: "Heure de Soleil, Jupiter ou Vénus — procédez avec confiance",
