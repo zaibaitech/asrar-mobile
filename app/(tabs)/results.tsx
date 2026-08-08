@@ -90,7 +90,6 @@ function getTabKey(routeName: string, language: string): string {
     'zodiac stones': ['zodiac stones', 'الأحجار', 'pierres'],
     'career': ['career', 'المهنة', 'carrière'],
     'blessed day': ['blessed day', 'اليوم المبارك', 'jour béni'],
-    'sadaqah': ['sadaqah', 'الصدقة', 'sadaqah'],
   };
   
   const lowerRoute = routeName.toLowerCase();
@@ -376,23 +375,6 @@ export default function IstikharaResults() {
           )}
         </Tab.Screen>
 
-        {/* PREMIUM: Sadaqah - Charity guidance */}
-        <Tab.Screen name={language === 'en' ? 'Sadaqah' : language === 'fr' ? 'Sadaqah' : 'الصدقة'}>
-          {() => (
-            <PremiumTabWrapper
-              featureId="spiritualGuidance"
-              title={language === 'en' ? 'Recommended Sadaqah' : 
-                     language === 'fr' ? 'Sadaqah Recommandé' : 
-                     'الصدقة الموصى بها'}
-              description={language === 'en' ? 'Personalized charity practices for blessing and spiritual protection' : 
-                          language === 'fr' ? 'Pratiques de charité personnalisées pour la bénédiction et la protection spirituelle' : 
-                          'ممارسات الصدقة الشخصية للبركة والحماية الروحية'}
-              icon="🤲"
-            >
-              <SadaqahTab data={data} elementColor={elementColor} />
-            </PremiumTabWrapper>
-          )}
-        </Tab.Screen>
       </Tab.Navigator>
 
       {/* Ad Banner */}

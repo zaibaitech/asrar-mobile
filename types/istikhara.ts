@@ -36,6 +36,7 @@ export interface IstikharaData {
   burujProfile: BurujProfile;
   repetitionCount: number;
   birthProfile?: BirthProfile;
+  calculationMethod?: 'name' | 'birthdate';
 }
 
 export interface IstikharaResponse {

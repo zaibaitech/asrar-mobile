@@ -1,9 +1,12 @@
+import { getZodiacSadaqah, type ZodiacSadaqahListItem } from '../../../data/zodiacSadaqahData';
 import * as Haptics from 'expo-haptics';
+import * as Linking from 'expo-linking';
 import {
   ChevronDown,
   ChevronUp,
   Clock,
   Coins,
+  ExternalLink,
   Gift,
   Heart,
   Info,
@@ -87,14 +90,22 @@ export default function SadaqahTab({ data, elementColor }: SadaqahTabProps) {
   const accentColor = elementColor || colors.accent;
   const sadaqah = profile.sadaqah;
 
-  // Helper to get text in current language from BilingualText (only en/fr supported)
-  const getText = (text: { en: string; fr: string }) => {
+  // DOB (birthdate) calculations use zodiac-based sadaqah guidance instead of
+  // the name-based buruj sadaqah data. Name-based results are unaffected.
+  const dobEntry = data.calculationMethod === 'birthdate'
+    ? getZodiacSadaqah(data.birthProfile?.sunSign?.burjEn)
+    : null;
+
+  // Helper to get text in current language (ar/fr supported, falls back to en)
+  const getText = (text: { en: string; fr: string; ar?: string }) => {
+    if (language === 'ar' && text.ar) return text.ar;
     if (language === 'fr' && text.fr) return text.fr;
     return text.en;
   };
 
   // Helper to get array in current language
-  const getArray = (arr: { en: string[]; fr: string[] }) => {
+  const getArray = (arr: { en: string[]; fr: string[]; ar?: string[] }) => {
+    if (language === 'ar' && arr.ar) return arr.ar;
     if (language === 'fr' && arr.fr) return arr.fr;
     return arr.en;
   };
@@ -110,7 +121,7 @@ export default function SadaqahTab({ data, elementColor }: SadaqahTabProps) {
     shadowColor: accentColor,
   };
 
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['monthly']));
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['monthly', 'general', 'specific']));
 
   const toggleSection = async (section: string) => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -124,6 +135,26 @@ export default function SadaqahTab({ data, elementColor }: SadaqahTabProps) {
       return newSet;
     });
   };
+
+  const renderZodiacItem = (item: ZodiacSadaqahListItem, idx: number) => (
+    <View style={styles.subsection} key={idx}>
+      <Text style={[styles.contentText, styles.zodiacItemTitle]}>
+        {idx + 1}. {getText(item.title)}
+      </Text>
+      <Text style={styles.contentText}>{getText(item.lead)}</Text>
+      {item.bullets && getArray(item.bullets).length > 0 && (
+        <View style={styles.listContainer}>
+          {getArray(item.bullets).map((bullet, bulletIdx) => (
+            <View key={bulletIdx} style={styles.listItem}>
+              <View style={[styles.listBullet, { backgroundColor: accentColor }]} />
+              <Text style={styles.listText}>{bullet}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+      {item.after && <Text style={styles.contentText}>{getText(item.after)}</Text>}
+    </View>
+  );
 
   return (
     <ScrollView 
@@ -145,6 +176,197 @@ export default function SadaqahTab({ data, elementColor }: SadaqahTabProps) {
         </Text>
       </View>
 
+      {dobEntry ? (
+        <>
+          {/* Sign Header */}
+          <PatternCard style={[styles.card, cardSurface]}>
+            <View style={styles.cardHeader}>
+              <Sparkles size={20} color={accentColor} />
+              <Text style={styles.cardTitle}>
+                {dobEntry.transliteration} — {dobEntry.signEn} ({dobEntry.signArabic})
+              </Text>
+            </View>
+            {dobEntry.rulingPlanet && (
+              <View style={[styles.infoBox, { backgroundColor: withAlpha(accentColor, 0.08), borderColor: withAlpha(accentColor, 0.14), borderWidth: 1 }]}>
+                <Info size={16} color={accentColor} />
+                <Text style={styles.infoText}>
+                  {(language === 'ar' ? 'الكوكب الحاكم: ' : language === 'fr' ? 'Planète régente : ' : 'Ruling Planet: ') + getText(dobEntry.rulingPlanet)}
+                </Text>
+              </View>
+            )}
+            {dobEntry.intro && (
+              <Text style={[styles.contentText, { marginTop: Spacing.sm }]}>{getText(dobEntry.intro)}</Text>
+            )}
+          </PatternCard>
+
+          {/* General Forms of Sadaqah (only present for some signs) */}
+          {dobEntry.generalForms && dobEntry.generalForms.length > 0 && (
+            <TouchableOpacity activeOpacity={0.9} onPress={() => toggleSection('general')}>
+              <PatternCard style={[styles.card, raisedSurface]}>
+                <View style={styles.collapsibleHeader}>
+                  <View style={styles.cardHeader}>
+                    <Gift size={20} color={accentColor} />
+                    <Text style={styles.cardTitle}>
+                      {language === 'ar' ? 'أشكال الصدقة العامة' : language === 'fr' ? 'Formes Générales de Sadaqah' : 'General Forms of Sadaqah'}
+                    </Text>
+                  </View>
+                  {expandedSections.has('general') ? (
+                    <ChevronUp size={20} color={accentColor} />
+                  ) : (
+                    <ChevronDown size={20} color={accentColor} />
+                  )}
+                </View>
+                {expandedSections.has('general') && (
+                  <View style={styles.sectionContent}>
+                    {dobEntry.generalForms.map((item, idx) => renderZodiacItem(item, idx))}
+                  </View>
+                )}
+              </PatternCard>
+            </TouchableOpacity>
+          )}
+
+          {/* Specific Sadaqah for this sign */}
+          <TouchableOpacity activeOpacity={0.9} onPress={() => toggleSection('specific')}>
+            <PatternCard style={[styles.card, cardSurface, { borderLeftWidth: Borders.accent, borderLeftColor: accentColor }]}>
+              <View style={styles.collapsibleHeader}>
+                <View style={styles.cardHeader}>
+                  <Heart size={20} color={accentColor} />
+                  <Text style={styles.cardTitle}>
+                    {language === 'ar'
+                      ? `الصدقة الخاصة بـ ${dobEntry.signArabic}`
+                      : (language === 'fr' ? 'Sadaqah Spécifique pour ' : 'Specific Sadaqah for ') + dobEntry.signEn}
+                  </Text>
+                </View>
+                {expandedSections.has('specific') ? (
+                  <ChevronUp size={20} color={accentColor} />
+                ) : (
+                  <ChevronDown size={20} color={accentColor} />
+                )}
+              </View>
+              {expandedSections.has('specific') && (
+                <View style={styles.sectionContent}>
+                  {dobEntry.specific.map((item, idx) => renderZodiacItem(item, idx))}
+                </View>
+              )}
+            </PatternCard>
+          </TouchableOpacity>
+
+          {/* Timing, Secret Sadaqah & Summary */}
+          {(dobEntry.timing || dobEntry.secret || (dobEntry.summary && dobEntry.summary.en.length > 0) || dobEntry.closingNote) && (
+            <TouchableOpacity activeOpacity={0.9} onPress={() => toggleSection('guidance')}>
+              <PatternCard style={[styles.card, raisedSurface]}>
+                <View style={styles.collapsibleHeader}>
+                  <View style={styles.cardHeader}>
+                    <Clock size={20} color={accentColor} />
+                    <Text style={styles.cardTitle}>
+                      {language === 'ar' ? 'التوقيت والإرشادات' : language === 'fr' ? 'Timing et Conseils' : 'Timing & Guidance'}
+                    </Text>
+                  </View>
+                  {expandedSections.has('guidance') ? (
+                    <ChevronUp size={20} color={accentColor} />
+                  ) : (
+                    <ChevronDown size={20} color={accentColor} />
+                  )}
+                </View>
+
+                {expandedSections.has('guidance') && (
+                  <View style={styles.sectionContent}>
+                    {dobEntry.timing && (
+                      <View style={styles.subsection}>
+                        <View style={styles.subsectionHeader}>
+                          <Clock size={16} color={accentColor} />
+                          <Text style={styles.subsectionTitle}>{getText(dobEntry.timing.title)}</Text>
+                        </View>
+                        <View style={styles.listContainer}>
+                          {getArray(dobEntry.timing.lines).map((line, i) => (
+                            <View key={i} style={styles.listItem}>
+                              <View style={[styles.listBullet, { backgroundColor: accentColor }]} />
+                              <Text style={styles.listText}>{line}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    )}
+
+                    {dobEntry.secret && (
+                      <View style={[styles.highlightBox, { backgroundColor: withAlpha(accentColor, 0.10), borderColor: withAlpha(accentColor, 0.18), borderWidth: 1 }]}>
+                        <View style={styles.subsectionHeader}>
+                          <Sparkles size={16} color={accentColor} />
+                          <Text style={styles.subsectionTitle}>{getText(dobEntry.secret.title)}</Text>
+                        </View>
+                        {dobEntry.secret.intro && (
+                          <Text style={styles.contentText}>{getText(dobEntry.secret.intro)}</Text>
+                        )}
+                        {dobEntry.secret.bullets && getArray(dobEntry.secret.bullets).length > 0 && (
+                          <View style={styles.listContainer}>
+                            {getArray(dobEntry.secret.bullets).map((b, i) => (
+                              <View key={i} style={styles.listItem}>
+                                <View style={[styles.listBullet, { backgroundColor: accentColor }]} />
+                                <Text style={styles.listText}>{b}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        )}
+                        {dobEntry.secret.note && (
+                          <Text style={styles.contentText}>{getText(dobEntry.secret.note)}</Text>
+                        )}
+                      </View>
+                    )}
+
+                    {dobEntry.summary && getArray(dobEntry.summary).length > 0 && (
+                      <View style={styles.subsection}>
+                        <View style={styles.subsectionHeader}>
+                          <TrendingUp size={16} color={accentColor} />
+                          <Text style={styles.subsectionTitle}>
+                            {language === 'ar' ? 'الملخص' : language === 'fr' ? 'Résumé' : 'Summary'}
+                          </Text>
+                        </View>
+                        <View style={styles.listContainer}>
+                          {getArray(dobEntry.summary).map((s, i) => (
+                            <View key={i} style={styles.listItem}>
+                              <View style={[styles.listBullet, { backgroundColor: accentColor }]} />
+                              <Text style={styles.listText}>{s}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    )}
+
+                    {dobEntry.closingNote && (
+                      <View style={[styles.infoBox, { backgroundColor: withAlpha(accentColor, 0.08), borderColor: withAlpha(accentColor, 0.14), borderWidth: 1 }]}>
+                        <Info size={16} color={accentColor} />
+                        <Text style={styles.infoText}>{getText(dobEntry.closingNote)}</Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+              </PatternCard>
+            </TouchableOpacity>
+          )}
+
+          {/* Attribution footer */}
+          <View style={styles.attributionFooter}>
+            <Text style={styles.attributionText}>
+              {(language === 'ar' ? 'بإذن من: ' : language === 'fr' ? 'Autorisé par : ' : 'Authorized by: ') + dobEntry.authorizedBy}
+            </Text>
+            {dobEntry.videoUrl && (
+              <TouchableOpacity
+                onPress={async () => {
+                  await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  Linking.openURL(dobEntry.videoUrl!);
+                }}
+                style={styles.attributionLink}
+              >
+                <ExternalLink size={14} color={accentColor} />
+                <Text style={[styles.attributionLinkText, { color: accentColor }]}>
+                  {language === 'ar' ? 'شاهد باللغة الولوفية' : language === 'fr' ? 'Regarder en Wolof' : 'Watch in Wolof language'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </>
+      ) : (
+        <>
       {/* Monthly Sadaqah Section */}
       <TouchableOpacity
         activeOpacity={0.9}
@@ -382,6 +604,8 @@ export default function SadaqahTab({ data, elementColor }: SadaqahTabProps) {
           )}
         </PatternCard>
       </TouchableOpacity>
+        </>
+      )}
     </ScrollView>
   );
 }
@@ -523,5 +747,28 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     borderRadius: Borders.radiusMd,
     gap: Spacing.sm,
+  },
+  zodiacItemTitle: {
+    fontWeight: Typography.weightBold,
+    color: DarkTheme.textPrimary,
+  },
+  attributionFooter: {
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingVertical: Spacing.md,
+  },
+  attributionText: {
+    fontSize: Typography.caption,
+    color: DarkTheme.textTertiary,
+    fontStyle: 'italic',
+  },
+  attributionLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  attributionLinkText: {
+    fontSize: Typography.caption,
+    fontWeight: Typography.weightSemibold,
   },
 });
