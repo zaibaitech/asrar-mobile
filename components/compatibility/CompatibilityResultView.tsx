@@ -33,7 +33,9 @@ export function CompatibilityResultView({ result, language }: CompatibilityResul
 
 function PersonPersonResultView({ result, language }: { result: PersonPersonCompatibility; language: 'en' | 'ar' }) {
   const { person1, person2, relationshipCompatibility } = result;
-  const rc = relationshipCompatibility;
+  // relationshipCompatibility is only absent when either person used a DOB
+  // input; this legacy view doesn't handle that case.
+  const rc = relationshipCompatibility!;
   const methods = rc.methods;
 
   return (

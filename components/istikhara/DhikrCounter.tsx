@@ -354,7 +354,7 @@ export function DhikrCounter({
     
     try {
       await Sharing.shareAsync('data:text/plain;base64,' + btoa(shareText), {
-        dialogTitle: 'Share Progress'
+        dialogTitle: language === 'en' ? 'Share Progress' : 'Partager la Progression'
       });
     } catch (error) {
       await handleCopy(shareText, 'share');

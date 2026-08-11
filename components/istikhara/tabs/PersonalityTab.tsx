@@ -81,7 +81,7 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
   const cardBgStrong = `${accentColor}1F`;
   const glowBg = `${accentColor}1A`;
   const zodiac = getZodiacSign(data.burujRemainder);
-  const personality = profile.personality?.[language as 'en' | 'fr'] || profile.personality?.en;
+  const personality = profile.personality?.[language as 'en' | 'fr' | 'ar'] || profile.personality?.en;
 
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['temperament']));
 
@@ -102,61 +102,61 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
     {
       key: 'temperament',
       icon: <Brain size={24} color={accentColor} />,
-      label: language === 'en' ? 'Temperament' : 'Tempérament',
+      label: language === 'ar' ? 'المزاج' : language === 'en' ? 'Temperament' : 'Tempérament',
       color: accentColor,
     },
     {
       key: 'communication',
       icon: <MessageCircle size={24} color={accentColor} />,
-      label: language === 'en' ? 'Communication Style' : 'Style de Communication',
+      label: language === 'ar' ? 'أسلوب التواصل' : language === 'en' ? 'Communication Style' : 'Style de Communication',
       color: accentColor,
     },
     {
       key: 'anger',
       icon: <AlertCircle size={24} color={accentColor} />,
-      label: language === 'en' ? 'Anger Expression' : 'Expression de la Colère',
+      label: language === 'ar' ? 'التعبير عن الغضب' : language === 'en' ? 'Anger Expression' : 'Expression de la Colère',
       color: accentColor,
     },
     {
       key: 'social_loved',
       icon: <Heart size={24} color={accentColor} />,
-      label: language === 'en' ? 'Social Strengths' : 'Forces Sociales',
+      label: language === 'ar' ? 'نقاط القوة الاجتماعية' : language === 'en' ? 'Social Strengths' : 'Forces Sociales',
       color: accentColor,
     },
     {
       key: 'social_challenge',
       icon: <Users size={24} color={accentColor} />,
-      label: language === 'en' ? 'Relationship Dynamics' : 'Dynamiques Relationnelles',
+      label: language === 'ar' ? 'ديناميكيات العلاقات' : language === 'en' ? 'Relationship Dynamics' : 'Dynamiques Relationnelles',
       color: accentColor,
     },
     {
       key: 'social_attraction',
       icon: <Star size={24} color={accentColor} />,
-      label: language === 'en' ? 'Natural Magnetism' : 'Magnétisme Naturel',
+      label: language === 'ar' ? 'الجاذبية الطبيعية' : language === 'en' ? 'Natural Magnetism' : 'Magnétisme Naturel',
       color: accentColor,
     },
     {
       key: 'dreams',
       icon: <Eye size={24} color={accentColor} />,
-      label: language === 'en' ? 'Dream Patterns' : 'Motifs de Rêve',
+      label: language === 'ar' ? 'أنماط الأحلام' : language === 'en' ? 'Dream Patterns' : 'Motifs de Rêve',
       color: accentColor,
     },
     {
       key: 'life_blessing',
       icon: <Shield size={24} color={accentColor} />,
-      label: language === 'en' ? 'Life Blessings' : 'Bénédictions de Vie',
+      label: language === 'ar' ? 'بركات الحياة' : language === 'en' ? 'Life Blessings' : 'Bénédictions de Vie',
       color: accentColor,
     },
     {
       key: 'divine_support',
       icon: <Sparkles size={24} color={accentColor} />,
-      label: language === 'en' ? 'Divine Support' : 'Soutien Divin',
+      label: language === 'ar' ? 'الدعم الإلهي' : language === 'en' ? 'Divine Support' : 'Soutien Divin',
       color: accentColor,
     },
     {
       key: 'challenge',
       icon: <TrendingUp size={24} color={accentColor} />,
-      label: language === 'en' ? 'Life Challenges' : 'Défis de Vie',
+      label: language === 'ar' ? 'تحديات الحياة' : language === 'en' ? 'Life Challenges' : 'Défis de Vie',
       color: accentColor,
     },
   ];
@@ -172,12 +172,14 @@ export default function PersonalityTab({ data, elementColor }: PersonalityTabPro
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>
-          {language === 'en' ? 'Personality Profile' : 'Profil de Personnalité'}
+          {language === 'ar' ? 'الملف الشخصي' : language === 'en' ? 'Personality Profile' : 'Profil de Personnalité'}
         </Text>
         <Text style={styles.subtitle}>
-          {language === 'en' 
-            ? 'Deep insights into your character and nature' 
-            : 'Aperçus profonds de votre caractère et nature'}
+          {language === 'ar'
+            ? 'رؤى عميقة حول طبعك وشخصيتك'
+            : language === 'en'
+              ? 'Deep insights into your character and nature'
+              : 'Aperçus profonds de votre caractère et nature'}
         </Text>
       </View>
 

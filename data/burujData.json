@@ -36,12 +36,26 @@
           "life_blessing": "Généralement accordé une vie remarquablement longue et une vitalité qui perdure",
           "divine_support": "Reçoit une protection divine dans les questions de subsistance",
           "challenge": "Peut connaître la douleur de la mortalité infantile ou des enfants ayant des difficultés maritales"
+        },
+        "ar": {
+          "temperament": "بطيء الغضب، لكنه ينفجر عند الاستفزاز — يستحيل تهدئته بعد اشتعاله",
+          "communication": "يصبح الكلام قاسيًا وجارحًا جدًا عند الغضب، كلمات كالنار",
+          "anger": "يحتاج وقتًا ليُستفَز، لكنه بعد الغضب يصبح قوة لا تُوقَف",
+          "social_loved": "محبوب ومحترم بعمق من الغرباء والجمهور العام",
+          "social_challenge": "يواجه صعوبة في الحفاظ على الانسجام في العلاقات الأسرية القريبة رغم بذل الجهد",
+          "social_attraction": "ينجذب أفراد العائلة الممتدة وغير الأقارب طبيعيًا إلى دفئه",
+          "social_unpopular": "قد يواجه سوء فهم من العائلة المباشرة التي لا ترى شخصيته العامة",
+          "dreams": "قد يرى النار أحيانًا في المنام، وإن كان أقل تكرارًا من رؤية العناصر الأخرى لرموزها",
+          "life_blessing": "يُمنح عادةً حياة طويلة بشكل ملحوظ وحيوية تدوم رغم التحديات",
+          "divine_support": "يحظى بحماية إلهية في أمور الرزق والمعيشة",
+          "challenge": "قد يختبر ألم وفاة الأبناء أو مواجهتهم صعوبات في الزواج"
         }
       },
       "career": {
         "traditional": {
           "en": "Livestock trading, fashion and clothing business, fruit wholesaling (sell wholesale for quick turnover to prevent spoilage)",
-          "fr": "Commerce de bétail, entreprise de mode et vêtements, vente en gros de fruits (vendre en gros pour rotation rapide afin d'éviter la détérioration)"
+          "fr": "Commerce de bétail, entreprise de mode et vêtements, vente en gros de fruits (vendre en gros pour rotation rapide afin d'éviter la détérioration)",
+          "ar": "تجارة المواشي، أعمال الأزياء والملابس، بيع الفواكه بالجملة (بيع بالجملة لتصريف سريع يمنع التلف)"
         },
         "modern_recommended": {
           "en": [
@@ -139,27 +153,79 @@
                 "Réseaux de gros de produits"
               ]
             }
+          ],
+          "ar": [
+            {
+              "category": "الأزياء والملابس",
+              "icon": "👕",
+              "items": [
+                "منصات التجارة الإلكترونية للملابس",
+                "متاجر الأزياء بالتجزئة",
+                "تصنيع المنسوجات",
+                "تطوير علامات الملابس التجارية",
+                "توزيع الأزياء بالجملة",
+                "خدمات الخياطة المخصصة"
+              ]
+            },
+            {
+              "category": "الطعام والضيافة",
+              "icon": "🍽️",
+              "items": [
+                "امتلاك المطاعم",
+                "خدمات تقديم الطعام",
+                "منصات توصيل الطعام",
+                "مشاريع من المزرعة إلى المائدة",
+                "أسواق الأغذية الطازجة",
+                "مفاهيم المطاعم السريعة غير الرسمية"
+              ]
+            },
+            {
+              "category": "التجارة الزراعية",
+              "icon": "🐄",
+              "items": [
+                "تجارة سلع المواشي",
+                "عقود الحبوب الآجلة والسلع",
+                "سلاسل التوريد الزراعية",
+                "بيع مستلزمات المطاعم بالجملة",
+                "تصنيع وتوزيع اللحوم"
+              ]
+            },
+            {
+              "category": "لوجستيات السلع سريعة التلف",
+              "icon": "📦",
+              "items": [
+                "توزيع السلع الطازجة",
+                "لوجستيات سلسلة التبريد",
+                "إدارة المخزون سريع الدوران",
+                "بيع المنتجات الحساسة للوقت",
+                "شبكات بيع المحاصيل بالجملة"
+              ]
+            }
           ]
         },
         "avoid": {
           "traditional": {
             "en": "None specified - Fire element has freedom in career choices",
-            "fr": "Aucun spécifié - L'élément Feu a la liberté dans les choix de carrière"
+            "fr": "Aucun spécifié - L'élément Feu a la liberté dans les choix de carrière",
+            "ar": "لا يوجد تحديد - يتمتع عنصر النار بحرية في الخيارات المهنية"
           },
           "modern": {
             "en": "Slow-moving inventory, long-term storage businesses, or careers requiring extreme patience",
-            "fr": "Inventaire à mouvement lent, entreprises de stockage à long terme, ou carrières nécessitant une patience extrême"
+            "fr": "Inventaire à mouvement lent, entreprises de stockage à long terme, ou carrières nécessitant une patience extrême",
+            "ar": "المخزون بطيء الحركة، أعمال التخزين طويلة الأمد، أو المهن التي تتطلب صبرًا شديدًا"
           }
         },
         "principle": {
           "en": "Quick turnover, fresh goods, dynamic movement, and energetic action align perfectly with your fiery nature and passionate energy",
-          "fr": "Rotation rapide, produits frais, mouvement dynamique et action énergique s'alignent parfaitement avec votre nature ardente et votre énergie passionnée"
+          "fr": "Rotation rapide, produits frais, mouvement dynamique et action énergique s'alignent parfaitement avec votre nature ardente et votre énergie passionnée",
+          "ar": "يتوافق التصريف السريع والسلع الطازجة والحركة الديناميكية والفعل النشيط تمامًا مع طبيعتك النارية وطاقتك الشغوفة"
         }
       },
       "blessed_day": {
         "day": {
           "en": "Tuesday",
-          "fr": "Mardi"
+          "fr": "Mardi",
+          "ar": "الثلاثاء"
         },
         "day_number": 2,
         "best_for": {
@@ -180,6 +246,15 @@
             "Signer des contrats importants",
             "Lancer de nouvelles initiatives",
             "Affronter les défis de front"
+          ],
+          "ar": [
+            "بدء مشاريع وأعمال تجارية جديدة",
+            "اجتماعات مهمة مع شركاء محتملين",
+            "اتخاذ قرارات حياتية حاسمة",
+            "بدء رحلة سفر للعمل أو المتعة",
+            "توقيع عقود مهمة",
+            "إطلاق مبادرات جديدة",
+            "مواجهة التحديات بشكل مباشر"
           ]
         },
         "special_notes": {
@@ -192,6 +267,11 @@
             "L'énergie de Mars culmine ce jour, amplifiant votre feu naturel",
             "Votre charisme et pouvoir de persuasion sont à leur maximum",
             "Le soutien divin coule le plus librement les mardis"
+          ],
+          "ar": [
+            "تبلغ طاقة المريخ ذروتها في هذا اليوم، مما يضخّم نارك الطبيعية",
+            "كاريزمتك وقدرتك على الإقناع في أقوى حالاتهما",
+            "يتدفق الدعم الإلهي بحرية أكبر يوم الثلاثاء"
           ]
         }
       },
@@ -199,19 +279,23 @@
         "monthly": {
           "traditional": {
             "en": "Beef (cow meat) - shared with those in need",
-            "fr": "Viande de bœuf - partagée avec les nécessiteux"
+            "fr": "Viande de bœuf - partagée avec les nécessiteux",
+            "ar": "لحم البقر - يُشارَك مع المحتاجين"
           },
           "frequency": {
             "en": "Every 1-2 months consistently",
-            "fr": "Tous les 1-2 mois de manière cohérente"
+            "fr": "Tous les 1-2 mois de manière cohérente",
+            "ar": "كل شهر إلى شهرين بانتظام"
           },
           "context": {
             "en": "Whether in ease or difficulty, prosperity or hardship - consistency is key",
-            "fr": "Que ce soit dans l'aisance ou la difficulté, la prospérité ou l'épreuve - la cohérence est essentielle"
+            "fr": "Que ce soit dans l'aisance ou la difficulté, la prospérité ou l'épreuve - la cohérence est essentielle",
+            "ar": "سواء في اليسر أو العسر، الرخاء أو الشدة - الاستمرارية هي المفتاح"
           },
           "purpose": {
             "en": "To balance your fiery ṭabʿ, maintain spiritual equilibrium, cool excessive heat, and attract divine blessings",
-            "fr": "Pour équilibrer votre ṭabʿ ardent, maintenir l'équilibre spirituel, refroidir la chaleur excessive et attirer les bénédictions divines"
+            "fr": "Pour équilibrer votre ṭabʿ ardent, maintenir l'équilibre spirituel, refroidir la chaleur excessive et attirer les bénédictions divines",
+            "ar": "لموازنة طبعك الناري، والحفاظ على التوازن الروحي، وتهدئة الحرارة الزائدة، وجلب البركات الإلهية"
           },
           "modern_alternatives": {
             "en": [
@@ -229,13 +313,22 @@
               "Soutenir les organisations fournissant des repas",
               "Organiser des dîners communautaires avec des plats de viande",
               "Parrainer des repas dans les mosquées ou centres communautaires"
+            ],
+            "ar": [
+              "مشاركة وجبات لحم البقر مع الأسر المحتاجة",
+              "التبرع لبنوك الطعام المتخصصة بالبروتين",
+              "إطعام الجياع في مطابخ الطعام الخيرية",
+              "دعم المنظمات التي توفر الوجبات",
+              "استضافة عشاء مجتمعي بأطباق اللحوم",
+              "رعاية وجبات في المساجد أو المراكز المجتمعية"
             ]
           }
         },
         "lifetime": {
           "traditional": {
             "en": "One lamb without horns - a sacred once-in-lifetime offering",
-            "fr": "Un agneau sans cornes - une offrande sacrée unique dans la vie"
+            "fr": "Un agneau sans cornes - une offrande sacrée unique dans la vie",
+            "ar": "خروف واحد بلا قرون - قربان مقدس يُقدَّم مرة واحدة في العمر"
           },
           "components": {
             "en": [
@@ -251,6 +344,13 @@
               "Viande distribuée parmi les croyants et les pauvres",
               "Effectué avec une intention sincère (niyyah)",
               "Fait pendant un moment spirituellement propice"
+            ],
+            "ar": [
+              "خروف كامل بلا قرون (يرمز إلى الطهارة والاستسلام)",
+              "يجب أن يكون سليمًا وخاليًا من العيوب",
+              "توزَّع اللحوم بين المؤمنين والفقراء",
+              "يُؤدَّى بنية صادقة",
+              "يُفعل خلال وقت مبارك روحيًا"
             ]
           },
           "best_timing": {
@@ -267,11 +367,19 @@
               "Pendant les moments de gratitude ou après des jalons majeurs de la vie",
               "Lors de la recherche d'intervention divine pour des questions importantes",
               "Après avoir terminé un voyage spirituel significatif"
+            ],
+            "ar": [
+              "أدِّه في يومك المبارك (الثلاثاء) لأقصى فائدة روحية",
+              "المناسبات الإسلامية كعيد الأضحى تضخّم البركة",
+              "خلال أوقات الامتنان أو بعد محطات حياتية مهمة",
+              "عند طلب التدخل الإلهي في أمور مهمة",
+              "بعد إتمام رحلة روحية مهمة"
             ]
           },
           "significance": {
             "en": "A major spiritual milestone that removes obstacles from your path, strengthens your connection with the Divine, balances your fiery nature, and opens doors of sustenance. This sacred act creates lasting spiritual protection for you and your lineage.",
-            "fr": "Un jalon spirituel majeur qui élimine les obstacles de votre chemin, renforce votre connexion avec le Divin, équilibre votre nature ardente et ouvre les portes de la subsistance. Cet acte sacré crée une protection spirituelle durable pour vous et votre lignée."
+            "fr": "Un jalon spirituel majeur qui élimine les obstacles de votre chemin, renforce votre connexion avec le Divin, équilibre votre nature ardente et ouvre les portes de la subsistance. Cet acte sacré crée une protection spirituelle durable pour vous et votre lignée.",
+            "ar": "محطة روحية كبرى تزيل العقبات من طريقك، وتقوّي اتصالك بالله، وتوازن طبيعتك النارية، وتفتح أبواب الرزق. يخلق هذا العمل المقدس حماية روحية دائمة لك ولنسلك."
           }
         }
       },
@@ -279,11 +387,13 @@
         "practice_night": {
           "primary": {
             "en": "Saturday night",
-            "fr": "Nuit du samedi"
+            "fr": "Nuit du samedi",
+            "ar": "ليلة السبت"
           },
           "note": {
             "en": "Day of Mars: Tuesday · Night of Mars: Saturday night (after midnight → Fajr)",
-            "fr": "Jour de Mars : Mardi · Nuit de Mars : Nuit du samedi (après minuit → Fajr)"
+            "fr": "Jour de Mars : Mardi · Nuit de Mars : Nuit du samedi (après minuit → Fajr)",
+            "ar": "يوم المريخ: الثلاثاء · ليلة المريخ: ليلة السبت (بعد منتصف الليل حتى الفجر)"
           }
         },
         "zodiac_sign": {
@@ -296,7 +406,8 @@
           "transliteration": "Ya Maliku Ya Quddus",
           "translation": {
             "en": "O Sovereign, O Most Holy",
-            "fr": "Ô Souverain, Ô Très Saint"
+            "fr": "Ô Souverain, Ô Très Saint",
+            "ar": "يا مالك يا قدوس"
           }
         },
         "quranic_verse": {
@@ -304,7 +415,8 @@
           "transliteration": "Maliki yawmi al-din",
           "translation": {
             "en": "Master of the Day of Judgment",
-            "fr": "Maître du Jour du Jugement"
+            "fr": "Maître du Jour du Jugement",
+            "ar": "مَالِكِ يَوْمِ الدِّينِ"
           },
           "reference": "Surah Al-Fatiha 1:4"
         },
@@ -313,7 +425,8 @@
           "transliteration": "Shamsiya Ilu",
           "name": {
             "en": "Shamsiya'il",
-            "fr": "Shamsiya'il"
+            "fr": "Shamsiya'il",
+            "ar": "شمسيائيل"
           }
         },
         "jinn": {
@@ -321,7 +434,8 @@
           "transliteration": "Ahmar",
           "meaning": {
             "en": "Red",
-            "fr": "Rouge"
+            "fr": "Rouge",
+            "ar": "أحمر"
           }
         },
         "instructions": {
@@ -350,6 +464,19 @@
             "Réciter le nom du Jinn: Ya Ahmar   (répéter Hadad fois: votre nom + nom de la mère)",
             "Pour l'Istikhara: énoncer votre question et chercher guidance divine",
             "Fermer avec bénédictions sur le Prophète ﷺ et gratitude"
+          ],
+          "ar": [
+            "توضّأ مع تنفس واعٍ وحضور قلبي",
+            "ابحث عن مكان هادئ ومهوَّى جيدًا إن أمكن",
+            "استقبل القبلة للتوافق الروحي",
+            "ابدأ بالبسملة وأرسل الصلاة على النبي محمد ﷺ",
+            "خذ أنفاسًا عميقة ومهدئة لتتمركز",
+            "اتلُ الآية القرآنية (مَالِكِ يَوْمِ الدِّينِ) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر الأسماء الإلهية (يا مالك يا قدوس) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الملك: يا شمسيائيل (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الجن: يا أحمر (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "للاستخارة: اذكر سؤالك واطلب الهداية الإلهية",
+            "اختم بالصلاة على النبي ﷺ والشكر"
           ]
         }
       }
@@ -390,12 +517,26 @@
           "life_blessing": "Reçoit une assistance divine constante dans les moments de besoin - l'aide arrive toujours",
           "divine_support": "Protégé dans les questions de subsistance et de provision matérielle",
           "challenge": "Doit apprendre à fixer des limites avec la famille tout en maintenant leur nature généreuse"
+        },
+        "ar": {
+          "temperament": "صبور ومحتمل بشكل استثنائي - يتحمل مشقات هائلة دون شكوى",
+          "communication": "يتكلم برزانة وحكمة، وكلماته تحمل وزنًا وثباتًا",
+          "anger": "بطيء الغضب للغاية، لكن عند استفزازه يصبح غضبه كالزلزال في قوته",
+          "social_loved": "محبوب بعمق من الغرباء ومن يشهدون صبره وقوته",
+          "social_challenge": "يواجه صعوبات في العلاقات الأسرية القريبة رغم طبيعته الثابتة",
+          "social_attraction": "تنجذب العائلة الممتدة وأفراد المجتمع إلى موثوقيته",
+          "social_unpopular": "قد يُستهان بجهوده من أقرب المقربين إليه",
+          "dreams": "حياة حالمة غنية وحيّة - يرى كثيرًا الماء والصحاري الشاسعة والمدن القديمة والمناظر الأرضية",
+          "life_blessing": "يحظى بمساعدة إلهية مستمرة وقت الحاجة - العون يصل دائمًا",
+          "divine_support": "محميّ في أمور الرزق والعطاء المادي",
+          "challenge": "عليه أن يتعلم وضع الحدود مع العائلة مع الحفاظ على طبيعته الكريمة"
         }
       },
       "career": {
         "traditional": {
           "en": "Agriculture and farming, mining and mineral extraction, gold trading, petroleum and natural resources, earth-derived products",
-          "fr": "Agriculture et élevage, mines et extraction minérale, commerce de l'or, pétrole et ressources naturelles, produits dérivés de la terre"
+          "fr": "Agriculture et élevage, mines et extraction minérale, commerce de l'or, pétrole et ressources naturelles, produits dérivés de la terre",
+          "ar": "الزراعة والفلاحة، التعدين واستخراج المعادن، تجارة الذهب، البترول والموارد الطبيعية، المنتجات المستخرجة من الأرض"
         },
         "modern_recommended": {
           "en": [
@@ -519,27 +660,92 @@
                 "Vente d'équipement agricole"
               ]
             }
+          ],
+          "ar": [
+            {
+              "category": "الزراعة والفلاحة",
+              "icon": "🌾",
+              "items": [
+                "عمليات الزراعة التجارية",
+                "مشاريع الزراعة العضوية",
+                "التقنية الزراعية (AgriTech)",
+                "تجارة المحاصيل والسلع",
+                "استشارات الزراعة المستدامة",
+                "إدارة الدفيئات الزراعية"
+              ]
+            },
+            {
+              "category": "التعدين والموارد الطبيعية",
+              "icon": "⛏️",
+              "items": [
+                "عمليات التعدين وإدارتها",
+                "تجارة المعادن الثمينة",
+                "شركات استخراج المعادن",
+                "عمليات المحاجر",
+                "استشارات الموارد الطبيعية",
+                "تجارة الأحجار الكريمة"
+              ]
+            },
+            {
+              "category": "العقارات والبناء",
+              "icon": "🏗️",
+              "items": [
+                "التطوير العقاري",
+                "إدارة الممتلكات",
+                "شركات البناء والمقاولات",
+                "الاستثمار العقاري في الأراضي",
+                "توريد مواد البناء",
+                "تطوير البنية التحتية"
+              ]
+            },
+            {
+              "category": "الطاقة والبترول",
+              "icon": "⚡",
+              "items": [
+                "صناعة النفط والغاز",
+                "مشاريع الطاقة المتجددة",
+                "استشارات الطاقة",
+                "توزيع المنتجات البترولية",
+                "حلول الطاقة البديلة",
+                "منشآت توليد الطاقة"
+              ]
+            },
+            {
+              "category": "منتجات الأرض",
+              "icon": "🌱",
+              "items": [
+                "بيع الحبوب والغلال بالجملة",
+                "شبكات توزيع المحاصيل",
+                "تصنيع الأغذية من المحاصيل",
+                "توريد البذور والأسمدة",
+                "بيع المعدات الزراعية"
+              ]
+            }
           ]
         },
         "avoid": {
           "traditional": {
             "en": "Fish and all fish-related products or businesses",
-            "fr": "Poisson et tous les produits ou entreprises liés au poisson"
+            "fr": "Poisson et tous les produits ou entreprises liés au poisson",
+            "ar": "السمك وجميع المنتجات أو الأعمال المرتبطة بالسمك"
           },
           "modern": {
             "en": "Seafood industry, aquaculture, fish markets, sushi restaurants, fishing equipment - all water-based food commerce",
-            "fr": "Industrie des fruits de mer, aquaculture, marchés de poisson, restaurants de sushi, équipement de pêche - tout commerce alimentaire aquatique"
+            "fr": "Industrie des fruits de mer, aquaculture, marchés de poisson, restaurants de sushi, équipement de pêche - tout commerce alimentaire aquatique",
+            "ar": "صناعة المأكولات البحرية، الاستزراع المائي، أسواق السمك، مطاعم السوشي، معدات الصيد - كل تجارة غذائية قائمة على الماء"
           }
         },
         "principle": {
           "en": "Stability, long-term growth, tangible assets, and connection to the earth's bounty align perfectly with your grounded nature and patient disposition",
-          "fr": "Stabilité, croissance à long terme, actifs tangibles et connexion à la générosité de la terre s'alignent parfaitement avec votre nature ancrée et disposition patiente"
+          "fr": "Stabilité, croissance à long terme, actifs tangibles et connexion à la générosité de la terre s'alignent parfaitement avec votre nature ancrée et disposition patiente",
+          "ar": "الاستقرار والنمو طويل الأمد والأصول الملموسة والاتصال بخيرات الأرض تتوافق تمامًا مع طبيعتك الراسخة ومزاجك الصبور"
         }
       },
       "blessed_day": {
         "day": {
           "en": "Friday",
-          "fr": "Vendredi"
+          "fr": "Vendredi",
+          "ar": "الجمعة"
         },
         "day_number": 5,
         "best_for": {
@@ -560,6 +766,15 @@
             "Rassemblements familiaux et réconciliation",
             "Chercher le pardon et le renouveau spirituel",
             "Service communautaire et œuvres caritatives"
+          ],
+          "ar": [
+            "اتخاذ قرارات مالية واستثمارات مهمة",
+            "توقيع عقود الممتلكات أو الأراضي",
+            "بدء مشاريع زراعية أو مرتبطة بالأرض",
+            "المشتريات الكبرى للأصول الملموسة",
+            "التجمعات العائلية والمصالحة",
+            "طلب المغفرة والتجدد الروحي",
+            "الخدمة المجتمعية والأعمال الخيرية"
           ]
         },
         "special_notes": {
@@ -574,6 +789,12 @@
             "L'énergie de Vénus améliore la beauté, l'harmonie et les bénédictions matérielles",
             "Votre stabilité naturelle est amplifiée ce jour saint",
             "Parfait pour la planification à long terme et les engagements"
+          ],
+          "ar": [
+            "الجمعة هي أعظم الأيام بركة في الإسلام - يوم الجمعة",
+            "طاقة الزهرة تعزز الجمال والانسجام والبركات المادية",
+            "استقرارك الطبيعي يتضخم في هذا اليوم المبارك",
+            "مثالي للتخطيط طويل الأمد والالتزامات"
           ]
         }
       },
@@ -581,19 +802,23 @@
         "monthly": {
           "traditional": {
             "en": "Food or earth-derived products - grains, crops, cereals",
-            "fr": "Nourriture ou produits dérivés de la terre - céréales, cultures, grains"
+            "fr": "Nourriture ou produits dérivés de la terre - céréales, cultures, grains",
+            "ar": "الطعام أو المنتجات المستخرجة من الأرض - الحبوب والمحاصيل والغلال"
           },
           "frequency": {
             "en": "Every 1-2 months without fail",
-            "fr": "Tous les 1-2 mois sans faute"
+            "fr": "Tous les 1-2 mois sans faute",
+            "ar": "كل شهر إلى شهرين دون انقطاع"
           },
           "context": {
             "en": "In all circumstances - prosperity or hardship - to maintain spiritual balance",
-            "fr": "En toutes circonstances - prospérité ou épreuve - pour maintenir l'équilibre spirituel"
+            "fr": "En toutes circonstances - prospérité ou épreuve - pour maintenir l'équilibre spirituel",
+            "ar": "في جميع الأحوال - الرخاء أو الشدة - للحفاظ على التوازن الروحي"
           },
           "purpose": {
             "en": "To balance your earthy nature, maintain spiritual grounding, ensure continued divine provision, and avoid stagnation. CRITICAL: Never give fish - this disrupts your elemental balance severely.",
-            "fr": "Pour équilibrer votre nature terrestre, maintenir l'ancrage spirituel, assurer la provision divine continue et éviter la stagnation. CRITIQUE: Ne jamais donner de poisson - cela perturbe gravement votre équilibre élémentaire."
+            "fr": "Pour équilibrer votre nature terrestre, maintenir l'ancrage spirituel, assurer la provision divine continue et éviter la stagnation. CRITIQUE: Ne jamais donner de poisson - cela perturbe gravement votre équilibre élémentaire.",
+            "ar": "لموازنة طبعك الأرضي، والحفاظ على الرسوخ الروحي، وضمان استمرار الرزق الإلهي، وتجنب الركود. تنبيه هام: لا تتصدق بالسمك أبدًا - فهذا يخلّ بتوازنك العنصري بشدة."
           },
           "modern_alternatives": {
             "en": [
@@ -611,13 +836,22 @@
               "Parrainer des programmes de repas scolaires",
               "Donner aux organisations nourrissant les affamés (assurer AUCUN produit de poisson)",
               "Fournir des produits secs et des aliments terrestres non périssables"
+            ],
+            "ar": [
+              "التبرع بالأرز أو القمح أو الحبوب لبنوك الطعام",
+              "توفير الخبز والمخبوزات للمحتاجين",
+              "دعم التعاونيات الزراعية التي تساعد المزارعين",
+              "رعاية برامج وجبات المدارس",
+              "التبرع لمنظمات إطعام الجياع (مع التأكد من خلوها من منتجات السمك)",
+              "توفير المواد الجافة والأطعمة الأرضية غير القابلة للتلف"
             ]
           }
         },
         "lifetime": {
           "traditional": {
             "en": "One cow (complete) - meat distributed among believers and the poor",
-            "fr": "Une vache (complète) - viande distribuée parmi les croyants et les pauvres"
+            "fr": "Une vache (complète) - viande distribuée parmi les croyants et les pauvres",
+            "ar": "بقرة واحدة كاملة - يُوزَّع لحمها بين المؤمنين والفقراء"
           },
           "components": {
             "en": [
@@ -635,6 +869,14 @@
               "Prioriser nourrir les pauvres et nécessiteux d'abord",
               "Garder une portion minimale pour vous-même (la tradition recommande 1/3 de distribution)",
               "Effectuer avec intention sincère de plaire à Allah"
+            ],
+            "ar": [
+              "بقرة واحدة كاملة وسليمة وخالية من العيوب",
+              "يجب أن تكون البقرة في السن المناسب (بالغة)",
+              "توزَّع اللحوم على نطاق واسع بين أفراد المجتمع",
+              "إعطاء الأولوية لإطعام الفقراء والمحتاجين أولًا",
+              "الاحتفاظ بحصة قليلة لنفسك (توصي التقاليد بتوزيع الثلث)",
+              "أداؤها بنية صادقة لإرضاء الله"
             ]
           },
           "best_timing": {
@@ -651,11 +893,19 @@
               "Pendant Dhul-Hijjah (mois sacré)",
               "Moments de transitions de vie majeures ou de gratitude",
               "Lors de la recherche d'ouvertures divines dans la subsistance"
+            ],
+            "ar": [
+              "أدِّها يوم الجمعة (يومك المبارك) بعد صلاة الجمعة",
+              "عيد الأضحى هو أكثر الأوقات بركة",
+              "خلال شهر ذي الحجة (الشهر المقدس)",
+              "أوقات التحولات الحياتية الكبرى أو الامتنان",
+              "عند طلب فتوحات إلهية في الرزق"
             ]
           },
           "significance": {
             "en": "A profound spiritual milestone that removes major obstacles, opens doors of sustenance from unexpected sources, strengthens family bonds, and establishes lasting barakah (blessing) in your lineage. The earth element connects you deeply to provision.",
-            "fr": "Un jalon spirituel profond qui élimine les obstacles majeurs, ouvre les portes de subsistance de sources inattendues, renforce les liens familiaux et établit une barakah (bénédiction) durable dans votre lignée. L'élément terre vous connecte profondément à la provision."
+            "fr": "Un jalon spirituel profond qui élimine les obstacles majeurs, ouvre les portes de subsistance de sources inattendues, renforce les liens familiaux et établit une barakah (bénédiction) durable dans votre lignée. L'élément terre vous connecte profondément à la provision.",
+            "ar": "محطة روحية عميقة تزيل العقبات الكبرى، وتفتح أبواب الرزق من مصادر غير متوقعة، وتقوّي الروابط الأسرية، وترسّخ بركة دائمة في نسلك. عنصر الأرض يصلك بعمق بمصادر العطاء."
           }
         }
       },
@@ -663,11 +913,13 @@
         "practice_night": {
           "primary": {
             "en": "Tuesday night",
-            "fr": "Nuit du mardi"
+            "fr": "Nuit du mardi",
+            "ar": "ليلة الثلاثاء"
           },
           "note": {
             "en": "Day of Venus: Friday · Night of Venus: Tuesday night (after midnight → Fajr)",
-            "fr": "Jour de Vénus : Vendredi · Nuit de Vénus : Nuit du mardi (après minuit → Fajr)"
+            "fr": "Jour de Vénus : Vendredi · Nuit de Vénus : Nuit du mardi (après minuit → Fajr)",
+            "ar": "يوم الزهرة: الجمعة · ليلة الزهرة: ليلة الثلاثاء (بعد منتصف الليل حتى الفجر)"
           }
         },
         "zodiac_sign": {
@@ -680,7 +932,8 @@
           "transliteration": "Ya Kafi Ya Ghani",
           "translation": {
             "en": "O Sufficient One, O Self-Sufficient",
-            "fr": "Ô Celui qui suffit, Ô Autosuffisant"
+            "fr": "Ô Celui qui suffit, Ô Autosuffisant",
+            "ar": "يا كافي يا غني"
           }
         },
         "quranic_verse": {
@@ -688,7 +941,8 @@
           "transliteration": "Sirata alladhina an'amta 'alayhim",
           "translation": {
             "en": "The path of those upon whom You have bestowed favor",
-            "fr": "Le chemin de ceux que Tu as comblés de faveurs"
+            "fr": "Le chemin de ceux que Tu as comblés de faveurs",
+            "ar": "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ"
           },
           "reference": "Surah Al-Fatiha 1:7a"
         },
@@ -697,7 +951,8 @@
           "transliteration": "Ghaniya'ilu",
           "name": {
             "en": "Ghaniya'il",
-            "fr": "Ghaniya'il"
+            "fr": "Ghaniya'il",
+            "ar": "غنيائيل"
           }
         },
         "jinn": {
@@ -705,7 +960,8 @@
           "transliteration": "Abyad",
           "meaning": {
             "en": "White",
-            "fr": "Blanc"
+            "fr": "Blanc",
+            "ar": "أبيض"
           }
         },
         "instructions": {
@@ -734,6 +990,19 @@
             "Faire des dua pour la subsistance, la stabilité et l'harmonie familiale",
             "Fermer avec des bénédictions sur le Prophète ﷺ et gratitude (Alhamdulillah)",
             "Maintenir une patience ancrée en attendant votre réponse"
+          ],
+          "ar": [
+            "توضّأ مع تنفس واعٍ وحضور قلبي",
+            "ابحث عن مكان هادئ ومهوَّى جيدًا إن أمكن",
+            "استقبل القبلة للتوافق الروحي",
+            "ابدأ بالبسملة وأرسل الصلاة على النبي محمد ﷺ",
+            "خذ أنفاسًا عميقة ومهدئة لتتمركز",
+            "اتلُ الآية القرآنية (صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر الأسماء الإلهية (يا كافي يا غني) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الملك: يا غنيائيل (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الجن: يا أبيض (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "للاستخارة: اذكر سؤالك واطلب الهداية الإلهية",
+            "اختم بالصلاة على النبي ﷺ والشكر"
           ]
         }
       }
@@ -774,12 +1043,26 @@
           "life_blessing": "Reçoit une protection divine malgré leurs défis avec la colère",
           "divine_support": "Allah leur accorde des opportunités d'apprendre la patience et la maîtrise émotionnelle",
           "challenge": "Doit travailler consciemment pour contrôler la colère et développer la patience - c'est le test spirituel de leur vie"
+        },
+        "ar": {
+          "temperament": "سريع الغضب وسهل الاستفزاز - تصعد الحدة فيه بسرعة كريح العاصفة",
+          "communication": "يصبح الكلام حادًا وجارحًا عند الانزعاج، وقد يجرح الكلام بعمق",
+          "anger": "فتيل غضبه قصير جدًا - أدنى استفزاز قد يشعل رد فعل عنيفًا",
+          "social_loved": "رغم حدة طبعه، له أصدقاء أوفياء يتفهمون طبيعته المتوقدة",
+          "social_challenge": "غير محبوب غالبًا بسبب تقلب مزاجه وسرعة غضبه",
+          "social_attraction": "ينجذب إليه أصحاب الصبر بفضل تألقه الفكري",
+          "social_unpopular": "يصعب على معظم الناس التعامل مع تقلباته العاطفية الحادة",
+          "dreams": "كثيرًا ما يحلم بالطيران في السماء، أو أن يُرفَع ويُعلَى، أو يُحمَل في أيدي الناس، أو يحلّق فوق الأرض",
+          "life_blessing": "يحظى بحماية إلهية رغم ما يواجهه من تحديات الغضب",
+          "divine_support": "يمنحه الله فرصًا لتعلّم الصبر والتحكم في مشاعره",
+          "challenge": "عليه أن يعمل بوعي على ضبط غضبه وتنمية الصبر - وهذا هو اختباره الروحي في الحياة"
         }
       },
       "career": {
         "traditional": {
           "en": "Fruits and vegetables trading, fashion and clothing business - items that move and circulate like air",
-          "fr": "Commerce de fruits et légumes, entreprise de mode et vêtements - articles qui bougent et circulent comme l'air"
+          "fr": "Commerce de fruits et légumes, entreprise de mode et vêtements - articles qui bougent et circulent comme l'air",
+          "ar": "تجارة الفواكه والخضروات، أعمال الأزياء والملابس - سلع تتحرك وتتداول كالهواء"
         },
         "modern_recommended": {
           "en": [
@@ -905,27 +1188,93 @@
                 "Innovation numérique"
               ]
             }
+          ],
+          "ar": [
+            {
+              "category": "الأزياء والتجزئة",
+              "icon": "👗",
+              "items": [
+                "بوتيكات ومتاجر الملابس",
+                "استوديوهات تصميم الأزياء",
+                "تجارة المنسوجات",
+                "منصات الأزياء عبر الإنترنت",
+                "مفاهيم بيع تجزئة عصرية",
+                "مجموعات أزياء موسمية"
+              ]
+            },
+            {
+              "category": "المنتجات الطازجة",
+              "icon": "🥬",
+              "items": [
+                "بيع الفواكه والخضروات بالجملة",
+                "أسواق المنتجات الطازجة",
+                "توزيع المنتجات العضوية",
+                "خدمات توصيل المنتجات الطازجة من المزرعة",
+                "محلات العصائر والسموذي",
+                "بيع الأطعمة الصحية بالتجزئة"
+              ]
+            },
+            {
+              "category": "الاتصالات والإعلام",
+              "icon": "📡",
+              "items": [
+                "شركات الإعلام الرقمي",
+                "شركات العلاقات العامة",
+                "البث والإذاعة",
+                "إدارة وسائل التواصل الاجتماعي",
+                "وكالات إنتاج المحتوى",
+                "التسويق والإعلان"
+              ]
+            },
+            {
+              "category": "السفر والنقل",
+              "icon": "✈️",
+              "items": [
+                "وكالات السفر",
+                "وظائف في صناعة الطيران",
+                "لوجستيات النقل",
+                "أعمال السياحة",
+                "خدمات التوصيل",
+                "شركات الشحن السريع"
+              ]
+            },
+            {
+              "category": "التقنية والابتكار",
+              "icon": "💻",
+              "items": [
+                "الشركات الناشئة التقنية",
+                "تطوير البرمجيات",
+                "تطوير التطبيقات",
+                "خدمات الحوسبة السحابية",
+                "الاستشارات التقنية",
+                "الابتكار الرقمي"
+              ]
+            }
           ]
         },
         "avoid": {
           "traditional": {
             "en": "Fish and all fish-related products - disrupts air element severely",
-            "fr": "Poisson et tous les produits liés au poisson - perturbe gravement l'élément air"
+            "fr": "Poisson et tous les produits liés au poisson - perturbe gravement l'élément air",
+            "ar": "السمك وجميع المنتجات المرتبطة به - يُخِلّ بعنصر الهواء بشدة"
           },
           "modern": {
             "en": "Seafood industry, aquaculture, fishing, fish markets - any water-based food business. Also avoid slow, stagnant businesses that lack movement.",
-            "fr": "Industrie des fruits de mer, aquaculture, pêche, marchés de poisson - toute entreprise alimentaire aquatique. Évitez également les entreprises lentes et stagnantes qui manquent de mouvement."
+            "fr": "Industrie des fruits de mer, aquaculture, pêche, marchés de poisson - toute entreprise alimentaire aquatique. Évitez également les entreprises lentes et stagnantes qui manquent de mouvement.",
+            "ar": "صناعة المأكولات البحرية، تربية الأحياء المائية، الصيد، أسواق السمك - أي نشاط غذائي قائم على الماء. تجنّب أيضًا الأعمال البطيئة والراكدة التي تفتقر إلى الحركة."
           }
         },
         "principle": {
           "en": "Movement, circulation, communication, and fresh exchange align with your airy nature. Like wind, you thrive with constant motion and change.",
-          "fr": "Mouvement, circulation, communication et échange frais s'alignent avec votre nature aérienne. Comme le vent, vous prospérez avec le mouvement et le changement constants."
+          "fr": "Mouvement, circulation, communication et échange frais s'alignent avec votre nature aérienne. Comme le vent, vous prospérez avec le mouvement et le changement constants.",
+          "ar": "الحركة والتداول والتواصل والتبادل المتجدد تنسجم مع طبيعتك الهوائية. فأنت، كالريح، تزدهر بالحركة والتغيّر المستمرين."
         }
       },
       "blessed_day": {
         "day": {
           "en": "Wednesday",
-          "fr": "Mercredi"
+          "fr": "Mercredi",
+          "ar": "الأربعاء"
         },
         "day_number": 3,
         "best_for": {
@@ -946,6 +1295,15 @@
             "Réseautage social et établissement de connexions",
             "Écriture et expression créative",
             "Résolution pacifique des conflits"
+          ],
+          "ar": [
+            "التواصل والمحادثات المهمة",
+            "توقيع العقود والاتفاقيات",
+            "بدء مشاريع تجارية جديدة",
+            "المساعي الفكرية والتعلم",
+            "التواصل الاجتماعي وبناء العلاقات",
+            "الكتابة والتعبير الإبداعي",
+            "حل النزاعات بسلام"
           ]
         },
         "special_notes": {
@@ -960,6 +1318,12 @@
             "Associé au Prophète Musa (Moïse) ع - le grand communicateur",
             "Votre clarté mentale est la plus vive ce jour",
             "Idéal pour apprendre la gestion de la colère et les pratiques de patience"
+          ],
+          "ar": [
+            "طاقة عطارد في ذروتها - تعزّز التواصل والذكاء",
+            "مرتبط بالنبي موسى عليه السلام - المتحدث العظيم",
+            "صفاء ذهنك في أوجه في هذا اليوم",
+            "مثالي لتعلّم إدارة الغضب وممارسات الصبر"
           ]
         },
         "associated_prophet": {
@@ -972,19 +1336,23 @@
         "monthly": {
           "traditional": {
             "en": "Their own clothing from their wardrobe - garments they have worn",
-            "fr": "Leurs propres vêtements de leur garde-robe - vêtements qu'ils ont portés"
+            "fr": "Leurs propres vêtements de leur garde-robe - vêtements qu'ils ont portés",
+            "ar": "ملابسهم الخاصة من خزانتهم - ثياب قد لبسوها"
           },
           "frequency": {
             "en": "Every 1-2 months consistently",
-            "fr": "Tous les 1-2 mois de manière cohérente"
+            "fr": "Tous les 1-2 mois de manière cohérente",
+            "ar": "كل شهر إلى شهرين بانتظام"
           },
           "context": {
             "en": "In all circumstances - this practice cools the fiery anger and brings spiritual balance",
-            "fr": "En toutes circonstances - cette pratique refroidit la colère ardente et apporte l'équilibre spirituel"
+            "fr": "En toutes circonstances - cette pratique refroidit la colère ardente et apporte l'équilibre spirituel",
+            "ar": "في كل الأحوال - هذه الممارسة تهدّئ الغضب الملتهب وتجلب التوازن الروحي"
           },
           "purpose": {
             "en": "To purify the temperament, balance volatile emotions, cool anger, attract patience, and maintain spiritual equilibrium. The act of giving clothes symbolizes shedding negative traits.",
-            "fr": "Pour purifier le tempérament, équilibrer les émotions volatiles, refroidir la colère, attirer la patience et maintenir l'équilibre spirituel. L'acte de donner des vêtements symbolise l'abandon des traits négatifs."
+            "fr": "Pour purifier le tempérament, équilibrer les émotions volatiles, refroidir la colère, attirer la patience et maintenir l'équilibre spirituel. L'acte de donner des vêtements symbolise l'abandon des traits négatifs.",
+            "ar": "لتزكية الطبع، وموازنة المشاعر المتقلبة، وتهدئة الغضب، وجلب الصبر، والحفاظ على التوازن الروحي. فعل التصدق بالملابس يرمز إلى نزع الصفات السلبية."
           },
           "modern_alternatives": {
             "en": [
@@ -1002,13 +1370,22 @@
               "Soutenir les collectes de vêtements pour les nécessiteux",
               "Donner aux organisations comme Goodwill ou Armée du Salut",
               "Parrainer des vêtements pour les enfants dans le besoin"
+            ],
+            "ar": [
+              "التبرع بملابس مستعملة بحالة جيدة للملاجئ",
+              "إعطاء الملابس للجمعيات الخيرية",
+              "توفير الملابس للاجئين والنازحين",
+              "دعم حملات جمع الملابس للمحتاجين",
+              "التبرع لمنظمات مثل Goodwill أو جيش الخلاص",
+              "رعاية ملابس للأطفال المحتاجين"
             ]
           }
         },
         "lifetime": {
           "traditional": {
             "en": "One complete outfit: shirt + trousers (or full African dress with trousers) + 1000 cowries OR 1000 of any currency",
-            "fr": "Une tenue complète: chemise + pantalon (ou robe africaine complète avec pantalon) + 1000 cauris OU 1000 de toute monnaie"
+            "fr": "Une tenue complète: chemise + pantalon (ou robe africaine complète avec pantalon) + 1000 cauris OU 1000 de toute monnaie",
+            "ar": "طقم كامل: قميص + بنطال (أو زي أفريقي كامل مع بنطال) + 1000 ودعة أو 1000 من أي عملة"
           },
           "buruj_sadaqa": {
             "element": "air",
@@ -1043,6 +1420,15 @@
               "1000 cauris OU 1000 unités de toute monnaie (symbolique de la liberté et l'échange de l'air)",
               "Donné à quelqu'un réellement dans le besoin",
               "Effectué avec intention sincère de plaire à Allah"
+            ],
+            "ar": [
+              "طقم كامل جديد (ملابس علوية وسفلية)",
+              "يجب أن تكون الملابس محتشمة ومناسبة للصلاة",
+              "يمكن أن تكون زيًا أفريقيًا تقليديًا (بوبو) مع بنطال، أو قميصًا وبنطالًا غربيين",
+              "يجب أن تكون الملابس جديدة، لا مستعملة",
+              "1000 ودعة أو 1000 وحدة من أي عملة (رمزًا لحرية الهواء وتبادله)",
+              "تُعطى لشخص محتاج فعليًا",
+              "تُؤدَّى بنية صادقة لإرضاء الله"
             ]
           },
           "best_timing": {
@@ -1059,11 +1445,19 @@
               "Avant les célébrations de l'Aïd",
               "Lors de la recherche de surmonter les schémas de colère",
               "Pendant les périodes de transformation spirituelle majeure"
+            ],
+            "ar": [
+              "أدِّه يوم الأربعاء (يومك المبارك) - الأمثل لعنصر الهواء",
+              "خلال رمضان لبركات مضاعفة",
+              "قبل احتفالات العيد",
+              "عند السعي للتغلب على أنماط الغضب",
+              "خلال أوقات التحول الروحي الكبير"
             ]
           },
           "significance": {
             "en": "A transformative spiritual act that specifically targets anger management and emotional balance. This buruj sadaqah for Air element creates a shield against the negative effects of quick temper and helps develop patience, wisdom, and self-control - your life's spiritual lessons. The monetary component represents the flow and exchange energy of air.",
-            "fr": "Un acte spirituel transformateur qui cible spécifiquement la gestion de la colère et l'équilibre émotionnel. Cette sadaqah buruj pour l'élément Air crée un bouclier contre les effets négatifs du tempérament vif et aide à développer la patience, la sagesse et la maîtrise de soi - les leçons spirituelles de votre vie. Le composant monétaire représente l'énergie de flux et d'échange de l'air."
+            "fr": "Un acte spirituel transformateur qui cible spécifiquement la gestion de la colère et l'équilibre émotionnel. Cette sadaqah buruj pour l'élément Air crée un bouclier contre les effets négatifs du tempérament vif et aide à développer la patience, la sagesse et la maîtrise de soi - les leçons spirituelles de votre vie. Le composant monétaire représente l'énergie de flux et d'échange de l'air.",
+            "ar": "عمل روحي تحويلي يستهدف تحديدًا إدارة الغضب والتوازن العاطفي. هذه الصدقة البروجية لعنصر الهواء تخلق درعًا واقيًا من الآثار السلبية لسرعة الغضب، وتساعد على تنمية الصبر والحكمة وضبط النفس - وهي دروس الحياة الروحية لك. المكوّن المالي يمثّل طاقة التدفق والتبادل الخاصة بالهواء."
           }
         }
       },
@@ -1071,11 +1465,13 @@
         "practice_night": {
           "primary": {
             "en": "Sunday night",
-            "fr": "Nuit du dimanche"
+            "fr": "Nuit du dimanche",
+            "ar": "ليلة الأحد"
           },
           "note": {
             "en": "Day of Mercury: Wednesday · Night of Mercury: Sunday night (after midnight → Fajr)",
-            "fr": "Jour de Mercure : Mercredi · Nuit de Mercure : Nuit du dimanche (après minuit → Fajr)"
+            "fr": "Jour de Mercure : Mercredi · Nuit de Mercure : Nuit du dimanche (après minuit → Fajr)",
+            "ar": "يوم عطارد: الأربعاء · ليلة عطارد: ليلة الأحد (بعد منتصف الليل حتى الفجر)"
           }
         },
         "zodiac_sign": {
@@ -1092,7 +1488,8 @@
           "transliteration": "Ya 'Aliyyu Ya 'Azim",
           "translation": {
             "en": "O Most High, O Most Great",
-            "fr": "Ô Très Haut, Ô Très Grand"
+            "fr": "Ô Très Haut, Ô Très Grand",
+            "ar": "يا علي يا عظيم"
           }
         },
         "quranic_verse": {
@@ -1100,7 +1497,8 @@
           "transliteration": "Iyyaka na'budu wa iyyaka nasta'in",
           "translation": {
             "en": "You alone we worship, and You alone we ask for help",
-            "fr": "C'est Toi seul que nous adorons, et c'est Toi seul dont nous implorons secours"
+            "fr": "C'est Toi seul que nous adorons, et c'est Toi seul dont nous implorons secours",
+            "ar": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ"
           },
           "reference": "Surah Al-Fatiha 1:5"
         },
@@ -1109,7 +1507,8 @@
           "transliteration": "Mika'il",
           "name": {
             "en": "Michael (Mika'il)",
-            "fr": "Michel (Mika'il)"
+            "fr": "Michel (Mika'il)",
+            "ar": "ميكائيل"
           }
         },
         "jinn": {
@@ -1117,7 +1516,8 @@
           "transliteration": "Burqan",
           "meaning": {
             "en": "Lightning",
-            "fr": "Foudre"
+            "fr": "Foudre",
+            "ar": "برق"
           }
         },
         "instructions": {
@@ -1147,6 +1547,19 @@
             "Faire des dua spécifiquement pour la patience et la gestion de la colère",
             "Fermer avec des bénédictions sur le Prophète ﷺ et gratitude",
             "Pratiquer la respiration consciente en attendant votre réponse"
+          ],
+          "ar": [
+            "توضّأ مع تنفس واعٍ وحضور قلبي",
+            "ابحث عن مكان هادئ ومهوَّى جيدًا إن أمكن",
+            "استقبل القبلة للتوافق الروحي",
+            "ابدأ بالبسملة وأرسل الصلاة على النبي محمد ﷺ",
+            "خذ أنفاسًا عميقة ومهدئة لتتمركز",
+            "اتلُ الآية القرآنية (إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر الأسماء الإلهية (يا علي يا عظيم) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الملك: يا ميكائيل (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الجن: يا برقان (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "للاستخارة: اذكر سؤالك واطلب الهداية الإلهية",
+            "اختم بالصلاة على النبي ﷺ والشكر"
           ]
         }
       }
@@ -1187,12 +1600,26 @@
           "life_blessing": "Accordé une sagesse émotionnelle profonde et une compréhension intuitive des autres",
           "divine_support": "Protégé de ceux qui exploiteraient leur gentillesse",
           "challenge": "Doit apprendre quand fixer des limites sans perdre leur nature compatissante"
+        },
+        "ar": {
+          "temperament": "شديد الصبر — يُظَنّ به الغباء أو الضعف بسبب تحمّله غير الاعتيادي",
+          "communication": "صامت وهادئ في العادة، لكنه عند الغضب يتكلم باستمرار دون توقف",
+          "anger": "يحتاج استفزازًا هائلًا ليغضب، لكنه بعد الانزعاج يصبح سيلًا كلاميًا لا يُوقَف — لا أحد يقدر أن يهدّئه أو يقاطعه",
+          "social_loved": "محبوب بعمق من الذين يدركون قوته في الصبر",
+          "social_challenge": "غالبًا ما يُستهان به أو يُستغَل بسبب طبيعته اللطيفة",
+          "social_attraction": "ينجذب إليه أصحاب الأزمات طبيعيًا بفضل حضوره المهدّئ",
+          "social_unpopular": "قد يخلط البعض بين صبره وبين الضعف أو قلة الفطنة",
+          "dreams": "يظهر الماء بكثرة شديدة — أن يكون في الماء أو قربه، الماء الجاري، المحيطات، الأنهار. معظم أصحاب هذا البروج يرون الماء بانتظام في أحلامهم.",
+          "life_blessing": "يُمنح حكمة عاطفية عميقة وفهمًا حدسيًا للآخرين",
+          "divine_support": "محميّ ممن قد يستغلون طيبته",
+          "challenge": "عليه أن يتعلم متى يضع الحدود دون أن يفقد طبيعته الرحيمة"
         }
       },
       "career": {
         "traditional": {
           "en": "Fish and seafood trading, fashion and clothing business, earth-based products (blessed despite being water element)",
-          "fr": "Commerce de poisson et fruits de mer, entreprise de mode et vêtements, produits terrestres (bénis malgré l'élément eau)"
+          "fr": "Commerce de poisson et fruits de mer, entreprise de mode et vêtements, produits terrestres (bénis malgré l'élément eau)",
+          "ar": "تجارة السمك والمأكولات البحرية، أعمال الأزياء والملابس، المنتجات الأرضية (مباركة رغم أن العنصر ماء)"
         },
         "modern_recommended": {
           "en": [
@@ -1316,27 +1743,92 @@
                 "Commerce de détail de produits naturels"
               ]
             }
+          ],
+          "ar": [
+            {
+              "category": "المأكولات البحرية والأحياء المائية",
+              "icon": "🐟",
+              "items": [
+                "أسواق السمك والبيع بالجملة",
+                "مطاعم المأكولات البحرية",
+                "الاستزراع المائي وتربية الأسماك",
+                "توزيع المنتجات البحرية",
+                "بيع السوشي والمأكولات البحرية بالتجزئة",
+                "منشآت تصنيع وتجهيز الأسماك"
+              ]
+            },
+            {
+              "category": "الأزياء والمنسوجات",
+              "icon": "👔",
+              "items": [
+                "بيع الملابس بالتجزئة والجملة",
+                "بوتيكات الأزياء",
+                "تصنيع المنسوجات",
+                "منصات الأزياء عبر الإنترنت",
+                "تجارة الأقمشة",
+                "تصنيع الملابس"
+              ]
+            },
+            {
+              "category": "العلاج والعافية",
+              "icon": "💆",
+              "items": [
+                "مراكز السبا والعافية",
+                "منشآت العلاج المائي",
+                "ممارسات فنون الشفاء",
+                "الاستشارة والعلاج النفسي",
+                "الطب البديل",
+                "التدريب على العافية"
+              ]
+            },
+            {
+              "category": "المشروبات والسوائل",
+              "icon": "🥤",
+              "items": [
+                "توزيع المياه المعبأة",
+                "أعمال العصائر والمشروبات المخفوقة",
+                "تصنيع المشروبات",
+                "محلات القهوة والشاي",
+                "تجارة المنتجات السائلة",
+                "خدمات تنقية المياه"
+              ]
+            },
+            {
+              "category": "منتجات الأرض (مباركة)",
+              "icon": "🌾",
+              "items": [
+                "المنتجات الزراعية",
+                "تجارة الحبوب والمحاصيل",
+                "الزراعة العضوية",
+                "السلع المستخرجة من الأرض",
+                "بيع المنتجات الطبيعية بالتجزئة"
+              ]
+            }
           ]
         },
         "avoid": {
           "traditional": {
             "en": "Fruits and vegetables - these disrupt water element balance severely",
-            "fr": "Fruits et légumes - ceux-ci perturbent gravement l'équilibre de l'élément eau"
+            "fr": "Fruits et légumes - ceux-ci perturbent gravement l'équilibre de l'élément eau",
+            "ar": "الفواكه والخضروات — تخلّ بشدة بتوازن عنصر الماء"
           },
           "modern": {
             "en": "Fresh produce markets, fruit wholesale, vegetable trading, juice bars (from fruits), salad businesses - any fruit/vegetable-focused enterprise",
-            "fr": "Marchés de produits frais, vente en gros de fruits, commerce de légumes, bars à jus (de fruits), entreprises de salades - toute entreprise axée sur les fruits/légumes"
+            "fr": "Marchés de produits frais, vente en gros de fruits, commerce de légumes, bars à jus (de fruits), entreprises de salades - toute entreprise axée sur les fruits/légumes",
+            "ar": "أسواق المنتجات الطازجة، بيع الفواكه بالجملة، تجارة الخضروات، محلات عصائر الفواكه، مشاريع السلطات — أي نشاط تجاري محوره الفواكه أو الخضروات"
           }
         },
         "principle": {
           "en": "Flow, adaptability, emotional intelligence, and nurturing energy align with your water nature. Like water, you find success in filling needs and providing sustenance.",
-          "fr": "Flux, adaptabilité, intelligence émotionnelle et énergie nourricière s'alignent avec votre nature aquatique. Comme l'eau, vous trouvez le succès en comblant les besoins et en fournissant la subsistance."
+          "fr": "Flux, adaptabilité, intelligence émotionnelle et énergie nourricière s'alignent avec votre nature aquatique. Comme l'eau, vous trouvez le succès en comblant les besoins et en fournissant la subsistance.",
+          "ar": "الانسياب والتكيّف والذكاء العاطفي والطاقة الحاضنة تتوافق مع طبيعتك المائية. فمثل الماء، تجد نجاحك في سدّ الحاجات وتوفير الرزق."
         }
       },
       "blessed_day": {
         "day": {
           "en": "Monday",
-          "fr": "Lundi"
+          "fr": "Lundi",
+          "ar": "الاثنين"
         },
         "day_number": 1,
         "best_for": {
@@ -1357,6 +1849,15 @@
             "Pratiques spirituelles et méditation",
             "Questions familiales et réconciliation",
             "Travail intuitif et psychique"
+          ],
+          "ar": [
+            "الشفاء العاطفي والعلاج النفسي",
+            "اتخاذ القرارات نابعة من القلب",
+            "بدء المشاريع الإبداعية",
+            "المشاريع المرتبطة بالماء",
+            "الممارسات الروحية والتأمل",
+            "الشؤون العائلية والمصالحة",
+            "العمل الحدسي والاستشرافي"
           ]
         },
         "special_notes": {
@@ -1371,6 +1872,12 @@
             "Votre empathie naturelle est la plus forte ce jour",
             "Parfait pour les rituels de nettoyage et le renouveau",
             "L'eau a un pouvoir spirituel maximal les lundis"
+          ],
+          "ar": [
+            "طاقة القمر تبلغ ذروتها — تعزز المشاعر والحدس",
+            "تعاطفك الطبيعي في أقوى حالاته هذا اليوم",
+            "مثالي لطقوس التطهير والتجدد",
+            "للماء أقصى قوة روحية أيام الاثنين"
           ]
         }
       },
@@ -1378,19 +1885,23 @@
         "monthly": {
           "traditional": {
             "en": "Rice and fish together (can be cooked or uncooked)",
-            "fr": "Riz et poisson ensemble (peut être cuit ou non cuit)"
+            "fr": "Riz et poisson ensemble (peut être cuit ou non cuit)",
+            "ar": "الأرز والسمك معًا (يمكن أن يكونا مطبوخين أو نيئين)"
           },
           "frequency": {
             "en": "Every 1-2 months consistently",
-            "fr": "Tous les 1-2 mois de manière cohérente"
+            "fr": "Tous les 1-2 mois de manière cohérente",
+            "ar": "كل شهر إلى شهرين بانتظام"
           },
           "context": {
             "en": "In all circumstances - this unique combination balances your water nature perfectly",
-            "fr": "En toutes circonstances - cette combinaison unique équilibre parfaitement votre nature aquatique"
+            "fr": "En toutes circonstances - cette combinaison unique équilibre parfaitement votre nature aquatique",
+            "ar": "في جميع الأحوال — هذا المزيج الفريد يوازن طبيعتك المائية توازنًا تامًا"
           },
           "purpose": {
             "en": "To balance your water element, maintain emotional equilibrium, prevent being overwhelmed by feelings, and ensure spiritual flow. The rice (earth) grounds the fish (water) creating perfect harmony.",
-            "fr": "Pour équilibrer votre élément eau, maintenir l'équilibre émotionnel, éviter d'être submergé par les sentiments et assurer le flux spirituel. Le riz (terre) ancre le poisson (eau) créant une harmonie parfaite."
+            "fr": "Pour équilibrer votre élément eau, maintenir l'équilibre émotionnel, éviter d'être submergé par les sentiments et assurer le flux spirituel. Le riz (terre) ancre le poisson (eau) créant une harmonie parfaite.",
+            "ar": "لموازنة عنصر الماء لديك، والحفاظ على الاتزان العاطفي، ومنع الانغماس المفرط في المشاعر، وضمان الانسياب الروحي. فالأرز (الأرض) يثبّت السمك (الماء) فيصنعان انسجامًا تامًا."
           },
           "modern_alternatives": {
             "en": [
@@ -1408,13 +1919,22 @@
               "Soutenir les organisations nourrissant les communautés côtières",
               "Parrainer des repas de fruits de mer dans les centres communautaires",
               "Fournir les deux produits de base aux familles dans le besoin"
+            ],
+            "ar": [
+              "التبرع بوجبات الأرز والسمك للملاجئ",
+              "توفير الأرز والسمك المعلّب لبنوك الطعام",
+              "طهي وتوزيع أطباق الأرز مع السمك",
+              "دعم المنظمات التي تُطعم المجتمعات الساحلية",
+              "رعاية وجبات المأكولات البحرية في المراكز المجتمعية",
+              "توفير كلا الطعامين الأساسيين للأسر المحتاجة"
             ]
           }
         },
         "lifetime": {
           "traditional": {
             "en": "Goat with some clothes and 4 coins of money (Néént dërëm in Wolof)",
-            "fr": "Chèvre avec quelques vêtements et 4 pièces de monnaie (Néént dërëm en Wolof)"
+            "fr": "Chèvre avec quelques vêtements et 4 pièces de monnaie (Néént dërëm en Wolof)",
+            "ar": "عنزة مع بعض الملابس و4 قطع نقدية (Néént dërëm بالولوفية)"
           },
           "buruj_sadaqa": {
             "element": "water",
@@ -1445,6 +1965,15 @@
               "Vêtements donnés aux nécessiteux",
               "Pièces données en sadaqah aux nécessiteux",
               "Tout effectué avec intention sincère"
+            ],
+            "ar": [
+              "عنزة واحدة كاملة وسليمة (بأي لون)",
+              "عدة قطع من الملابس (محتشمة ومناسبة)",
+              "4 قطع نقدية أو عملة (Néént dërëm — رمز للعناصر الأربعة وانسياب الماء)",
+              "توزَّع اللحوم بين المؤمنين والفقراء",
+              "تُمنح الملابس للمحتاجين",
+              "تُمنح القطع النقدية صدقة للمحتاجين",
+              "يُؤدَّى كل ذلك بنية صادقة"
             ]
           },
           "best_timing": {
@@ -1461,11 +1990,19 @@
               "Après des transitions de vie majeures",
               "Lors de la recherche de guérison émotionnelle",
               "Pendant Dhul-Hijjah (mois sacré)"
+            ],
+            "ar": [
+              "أدِّه يوم الاثنين (يومك المبارك) — الأمثل لعنصر الماء",
+              "خلال عيد الأضحى لبركات مضاعفة",
+              "بعد التحولات الكبرى في الحياة",
+              "عند طلب الشفاء العاطفي",
+              "خلال ذي الحجة (الشهر المبارك)"
             ]
           },
           "significance": {
             "en": "A profound spiritual milestone that creates emotional balance for Water element, protects from being overwhelmed, strengthens boundaries while maintaining compassion, and opens doors of sustenance. The combination of elements (goat, cloth, 4 coins) represents complete spiritual protection and the harmonious flow of water energy.",
-            "fr": "Un jalon spirituel profond qui crée l'équilibre émotionnel pour l'élément Eau, protège contre le sentiment d'être submergé, renforce les limites tout en maintenant la compassion et ouvre les portes de la subsistance. La combinaison d'éléments (chèvre, tissu, 4 pièces) représente une protection spirituelle complète et le flux harmonieux de l'énergie de l'eau."
+            "fr": "Un jalon spirituel profond qui crée l'équilibre émotionnel pour l'élément Eau, protège contre le sentiment d'être submergé, renforce les limites tout en maintenant la compassion et ouvre les portes de la subsistance. La combinaison d'éléments (chèvre, tissu, 4 pièces) représente une protection spirituelle complète et le flux harmonieux de l'énergie de l'eau.",
+            "ar": "محطة روحية عميقة تحقق التوازن العاطفي لعنصر الماء، وتحمي من الانغماس المفرط في المشاعر، وتقوّي الحدود مع الحفاظ على الرحمة، وتفتح أبواب الرزق. مزيج العناصر (العنزة والقماش والقطع النقدية الأربع) يمثل حماية روحية كاملة وانسيابًا منسجمًا لطاقة الماء."
           }
         }
       },
@@ -1473,11 +2010,13 @@
         "practice_night": {
           "primary": {
             "en": "Friday night",
-            "fr": "Nuit du vendredi"
+            "fr": "Nuit du vendredi",
+            "ar": "ليلة الجمعة"
           },
           "note": {
             "en": "Day of the Moon: Monday · Night of the Moon: Friday night (after midnight → Fajr)",
-            "fr": "Jour de la Lune : Lundi · Nuit de la Lune : Nuit du vendredi (après minuit → Fajr)"
+            "fr": "Jour de la Lune : Lundi · Nuit de la Lune : Nuit du vendredi (après minuit → Fajr)",
+            "ar": "يوم القمر: الاثنين · ليلة القمر: ليلة الجمعة (بعد منتصف الليل حتى الفجر)"
           }
         },
         "zodiac_sign": {
@@ -1490,7 +2029,8 @@
           "transliteration": "Ya Rahmanu Ya Rahim",
           "translation": {
             "en": "O Most Merciful, O Most Compassionate",
-            "fr": "Ô Très Miséricordieux, Ô Très Compatissant"
+            "fr": "Ô Très Miséricordieux, Ô Très Compatissant",
+            "ar": "يا رحمن يا رحيم"
           }
         },
         "quranic_verse": {
@@ -1498,7 +2038,8 @@
           "transliteration": "Ar-Rahmani r-Rahim",
           "translation": {
             "en": "The Most Merciful, the Most Compassionate",
-            "fr": "Le Très Miséricordieux, le Très Compatissant"
+            "fr": "Le Très Miséricordieux, le Très Compatissant",
+            "ar": "الرَّحْمَٰنِ الرَّحِيمِ"
           },
           "reference": "Surah Al-Fatiha 1:3"
         },
@@ -1507,7 +2048,8 @@
           "transliteration": "Jibril",
           "name": {
             "en": "Gabriel (Jibril)",
-            "fr": "Gabriel (Jibril)"
+            "fr": "Gabriel (Jibril)",
+            "ar": "جبريل"
           }
         },
         "jinn": {
@@ -1515,7 +2057,8 @@
           "transliteration": "Murata",
           "meaning": {
             "en": "Bitterness",
-            "fr": "Amertume"
+            "fr": "Amertume",
+            "ar": "مرارة"
           }
         },
         "instructions": {
@@ -1545,6 +2088,20 @@
             "Faire des dua pour la guérison émotionnelle et des limites saines",
             "Fermer avec des bénédictions sur le Prophète ﷺ et gratitude",
             "Se permettre de ressentir toutes les émotions qui surgissent - elles sont une guidance"
+          ],
+          "ar": [
+            "توضّأ بعناية وحضور قلبي إضافيين",
+            "اجلس قرب الماء إن أمكن (يعزز الاتصال الروحي)",
+            "استقبل القبلة للتوافق الروحي",
+            "ابدأ بالبسملة وأرسل الصلاة على النبي محمد ﷺ",
+            "تنفّس بعمق ودَع مشاعرك تهدأ كالماء الساكن",
+            "اذكر الأسماء الإلهية (يا رحمن يا رحيم) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "استشعر رحمة الله الواسعة وهي تحيط بك كالمحيط",
+            "أتبِع ذلك بتلاوة الآية القرآنية (الرَّحْمَٰنِ الرَّحِيمِ) 3-7 مرات بحضور عاطفي عميق",
+            "للاستخارة: اذكر سؤالك واطلب هداية رحيمة",
+            "ادعُ بالشفاء العاطفي ووضع حدود صحية",
+            "اختم بالصلاة على النبي ﷺ والشكر",
+            "اسمح لنفسك بالإحساس بكل المشاعر التي تنبثق - فهي هداية"
           ]
         }
       }
@@ -1585,12 +2142,26 @@
           "life_blessing": "Accordé des capacités de leadership naturelles et instincts protecteurs",
           "divine_support": "Protégé dans les nouvelles entreprises et initiatives audacieuses",
           "challenge": "Doit équilibrer l'assertivité avec la patience et la compréhension"
+        },
+        "ar": {
+          "temperament": "شغوف وديناميكي - يحركه نار داخلية وحماس للحياة",
+          "communication": "يتحدث بدفء وقناعة، يلهم الآخرين بكلمات نارية",
+          "anger": "بطيء الغضب لكنه شرس عند الاستفزاز، يشتعل بشدة لكن يمكن أن يهدأ بالمنطق",
+          "social_loved": "محبوب لصفات القيادة وطبيعته الشجاعة",
+          "social_challenge": "قد يُرهق الآخرين بشدته وتوقعاته العالية",
+          "social_attraction": "جاذبيته الطبيعية تجذب من يبحثون عن التوجيه والإلهام",
+          "social_unpopular": "يجد البعض صراحته مبالغًا فيها ومواجِهة أكثر من اللازم",
+          "dreams": "النار والضوء والشمس والإضاءة تظهر في الأحلام رمزًا للوضوح",
+          "life_blessing": "يُمنح قدرات قيادية طبيعية وغرائز حماية فطرية",
+          "divine_support": "محميّ في المشاريع الجديدة والمبادرات الجريئة",
+          "challenge": "عليه أن يوازن بين الحزم والصبر والتفهم"
         }
       },
       "career": {
         "traditional": {
           "en": "Leadership roles, entrepreneurship, any venture requiring courage and initiative",
-          "fr": "Rôles de leadership, entrepreneuriat, toute entreprise nécessitant courage et initiative"
+          "fr": "Rôles de leadership, entrepreneuriat, toute entreprise nécessitant courage et initiative",
+          "ar": "أدوار القيادة، ريادة الأعمال، وأي مشروع يتطلب الشجاعة والمبادرة"
         },
         "modern_recommended": {
           "en": [
@@ -1692,27 +2263,81 @@
                 "Initiatives culturelles"
               ]
             }
+          ],
+          "ar": [
+            {
+              "category": "القيادة والإدارة",
+              "icon": "👔",
+              "items": [
+                "مناصب القيادة التنفيذية",
+                "إدارة الأعمال",
+                "إدارة المشاريع",
+                "أدوار قيادة الفرق",
+                "ريادة الأعمال",
+                "تأسيس الشركات الناشئة"
+              ]
+            },
+            {
+              "category": "الابتكار والتكنولوجيا",
+              "icon": "💡",
+              "items": [
+                "الشركات التقنية الناشئة",
+                "تطوير المنتجات",
+                "استشارات الابتكار",
+                "التحول الرقمي",
+                "رأس المال الاستثماري",
+                "احتضان الأعمال"
+              ]
+            },
+            {
+              "category": "الخدمة العامة",
+              "icon": "🏛️",
+              "items": [
+                "القيادة الحكومية",
+                "التنظيم المجتمعي",
+                "المناصرة السياسية",
+                "قيادة المنظمات غير الربحية",
+                "ريادة الأعمال الاجتماعية",
+                "السياسة العامة"
+              ]
+            },
+            {
+              "category": "الصناعات الإبداعية",
+              "icon": "🎨",
+              "items": [
+                "إنتاج الأفلام والإعلام",
+                "الإخراج الإبداعي",
+                "تطوير العلامات التجارية",
+                "صناعة الترفيه",
+                "إدارة الفنون",
+                "المبادرات الثقافية"
+              ]
+            }
           ]
         },
         "avoid": {
           "traditional": {
             "en": "Routine, repetitive work lacking creativity or leadership opportunity",
-            "fr": "Travail routinier et répétitif manquant de créativité ou d'opportunité de leadership"
+            "fr": "Travail routinier et répétitif manquant de créativité ou d'opportunité de leadership",
+            "ar": "العمل الروتيني المتكرر الذي يفتقر إلى الإبداع أو فرص القيادة"
           },
           "modern": {
             "en": "Subordinate roles without autonomy, micromanaged positions, careers suppressing initiative",
-            "fr": "Rôles subordonnés sans autonomie, postes micro-gérés, carrières supprimant l'initiative"
+            "fr": "Rôles subordonnés sans autonomie, postes micro-gérés, carrières supprimant l'initiative",
+            "ar": "الأدوار التابعة دون استقلالية، والوظائف الخاضعة للإدارة الدقيقة المفرطة، والمسارات المهنية التي تكبح المبادرة"
           }
         },
         "principle": {
           "en": "Leadership, innovation, courage, and pioneering spirit align with your solar fire nature",
-          "fr": "Leadership, innovation, courage et esprit pionnier s'alignent avec votre nature de feu solaire"
+          "fr": "Leadership, innovation, courage et esprit pionnier s'alignent avec votre nature de feu solaire",
+          "ar": "القيادة والابتكار والشجاعة وروح الريادة تنسجم مع طبيعتك النارية الشمسية"
         }
       },
       "blessed_day": {
         "day": {
           "en": "Sunday",
-          "fr": "Dimanche"
+          "fr": "Dimanche",
+          "ar": "الأحد"
         },
         "day_number": 0,
         "best_for": {
@@ -1733,6 +2358,15 @@
             "Initiatives de leadership",
             "Prendre des décisions audacieuses",
             "Pratiques spirituelles alignées sur le solaire"
+          ],
+          "ar": [
+            "بدء السفر - يوم مبارك بشكل خاص لبدء الرحلات",
+            "بدء بناء منزل أو مبنى جديد",
+            "إطلاق مشاريع حياتية كبرى",
+            "البدايات الجديدة المهمة",
+            "المبادرات القيادية",
+            "اتخاذ القرارات الجريئة",
+            "الممارسات الروحية المرتبطة بالشمس"
           ]
         },
         "special_notes": {
@@ -1749,6 +2383,13 @@
             "Jour le plus propice pour poser la première brique d'une nouvelle maison",
             "L'énergie solaire amplifie votre élément feu naturel",
             "Parfait pour initier des projets nécessitant une énergie soutenue"
+          ],
+          "ar": [
+            "الأحد هو يوم الشمس - مصدر قوتك الطبيعي",
+            "أفضل يوم في الأسبوع لبدء أي رحلة مهمة",
+            "أكثر الأيام بركة لوضع اللبنة الأولى لمنزل جديد",
+            "الطاقة الشمسية تضخّم عنصر النار الطبيعي فيك",
+            "مثالي لبدء المشاريع التي تتطلب طاقة مستمرة"
           ]
         }
       },
@@ -1756,19 +2397,23 @@
         "monthly": {
           "traditional": {
             "en": "Similar to Buruj 1 - beef or substantial food for those in need",
-            "fr": "Similaire au Buruj 1 - bœuf ou nourriture substantielle pour les nécessiteux"
+            "fr": "Similaire au Buruj 1 - bœuf ou nourriture substantielle pour les nécessiteux",
+            "ar": "مشابه للبرج 1 - لحم بقري أو طعام وفير للمحتاجين"
           },
           "frequency": {
             "en": "Every 1-2 months consistently",
-            "fr": "Tous les 1-2 mois de manière cohérente"
+            "fr": "Tous les 1-2 mois de manière cohérente",
+            "ar": "كل شهر إلى شهرين بانتظام"
           },
           "context": {
             "en": "To maintain spiritual balance and cool excessive fire energy",
-            "fr": "Pour maintenir l'équilibre spirituel et refroidir l'énergie de feu excessive"
+            "fr": "Pour maintenir l'équilibre spirituel et refroidir l'énergie de feu excessive",
+            "ar": "للحفاظ على التوازن الروحي وتهدئة طاقة النار الزائدة"
           },
           "purpose": {
             "en": "Balances fiery nature, attracts divine blessings for new beginnings, maintains leadership barakah",
-            "fr": "Équilibre la nature ardente, attire les bénédictions divines pour les nouveaux départs, maintient la barakah du leadership"
+            "fr": "Équilibre la nature ardente, attire les bénédictions divines pour les nouveaux départs, maintient la barakah du leadership",
+            "ar": "يوازن الطبيعة النارية، ويجذب البركات الإلهية للبدايات الجديدة، ويحافظ على بركة القيادة"
           },
           "modern_alternatives": {
             "en": [
@@ -1786,13 +2431,22 @@
               "Parrainer des repas pour voyageurs ou personnes déplacées",
               "Fournir de la nourriture aux travailleurs de la construction ou ouvriers",
               "Soutenir les programmes alimentaires pour réfugiés"
+            ],
+            "ar": [
+              "إطعام الأسر المحتاجة بوجبات وفيرة",
+              "دعم المطابخ الخيرية وبرامج التغذية",
+              "التبرع للمنظمات التي تساعد في البدايات الجديدة",
+              "رعاية وجبات للمسافرين أو النازحين",
+              "توفير الطعام لعمال البناء أو العمال",
+              "دعم برامج تغذية اللاجئين"
             ]
           }
         },
         "lifetime": {
           "traditional": {
             "en": "White lamb and white clothing",
-            "fr": "Agneau blanc et vêtements blancs"
+            "fr": "Agneau blanc et vêtements blancs",
+            "ar": "خروف أبيض وملابس بيضاء"
           },
           "components": {
             "en": [
@@ -1810,6 +2464,14 @@
               "Vêtements blancs donnés aux nécessiteux",
               "Effectué avec intention de purification et renouveau",
               "Tout fait avec niyyah sincère pour plaire à Allah"
+            ],
+            "ar": [
+              "خروف أبيض كامل (خالٍ من العيوب)",
+              "قطع ملابس بيضاء (ترمز إلى الطهارة والبدايات الجديدة)",
+              "توزيع لحم الخروف على المؤمنين والفقراء",
+              "إعطاء ملابس بيضاء للمحتاجين",
+              "يُؤدى بنية التطهر والتجدد",
+              "كل ذلك بنية صادقة لإرضاء الله"
             ]
           },
           "best_timing": {
@@ -1826,11 +2488,19 @@
               "Avant de commencer des voyages ou projets de vie majeurs",
               "Lors de la recherche de purification et nouveaux départs",
               "Au début d'une nouvelle année ou phase de vie significative"
+            ],
+            "ar": [
+              "أدِّها يوم الأحد (يومك المبارك) لأقصى فائدة",
+              "خلال عيد الأضحى لبركات مضاعفة",
+              "قبل بدء رحلات أو مشاريع حياتية كبرى",
+              "عند السعي إلى التطهر والبدايات الجديدة",
+              "في بداية عام جديد أو مرحلة حياتية مهمة"
             ]
           },
           "significance": {
             "en": "The white lamb represents purity of intention and fresh beginnings - core to your solar nature. This sacred offering removes obstacles from new ventures, blesses travels and construction projects, purifies your path, and establishes divine protection for bold initiatives. The white color symbolizes the purifying light of the sun.",
-            "fr": "L'agneau blanc représente la pureté de l'intention et les nouveaux départs - au cœur de votre nature solaire. Cette offrande sacrée élimine les obstacles des nouvelles entreprises, bénit les voyages et projets de construction, purifie votre chemin et établit une protection divine pour les initiatives audacieuses. La couleur blanche symbolise la lumière purificatrice du soleil."
+            "fr": "L'agneau blanc représente la pureté de l'intention et les nouveaux départs - au cœur de votre nature solaire. Cette offrande sacrée élimine les obstacles des nouvelles entreprises, bénit les voyages et projets de construction, purifie votre chemin et établit une protection divine pour les initiatives audacieuses. La couleur blanche symbolise la lumière purificatrice du soleil.",
+            "ar": "يمثل الخروف الأبيض نقاء النية والبدايات الجديدة - وهو جوهر طبيعتك الشمسية. هذه القربة المباركة تزيل العقبات عن المشاريع الجديدة، وتبارك السفر ومشاريع البناء، وتطهّر طريقك، وترسي حماية إلهية للمبادرات الجريئة. اللون الأبيض يرمز إلى نور الشمس المطهِّر."
           }
         }
       },
@@ -1838,11 +2508,13 @@
         "practice_night": {
           "primary": {
             "en": "Thursday night",
-            "fr": "Nuit du jeudi"
+            "fr": "Nuit du jeudi",
+            "ar": "ليلة الخميس"
           },
           "note": {
             "en": "Day of the Sun: Sunday · Night of the Sun: Thursday night (after midnight → Fajr)",
-            "fr": "Jour du Soleil : Dimanche · Nuit du Soleil : Nuit du jeudi (après minuit → Fajr)"
+            "fr": "Jour du Soleil : Dimanche · Nuit du Soleil : Nuit du jeudi (après minuit → Fajr)",
+            "ar": "يوم الشمس: الأحد · ليلة الشمس: ليلة الخميس (بعد منتصف الليل ← الفجر)"
           }
         },
         "zodiac_sign": {
@@ -1859,7 +2531,8 @@
           "transliteration": "Ya Hayyu Ya Qayyum",
           "translation": {
             "en": "O Ever-Living, O Self-Sustaining",
-            "fr": "Ô Vivant, Ô Auto-Subsistant"
+            "fr": "Ô Vivant, Ô Auto-Subsistant",
+            "ar": "يا حي يا قيوم"
           }
         },
         "quranic_verse": {
@@ -1867,7 +2540,8 @@
           "transliteration": "Alhamdulillahi rabbil 'alamin",
           "translation": {
             "en": "All praise is due to Allah, Lord of the worlds",
-            "fr": "Louange à Allah, Seigneur des mondes"
+            "fr": "Louange à Allah, Seigneur des mondes",
+            "ar": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ"
           },
           "reference": "Surah Al-Fatiha 1:2"
         },
@@ -1876,7 +2550,8 @@
           "transliteration": "Rawqiya Ilu",
           "name": {
             "en": "Rawqiya'il",
-            "fr": "Rawqiya'il"
+            "fr": "Rawqiya'il",
+            "ar": "روقيا ئل"
           }
         },
         "jinn": {
@@ -1884,7 +2559,8 @@
           "transliteration": "Madhhab",
           "meaning": {
             "en": "Doctrine",
-            "fr": "Doctrine"
+            "fr": "Doctrine",
+            "ar": "مذهب"
           }
         },
         "instructions": {
@@ -1913,6 +2589,19 @@
             "Réciter le nom du Jinn: Ya Madhhab   (répéter Hadad fois: votre nom + nom de la mère)",
             "Énoncer clairement votre question d'Istikhara et chercher guidance divine",
             "Fermer avec salawat sur le Prophète ﷺ et gratitude"
+          ],
+          "ar": [
+            "توضّأ مع التنفس الواعي",
+            "اختر مكانًا هادئًا وجيد التهوية",
+            "استقبل القبلة إن أمكن",
+            "ابدأ بالبسملة وأرسل الصلاة على النبي ﷺ",
+            "خذ 3-7 أنفاس عميقة وواعية",
+            "اتلُ الآية القرآنية (الحمد لله رب العالمين) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر الأسماء الإلهية (يا حي يا قيوم) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الملَك: يا روقيا ئل (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الجن: يا مذهب (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر سؤال الاستخارة بوضوح واطلب التوجيه الإلهي",
+            "اختم بالصلاة على النبي ﷺ والشكر"
           ]
         }
       }
@@ -1953,12 +2642,26 @@
           "life_blessing": "Accordé une foi inébranlable et sécurité matérielle",
           "divine_support": "Protégé dans les questions de propriété et investissements à long terme",
           "challenge": "Doit apprendre la flexibilité tout en maintenant la stabilité de base"
+        },
+        "ar": {
+          "temperament": "عميق الرسوخ وعملي — يجسّد الثبات والاعتمادية",
+          "communication": "يتحدث بتأنٍّ وتروٍّ، وكلماته تحمل وزنًا ودوامًا",
+          "anger": "بطيء الاستفزاز لكنه لا يتزحزح عند الغضب، كالجبل",
+          "social_loved": "يحظى بثقة الجميع لثباته واعتماديته",
+          "social_challenge": "قد يُنظر إليه كصارم أو مقاوم للتغيير",
+          "social_attraction": "ينجذب إليه طبيعيًا من يبحثون عن الاستقرار",
+          "social_unpopular": "يجد البعض حذره الشديد مزعجًا",
+          "dreams": "تظهر في منامه الأرض والجبال والمباني والبنى رمزًا للأساس والثبات",
+          "life_blessing": "يُمنح إيمانًا راسخًا لا يتزعزع وأمانًا ماديًا",
+          "divine_support": "محفوظ في أمور الممتلكات والاستثمارات طويلة الأمد",
+          "challenge": "عليه أن يتعلم المرونة مع الحفاظ على ثباته الجوهري"
         }
       },
       "career": {
         "traditional": {
           "en": "Similar to Buruj 2 - agriculture, real estate, construction, earth resources",
-          "fr": "Similaire au Buruj 2 - agriculture, immobilier, construction, ressources terrestres"
+          "fr": "Similaire au Buruj 2 - agriculture, immobilier, construction, ressources terrestres",
+          "ar": "مماثل للبروج 2 - الزراعة، العقارات، البناء، موارد الأرض"
         },
         "modern_recommended": {
           "en": [
@@ -2060,27 +2763,81 @@
                 "Projets municipaux"
               ]
             }
+          ],
+          "ar": [
+            {
+              "category": "العقارات والممتلكات",
+              "icon": "🏠",
+              "items": [
+                "الاستثمار العقاري",
+                "التطوير العقاري",
+                "إدارة الأراضي",
+                "شركات البناء",
+                "مكاتب الهندسة المعمارية",
+                "إدارة الممتلكات"
+              ]
+            },
+            {
+              "category": "المال والمصارف",
+              "icon": "🏦",
+              "items": [
+                "الأعمال المصرفية والمالية",
+                "إدارة الاستثمارات",
+                "التخطيط المالي",
+                "إدارة الثروات",
+                "خدمات المحاسبة",
+                "التأمين"
+              ]
+            },
+            {
+              "category": "الزراعة والموارد الطبيعية",
+              "icon": "🌾",
+              "items": [
+                "الزراعة واسعة النطاق",
+                "إدارة الأراضي الزراعية",
+                "إدارة الموارد الطبيعية",
+                "عمليات التعدين",
+                "إدارة الغابات",
+                "الحفاظ على البيئة"
+              ]
+            },
+            {
+              "category": "البنية التحتية",
+              "icon": "🏗️",
+              "items": [
+                "الهندسة المدنية",
+                "التخطيط العمراني",
+                "تطوير البنية التحتية",
+                "أنظمة النقل",
+                "الأشغال العامة",
+                "المشاريع البلدية"
+              ]
+            }
           ]
         },
         "avoid": {
           "traditional": {
             "en": "Fish and fish-related products",
-            "fr": "Poisson et produits liés au poisson"
+            "fr": "Poisson et produits liés au poisson",
+            "ar": "السمك ومنتجاته"
           },
           "modern": {
             "en": "Seafood industry, high-risk volatile ventures, speculative businesses",
-            "fr": "Industrie des fruits de mer, entreprises volatiles à haut risque, affaires spéculatives"
+            "fr": "Industrie des fruits de mer, entreprises volatiles à haut risque, affaires spéculatives",
+            "ar": "صناعة المأكولات البحرية، المشاريع شديدة التقلب والمخاطرة، الأعمال المضاربية"
           }
         },
         "principle": {
           "en": "Long-term stability, tangible assets, and foundational structures align with your earth nature",
-          "fr": "Stabilité à long terme, actifs tangibles et structures fondamentales s'alignent avec votre nature terrestre"
+          "fr": "Stabilité à long terme, actifs tangibles et structures fondamentales s'alignent avec votre nature terrestre",
+          "ar": "الاستقرار طويل الأمد، والأصول الملموسة، والبنى التأسيسية تنسجم مع طبيعتك الترابية"
         }
       },
       "blessed_day": {
         "day": {
           "en": "Wednesday",
-          "fr": "Mercredi"
+          "fr": "Mercredi",
+          "ar": "الأربعاء"
         },
         "day_number": 3,
         "best_for": {
@@ -2103,6 +2860,16 @@
             "Travail ancestral et questions familiales",
             "Mise en œuvre de discipline et structure",
             "Effectuer votre sadaqah de vie"
+          ],
+          "ar": [
+            "التخطيط والاستراتيجية طويلة الأمد",
+            "الصفقات العقارية والاستثمارات",
+            "بناء الأسس (الحرفية والمجازية)",
+            "الالتزامات والعقود الجادة",
+            "ممارسات الترسّخ الروحي",
+            "العمل المتعلق بالأسلاف والشؤون العائلية",
+            "تطبيق الانضباط والتنظيم",
+            "أداء صدقتك مدى الحياة"
           ]
         },
         "special_notes": {
@@ -2117,6 +2884,12 @@
             "Votre stabilité naturelle est la plus prononcée",
             "Idéal pour établir des fondations durables",
             "Jour parfait pour votre sacrifice sadaqah de vie"
+          ],
+          "ar": [
+            "الأربعاء (يوم عطارد) يعزز تواصل عنصر الأرض",
+            "ثباتك الطبيعي يبلغ أوضح حالاته",
+            "مثالي لإرساء أسس دائمة",
+            "يوم مثالي لتقديم صدقتك مدى الحياة"
           ]
         }
       },
@@ -2124,19 +2897,23 @@
         "monthly": {
           "traditional": {
             "en": "Grains, crops, earth-derived food products",
-            "fr": "Céréales, cultures, produits alimentaires dérivés de la terre"
+            "fr": "Céréales, cultures, produits alimentaires dérivés de la terre",
+            "ar": "الحبوب والمحاصيل والمنتجات الغذائية المستمدة من الأرض"
           },
           "frequency": {
             "en": "Every 1-2 months without fail",
-            "fr": "Tous les 1-2 mois sans faute"
+            "fr": "Tous les 1-2 mois sans faute",
+            "ar": "كل شهر إلى شهرين دون انقطاع"
           },
           "context": {
             "en": "To maintain grounding and prevent stagnation",
-            "fr": "Pour maintenir l'ancrage et prévenir la stagnation"
+            "fr": "Pour maintenir l'ancrage et prévenir la stagnation",
+            "ar": "للحفاظ على الترسّخ ومنع الركود"
           },
           "purpose": {
             "en": "Maintains spiritual flow, prevents excessive rigidity, ensures continued blessings in property and assets",
-            "fr": "Maintient le flux spirituel, prévient la rigidité excessive, assure les bénédictions continues dans la propriété et les actifs"
+            "fr": "Maintient le flux spirituel, prévient la rigidité excessive, assure les bénédictions continues dans la propriété et les actifs",
+            "ar": "يحافظ على استمرار التدفق الروحي، ويمنع الصلابة المفرطة، ويضمن استمرار البركات في الممتلكات والأصول"
           },
           "modern_alternatives": {
             "en": [
@@ -2154,13 +2931,22 @@
               "Parrainer des repas dans les centres communautaires",
               "Donner aux efforts de conservation des terres",
               "Soutenir les initiatives d'agriculture durable"
+            ],
+            "ar": [
+              "التبرع بالأرز والقمح والحبوب لبنوك الطعام",
+              "دعم الجمعيات التعاونية الزراعية",
+              "توفير البذور للمجتمعات الزراعية",
+              "رعاية وجبات في المراكز المجتمعية",
+              "التبرع لجهود الحفاظ على الأراضي",
+              "دعم مبادرات الزراعة المستدامة"
             ]
           }
         },
         "lifetime": {
           "traditional": {
             "en": "Zakat al-Fitr in corn for 12 people, One Barred Plymouth Rock chicken",
-            "fr": "Zakat al-Fitr en maïs pour 12 personnes, Un poulet Barred Plymouth Rock"
+            "fr": "Zakat al-Fitr en maïs pour 12 personnes, Un poulet Barred Plymouth Rock",
+            "ar": "زكاة الفطر من الذرة لاثني عشر شخصًا، ودجاجة واحدة من سلالة باريد بليموث روك"
           },
           "components": {
             "en": [
@@ -2178,6 +2964,14 @@
               "Poulet préparé et partagé avec la communauté",
               "Doit être effectué le mercredi (votre jour béni)",
               "Fait avec niyyah sincère pour plaire à Allah"
+            ],
+            "ar": [
+              "الذرة: مقدار زكاة الفطر لاثني عشر شخصًا - نحو 36 كيلوغرامًا إجمالًا (3 كيلوغرام للفرد الواحد)",
+              "دجاجة واحدة من سلالة باريد بليموث روك - ذات نقشة ريش مخططة بالأسود والأبيض مميزة",
+              "توزيع كل الذرة على المحتاجين والفقراء",
+              "تُحضَّر الدجاجة وتُشارَك مع المجتمع",
+              "يجب أن تُؤدَّى يوم الأربعاء (يومك المبارك)",
+              "تُؤدَّى بنية صادقة لإرضاء الله"
             ]
           },
           "zakat_calculation": {
@@ -2209,11 +3003,19 @@
               "Particulièrement béni pendant le Ramadan ou Dhul-Hijjah",
               "Lors de l'acquisition de nouvelle propriété ou atteinte de stabilité majeure",
               "Aux jalons majeurs de la vie"
+            ],
+            "ar": [
+              "الأربعاء (يومك المبارك) - أقوى توقيت",
+              "يمكن أداؤها في أي أربعاء طوال العام",
+              "مباركة بشكل خاص في رمضان أو ذي الحجة",
+              "عند اقتناء ممتلكات جديدة أو بلوغ استقرار كبير",
+              "في المحطات الكبرى من الحياة"
             ]
           },
           "significance": {
             "en": "The number 12 represents completion and fullness in Islamic tradition. Corn (earth's grain) grounds your element. The specific chicken breed symbolizes balanced duality. This sacrifice establishes lasting material barakah, protects property and assets, ensures generational stability, and opens doors of sustenance. Wednesday timing aligns the earth element with communication and manifestation energies.",
-            "fr": "Le nombre 12 représente l'achèvement et la plénitude dans la tradition islamique. Le maïs (céréale de la terre) ancre votre élément. La race de poulet spécifique symbolise la dualité équilibrée. Ce sacrifice établit une barakah matérielle durable, protège la propriété et les actifs, assure la stabilité générationnelle et ouvre les portes de la subsistance. Le timing du mercredi aligne l'élément terre avec les énergies de communication et manifestation."
+            "fr": "Le nombre 12 représente l'achèvement et la plénitude dans la tradition islamique. Le maïs (céréale de la terre) ancre votre élément. La race de poulet spécifique symbolise la dualité équilibrée. Ce sacrifice établit une barakah matérielle durable, protège la propriété et les actifs, assure la stabilité générationnelle et ouvre les portes de la subsistance. Le timing du mercredi aligne l'élément terre avec les énergies de communication et manifestation.",
+            "ar": "يمثل الرقم 12 الاكتمال والتمام في التقليد الإسلامي. الذرة (حبّ الأرض) ترسّخ عنصرك. سلالة الدجاج المحددة ترمز إلى الثنائية المتوازنة. هذا القربان يُرسي بركة مادية دائمة، ويحمي الممتلكات والأصول، ويضمن الاستقرار عبر الأجيال، ويفتح أبواب الرزق. توقيت الأربعاء يوائم عنصر الأرض مع طاقات التواصل والتجلي."
           }
         }
       },
@@ -2221,11 +3023,13 @@
         "practice_night": {
           "primary": {
             "en": "Sunday night",
-            "fr": "Nuit du dimanche"
+            "fr": "Nuit du dimanche",
+            "ar": "ليلة الأحد"
           },
           "note": {
             "en": "Day of Mercury: Wednesday · Night of Mercury: Sunday night (after midnight → Fajr)",
-            "fr": "Jour de Mercure : Mercredi · Nuit de Mercure : Nuit du dimanche (après minuit → Fajr)"
+            "fr": "Jour de Mercure : Mercredi · Nuit de Mercure : Nuit du dimanche (après minuit → Fajr)",
+            "ar": "يوم عطارد: الأربعاء · ليلة عطارد: ليلة الأحد (بعد منتصف الليل حتى الفجر)"
           }
         },
         "zodiac_sign": {
@@ -2238,7 +3042,8 @@
           "transliteration": "Ya Fattah Ya Razzaq",
           "translation": {
             "en": "O Opener, O Provider",
-            "fr": "Ô Celui qui ouvre, Ô Pourvoyeur"
+            "fr": "Ô Celui qui ouvre, Ô Pourvoyeur",
+            "ar": "يا فتاح يا رزاق"
           }
         },
         "quranic_verse": {
@@ -2246,7 +3051,8 @@
           "transliteration": "Iyyaka na'budu wa iyyaka nasta'in",
           "translation": {
             "en": "You alone we worship, and You alone we ask for help",
-            "fr": "C'est Toi que nous adorons, et c'est Toi dont nous implorons secours"
+            "fr": "C'est Toi que nous adorons, et c'est Toi dont nous implorons secours",
+            "ar": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ"
           },
           "reference": "Surah Al-Fatiha 1:5"
         },
@@ -2255,7 +3061,8 @@
           "transliteration": "Kashfa Ya Ilu",
           "name": {
             "en": "Kashfa Ya'il",
-            "fr": "Kashfa Ya'il"
+            "fr": "Kashfa Ya'il",
+            "ar": "كشف يا ايل"
           }
         },
         "jinn": {
@@ -2263,7 +3070,8 @@
           "transliteration": "Maymun",
           "meaning": {
             "en": "Blessed/Fortunate",
-            "fr": "Béni/Fortuné"
+            "fr": "Béni/Fortuné",
+            "ar": "مبارك/محظوظ"
           }
         },
         "instructions": {
@@ -2293,6 +3101,19 @@
             "Faire des dua pour les ouvertures dans le rizq, la propriété et la stabilité",
             "Fermer avec bénédictions sur le Prophète ﷺ et gratitude",
             "Rester ancré et patient en attendant votre réponse"
+          ],
+          "ar": [
+            "توضّأ مع التنفس الواعي والحضور",
+            "اختر مكانًا هادئًا وجيد التهوية إن أمكن",
+            "استقبل القبلة للاصطفاف الروحي",
+            "ابدأ بالبسملة وأرسل الصلاة على النبي محمد ﷺ",
+            "خذ أنفاسًا عميقة ومهدئة لتتمركز",
+            "اتلُ الآية القرآنية (غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر الأسماء الإلهية (يا فتاح يا رزاق) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الملَك: يا كشف يا ايل (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الجن: يا ميمون (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "للاستخارة: اذكر سؤالك واطلب التوجيه الإلهي",
+            "اختم بالصلاة على النبي ﷺ والشكر"
           ]
         }
       }
@@ -2333,12 +3154,26 @@
           "life_blessing": "Accordé des capacités de communication exceptionnelles et adaptabilité",
           "divine_support": "Protégé dans les efforts intellectuels et sociaux",
           "challenge": "Doit développer profondeur et suivi aux côtés de la polyvalence"
+        },
+        "ar": {
+          "temperament": "سريع الفهم وذهنه رشيق - يزدهر مع التحفيز الذهني",
+          "communication": "فصيح ومقنع، متواصل ومعلّم بالفطرة",
+          "anger": "سريع الاشتعال لكنه سريع الهدوء أيضًا، كالرياح العابرة",
+          "social_loved": "محبوب ومُعجَب به لذكائه وفطنته وسحره الاجتماعي",
+          "social_challenge": "قد يُنظر إليه أحيانًا كسطحي أو متقلب",
+          "social_attraction": "صاحب علاقات بالفطرة يربط بين مجموعات متنوعة من الناس",
+          "social_unpopular": "يجد البعض قلقه وتقلبه مزعجًا",
+          "dreams": "الطيران، المرتفعات، السماء، أن يُحمَل إلى الأعلى، السعي الفكري في الأحلام",
+          "life_blessing": "يُمنح قدرات تواصل استثنائية وقدرة على التكيّف",
+          "divine_support": "محميّ في مساعيه الفكرية والاجتماعية",
+          "challenge": "عليه أن يطوّر العمق والمثابرة إلى جانب تعدد مواهبه"
         }
       },
       "career": {
         "traditional": {
           "en": "Similar to Buruj 3 - communication, trade, fashion, fresh produce",
-          "fr": "Similaire au Buruj 3 - communication, commerce, mode, produits frais"
+          "fr": "Similaire au Buruj 3 - communication, commerce, mode, produits frais",
+          "ar": "مشابه للبرج الثالث - التواصل، التجارة، الأزياء، المنتجات الطازجة"
         },
         "modern_recommended": {
           "en": [
@@ -2440,27 +3275,81 @@
                 "Travail éditorial"
               ]
             }
+          ],
+          "ar": [
+            {
+              "category": "الإعلام والاتصالات",
+              "icon": "📱",
+              "items": [
+                "الصحافة والتقارير الإخبارية",
+                "إدارة وسائل التواصل الاجتماعي",
+                "العلاقات العامة",
+                "البث الإذاعي والتلفزيوني",
+                "إنشاء المحتوى",
+                "التسويق الرقمي"
+              ]
+            },
+            {
+              "category": "التعليم والتدريب",
+              "icon": "📚",
+              "items": [
+                "التدريس والتعليم",
+                "التدريب المؤسسي",
+                "إنشاء الدورات عبر الإنترنت",
+                "تقنيات التعليم",
+                "تدريس اللغات",
+                "الاستشارات الأكاديمية"
+              ]
+            },
+            {
+              "category": "المبيعات والتشبيك",
+              "icon": "🤝",
+              "items": [
+                "المبيعات وتطوير الأعمال",
+                "التسويق الشبكي",
+                "سفارة العلامة التجارية",
+                "علاقات العملاء",
+                "تطوير الشراكات",
+                "إدارة المجتمعات"
+              ]
+            },
+            {
+              "category": "الكتابة والنشر",
+              "icon": "✍️",
+              "items": [
+                "الكتابة والتأليف",
+                "النشر",
+                "كتابة المحتوى الإعلاني",
+                "الكتابة التقنية",
+                "خدمات الترجمة",
+                "العمل التحريري"
+              ]
+            }
           ]
         },
         "avoid": {
           "traditional": {
             "en": "Fish and fish-related products",
-            "fr": "Poisson et produits liés au poisson"
+            "fr": "Poisson et produits liés au poisson",
+            "ar": "الأسماك والمنتجات المرتبطة بالأسماك"
           },
           "modern": {
             "en": "Seafood industry, isolated work, repetitive tasks without variety",
-            "fr": "Industrie des fruits de mer, travail isolé, tâches répétitives sans variété"
+            "fr": "Industrie des fruits de mer, travail isolé, tâches répétitives sans variété",
+            "ar": "صناعة المأكولات البحرية، العمل المعزول، المهام المتكررة الخالية من التنوع"
           }
         },
         "principle": {
           "en": "Communication, movement, variety, and intellectual exchange align with your airy nature",
-          "fr": "Communication, mouvement, variété et échange intellectuel s'alignent avec votre nature aérienne"
+          "fr": "Communication, mouvement, variété et échange intellectuel s'alignent avec votre nature aérienne",
+          "ar": "التواصل والحركة والتنوع والتبادل الفكري تنسجم مع طبيعتك الهوائية"
         }
       },
       "blessed_day": {
         "day": {
           "en": "Friday",
-          "fr": "Vendredi"
+          "fr": "Vendredi",
+          "ar": "الجمعة"
         },
         "day_number": 5,
         "best_for": {
@@ -2481,6 +3370,15 @@
             "Écriture et expression créative",
             "Construction de connexions communautaires",
             "Prières du vendredi et communauté spirituelle"
+          ],
+          "ar": [
+            "التواصلات والعروض التقديمية المهمة",
+            "التجمعات الاجتماعية والتشبيك",
+            "التدريس ومشاركة المعرفة",
+            "بدء المشاريع التعليمية",
+            "الكتابة والتعبير الإبداعي",
+            "بناء الروابط المجتمعية",
+            "صلاة الجمعة والمجتمع الروحي"
           ]
         },
         "special_notes": {
@@ -2495,6 +3393,12 @@
             "Vos capacités de communication culminent ce jour saint",
             "Parfait pour construire des ponts entre les personnes et les idées",
             "Le soutien divin coule à travers les connexions communautaires"
+          ],
+          "ar": [
+            "تتحد طاقتا الزهرة والجمعة لتمنح بركات اجتماعية قوية",
+            "تبلغ قدراتك على التواصل ذروتها في هذا اليوم المبارك",
+            "مثالي لبناء الجسور بين الناس والأفكار",
+            "يتدفق الدعم الإلهي عبر الروابط المجتمعية"
           ]
         }
       },
@@ -2502,19 +3406,23 @@
         "monthly": {
           "traditional": {
             "en": "Clothing from your wardrobe - similar to Buruj 3",
-            "fr": "Vêtements de votre garde-robe - similaire au Buruj 3"
+            "fr": "Vêtements de votre garde-robe - similaire au Buruj 3",
+            "ar": "ملابس من خزانتك - مشابه للبرج الثالث"
           },
           "frequency": {
             "en": "Every 1-2 months consistently",
-            "fr": "Tous les 1-2 mois de manière cohérente"
+            "fr": "Tous les 1-2 mois de manière cohérente",
+            "ar": "كل شهر إلى شهرين بانتظام"
           },
           "context": {
             "en": "To maintain balance and prevent scattered energy",
-            "fr": "Pour maintenir l'équilibre et prévenir l'énergie dispersée"
+            "fr": "Pour maintenir l'équilibre et prévenir l'énergie dispersée",
+            "ar": "للحفاظ على التوازن ومنع تشتت الطاقة"
           },
           "purpose": {
             "en": "Grounds your airy nature, brings focus, attracts meaningful connections, and ensures spiritual clarity in communication",
-            "fr": "Ancre votre nature aérienne, apporte concentration, attire des connexions significatives et assure clarté spirituelle dans la communication"
+            "fr": "Ancre votre nature aérienne, apporte concentration, attire des connexions significatives et assure clarté spirituelle dans la communication",
+            "ar": "يُرسّخ طبيعتك الهوائية، يمنحك التركيز، يجذب الروابط ذات المعنى، ويضمن الصفاء الروحي في التواصل"
           },
           "modern_alternatives": {
             "en": [
@@ -2532,13 +3440,22 @@
               "Donner aux organisations aidant les réfugiés",
               "Parrainer des uniformes scolaires pour enfants",
               "Soutenir les programmes de tenue pour le succès"
+            ],
+            "ar": [
+              "تبرّع بملابس مستعملة بحالة جيدة بانتظام",
+              "وفّر ملابس مهنية لباحثين عن عمل",
+              "ادعم برامج الملابس للطلاب",
+              "تبرّع لمنظمات تساعد اللاجئين",
+              "ارعَ الزي المدرسي للأطفال",
+              "ادعم برامج التأنق من أجل النجاح"
             ]
           }
         },
         "lifetime": {
           "traditional": {
             "en": "White lamb (any lamb if white unavailable), 4 coins",
-            "fr": "Agneau blanc (tout agneau si blanc non disponible), 4 pièces"
+            "fr": "Agneau blanc (tout agneau si blanc non disponible), 4 pièces",
+            "ar": "خروف أبيض (أو أي خروف إن لم يتوفر الأبيض)، 4 قطع نقدية"
           },
           "components": {
             "en": [
@@ -2556,6 +3473,14 @@
               "Pièces données en sadaqah à quatre personnes nécessiteuses différentes",
               "Effectué avec intention de clarté spirituelle",
               "Tout fait avec niyyah sincère pour plaire à Allah"
+            ],
+            "ar": [
+              "خروف أبيض (يُفضَّل) أو أي خروف إن لم يتوفر الأبيض",
+              "4 قطع نقدية أو عملة (تمثّل الجهات الأربع الأصلية)",
+              "لحم الخروف يوزَّع بين المؤمنين والفقراء",
+              "القطع النقدية تُعطى كصدقة لأربعة أشخاص محتاجين مختلفين",
+              "يُؤدَّى ذلك بنيّة الصفاء الروحي",
+              "كل ذلك يُنجَز بنية صادقة لإرضاء الله"
             ]
           },
           "best_timing": {
@@ -2572,11 +3497,19 @@
               "Lors de la recherche de clarté dans les communications importantes",
               "Avant des engagements majeurs d'enseignement ou de prise de parole",
               "Pendant les moments de construction de connexions communautaires"
+            ],
+            "ar": [
+              "أدِّها يوم الجمعة (يومك المبارك) بعد صلاة الجمعة",
+              "خلال عيد الأضحى لأقصى قدر من البركات",
+              "عند السعي لتحقيق الوضوح في التواصلات المهمة",
+              "قبل مناسبات التدريس أو الإلقاء الكبرى",
+              "خلال أوقات بناء الروابط المجتمعية"
             ]
           },
           "significance": {
             "en": "This offering grounds your airy nature through the lamb (earth connection) while the 4 coins represent spreading your gifts in all directions. It ensures your words carry barakah, protects your communication endeavors, and opens doors for meaningful connections. The four coins symbolize reaching the four corners of the earth with your message.",
-            "fr": "Cette offrande ancre votre nature aérienne à travers l'agneau (connexion terrestre) tandis que les 4 pièces représentent la diffusion de vos dons dans toutes les directions. Elle assure que vos paroles portent la barakah, protège vos efforts de communication et ouvre les portes pour des connexions significatives. Les quatre pièces symbolisent atteindre les quatre coins de la terre avec votre message."
+            "fr": "Cette offrande ancre votre nature aérienne à travers l'agneau (connexion terrestre) tandis que les 4 pièces représentent la diffusion de vos dons dans toutes les directions. Elle assure que vos paroles portent la barakah, protège vos efforts de communication et ouvre les portes pour des connexions significatives. Les quatre pièces symbolisent atteindre les quatre coins de la terre avec votre message.",
+            "ar": "هذه العطية تُرسّخ طبيعتك الهوائية من خلال الخروف (اتصال بالأرض)، بينما تمثّل القطع الأربع نشر عطاياك في كل الاتجاهات. تضمن أن تحمل كلماتك البركة، وتحمي مساعيك في التواصل، وتفتح الأبواب لروابط ذات معنى. القطع الأربع ترمز إلى بلوغ أركان الأرض الأربعة برسالتك."
           }
         }
       },
@@ -2584,11 +3517,13 @@
         "practice_night": {
           "primary": {
             "en": "Tuesday night",
-            "fr": "Nuit du mardi"
+            "fr": "Nuit du mardi",
+            "ar": "ليلة الثلاثاء"
           },
           "note": {
             "en": "Day of Venus: Friday · Night of Venus: Tuesday night (after midnight → Fajr)",
-            "fr": "Jour de Vénus : Vendredi · Nuit de Vénus : Nuit du mardi (après minuit → Fajr)"
+            "fr": "Jour de Vénus : Vendredi · Nuit de Vénus : Nuit du mardi (après minuit → Fajr)",
+            "ar": "يوم الزهرة: الجمعة · ليلة الزهرة: ليلة الثلاثاء (بعد منتصف الليل → الفجر)"
           }
         },
         "zodiac_sign": {
@@ -2601,7 +3536,8 @@
           "transliteration": "Yā ʿAliyyu Yā ʿAẓīm",
           "translation": {
             "en": "O Most High, O Most Great - The Exalted Above All",
-            "fr": "Ô Très-Haut, Ô Très Grand - L'Exalté Au-Dessus de Tout"
+            "fr": "Ô Très-Haut, Ô Très Grand - L'Exalté Au-Dessus de Tout",
+            "ar": "يَا عَلِيُّ يَا عَظِيمُ"
           }
         },
         "quranic_verse": {
@@ -2609,7 +3545,8 @@
           "transliteration": "Ṣirāṭa alladhīna anʿamta ʿalayhim",
           "translation": {
             "en": "The path of those upon whom You have bestowed favor",
-            "fr": "Le chemin de ceux que Tu as comblés de faveurs"
+            "fr": "Le chemin de ceux que Tu as comblés de faveurs",
+            "ar": "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ"
           },
           "reference": "Surah Al-Fatiha 1:7a"
         },
@@ -2618,7 +3555,8 @@
           "transliteration": "Mīkāʾīl (Michael)",
           "name": {
             "en": "The Angel of Provision and Mercy",
-            "fr": "L'Ange de la Provision et de la Miséricorde"
+            "fr": "L'Ange de la Provision et de la Miséricorde",
+            "ar": "مِيكَائِيلُ"
           }
         },
         "jinn": {
@@ -2626,7 +3564,8 @@
           "transliteration": "Burqān",
           "meaning": {
             "en": "The Lightning One - Swift as Wind",
-            "fr": "Celui de la Foudre - Rapide comme le Vent"
+            "fr": "Celui de la Foudre - Rapide comme le Vent",
+            "ar": "صاحب البرق - سريع كالريح"
           }
         },
         "instructions": {
@@ -2656,6 +3595,19 @@
             "Faire des dua pour la sagesse dans la communication et les connexions significatives",
             "Fermer avec bénédictions sur le Prophète ﷺ et gratitude",
             "Rester mentalement alerte pour les signes et l'inspiration"
+          ],
+          "ar": [
+            "توضّأ مع التنفّس الواعي والحضور الذهني",
+            "ابحث عن مكان هادئ وجيد التهوية إن أمكن",
+            "استقبل القبلة للاصطفاف الروحي",
+            "ابدأ بالبسملة وصلِّ على النبي محمد ﷺ",
+            "خذ أنفاسًا عميقة ومهدئة لتتمركز في ذاتك",
+            "اتلُ الآية القرآنية (صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر الأسماء الإلهية (يَا عَلِيُّ يَا عَظِيمُ) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الملَك: يا ميكائيل (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الجنّي: يا برقان (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "للاستخارة: اذكر سؤالك واطلب الهداية الإلهية",
+            "اختم بالصلاة على النبي ﷺ والشكر"
           ]
         }
       }
@@ -2696,12 +3648,26 @@
           "life_blessing": "Accordé une perspicacité profonde des vérités cachées et des capacités de guérison",
           "divine_support": "Protégé à travers les transformations les plus profondes de la vie",
           "challenge": "Doit apprendre à faire confiance et à lâcher le contrôle"
+        },
+        "ar": {
+          "temperament": "شديد وتحويلي - تيارات عاطفية عميقة تجري تحت سطح هادئ",
+          "communication": "يتحدث بفهم ثاقب وعمق عاطفي",
+          "anger": "بطيء في إظهار الغضب خارجيًا لكنه يشعر به بعمق، وعند انطلاقه يكون كموجة مد عارمة",
+          "social_loved": "محترم لولائه وعمقه وحضوره التحويلي",
+          "social_challenge": "قد تُرهق شدته من يفضلون العلاقات السطحية",
+          "social_attraction": "يسعى من يمرون بأزمات غريزيًا إلى عمقه وفهمه",
+          "social_unpopular": "يخشى البعض قدرته على رؤية ما وراء المظاهر",
+          "dreams": "المياه العميقة، المحيطات، التحول، رمزية الموت والبعث، الأسرار",
+          "life_blessing": "يُمنح بصيرة عميقة في الحقائق الخفية وقدرات على الشفاء",
+          "divine_support": "محفوظ عبر أعمق تحولات الحياة",
+          "challenge": "عليه أن يتعلم الثقة والتخلي عن السيطرة"
         }
       },
       "career": {
         "traditional": {
           "en": "Similar to Buruj 4 - fish trading, deep work, transformative professions",
-          "fr": "Similaire au Buruj 4 - commerce de poisson, travail profond, professions transformatrices"
+          "fr": "Similaire au Buruj 4 - commerce de poisson, travail profond, professions transformatrices",
+          "ar": "مشابه للبروج 4 - تجارة الأسماك، العمل العميق، المهن التحويلية"
         },
         "modern_recommended": {
           "en": [
@@ -2803,27 +3769,81 @@
                 "Soins palliatifs et de fin de vie"
               ]
             }
+          ],
+          "ar": [
+            {
+              "category": "الشفاء والعلاج",
+              "icon": "🏥",
+              "items": [
+                "العلاج النفسي والإرشاد",
+                "علاج الصدمات النفسية",
+                "أساليب الشفاء العميق",
+                "الخدمات النفسية والطب النفسي",
+                "التدخل في الأزمات",
+                "التدريب التحويلي (كوتشينغ)"
+              ]
+            },
+            {
+              "category": "التحقيق والبحث",
+              "icon": "🔍",
+              "items": [
+                "العمل التحقيقي (المباحث)",
+                "البحث والتحليل",
+                "علوم الأدلة الجنائية",
+                "الصحافة الاستقصائية",
+                "البحث العلمي",
+                "تحليل البيانات"
+              ]
+            },
+            {
+              "category": "المالية والموارد",
+              "icon": "💰",
+              "items": [
+                "الخدمات المصرفية الاستثمارية",
+                "التحليل المالي",
+                "تخطيط التركات",
+                "اكتتاب التأمين",
+                "إدارة الموارد",
+                "الاندماج والاستحواذ"
+              ]
+            },
+            {
+              "category": "العمل التحويلي",
+              "icon": "🔄",
+              "items": [
+                "التدريب على الحياة (لايف كوتشينغ)",
+                "الإرشاد الروحي",
+                "إدارة الأزمات",
+                "التحول التنظيمي",
+                "الاستشارات في إدارة التغيير",
+                "الرعاية التلطيفية ورعاية نهاية الحياة"
+              ]
+            }
           ]
         },
         "avoid": {
           "traditional": {
             "en": "Fruits and vegetables",
-            "fr": "Fruits et légumes"
+            "fr": "Fruits et légumes",
+            "ar": "الفواكه والخضروات"
           },
           "modern": {
             "en": "Fresh produce business, fruit wholesale, superficial work lacking depth",
-            "fr": "Commerce de produits frais, vente en gros de fruits, travail superficiel manquant de profondeur"
+            "fr": "Commerce de produits frais, vente en gros de fruits, travail superficiel manquant de profondeur",
+            "ar": "تجارة المنتجات الطازجة، بيع الفواكه بالجملة، العمل السطحي الذي يفتقر إلى العمق"
           }
         },
         "principle": {
           "en": "Depth, transformation, healing, and uncovering hidden truths align with your Scorpionic water nature",
-          "fr": "Profondeur, transformation, guérison et découverte de vérités cachées s'alignent avec votre nature aquatique scorpionique"
+          "fr": "Profondeur, transformation, guérison et découverte de vérités cachées s'alignent avec votre nature aquatique scorpionique",
+          "ar": "العمق والتحول والشفاء وكشف الحقائق الخفية تتوافق مع طبيعتك المائية العقربية"
         }
       },
       "blessed_day": {
         "day": {
           "en": "Tuesday",
-          "fr": "Mardi"
+          "fr": "Mardi",
+          "ar": "الثلاثاء"
         },
         "day_number": 2,
         "best_for": {
@@ -2844,6 +3864,15 @@
             "Confronter des vérités difficiles",
             "Mouvements de pouvoir stratégiques",
             "Pratiques spirituelles intenses"
+          ],
+          "ar": [
+            "العمل التحويلي العميق",
+            "التحقيق في الأمور الخفية",
+            "إنهاء الدورات وتحرير الماضي",
+            "جلسات شفاء قوية",
+            "مواجهة الحقائق الصعبة",
+            "تحركات القوة الاستراتيجية",
+            "الممارسات الروحية المكثفة"
           ]
         },
         "special_notes": {
@@ -2858,6 +3887,12 @@
             "Jour parfait pour les fins qui mènent à de nouveaux départs",
             "Vos capacités de transformation culminent ce jour",
             "Courage et perspicacité se combinent puissamment les mardis"
+          ],
+          "ar": [
+            "طاقة المريخ تُكثّف قوتك العقربية الطبيعية",
+            "يوم مثالي للنهايات التي تقود إلى بدايات جديدة",
+            "تبلغ قدراتك التحويلية ذروتها في هذا اليوم",
+            "الشجاعة والبصيرة تجتمعان بقوة أيام الثلاثاء"
           ]
         }
       },
@@ -2865,19 +3900,23 @@
         "monthly": {
           "traditional": {
             "en": "Rice and fish together - similar to Buruj 4",
-            "fr": "Riz et poisson ensemble - similaire au Buruj 4"
+            "fr": "Riz et poisson ensemble - similaire au Buruj 4",
+            "ar": "الأرز والسمك معًا - مشابه للبروج 4"
           },
           "frequency": {
             "en": "Every 1-2 months consistently",
-            "fr": "Tous les 1-2 mois de manière cohérente"
+            "fr": "Tous les 1-2 mois de manière cohérente",
+            "ar": "كل شهر إلى شهرين بانتظام"
           },
           "context": {
             "en": "To balance intense emotional depth and maintain flow",
-            "fr": "Pour équilibrer la profondeur émotionnelle intense et maintenir le flux"
+            "fr": "Pour équilibrer la profondeur émotionnelle intense et maintenir le flux",
+            "ar": "لموازنة العمق العاطفي الشديد والحفاظ على التدفق"
           },
           "purpose": {
             "en": "Releases stuck energy, facilitates transformation, ensures emotional flow, and attracts healing opportunities",
-            "fr": "Libère l'énergie bloquée, facilite la transformation, assure le flux émotionnel et attire les opportunités de guérison"
+            "fr": "Libère l'énergie bloquée, facilite la transformation, assure le flux émotionnel et attire les opportunités de guérison",
+            "ar": "يحرر الطاقة الراكدة، ويسهّل التحول، ويضمن التدفق العاطفي، ويجذب فرص الشفاء"
           },
           "modern_alternatives": {
             "en": [
@@ -2895,13 +3934,22 @@
               "Parrainer de la nourriture pour les groupes de soutien au deuil",
               "Donner aux organisations aidant les survivants de traumatismes",
               "Soutenir les programmes de repas pour ceux en transition"
+            ],
+            "ar": [
+              "التبرع بوجبات الأرز والسمك للملاجئ",
+              "دعم البرامج التي تُطعم من هم في أزمة",
+              "توفير وجبات للمستشفيات ومراكز الشفاء",
+              "رعاية الطعام لمجموعات دعم الحزن",
+              "التبرع لمنظمات تساعد الناجين من الصدمات",
+              "دعم برامج الوجبات لمن هم في مرحلة انتقالية"
             ]
           }
         },
         "lifetime": {
           "traditional": {
             "en": "Red goat, one-eighth of a mithqāl gold (sumun mithqāl az-zahab ≈ 0.531g) OR money equivalent",
-            "fr": "Chèvre rouge, un huitième de mithqāl d'or (sumun mithqāl az-zahab ≈ 0,531g) OU équivalent monétaire"
+            "fr": "Chèvre rouge, un huitième de mithqāl d'or (sumun mithqāl az-zahab ≈ 0,531g) OU équivalent monétaire",
+            "ar": "عنزة حمراء، ثمن مثقال ذهب (ثُمُن مثقال الذهب ≈ 0.531 جرام) أو ما يعادله من المال"
           },
           "components": {
             "en": [
@@ -2923,6 +3971,16 @@
               "Prioriser ceux qui traversent des transitions difficiles",
               "Effectué avec intention de transformation et guérison",
               "Fait avec niyyah sincère pour plaire à Allah"
+            ],
+            "ar": [
+              "عنزة حمراء كاملة (ترمز إلى التحول والقوة)",
+              "ثُمُن مثقال من الذهب (حوالي 0.531 جرام) أو ما يعادله من المال",
+              "يجب أن تكون العنزة سليمة وذات جودة جيدة",
+              "توزيع اللحم على نطاق واسع بين أفراد المجتمع",
+              "إعطاء الذهب/المال صدقة للمحتاجين",
+              "إعطاء الأولوية لمن يمرون بانتقالات صعبة",
+              "يُؤدَّى بنية التحول والشفاء",
+              "يُؤدَّى بنية صادقة لإرضاء الله"
             ]
           },
           "best_timing": {
@@ -2939,31 +3997,43 @@
               "Aux tournants majeurs de la vie",
               "Lors de la recherche de guérison profonde ou libération",
               "Pendant Muharram (mois de transformation)"
+            ],
+            "ar": [
+              "أدِّها يوم الثلاثاء (يومك المبارك)",
+              "خلال عيد الأضحى لأقصى تحول",
+              "عند منعطفات الحياة الكبرى",
+              "عند السعي إلى شفاء عميق أو تحرر",
+              "خلال شهر محرم (شهر التحول)"
             ]
           },
           "buruj_sadaqa": {
             "element": "water",
             "sacrifice": {
               "en": "Red goat, one-eighth of a mithqāl gold (sumun mithqāl az-zahab ≈ 0.531g) OR money equivalent",
-              "fr": "Chèvre rouge, un huitième de mithqāl d'or (sumun mithqāl az-zahab ≈ 0,531g) OU équivalent monétaire"
+              "fr": "Chèvre rouge, un huitième de mithqāl d'or (sumun mithqāl az-zahab ≈ 0,531g) OU équivalent monétaire",
+              "ar": "عنزة حمراء، ثمن مثقال ذهب (ثُمُن مثقال الذهب ≈ 0.531 جرام) أو ما يعادله من المال"
             },
             "zodiac": {
               "en": "Capricorn (Jady)",
               "fr": "Capricorne (Jady)",
-              "arabic": "الجدي"
+              "arabic": "الجدي",
+              "ar": "الجدي"
             },
             "best_day": {
               "en": "Tuesday",
-              "fr": "Mardi"
+              "fr": "Mardi",
+              "ar": "الثلاثاء"
             },
             "note": {
               "en": "The red goat symbolizes Scorpio's transformative power, while Capricorn represents the structured manifestation of that transformation",
-              "fr": "La chèvre rouge symbolise le pouvoir transformateur du Scorpion, tandis que le Capricorne représente la manifestation structurée de cette transformation"
+              "fr": "La chèvre rouge symbolise le pouvoir transformateur du Scorpion, tandis que le Capricorne représente la manifestation structurée de cette transformation",
+              "ar": "العنزة الحمراء ترمز إلى قوة العقرب التحويلية، بينما يمثل الجدي التجلي المنظّم لذلك التحول"
             }
           },
           "significance": {
             "en": "The red goat represents the blood of life and the power of transformation specific to buruj 8 (Water-Scorpio). This profound buruj sadaqah facilitates major life transitions, releases karmic patterns, empowers deep healing work, and transforms obstacles into opportunities. The red color symbolizes the intensity and power of Scorpio water - death and rebirth. The gold component (or monetary equivalent) represents the preciousness of transformation and connects to Capricorn's earthly manifestation.",
-            "fr": "La chèvre rouge représente le sang de la vie et le pouvoir de transformation spécifique au buruj 8 (Eau-Scorpion). Cette sadaqah buruj profonde facilite les transitions de vie majeures, libère les schémas karmiques, permet un travail de guérison profond et transforme les obstacles en opportunités. La couleur rouge symbolise l'intensité et le pouvoir de l'eau Scorpion - mort et renaissance. Le composant or (ou équivalent monétaire) représente le caractère précieux de la transformation et se connecte à la manifestation terrestre du Capricorne."
+            "fr": "La chèvre rouge représente le sang de la vie et le pouvoir de transformation spécifique au buruj 8 (Eau-Scorpion). Cette sadaqah buruj profonde facilite les transitions de vie majeures, libère les schémas karmiques, permet un travail de guérison profond et transforme les obstacles en opportunités. La couleur rouge symbolise l'intensité et le pouvoir de l'eau Scorpion - mort et renaissance. Le composant or (ou équivalent monétaire) représente le caractère précieux de la transformation et se connecte à la manifestation terrestre du Capricorne.",
+            "ar": "تمثل العنزة الحمراء دم الحياة وقوة التحول الخاصة بالبروج 8 (الماء-العقرب). هذه الصدقة العميقة الخاصة بالبروج تُيسّر الانتقالات الكبرى في الحياة، وتحرر الأنماط الكرمية، وتمكّن من عمل الشفاء العميق، وتحوّل العقبات إلى فرص. يرمز اللون الأحمر إلى شدة وقوة ماء العقرب - الموت والبعث. ويمثل عنصر الذهب (أو ما يعادله من المال) نفاسة التحول ويرتبط بالتجلي الأرضي للجدي."
           }
         }
       },
@@ -2971,11 +4041,13 @@
         "practice_night": {
           "primary": {
             "en": "Saturday night",
-            "fr": "Nuit du samedi"
+            "fr": "Nuit du samedi",
+            "ar": "ليلة السبت"
           },
           "note": {
             "en": "Day of Mars: Tuesday · Night of Mars: Saturday night (after midnight → Fajr)",
-            "fr": "Jour de Mars : Mardi · Nuit de Mars : Nuit du samedi (après minuit → Fajr)"
+            "fr": "Jour de Mars : Mardi · Nuit de Mars : Nuit du samedi (après minuit → Fajr)",
+            "ar": "يوم المريخ: الثلاثاء · ليلة المريخ: ليلة السبت (بعد منتصف الليل ← الفجر)"
           }
         },
         "zodiac_sign": {
@@ -2988,7 +4060,8 @@
           "transliteration": "Yā Māliku Yā Quddūs",
           "translation": {
             "en": "O Sovereign, O Most Holy - The King and The Pure",
-            "fr": "Ô Souverain, Ô Très Saint - Le Roi et Le Pur"
+            "fr": "Ô Souverain, Ô Très Saint - Le Roi et Le Pur",
+            "ar": "يَا مَالِكُ يَا قُدُّوسُ"
           }
         },
         "quranic_verse": {
@@ -2996,7 +4069,8 @@
           "transliteration": "Māliki yawmi d-dīn",
           "translation": {
             "en": "Master of the Day of Judgment - Ultimate Authority",
-            "fr": "Maître du Jour du Jugement - Autorité Ultime"
+            "fr": "Maître du Jour du Jugement - Autorité Ultime",
+            "ar": "مَـٰلِكِ يَوْمِ ٱلدِّينِ"
           },
           "reference": "Surah Al-Fatiha 1:4"
         },
@@ -3005,7 +4079,8 @@
           "transliteration": "Shamsiyā Īl",
           "name": {
             "en": "The Angel of Transformation and Renewal",
-            "fr": "L'Ange de Transformation et Renouveau"
+            "fr": "L'Ange de Transformation et Renouveau",
+            "ar": "شَمْسِيَا إِيلُ"
           }
         },
         "jinn": {
@@ -3013,7 +4088,8 @@
           "transliteration": "Aḥmar",
           "meaning": {
             "en": "The Red One - King of Transformation",
-            "fr": "Le Rouge - Roi de la Transformation"
+            "fr": "Le Rouge - Roi de la Transformation",
+            "ar": "الأحمر - ملك التحول"
           }
         },
         "instructions": {
@@ -3042,344 +4118,474 @@
             "Réciter le nom du Jinn: Ya Ahmar   (répéter Hadad fois: votre nom + nom de la mère)",
             "Énoncer clairement votre question d'Istikhara et chercher guidance divine",
             "Fermer avec salawat sur le Prophète ﷺ et gratitude"
+          ],
+          "ar": [
+            "توضّأ بتنفّس واعٍ وحضور",
+            "ابحث عن مكان هادئ جيد التهوية",
+            "استقبل القبلة إن أمكن",
+            "ابدأ بالبسملة وصلِّ على النبي ﷺ",
+            "خذ 3-7 أنفاس عميقة وواعية",
+            "اتلُ الآية القرآنية (مَالِكِ يَوْمِ الدِّينِ) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر الأسماء الحسنى (يا مالك يا قدوس) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الملَك: يا شمسيا إيل (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الجني: يا أحمر (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر سؤال الاستخارة بوضوح واطلب الهداية الإلهية",
+            "اختم بالصلاة على النبي ﷺ والشكر"
           ]
         }
       }
     },
     "9": {
-      "buruj": 9,
-      "element": "fire",
-      "element_emoji": "🔥",
-      "element_number": 1,
-      "colors": [
-        "#FF6B35",
-        "#F7931E",
-        "#FFD700"
+  "buruj": 9,
+  "element": "fire",
+  "element_emoji": "🔥",
+  "element_number": 1,
+  "colors": [
+    "#FF6B35",
+    "#F7931E",
+    "#FFD700"
+  ],
+  "personality": {
+    "en": {
+      "temperament": "Optimistic and adventurous - seeks expansion and truth",
+      "communication": "Speaks with enthusiasm and philosophical depth",
+      "anger": "Slow to anger, but when provoked speaks with blazing directness",
+      "social_loved": "Beloved for generosity and uplifting spirit",
+      "social_challenge": "May promise more than can be delivered",
+      "social_attraction": "People seek their wisdom and optimistic perspective",
+      "social_unpopular": "Some find their bluntness too harsh",
+      "dreams": "Fire, travel, distant places, learning, spiritual journeys",
+      "life_blessing": "Granted wisdom and opportunities for expansion",
+      "divine_support": "Protected in travel and seeking knowledge",
+      "challenge": "Must develop discipline alongside freedom-seeking nature"
+    },
+    "fr": {
+      "temperament": "Optimiste et aventureux - cherche l'expansion et la vérité",
+      "communication": "Parle avec enthousiasme et profondeur philosophique",
+      "anger": "Lent à la colère, mais quand provoqué parle avec franchise brûlante",
+      "social_loved": "Aimé pour la générosité et l'esprit édifiant",
+      "social_challenge": "Peut promettre plus que ce qui peut être livré",
+      "social_attraction": "Les gens recherchent leur sagesse et perspective optimiste",
+      "social_unpopular": "Certains trouvent leur franchise trop dure",
+      "dreams": "Feu, voyage, lieux lointains, apprentissage, voyages spirituels",
+      "life_blessing": "Accordé sagesse et opportunités d'expansion",
+      "divine_support": "Protégé dans le voyage et la recherche de connaissance",
+      "challenge": "Doit développer la discipline aux côtés de la nature cherchant la liberté"
+    },
+    "ar": {
+      "temperament": "متفائل ومغامر - يسعى إلى التوسع والحقيقة",
+      "communication": "يتحدث بحماس وعمق فلسفي",
+      "anger": "بطيء الغضب، لكنه عند الاستفزاز يتحدث بصراحة لاذعة",
+      "social_loved": "محبوب لكرمه وروحه المُلهِمة",
+      "social_challenge": "قد يَعِد بأكثر مما يستطيع الوفاء به",
+      "social_attraction": "يلتمس الناس حكمته ونظرته المتفائلة",
+      "social_unpopular": "يجد البعض صراحته قاسية أكثر من اللازم",
+      "dreams": "النار، السفر، الأماكن البعيدة، التعلّم، الرحلات الروحية",
+      "life_blessing": "يُمنح الحكمة وفرص التوسع",
+      "divine_support": "محميّ في السفر وطلب العلم",
+      "challenge": "عليه أن يطوّر الانضباط إلى جانب طبعه الباحث عن الحرية"
+    }
+  },
+  "career": {
+    "traditional": {
+      "en": "Teaching, trade, long-distance commerce, knowledge-based professions",
+      "fr": "Enseignement, commerce, commerce à longue distance, professions basées sur la connaissance",
+      "ar": "التدريس، التجارة، التجارة عبر مسافات طويلة، المهن القائمة على المعرفة"
+    },
+    "modern_recommended": {
+      "en": [
+        {
+          "category": "Education & Philosophy",
+          "icon": "📖",
+          "items": [
+            "Higher education teaching",
+            "Religious scholarship",
+            "Philosophy and ethics",
+            "International education",
+            "Cultural studies",
+            "Academic research"
+          ]
+        },
+        {
+          "category": "Travel & International",
+          "icon": "🌍",
+          "items": [
+            "International business",
+            "Import/export trading",
+            "Travel industry",
+            "International relations",
+            "Cross-cultural consulting",
+            "Global logistics"
+          ]
+        },
+        {
+          "category": "Publishing & Media",
+          "icon": "📚",
+          "items": [
+            "Publishing houses",
+            "Book writing and authorship",
+            "Educational media",
+            "Documentary production",
+            "International journalism",
+            "Knowledge platforms"
+          ]
+        }
       ],
-      "personality": {
-        "en": {
-          "temperament": "Optimistic and adventurous - seeks expansion and truth",
-          "communication": "Speaks with enthusiasm and philosophical depth",
-          "anger": "Slow to anger, but when provoked speaks with blazing directness",
-          "social_loved": "Beloved for generosity and uplifting spirit",
-          "social_challenge": "May promise more than can be delivered",
-          "social_attraction": "People seek their wisdom and optimistic perspective",
-          "social_unpopular": "Some find their bluntness too harsh",
-          "dreams": "Fire, travel, distant places, learning, spiritual journeys",
-          "life_blessing": "Granted wisdom and opportunities for expansion",
-          "divine_support": "Protected in travel and seeking knowledge",
-          "challenge": "Must develop discipline alongside freedom-seeking nature"
-        },
-        "fr": {
-          "temperament": "Optimiste et aventureux - cherche l'expansion et la vérité",
-          "communication": "Parle avec enthousiasme et profondeur philosophique",
-          "anger": "Lent à la colère, mais quand provoqué parle avec franchise brûlante",
-          "social_loved": "Aimé pour la générosité et l'esprit édifiant",
-          "social_challenge": "Peut promettre plus que ce qui peut être livré",
-          "social_attraction": "Les gens recherchent leur sagesse et perspective optimiste",
-          "social_unpopular": "Certains trouvent leur franchise trop dure",
-          "dreams": "Feu, voyage, lieux lointains, apprentissage, voyages spirituels",
-          "life_blessing": "Accordé sagesse et opportunités d'expansion",
-          "divine_support": "Protégé dans le voyage et la recherche de connaissance",
-          "challenge": "Doit développer la discipline aux côtés de la nature cherchant la liberté"
-        }
-      },
-      "career": {
-        "traditional": {
-          "en": "Teaching, trade, long-distance commerce, knowledge-based professions",
-          "fr": "Enseignement, commerce, commerce à longue distance, professions basées sur la connaissance"
-        },
-        "modern_recommended": {
-          "en": [
-            {
-              "category": "Education & Philosophy",
-              "icon": "📖",
-              "items": [
-                "Higher education teaching",
-                "Religious scholarship",
-                "Philosophy and ethics",
-                "International education",
-                "Cultural studies",
-                "Academic research"
-              ]
-            },
-            {
-              "category": "Travel & International",
-              "icon": "🌍",
-              "items": [
-                "International business",
-                "Import/export trading",
-                "Travel industry",
-                "International relations",
-                "Cross-cultural consulting",
-                "Global logistics"
-              ]
-            },
-            {
-              "category": "Publishing & Media",
-              "icon": "📚",
-              "items": [
-                "Publishing houses",
-                "Book writing and authorship",
-                "Educational media",
-                "Documentary production",
-                "International journalism",
-                "Knowledge platforms"
-              ]
-            }
-          ],
-          "fr": [
-            {
-              "category": "Éducation & Philosophie",
-              "icon": "📖",
-              "items": [
-                "Enseignement supérieur",
-                "Érudition religieuse",
-                "Philosophie et éthique",
-                "Éducation internationale",
-                "Études culturelles",
-                "Recherche académique"
-              ]
-            },
-            {
-              "category": "Voyage & International",
-              "icon": "🌍",
-              "items": [
-                "Commerce international",
-                "Commerce import/export",
-                "Industrie du voyage",
-                "Relations internationales",
-                "Conseil interculturel",
-                "Logistique mondiale"
-              ]
-            },
-            {
-              "category": "Édition & Médias",
-              "icon": "📚",
-              "items": [
-                "Maisons d'édition",
-                "Écriture et auteur de livres",
-                "Médias éducatifs",
-                "Production de documentaires",
-                "Journalisme international",
-                "Plateformes de connaissance"
-              ]
-            }
+      "fr": [
+        {
+          "category": "Éducation & Philosophie",
+          "icon": "📖",
+          "items": [
+            "Enseignement supérieur",
+            "Érudition religieuse",
+            "Philosophie et éthique",
+            "Éducation internationale",
+            "Études culturelles",
+            "Recherche académique"
           ]
         },
-        "avoid": {
-          "traditional": {
-            "en": "None specified for this buruj",
-            "fr": "Aucun spécifié pour ce buruj"
-          },
-          "modern": {
-            "en": "Confined spaces, restrictive roles, work without meaning or purpose",
-            "fr": "Espaces confinés, rôles restrictifs, travail sans sens ou objectif"
-          }
-        },
-        "principle": {
-          "en": "Expansion, knowledge, truth-seeking, and freedom align with Sagittarius fire",
-          "fr": "Expansion, connaissance, recherche de vérité et liberté s'alignent avec le feu Sagittaire"
-        }
-      },
-      "blessed_day": {
-        "day": {
-          "en": "Thursday",
-          "fr": "Jeudi"
-        },
-        "day_number": 4,
-        "best_for": {
-          "en": [
-            "Seeking knowledge and education",
-            "Beginning journeys and travels",
-            "Teaching and sharing wisdom",
-            "Signing educational contracts",
-            "Starting publishing projects",
-            "International business dealings",
-            "Spiritual study and reflection"
-          ],
-          "fr": [
-            "Chercher connaissance et éducation",
-            "Commencer voyages et déplacements",
-            "Enseigner et partager la sagesse",
-            "Signer des contrats éducatifs",
-            "Commencer des projets d'édition",
-            "Affaires commerciales internationales",
-            "Étude spirituelle et réflexion"
+        {
+          "category": "Voyage & International",
+          "icon": "🌍",
+          "items": [
+            "Commerce international",
+            "Commerce import/export",
+            "Industrie du voyage",
+            "Relations internationales",
+            "Conseil interculturel",
+            "Logistique mondiale"
           ]
         },
-        "special_notes": {
-          "en": [
-            "Jupiter energy peaks - brings expansion and blessings",
-            "Best day for learning and teaching",
-            "Your wisdom and generosity are amplified",
-            "Perfect for beginning long-term educational pursuits"
-          ],
-          "fr": [
-            "L'énergie de Jupiter culmine - apporte expansion et bénédictions",
-            "Meilleur jour pour apprendre et enseigner",
-            "Votre sagesse et générosité sont amplifiées",
-            "Parfait pour commencer des poursuites éducatives à long terme"
+        {
+          "category": "Édition & Médias",
+          "icon": "📚",
+          "items": [
+            "Maisons d'édition",
+            "Écriture et auteur de livres",
+            "Médias éducatifs",
+            "Production de documentaires",
+            "Journalisme international",
+            "Plateformes de connaissance"
           ]
         }
-      },
-      "sadaqah": {
-        "monthly": {
-          "traditional": {
-            "en": "Food to those in need - similar to other fire buruj",
-            "fr": "Nourriture aux nécessiteux - similaire aux autres buruj de feu"
-          },
-          "frequency": {
-            "en": "Every 1-2 months",
-            "fr": "Tous les 1-2 mois"
-          },
-          "context": {
-            "en": "To balance fire energy and attract continued blessings",
-            "fr": "Pour équilibrer l'énergie de feu et attirer les bénédictions continues"
-          },
-          "purpose": {
-            "en": "Maintains spiritual balance and ensures blessings in knowledge and travel",
-            "fr": "Maintient l'équilibre spirituel et assure les bénédictions dans la connaissance et le voyage"
-          },
-          "modern_alternatives": {
-            "en": [
-              "Feed students and scholars",
-              "Support educational meal programs",
-              "Donate to university food banks",
-              "Sponsor meals for travelers",
-              "Support refugee feeding programs"
-            ],
-            "fr": [
-              "Nourrir étudiants et érudits",
-              "Soutenir programmes de repas éducatifs",
-              "Donner aux banques alimentaires universitaires",
-              "Parrainer repas pour voyageurs",
-              "Soutenir programmes alimentaires pour réfugiés"
-            ]
-          }
+      ],
+      "ar": [
+        {
+          "category": "التعليم والفلسفة",
+          "icon": "📖",
+          "items": [
+            "التدريس في التعليم العالي",
+            "العلم الشرعي والدراسات الدينية",
+            "الفلسفة والأخلاق",
+            "التعليم الدولي",
+            "الدراسات الثقافية",
+            "البحث الأكاديمي"
+          ]
         },
-        "lifetime": {
-          "traditional": {
-            "en": "White hen, 1,000 cowrie shells OR 1,000 in currency",
-            "fr": "Poule blanche, 1 000 cauris OU 1 000 en monnaie"
-          },
-          "components": {
-            "en": [
-              "One white hen (symbolizing purity and knowledge)",
-              "1,000 cowrie shells OR equivalent in currency",
-              "Hen distributed as food to the needy",
-              "Currency/cowries given as sadaqah",
-              "Performed with intention for expansion and blessings",
-              "All with sincere niyyah"
-            ],
-            "fr": [
-              "Une poule blanche (symbolisant pureté et connaissance)",
-              "1 000 cauris OU équivalent en monnaie",
-              "Poule distribuée comme nourriture aux nécessiteux",
-              "Monnaie/cauris donnés en sadaqah",
-              "Effectué avec intention d'expansion et bénédictions",
-              "Tout avec niyyah sincère"
-            ]
-          },
-          "best_timing": {
-            "en": [
-              "Thursday (your blessed day)",
-              "Before major travels or educational ventures",
-              "During Islamic months of blessing",
-              "When seeking expansion in knowledge or business"
-            ],
-            "fr": [
-              "Jeudi (votre jour béni)",
-              "Avant voyages majeurs ou entreprises éducatives",
-              "Pendant mois islamiques de bénédiction",
-              "Lors de la recherche d'expansion dans connaissance ou affaires"
-            ]
-          },
-          "significance": {
-            "en": "Opens doors of knowledge, blesses travels, attracts opportunities for expansion, ensures protection during journeys",
-            "fr": "Ouvre portes de connaissance, bénit voyages, attire opportunités d'expansion, assure protection pendant voyages"
-          }
-        }
-      },
-      "spiritual_practice": {
-        "practice_night": {
-          "primary": {
-            "en": "Monday night",
-            "fr": "Nuit du lundi"
-          },
-          "note": {
-            "en": "Day of Jupiter: Thursday · Night of Jupiter: Monday night (after midnight → Fajr)",
-            "fr": "Jour de Jupiter : Jeudi · Nuit de Jupiter : Nuit du lundi (après minuit → Fajr)"
-          }
+        {
+          "category": "السفر والشؤون الدولية",
+          "icon": "🌍",
+          "items": [
+            "الأعمال الدولية",
+            "تجارة الاستيراد والتصدير",
+            "صناعة السفر والسياحة",
+            "العلاقات الدولية",
+            "الاستشارات بين الثقافات",
+            "الخدمات اللوجستية العالمية"
+          ]
         },
-        "zodiac_sign": {
-          "en": "Sagittarius (Al-Qaws) - The Archer",
-          "fr": "Sagittaire (Al-Qaws) - L'Archer",
-          "arabic": "القوس"
-        },
-        "divine_names": {
-          "arabic": "يا كبير يا متعالي",
-          "transliteration": "Ya Kabiru Ya Muta'ali",
-          "translation": {
-            "en": "O Most Great, O Most Exalted",
-            "fr": "Ô Très Grand, Ô Très Sublime"
-          }
-        },
-        "quranic_verse": {
-          "arabic": "اهدنا الصراط المستقيم",
-          "transliteration": "Ihdina al-sirata al-mustaqim",
-          "translation": {
-            "en": "Guide us to the straight path",
-            "fr": "Guide-nous dans le droit chemin"
-          },
-          "reference": "Surah Al-Fatiha 1:6"
-        },
-        "angel": {
-          "arabic": "صرف يائل",
-          "transliteration": "Sarf Ya'il",
-          "name": {
-            "en": "Sarfya'il",
-            "fr": "Sarfya'il"
-          }
-        },
-        "jinn": {
-          "arabic": "سمهرو سن",
-          "transliteration": "Samharu Sin",
-          "meaning": {
-            "en": "Samharu Sin",
-            "fr": "Samharu Sin"
-          }
-        },
-        "instructions": {
-          "en": [
-            "Perform wudu (ablution) with mindful breathing",
-            "Find a quiet, airy space",
-            "Face Qibla if possible",
-            "Begin with Bismillah and send salawat upon the Prophet ﷺ",
-            "Take 3-7 deep, conscious breaths",
-            "Recite the Quranic verse (Ihdina al-sirata al-mustaqim) (repeat Hadad times: your name + mother's name)",
-            "Recite Divine Names (Ya Kabiru Ya Muta'ali) (repeat Hadad times: your name + mother's name)",
-            "Recite the Angel name: Ya Sarf Ya'il  (repeat Hadad times: your name + mother's name)",
-            "Recite the Jinn name: Ya Samharu Sin  (repeat Hadad times: your name + mother's name)",
-            "State your Istikhara question clearly and seek divine guidance",
-            "Close with salawat upon the Prophet ﷺ and gratitude"
-          ],
-          "fr": [
-            "Effectuer le wudu (ablution) avec respiration consciente",
-            "Trouver un espace calme et aéré",
-            "Faire face à la Qibla si possible",
-            "Commencer avec Bismillah et envoyer salawat sur le Prophète ﷺ",
-            "Prendre 3-7 respirations profondes et conscientes",
-            "Réciter le verset coranique (Ihdina al-sirata al-mustaqim) (répéter Hadad fois: votre nom + nom de la mère)",
-            "Réciter les Noms Divins (Ya Kabiru Ya Muta'ali) (répéter Hadad fois: votre nom + nom de la mère)",
-            "Réciter le nom de l'Ange: Ya Sarf Ya'il   (répéter Hadad fois: votre nom + nom de la mère)",
-            "Réciter le nom du Jinn: Ya Samharu Sin   (répéter Hadad fois: votre nom + nom de la mère)",
-            "Énoncer clairement votre question d'Istikhara et chercher guidance divine",
-            "Fermer avec salawat sur le Prophète ﷺ et gratitude"
+        {
+          "category": "النشر والإعلام",
+          "icon": "📚",
+          "items": [
+            "دور النشر",
+            "كتابة الكتب والتأليف",
+            "الإعلام التعليمي",
+            "إنتاج الأفلام الوثائقية",
+            "الصحافة الدولية",
+            "منصات المعرفة"
           ]
         }
+      ]
+    },
+    "avoid": {
+      "traditional": {
+        "en": "None specified for this buruj",
+        "fr": "Aucun spécifié pour ce buruj",
+        "ar": "لا يوجد شيء محدد لهذا البرج"
+      },
+      "modern": {
+        "en": "Confined spaces, restrictive roles, work without meaning or purpose",
+        "fr": "Espaces confinés, rôles restrictifs, travail sans sens ou objectif",
+        "ar": "الأماكن المغلقة، الأدوار المقيِّدة، العمل بلا معنى أو هدف"
       }
     },
+    "principle": {
+      "en": "Expansion, knowledge, truth-seeking, and freedom align with Sagittarius fire",
+      "fr": "Expansion, connaissance, recherche de vérité et liberté s'alignent avec le feu Sagittaire",
+      "ar": "التوسع والمعرفة والبحث عن الحقيقة والحرية تنسجم مع نار برج القوس"
+    }
+  },
+  "blessed_day": {
+    "day": {
+      "en": "Thursday",
+      "fr": "Jeudi",
+      "ar": "الخميس"
+    },
+    "day_number": 4,
+    "best_for": {
+      "en": [
+        "Seeking knowledge and education",
+        "Beginning journeys and travels",
+        "Teaching and sharing wisdom",
+        "Signing educational contracts",
+        "Starting publishing projects",
+        "International business dealings",
+        "Spiritual study and reflection"
+      ],
+      "fr": [
+        "Chercher connaissance et éducation",
+        "Commencer voyages et déplacements",
+        "Enseigner et partager la sagesse",
+        "Signer des contrats éducatifs",
+        "Commencer des projets d'édition",
+        "Affaires commerciales internationales",
+        "Étude spirituelle et réflexion"
+      ],
+      "ar": [
+        "طلب العلم والمعرفة",
+        "بدء الرحلات والأسفار",
+        "التدريس ومشاركة الحكمة",
+        "توقيع العقود التعليمية",
+        "بدء مشاريع النشر",
+        "التعاملات التجارية الدولية",
+        "الدراسة والتأمل الروحي"
+      ]
+    },
+    "special_notes": {
+      "en": [
+        "Jupiter energy peaks - brings expansion and blessings",
+        "Best day for learning and teaching",
+        "Your wisdom and generosity are amplified",
+        "Perfect for beginning long-term educational pursuits"
+      ],
+      "fr": [
+        "L'énergie de Jupiter culmine - apporte expansion et bénédictions",
+        "Meilleur jour pour apprendre et enseigner",
+        "Votre sagesse et générosité sont amplifiées",
+        "Parfait pour commencer des poursuites éducatives à long terme"
+      ],
+      "ar": [
+        "طاقة كوكب المشتري في ذروتها - تجلب التوسع والبركات",
+        "أفضل يوم للتعلّم والتدريس",
+        "حكمتك وكرمك يتضاعفان",
+        "مثالي لبدء المساعي التعليمية طويلة المدى"
+      ]
+    }
+  },
+  "sadaqah": {
+    "monthly": {
+      "traditional": {
+        "en": "Food to those in need - similar to other fire buruj",
+        "fr": "Nourriture aux nécessiteux - similaire aux autres buruj de feu",
+        "ar": "إطعام المحتاجين - مشابه لبقية أبراج النار"
+      },
+      "frequency": {
+        "en": "Every 1-2 months",
+        "fr": "Tous les 1-2 mois",
+        "ar": "كل شهر إلى شهرين"
+      },
+      "context": {
+        "en": "To balance fire energy and attract continued blessings",
+        "fr": "Pour équilibrer l'énergie de feu et attirer les bénédictions continues",
+        "ar": "لموازنة طاقة النار وجذب البركات المستمرة"
+      },
+      "purpose": {
+        "en": "Maintains spiritual balance and ensures blessings in knowledge and travel",
+        "fr": "Maintient l'équilibre spirituel et assure les bénédictions dans la connaissance et le voyage",
+        "ar": "يحافظ على التوازن الروحي ويضمن البركة في العلم والسفر"
+      },
+      "modern_alternatives": {
+        "en": [
+          "Feed students and scholars",
+          "Support educational meal programs",
+          "Donate to university food banks",
+          "Sponsor meals for travelers",
+          "Support refugee feeding programs"
+        ],
+        "fr": [
+          "Nourrir étudiants et érudits",
+          "Soutenir programmes de repas éducatifs",
+          "Donner aux banques alimentaires universitaires",
+          "Parrainer repas pour voyageurs",
+          "Soutenir programmes alimentaires pour réfugiés"
+        ],
+        "ar": [
+          "إطعام الطلاب والعلماء",
+          "دعم برامج الوجبات التعليمية",
+          "التبرع لبنوك الطعام الجامعية",
+          "رعاية وجبات للمسافرين",
+          "دعم برامج إطعام اللاجئين"
+        ]
+      }
+    },
+    "lifetime": {
+      "traditional": {
+        "en": "White hen, 1,000 cowrie shells OR 1,000 in currency",
+        "fr": "Poule blanche, 1 000 cauris OU 1 000 en monnaie",
+        "ar": "دجاجة بيضاء، 1000 ودعة أو ما يعادلها نقدًا"
+      },
+      "components": {
+        "en": [
+          "One white hen (symbolizing purity and knowledge)",
+          "1,000 cowrie shells OR equivalent in currency",
+          "Hen distributed as food to the needy",
+          "Currency/cowries given as sadaqah",
+          "Performed with intention for expansion and blessings",
+          "All with sincere niyyah"
+        ],
+        "fr": [
+          "Une poule blanche (symbolisant pureté et connaissance)",
+          "1 000 cauris OU équivalent en monnaie",
+          "Poule distribuée comme nourriture aux nécessiteux",
+          "Monnaie/cauris donnés en sadaqah",
+          "Effectué avec intention d'expansion et bénédictions",
+          "Tout avec niyyah sincère"
+        ],
+        "ar": [
+          "دجاجة بيضاء واحدة (ترمز إلى الطهارة والمعرفة)",
+          "1000 ودعة أو ما يعادلها نقدًا",
+          "توزيع الدجاجة كطعام للمحتاجين",
+          "تقديم النقود أو الودع كصدقة",
+          "تُؤدى بنية التوسع والبركة",
+          "كل ذلك بنية صادقة"
+        ]
+      },
+      "best_timing": {
+        "en": [
+          "Thursday (your blessed day)",
+          "Before major travels or educational ventures",
+          "During Islamic months of blessing",
+          "When seeking expansion in knowledge or business"
+        ],
+        "fr": [
+          "Jeudi (votre jour béni)",
+          "Avant voyages majeurs ou entreprises éducatives",
+          "Pendant mois islamiques de bénédiction",
+          "Lors de la recherche d'expansion dans connaissance ou affaires"
+        ],
+        "ar": [
+          "الخميس (يومك المبارك)",
+          "قبل الأسفار الكبرى أو المساعي التعليمية",
+          "خلال الأشهر الإسلامية المباركة",
+          "عند السعي للتوسع في العلم أو الأعمال"
+        ]
+      },
+      "significance": {
+        "en": "Opens doors of knowledge, blesses travels, attracts opportunities for expansion, ensures protection during journeys",
+        "fr": "Ouvre portes de connaissance, bénit voyages, attire opportunités d'expansion, assure protection pendant voyages",
+        "ar": "يفتح أبواب المعرفة، يبارك الأسفار، يجذب فرص التوسع، ويضمن الحماية أثناء الرحلات"
+      }
+    }
+  },
+  "spiritual_practice": {
+    "practice_night": {
+      "primary": {
+        "en": "Monday night",
+        "fr": "Nuit du lundi",
+        "ar": "ليلة الاثنين"
+      },
+      "note": {
+        "en": "Day of Jupiter: Thursday · Night of Jupiter: Monday night (after midnight → Fajr)",
+        "fr": "Jour de Jupiter : Jeudi · Nuit de Jupiter : Nuit du lundi (après minuit → Fajr)",
+        "ar": "يوم المشتري: الخميس · ليلة المشتري: ليلة الاثنين (بعد منتصف الليل ← الفجر)"
+      }
+    },
+    "zodiac_sign": {
+      "en": "Sagittarius (Al-Qaws) - The Archer",
+      "fr": "Sagittaire (Al-Qaws) - L'Archer",
+      "arabic": "القوس"
+    },
+    "divine_names": {
+      "arabic": "يا كبير يا متعالي",
+      "transliteration": "Ya Kabiru Ya Muta'ali",
+      "translation": {
+        "en": "O Most Great, O Most Exalted",
+        "fr": "Ô Très Grand, Ô Très Sublime",
+        "ar": "يا كبير يا متعالي"
+      }
+    },
+    "quranic_verse": {
+      "arabic": "اهدنا الصراط المستقيم",
+      "transliteration": "Ihdina al-sirata al-mustaqim",
+      "translation": {
+        "en": "Guide us to the straight path",
+        "fr": "Guide-nous dans le droit chemin",
+        "ar": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ"
+      },
+      "reference": "Surah Al-Fatiha 1:6"
+    },
+    "angel": {
+      "arabic": "صرف يائل",
+      "transliteration": "Sarf Ya'il",
+      "name": {
+        "en": "Sarfya'il",
+        "fr": "Sarfya'il",
+        "ar": "صرف يائل"
+      }
+    },
+    "jinn": {
+      "arabic": "سمهرو سن",
+      "transliteration": "Samharu Sin",
+      "meaning": {
+        "en": "Samharu Sin",
+        "fr": "Samharu Sin",
+        "ar": "سمهرو سن"
+      }
+    },
+    "instructions": {
+      "en": [
+        "Perform wudu (ablution) with mindful breathing",
+        "Find a quiet, airy space",
+        "Face Qibla if possible",
+        "Begin with Bismillah and send salawat upon the Prophet ﷺ",
+        "Take 3-7 deep, conscious breaths",
+        "Recite the Quranic verse (Ihdina al-sirata al-mustaqim) (repeat Hadad times: your name + mother's name)",
+        "Recite Divine Names (Ya Kabiru Ya Muta'ali) (repeat Hadad times: your name + mother's name)",
+        "Recite the Angel name: Ya Sarf Ya'il  (repeat Hadad times: your name + mother's name)",
+        "Recite the Jinn name: Ya Samharu Sin  (repeat Hadad times: your name + mother's name)",
+        "State your Istikhara question clearly and seek divine guidance",
+        "Close with salawat upon the Prophet ﷺ and gratitude"
+      ],
+      "fr": [
+        "Effectuer le wudu (ablution) avec respiration consciente",
+        "Trouver un espace calme et aéré",
+        "Faire face à la Qibla si possible",
+        "Commencer avec Bismillah et envoyer salawat sur le Prophète ﷺ",
+        "Prendre 3-7 respirations profondes et conscientes",
+        "Réciter le verset coranique (Ihdina al-sirata al-mustaqim) (répéter Hadad fois: votre nom + nom de la mère)",
+        "Réciter les Noms Divins (Ya Kabiru Ya Muta'ali) (répéter Hadad fois: votre nom + nom de la mère)",
+        "Réciter le nom de l'Ange: Ya Sarf Ya'il   (répéter Hadad fois: votre nom + nom de la mère)",
+        "Réciter le nom du Jinn: Ya Samharu Sin   (répéter Hadad fois: votre nom + nom de la mère)",
+        "Énoncer clairement votre question d'Istikhara et chercher guidance divine",
+        "Fermer avec salawat sur le Prophète ﷺ et gratitude"
+      ],
+      "ar": [
+        "توضّأ مع التنفس الواعي",
+        "اختر مكانًا هادئًا وجيد التهوية",
+        "استقبل القبلة إن أمكن",
+        "ابدأ بالبسملة وأرسل الصلاة على النبي ﷺ",
+        "خذ 3-7 أنفاس عميقة وواعية",
+        "اتلُ الآية القرآنية (اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+        "اذكر الأسماء الحسنى (يا كبير يا متعالي) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+        "اذكر اسم الملَك: يا صرف يائل (كرر بعدد الحدد: اسمك + اسم والدتك)",
+        "اذكر اسم الجني: يا سمهرو سن (كرر بعدد الحدد: اسمك + اسم والدتك)",
+        "اذكر سؤال الاستخارة بوضوح واطلب الهداية الإلهية",
+        "اختم بالصلاة على النبي ﷺ والشكر"
+      ]
+    }
+  }
+},
     "10": {
       "buruj": 10,
       "element": "earth",
@@ -3416,12 +4622,26 @@
           "life_blessing": "Accordé patience et succès ultime par persévérance",
           "divine_support": "Protégé dans efforts à long terme et carrière",
           "challenge": "Doit apprendre à équilibrer ambition avec compassion"
+        },
+        "ar": {
+          "temperament": "منضبط وطموح — يسعى إلى الإنجاز والإتقان",
+          "communication": "يتحدث بسلطة وحكمة متزنة",
+          "anger": "بطيء الغضب جدًا، لكنه إذا استُفِزّ يصبح ثابتًا كالجبل لا يتزحزح",
+          "social_loved": "محترم لموثوقيته وإنجازاته",
+          "social_challenge": "قد يبدو باردًا أو جادًا أكثر من اللازم",
+          "social_attraction": "ينجذب إليه من يبحثون عن الاستقرار والتوجيه",
+          "social_unpopular": "يجد البعض جديته مخيفة",
+          "dreams": "الجبال، الأبنية، الإنجازات، التسلق إلى الأعلى",
+          "life_blessing": "يُمنح الصبر والنجاح النهائي عبر المثابرة",
+          "divine_support": "محميّ في مساعيه طويلة الأمد وفي مسيرته المهنية",
+          "challenge": "عليه أن يتعلم موازنة الطموح بالرحمة"
         }
       },
       "career": {
         "traditional": {
           "en": "Similar to other earth buruj - agriculture, construction, earth resources, property",
-          "fr": "Similaire aux autres buruj de terre - agriculture, construction, ressources terrestres, propriété"
+          "fr": "Similaire aux autres buruj de terre - agriculture, construction, ressources terrestres, propriété",
+          "ar": "مشابه لبروج الأرض الأخرى - الزراعة، البناء، موارد الأرض، العقارات"
         },
         "modern_recommended": {
           "en": [
@@ -3499,27 +4719,69 @@
                 "Gestion de projet"
               ]
             }
+          ],
+          "ar": [
+            {
+              "category": "القيادة والإدارة",
+              "icon": "👨‍💼",
+              "items": [
+                "القيادة التنفيذية للشركات",
+                "المناصب الحكومية",
+                "القيادة العسكرية",
+                "الإدارة المؤسسية",
+                "التخطيط الاستراتيجي طويل الأمد",
+                "التطوير التنظيمي"
+              ]
+            },
+            {
+              "category": "المهن التقليدية",
+              "icon": "⚖️",
+              "items": [
+                "القانون والقضاء",
+                "المحاسبة والتدقيق",
+                "الهندسة",
+                "العمارة",
+                "الطب (الجراحة)",
+                "الإدارة الأكاديمية"
+              ]
+            },
+            {
+              "category": "العقارات والبناء",
+              "icon": "🏗️",
+              "items": [
+                "البناء واسع النطاق",
+                "التطوير العقاري",
+                "مشاريع البنية التحتية",
+                "الاستثمار العقاري",
+                "التخطيط العمراني",
+                "إدارة المشاريع"
+              ]
+            }
           ]
         },
         "avoid": {
           "traditional": {
             "en": "Fish and fish-related products",
-            "fr": "Poisson et produits liés au poisson"
+            "fr": "Poisson et produits liés au poisson",
+            "ar": "السمك والمنتجات المرتبطة بالسمك"
           },
           "modern": {
             "en": "Seafood industry, unstable ventures, roles without clear authority",
-            "fr": "Industrie des fruits de mer, entreprises instables, rôles sans autorité claire"
+            "fr": "Industrie des fruits de mer, entreprises instables, rôles sans autorité claire",
+            "ar": "صناعة المأكولات البحرية، المشاريع غير المستقرة، الأدوار التي تفتقر إلى سلطة واضحة"
           }
         },
         "principle": {
           "en": "Structure, discipline, long-term achievement, and mastery align with Capricorn earth",
-          "fr": "Structure, discipline, réalisation à long terme et maîtrise s'alignent avec la terre Capricorne"
+          "fr": "Structure, discipline, réalisation à long terme et maîtrise s'alignent avec la terre Capricorne",
+          "ar": "البنية والانضباط والإنجاز طويل الأمد والإتقان تتوافق مع طبيعة الجدي الترابية"
         }
       },
       "blessed_day": {
         "day": {
           "en": "Saturday",
-          "fr": "Samedi"
+          "fr": "Samedi",
+          "ar": "السبت"
         },
         "day_number": 6,
         "best_for": {
@@ -3542,6 +4804,16 @@
             "Décisions immobilières et d'investissement",
             "Établissement d'intentions sérieuses",
             "Effectuer votre sadaqah de vie"
+          ],
+          "ar": [
+            "تخطيط المسيرة المهنية وتطويرها",
+            "القرارات التجارية المهمة",
+            "الالتزامات طويلة الأمد",
+            "تطبيق الانضباط والبنية",
+            "أمور السلطة",
+            "قرارات العقارات والاستثمار",
+            "وضع النوايا الجادة",
+            "أداء صدقتك مدى الحياة"
           ]
         },
         "special_notes": {
@@ -3560,6 +4832,14 @@
             "Idéal pour établir structures durables",
             "Parfait pour planification patiente à long terme",
             "Jour le plus propice pour votre sadaqah de vie"
+          ],
+          "ar": [
+            "السبت هو أفضل يوم لهذا البرج",
+            "طاقة زحل في ذروتها - الأقوى للمساعي الجادة",
+            "انضباطك وسلطتك الطبيعيان في أقوى حالاتهما",
+            "مثالي لإرساء بنى دائمة",
+            "مثالي للتخطيط الصبور طويل الأمد",
+            "أكثر الأيام يمنًا لأداء صدقتك مدى الحياة"
           ]
         }
       },
@@ -3567,19 +4847,23 @@
         "monthly": {
           "traditional": {
             "en": "Grains, earth-derived food products",
-            "fr": "Céréales, produits alimentaires dérivés de la terre"
+            "fr": "Céréales, produits alimentaires dérivés de la terre",
+            "ar": "الحبوب، المنتجات الغذائية المشتقة من الأرض"
           },
           "frequency": {
             "en": "Every 1-2 months",
-            "fr": "Tous les 1-2 mois"
+            "fr": "Tous les 1-2 mois",
+            "ar": "كل 1-2 شهر"
           },
           "context": {
             "en": "To maintain spiritual flow and prevent stagnation",
-            "fr": "Pour maintenir flux spirituel et prévenir stagnation"
+            "fr": "Pour maintenir flux spirituel et prévenir stagnation",
+            "ar": "للحفاظ على التدفق الروحي ومنع الركود"
           },
           "purpose": {
             "en": "Balances earth energy, ensures continued success, maintains spiritual grounding",
-            "fr": "Équilibre énergie terrestre, assure succès continu, maintient ancrage spirituel"
+            "fr": "Équilibre énergie terrestre, assure succès continu, maintient ancrage spirituel",
+            "ar": "يوازن طاقة الأرض، يضمن استمرار النجاح، يحافظ على الرسوخ الروحي"
           },
           "modern_alternatives": {
             "en": [
@@ -3595,13 +4879,21 @@
               "Parrainer repas pour travailleurs et ouvriers",
               "Donner aux organisations aidant les chômeurs",
               "Soutenir programmes de formation professionnelle"
+            ],
+            "ar": [
+              "تبرع بالحبوب والمواد الأساسية لبنوك الطعام",
+              "ادعم المجتمعات الزراعية",
+              "ارعَ وجبات للعمال والكادحين",
+              "تبرع للمنظمات التي تساعد العاطلين عن العمل",
+              "ادعم برامج التدريب المهني"
             ]
           }
         },
         "lifetime": {
           "traditional": {
             "en": "One black lamb, 10 Miskāl of gold (42.50 grams) or monetary equivalent",
-            "fr": "Un agneau noir, 10 Miskāl d'or (42,50 grammes) ou équivalent monétaire"
+            "fr": "Un agneau noir, 10 Miskāl d'or (42,50 grammes) ou équivalent monétaire",
+            "ar": "حَمَل أسود واحد، 10 مثقال من الذهب (42.50 غرامًا) أو ما يعادله نقدًا"
           },
           "components": {
             "en": [
@@ -3621,6 +4913,15 @@
               "Valeur d'or donnée en sadaqah aux nécessiteux",
               "Doit être effectué le samedi (LE MEILLEUR jour pour ce buruj)",
               "Fait avec niyyah sincère et intention sérieuse"
+            ],
+            "ar": [
+              "حَمَل أسود واحد (يرمز إلى العمق والإتقان وطاقة زحل)",
+              "10 مثقال من الذهب = 42.50 غرامًا من الذهب (10 × 4.25غ)",
+              "أو ما يعادل قيمة 42.50 غرامًا من الذهب نقدًا",
+              "يُوزَّع لحم الحَمَل الأسود على الفقراء والمحتاجين",
+              "تُعطى قيمة الذهب صدقةً للمحتاجين",
+              "يجب أن تُؤدَّى يوم السبت (أفضل يوم لهذا البرج)",
+              "تُؤدَّى بنية صادقة وقصد جاد"
             ]
           },
           "gold_calculation": {
@@ -3673,11 +4974,21 @@
               "Aux moments d'établissement de vie majeur",
               "Peut être effectué n'importe quel samedi tout au long de l'année",
               "Particulièrement puissant pendant Dhul-Hijjah (mois du sacrifice)"
+            ],
+            "ar": [
+              "السبت (أفضل يوم لهذا البرج) - أقوى توقيت",
+              "عند تحقيق إنجاز مهني كبير أو ترقية",
+              "عند اقتناء ممتلكات أو ثروة مهمة",
+              "خلال أوقات ترسيخ سلطة أو قيادة كبرى",
+              "في لحظات الاستقرار الكبرى في الحياة",
+              "يمكن أداؤها أي يوم سبت طوال العام",
+              "قوية بشكل خاص خلال ذي الحجة (شهر الأضحية)"
             ]
           },
           "significance": {
             "en": "This is one of the most powerful sadaqah combinations in ʿIlm al-Ḥurūf. The black lamb represents mastery over the material world through spiritual discipline. The 10 Miskāl of gold (42.50g) represents complete wealth and divine provision. Together, they establish: lasting success in career and authority, protection of property and generational wealth, divine support in ambitious undertakings, mastery and leadership in your field, unshakeable material stability. Saturn's Saturday energy amplifies discipline, structure, and long-term results. This sacrifice creates a foundation that lasts for generations.",
-            "fr": "C'est l'une des combinaisons sadaqah les plus puissantes dans ʿIlm al-Ḥurūf. L'agneau noir représente la maîtrise du monde matériel par la discipline spirituelle. Les 10 Miskāl d'or (42,50g) représentent la richesse complète et la provision divine. Ensemble, ils établissent: succès durable dans la carrière et l'autorité, protection de la propriété et richesse générationnelle, soutien divin dans les entreprises ambitieuses, maîtrise et leadership dans votre domaine, stabilité matérielle inébranlable. L'énergie du samedi de Saturne amplifie discipline, structure et résultats à long terme. Ce sacrifice crée une fondation qui dure des générations."
+            "fr": "C'est l'une des combinaisons sadaqah les plus puissantes dans ʿIlm al-Ḥurūf. L'agneau noir représente la maîtrise du monde matériel par la discipline spirituelle. Les 10 Miskāl d'or (42,50g) représentent la richesse complète et la provision divine. Ensemble, ils établissent: succès durable dans la carrière et l'autorité, protection de la propriété et richesse générationnelle, soutien divin dans les entreprises ambitieuses, maîtrise et leadership dans votre domaine, stabilité matérielle inébranlable. L'énergie du samedi de Saturne amplifie discipline, structure et résultats à long terme. Ce sacrifice crée une fondation qui dure des générations.",
+            "ar": "هذه من أقوى تركيبات الصدقة في علم الحروف. يرمز الحَمَل الأسود إلى التمكن من العالم المادي عبر الانضباط الروحي. و10 مثقال من الذهب (42.50غ) يرمز إلى الثروة الكاملة والرزق الإلهي. معًا، يُرسِيان: نجاحًا دائمًا في المسيرة المهنية والسلطة، وحماية للممتلكات والثروة الموروثة عبر الأجيال، ودعمًا إلهيًا في المساعي الطموحة، وإتقانًا وقيادة في مجالك، واستقرارًا ماديًا لا يتزعزع. تضخّم طاقة السبت الزحلية الانضباط والبنية والنتائج طويلة الأمد. هذه التضحية تُرسي أساسًا يدوم أجيالًا."
           },
           "practical_notes": {
             "en": [
@@ -3701,11 +5012,13 @@
         "practice_night": {
           "primary": {
             "en": "Wednesday night",
-            "fr": "Nuit du mercredi"
+            "fr": "Nuit du mercredi",
+            "ar": "ليلة الأربعاء"
           },
           "note": {
             "en": "Day of Saturn: Saturday · Night of Saturn: Wednesday night (after midnight → Fajr)",
-            "fr": "Jour de Saturne : Samedi · Nuit de Saturne : Nuit du mercredi (après minuit → Fajr)"
+            "fr": "Jour de Saturne : Samedi · Nuit de Saturne : Nuit du mercredi (après minuit → Fajr)",
+            "ar": "يوم زحل: السبت · ليلة زحل: ليلة الأربعاء (بعد منتصف الليل حتى الفجر)"
           }
         },
         "zodiac_sign": {
@@ -3718,7 +5031,8 @@
           "transliteration": "Yā Fattāḥu Yā Razzāq",
           "translation": {
             "en": "O Opener, O Provider",
-            "fr": "Ô Celui qui Ouvre, Ô Pourvoyeur"
+            "fr": "Ô Celui qui Ouvre, Ô Pourvoyeur",
+            "ar": "يَا فَتَّاحُ يَا رَزَّاقُ"
           }
         },
         "quranic_verse": {
@@ -3726,7 +5040,8 @@
           "transliteration": "Ghayri al-maghdubi 'alayhim wala al-dallin",
           "translation": {
             "en": "Not of those who have evoked [Your] anger or of those who are astray",
-            "fr": "Non pas de ceux qui ont encouru Ta colère, ni des égarés"
+            "fr": "Non pas de ceux qui ont encouru Ta colère, ni des égarés",
+            "ar": "غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ"
           },
           "reference": "Surah Al-Fatiha 1:7b"
         },
@@ -3735,7 +5050,8 @@
           "transliteration": "Kashfu Yā Īl",
           "name": {
             "en": "Angel of Unveiling",
-            "fr": "Ange du Dévoilement"
+            "fr": "Ange du Dévoilement",
+            "ar": "كَشْفُ يَا إِيلُ"
           }
         },
         "jinn": {
@@ -3743,7 +5059,8 @@
           "transliteration": "Maymūnah",
           "meaning": {
             "en": "The Blessed One",
-            "fr": "La Bénie"
+            "fr": "La Bénie",
+            "ar": "المباركة"
           }
         },
         "instructions": {
@@ -3772,6 +5089,19 @@
             "Réciter le nom du Jinn: Ya Maymunah   (répéter Hadad fois: votre nom + nom de la mère)",
             "Énoncer clairement votre question d'Istikhara et chercher guidance divine",
             "Fermer avec salawat sur le Prophète ﷺ et gratitude"
+          ],
+          "ar": [
+            "توضّأ مع التنفس الواعي",
+            "اختر مكانًا هادئًا وجيد التهوية",
+            "استقبل القبلة إن أمكن",
+            "ابدأ بالبسملة وأرسل الصلاة على النبي ﷺ",
+            "خذ 3-7 أنفاس عميقة وواعية",
+            "اتلُ الآية القرآنية (غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر الأسماء الحسنى (يا فتّاح يا رزّاق) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الملَك: يا كشف يا إيل (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الجني: يا ميمونة (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر سؤال الاستخارة بوضوح واطلب الهداية الإلهية",
+            "اختم بالصلاة على النبي ﷺ والشكر"
           ]
         }
       }
@@ -3812,12 +5142,26 @@
           "life_blessing": "Accordé vision pour bénéfice collectif et innovation",
           "divine_support": "Protégé dans service communautaire et travail humanitaire",
           "challenge": "Doit équilibrer idéalisme avec mise en œuvre pratique"
+        },
+        "ar": {
+          "temperament": "مبدع وإنساني النزعة - يسعى لخدمة الجماعة",
+          "communication": "يتحدث برؤية للمستقبل ورفاهية المجتمع",
+          "anger": "ينعزل عاطفيًا عند الغضب، قد يصبح بعيدًا أو منفصلاً",
+          "social_loved": "محبوب لتفكيره التقدمي وجهوده الإنسانية",
+          "social_challenge": "قد يبدو بعيدًا عاطفيًا أو مثاليًا أكثر من اللازم",
+          "social_attraction": "ينجذب إليه الباحثون عن التغيير والابتكار",
+          "social_unpopular": "يجد البعض أفكاره غير التقليدية مقلقة",
+          "dreams": "الطيران، رؤى المستقبل، المجتمعات، التجمعات، الحلول المبتكرة",
+          "life_blessing": "يُمنح رؤية لخير الجماعة والابتكار",
+          "divine_support": "محميّ في خدمة المجتمع والعمل الإنساني",
+          "challenge": "عليه أن يوازن بين المثالية والتطبيق العملي"
         }
       },
       "career": {
         "traditional": {
           "en": "Similar to other air buruj - communication, trade, community service",
-          "fr": "Similaire aux autres buruj d'air - communication, commerce, service communautaire"
+          "fr": "Similaire aux autres buruj d'air - communication, commerce, service communautaire",
+          "ar": "مشابه لأبراج الهواء الأخرى - التواصل، التجارة، خدمة المجتمع"
         },
         "modern_recommended": {
           "en": [
@@ -3895,27 +5239,69 @@
                 "Conseil en innovation"
               ]
             }
+          ],
+          "ar": [
+            {
+              "category": "التقنية والابتكار",
+              "icon": "💻",
+              "items": [
+                "الابتكار التقني",
+                "تطوير البرمجيات",
+                "الذكاء الاصطناعي والتعلم الآلي",
+                "البلوكتشين والعملات الرقمية",
+                "تقنية الفضاء",
+                "التقنية الخضراء"
+              ]
+            },
+            {
+              "category": "العمل الإنساني والاجتماعي",
+              "icon": "🤝",
+              "items": [
+                "قيادة المنظمات غير الربحية",
+                "ريادة الأعمال الاجتماعية",
+                "تنظيم المجتمع",
+                "الدفاع عن حقوق الإنسان",
+                "التنمية الدولية",
+                "الابتكار الاجتماعي"
+              ]
+            },
+            {
+              "category": "العلوم والبحث",
+              "icon": "🔬",
+              "items": [
+                "البحث العلمي",
+                "علوم البيئة",
+                "الطاقة المتجددة",
+                "علم الفلك والفضاء",
+                "دراسات المستقبل",
+                "استشارات الابتكار"
+              ]
+            }
           ]
         },
         "avoid": {
           "traditional": {
             "en": "Fish and fish-related products",
-            "fr": "Poisson et produits liés au poisson"
+            "fr": "Poisson et produits liés au poisson",
+            "ar": "السمك والمنتجات المرتبطة بالسمك"
           },
           "modern": {
             "en": "Seafood industry, traditional rigid structures, roles opposing innovation",
-            "fr": "Industrie des fruits de mer, structures rigides traditionnelles, rôles opposant l'innovation"
+            "fr": "Industrie des fruits de mer, structures rigides traditionnelles, rôles opposant l'innovation",
+            "ar": "صناعة المأكولات البحرية، الهياكل التقليدية الجامدة، الأدوار المعارضة للابتكار"
           }
         },
         "principle": {
           "en": "Innovation, community service, future vision, and progressive thinking align with Aquarius air",
-          "fr": "Innovation, service communautaire, vision future et pensée progressive s'alignent avec l'air Verseau"
+          "fr": "Innovation, service communautaire, vision future et pensée progressive s'alignent avec l'air Verseau",
+          "ar": "الابتكار وخدمة المجتمع ورؤية المستقبل والتفكير التقدمي تتوافق مع هواء الدلو"
         }
       },
       "blessed_day": {
         "day": {
           "en": "Sunday",
-          "fr": "Dimanche"
+          "fr": "Dimanche",
+          "ar": "الأحد"
         },
         "day_number": 0,
         "best_for": {
@@ -3936,6 +5322,15 @@
             "Lancements technologiques",
             "Efforts de réforme sociale",
             "Planification future"
+          ],
+          "ar": [
+            "المشاريع المجتمعية والتجمعات",
+            "الابتكار والأفكار الجديدة",
+            "المبادرات الإنسانية",
+            "الأنشطة الجماعية والتعاون",
+            "إطلاق التقنيات الجديدة",
+            "جهود الإصلاح الاجتماعي",
+            "التخطيط للمستقبل"
           ]
         },
         "special_notes": {
@@ -3950,6 +5345,12 @@
             "Votre vision humanitaire est la plus claire",
             "Parfait pour lancer initiatives communautaires",
             "Soutien divin coule à travers efforts collectifs"
+          ],
+          "ar": [
+            "الطاقة الشمسية ممزوجة بالهواء تجلب ابتكارًا مضيئًا",
+            "رؤيتك الإنسانية في أوضح حالاتها",
+            "مثالي لإطلاق المبادرات المجتمعية",
+            "الدعم الإلهي يتدفق عبر الجهود الجماعية"
           ]
         }
       },
@@ -3957,19 +5358,23 @@
         "monthly": {
           "traditional": {
             "en": "Clothing from wardrobe",
-            "fr": "Vêtements de la garde-robe"
+            "fr": "Vêtements de la garde-robe",
+            "ar": "ملابس من الخزانة"
           },
           "frequency": {
             "en": "Every 1-2 months",
-            "fr": "Tous les 1-2 mois"
+            "fr": "Tous les 1-2 mois",
+            "ar": "كل شهر إلى شهرين"
           },
           "context": {
             "en": "To ground visionary energy and maintain connection to community needs",
-            "fr": "Pour ancrer énergie visionnaire et maintenir connexion aux besoins communautaires"
+            "fr": "Pour ancrer énergie visionnaire et maintenir connexion aux besoins communautaires",
+            "ar": "لترسيخ الطاقة الرؤيوية والحفاظ على الاتصال باحتياجات المجتمع"
           },
           "purpose": {
             "en": "Balances detached air nature, maintains connection to practical service, ensures spiritual flow",
-            "fr": "Équilibre nature aérienne détachée, maintient connexion au service pratique, assure flux spirituel"
+            "fr": "Équilibre nature aérienne détachée, maintient connexion au service pratique, assure flux spirituel",
+            "ar": "يوازن طبيعة الهواء المنعزلة، يحافظ على الاتصال بالخدمة العملية، ويضمن تدفق البركة الروحية"
           },
           "modern_alternatives": {
             "en": [
@@ -3985,13 +5390,21 @@
               "Fournir tenues de travail pour programmes de formation",
               "Donner aux collectes de vêtements communautaires",
               "Soutenir besoins en vêtements des logements transitoires"
+            ],
+            "ar": [
+              "التبرع بالملابس لملاجئ المشردين",
+              "دعم برامج الملابس للاجئين",
+              "توفير ملابس عمل لبرامج التدريب المهني",
+              "التبرع لحملات جمع الملابس المجتمعية",
+              "دعم احتياجات الملابس للسكن الانتقالي"
             ]
           }
         },
         "lifetime": {
           "traditional": {
             "en": "Guinea fowl (pintade), their own clothing, 9 meters of cloth (mbasin/African/Asian fabric), 1,000 cowrie shells OR 1,000 in currency",
-            "fr": "Pintade, leurs propres vêtements, 9 mètres de tissu (mbasin/tissu africain/asiatique), 1 000 cauris OU 1 000 en monnaie"
+            "fr": "Pintade, leurs propres vêtements, 9 mètres de tissu (mbasin/tissu africain/asiatique), 1 000 cauris OU 1 000 en monnaie",
+            "ar": "دجاج غينيا (البانتاد)، ملابسهم الخاصة، 9 أمتار من القماش (مبصن/قماش أفريقي أو آسيوي)، 1000 ودعة أو ما يعادلها من العملة"
           },
           "components": {
             "en": [
@@ -4011,6 +5424,15 @@
               "Tout distribué aux nécessiteux",
               "Effectué avec intention pour bénéfice communautaire",
               "Tout avec niyyah sincère"
+            ],
+            "ar": [
+              "دجاجة غينيا واحدة (رمز المجتمع والتفرد)",
+              "أغراض ملابس شخصية",
+              "9 أمتار من قماش جيد الجودة (قماش أفريقي أو آسيوي)",
+              "1000 ودعة أو ما يعادلها من العملة",
+              "توزَّع جميعها على المحتاجين",
+              "تُؤدّى بنية خدمة المجتمع",
+              "كل ذلك بنية صادقة"
             ]
           },
           "best_timing": {
@@ -4025,11 +5447,18 @@
               "Lors du lancement de projets communautaires majeurs",
               "Pendant périodes de transition sociale",
               "Lors de la recherche de bénéfice pour le collectif"
+            ],
+            "ar": [
+              "الأحد (يومك المبارك)",
+              "عند إطلاق مشاريع مجتمعية كبرى",
+              "خلال فترات التحول الاجتماعي",
+              "عند السعي لتحقيق نفع للجماعة"
             ]
           },
           "significance": {
             "en": "Opens doors for humanitarian work, blesses community initiatives, attracts support for innovative projects, ensures divine assistance in collective service",
-            "fr": "Ouvre portes pour travail humanitaire, bénit initiatives communautaires, attire soutien pour projets innovants, assure assistance divine dans service collectif"
+            "fr": "Ouvre portes pour travail humanitaire, bénit initiatives communautaires, attire soutien pour projets innovants, assure assistance divine dans service collectif",
+            "ar": "يفتح أبواب العمل الإنساني، ويبارك المبادرات المجتمعية، ويجذب الدعم للمشاريع المبتكرة، ويضمن العون الإلهي في خدمة الجماعة"
           }
         }
       },
@@ -4037,11 +5466,13 @@
         "practice_night": {
           "primary": {
             "en": "Wednesday night",
-            "fr": "Nuit du mercredi"
+            "fr": "Nuit du mercredi",
+            "ar": "ليلة الأربعاء"
           },
           "note": {
             "en": "Day of Saturn: Saturday · Night of Saturn: Wednesday night (after midnight → Fajr)",
-            "fr": "Jour de Saturne : Samedi · Nuit de Saturne : Nuit du mercredi (après minuit → Fajr)"
+            "fr": "Jour de Saturne : Samedi · Nuit de Saturne : Nuit du mercredi (après minuit → Fajr)",
+            "ar": "يوم زُحل: السبت · ليلة زُحل: ليلة الأربعاء (بعد منتصف الليل حتى الفجر)"
           }
         },
         "zodiac_sign": {
@@ -4054,7 +5485,8 @@
           "transliteration": "Yā ʿAliyyu Yā ʿAẓīm",
           "translation": {
             "en": "O Most High, O Most Great",
-            "fr": "Ô Très-Haut, Ô Très Grand"
+            "fr": "Ô Très-Haut, Ô Très Grand",
+            "ar": "يَا عَلِيُّ يَا عَظِيمُ"
           }
         },
         "quranic_verse": {
@@ -4062,7 +5494,8 @@
           "transliteration": "Alhamdulillahi rabbil ʿalamin",
           "translation": {
             "en": "All praise is due to Allah, Lord of all the worlds",
-            "fr": "Louange à Allah, Seigneur de l'univers"
+            "fr": "Louange à Allah, Seigneur de l'univers",
+            "ar": "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ"
           },
           "reference": "Surah Al-Fatiha 1:2"
         },
@@ -4071,7 +5504,8 @@
           "transliteration": "Mīkāʾīl",
           "name": {
             "en": "Angel Mikail",
-            "fr": "Ange Mikail"
+            "fr": "Ange Mikail",
+            "ar": "مِيكَائِيلُ"
           }
         },
         "jinn": {
@@ -4079,7 +5513,8 @@
           "transliteration": "Burqān",
           "meaning": {
             "en": "The Lightning One",
-            "fr": "Celui de la Foudre"
+            "fr": "Celui de la Foudre",
+            "ar": "صاحب البرق"
           }
         },
         "instructions": {
@@ -4108,6 +5543,19 @@
             "Réciter le nom du Jinn: Ya Burqan   (répéter Hadad fois: votre nom + nom de la mère)",
             "Énoncer clairement votre question d'Istikhara et chercher guidance divine",
             "Fermer avec salawat sur le Prophète ﷺ et gratitude"
+          ],
+          "ar": [
+            "توضّأ بتنفّس واعٍ وحضور",
+            "اجلس في مكان هادئ ومتجدد الهواء",
+            "استقبل القبلة إن أمكن",
+            "ابدأ بالبسملة وأرسل الصلاة على النبي ﷺ",
+            "خذ من 3 إلى 7 أنفاس عميقة وواعية",
+            "اتلُ الآية القرآنية (صراط الذين أنعمت عليهم) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر الأسماء الحسنى (يا عليّ يا عظيم) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الملَك: يا ميكائيل (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الجن: يا برقان (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر سؤال الاستخارة بوضوح واطلب الهداية الإلهية",
+            "اختم بالصلاة على النبي ﷺ والشكر"
           ]
         }
       }
@@ -4148,12 +5596,26 @@
           "life_blessing": "Accordé connexion spirituelle profonde et capacités de guérison",
           "divine_support": "Protégé à travers le service aux autres",
           "challenge": "Doit apprendre limites saines sans perdre compassion"
+        },
+        "ar": {
+          "temperament": "عاطفي وحدسي — شديد التأثر بألم الآخرين",
+          "communication": "يتحدث بتعاطف وفهم روحي عميق",
+          "anger": "يمتص الغضب داخليًا، وقد ينطوي على نفسه أو يميل إلى الحزن",
+          "social_loved": "محبوب لرأفته وخدمته المخلصة الخالية من المصلحة",
+          "social_challenge": "قد يُستغَل بسبب طبيعته المعطاءة",
+          "social_attraction": "يسعى إليه المحتاجون طبيعيًا لحضوره المُطمئن والشافي",
+          "social_unpopular": "يستغل البعض عجزه عن قول لا",
+          "dreams": "الماء، المحيطات، الرؤى الروحية، التجارب الصوفية، مساعدة الآخرين",
+          "life_blessing": "يُمنح اتصالًا روحيًا عميقًا وقدرات على الشفاء",
+          "divine_support": "يحظى بالحماية من خلال خدمة الآخرين",
+          "challenge": "عليه أن يتعلم وضع حدود صحية دون أن يفقد رأفته"
         }
       },
       "career": {
         "traditional": {
           "en": "Similar to other water buruj - healing, fish trading, spiritual service",
-          "fr": "Similaire aux autres buruj d'eau - guérison, commerce de poisson, service spirituel"
+          "fr": "Similaire aux autres buruj d'eau - guérison, commerce de poisson, service spirituel",
+          "ar": "مشابه لبقية بروج الماء - الشفاء، تجارة الأسماك، الخدمة الروحية"
         },
         "modern_recommended": {
           "en": [
@@ -4255,27 +5717,81 @@
                 "Services sociaux"
               ]
             }
+          ],
+          "ar": [
+            {
+              "category": "الشفاء والرعاية الصحية",
+              "icon": "🏥",
+              "items": [
+                "التمريض والرعاية",
+                "الشفاء الشامل",
+                "الاستشارات النفسية",
+                "الرعاية التلطيفية",
+                "الشفاء بالطاقة",
+                "الطب الرحيم"
+              ]
+            },
+            {
+              "category": "الروحانيات والدين",
+              "icon": "🕌",
+              "items": [
+                "العلم الشرعي",
+                "الإرشاد الروحي",
+                "الرعاية الروحية",
+                "تعليم التأمل",
+                "التربية الإسلامية",
+                "العمل بين الأديان"
+              ]
+            },
+            {
+              "category": "الفنون والإبداع",
+              "icon": "🎨",
+              "items": [
+                "الموسيقى والشعر",
+                "فنون الشفاء",
+                "الرقص والعلاج بالحركة",
+                "العلاج بالفنون الإبداعية",
+                "التصوير الفوتوغرافي",
+                "الفن الروحي"
+              ]
+            },
+            {
+              "category": "الخدمة والعمل الخيري",
+              "icon": "❤️",
+              "items": [
+                "العمل الخيري",
+                "المساعدات الإنسانية",
+                "دعم اللاجئين",
+                "رعاية الحيوان",
+                "حماية البيئة",
+                "الخدمات الاجتماعية"
+              ]
+            }
           ]
         },
         "avoid": {
           "traditional": {
             "en": "Fruits and vegetables",
-            "fr": "Fruits et légumes"
+            "fr": "Fruits et légumes",
+            "ar": "الفواكه والخضروات"
           },
           "modern": {
             "en": "Fresh produce business, aggressive sales roles, competitive environments lacking compassion",
-            "fr": "Commerce de produits frais, rôles de vente agressifs, environnements compétitifs manquant de compassion"
+            "fr": "Commerce de produits frais, rôles de vente agressifs, environnements compétitifs manquant de compassion",
+            "ar": "تجارة المنتجات الطازجة، وظائف البيع العدوانية، البيئات التنافسية التي تفتقر إلى الرأفة"
           }
         },
         "principle": {
           "en": "Compassion, service, spiritual connection, and healing align with Pisces water",
-          "fr": "Compassion, service, connexion spirituelle et guérison s'alignent avec l'eau Poissons"
+          "fr": "Compassion, service, connexion spirituelle et guérison s'alignent avec l'eau Poissons",
+          "ar": "الرأفة والخدمة والاتصال الروحي والشفاء تتناغم مع طبيعة الماء لبرج الحوت"
         }
       },
       "blessed_day": {
         "day": {
           "en": "Thursday",
-          "fr": "Jeudi"
+          "fr": "Jeudi",
+          "ar": "الخميس"
         },
         "day_number": 4,
         "best_for": {
@@ -4298,6 +5814,16 @@
             "Enseignement et guidance spirituels",
             "Actes de compassion et miséricorde",
             "Effectuer votre sadaqah de vie"
+          ],
+          "ar": [
+            "العمل الروحي والشفاء",
+            "الأنشطة الخيرية والعطاء",
+            "التأمل والدعاء",
+            "مساعدة المحتاجين",
+            "المساعي الإبداعية والفنية",
+            "التعليم والإرشاد الروحي",
+            "أعمال الرأفة والرحمة",
+            "أداء صدقتك مدى الحياة"
           ]
         },
         "special_notes": {
@@ -4316,6 +5842,14 @@
             "Parfait pour retraites spirituelles et prière profonde",
             "Miséricorde divine et barakah coulent le plus librement les jeudis",
             "Jour le plus puissant pour votre sadaqah de vie"
+          ],
+          "ar": [
+            "الخميس هو أفضل وأبرك يوم لهذا البرج",
+            "طاقة المشتري تجلب توسعًا في الرأفة والبركات الإلهية",
+            "قدراتك على الشفاء واتصالك الروحي في أقوى حالاتهما",
+            "مثالي للخلوات الروحية والدعاء العميق",
+            "الرحمة الإلهية والبركة تتدفقان بحرية أكبر أيام الخميس",
+            "أقوى يوم لأداء صدقتك مدى الحياة"
           ]
         }
       },
@@ -4323,19 +5857,23 @@
         "monthly": {
           "traditional": {
             "en": "Rice and fish together",
-            "fr": "Riz et poisson ensemble"
+            "fr": "Riz et poisson ensemble",
+            "ar": "الأرز والسمك معًا"
           },
           "frequency": {
             "en": "Every 1-2 months",
-            "fr": "Tous les 1-2 mois"
+            "fr": "Tous les 1-2 mois",
+            "ar": "كل شهر إلى شهرين"
           },
           "context": {
             "en": "To maintain spiritual balance and prevent absorption of others' pain",
-            "fr": "Pour maintenir équilibre spirituel et prévenir absorption de la douleur des autres"
+            "fr": "Pour maintenir équilibre spirituel et prévenir absorption de la douleur des autres",
+            "ar": "للحفاظ على التوازن الروحي ومنع امتصاص ألم الآخرين"
           },
           "purpose": {
             "en": "Protects empathic nature, maintains boundaries while serving, ensures spiritual clarity",
-            "fr": "Protège nature empathique, maintient limites tout en servant, assure clarté spirituelle"
+            "fr": "Protège nature empathique, maintient limites tout en servant, assure clarté spirituelle",
+            "ar": "يحمي الطبيعة المتعاطفة، يحافظ على الحدود أثناء الخدمة، ويضمن الصفاء الروحي"
           },
           "modern_alternatives": {
             "en": [
@@ -4351,13 +5889,21 @@
               "Fournir nourriture aux centres de retraite spirituelle",
               "Parrainer repas pour patients d'hôpital",
               "Donner aux organisations servant les vulnérables"
+            ],
+            "ar": [
+              "التبرع بوجبات الأرز والسمك للمُعزّين والحزانى",
+              "دعم برامج وجبات الرعاية التلطيفية",
+              "تقديم الطعام لمراكز الخلوات الروحية",
+              "رعاية وجبات لمرضى المستشفيات",
+              "التبرع لمنظمات تخدم الفئات الضعيفة"
             ]
           }
         },
         "lifetime": {
           "traditional": {
             "en": "Zakat al-Fitr in rice for 12 people, Fish",
-            "fr": "Zakat al-Fitr en riz pour 12 personnes, Poisson"
+            "fr": "Zakat al-Fitr en riz pour 12 personnes, Poisson",
+            "ar": "زكاة الفطر أرزًا لاثني عشر شخصًا، وسمك"
           },
           "components": {
             "en": [
@@ -4377,6 +5923,15 @@
               "Le nombre 12 symbolise achèvement et perfection spirituelle (12ème buruj)",
               "Doit être effectué le jeudi (LE MEILLEUR jour pour ce buruj)",
               "Fait avec niyyah sincère pour plaire à Allah"
+            ],
+            "ar": [
+              "الأرز: مقدار زكاة الفطر لاثني عشر شخصًا - حوالي 36 كجم إجمالًا (3 كجم للشخص)",
+              "السمك - كمية مناسبة للتوزيع على المجتمع (طازج أو محفوظ)",
+              "يُوزَّع كل الأرز على المحتاجين والفقراء",
+              "يُحضَّر السمك ويُشارَك مع المجتمع",
+              "الرقم 12 يرمز إلى الاكتمال والكمال الروحي (البرج الثاني عشر)",
+              "يجب أداؤه يوم الخميس (أفضل يوم لهذا البرج)",
+              "يُؤدَّى بنية صادقة لإرضاء الله"
             ]
           },
           "zakat_calculation": {
@@ -4409,11 +5964,20 @@
               "À l'achèvement d'un voyage spirituel majeur ou transformation",
               "Lors de la recherche de clôture spirituelle ou nouveau départ",
               "Après guérison majeure ou transition de vie"
+            ],
+            "ar": [
+              "الخميس (أفضل يوم لهذا البرج) - أقوى توقيت",
+              "يمكن أداؤه في أي خميس على مدار السنة",
+              "مبارك بشكل خاص خلال شهر رمضان",
+              "عند إتمام رحلة روحية كبرى أو تحول جوهري",
+              "عند السعي إلى ختام روحي أو بداية جديدة",
+              "بعد شفاء كبير أو انتقال في مسار الحياة"
             ]
           },
           "significance": {
             "en": "This is the completion buruj (12th) with 12 portions - representing full spiritual cycle completion. Rice (nourishment) and fish (water element) create complete spiritual protection and healing. The number 12 appears twice (12th buruj + 12 portions) symbolizing ultimate spiritual wholeness. Thursday's Jupiter energy amplifies compassion, mercy, and divine blessings. This sacrifice protects your empathic nature, establishes healthy boundaries while maintaining compassion, attracts divine protection in service to others, and ensures spiritual completion and closure.",
-            "fr": "C'est le buruj d'achèvement (12ème) avec 12 portions - représentant l'achèvement du cycle spirituel complet. Le riz (nourriture) et le poisson (élément eau) créent une protection spirituelle et guérison complètes. Le nombre 12 apparaît deux fois (12ème buruj + 12 portions) symbolisant la plénitude spirituelle ultime. L'énergie de Jupiter du jeudi amplifie la compassion, la miséricorde et les bénédictions divines. Ce sacrifice protège votre nature empathique, établit des limites saines tout en maintenant la compassion, attire la protection divine dans le service aux autres et assure l'achèvement et la clôture spirituels."
+            "fr": "C'est le buruj d'achèvement (12ème) avec 12 portions - représentant l'achèvement du cycle spirituel complet. Le riz (nourriture) et le poisson (élément eau) créent une protection spirituelle et guérison complètes. Le nombre 12 apparaît deux fois (12ème buruj + 12 portions) symbolisant la plénitude spirituelle ultime. L'énergie de Jupiter du jeudi amplifie la compassion, la miséricorde et les bénédictions divines. Ce sacrifice protège votre nature empathique, établit des limites saines tout en maintenant la compassion, attire la protection divine dans le service aux autres et assure l'achèvement et la clôture spirituels.",
+            "ar": "هذا هو برج الاكتمال (الثاني عشر) بحصص عددها 12 - ما يمثل إتمام الدورة الروحية الكاملة. الأرز (التغذية) والسمك (عنصر الماء) يخلقان حماية روحية وشفاءً كاملين. الرقم 12 يظهر مرتين (البرج الثاني عشر + 12 حصة) رمزًا للكمال الروحي الأسمى. طاقة المشتري يوم الخميس تضاعف الرأفة والرحمة والبركات الإلهية. هذه الصدقة تحمي طبيعتك المتعاطفة، وتؤسس حدودًا صحية مع الحفاظ على الرأفة، وتجذب الحماية الإلهية في خدمة الآخرين، وتضمن الاكتمال والختام الروحي."
           }
         }
       },
@@ -4421,11 +5985,13 @@
         "practice_night": {
           "primary": {
             "en": "Monday night",
-            "fr": "Nuit du lundi"
+            "fr": "Nuit du lundi",
+            "ar": "ليلة الاثنين"
           },
           "note": {
             "en": "Day of Jupiter: Thursday · Night of Jupiter: Monday night (after midnight → Fajr)",
-            "fr": "Jour de Jupiter : Jeudi · Nuit de Jupiter : Nuit du lundi (après minuit → Fajr)"
+            "fr": "Jour de Jupiter : Jeudi · Nuit de Jupiter : Nuit du lundi (après minuit → Fajr)",
+            "ar": "يوم المشتري: الخميس · ليلة المشتري: ليلة الاثنين (بعد منتصف الليل حتى الفجر)"
           }
         },
         "zodiac_sign": {
@@ -4438,7 +6004,8 @@
           "transliteration": "Yā Kabīru Yā Mutaʿālī",
           "translation": {
             "en": "O Great One, O Most Exalted",
-            "fr": "Ô Grand, Ô Très Exalté"
+            "fr": "Ô Grand, Ô Très Exalté",
+            "ar": "يَا كَبِيرُ يَا مُتَعَالِي"
           }
         },
         "quranic_verse": {
@@ -4446,7 +6013,8 @@
           "transliteration": "Ihdina al-sirata al-mustaqim",
           "translation": {
             "en": "Guide us to the straight path",
-            "fr": "Guide-nous dans le droit chemin"
+            "fr": "Guide-nous dans le droit chemin",
+            "ar": "ٱهۡدِنَا ٱلصِّرَٰطَ ٱلۡمُسۡتَقِيمَ"
           },
           "reference": "Surah Al-Fatiha 1:6"
         },
@@ -4455,7 +6023,8 @@
           "transliteration": "Ṣarfu Yā Īl",
           "name": {
             "en": "Angel of Turning",
-            "fr": "Ange du Changement"
+            "fr": "Ange du Changement",
+            "ar": "صَرْفُ يَا إِيلُ"
           }
         },
         "jinn": {
@@ -4463,7 +6032,8 @@
           "transliteration": "Samharūsh",
           "meaning": {
             "en": "King of Jinn",
-            "fr": "Roi des Jinns"
+            "fr": "Roi des Jinns",
+            "ar": "ملك الجن"
           }
         },
         "instructions": {
@@ -4491,6 +6061,19 @@
             "Faire des dua pour vos besoins et pour toute la création",
             "Fermer avec salawat sur le Prophète ﷺ",
             "Dormir avec wudu et attendre guidance par les rêves"
+          ],
+          "ar": [
+            "توضّأ مع التنفس الواعي والحضور",
+            "ابحث عن مكان هادئ وجيد التهوية إن أمكن",
+            "استقبل القبلة لتحقيق التوافق الروحي",
+            "ابدأ بالبسملة وصلِّ على النبي محمد ﷺ",
+            "خذ أنفاسًا عميقة ومهدئة لتتمركز في ذاتك",
+            "اتلُ الآية القرآنية (اهدنا الصراط المستقيم) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر الأسماء الحسنى (يا كبير يا متعالي) (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الملك: يا صرف يا إيل (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "اذكر اسم الجن: يا سمهروش (كرر بعدد الحدد: اسمك + اسم والدتك)",
+            "للاستخارة: اذكر سؤالك واطلب الهداية الإلهية",
+            "اختم بالصلاة على النبي ﷺ والشكر"
           ]
         }
       }

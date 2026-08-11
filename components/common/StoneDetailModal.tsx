@@ -4,7 +4,7 @@
  */
 
 import { getElementColors } from '@/constants/ElementColors';
-import { getStoneVisual, type EnhancedStoneData } from '@/constants/enhancedStoneData';
+import { getEnhancedStoneData, getStoneVisual, type EnhancedStoneData } from '@/constants/enhancedStoneData';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Linking from 'expo-linking';
@@ -31,6 +31,28 @@ import {
 import Svg, { Circle, Defs, Path, Pattern, Rect } from 'react-native-svg';
 
 const { width, height } = Dimensions.get('window');
+
+const ZODIAC_NAME_FR: Record<string, string> = {
+  aries: 'Bélier',
+  taurus: 'Taureau',
+  gemini: 'Gémeaux',
+  cancer: 'Cancer',
+  leo: 'Lion',
+  virgo: 'Vierge',
+  libra: 'Balance',
+  scorpio: 'Scorpion',
+  sagittarius: 'Sagittaire',
+  capricorn: 'Capricorne',
+  aquarius: 'Verseau',
+  pisces: 'Poissons',
+};
+
+function displayZodiacName(zodiacSign: string, language: string): string {
+  if (language === 'fr') {
+    return ZODIAC_NAME_FR[zodiacSign.toLowerCase()] || zodiacSign;
+  }
+  return zodiacSign;
+}
 
 function hexToRgba(hex: string, alpha: number) {
   const normalized = (hex || '').replace('#', '').trim();
@@ -152,7 +174,7 @@ export function StoneDetailModal({ visible, onClose, stone, zodiacSign, element 
               <Text style={[styles.ratingText, { color: accent }]}>
                 {language === 'en' ? 'Perfect for' :
                  language === 'fr' ? 'Parfait pour' :
-                 'مثالي لـ'} {zodiacSign}
+                 'مثالي لـ'} {displayZodiacName(zodiacSign, language)}
               </Text>
             </View>
           </View>
@@ -211,7 +233,7 @@ export function StoneDetailModal({ visible, onClose, stone, zodiacSign, element 
                 <Heart size={20} color={accent} />
                 <Text style={styles.sectionTitle}>
                   {language === 'en' ? `Why Good for ${zodiacSign}?` :
-                   language === 'fr' ? `Pourquoi Bon pour ${zodiacSign}?` :
+                   language === 'fr' ? `Pourquoi Bon pour ${displayZodiacName(zodiacSign, language)}?` :
                    `لماذا جيد لـ ${zodiacSign}؟`}
                 </Text>
               </View>
@@ -279,9 +301,9 @@ export function StoneDetailModal({ visible, onClose, stone, zodiacSign, element 
                'دليل الأسعار:'}
             </Text>
             <Text style={styles.priceText}>
-              Small: {stone.shopping.priceRange.small} • 
-              Medium: {stone.shopping.priceRange.medium} • 
-              Large: {stone.shopping.priceRange.large}
+              {language === 'en' ? 'Small' : language === 'fr' ? 'Petit' : 'صغير'}: {stone.shopping.priceRange.small} •{' '}
+              {language === 'en' ? 'Medium' : language === 'fr' ? 'Moyen' : 'متوسط'}: {stone.shopping.priceRange.medium} •{' '}
+              {language === 'en' ? 'Large' : language === 'fr' ? 'Grand' : 'كبير'}: {stone.shopping.priceRange.large}
             </Text>
             
             <Text style={styles.shopSubtitle}>
@@ -298,7 +320,9 @@ export function StoneDetailModal({ visible, onClose, stone, zodiacSign, element 
                 <View style={styles.shopButtonContent}>
                   <Text style={styles.shopButtonText}>{store.name}</Text>
                   {store.verified && (
-                    <Text style={styles.verifiedBadge}>✓ Verified</Text>
+                    <Text style={styles.verifiedBadge}>
+                      ✓ {language === 'en' ? 'Verified' : language === 'fr' ? 'Vérifié' : 'موثّق'}
+                    </Text>
                   )}
                 </View>
                 <ExternalLink size={18} color={accent} />
@@ -352,11 +376,17 @@ export function StoneDetailModal({ visible, onClose, stone, zodiacSign, element 
                 </Text>
               </View>
               <View style={styles.relatedStones}>
-                {stone.relatedStones.map((relatedId, index) => (
-                  <View key={index} style={[styles.relatedPill, { borderColor: hexToRgba(accent, 0.20) }]}>
-                    <Text style={styles.relatedText}>{relatedId.replace(/-/g, ' ')}</Text>
-                  </View>
-                ))}
+                {stone.relatedStones.map((relatedId, index) => {
+                  const relatedStone = getEnhancedStoneData(relatedId);
+                  const relatedName = relatedStone
+                    ? (language === 'fr' ? relatedStone.nameFr : language === 'ar' ? relatedStone.nameAr : relatedStone.name)
+                    : relatedId.replace(/-/g, ' ');
+                  return (
+                    <View key={index} style={[styles.relatedPill, { borderColor: hexToRgba(accent, 0.20) }]}>
+                      <Text style={styles.relatedText}>{relatedName}</Text>
+                    </View>
+                  );
+                })}
               </View>
             </View>
           )}

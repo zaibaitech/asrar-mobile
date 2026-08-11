@@ -5,15 +5,24 @@
  */
 
 import {
+    checkBurjCompatibility,
+    deriveBurjFromDOB,
+    deriveElementFromBurj,
+    derivePlanetaryRulerFromBurj
+} from '../ProfileDerivationService';
+import {
     analyzeRelationshipCompatibility,
     getElementFromAbjadTotal
 } from '../../utils/relationshipCompatibility';
-import { NameDestinyResult } from '../ilm-huruf/core';
+import { getBurujData } from '../istikhara/calculations';
+import { ABJAD_MAGHRIBI } from '../../constants/abjad-maps';
+import { buildDestiny, NameDestinyResult } from '../ilm-huruf/core';
 import {
     CompatibilityEvaluation,
     ElementalRelationship,
     ModeOfAction,
     PersonPersonCompatibility,
+    PersonPersonParticipant,
     PlanetaryResonance,
     SpiritualDestinyData,
     ZahirBatinInteraction
@@ -43,7 +52,7 @@ export function extractSpiritualDestiny(
   };
 }
 
-function determineZahirBatin(element: 'fire' | 'water' | 'air' | 'earth'): 'zahir' | 'batin' | 'balanced' {
+export function determineZahirBatin(element: 'fire' | 'water' | 'air' | 'earth'): 'zahir' | 'batin' | 'balanced' {
   // Fire & Air are Zāhir (manifest/outward)
   // Water & Earth are Bāṭin (hidden/inward)
   if (element === 'fire' || element === 'air') {
@@ -535,11 +544,13 @@ export function calculatePersonPersonCompatibility(
     type: 'person-person',
     relationshipContext,
     person1: {
+      inputMethod: 'name',
       name: person1Name,
       arabicName: person1ArabicName,
       destiny: destiny1
     },
     person2: {
+      inputMethod: 'name',
       name: person2Name,
       arabicName: person2ArabicName,
       destiny: destiny2
@@ -547,5 +558,151 @@ export function calculatePersonPersonCompatibility(
     evaluation,
     // Add the authentic 4-method compatibility analysis
     relationshipCompatibility
+  };
+}
+
+// ============================================================================
+// PERSON ↔ PERSON COMPATIBILITY — MIXED NAME / DATE-OF-BIRTH INPUT
+// ============================================================================
+//
+// Some users can't write their name in Arabic, or prefer a birth date. This
+// entry point lets each person independently use either input.
+//
+// - Both people use a name → delegates wholesale to the unchanged
+//   calculatePersonPersonCompatibility() above (zero regression).
+// - Either person uses a DOB → the abjad/letter-based 4-method breakdown
+//   (analyzeRelationshipCompatibility) has no valid input for that person, so
+//   it is skipped; a burj/elemental comparison is used instead (a
+//   complementary dimension, not a replacement for the abjad calculation).
+
+export type PersonPersonParticipantInput =
+  | { inputMethod: 'name'; name: string; arabicName: string }
+  | { inputMethod: 'dob'; dobISO: string; dobLabel: string };
+
+export class DobDerivationError extends Error {
+  constructor(dobISO: string) {
+    super(`Unable to derive astrological data from date of birth: ${dobISO}`);
+    this.name = 'DobDerivationError';
+  }
+}
+
+function buildParticipant(input: PersonPersonParticipantInput): PersonPersonParticipant {
+  if (input.inputMethod === 'name') {
+    const destinyRaw = buildDestiny(input.arabicName, undefined, ABJAD_MAGHRIBI);
+    const destiny = extractSpiritualDestiny(destinyRaw, input.name);
+    return {
+      inputMethod: 'name',
+      name: input.name,
+      arabicName: input.arabicName,
+      destiny
+    };
+  }
+
+  const burjData = deriveBurjFromDOB(input.dobISO);
+  if (!burjData) {
+    throw new DobDerivationError(input.dobISO);
+  }
+
+  const element = deriveElementFromBurj(burjData.burjIndex);
+  const planetaryRuler = derivePlanetaryRulerFromBurj(burjData.burjIndex);
+
+  let burujProfile;
+  try {
+    // ProfileDerivationService's burjIndex is a 0-11 tropical index; getBurujData
+    // expects a 1-12 remainder — the +1 conversion matches who-am-i.tsx.
+    burujProfile = getBurujData(burjData.burjIndex + 1);
+  } catch {
+    burujProfile = undefined;
+  }
+
+  return {
+    inputMethod: 'dob',
+    name: input.dobLabel,
+    zodiac: {
+      dobISO: input.dobISO,
+      dobLabel: input.dobLabel,
+      burjIndex: burjData.burjIndex,
+      burjEn: burjData.burjEn,
+      burjAr: burjData.burjAr,
+      element,
+      planetaryRuler,
+      burujProfile
+    }
+  };
+}
+
+function normalizeParticipant(participant: PersonPersonParticipant): {
+  element: 'fire' | 'water' | 'air' | 'earth';
+  planet: string;
+  zahirBatin: 'zahir' | 'batin' | 'balanced';
+} {
+  if (participant.inputMethod === 'name' && participant.destiny) {
+    return {
+      element: participant.destiny.element,
+      planet: participant.destiny.planet,
+      zahirBatin: participant.destiny.zahirBatin
+    };
+  }
+
+  const zodiac = participant.zodiac!;
+  const planet = zodiac.planetaryRuler.charAt(0).toUpperCase() + zodiac.planetaryRuler.slice(1);
+  return {
+    element: zodiac.element,
+    planet,
+    zahirBatin: determineZahirBatin(zodiac.element)
+  };
+}
+
+export function calculatePersonPersonCompatibilityMixed(
+  person1Input: PersonPersonParticipantInput,
+  person2Input: PersonPersonParticipantInput,
+  relationshipContext: 'marriage' | 'friendship' | 'family' | 'work' | 'universal' = 'universal'
+): PersonPersonCompatibility {
+  if (person1Input.inputMethod === 'name' && person2Input.inputMethod === 'name') {
+    const result = calculatePersonPersonCompatibility(
+      person1Input.name,
+      person1Input.arabicName,
+      buildDestiny(person1Input.arabicName, undefined, ABJAD_MAGHRIBI),
+      person2Input.name,
+      person2Input.arabicName,
+      buildDestiny(person2Input.arabicName, undefined, ABJAD_MAGHRIBI),
+      relationshipContext
+    );
+
+    return {
+      ...result,
+      person1: { ...result.person1, inputMethod: 'name' },
+      person2: { ...result.person2, inputMethod: 'name' }
+    };
+  }
+
+  const person1 = buildParticipant(person1Input);
+  const person2 = buildParticipant(person2Input);
+
+  const norm1 = normalizeParticipant(person1);
+  const norm2 = normalizeParticipant(person2);
+
+  const evaluation = buildCompatibilityEvaluation(
+    norm1.element,
+    norm2.element,
+    norm1.planet,
+    norm2.planet,
+    norm1.zahirBatin,
+    norm2.zahirBatin
+  );
+
+  let burjCompatibility: PersonPersonCompatibility['burjCompatibility'];
+  if (person1.inputMethod === 'dob' && person2.inputMethod === 'dob') {
+    burjCompatibility = checkBurjCompatibility(person1.zodiac!.burjIndex, person2.zodiac!.burjIndex);
+  }
+
+  return {
+    type: 'person-person',
+    relationshipContext,
+    person1,
+    person2,
+    evaluation,
+    relationshipCompatibility: undefined,
+    burjCompatibility
   };
 }

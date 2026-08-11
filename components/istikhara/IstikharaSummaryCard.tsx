@@ -10,15 +10,15 @@ import { formatHijriDate } from '../../utils/hijriDate';
 
 interface IstikharaSummaryCardProps {
   result: any;
-  language?: 'en' | 'fr';
+  language?: 'en' | 'fr' | 'ar';
   accentColor?: string;
 }
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-function formatGregorianDate(date: Date, language: 'en' | 'fr'): string {
+function formatGregorianDate(date: Date, language: 'en' | 'fr' | 'ar'): string {
   try {
-    return new Intl.DateTimeFormat(language === 'fr' ? 'fr-FR' : 'en-US', {
+    return new Intl.DateTimeFormat(language === 'ar' ? 'ar' : language === 'fr' ? 'fr-FR' : 'en-US', {
       year: 'numeric',
       month: 'short',
       day: '2-digit',
@@ -141,7 +141,16 @@ function IslamicPatternOverlay() {
 }
 
 // Helper function to translate element names
-function getElementName(element: string, language: 'en' | 'fr'): string {
+function getElementName(element: string, language: 'en' | 'fr' | 'ar'): string {
+  if (language === 'ar') {
+    const elementMap: Record<string, string> = {
+      fire: 'النار',
+      earth: 'التراب',
+      air: 'الهواء',
+      water: 'الماء',
+    };
+    return elementMap[element.toLowerCase()] || element;
+  }
   if (language === 'fr') {
     const elementMap: Record<string, string> = {
       fire: 'Feu',
@@ -155,12 +164,12 @@ function getElementName(element: string, language: 'en' | 'fr'): string {
 }
 
 // Helper function to get zodiac info by burj number
-function getZodiacInfo(burjNumber: number, language: 'en' | 'fr'): { name: string; nameAr: string } | null {
+function getZodiacInfo(burjNumber: number, language: 'en' | 'fr' | 'ar'): { name: string; nameAr: string } | null {
   const zodiac = ZODIAC_SIGNS[burjNumber];
   if (!zodiac) return null;
-  
+
   return {
-    name: language === 'en' ? zodiac.nameEn : zodiac.nameFr,
+    name: language === 'ar' ? zodiac.nameAr : language === 'en' ? zodiac.nameEn : zodiac.nameFr,
     nameAr: zodiac.nameAr,
   };
 }
@@ -168,7 +177,7 @@ function getZodiacInfo(burjNumber: number, language: 'en' | 'fr'): { name: strin
 // Helper function to get primary mansion info by burj number
 // Each zodiac sign (burj) corresponds to 2-3 lunar mansions
 // We show the first (primary) mansion for each zodiac
-function getMansionInfo(burjNumber: number, language: 'en' | 'fr'): { name: string; nameAr: string } | null {
+function getMansionInfo(burjNumber: number, language: 'en' | 'fr' | 'ar'): { name: string; nameAr: string } | null {
   // Map burj numbers (1-12) to primary mansion index
   // Based on traditional Islamic astronomy where each zodiac spans ~2.33 mansions
   const burjToMansionMap: Record<number, number> = {
@@ -193,7 +202,7 @@ function getMansionInfo(burjNumber: number, language: 'en' | 'fr'): { name: stri
   if (!mansion) return null;
   
   return {
-    name: language === 'en' ? mansion.nameEnglish : mansion.nameFrench,
+    name: language === 'ar' ? mansion.nameArabic : language === 'en' ? mansion.nameEnglish : mansion.nameFrench,
     nameAr: mansion.nameArabic,
   };
 }
@@ -206,33 +215,41 @@ function shortSpiritualQuality(text: string): string {
   return first.length > 38 ? `${first.slice(0, 36).trim()}…` : first;
 }
 
-function getZodiacSpiritualQuality(burjNumber: number, language: 'en' | 'fr'): string | null {
+function getZodiacSpiritualQuality(burjNumber: number, language: 'en' | 'fr' | 'ar'): string | null {
   const zodiac = ZODIAC_SIGNS[burjNumber];
   if (!zodiac) return null;
-  const raw = language === 'fr' ? zodiac.spiritualQualityFr : zodiac.spiritualQuality;
+  const raw = language === 'ar' ? zodiac.spiritualQualityAr : language === 'fr' ? zodiac.spiritualQualityFr : zodiac.spiritualQuality;
   return raw ? shortSpiritualQuality(raw) : null;
 }
 
-function getElementTagline(element: string, language: 'en' | 'fr'): string {
-  const taglines: Record<string, { en: string; fr: string }> = {
-    water: { en: 'Governs: Emotions & intuition', fr: 'Gouverne : Émotions & intuition' },
-    fire: { en: 'Governs: Will & vitality', fr: 'Gouverne : Volonté & vitalité' },
-    air: { en: 'Governs: Mind & communication', fr: 'Gouverne : Esprit & communication' },
-    earth: { en: 'Governs: Stability & grounding', fr: 'Gouverne : Stabilité & ancrage' },
+function getElementTagline(element: string, language: 'en' | 'fr' | 'ar'): string {
+  const taglines: Record<string, { en: string; fr: string; ar: string }> = {
+    water: { en: 'Governs: Emotions & intuition', fr: 'Gouverne : Émotions & intuition', ar: 'يحكم: العواطف والحدس' },
+    fire: { en: 'Governs: Will & vitality', fr: 'Gouverne : Volonté & vitalité', ar: 'يحكم: الإرادة والحيوية' },
+    air: { en: 'Governs: Mind & communication', fr: 'Gouverne : Esprit & communication', ar: 'يحكم: العقل والتواصل' },
+    earth: { en: 'Governs: Stability & grounding', fr: 'Gouverne : Stabilité & ancrage', ar: 'يحكم: الثبات والرسوخ' },
   };
   const key = String(element || '').toLowerCase();
-  return (taglines[key] ? (language === 'fr' ? taglines[key].fr : taglines[key].en) : (language === 'fr' ? 'Gouverne : Équilibre intérieur' : 'Governs: Inner balance'));
+  const entry = taglines[key];
+  if (entry) {
+    return language === 'ar' ? entry.ar : language === 'fr' ? entry.fr : entry.en;
+  }
+  return language === 'ar' ? 'يحكم: التوازن الداخلي' : language === 'fr' ? 'Gouverne : Équilibre intérieur' : 'Governs: Inner balance';
 }
 
-function getBestTimeSuggestion(element: string, language: 'en' | 'fr'): string {
-  const suggestions: Record<string, { en: string; fr: string }> = {
-    water: { en: 'Best time: After Fajr', fr: 'Meilleur moment : Après Fajr' },
-    fire: { en: 'Best time: After Ẓuhr', fr: 'Meilleur moment : Après Ẓuhr' },
-    air: { en: 'Best time: After ʿAṣr', fr: 'Meilleur moment : Après ʿAṣr' },
-    earth: { en: 'Best time: After Maghrib', fr: 'Meilleur moment : Après Maghrib' },
+function getBestTimeSuggestion(element: string, language: 'en' | 'fr' | 'ar'): string {
+  const suggestions: Record<string, { en: string; fr: string; ar: string }> = {
+    water: { en: 'Best time: After Fajr', fr: 'Meilleur moment : Après Fajr', ar: 'أفضل وقت: بعد الفجر' },
+    fire: { en: 'Best time: After Ẓuhr', fr: 'Meilleur moment : Après Ẓuhr', ar: 'أفضل وقت: بعد الظهر' },
+    air: { en: 'Best time: After ʿAṣr', fr: 'Meilleur moment : Après ʿAṣr', ar: 'أفضل وقت: بعد العصر' },
+    earth: { en: 'Best time: After Maghrib', fr: 'Meilleur moment : Après Maghrib', ar: 'أفضل وقت: بعد المغرب' },
   };
   const key = String(element || '').toLowerCase();
-  return (suggestions[key] ? (language === 'fr' ? suggestions[key].fr : suggestions[key].en) : (language === 'fr' ? 'Meilleur moment : Après ʿIshāʾ' : 'Best time: After ʿIshāʾ'));
+  const entry = suggestions[key];
+  if (entry) {
+    return language === 'ar' ? entry.ar : language === 'fr' ? entry.fr : entry.en;
+  }
+  return language === 'ar' ? 'أفضل وقت: بعد العشاء' : language === 'fr' ? 'Meilleur moment : Après ʿIshāʾ' : 'Best time: After ʿIshāʾ';
 }
 
 export function IstikharaSummaryCard({ result, language = 'en', accentColor }: IstikharaSummaryCardProps) {
@@ -329,7 +346,7 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
   }, [careerProgress, careerRow, mainProgress, overallRow, pulse, spiritualProgress, spiritualRow]);
 
   const blessedDay = profile.blessed_day;
-  const personality = profile.personality?.[language];
+  const personality = profile.personality?.[language] ?? profile.personality?.en;
   const zodiacInfo = getZodiacInfo(result.burujRemainder, language);
 
   return (
@@ -346,7 +363,7 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
           <View style={styles.leftColumn}>
             <View style={styles.radialContainer}>
               <Text style={styles.dominantLabel}>
-                {language === 'en' ? 'DOMINANT ELEMENT' : 'ÉLÉMENT DOMINANT'}
+                {language === 'ar' ? 'العنصر الغالب' : language === 'en' ? 'DOMINANT ELEMENT' : 'ÉLÉMENT DOMINANT'}
               </Text>
               <View style={styles.ringWrap}>
                 <Svg width={180} height={180} viewBox="0 0 180 180">
@@ -469,15 +486,15 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
               </View>
 
               <Text style={[styles.belowRingElement, { color: accent }]}>
-                {language === 'en' ? 'Element:' : 'Élément :'} {getElementName(profile.element, language)}
+                {language === 'ar' ? 'العنصر:' : language === 'en' ? 'Element:' : 'Élément :'} {getElementName(profile.element, language)}
               </Text>
             </View>
 
             {/* Context banner: Hijri + Gregorian */}
-            <View style={[styles.contextBanner, { borderColor: border }]}> 
+            <View style={[styles.contextBanner, { borderColor: border }]}>
               <View style={styles.contextLeft}>
                 <Text style={styles.contextTitle}>
-                  {language === 'en' ? 'Calculation Date' : 'Date du calcul'}
+                  {language === 'ar' ? 'تاريخ الحساب' : language === 'en' ? 'Calculation Date' : 'Date du calcul'}
                 </Text>
                 <Text style={styles.contextDate}>
                   {(() => {
@@ -490,9 +507,11 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
               <View style={styles.contextRight}>
                 <View style={[styles.statusDot, { backgroundColor: accent }]} />
                 <Text style={styles.contextStatus} numberOfLines={1}>
-                  {language === 'en'
-                    ? `For ${String(result?.personName ?? 'You')}`
-                    : `Pour ${String(result?.personName ?? 'Vous')}`}
+                  {language === 'ar'
+                    ? `لـ ${String(result?.personName ?? 'أنت')}`
+                    : language === 'en'
+                      ? `For ${String(result?.personName ?? 'You')}`
+                      : `Pour ${String(result?.personName ?? 'Vous')}`}
                 </Text>
               </View>
             </View>
@@ -505,6 +524,7 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                     key: 'overall' as const,
                     labelEn: 'Overall Alignment',
                     labelFr: 'Alignement Global',
+                    labelAr: 'التوافق العام',
                     value: scores.main,
                     anim: overallRow,
                     Icon: Compass,
@@ -513,6 +533,7 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                     key: 'career' as const,
                     labelEn: 'Career Match',
                     labelFr: 'Correspondance Carrière',
+                    labelAr: 'التوافق المهني',
                     value: scores.career,
                     anim: careerRow,
                     Icon: Briefcase,
@@ -521,12 +542,13 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                     key: 'spiritual' as const,
                     labelEn: 'Spiritual Practice',
                     labelFr: 'Pratique Spirituelle',
+                    labelAr: 'الممارسة الروحية',
                     value: scores.spiritual,
                     anim: spiritualRow,
                     Icon: Sparkles,
                   },
                 ]
-              ).map(({ key, labelEn, labelFr, value, anim, Icon }) => {
+              ).map(({ key, labelEn, labelFr, labelAr, value, anim, Icon }) => {
                 const pct = clamp01(value / 100);
                 const widthPct = anim.interpolate({ inputRange: [0, 1], outputRange: ['0%', `${Math.round(pct * 100)}%`] });
                 return (
@@ -550,7 +572,7 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                         <View style={[styles.legendIconWrap, { backgroundColor: withAlpha(accent, 0.13), borderColor: withAlpha(accent, 0.165) }]}> 
                           <Icon size={16} color={accent} />
                         </View>
-                        <Text style={styles.legendText}>{language === 'en' ? labelEn : labelFr}</Text>
+                        <Text style={styles.legendText}>{language === 'ar' ? labelAr : language === 'en' ? labelEn : labelFr}</Text>
                       </View>
                       <View style={styles.legendRowRight}>
                         <Text style={[styles.legendValue, { color: accent }]}>{value}%</Text>
@@ -582,26 +604,32 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                 <Pressable style={[styles.modalCard, { borderColor: border }]} onPress={() => {}}>
                   <Text style={[styles.modalTitle, { color: accent }]}>
                     {infoKey === 'overall'
-                      ? (language === 'en' ? 'Overall Alignment' : 'Alignement Global')
+                      ? (language === 'ar' ? 'التوافق العام' : language === 'en' ? 'Overall Alignment' : 'Alignement Global')
                       : infoKey === 'career'
-                        ? (language === 'en' ? 'Career Match' : 'Correspondance Carrière')
-                        : (language === 'en' ? 'Spiritual Practice' : 'Pratique Spirituelle')}
+                        ? (language === 'ar' ? 'التوافق المهني' : language === 'en' ? 'Career Match' : 'Correspondance Carrière')
+                        : (language === 'ar' ? 'الممارسة الروحية' : language === 'en' ? 'Spiritual Practice' : 'Pratique Spirituelle')}
                   </Text>
                   <Text style={styles.modalBody}>
                     {infoKey === 'overall'
-                      ? (language === 'en'
-                        ? 'A blended indicator of how well your current profile resonates with the core pattern shown above.'
-                        : 'Indicateur global de la cohérence entre votre profil et le schéma spirituel affiché.')
+                      ? (language === 'ar'
+                        ? 'مؤشر مركّب يعكس مدى توافق ملفك الحالي مع النمط الأساسي الموضح أعلاه.'
+                        : language === 'en'
+                          ? 'A blended indicator of how well your current profile resonates with the core pattern shown above.'
+                          : 'Indicateur global de la cohérence entre votre profil et le schéma spirituel affiché.')
                       : infoKey === 'career'
-                        ? (language === 'en'
-                          ? 'How strongly your profile supports career/mission themes associated with your Burūj and element.'
-                          : 'Mesure la compatibilité de votre profil avec les thèmes professionnels liés à votre Burūj et élément.')
-                        : (language === 'en'
-                          ? 'How supportive the current pattern is for devotional focus and recommended spiritual practice.'
-                          : 'Mesure le soutien du schéma actuel pour la pratique spirituelle et la concentration dévotionnelle.')}
+                        ? (language === 'ar'
+                          ? 'مدى دعم ملفك لموضوعات المهنة/الرسالة المرتبطة ببرجك وعنصرك.'
+                          : language === 'en'
+                            ? 'How strongly your profile supports career/mission themes associated with your Burūj and element.'
+                            : 'Mesure la compatibilité de votre profil avec les thèmes professionnels liés à votre Burūj et élément.')
+                        : (language === 'ar'
+                          ? 'مدى دعم النمط الحالي للتركيز التعبدي والممارسة الروحية الموصى بها.'
+                          : language === 'en'
+                            ? 'How supportive the current pattern is for devotional focus and recommended spiritual practice.'
+                            : 'Mesure le soutien du schéma actuel pour la pratique spirituelle et la concentration dévotionnelle.')}
                   </Text>
                   <Pressable onPress={() => setInfoOpen(false)} style={[styles.modalClose, { backgroundColor: withAlpha(accent, 0.13), borderColor: withAlpha(accent, 0.2) }]}>
-                    <Text style={[styles.modalCloseText, { color: accent }]}>{language === 'en' ? 'Close' : 'Fermer'}</Text>
+                    <Text style={[styles.modalCloseText, { color: accent }]}>{language === 'ar' ? 'إغلاق' : language === 'en' ? 'Close' : 'Fermer'}</Text>
                   </Pressable>
                 </Pressable>
               </Pressable>
@@ -613,7 +641,7 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
             <View style={styles.statsHeader}>
               <Award size={18} color={accent} />
               <Text style={styles.statsTitle}>
-                {language === 'en' ? 'Your Numbers' : 'Vos Numéros'}
+                {language === 'ar' ? 'أرقامك' : language === 'en' ? 'Your Numbers' : 'Vos Numéros'}
               </Text>
             </View>
 
@@ -635,13 +663,13 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                     </View>
                   </View>
                   <View style={styles.featuredContent}>
-                    <Text style={styles.featuredSubtitle}>{language === 'en' ? 'Burūj' : 'Burūj'}</Text>
+                    <Text style={styles.featuredSubtitle}>{language === 'ar' ? 'البروج' : 'Burūj'}</Text>
                     {(() => {
                       const mansionInfo = getMansionInfo(result.burujRemainder, language);
                       return mansionInfo ? (
                         <>
                           <Text style={styles.featuredDescription}>{mansionInfo.name}</Text>
-                          <Text style={styles.featuredArabic}>{mansionInfo.nameAr} • {language === 'en' ? 'Mansion' : 'Maison'}</Text>
+                          <Text style={styles.featuredArabic}>{mansionInfo.nameAr} • {language === 'ar' ? 'منزلة' : language === 'en' ? 'Mansion' : 'Maison'}</Text>
                         </>
                       ) : null;
                     })()}
@@ -649,7 +677,7 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                       const quality = getZodiacSpiritualQuality(result.burujRemainder, language);
                       return quality ? (
                         <Text style={[styles.featuredStrength, { color: withAlpha(accent, 0.9) }]}>
-                          {language === 'en' ? 'Spiritual Strength: ' : 'Force spirituelle : '}{quality}
+                          {language === 'ar' ? 'القوة الروحية: ' : language === 'en' ? 'Spiritual Strength: ' : 'Force spirituelle : '}{quality}
                         </Text>
                       ) : null;
                     })()}
@@ -664,8 +692,8 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                   <LinearGradient colors={cardBg as any} style={styles.compactGradient}>
                     <Text style={styles.compactIcon}>{profile.element_emoji}</Text>
                     <Text style={[styles.compactNumber, { color: accent }]}>{profile.element_number}</Text>
-                    <Text style={styles.compactLabel}>{language === 'en' ? 'Element' : 'Élément'}</Text>
-                    <Text style={styles.compactSublabel}>{language === 'en' ? 'ID Number' : 'Numéro ID'}</Text>
+                    <Text style={styles.compactLabel}>{language === 'ar' ? 'العنصر' : language === 'en' ? 'Element' : 'Élément'}</Text>
+                    <Text style={styles.compactSublabel}>{language === 'ar' ? 'الرقم التعريفي' : language === 'en' ? 'ID Number' : 'Numéro ID'}</Text>
                     <Text style={[styles.compactDetail, { color: withAlpha(accent, 0.85) }]}>
                       {getElementTagline(profile.element, language)}
                     </Text>
@@ -679,13 +707,13 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                     <Text style={[styles.compactNumber, { color: accent }]}>
                       {isBirthdateOnly ? '—' : result.repetitionCount}
                     </Text>
-                    <Text style={styles.compactLabel}>{language === 'en' ? 'Count' : 'Compteur'}</Text>
-                    <Text style={styles.compactSublabel}>{language === 'en' ? 'Repetitions' : 'Répétitions'}</Text>
+                    <Text style={styles.compactLabel}>{language === 'ar' ? 'العدد' : language === 'en' ? 'Count' : 'Compteur'}</Text>
+                    <Text style={styles.compactSublabel}>{language === 'ar' ? 'التكرارات' : language === 'en' ? 'Repetitions' : 'Répétitions'}</Text>
                     <Text style={[styles.compactDetail, { color: withAlpha(accent, 0.85) }]}>
-                      {isBirthdateOnly 
-                        ? (language === 'en' ? 'Use name method for count' : 'Utilisez la méthode nom')
-                        : (profile.spiritual_practice?.practice_night?.primary?.[language] 
-                            ? `${language === 'en' ? 'Best day: ' : 'Meilleur jour : '}${profile.spiritual_practice.practice_night.primary[language]}`
+                      {isBirthdateOnly
+                        ? (language === 'ar' ? 'استخدم طريقة الاسم للعدد' : language === 'en' ? 'Use name method for count' : 'Utilisez la méthode nom')
+                        : (profile.spiritual_practice?.practice_night?.primary?.[language]
+                            ? `${language === 'ar' ? 'أفضل يوم: ' : language === 'en' ? 'Best day: ' : 'Meilleur jour : '}${profile.spiritual_practice.practice_night.primary[language]}`
                             : getBestTimeSuggestion(profile.element, language))}
                     </Text>
                   </LinearGradient>
@@ -700,14 +728,14 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                       <Text style={styles.featuredIcon}>📊</Text>
                       <View style={styles.featuredHeaderText}>
                         <Text style={[styles.featuredNumber, { color: accent }]}>{result.combinedTotal}</Text>
-                        <Text style={styles.featuredTitle}>{language === 'en' ? 'Total Ḥadad Value' : 'Valeur Ḥadad Total'}</Text>
+                        <Text style={styles.featuredTitle}>{language === 'ar' ? 'إجمالي قيمة الحداد' : language === 'en' ? 'Total Ḥadad Value' : 'Valeur Ḥadad Total'}</Text>
                       </View>
                     </View>
                     <View style={styles.featuredContent}>
-                      <Text style={styles.featuredSubtitle}>{language === 'en' ? 'Divine Frequency' : 'Fréquence divine'}</Text>
+                      <Text style={styles.featuredSubtitle}>{language === 'ar' ? 'التردد الإلهي' : language === 'en' ? 'Divine Frequency' : 'Fréquence divine'}</Text>
                       {(typeof result?.personTotal === 'number' || typeof result?.motherTotal === 'number') && (
                         <Text style={styles.featuredDescription}>
-                          {language === 'en' ? 'You' : 'Vous'}: {typeof result?.personTotal === 'number' ? result.personTotal : 0}  •  {language === 'en' ? 'Mother' : 'Mère'}: {typeof result?.motherTotal === 'number' ? result.motherTotal : 0}
+                          {language === 'ar' ? 'أنت' : language === 'en' ? 'You' : 'Vous'}: {typeof result?.personTotal === 'number' ? result.personTotal : 0}  •  {language === 'ar' ? 'الأم' : language === 'en' ? 'Mother' : 'Mère'}: {typeof result?.motherTotal === 'number' ? result.motherTotal : 0}
                         </Text>
                       )}
                     </View>
@@ -728,17 +756,19 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                       <Calendar size={18} color={accent} />
                     </View>
                     <Text style={styles.blessedDayTitle}>
-                      {language === 'en' ? 'Your Power Day' : 'Votre Jour de Puissance'}
+                      {language === 'ar' ? 'يوم قوتك' : language === 'en' ? 'Your Power Day' : 'Votre Jour de Puissance'}
                     </Text>
                   </View>
                   <View style={styles.blessedDayContent}>
                     <Text style={styles.blessedDayName}>
-                      {blessedDay.day?.[language]}
+                      {blessedDay.day?.[language] ?? blessedDay.day?.en}
                     </Text>
                     <Text style={styles.blessedDayDesc}>
-                      {language === 'en' 
-                        ? 'Most auspicious for important decisions' 
-                        : 'Le plus propice pour les décisions importantes'}
+                      {language === 'ar'
+                        ? 'الأكثر بركة لاتخاذ القرارات المهمة'
+                        : language === 'en'
+                          ? 'Most auspicious for important decisions'
+                          : 'Le plus propice pour les décisions importantes'}
                     </Text>
                   </View>
                 </LinearGradient>
@@ -751,7 +781,7 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
             <View style={styles.insightsHeader}>
               <Target size={18} color={accent} />
               <Text style={styles.insightsTitle}>
-                {language === 'en' ? 'Key Insights' : 'Perspectives Clés'}
+                {language === 'ar' ? 'رؤى رئيسية' : language === 'en' ? 'Key Insights' : 'Perspectives Clés'}
               </Text>
             </View>
 
@@ -768,13 +798,13 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                     </View>
                     <View style={styles.insightTitleContainer}>
                       <Text style={styles.insightTitle}>
-                        {language === 'en' ? 'Career Path' : 'Parcours Professionnel'}
+                        {language === 'ar' ? 'المسار المهني' : language === 'en' ? 'Career Path' : 'Parcours Professionnel'}
                       </Text>
                     </View>
                   </View>
                   <Text style={styles.insightText} numberOfLines={3}>
-                    {profile.career.principle?.[language] || 
-                     (language === 'en' ? 'Explore career guidance in the Career tab' : 'Explorez l\'orientation professionnelle dans l\'onglet Carrière')}
+                    {profile.career.principle?.[language] ||
+                     (language === 'ar' ? 'استكشف التوجيه المهني في تبويب المهنة' : language === 'en' ? 'Explore career guidance in the Career tab' : 'Explorez l\'orientation professionnelle dans l\'onglet Carrière')}
                   </Text>
                 </LinearGradient>
               </View>
@@ -793,17 +823,17 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                     </View>
                     <View style={styles.insightTitleContainer}>
                       <Text style={styles.insightTitle}>
-                        {language === 'en' ? 'Daily Practice' : 'Pratique Quotidienne'}
+                        {language === 'ar' ? 'الممارسة اليومية' : language === 'en' ? 'Daily Practice' : 'Pratique Quotidienne'}
                       </Text>
                     </View>
                   </View>
                   <Text style={styles.insightText} numberOfLines={2}>
-                    {profile.spiritual_practice.divine_names?.note?.[language] || 
+                    {profile.spiritual_practice.divine_names?.note?.[language] ||
                      profile.spiritual_practice?.[language] ||
-                     (language === 'en' ? 'Explore spiritual practices in the Spiritual tab' : 'Explorez les pratiques spirituelles dans l\'onglet Spirituel')}
+                     (language === 'ar' ? 'استكشف الممارسات الروحية في تبويب الممارسة الروحية' : language === 'en' ? 'Explore spiritual practices in the Spiritual tab' : 'Explorez les pratiques spirituelles dans l\'onglet Spirituel')}
                   </Text>
                   <Text style={styles.insightSubtext}>
-                    {language === 'en' ? 'Recite daily for spiritual balance' : 'Récitez quotidiennement pour l\'équilibre spirituel'}
+                    {language === 'ar' ? 'اتلُ يوميًا للتوازن الروحي' : language === 'en' ? 'Recite daily for spiritual balance' : 'Récitez quotidiennement pour l\'équilibre spirituel'}
                   </Text>
                 </LinearGradient>
               </View>
@@ -819,7 +849,7 @@ export function IstikharaSummaryCard({ result, language = 'en', accentColor }: I
                   <View style={styles.insightHeader}>
                     <Zap size={16} color={accent} />
                     <Text style={styles.insightSmallTitle}>
-                      {language === 'en' ? 'Core Trait' : 'Trait Principal'}
+                      {language === 'ar' ? 'السمة الأساسية' : language === 'en' ? 'Core Trait' : 'Trait Principal'}
                     </Text>
                   </View>
                   <Text style={styles.insightText} numberOfLines={3}>

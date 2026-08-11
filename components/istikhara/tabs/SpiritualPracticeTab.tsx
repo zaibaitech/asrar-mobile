@@ -7,6 +7,7 @@ import {
     CheckSquare,
     ChevronDown,
     ChevronUp,
+    Compass,
     Copy,
     Gift,
     Moon,
@@ -30,6 +31,8 @@ import Svg, { Circle, Defs, Path, Pattern, Rect } from 'react-native-svg';
 import { getElementColors } from "../../../constants/ElementColors";
 import { getZodiacSign } from '../../../constants/zodiacData';
 import { useLanguage } from "../../../contexts/LanguageContext";
+import { getManazilGuidance, tr } from '../../../data/manazilGuidance';
+import { getManazilForZodiacIndex } from '../../../data/lunarMansions';
 import NotificationService, { NotificationCategory } from '../../../services/NotificationService';
 import type { IstikharaCalculationResult } from "../../../services/istikhara/types";
 import { DhikrCounter } from "../DhikrCounter";
@@ -40,16 +43,18 @@ interface SpiritualPracticeTabProps {
   result: IstikharaCalculationResult;
 }
 
-type PracticeType = "monthly" | "lifetime" | "divine";
+type PracticeType = "monthly" | "lifetime" | "divine" | "manazil";
 
 type RitualEssenceItem = {
   ar: string;
   translit: string;
   en: string;
+  fr: string;
 };
 
 type RitualEssenceByZodiac = {
   zodiacEn: string;
+  zodiacFr: string;
   zodiacAr: string;
   zodiacTranslit: string;
   items: RitualEssenceItem[];
@@ -59,112 +64,124 @@ type RitualEssenceByZodiac = {
 const RITUAL_ESSENCES_BY_BURUJ: Record<number, RitualEssenceByZodiac> = {
   1: {
     zodiacEn: 'Aries',
+    zodiacFr: 'Bélier',
     zodiacAr: 'الحمل',
     zodiacTranslit: 'al-Ḥamal',
     items: [
-      { ar: 'لُبَان ذَكَر', translit: 'Lubān Dhakr', en: 'Male Frankincense' },
-      { ar: 'دَهْن العُود', translit: 'Dahn al-ʿŪd', en: 'Oud Oil' },
+      { ar: 'لُبَان ذَكَر', translit: 'Lubān Dhakr', en: 'Male Frankincense', fr: 'Encens mâle' },
+      { ar: 'دَهْن العُود', translit: 'Dahn al-ʿŪd', en: 'Oud Oil', fr: 'Huile de oud' },
     ],
   },
   2: {
     zodiacEn: 'Taurus',
+    zodiacFr: 'Taureau',
     zodiacAr: 'الثور',
     zodiacTranslit: 'al-Thawr',
     items: [
-      { ar: 'وَرْد', translit: 'Ward', en: 'Rose' },
-      { ar: 'صَنْدَل', translit: 'Sandal', en: 'Sandalwood' },
+      { ar: 'وَرْد', translit: 'Ward', en: 'Rose', fr: 'Rose' },
+      { ar: 'صَنْدَل', translit: 'Sandal', en: 'Sandalwood', fr: 'Bois de santal' },
     ],
   },
   3: {
     zodiacEn: 'Gemini',
+    zodiacFr: 'Gémeaux',
     zodiacAr: 'الجوزاء',
     zodiacTranslit: "al-Jawzā'",
     items: [
-      { ar: 'مَسْتَكَى', translit: 'Mastakā', en: 'Mastic Gum' },
-      { ar: 'دَهْن الزَّنْبَق', translit: 'Dahn al-Zanbaq', en: 'Lily Oil' },
+      { ar: 'مَسْتَكَى', translit: 'Mastakā', en: 'Mastic Gum', fr: 'Gomme mastic' },
+      { ar: 'دَهْن الزَّنْبَق', translit: 'Dahn al-Zanbaq', en: 'Lily Oil', fr: 'Huile de lys' },
     ],
   },
   4: {
     zodiacEn: 'Cancer',
+    zodiacFr: 'Cancer',
     zodiacAr: 'السرطان',
     zodiacTranslit: 'al-Saraṭān',
     items: [
-      { ar: 'كَافُور', translit: 'Kāfūr', en: 'Camphor' },
-      { ar: 'صَنْدَل أَبْيَض', translit: 'Sandal Abyaḍ', en: 'White Sandalwood' },
+      { ar: 'كَافُور', translit: 'Kāfūr', en: 'Camphor', fr: 'Camphre' },
+      { ar: 'صَنْدَل أَبْيَض', translit: 'Sandal Abyaḍ', en: 'White Sandalwood', fr: 'Santal blanc' },
     ],
   },
   5: {
     zodiacEn: 'Leo',
+    zodiacFr: 'Lion',
     zodiacAr: 'الأسد',
     zodiacTranslit: 'al-Asad',
     items: [
-      { ar: 'لُبَان', translit: 'Lubān', en: 'Frankincense' },
-      { ar: 'زَعْفَرَان', translit: 'Zaʿfarān', en: 'Saffron' },
-      { ar: 'عَنْبَر', translit: 'ʿAnbar', en: 'Ambergris' },
+      { ar: 'لُبَان', translit: 'Lubān', en: 'Frankincense', fr: 'Encens' },
+      { ar: 'زَعْفَرَان', translit: 'Zaʿfarān', en: 'Saffron', fr: 'Safran' },
+      { ar: 'عَنْبَر', translit: 'ʿAnbar', en: 'Ambergris', fr: 'Ambre gris' },
     ],
   },
   6: {
     zodiacEn: 'Virgo',
+    zodiacFr: 'Vierge',
     zodiacAr: 'العذراء',
     zodiacTranslit: 'al-ʿAdhrāʾ',
     items: [
-      { ar: 'مَسْتَكَى', translit: 'Mastakā', en: 'Mastic' },
-      { ar: 'صَنْدَل', translit: 'Sandal', en: 'Sandalwood' },
+      { ar: 'مَسْتَكَى', translit: 'Mastakā', en: 'Mastic', fr: 'Mastic' },
+      { ar: 'صَنْدَل', translit: 'Sandal', en: 'Sandalwood', fr: 'Bois de santal' },
     ],
   },
   7: {
     zodiacEn: 'Libra',
+    zodiacFr: 'Balance',
     zodiacAr: 'الميزان',
     zodiacTranslit: 'al-Mīzān',
     items: [
-      { ar: 'وَرْد', translit: 'Ward', en: 'Rose' },
-      { ar: 'مِسْك', translit: 'Misk', en: 'Musk' },
+      { ar: 'وَرْد', translit: 'Ward', en: 'Rose', fr: 'Rose' },
+      { ar: 'مِسْك', translit: 'Misk', en: 'Musk', fr: 'Musc' },
     ],
   },
   8: {
     zodiacEn: 'Scorpio',
+    zodiacFr: 'Scorpion',
     zodiacAr: 'العقرب',
     zodiacTranslit: 'al-ʿAqrab',
     items: [
-      { ar: 'مُرّ', translit: 'Murr', en: 'Myrrh' },
-      { ar: 'مِسْك', translit: 'Misk', en: 'Musk' },
-      { ar: 'عُود', translit: 'ʿŪd', en: 'Agarwood/Oud' },
+      { ar: 'مُرّ', translit: 'Murr', en: 'Myrrh', fr: 'Myrrhe' },
+      { ar: 'مِسْك', translit: 'Misk', en: 'Musk', fr: 'Musc' },
+      { ar: 'عُود', translit: 'ʿŪd', en: 'Agarwood/Oud', fr: 'Bois d\'agar / Oud' },
     ],
   },
   9: {
     zodiacEn: 'Sagittarius',
+    zodiacFr: 'Sagittaire',
     zodiacAr: 'القوس',
     zodiacTranslit: 'al-Qaws',
     items: [
-      { ar: 'جَوْزَة الطِّيب', translit: 'Jawzat al-Ṭīb', en: 'Nutmeg' },
-      { ar: 'صَنْدَل', translit: 'Sandal', en: 'Sandalwood' },
+      { ar: 'جَوْزَة الطِّيب', translit: 'Jawzat al-Ṭīb', en: 'Nutmeg', fr: 'Noix de muscade' },
+      { ar: 'صَنْدَل', translit: 'Sandal', en: 'Sandalwood', fr: 'Bois de santal' },
     ],
   },
   10: {
     zodiacEn: 'Capricorn',
+    zodiacFr: 'Capricorne',
     zodiacAr: 'الجدي',
     zodiacTranslit: 'al-Jady',
     items: [
-      { ar: 'مُرّ', translit: 'Murr', en: 'Myrrh' },
-      { ar: 'صَبْر', translit: 'Ṣabr', en: 'Aloe' },
+      { ar: 'مُرّ', translit: 'Murr', en: 'Myrrh', fr: 'Myrrhe' },
+      { ar: 'صَبْر', translit: 'Ṣabr', en: 'Aloe', fr: 'Aloès' },
     ],
   },
   11: {
     zodiacEn: 'Aquarius',
+    zodiacFr: 'Verseau',
     zodiacAr: 'الدلو',
     zodiacTranslit: 'al-Dalw',
     items: [
-      { ar: 'لُبَان', translit: 'Lubān', en: 'Frankincense' },
-      { ar: 'صَمْغ عَرَبِي', translit: 'Ṣamgh ʿArabī', en: 'Gum Arabic' },
+      { ar: 'لُبَان', translit: 'Lubān', en: 'Frankincense', fr: 'Encens' },
+      { ar: 'صَمْغ عَرَبِي', translit: 'Ṣamgh ʿArabī', en: 'Gum Arabic', fr: 'Gomme arabique' },
     ],
   },
   12: {
     zodiacEn: 'Pisces',
+    zodiacFr: 'Poissons',
     zodiacAr: 'الحوت',
     zodiacTranslit: 'al-Ḥūt',
     items: [
-      { ar: 'عَنْبَر', translit: 'ʿAnbar', en: 'Ambergris' },
-      { ar: 'صَنْدَل', translit: 'Sandal', en: 'Sandalwood' },
+      { ar: 'عَنْبَر', translit: 'ʿAnbar', en: 'Ambergris', fr: 'Ambre gris' },
+      { ar: 'صَنْدَل', translit: 'Sandal', en: 'Sandalwood', fr: 'Bois de santal' },
     ],
   },
 };
@@ -292,6 +309,16 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
   
   // Check if this is a birthdate-only calculation (no valid name-based count)
   const isBirthdateOnly = result.calculationMethod === 'birthdate';
+
+  // Manazil al-Qamar (lunar mansions) traditionally associated with this
+  // zodiac sign, each paired with its benefit/practice guidance.
+  const zodiacManazil = useMemo(() => {
+    if (!isBirthdateOnly) return [];
+    return getManazilForZodiacIndex(result.burujRemainder - 1).map((mansion) => ({
+      mansion,
+      guidance: getManazilGuidance({ mansionIndex: mansion.index, mansionElement: mansion.element }),
+    }));
+  }, [isBirthdateOnly, result.burujRemainder]);
 
   const cardSurface = {
     backgroundColor: withAlpha(accentColor, 0.14),
@@ -510,12 +537,14 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
           <Moon size={32} color={accentColor} />
         </View>
         <Text style={styles.title}>
-          {language === 'en' ? 'Spiritual Practices' : 'Pratiques Spirituelles'}
+          {language === 'ar' ? 'الممارسة الروحية' : language === 'en' ? 'Spiritual Practices' : 'Pratiques Spirituelles'}
         </Text>
         <Text style={styles.subtitle}>
-          {language === 'en' 
-            ? 'Sacred practices aligned with your spiritual nature' 
-            : 'Pratiques sacrées alignées avec votre nature spirituelle'}
+          {language === 'ar'
+            ? 'ممارسات مقدسة متوافقة مع طبيعتك الروحية'
+            : language === 'en'
+              ? 'Sacred practices aligned with your spiritual nature'
+              : 'Pratiques sacrées alignées avec votre nature spirituelle'}
         </Text>
       </View>
 
@@ -531,37 +560,55 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
         >
           <Sparkles size={20} color={activeType === 'divine' ? accentColor : '#9ca3af'} />
           <Text style={[styles.typeButtonText, activeType === 'divine' && { color: accentColor }]}>
-            {language === 'en' ? 'Divine Names' : 'Noms Divins'}
+            {language === 'ar' ? 'الأسماء الإلهية' : language === 'en' ? 'Divine Names' : 'Noms Divins'}
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.typeButton,
-            { backgroundColor: withAlpha(accentColor, 0.10), borderColor: withAlpha(accentColor, 0.18) },
-            activeType === 'monthly' && [styles.typeButtonActive, { borderColor: withAlpha(accentColor, 0.35), backgroundColor: withAlpha(accentColor, 0.18) }],
-          ]}
-          onPress={() => switchType('monthly')}
-        >
-          <Calendar size={20} color={activeType === 'monthly' ? accentColor : '#9ca3af'} />
-          <Text style={[styles.typeButtonText, activeType === 'monthly' && { color: accentColor }]}>
-            {language === 'en' ? 'Monthly' : 'Mensuel'}
-          </Text>
-        </TouchableOpacity>
+        {isBirthdateOnly ? (
+          <TouchableOpacity
+            style={[
+              styles.typeButton,
+              { backgroundColor: withAlpha(accentColor, 0.10), borderColor: withAlpha(accentColor, 0.18) },
+              activeType === 'manazil' && [styles.typeButtonActive, { borderColor: withAlpha(accentColor, 0.35), backgroundColor: withAlpha(accentColor, 0.18) }],
+            ]}
+            onPress={() => switchType('manazil')}
+          >
+            <Compass size={20} color={activeType === 'manazil' ? accentColor : '#9ca3af'} />
+            <Text style={[styles.typeButtonText, activeType === 'manazil' && { color: accentColor }]}>
+              {language === 'ar' ? 'المنازل' : language === 'fr' ? 'Manazil' : 'Manazil'}
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <>
+            <TouchableOpacity
+              style={[
+                styles.typeButton,
+                { backgroundColor: withAlpha(accentColor, 0.10), borderColor: withAlpha(accentColor, 0.18) },
+                activeType === 'monthly' && [styles.typeButtonActive, { borderColor: withAlpha(accentColor, 0.35), backgroundColor: withAlpha(accentColor, 0.18) }],
+              ]}
+              onPress={() => switchType('monthly')}
+            >
+              <Calendar size={20} color={activeType === 'monthly' ? accentColor : '#9ca3af'} />
+              <Text style={[styles.typeButtonText, activeType === 'monthly' && { color: accentColor }]}>
+                {language === 'ar' ? 'شهري' : language === 'en' ? 'Monthly' : 'Mensuel'}
+              </Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.typeButton,
-            { backgroundColor: withAlpha(accentColor, 0.10), borderColor: withAlpha(accentColor, 0.18) },
-            activeType === 'lifetime' && [styles.typeButtonActive, { borderColor: withAlpha(accentColor, 0.35), backgroundColor: withAlpha(accentColor, 0.18) }],
-          ]}
-          onPress={() => switchType('lifetime')}
-        >
-          <Star size={20} color={activeType === 'lifetime' ? accentColor : '#9ca3af'} />
-          <Text style={[styles.typeButtonText, activeType === 'lifetime' && { color: accentColor }]}>
-            {language === 'en' ? 'Lifetime' : 'Vie'}
-          </Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.typeButton,
+                { backgroundColor: withAlpha(accentColor, 0.10), borderColor: withAlpha(accentColor, 0.18) },
+                activeType === 'lifetime' && [styles.typeButtonActive, { borderColor: withAlpha(accentColor, 0.35), backgroundColor: withAlpha(accentColor, 0.18) }],
+              ]}
+              onPress={() => switchType('lifetime')}
+            >
+              <Star size={20} color={activeType === 'lifetime' ? accentColor : '#9ca3af'} />
+              <Text style={[styles.typeButtonText, activeType === 'lifetime' && { color: accentColor }]}>
+                {language === 'ar' ? 'مدى الحياة' : language === 'en' ? 'Lifetime' : 'Vie'}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
 
       {/* Divine Names Practice */}
@@ -573,7 +620,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
               <View style={styles.cardHeader}>
                 <Moon size={24} color={accentColor} />
                 <Text style={[styles.cardTitle, { color: accentColor }]}>
-                  {language === 'en' ? 'Practice Night' : 'Nuit de Pratique'}
+                  {language === 'ar' ? 'ليلة الممارسة' : language === 'en' ? 'Practice Night' : 'Nuit de Pratique'}
                 </Text>
                 {practiceWindow.isActiveNow && (
                   <View style={[styles.statusPill, { borderColor: withAlpha(accentColor, 0.35), backgroundColor: withAlpha(accentColor, 0.14) }]}>
@@ -584,7 +631,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                 )}
               </View>
               <Text style={styles.practiceNight}>
-                {spiritual_practice.practice_night.primary[language as 'en' | 'fr']}
+                {spiritual_practice.practice_night.primary[language as 'en' | 'fr' | 'ar'] ?? spiritual_practice.practice_night.primary.en}
               </Text>
               <Text style={styles.practiceTimingHint}>
                 {language === 'fr'
@@ -603,7 +650,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                     {practiceWindow.nextStart.toLocaleDateString(
                       language === 'fr' ? 'fr-FR' : language === 'ar' ? 'ar' : 'en-US',
                       { weekday: 'long', month: 'short', day: 'numeric' }
-                    )} • 12:00 AM – {language === 'fr' ? 'Fajr' : language === 'ar' ? 'الفجر' : 'Fajr'}
+                    )} • {language === 'en' ? '12:00 AM' : '00:00'} – {language === 'fr' ? 'Fajr' : language === 'ar' ? 'الفجر' : 'Fajr'}
                   </Text>
                 </View>
               )}
@@ -632,7 +679,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
 
               {spiritual_practice.practice_night.note && (
                 <Text style={styles.practiceNote}>
-                  {spiritual_practice.practice_night.note[language as 'en' | 'fr']}
+                  {spiritual_practice.practice_night.note[language as 'en' | 'fr' | 'ar'] ?? spiritual_practice.practice_night.note.en}
                 </Text>
               )}
             </PatternCard>
@@ -644,12 +691,12 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
               <View style={styles.cardHeader}>
                 <Star size={24} color={accentColor} />
                 <Text style={[styles.cardTitle, { color: accentColor }]}>
-                  {language === 'en' ? 'Your Zodiac Sign' : 'Votre Signe Zodiacal'}
+                  {language === 'ar' ? 'برجك' : language === 'en' ? 'Your Zodiac Sign' : 'Votre Signe Zodiacal'}
                 </Text>
               </View>
               <View style={styles.zodiacContent}>
                 <Text style={styles.zodiacText}>
-                  {language === 'fr' ? zodiac.nameFr : zodiac.nameEn}
+                  {language === 'ar' ? zodiac.nameAr : language === 'fr' ? zodiac.nameFr : zodiac.nameEn}
                 </Text>
                 <Text style={styles.zodiacArabic}>
                   {zodiac.nameAr}
@@ -668,7 +715,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                     {language === 'ar' ? 'جوهر الطقس' : language === 'fr' ? 'Essence rituelle' : 'Ritual Essence'}
                   </Text>
                   <Text style={styles.essenceSubtitle}>
-                    {(language === 'fr' ? zodiac?.nameFr : zodiac?.nameEn) || ritualEssence.zodiacEn} ({ritualEssence.zodiacTranslit})
+                    {(language === 'ar' ? (zodiac?.nameAr || ritualEssence.zodiacAr) : language === 'fr' ? (zodiac?.nameFr || ritualEssence.zodiacFr) : (zodiac?.nameEn || ritualEssence.zodiacEn))} ({ritualEssence.zodiacTranslit})
                   </Text>
                 </View>
 
@@ -698,7 +745,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
 
               <Text style={styles.essenceArabic}>{ritualEssence.items.map(i => i.ar).join(' • ')}</Text>
               <Text style={styles.essenceTranslit}>{ritualEssence.items.map(i => i.translit).join(' • ')}</Text>
-              <Text style={styles.essenceTranslation}>{ritualEssence.items.map(i => i.en).join(' • ')}</Text>
+              <Text style={styles.essenceTranslation}>{ritualEssence.items.map(i => (language === 'ar' ? i.ar : language === 'fr' ? i.fr : i.en)).join(' • ')}</Text>
 
               <Text style={styles.essenceUsageNote}>
                 {language === 'ar'
@@ -718,7 +765,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
 
               <View style={styles.essenceHowToWrap}>
                 <Text style={styles.essenceHowToTitle}>
-                  {language === 'fr' ? 'Comment utiliser' : language === 'ar' ? 'طريقة الاستخدام' : 'How to use'}
+                  {language === 'ar' ? 'طريقة الاستخدام' : language === 'fr' ? 'Comment utiliser' : 'How to use'}
                 </Text>
                 <Text style={styles.essenceHowToText}>
                   {language === 'fr'
@@ -742,11 +789,11 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                         ]}
                       >
                       <Text style={styles.essenceRowTitle}>
-                        {entry.zodiacEn} ({entry.zodiacTranslit}){isUserSign ? ' ⭐' : ''}
+                        {(language === 'ar' ? entry.zodiacAr : language === 'fr' ? entry.zodiacFr : entry.zodiacEn)} ({entry.zodiacTranslit}){isUserSign ? ' ⭐' : ''}
                       </Text>
                       <Text style={styles.essenceRowArabic}>{entry.items.map(i => i.ar).join(' • ')}</Text>
                       <Text style={styles.essenceRowTranslit}>{entry.items.map(i => i.translit).join(' • ')}</Text>
-                      <Text style={styles.essenceRowEn}>{entry.items.map(i => i.en).join(' • ')}</Text>
+                      <Text style={styles.essenceRowEn}>{entry.items.map(i => (language === 'ar' ? i.ar : language === 'fr' ? i.fr : i.en)).join(' • ')}</Text>
                       </View>
                     );
                   })}
@@ -761,7 +808,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
               <View style={styles.cardHeader}>
                 <Sparkles size={24} color={accentColor} />
                 <Text style={[styles.cardTitle, { color: accentColor }]}>
-                  {language === 'en' ? 'Divine Names to Recite' : 'Noms Divins à Réciter'}
+                  {language === 'ar' ? 'الأسماء الإلهية للتلاوة' : language === 'en' ? 'Divine Names to Recite' : 'Noms Divins à Réciter'}
                 </Text>
                 {!isBirthdateOnly && (
                   <View style={[styles.countPill, { borderColor: colors.border }]}>
@@ -813,7 +860,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                       {names.length <= 1 && !isBirthdateOnly && (
                         <View style={styles.singleCountRow}>
                           <Text style={styles.singleCountLabel}>
-                            {language === 'en' ? 'Recite this name:' : 'Récitez ce nom :'}
+                            {language === 'ar' ? 'اتلُ هذا الاسم:' : language === 'en' ? 'Recite this name:' : 'Récitez ce nom :'}
                           </Text>
                           <Text style={[styles.singleCountValue, { color: colors.accent }]}>
                             {totalHadadValue}
@@ -825,7 +872,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                 })()}
                 <Text style={[styles.transliteration, { color: withAlpha(accentColor, 0.9) }]}>{spiritual_practice.divine_names.transliteration}</Text>
                 <Text style={styles.translation}>
-                  {spiritual_practice.divine_names.translation[language as 'en' | 'fr']}
+                  {spiritual_practice.divine_names.translation[language as 'en' | 'fr' | 'ar'] ?? spiritual_practice.divine_names.translation.en}
                 </Text>
               </View>
 
@@ -835,9 +882,9 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
               >
                 <Target size={20} color={accentColor} />
                 <Text style={[styles.dhikrButtonText, { color: accentColor }]}>
-                  {showDhikrCounter 
-                    ? (language === 'en' ? 'Hide Counter' : 'Masquer Compteur')
-                    : (language === 'en' ? 'Start Dhikr Counter' : 'Démarrer Compteur')}
+                  {showDhikrCounter
+                    ? (language === 'ar' ? 'إخفاء العداد' : language === 'en' ? 'Hide Counter' : 'Masquer Compteur')
+                    : (language === 'ar' ? 'ابدأ عداد الذكر' : language === 'en' ? 'Start Dhikr Counter' : 'Démarrer Compteur')}
                 </Text>
               </TouchableOpacity>
             </PatternCard>
@@ -869,7 +916,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                 <View style={styles.cardHeader}>
                   <BookOpen size={24} color={accentColor} />
                   <Text style={[styles.cardTitle, { color: accentColor }]}>
-                    {language === 'en' ? 'Quranic Verse' : 'Verset Coranique'}
+                    {language === 'ar' ? 'آية قرآنية' : language === 'en' ? 'Quranic Verse' : 'Verset Coranique'}
                   </Text>
                   {!isBirthdateOnly && (
                     <View style={[styles.countPill, { borderColor: colors.border }]}>
@@ -895,7 +942,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                 </View>
                 <Text style={[styles.verseTransliteration, { color: withAlpha(accentColor, 0.9) }]}>{spiritual_practice.quranic_verse?.transliteration}</Text>
                 <Text style={styles.verseTranslation}>
-                  {spiritual_practice.quranic_verse?.translation[language as 'en' | 'fr']}
+                  {spiritual_practice.quranic_verse?.translation[language as 'en' | 'fr' | 'ar'] ?? spiritual_practice.quranic_verse?.translation.en}
                 </Text>
                 <Text style={styles.verseReference}>({spiritual_practice.quranic_verse?.reference})</Text>
               </View>
@@ -910,7 +957,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                   <View style={styles.smallCardHeader}>
                     <Shield size={20} color={accentColor} />
                     <Text style={[styles.smallCardTitle, { color: accentColor }]}>
-                      {language === 'en' ? 'Angel' : 'Ange'}
+                      {language === 'ar' ? 'الملك' : language === 'en' ? 'Angel' : 'Ange'}
                     </Text>
                     {!isBirthdateOnly && (
                       <View style={[styles.countPill, { borderColor: colors.border }]}>
@@ -924,7 +971,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                   <Text style={[styles.angelTransliteration, { color: withAlpha(accentColor, 0.9) }]}>{spiritual_practice.angel.transliteration}</Text>
                   {spiritual_practice.angel.name && (
                     <Text style={styles.angelName}>
-                      {spiritual_practice.angel.name[language as 'en' | 'fr']}
+                      {spiritual_practice.angel.name[language as 'en' | 'fr' | 'ar'] ?? spiritual_practice.angel.name.en}
                     </Text>
                   )}
                 </PatternCard>
@@ -935,7 +982,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                   <View style={styles.smallCardHeader}>
                     <Zap size={20} color={accentColor} />
                     <Text style={[styles.smallCardTitle, { color: accentColor }]}>
-                      {language === 'en' ? 'Jinn' : 'Djinn'}
+                      {language === 'ar' ? 'الجن' : language === 'en' ? 'Jinn' : 'Djinn'}
                     </Text>
                     {!isBirthdateOnly && (
                       <View style={[styles.countPill, { borderColor: colors.border }]}>
@@ -949,7 +996,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                   <Text style={[styles.angelTransliteration, { color: withAlpha(accentColor, 0.9) }]}>{spiritual_practice.jinn.transliteration}</Text>
                   {spiritual_practice.jinn.meaning && (
                     <Text style={styles.angelName}>
-                      {spiritual_practice.jinn.meaning[language as 'en' | 'fr']}
+                      {spiritual_practice.jinn.meaning[language as 'en' | 'fr' | 'ar'] ?? spiritual_practice.jinn.meaning.en}
                     </Text>
                   )}
                 </PatternCard>
@@ -1001,7 +1048,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
                 <View style={styles.cardHeader}>
                   <CheckSquare size={24} color={accentColor} />
                   <Text style={[styles.cardTitle, { color: accentColor }]}>
-                    {language === 'en' ? 'Practice Instructions' : 'Instructions de Pratique'}
+                    {language === 'ar' ? 'تعليمات الممارسة' : language === 'en' ? 'Practice Instructions' : 'Instructions de Pratique'}
                   </Text>
                 </View>
                 {showInstructions ? <ChevronUp size={20} color="#FFF" /> : <ChevronDown size={20} color="#FFF" />}
@@ -1009,7 +1056,7 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
 
               {showInstructions && (
                 <View style={styles.instructionsContent}>
-                  {spiritual_practice.instructions[language as 'en' | 'fr'].map((instruction, idx) => (
+                  {(spiritual_practice.instructions[language as 'en' | 'fr' | 'ar'] ?? spiritual_practice.instructions.en).map((instruction, idx) => (
                     <View key={idx} style={styles.instructionItem}>
                       <View style={[styles.instructionNumber, { backgroundColor: colors.background }]}>
                         <Text style={[styles.instructionNumberText, { color: accentColor }]}>
@@ -1026,50 +1073,115 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
         </View>
       )}
 
+      {/* Manazil al-Qamar for this Zodiac Sign (birthdate/DOB mode only) */}
+      {activeType === 'manazil' && isBirthdateOnly && (
+        <View>
+          {zodiacManazil.map(({ mansion, guidance }) => {
+            const mansionColors = getElementColors(mansion.element);
+            return (
+              <PatternCard
+                key={mansion.index}
+                style={[
+                  styles.card,
+                  {
+                    backgroundColor: withAlpha(mansionColors.accent, 0.14),
+                    borderColor: withAlpha(mansionColors.accent, 0.22),
+                    shadowColor: mansionColors.accent,
+                  },
+                ]}
+              >
+                <View style={styles.cardHeader}>
+                  <Compass size={24} color={mansionColors.accent} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.cardTitle, { color: mansionColors.accent }]}>
+                      {mansion.nameArabic} · {mansion.nameTransliteration}
+                    </Text>
+                    {language !== 'ar' && (
+                      <Text style={styles.essenceSubtitle}>
+                        {language === 'fr' ? mansion.nameFrench : mansion.nameEnglish}
+                      </Text>
+                    )}
+                  </View>
+                  <View style={[styles.countPill, { borderColor: mansionColors.border }]}>
+                    <Text style={[styles.countPillText, { color: mansionColors.accent }]}>
+                      {tr(guidance.themeLabel, language as 'en' | 'fr' | 'ar')}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.sadaqahSection}>
+                  <Text style={styles.sectionLabel}>
+                    {language === 'ar' ? 'الفائدة:' : language === 'fr' ? 'Bienfait :' : 'Benefit:'}
+                  </Text>
+                  <Text style={styles.sadaqahText}>
+                    {tr(guidance.essence, language as 'en' | 'fr' | 'ar')}
+                  </Text>
+                  <Text style={[styles.sadaqahText, { marginTop: 4, opacity: 0.85 }]}>
+                    {tr(guidance.manifests, language as 'en' | 'fr' | 'ar')}
+                  </Text>
+                </View>
+
+                <View style={styles.alternativesSection}>
+                  <Text style={styles.alternativesTitle}>
+                    {language === 'ar' ? 'الممارسة:' : language === 'fr' ? 'Pratique :' : 'Practice:'}
+                  </Text>
+                  {guidance.bestPractices.spiritual.slice(0, 3).map((item, idx) => (
+                    <View key={idx} style={styles.alternativeItem}>
+                      <Text style={styles.bullet}>•</Text>
+                      <Text style={styles.alternativeText}>{tr(item, language as 'en' | 'fr' | 'ar')}</Text>
+                    </View>
+                  ))}
+                </View>
+              </PatternCard>
+            );
+          })}
+        </View>
+      )}
+
       {/* Monthly Sadaqah */}
-      {activeType === 'monthly' && profile.sadaqah.monthly && (
+      {!isBirthdateOnly && activeType === 'monthly' && profile.sadaqah.monthly && (
         <View>
           <PatternCard style={[styles.card, cardSurface]}>
             <View style={styles.cardHeader}>
               <Gift size={24} color={accentColor} />
               <Text style={[styles.cardTitle, { color: accentColor }]}>
-                {language === 'en' ? 'Monthly Sadaqah' : 'Sadaqah Mensuelle'}
+                {language === 'ar' ? 'الصدقة الشهرية' : language === 'en' ? 'Monthly Sadaqah' : 'Sadaqah Mensuelle'}
               </Text>
             </View>
 
             <View style={styles.sadaqahSection}>
               <Text style={styles.sectionLabel}>
-                {language === 'en' ? 'Traditional:' : 'Traditionnel:'}
+                {language === 'ar' ? 'تقليديًا:' : language === 'en' ? 'Traditional:' : 'Traditionnel:'}
               </Text>
               <Text style={styles.sadaqahText}>
-                {profile.sadaqah.monthly.traditional[language as 'en' | 'fr']}
+                {profile.sadaqah.monthly.traditional[language as 'en' | 'fr' | 'ar'] ?? profile.sadaqah.monthly.traditional.en}
               </Text>
             </View>
 
             <View style={styles.sadaqahSection}>
               <Text style={styles.sectionLabel}>
-                {language === 'en' ? 'Frequency:' : 'Fréquence:'}
+                {language === 'ar' ? 'التكرار:' : language === 'en' ? 'Frequency:' : 'Fréquence:'}
               </Text>
               <Text style={styles.sadaqahText}>
-                {profile.sadaqah.monthly.frequency[language as 'en' | 'fr']}
+                {profile.sadaqah.monthly.frequency[language as 'en' | 'fr' | 'ar'] ?? profile.sadaqah.monthly.frequency.en}
               </Text>
             </View>
 
             <View style={styles.sadaqahSection}>
               <Text style={styles.sectionLabel}>
-                {language === 'en' ? 'Purpose:' : 'Objectif:'}
+                {language === 'ar' ? 'الغرض:' : language === 'en' ? 'Purpose:' : 'Objectif:'}
               </Text>
               <Text style={styles.sadaqahText}>
-                {profile.sadaqah.monthly.purpose?.[language as 'en' | 'fr'] || ''}
+                {profile.sadaqah.monthly.purpose?.[language as 'en' | 'fr' | 'ar'] || profile.sadaqah.monthly.purpose?.en || ''}
               </Text>
             </View>
 
             {profile.sadaqah.monthly.modern_alternatives && (
               <View style={styles.alternativesSection}>
                 <Text style={styles.alternativesTitle}>
-                  {language === 'en' ? 'Modern Alternatives:' : 'Alternatives Modernes:'}
+                  {language === 'ar' ? 'بدائل معاصرة:' : language === 'en' ? 'Modern Alternatives:' : 'Alternatives Modernes:'}
                 </Text>
-                {profile.sadaqah.monthly.modern_alternatives[language as 'en' | 'fr'].map((alt, idx) => (
+                {(profile.sadaqah.monthly.modern_alternatives[language as 'en' | 'fr' | 'ar'] ?? profile.sadaqah.monthly.modern_alternatives.en).map((alt, idx) => (
                   <View key={idx} style={styles.alternativeItem}>
                     <Text style={styles.bullet}>•</Text>
                     <Text style={styles.alternativeText}>{alt}</Text>
@@ -1082,27 +1194,27 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
       )}
 
       {/* Lifetime Offering */}
-      {activeType === 'lifetime' && profile.sadaqah.lifetime && (
+      {!isBirthdateOnly && activeType === 'lifetime' && profile.sadaqah.lifetime && (
         <View>
           <PatternCard style={[styles.card, cardSurface]}>
             <View style={styles.cardHeader}>
               <Star size={24} color={accentColor} />
               <Text style={[styles.cardTitle, { color: accentColor }]}>
-                {language === 'en' ? 'Lifetime Sacred Offering' : 'Offrande Sacrée de Vie'}
+                {language === 'ar' ? 'القربان المقدس مدى الحياة' : language === 'en' ? 'Lifetime Sacred Offering' : 'Offrande Sacrée de Vie'}
               </Text>
             </View>
 
             <View style={styles.lifetimeContent}>
               <Text style={styles.lifetimeTraditional}>
-                {profile.sadaqah.lifetime.traditional[language as 'en' | 'fr']}
+                {profile.sadaqah.lifetime.traditional[language as 'en' | 'fr' | 'ar'] ?? profile.sadaqah.lifetime.traditional.en}
               </Text>
 
               {profile.sadaqah.lifetime.components && (
                 <View style={styles.componentsSection}>
                   <Text style={styles.componentsTitle}>
-                    {language === 'en' ? 'Components:' : 'Composants:'}
+                    {language === 'ar' ? 'المكونات:' : language === 'en' ? 'Components:' : 'Composants:'}
                   </Text>
-                  {profile.sadaqah.lifetime.components[language as 'en' | 'fr'].map((comp, idx) => (
+                  {(profile.sadaqah.lifetime.components[language as 'en' | 'fr' | 'ar'] ?? profile.sadaqah.lifetime.components.en).map((comp, idx) => (
                     <View key={idx} style={styles.componentItem}>
                       <CheckSquare size={16} color={accentColor} />
                       <Text style={styles.componentText}>{comp}</Text>
@@ -1114,9 +1226,9 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
               {profile.sadaqah.lifetime.best_timing && (
                 <View style={styles.timingSection}>
                   <Text style={styles.timingTitle}>
-                    ⏰ {language === 'en' ? 'Best Timing:' : 'Meilleur Moment:'}
+                    ⏰ {language === 'ar' ? 'أفضل توقيت:' : language === 'en' ? 'Best Timing:' : 'Meilleur Moment:'}
                   </Text>
-                  {profile.sadaqah.lifetime.best_timing[language as 'en' | 'fr'].map((timing, idx) => (
+                  {(profile.sadaqah.lifetime.best_timing[language as 'en' | 'fr' | 'ar'] ?? profile.sadaqah.lifetime.best_timing.en).map((timing, idx) => (
                     <Text key={idx} style={styles.timingText}>• {timing}</Text>
                   ))}
                 </View>
@@ -1125,10 +1237,10 @@ export default function SpiritualPracticeTab({ result }: SpiritualPracticeTabPro
               {profile.sadaqah.lifetime.significance && (
                 <View style={styles.significanceSection}>
                   <Text style={styles.significanceTitle}>
-                    {language === 'en' ? 'Spiritual Significance:' : 'Signification Spirituelle:'}
+                    {language === 'ar' ? 'الأهمية الروحية:' : language === 'en' ? 'Spiritual Significance:' : 'Signification Spirituelle:'}
                   </Text>
                   <Text style={styles.significanceText}>
-                    {profile.sadaqah.lifetime.significance[language as 'en' | 'fr']}
+                    {profile.sadaqah.lifetime.significance[language as 'en' | 'fr' | 'ar'] ?? profile.sadaqah.lifetime.significance.en}
                   </Text>
                 </View>
               )}

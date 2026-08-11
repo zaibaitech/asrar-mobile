@@ -45,7 +45,8 @@ type BirthInputMode = 'full' | 'monthDay';
 
 export default function WhoAmICalculator() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const dateLocale = language === 'fr' ? 'fr-FR' : language === 'ar' ? 'ar' : 'en-US';
   const { recordCalculation, showInterstitialIfReady } = useAds();
   const { profile } = useProfile();
   const { calculate, loading, error, result } = useIstikhara();
@@ -145,7 +146,7 @@ export default function WhoAmICalculator() {
     if (!isFormValid) {
       const message = calculationMethod === 'name'
         ? t('istikhara.validation.missingNames') || 'Please enter both names to continue.'
-        : 'Please select your birth date to continue.';
+        : t('istikhara.validation.missingBirthDate') || 'Please select your birth date to continue.';
       Alert.alert(t('common.error'), message);
       return;
     }
@@ -155,20 +156,11 @@ export default function WhoAmICalculator() {
 
     try {
       if (calculationMethod === 'name') {
-        // Name-based calculation (existing logic)
+        // Name-based calculation (existing logic).
+        // Navigation to results happens in the `result` effect below once the
+        // full data payload is ready — pushing here too would stack a second,
+        // data-less results screen on top of it.
         await calculate(personName.trim(), motherName.trim(), 'en');
-        
-        // If calculation was successful, navigate to results
-        if (!error) {
-          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          router.push({
-            pathname: '/(tabs)/results',
-            params: {
-              personName: personName.trim(),
-              motherName: motherName.trim(),
-            },
-          });
-        }
       } else {
         // Date-based calculation (new logic)
         let dobDate: Date;
@@ -177,14 +169,14 @@ export default function WhoAmICalculator() {
         if (birthInputMode === 'full') {
           if (!birthDate) return;
           dobDate = birthDate;
-          dobLabel = birthDate.toLocaleDateString();
+          dobLabel = birthDate.toLocaleDateString(dateLocale);
         } else {
           if (!birthMonthDayValid) return;
 
           // When the year is unknown (calculating for someone else), we only need month/day
           // to derive Burj and element. We use a fixed leap-safe year for date construction.
           dobDate = new Date(Date.UTC(2000, birthMonthNum - 1, birthDayNum, 12, 0, 0));
-          dobLabel = dobDate.toLocaleDateString('en-US', {
+          dobLabel = dobDate.toLocaleDateString(dateLocale, {
             month: 'long',
             day: 'numeric',
           });
@@ -192,11 +184,20 @@ export default function WhoAmICalculator() {
 
         const dobISO = dobDate.toISOString();
         const burjData = deriveBurjFromDOB(dobISO);
-        
+
         if (!burjData) {
-          Alert.alert(t('common.error'), 'Unable to calculate astrological data from birth date.');
+          Alert.alert(
+            t('common.error'),
+            language === 'fr'
+              ? 'Impossible de calculer les données astrologiques à partir de la date de naissance.'
+              : language === 'ar'
+                ? 'تعذر حساب البيانات الفلكية من تاريخ الميلاد.'
+                : 'Unable to calculate astrological data from birth date.'
+          );
           return;
         }
+
+        const dobLabelPrefix = language === 'fr' ? 'Date de naissance' : language === 'ar' ? 'تاريخ الميلاد' : 'Birth Date';
         
         // Map tropical zodiac index (0-11) to the existing Istikhara Buruj remainder (1-12)
         // so Results tabs can reuse the full local buruj profile dataset.
@@ -219,7 +220,7 @@ export default function WhoAmICalculator() {
         const birthdateResult = {
           success: true,
           data: {
-            personName: `Birth Date: ${dobLabel}`,
+            personName: `${dobLabelPrefix}: ${dobLabel}`,
             motherName: '',
             personTotal: 0,
             motherTotal: 0,
@@ -254,14 +255,14 @@ export default function WhoAmICalculator() {
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         
         // Save to history for birthdate calculations
-        HistoryService.saveCalculation(birthdateResult.data, `Birth Date: ${dobLabel}`, '');
+        HistoryService.saveCalculation(birthdateResult.data, `${dobLabelPrefix}: ${dobLabel}`, '');
         
         // Navigate to results with birthdate data
         router.push({
           pathname: '/(tabs)/results',
           params: {
             data: JSON.stringify(birthdateResult.data),
-            personName: `Birth Date: ${dobLabel}`,
+            personName: `${dobLabelPrefix}: ${dobLabel}`,
             motherName: '',
             calculationMethod: 'birthdate',
           },
@@ -280,9 +281,11 @@ export default function WhoAmICalculator() {
   React.useEffect(() => {
     if (error) {
       console.error('Displaying error to user:', error);
-      Alert.alert('Calculation Error', String(error), [
-        { text: 'OK', onPress: () => {} },
-      ]);
+      Alert.alert(
+        language === 'fr' ? 'Erreur de calcul' : language === 'ar' ? 'خطأ في الحساب' : 'Calculation Error',
+        String(error),
+        [{ text: 'OK', onPress: () => {} }]
+      );
     }
   }, [error]);
 
@@ -305,7 +308,14 @@ export default function WhoAmICalculator() {
         });
       } catch (navError) {
         console.error('Navigation error:', navError);
-        Alert.alert('Error', 'Failed to navigate to results');
+        Alert.alert(
+          t('common.error'),
+          language === 'fr'
+            ? 'Échec de la navigation vers les résultats'
+            : language === 'ar'
+              ? 'تعذّر الانتقال إلى النتائج'
+              : 'Failed to navigate to results'
+        );
       }
     }
   }, [result, loading, error]);
@@ -468,7 +478,7 @@ export default function WhoAmICalculator() {
                       }}
                       placeholder={t('istikhara.form.personNamePlaceholder') || 'e.g., Ahmed, Rahim'}
                       showHelper={true}
-                      language="en"
+                      language={language}
                     />
                     <Text style={styles.nameLabel}>{t('istikhara.arabicName')} *</Text>
                     <View style={styles.arabicInputWrapper}>
@@ -511,7 +521,7 @@ export default function WhoAmICalculator() {
                       }}
                       placeholder={t('istikhara.form.motherNamePlaceholder') || 'e.g., Fatima, Aisha'}
                       showHelper={true}
-                      language="en"
+                      language={language}
                     />
                     <Text style={styles.nameLabel}>{t('istikhara.arabicName')} *</Text>
                     <View style={styles.arabicInputWrapper}>
@@ -594,7 +604,7 @@ export default function WhoAmICalculator() {
                       >
                         <Calendar size={20} color="#a78bfa" />
                         <Text style={styles.datePickerText}>
-                          {birthDate ? birthDate.toLocaleDateString('en-US', {
+                          {birthDate ? birthDate.toLocaleDateString(dateLocale, {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric'
@@ -633,11 +643,11 @@ export default function WhoAmICalculator() {
                           onPress={() => setShowTimePicker(true)}
                         >
                           <Text style={styles.datePickerText}>
-                            {birthTime 
-                              ? birthTime.toLocaleTimeString('en-US', {
+                            {birthTime
+                              ? birthTime.toLocaleTimeString(dateLocale, {
                                   hour: '2-digit',
                                   minute: '2-digit',
-                                  hour12: true
+                                  hour12: language === 'en'
                                 })
                               : (t('istikhara.birthDateForm.tapToSetTime') || 'Tap to set birth time (if known)')}
                           </Text>
@@ -733,7 +743,7 @@ export default function WhoAmICalculator() {
                             if (!touched.birthDay) setTouched({ ...touched, birthDay: true });
                           }}
                           keyboardType="number-pad"
-                          placeholder="DD"
+                          placeholder={language === 'fr' ? 'JJ' : 'DD'}
                           placeholderTextColor="rgba(255, 255, 255, 0.4)"
                           style={styles.monthDayInput}
                           maxLength={2}

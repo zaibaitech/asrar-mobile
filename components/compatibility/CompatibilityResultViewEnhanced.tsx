@@ -26,6 +26,7 @@ import type {
 } from '../../services/compatibility/types';
 import { PremiumSection } from '../subscription/PremiumSection';
 import { CompatibilityGauge } from './CompatibilityGauge';
+import { PersonPersonZodiacResultView } from './PersonPersonZodiacResultView';
 import { SoulConnectionRing } from './SoulConnectionRing';
 
 const { width } = Dimensions.get('window');
@@ -92,7 +93,12 @@ const METHOD_THEMES = {
 
 export function CompatibilityResultView({ result, language }: CompatibilityResultViewProps) {
   if (result.type === 'person-person') {
-    return <PersonPersonResultView result={result} language={language} />;
+    // relationshipCompatibility (the abjad 4-method breakdown) is only ever
+    // populated when both people used a name — otherwise there's no valid
+    // dual-abjad input and a burj/elemental summary is shown instead.
+    return result.relationshipCompatibility
+      ? <PersonPersonResultView result={result} language={language} />
+      : <PersonPersonZodiacResultView result={result} language={language} />;
   } else if (result.type === 'person-divine-name') {
     return <PersonDivineNameResultView result={result} language={language} />;
   } else {
@@ -107,7 +113,9 @@ export function CompatibilityResultView({ result, language }: CompatibilityResul
 function PersonPersonResultView({ result, language }: { result: PersonPersonCompatibility; language: 'en' | 'fr' | 'ar' }) {
   const { t } = useLanguage();
   const { person1, person2, relationshipCompatibility, relationshipContext } = result;
-  const rc = relationshipCompatibility;
+  // Guaranteed defined here — CompatibilityResultView only renders this
+  // component when relationshipCompatibility is present (both people used a name).
+  const rc = relationshipCompatibility!;
   const methods = rc.methods;
   const theme = RELATIONSHIP_THEMES[relationshipContext];
   
@@ -144,7 +152,7 @@ function PersonPersonResultView({ result, language }: { result: PersonPersonComp
         <View style={styles.namesRow}>
           <View style={styles.personSection}>
             <Text style={styles.nameText}>{person1.name}</Text>
-            <Text style={styles.arabicNameText}>{person1.arabicName}</Text>
+            <Text style={styles.arabicNameText}>{person1.arabicName!}</Text>
           </View>
           
           <View style={styles.heartContainer}>
@@ -158,7 +166,7 @@ function PersonPersonResultView({ result, language }: { result: PersonPersonComp
           
           <View style={styles.personSection}>
             <Text style={styles.nameText}>{person2.name}</Text>
-            <Text style={styles.arabicNameText}>{person2.arabicName}</Text>
+            <Text style={styles.arabicNameText}>{person2.arabicName!}</Text>
           </View>
         </View>
         
@@ -225,8 +233,8 @@ function PersonPersonResultView({ result, language }: { result: PersonPersonComp
               method={methods.spiritualDestiny} 
               person1Name={person1.name}
               person2Name={person2.name}
-              person1Kabir={person1.destiny.kabir}
-              person2Kabir={person2.destiny.kabir}
+              person1Kabir={person1.destiny!.kabir}
+              person2Kabir={person2.destiny!.kabir}
               relationshipContext={relationshipContext}
               language={language} 
             />

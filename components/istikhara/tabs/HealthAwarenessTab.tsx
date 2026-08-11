@@ -21,23 +21,24 @@ interface HealthAwarenessTabProps {
 
 type ZodiacLabel = {
   en: string;
+  fr: string;
   ar: string;
   translit: string;
 };
 
 const ZODIAC_LABELS_BY_BURUJ: Record<number, ZodiacLabel> = {
-  1: { en: 'Aries', ar: 'الحمل', translit: 'al-Ḥamal' },
-  2: { en: 'Taurus', ar: 'الثور', translit: 'al-Thawr' },
-  3: { en: 'Gemini', ar: 'الجوزاء', translit: "al-Jawzā'" },
-  4: { en: 'Cancer', ar: 'السرطان', translit: 'al-Saraṭān' },
-  5: { en: 'Leo', ar: 'الأسد', translit: 'al-Asad' },
-  6: { en: 'Virgo', ar: 'العذراء', translit: 'al-ʿAdhrāʾ' },
-  7: { en: 'Libra', ar: 'الميزان', translit: 'al-Mīzān' },
-  8: { en: 'Scorpio', ar: 'العقرب', translit: 'al-ʿAqrab' },
-  9: { en: 'Sagittarius', ar: 'القوس', translit: 'al-Qaws' },
-  10: { en: 'Capricorn', ar: 'الجدي', translit: 'al-Jady' },
-  11: { en: 'Aquarius', ar: 'الدلو', translit: 'al-Dalw' },
-  12: { en: 'Pisces', ar: 'الحوت', translit: 'al-Ḥūt' },
+  1: { en: 'Aries', fr: 'Bélier', ar: 'الحمل', translit: 'al-Ḥamal' },
+  2: { en: 'Taurus', fr: 'Taureau', ar: 'الثور', translit: 'al-Thawr' },
+  3: { en: 'Gemini', fr: 'Gémeaux', ar: 'الجوزاء', translit: "al-Jawzā'" },
+  4: { en: 'Cancer', fr: 'Cancer', ar: 'السرطان', translit: 'al-Saraṭān' },
+  5: { en: 'Leo', fr: 'Lion', ar: 'الأسد', translit: 'al-Asad' },
+  6: { en: 'Virgo', fr: 'Vierge', ar: 'العذراء', translit: 'al-ʿAdhrāʾ' },
+  7: { en: 'Libra', fr: 'Balance', ar: 'الميزان', translit: 'al-Mīzān' },
+  8: { en: 'Scorpio', fr: 'Scorpion', ar: 'العقرب', translit: 'al-ʿAqrab' },
+  9: { en: 'Sagittarius', fr: 'Sagittaire', ar: 'القوس', translit: 'al-Qaws' },
+  10: { en: 'Capricorn', fr: 'Capricorne', ar: 'الجدي', translit: 'al-Jady' },
+  11: { en: 'Aquarius', fr: 'Verseau', ar: 'الدلو', translit: 'al-Dalw' },
+  12: { en: 'Pisces', fr: 'Poissons', ar: 'الحوت', translit: 'al-Ḥūt' },
 };
 
 type LangKey = 'en' | 'fr' | 'ar';
@@ -178,7 +179,7 @@ export default function HealthAwarenessTab({ result }: HealthAwarenessTabProps) 
         <Text style={styles.screenSubTitle}>{subtitle}</Text>
 
         <Text style={styles.zodiacLine}>
-          {zodiacLabel.en} • {zodiacLabel.translit} • {zodiacLabel.ar}
+          {langKey === 'ar' ? zodiacLabel.ar : langKey === 'fr' ? zodiacLabel.fr : zodiacLabel.en} • {zodiacLabel.translit} • {zodiacLabel.ar}
         </Text>
         <Text style={styles.metaLine}>
           {localizeElement(health.element, langKey)} • {localizePlanet(health.planet, langKey)}

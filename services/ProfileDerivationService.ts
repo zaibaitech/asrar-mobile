@@ -467,6 +467,7 @@ export function checkBurjCompatibility(
 ): {
   compatible: boolean;
   reason: string;
+  reasonKey: 'scorpioFire' | 'aquariusWater' | 'sameElement' | 'fireAir' | 'earthWater' | 'fireWater' | 'earthAir' | 'neutral';
   harmonyScore: number;
 } {
   const element1 = deriveElementFromBurj(burjIndex1);
@@ -487,6 +488,7 @@ export function checkBurjCompatibility(
     return {
       compatible: true,
       reason: 'Scorpio & Fire - Mars-fueled passion',
+      reasonKey: 'scorpioFire',
       harmonyScore: 75,
     };
   }
@@ -500,63 +502,70 @@ export function checkBurjCompatibility(
     return {
       compatible: true,
       reason: 'Aquarius & Water - shared coolness',
+      reasonKey: 'aquariusWater',
       harmonyScore: 60,
     };
   }
-  
+
   // Same element = high compatibility
   if (element1 === element2) {
     return {
       compatible: true,
       reason: 'Same element - natural understanding',
+      reasonKey: 'sameElement',
       harmonyScore: 85,
     };
   }
-  
+
   // Fire + Air = compatible
   if ((element1 === 'fire' && element2 === 'air') ||
       (element1 === 'air' && element2 === 'fire')) {
     return {
       compatible: true,
       reason: 'Fire & Air - mutual support',
+      reasonKey: 'fireAir',
       harmonyScore: 75,
     };
   }
-  
+
   // Earth + Water = compatible
   if ((element1 === 'earth' && element2 === 'water') ||
       (element1 === 'water' && element2 === 'earth')) {
     return {
       compatible: true,
       reason: 'Earth & Water - mutual growth',
+      reasonKey: 'earthWater',
       harmonyScore: 75,
     };
   }
-  
+
   // Fire + Water = challenging
   if ((element1 === 'fire' && element2 === 'water') ||
       (element1 === 'water' && element2 === 'fire')) {
     return {
       compatible: false,
       reason: 'Fire & Water - requires balance',
+      reasonKey: 'fireWater',
       harmonyScore: 40,
     };
   }
-  
+
   // Earth + Air = challenging
   if ((element1 === 'earth' && element2 === 'air') ||
       (element1 === 'air' && element2 === 'earth')) {
     return {
       compatible: false,
       reason: 'Earth & Air - different perspectives',
+      reasonKey: 'earthAir',
       harmonyScore: 45,
     };
   }
-  
+
   // Default = neutral
   return {
     compatible: true,
     reason: 'Neutral elements',
+    reasonKey: 'neutral',
     harmonyScore: 60,
   };
 }

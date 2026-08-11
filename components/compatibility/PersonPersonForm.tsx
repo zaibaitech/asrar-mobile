@@ -3,24 +3,28 @@
  * Universal form for marriage, friendship, family, work
  */
 
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Keyboard } from 'lucide-react-native';
-import React, { useRef, useState } from 'react';
+import { Calendar, Keyboard } from 'lucide-react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
+    Platform,
+    Pressable,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View
 } from 'react-native';
-import { ABJAD_MAGHRIBI } from '../../constants/abjad-maps';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useProfile } from '../../contexts/ProfileContext';
 import {
-    calculatePersonPersonCompatibility
+    calculatePersonPersonCompatibilityMixed,
+    DobDerivationError,
+    type PersonPersonParticipantInput
 } from '../../services/compatibility/engine';
 import { PersonPersonCompatibility } from '../../services/compatibility/types';
-import { buildDestiny } from '../../services/ilm-huruf/core';
 import ArabicKeyboard from '../istikhara/ArabicKeyboard';
 import NameAutocomplete from '../NameAutocomplete';
 
@@ -31,6 +35,7 @@ interface PersonPersonFormProps {
 
 export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProps) {
   const { t } = useLanguage();
+  const { profile } = useProfile();
   const [person1Name, setPerson1Name] = useState('');
   const [person1Arabic, setPerson1Arabic] = useState('');
   const [person1Latin, setPerson1Latin] = useState('');
@@ -41,12 +46,41 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState('');
 
+  // Per-person input method: an Arabic name (abjad, the default) or a date of
+  // birth (zodiac/burj, a complementary alternative for those without an
+  // Arabic name spelling). The two people can use different methods.
+  const [person1InputMethod, setPerson1InputMethod] = useState<'name' | 'dob'>('name');
+  const [person2InputMethod, setPerson2InputMethod] = useState<'name' | 'dob'>('name');
+  const [person1DOB, setPerson1DOB] = useState<Date | null>(null);
+  const [person2DOB, setPerson2DOB] = useState<Date | null>(null);
+  const [showPerson1DatePicker, setShowPerson1DatePicker] = useState(false);
+  const [showPerson2DatePicker, setShowPerson2DatePicker] = useState(false);
+  const hasPrefilledPerson1 = useRef(false);
+  const dateLocale = language === 'fr' ? 'fr-FR' : language === 'ar' ? 'ar' : 'en-US';
+
   // Arabic keyboard state
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [activeInput, setActiveInput] = useState<'person1' | 'person2' | null>(null);
   const [cursorPosition, setCursorPosition] = useState(0);
   const person1InputRef = useRef<TextInput>(null);
   const person2InputRef = useRef<TextInput>(null);
+
+  // Prefill Person 1 from the saved profile (once) and auto-select the
+  // matching input method — name if a name is on file, DOB otherwise.
+  // Person 2 is never auto-filled.
+  useEffect(() => {
+    if (hasPrefilledPerson1.current) return;
+    if (profile.nameAr) {
+      setPerson1Arabic(profile.nameAr);
+      if (profile.nameLatin) setPerson1Latin(profile.nameLatin);
+      setPerson1InputMethod('name');
+      hasPrefilledPerson1.current = true;
+    } else if (profile.dobISO) {
+      setPerson1DOB(new Date(profile.dobISO));
+      setPerson1InputMethod('dob');
+      hasPrefilledPerson1.current = true;
+    }
+  }, [profile.nameAr, profile.nameLatin, profile.dobISO]);
 
   const relationshipTypes = [
     { value: 'universal' },
@@ -97,41 +131,53 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
     setShowKeyboard(true);
   };
 
+  const person1Valid = person1InputMethod === 'name' ? person1Arabic.trim().length > 0 : person1DOB !== null;
+  const person2Valid = person2InputMethod === 'name' ? person2Arabic.trim().length > 0 : person2DOB !== null;
+
+  const buildParticipantInput = (
+    method: 'name' | 'dob',
+    arabic: string,
+    displayName: string,
+    dob: Date | null
+  ): PersonPersonParticipantInput => {
+    if (method === 'name') {
+      return { inputMethod: 'name', name: displayName || arabic, arabicName: arabic };
+    }
+    const dobDate = dob as Date;
+    return {
+      inputMethod: 'dob',
+      dobISO: dobDate.toISOString().split('T')[0],
+      dobLabel: dobDate.toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric' }),
+    };
+  };
+
   const handleCalculate = async () => {
     setError('');
-    
+
     // Validation
-    if (!person1Arabic.trim() || !person2Arabic.trim()) {
-      setError(language === 'en' 
-        ? 'Both Arabic names are required'
-        : 'الأسماء العربية مطلوبة لكلا الطرفين');
+    if (!person1Valid || !person2Valid) {
+      setError(t('compatibility.form.errors.mixedValidation'));
       return;
     }
 
     setIsCalculating(true);
 
     try {
-      // Calculate Spiritual Destiny for both persons
-      const destiny1 = buildDestiny(person1Arabic, undefined, ABJAD_MAGHRIBI);
-      const destiny2 = buildDestiny(person2Arabic, undefined, ABJAD_MAGHRIBI);
+      const person1Input = buildParticipantInput(person1InputMethod, person1Arabic, person1Name, person1DOB);
+      const person2Input = buildParticipantInput(person2InputMethod, person2Arabic, person2Name, person2DOB);
 
-      // Calculate compatibility
-      const result = calculatePersonPersonCompatibility(
-        person1Name || person1Arabic,
-        person1Arabic,
-        destiny1,
-        person2Name || person2Arabic,
-        person2Arabic,
-        destiny2,
-        relationshipType
-      );
+      const result = calculatePersonPersonCompatibilityMixed(person1Input, person2Input, relationshipType);
 
       onCalculate(result);
     } catch (err) {
-      console.error('Compatibility calculation error:', err);
-      setError(language === 'en' 
-        ? 'Calculation failed. Please check your inputs.'
-        : 'فشل الحساب. يرجى التحقق من المدخلات.');
+      if (err instanceof DobDerivationError) {
+        setError(t('compatibility.form.inputMethod.dobDerivationFailed'));
+      } else {
+        console.error('Compatibility calculation error:', err);
+        setError(language === 'en'
+          ? 'Calculation failed. Please check your inputs.'
+          : 'فشل الحساب. يرجى التحقق من المدخلات.');
+      }
     } finally {
       setIsCalculating(false);
     }
@@ -179,54 +225,106 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
             </View>
           </View>
 
-          {/* Latin Name Autocomplete */}
-          <View style={[styles.inputWrapper, { zIndex: 10 }]}>
-            <Text style={styles.label}>
-              {t('compatibility.form.latinName')}
-            </Text>
-            <NameAutocomplete
-              value={person1Latin}
-              onChange={setPerson1Latin}
-              onArabicSelect={(arabic, latin) => {
-                setPerson1Arabic(arabic);
-                setPerson1Latin(latin);
-              }}
-              placeholder={t('compatibility.form.exampleFatima')}
-              showHelper={false}
-              language={language}
-            />
+          {/* Input method toggle */}
+          <View style={styles.methodToggle}>
+            <TouchableOpacity
+              style={[styles.methodChip, person1InputMethod === 'name' && styles.methodChipActive]}
+              onPress={() => setPerson1InputMethod('name')}
+            >
+              <Text style={[styles.methodChipText, person1InputMethod === 'name' && styles.methodChipTextActive]}>
+                {t('compatibility.form.inputMethod.useNameLabel')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.methodChip, person1InputMethod === 'dob' && styles.methodChipActive]}
+              onPress={() => setPerson1InputMethod('dob')}
+            >
+              <Text style={[styles.methodChipText, person1InputMethod === 'dob' && styles.methodChipTextActive]}>
+                {t('compatibility.form.inputMethod.useDobLabel')}
+              </Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Arabic Name Input */}
-          <View style={[styles.inputWrapper, { zIndex: 1 }]}>
-            <View style={styles.labelRow}>
-              <Text style={styles.label}>
-                {t('compatibility.form.arabicName')} *
-              </Text>
-              <TouchableOpacity
-                style={styles.keyboardButton}
-                onPress={() => openKeyboard('person1')}
-              >
-                <Keyboard size={14} color="#a78bfa" strokeWidth={2} />
-                <Text style={styles.keyboardButtonText}>
-                  {t('compatibility.form.keyboard')}
+          {person1InputMethod === 'name' ? (
+            <>
+              {/* Latin Name Autocomplete */}
+              <View style={[styles.inputWrapper, { zIndex: 10 }]}>
+                <Text style={styles.label}>
+                  {t('compatibility.form.latinName')}
                 </Text>
-              </TouchableOpacity>
+                <NameAutocomplete
+                  value={person1Latin}
+                  onChange={setPerson1Latin}
+                  onArabicSelect={(arabic, latin) => {
+                    setPerson1Arabic(arabic);
+                    setPerson1Latin(latin);
+                  }}
+                  placeholder={t('compatibility.form.exampleFatima')}
+                  showHelper={false}
+                  language={language}
+                />
+              </View>
+
+              {/* Arabic Name Input */}
+              <View style={[styles.inputWrapper, { zIndex: 1 }]}>
+                <View style={styles.labelRow}>
+                  <Text style={styles.label}>
+                    {t('compatibility.form.arabicName')} *
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.keyboardButton}
+                    onPress={() => openKeyboard('person1')}
+                  >
+                    <Keyboard size={14} color="#a78bfa" strokeWidth={2} />
+                    <Text style={styles.keyboardButtonText}>
+                      {t('compatibility.form.keyboard')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <TextInput
+                  ref={person1InputRef}
+                  style={[styles.input, styles.arabicInput]}
+                  value={person1Arabic}
+                  onChangeText={(text) => {
+                    setPerson1Arabic(text);
+                    setCursorPosition(text.length);
+                  }}
+                  onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
+                  placeholder="أحمد"
+                  placeholderTextColor="#64748b"
+                  editable={!showKeyboard || activeInput !== 'person1'}
+                />
+              </View>
+            </>
+          ) : (
+            <View style={styles.inputWrapper}>
+              <Text style={styles.label}>
+                {t('compatibility.form.inputMethod.dobLabel')}
+              </Text>
+              <Pressable style={styles.datePickerButton} onPress={() => setShowPerson1DatePicker(true)}>
+                <Calendar size={18} color="#a78bfa" />
+                <Text style={[styles.datePickerText, language === 'ar' && styles.textRTL]}>
+                  {person1DOB
+                    ? person1DOB.toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric' })
+                    : t('compatibility.form.inputMethod.datePickerPlaceholder')}
+                </Text>
+              </Pressable>
+              <Text style={[styles.hintText, language === 'ar' && styles.textRTL]}>{t('compatibility.form.inputMethod.dobHint')}</Text>
+              {showPerson1DatePicker && (
+                <DateTimePicker
+                  value={person1DOB || new Date(2000, 0, 1)}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(event, selectedDate) => {
+                    setShowPerson1DatePicker(Platform.OS === 'ios');
+                    if (selectedDate) setPerson1DOB(selectedDate);
+                  }}
+                  maximumDate={new Date()}
+                  minimumDate={new Date(1900, 0, 1)}
+                />
+              )}
             </View>
-            <TextInput
-              ref={person1InputRef}
-              style={[styles.input, styles.arabicInput]}
-              value={person1Arabic}
-              onChangeText={(text) => {
-                setPerson1Arabic(text);
-                setCursorPosition(text.length);
-              }}
-              onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
-              placeholder="أحمد"
-              placeholderTextColor="#64748b"
-              editable={!showKeyboard || activeInput !== 'person1'}
-            />
-          </View>
+          )}
         </LinearGradient>
       </View>
 
@@ -245,54 +343,106 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
             </View>
           </View>
 
-          {/* Latin Name Autocomplete */}
-          <View style={[styles.inputWrapper, { zIndex: 10 }]}>
-            <Text style={styles.label}>
-              {t('compatibility.form.latinName')}
-            </Text>
-            <NameAutocomplete
-              value={person2Latin}
-              onChange={setPerson2Latin}
-              onArabicSelect={(arabic, latin) => {
-                setPerson2Arabic(arabic);
-                setPerson2Latin(latin);
-              }}
-              placeholder={t('compatibility.form.exampleKhadija')}
-              showHelper={false}
-              language={language}
-            />
+          {/* Input method toggle */}
+          <View style={styles.methodToggle}>
+            <TouchableOpacity
+              style={[styles.methodChip, person2InputMethod === 'name' && styles.methodChipActive]}
+              onPress={() => setPerson2InputMethod('name')}
+            >
+              <Text style={[styles.methodChipText, person2InputMethod === 'name' && styles.methodChipTextActive]}>
+                {t('compatibility.form.inputMethod.useNameLabel')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.methodChip, person2InputMethod === 'dob' && styles.methodChipActive]}
+              onPress={() => setPerson2InputMethod('dob')}
+            >
+              <Text style={[styles.methodChipText, person2InputMethod === 'dob' && styles.methodChipTextActive]}>
+                {t('compatibility.form.inputMethod.useDobLabel')}
+              </Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Arabic Name Input */}
-          <View style={[styles.inputWrapper, { zIndex: 1 }]}>
-            <View style={styles.labelRow}>
-              <Text style={styles.label}>
-                {t('compatibility.form.arabicName')} *
-              </Text>
-              <TouchableOpacity
-                style={styles.keyboardButton}
-                onPress={() => openKeyboard('person2')}
-              >
-                <Keyboard size={14} color="#a78bfa" strokeWidth={2} />
-                <Text style={styles.keyboardButtonText}>
-                  {t('compatibility.form.keyboard')}
+          {person2InputMethod === 'name' ? (
+            <>
+              {/* Latin Name Autocomplete */}
+              <View style={[styles.inputWrapper, { zIndex: 10 }]}>
+                <Text style={styles.label}>
+                  {t('compatibility.form.latinName')}
                 </Text>
-              </TouchableOpacity>
+                <NameAutocomplete
+                  value={person2Latin}
+                  onChange={setPerson2Latin}
+                  onArabicSelect={(arabic, latin) => {
+                    setPerson2Arabic(arabic);
+                    setPerson2Latin(latin);
+                  }}
+                  placeholder={t('compatibility.form.exampleKhadija')}
+                  showHelper={false}
+                  language={language}
+                />
+              </View>
+
+              {/* Arabic Name Input */}
+              <View style={[styles.inputWrapper, { zIndex: 1 }]}>
+                <View style={styles.labelRow}>
+                  <Text style={styles.label}>
+                    {t('compatibility.form.arabicName')} *
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.keyboardButton}
+                    onPress={() => openKeyboard('person2')}
+                  >
+                    <Keyboard size={14} color="#a78bfa" strokeWidth={2} />
+                    <Text style={styles.keyboardButtonText}>
+                      {t('compatibility.form.keyboard')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <TextInput
+                  ref={person2InputRef}
+                  style={[styles.input, styles.arabicInput]}
+                  value={person2Arabic}
+                  onChangeText={(text) => {
+                    setPerson2Arabic(text);
+                    setCursorPosition(text.length);
+                  }}
+                  onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
+                  placeholder="فاطمة"
+                  placeholderTextColor="#64748b"
+                  editable={!showKeyboard || activeInput !== 'person2'}
+                />
+              </View>
+            </>
+          ) : (
+            <View style={styles.inputWrapper}>
+              <Text style={styles.label}>
+                {t('compatibility.form.inputMethod.dobLabel')}
+              </Text>
+              <Pressable style={styles.datePickerButton} onPress={() => setShowPerson2DatePicker(true)}>
+                <Calendar size={18} color="#a78bfa" />
+                <Text style={[styles.datePickerText, language === 'ar' && styles.textRTL]}>
+                  {person2DOB
+                    ? person2DOB.toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric' })
+                    : t('compatibility.form.inputMethod.datePickerPlaceholder')}
+                </Text>
+              </Pressable>
+              <Text style={[styles.hintText, language === 'ar' && styles.textRTL]}>{t('compatibility.form.inputMethod.dobHint')}</Text>
+              {showPerson2DatePicker && (
+                <DateTimePicker
+                  value={person2DOB || new Date(2000, 0, 1)}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(event, selectedDate) => {
+                    setShowPerson2DatePicker(Platform.OS === 'ios');
+                    if (selectedDate) setPerson2DOB(selectedDate);
+                  }}
+                  maximumDate={new Date()}
+                  minimumDate={new Date(1900, 0, 1)}
+                />
+              )}
             </View>
-            <TextInput
-              ref={person2InputRef}
-              style={[styles.input, styles.arabicInput]}
-              value={person2Arabic}
-              onChangeText={(text) => {
-                setPerson2Arabic(text);
-                setCursorPosition(text.length);
-              }}
-              onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
-              placeholder="فاطمة"
-              placeholderTextColor="#64748b"
-              editable={!showKeyboard || activeInput !== 'person2'}
-            />
-          </View>
+          )}
         </LinearGradient>
       </View>
 
@@ -334,6 +484,10 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 24,
   },
+  textRTL: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
   inputSection: {
     marginBottom: 8,
   },
@@ -370,6 +524,51 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     marginTop: 12,
+  },
+  methodToggle: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 4,
+  },
+  methodChip: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  methodChipActive: {
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    borderColor: '#8b5cf6',
+  },
+  methodChipText: {
+    color: '#94a3b8',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  methodChipTextActive: {
+    color: '#a78bfa',
+  },
+  datePickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    padding: 12,
+  },
+  datePickerText: {
+    color: '#ffffff',
+    fontSize: 15,
+  },
+  hintText: {
+    color: '#64748b',
+    fontSize: 12,
+    marginTop: 6,
   },
   relationshipTypes: {
     flexDirection: 'row',

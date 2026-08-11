@@ -82,15 +82,19 @@ export function ShoppingResources({ element }: ShoppingResourcesProps) {
               style={[styles.linkButton, { borderColor: colors.accent }]}
               onPress={() => openLink('https://www.amazon.com/s?k=healing+crystals')}
             >
-              <Text style={styles.linkText}>Amazon - Healing Crystals</Text>
+              <Text style={styles.linkText}>
+                Amazon - {language === 'en' ? 'Healing Crystals' : language === 'fr' ? 'Cristaux de Guérison' : 'أحجار الشفاء'}
+              </Text>
               <ExternalLink size={16} color={colors.accent} />
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={[styles.linkButton, { borderColor: colors.accent }]}
               onPress={() => openLink('https://www.etsy.com/search?q=genuine+healing+stones')}
             >
-              <Text style={styles.linkText}>Etsy - Authentic Stones</Text>
+              <Text style={styles.linkText}>
+                Etsy - {language === 'en' ? 'Authentic Stones' : language === 'fr' ? 'Pierres Authentiques' : 'أحجار أصيلة'}
+              </Text>
               <ExternalLink size={16} color={colors.accent} />
             </TouchableOpacity>
             

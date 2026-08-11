@@ -111,12 +111,14 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
             <Briefcase size={32} color={colors.accent} />
           </View>
           <Text style={styles.title}>
-            {language === 'en' ? 'Career & Vocation Guidance' : 'Orientation Professionnelle'}
+            {language === 'ar' ? 'التوجيه المهني والوظيفي' : language === 'en' ? 'Career & Vocation Guidance' : 'Orientation Professionnelle'}
           </Text>
           <Text style={styles.subtitle}>
-            {language === 'en'
-              ? 'Career guidance is not available for this calculation method.'
-              : 'Le guide de carrière n\'est pas disponible pour cette méthode de calcul.'}
+            {language === 'ar'
+              ? 'التوجيه المهني غير متاح لطريقة الحساب هذه.'
+              : language === 'en'
+                ? 'Career guidance is not available for this calculation method.'
+                : 'Le guide de carrière n\'est pas disponible pour cette méthode de calcul.'}
           </Text>
         </View>
       </ScrollView>
@@ -126,7 +128,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
   const [isExporting, setIsExporting] = useState(false);
 
-  const categories = career?.modern_recommended?.[language as 'en' | 'fr'] || [];
+  const categories = career?.modern_recommended?.[language as 'en' | 'fr' | 'ar'] || career?.modern_recommended?.en || [];
 
   const toggleCategory = (index: number) => {
     const newExpanded = new Set(expandedCategories);
@@ -162,15 +164,15 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(uri, {
           mimeType: 'application/pdf',
-          dialogTitle: language === 'en' ? 'Career Guidance PDF' : 'Guide de Carrière PDF'
+          dialogTitle: language === 'ar' ? 'ملف إرشاد المهنة PDF' : language === 'en' ? 'Career Guidance PDF' : 'Guide de Carrière PDF'
         });
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     } catch (error) {
       console.error('Export error:', error);
       Alert.alert(
-        language === 'en' ? 'Export Error' : 'Erreur d\'Export',
-        language === 'en' ? 'Failed to export PDF' : 'Échec de l\'export PDF'
+        language === 'ar' ? 'خطأ في التصدير' : language === 'en' ? 'Export Error' : 'Erreur d\'Export',
+        language === 'ar' ? 'فشل تصدير ملف PDF' : language === 'en' ? 'Failed to export PDF' : 'Échec de l\'export PDF'
       );
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
@@ -181,9 +183,11 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
   const handleShare = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     
-    const shareText = language === 'en' 
-      ? `Discovered my career path through Istikhara al-Asmāʾ! My ${profile.element} element aligns with ${categories?.[0]?.category || 'various'} industries.`
-      : `J'ai découvert ma voie professionnelle avec Istikhara al-Asmāʾ! Mon élément ${profile.element} s'aligne avec ${categories?.[0]?.category || 'diverses'} industries.`;
+    const shareText = language === 'ar'
+      ? `اكتشفت مساري المهني من خلال استخارة الأسماء! يتوافق عنصري ${profile.element} مع صناعات ${categories?.[0]?.category || 'متنوعة'}.`
+      : language === 'en'
+        ? `Discovered my career path through Istikhara al-Asmāʾ! My ${profile.element} element aligns with ${categories?.[0]?.category || 'various'} industries.`
+        : `J'ai découvert ma voie professionnelle avec Istikhara al-Asmāʾ! Mon élément ${profile.element} s'aligne avec ${categories?.[0]?.category || 'diverses'} industries.`;
 
     try {
       await Sharing.shareAsync('data:text/plain;base64,' + btoa(shareText));
@@ -213,25 +217,25 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
           </style>
         </head>
         <body>
-          <h1>${language === 'en' ? 'Career & Vocation Guidance' : 'Orientation Professionnelle'}</h1>
-          <p><strong>${language === 'en' ? 'Element' : 'Élément'}:</strong> ${profile.element ?? ''} ${profile.element_emoji ?? ''}</p>
-          
-          <h2>${language === 'en' ? 'Traditional Wisdom' : 'Sagesse Traditionnelle'}</h2>
-          <div class="quote">${career?.traditional?.[language as 'en' | 'fr'] ?? career?.traditional?.en ?? ''}</div>
-          
-          <h2>${language === 'en' ? 'Recommended Career Fields' : 'Domaines Professionnels Recommandés'}</h2>
+          <h1>${language === 'ar' ? 'التوجيه المهني والوظيفي' : language === 'en' ? 'Career & Vocation Guidance' : 'Orientation Professionnelle'}</h1>
+          <p><strong>${language === 'ar' ? 'العنصر' : language === 'en' ? 'Element' : 'Élément'}:</strong> ${profile.element ?? ''} ${profile.element_emoji ?? ''}</p>
+
+          <h2>${language === 'ar' ? 'الحكمة التقليدية' : language === 'en' ? 'Traditional Wisdom' : 'Sagesse Traditionnelle'}</h2>
+          <div class="quote">${career?.traditional?.[language as 'en' | 'fr' | 'ar'] ?? career?.traditional?.en ?? ''}</div>
+
+          <h2>${language === 'ar' ? 'المجالات المهنية الموصى بها' : language === 'en' ? 'Recommended Career Fields' : 'Domaines Professionnels Recommandés'}</h2>
           ${categoriesHTML}
-          
-          <h2>${language === 'en' ? 'Guiding Principle' : 'Principe Directeur'}</h2>
-          <div class="quote">${career?.principle?.[language as 'en' | 'fr'] ?? career?.principle?.en ?? ''}</div>
+
+          <h2>${language === 'ar' ? 'المبدأ الموجّه' : language === 'en' ? 'Guiding Principle' : 'Principe Directeur'}</h2>
+          <div class="quote">${career?.principle?.[language as 'en' | 'fr' | 'ar'] ?? career?.principle?.en ?? ''}</div>
         </body>
       </html>
     `;
   };
 
-  const hasSpecialBlessing = elementKey === 'water' && 
+  const hasSpecialBlessing = elementKey === 'water' &&
     categories?.some(cat => cat.category.toLowerCase().includes(
-      language === 'en' ? 'earth-based' : 'terrestres'
+      language === 'ar' ? 'أرض' : language === 'en' ? 'earth-based' : 'terrestres'
     ));
 
   const totalOpportunities = categories?.reduce((sum, cat) => sum + cat.items.length, 0) || 0;
@@ -244,19 +248,21 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
           <Briefcase size={32} color={accentColor} />
         </View>
         <Text style={styles.title}>
-          {language === 'en' ? 'Career & Vocation Guidance' : 'Orientation Professionnelle'}
+          {language === 'ar' ? 'التوجيه المهني والوظيفي' : language === 'en' ? 'Career & Vocation Guidance' : 'Orientation Professionnelle'}
         </Text>
         <Text style={styles.subtitle}>
-          {language === 'en' 
-            ? 'Career paths that resonate with your spiritual energy' 
-            : 'Parcours en harmonie avec votre énergie spirituelle'}
+          {language === 'ar'
+            ? 'مسارات مهنية تتناغم مع طاقتك الروحية'
+            : language === 'en'
+              ? 'Career paths that resonate with your spiritual energy'
+              : 'Parcours en harmonie avec votre énergie spirituelle'}
         </Text>
-        
+
         {/* Element Badge */}
         <PatternCard style={[styles.elementBadge, badgeSurface]}>
           <Text style={styles.elementEmoji}>{profile.element_emoji}</Text>
           <Text style={[styles.elementText, { color: accentColor }]}>
-            {profile.element} {language === 'en' ? 'Element' : 'Élément'}
+            {profile.element} {language === 'ar' ? 'عنصر' : language === 'en' ? 'Element' : 'Élément'}
           </Text>
         </PatternCard>
       </View>
@@ -269,20 +275,20 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
           </View>
           <View style={styles.cardHeaderText}>
             <Text style={[styles.cardTitle, { color: accentColor }]}>
-              {language === 'en' ? 'Traditional Wisdom' : 'Sagesse Traditionnelle'}
+              {language === 'ar' ? 'الحكمة التقليدية' : language === 'en' ? 'Traditional Wisdom' : 'Sagesse Traditionnelle'}
             </Text>
           </View>
         </View>
-        
+
         <View style={[styles.quoteContainer, { borderLeftColor: withAlpha(accentColor, 0.55) }]}>
           <Text style={styles.quote}>
-            "{career?.traditional?.[language as 'en' | 'fr'] ?? career?.traditional?.en ?? ''}"
+            "{career?.traditional?.[language as 'en' | 'fr' | 'ar'] ?? career?.traditional?.en ?? ''}"
           </Text>
         </View>
-        
+
         <View style={[styles.divider, { backgroundColor: withAlpha(accentColor, 0.16) }]} />
         <Text style={styles.quoteLabel}>
-          {language === 'en' ? 'Traditional Islamic Guidance' : 'Guidance Islamique Traditionnelle'}
+          {language === 'ar' ? 'إرشاد إسلامي تقليدي' : language === 'en' ? 'Traditional Islamic Guidance' : 'Guidance Islamique Traditionnelle'}
         </Text>
       </PatternCard>
 
@@ -295,14 +301,16 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
             </View>
             <View style={styles.cardHeaderText}>
               <Text style={[styles.blessingTitle, { color: accentColor }] }>
-                ✨ {language === 'en' ? 'Special Spiritual Blessing' : 'Bénédiction Spirituelle Spéciale'}
+                ✨ {language === 'ar' ? 'بركة روحية خاصة' : language === 'en' ? 'Special Spiritual Blessing' : 'Bénédiction Spirituelle Spéciale'}
               </Text>
             </View>
           </View>
           <Text style={styles.blessingText}>
-            {language === 'en' 
-              ? 'Despite being a Water element, you receive special blessings from Earth industries. This unique gift allows you to thrive in both water-related AND earth-based careers.'
-              : 'Bien que vous soyez un élément Eau, vous recevez des bénédictions spéciales des industries terrestres. Ce don unique vous permet de prospérer dans les carrières liées à l\'eau ET terrestres.'}
+            {language === 'ar'
+              ? 'رغم كونك من عنصر الماء، تحظى ببركات خاصة من الصناعات الترابية. تمنحك هذه الهبة الفريدة القدرة على الازدهار في المهن المرتبطة بالماء والأرض معًا.'
+              : language === 'en'
+                ? 'Despite being a Water element, you receive special blessings from Earth industries. This unique gift allows you to thrive in both water-related AND earth-based careers.'
+                : 'Bien que vous soyez un élément Eau, vous recevez des bénédictions spéciales des industries terrestres. Ce don unique vous permet de prospérer dans les carrières liées à l\'eau ET terrestres.'}
           </Text>
         </PatternCard>
       )}
@@ -312,7 +320,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
         <View style={styles.controlsHeader}>
           <TrendingUp size={20} color={accentColor} />
           <Text style={styles.controlsTitle}>
-            {language === 'en' ? 'Recommended Career Fields' : 'Domaines Professionnels'}
+            {language === 'ar' ? 'المجالات المهنية الموصى بها' : language === 'en' ? 'Recommended Career Fields' : 'Domaines Professionnels'}
           </Text>
         </View>
         <View style={styles.controlButtons}>
@@ -321,7 +329,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
             onPress={expandAll}
           >
             <Text style={[styles.controlButtonText, { color: accentColor }]}>
-              {language === 'en' ? 'Expand All' : 'Tout Développer'}
+              {language === 'ar' ? 'توسيع الكل' : language === 'en' ? 'Expand All' : 'Tout Développer'}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -329,7 +337,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
             onPress={collapseAll}
           >
             <Text style={[styles.controlButtonText, { color: 'rgba(255,255,255,0.78)' }]}>
-              {language === 'en' ? 'Collapse All' : 'Tout Réduire'}
+              {language === 'ar' ? 'طي الكل' : language === 'en' ? 'Collapse All' : 'Tout Réduire'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -356,7 +364,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
                     <View>
                       <Text style={styles.categoryTitle}>{category.category}</Text>
                       <Text style={styles.categoryCount}>
-                        {category.items.length} {language === 'en' ? 'opportunities' : 'opportunités'}
+                        {category.items.length} {language === 'ar' ? 'فرصة' : language === 'en' ? 'opportunities' : 'opportunités'}
                       </Text>
                     </View>
                   </View>
@@ -380,7 +388,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
                     ))}
                     <View style={[styles.itemsFooter, { borderTopColor: withAlpha(accentColor, 0.12) }]}>
                       <Text style={styles.itemsFooterText}>
-                        {category.items.length} {language === 'en' ? 'career paths in this category' : 'parcours dans cette catégorie'}
+                        {category.items.length} {language === 'ar' ? 'مسار مهني في هذه الفئة' : language === 'en' ? 'career paths in this category' : 'parcours dans cette catégorie'}
                       </Text>
                     </View>
                   </View>
@@ -392,9 +400,11 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
           <PatternCard style={[styles.emptyState, { backgroundColor: withAlpha(accentColor, 0.10), borderColor: withAlpha(accentColor, 0.16) }]}>
             <MessageCircle size={48} color="rgba(255,255,255,0.3)" />
             <Text style={styles.emptyStateText}>
-              {language === 'en' 
-                ? 'Career guidance data is being compiled for your profile' 
-                : 'Les données sont en cours de compilation pour votre profil'}
+              {language === 'ar'
+                ? 'يتم إعداد بيانات التوجيه المهني لملفك الشخصي'
+                : language === 'en'
+                  ? 'Career guidance data is being compiled for your profile'
+                  : 'Les données sont en cours de compilation pour votre profil'}
             </Text>
           </PatternCard>
         )}
@@ -407,22 +417,25 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
             <Text style={styles.emoji}>💡</Text>
           </View>
           <Text style={[styles.cardTitle, { color: accentColor }]}>
-            {language === 'en' ? 'Guiding Principle' : 'Principe Directeur'}
+            {language === 'ar' ? 'المبدأ الموجّه' : language === 'en' ? 'Guiding Principle' : 'Principe Directeur'}
           </Text>
         </View>
         <Text style={styles.principleText}>
-          "{career?.principle?.[language as 'en' | 'fr'] ?? career?.principle?.en ?? ''}"
+          "{career?.principle?.[language as 'en' | 'fr' | 'ar'] ?? career?.principle?.en ?? ''}"
         </Text>
         <Text style={styles.principleNote}>
-          {language === 'en' 
-            ? 'Let this principle guide your career decisions and professional journey.'
-            : 'Laissez ce principe guider vos décisions de carrière et votre parcours professionnel.'}
+          {language === 'ar'
+            ? 'دع هذا المبدأ يوجّه قراراتك المهنية ورحلتك المهنية.'
+            : language === 'en'
+              ? 'Let this principle guide your career decisions and professional journey.'
+              : 'Laissez ce principe guider vos décisions de carrière et votre parcours professionnel.'}
         </Text>
           </PatternCard>
 
       {/* Fields to Avoid */}
-      {((career?.avoid?.traditional?.[language as 'en' | 'fr'] ?? career?.avoid?.traditional?.en ?? "None specified") !== "None specified" && 
-        (career?.avoid?.traditional?.[language as 'en' | 'fr'] ?? career?.avoid?.traditional?.en ?? "Aucun spécifié") !== "Aucun spécifié") && (
+      {((career?.avoid?.traditional?.[language as 'en' | 'fr' | 'ar'] ?? career?.avoid?.traditional?.en ?? "None specified") !== "None specified" &&
+        (career?.avoid?.traditional?.[language as 'en' | 'fr' | 'ar'] ?? career?.avoid?.traditional?.en ?? "Aucun spécifié") !== "Aucun spécifié" &&
+        (career?.avoid?.traditional?.ar ?? "لا يوجد تحديد") !== "لا يوجد تحديد") && (
         <PatternCard style={[styles.card, styles.avoidCard, cardSurface]}>
           <View style={styles.cardHeader}>
             <View style={[styles.warningIcon, { backgroundColor: withAlpha(accentColor, 0.15) }]}>
@@ -430,40 +443,44 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
             </View>
             <View style={styles.cardHeaderText}>
               <Text style={[styles.avoidTitle, { color: accentColor }]}>
-                {language === 'en' ? 'Fields to Consider Carefully' : 'Domaines à Considérer Attentivement'}
+                {language === 'ar' ? 'مجالات تستحق تفكيرًا متأنيًا' : language === 'en' ? 'Fields to Consider Carefully' : 'Domaines à Considérer Attentivement'}
               </Text>
               <Text style={styles.avoidSubtitle}>
-                {language === 'en'
-                  ? 'May not align optimally with your spiritual energy'
-                  : 'Peuvent ne pas s\'aligner de manière optimale'}
+                {language === 'ar'
+                  ? 'قد لا تتوافق على النحو الأمثل مع طاقتك الروحية'
+                  : language === 'en'
+                    ? 'May not align optimally with your spiritual energy'
+                    : 'Peuvent ne pas s\'aligner de manière optimale'}
               </Text>
             </View>
           </View>
 
           <View style={styles.avoidSection}>
             <Text style={[styles.avoidSectionTitle, { color: accentColor }]}>
-              📜 {language === 'en' ? 'Traditional Guidance:' : 'Guidance Traditionnelle:'}
+              📜 {language === 'ar' ? 'الإرشاد التقليدي:' : language === 'en' ? 'Traditional Guidance:' : 'Guidance Traditionnelle:'}
             </Text>
             <Text style={styles.avoidQuote}>
-              "{career?.avoid?.traditional?.[language as 'en' | 'fr'] ?? career?.avoid?.traditional?.en ?? ''}"
+              "{career?.avoid?.traditional?.[language as 'en' | 'fr' | 'ar'] ?? career?.avoid?.traditional?.en ?? ''}"
             </Text>
           </View>
 
           <View style={styles.avoidSection}>
             <Text style={[styles.avoidSectionTitle, { color: accentColor }]}>
-              🌍 {language === 'en' ? 'Modern Application:' : 'Application Moderne:'}
+              🌍 {language === 'ar' ? 'التطبيق المعاصر:' : language === 'en' ? 'Modern Application:' : 'Application Moderne:'}
             </Text>
             <Text style={styles.avoidText}>
-              {career?.avoid?.modern?.[language as 'en' | 'fr'] ?? career?.avoid?.modern?.en ?? ''}
+              {career?.avoid?.modern?.[language as 'en' | 'fr' | 'ar'] ?? career?.avoid?.modern?.en ?? ''}
             </Text>
           </View>
 
           <View style={styles.avoidNote}>
             <Info size={16} color="#fbbf24" />
             <Text style={styles.avoidNoteText}>
-              {language === 'en' 
-                ? 'Focus your primary efforts on the recommended fields above for optimal results.'
-                : 'Concentrez vos efforts sur les domaines recommandés ci-dessus pour des résultats optimaux.'}
+              {language === 'ar'
+                ? 'ركّز جهودك الأساسية على المجالات الموصى بها أعلاه للحصول على أفضل النتائج.'
+                : language === 'en'
+                  ? 'Focus your primary efforts on the recommended fields above for optimal results.'
+                  : 'Concentrez vos efforts sur les domaines recommandés ci-dessus pour des résultats optimaux.'}
             </Text>
           </View>
         </PatternCard>
@@ -486,13 +503,13 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
             />
             {isExporting ? (
               <Text style={styles.actionButtonTextMuted}>
-                {language === 'en' ? 'Generating…' : 'Génération…'}
+                {language === 'ar' ? 'جارٍ الإنشاء…' : language === 'en' ? 'Generating…' : 'Génération…'}
               </Text>
             ) : (
               <>
                 <Download size={20} color={accentColor} />
                 <Text style={styles.actionButtonText}>
-                  {language === 'en' ? 'Download PDF' : 'Télécharger PDF'}
+                  {language === 'ar' ? 'تحميل PDF' : language === 'en' ? 'Download PDF' : 'Télécharger PDF'}
                 </Text>
               </>
             )}
@@ -503,7 +520,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
           <TouchableOpacity style={styles.actionButtonTouch} onPress={handleShare} activeOpacity={0.85}>
             <Share2 size={20} color={accentColor} />
             <Text style={styles.actionButtonText}>
-              {language === 'en' ? 'Share' : 'Partager'}
+              {language === 'ar' ? 'مشاركة' : language === 'en' ? 'Share' : 'Partager'}
             </Text>
           </TouchableOpacity>
         </PatternCard>
@@ -523,7 +540,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
         >
           <Text style={styles.statValue}>{categories?.length || 0}</Text>
           <Text style={styles.statLabel}>
-            {language === 'en' ? 'Career Fields' : 'Domaines'}
+            {language === 'ar' ? 'المجالات المهنية' : language === 'en' ? 'Career Fields' : 'Domaines'}
           </Text>
         </PatternCard>
 
@@ -539,7 +556,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
         >
           <Text style={styles.statValue}>{totalOpportunities}</Text>
           <Text style={styles.statLabel}>
-            {language === 'en' ? 'Opportunities' : 'Opportunités'}
+            {language === 'ar' ? 'الفرص' : language === 'en' ? 'Opportunities' : 'Opportunités'}
           </Text>
         </PatternCard>
 
@@ -555,7 +572,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
         >
           <Text style={styles.statEmoji}>{profile.element_emoji}</Text>
           <Text style={styles.statLabel}>
-            {language === 'en' ? 'Your Element' : 'Votre Élément'}
+            {language === 'ar' ? 'عنصرك' : language === 'en' ? 'Your Element' : 'Votre Élément'}
           </Text>
         </PatternCard>
 
@@ -571,7 +588,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
         >
           <Text style={styles.statEmoji}>✨</Text>
           <Text style={styles.statLabel}>
-            {language === 'en' ? 'Aligned Path' : 'Voie Alignée'}
+            {language === 'ar' ? 'المسار المتوافق' : language === 'en' ? 'Aligned Path' : 'Voie Alignée'}
           </Text>
         </PatternCard>
       </View>

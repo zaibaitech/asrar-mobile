@@ -8,6 +8,7 @@ export type ElementType = 'fire' | 'earth' | 'air' | 'water';
 export interface BilingualText {
   en: string;
   fr: string;
+  ar?: string;
 }
 
 export interface PersonalityProfile {
@@ -39,6 +40,20 @@ export interface PersonalityProfile {
     anger_pattern?: string;
     note?: string;
   };
+  ar?: {
+    temperament: string;
+    communication?: string;
+    social_loved?: string;
+    social_challenge?: string;
+    social_unpopular?: string;
+    social_attraction?: string;
+    life_blessing?: string;
+    divine_support?: string;
+    challenge?: string;
+    dreams: string;
+    anger_pattern?: string;
+    note?: string;
+  };
 }
 
 export interface CareerCategory {
@@ -52,6 +67,7 @@ export interface CareerGuidance {
   modern_recommended: {
     en: CareerCategory[];
     fr: CareerCategory[];
+    ar?: CareerCategory[];
   };
   avoid: {
     traditional: BilingualText;
@@ -66,10 +82,12 @@ export interface BlessedDay {
   best_for: {
     en: string[];
     fr: string[];
+    ar?: string[];
   };
   special_notes?: {
     en: string[];
     fr: string[];
+    ar?: string[];
   };
   associated_prophet?: BilingualText & { arabic: string };
   note?: BilingualText;
@@ -85,6 +103,7 @@ export interface MonthlySadaqah {
   modern_alternatives: {
     en: string[];
     fr: string[];
+    ar?: string[];
   };
 }
 
@@ -93,10 +112,12 @@ export interface LifetimeSadaqah {
   components?: {
     en: string[];
     fr: string[];
+    ar?: string[];
   };
   best_timing: {
     en: string[];
     fr: string[];
+    ar?: string[];
   };
   significance?: BilingualText;
   cultural_note?: BilingualText;
@@ -156,6 +177,7 @@ export interface SpiritualPractice {
   instructions?: {
     en: string[];
     fr: string[];
+    ar?: string[];
   };
 }
 
@@ -186,6 +208,7 @@ export interface IstikharaCalculationResult {
   burujRemainder: number;
   burujProfile: BurujProfile;
   repetitionCount: number;
+  calculationMethod?: 'name' | 'birthdate';
 }
 
 export interface IstikharaFormData {

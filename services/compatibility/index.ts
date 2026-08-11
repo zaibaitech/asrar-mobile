@@ -9,8 +9,10 @@ export * from './types';
 // Core engine
 export {
     analyzeElementalRelationship, analyzePlanetaryResonance, analyzeZahirBatinInteraction, buildCompatibilityEvaluation,
-    calculatePersonPersonCompatibility, calculateResonanceScore, determineModeOfAction, extractSpiritualDestiny, generateGuidanceSummary
+    calculatePersonPersonCompatibility, calculatePersonPersonCompatibilityMixed, calculateResonanceScore,
+    determineModeOfAction, determineZahirBatin, DobDerivationError, extractSpiritualDestiny, generateGuidanceSummary
 } from './engine';
+export type { PersonPersonParticipantInput } from './engine';
 
 // Divine Name compatibility
 export {

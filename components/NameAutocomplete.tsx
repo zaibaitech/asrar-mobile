@@ -159,13 +159,17 @@ export default function NameAutocomplete({
       {/* Helper Text */}
       {showHelper && (
         <Text style={styles.helperText}>
-          {matches.length > 0 
-            ? (language === 'en' 
-              ? 'Start typing to see Arabic suggestions' 
-              : 'ابدأ الكتابة لرؤية الاقتراحات العربية')
-            : (language === 'en'
-              ? 'Type your name in Latin letters - we\'ll show the Arabic equivalent'
-              : 'اكتب اسمك بالأحرف اللاتينية - سنعرض المعادل العربي')}
+          {matches.length > 0
+            ? (language === 'fr'
+              ? 'Commencez à taper pour voir les suggestions en arabe'
+              : language === 'ar'
+                ? 'ابدأ الكتابة لرؤية الاقتراحات العربية'
+                : 'Start typing to see Arabic suggestions')
+            : (language === 'fr'
+              ? 'Tapez votre nom en lettres latines - nous afficherons l\'équivalent arabe'
+              : language === 'ar'
+                ? 'اكتب اسمك بالأحرف اللاتينية - سنعرض المعادل العربي'
+                : 'Type your name in Latin letters - we\'ll show the Arabic equivalent')}
         </Text>
       )}
     </View>

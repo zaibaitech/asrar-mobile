@@ -4,6 +4,7 @@
  */
 
 import { RelationshipCompatibility, SpiritualDestinyResult } from '../../types/compatibility';
+import type { BurujProfile } from '../istikhara/types';
 
 // ============================================================================
 // COMPATIBILITY TYPES
@@ -156,26 +157,52 @@ export interface CompatibilityEvaluation {
 // PERSON ↔ PERSON COMPATIBILITY
 // ============================================================================
 
+// Which input a given person supplied — a name (abjad-based, the core engine)
+// or a date of birth (zodiac/burj-based, a complementary dimension).
+export type PersonInputMethod = 'name' | 'dob';
+
+// Lightweight zodiac data for a DOB-based person — parallel to SpiritualDestinyData
+// but derived from the real tropical zodiac (ProfileDerivationService), not abjad letters.
+export interface PersonZodiacData {
+  dobISO: string;                  // YYYY-MM-DD
+  dobLabel: string;                // localized display string, built by the form
+  burjIndex: number;               // 0-11 tropical index (ProfileDerivationService numbering)
+  burjEn: string;
+  burjAr: string;
+  element: 'fire' | 'water' | 'air' | 'earth';
+  planetaryRuler: string;          // e.g. 'mars', from derivePlanetaryRulerFromBurj
+  burujProfile?: BurujProfile;     // optional rich profile via getBurujData(burjIndex + 1)
+}
+
+export interface PersonPersonParticipant {
+  inputMethod: PersonInputMethod;
+  name: string;                    // Arabic name (name mode) or dobLabel (dob mode)
+  arabicName?: string;             // present iff inputMethod === 'name'
+  destiny?: SpiritualDestinyData;  // present iff inputMethod === 'name'
+  zodiac?: PersonZodiacData;       // present iff inputMethod === 'dob'
+}
+
 export interface PersonPersonCompatibility {
   type: 'person-person';
   relationshipContext: 'marriage' | 'friendship' | 'family' | 'work' | 'universal';
-  
-  person1: {
-    name: string;
-    arabicName: string;
-    destiny: SpiritualDestinyData;
-  };
-  
-  person2: {
-    name: string;
-    arabicName: string;
-    destiny: SpiritualDestinyData;
-  };
-  
+
+  person1: PersonPersonParticipant;
+  person2: PersonPersonParticipant;
+
   evaluation: CompatibilityEvaluation;
-  
-  // AUTHENTIC 4-METHOD COMPATIBILITY ANALYSIS
-  relationshipCompatibility: RelationshipCompatibility;
+
+  // AUTHENTIC 4-METHOD COMPATIBILITY ANALYSIS — only present when BOTH people
+  // used a name (it has no valid input for a DOB-only person).
+  relationshipCompatibility?: RelationshipCompatibility;
+
+  // Zodiac/elemental harmony via burj comparison — only present when BOTH
+  // people used a date of birth.
+  burjCompatibility?: {
+    compatible: boolean;
+    reason: string;      // raw English, kept for logs — do not render directly
+    reasonKey: string;   // stable slug for i18n lookup
+    harmonyScore: number;
+  };
 }
 
 // ============================================================================

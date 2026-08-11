@@ -183,7 +183,7 @@ export default function SadaqahTab({ data, elementColor }: SadaqahTabProps) {
             <View style={styles.cardHeader}>
               <Sparkles size={20} color={accentColor} />
               <Text style={styles.cardTitle}>
-                {dobEntry.transliteration} — {dobEntry.signEn} ({dobEntry.signArabic})
+                {dobEntry.transliteration} — {language === 'ar' ? dobEntry.signArabic : language === 'fr' ? dobEntry.signFr : dobEntry.signEn} ({dobEntry.signArabic})
               </Text>
             </View>
             {dobEntry.rulingPlanet && (
@@ -234,7 +234,9 @@ export default function SadaqahTab({ data, elementColor }: SadaqahTabProps) {
                   <Text style={styles.cardTitle}>
                     {language === 'ar'
                       ? `الصدقة الخاصة بـ ${dobEntry.signArabic}`
-                      : (language === 'fr' ? 'Sadaqah Spécifique pour ' : 'Specific Sadaqah for ') + dobEntry.signEn}
+                      : language === 'fr'
+                        ? `Sadaqah Spécifique pour ${dobEntry.signFr}`
+                        : `Specific Sadaqah for ${dobEntry.signEn}`}
                   </Text>
                 </View>
                 {expandedSections.has('specific') ? (

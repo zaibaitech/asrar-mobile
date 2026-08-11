@@ -128,8 +128,10 @@ export default function IstikharaResults() {
         setData(parsedData);
       } catch (error) {
         console.error('Failed to parse result data:', error);
-        const errorMsg = error instanceof Error ? error.message : 'Failed to load results';
-        Alert.alert('Error', errorMsg, [
+        const errorMsg = error instanceof Error
+          ? error.message
+          : (language === 'fr' ? 'Échec du chargement des résultats' : language === 'ar' ? 'تعذّر تحميل النتائج' : 'Failed to load results');
+        Alert.alert(t('common.error'), errorMsg, [
           { text: 'OK', onPress: () => router.back() },
         ]);
       }
@@ -170,7 +172,7 @@ export default function IstikharaResults() {
       <SafeAreaView style={styles.container}>
         {/* Custom App Header */}
         <ResponsiveAppHeader
-          currentLanguage={language === 'en' ? 'EN' : 'FR'}
+          currentLanguage={language === 'ar' ? 'AR' : language === 'fr' ? 'FR' : 'EN'}
           onLanguageChange={(lang) => setLanguage(lang.toLowerCase() as 'en' | 'fr' | 'ar')}
           onProfilePress={() => router.push('/modal')}
           onHistoryPress={() => setShowHistory(true)}
@@ -182,7 +184,7 @@ export default function IstikharaResults() {
         {/* Action Buttons Bar */}
         <View style={styles.actionBar}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Text style={styles.backButtonText}>← Back</Text>
+            <Text style={styles.backButtonText}>← {t('common.back')}</Text>
           </TouchableOpacity>
           <View style={styles.actionButtons}>
             <TouchableOpacity 
@@ -192,7 +194,7 @@ export default function IstikharaResults() {
               }} 
               style={[styles.actionButton, styles.newCalcButton]}
             >
-              <Text style={styles.newCalcButtonText}>✨ {language === 'en' ? 'New Calculation' : 'Nouveau Calcul'}</Text>
+              <Text style={styles.newCalcButtonText}>✨ {language === 'ar' ? 'حساب جديد' : language === 'en' ? 'New Calculation' : 'Nouveau Calcul'}</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               onPress={() => {
@@ -322,16 +324,16 @@ export default function IstikharaResults() {
         </Tab.Screen>
 
         {/* PREMIUM: Zodiac Stones - Crystal guidance */}
-        <Tab.Screen name={language === 'en' ? 'Zodiac Stones' : language === 'fr' ? 'Pierres' : 'الأحجار'}>
+        <Tab.Screen name={language === 'ar' ? 'الأحجار' : language === 'fr' ? 'Pierres' : 'Zodiac Stones'}>
           {() => (
             <PremiumTabWrapper
               featureId="spiritualGuidance"
-              title={language === 'en' ? 'Zodiac Stones & Crystals' : 
-                     language === 'fr' ? 'Pierres et Cristaux du Zodiaque' : 
-                     'أحجار وبلورات البرج'}
-              description={language === 'en' ? 'Discover beneficial stones that resonate with your zodiac energy' : 
-                          language === 'fr' ? 'Découvrez les pierres bénéfiques qui résonnent avec l\'énergie de votre signe' : 
-                          'اكتشف الأحجار المفيدة التي تتناغم مع طاقة برجك'}
+              title={language === 'ar' ? 'أحجار وبلورات البرج' :
+                     language === 'fr' ? 'Pierres et Cristaux du Zodiaque' :
+                     'Zodiac Stones & Crystals'}
+              description={language === 'ar' ? 'اكتشف الأحجار المفيدة التي تتناغم مع طاقة برجك' :
+                          language === 'fr' ? 'Découvrez les pierres bénéfiques qui résonnent avec l\'énergie de votre signe' :
+                          'Discover beneficial stones that resonate with your zodiac energy'}
               icon="💎"
             >
               <ZodiacStonesTab result={{

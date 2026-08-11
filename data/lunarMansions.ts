@@ -184,3 +184,36 @@ export function getCosmicLunarMansionForDate(date: Date = new Date()): LunarMans
   const index = getCosmicLunarMansionIndexForDate(date);
   return LUNAR_MANSIONS[index];
 }
+
+/**
+ * Manazil (0-27) grouped under each tropical zodiac sign (0=Aries..11=Pisces).
+ *
+ * Both systems share the same 0° Aries origin (Al-Sharatān opens the cycle at
+ * the vernal equinox), so each 30° sign is assigned the mansions whose
+ * starting degree (index * 360/28) falls within its span. The four cardinal
+ * signs (Aries, Cancer, Libra, Capricorn) each start 3 mansions; the other
+ * eight each start 2 — 4×3 + 8×2 = 28, matching the full cycle.
+ */
+export const MANAZIL_BY_ZODIAC_INDEX: number[][] = [
+  [0, 1, 2],     // Aries
+  [3, 4],        // Taurus
+  [5, 6],        // Gemini
+  [7, 8, 9],     // Cancer
+  [10, 11],      // Leo
+  [12, 13],      // Virgo
+  [14, 15, 16],  // Libra
+  [17, 18],      // Scorpio
+  [19, 20],      // Sagittarius
+  [21, 22, 23],  // Capricorn
+  [24, 25],      // Aquarius
+  [26, 27],      // Pisces
+];
+
+/**
+ * Get the Manazil al-Qamar traditionally associated with a tropical zodiac
+ * sign (0=Aries..11=Pisces).
+ */
+export function getManazilForZodiacIndex(zodiacIndex: number): LunarMansion[] {
+  const normalized = ((Math.floor(zodiacIndex) % 12) + 12) % 12;
+  return MANAZIL_BY_ZODIAC_INDEX[normalized].map((idx) => LUNAR_MANSIONS[idx]);
+}
