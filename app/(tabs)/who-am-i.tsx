@@ -37,8 +37,9 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useProfile } from '../../contexts/ProfileContext';
 import { useIstikhara } from '../../hooks/useIstikhara';
 import { HistoryService } from '../../services/HistoryService';
-import { deriveElementFromBurj, resolveBurjWithIngressGuard } from '../../services/ProfileDerivationService';
+import { deriveElementFromBurj, isNearIngress, resolveBurjWithIngressGuard } from '../../services/ProfileDerivationService';
 import { getBurujData } from '../../services/istikhara/calculations';
+import { COUNTRY_NAMES } from '../../data/countryUtcOffsets';
 
 type CalculationMethod = 'name' | 'birthdate';
 type BirthInputMode = 'full' | 'monthDay';
@@ -78,6 +79,14 @@ export default function WhoAmICalculator() {
     longitude: number;
     label?: string;
   } | null>(null);
+
+  // Birth country (optional — the primary disambiguator for a zodiac sign
+  // near a solar ingress; a much lighter ask than birth time, and usually
+  // sufficient on its own to resolve the ambiguity).
+  const [birthCountry, setBirthCountry] = useState<string | null>(null);
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [countryFilter, setCountryFilter] = useState('');
+
   // Auto-fill from profile if available
   useEffect(() => {
     if (profile.nameAr && !personName) {
@@ -138,9 +147,15 @@ export default function WhoAmICalculator() {
   })();
   
   // Form validity based on selected method
-  const isFormValid = calculationMethod === 'name' 
+  const isFormValid = calculationMethod === 'name'
     ? (personValid && motherValid)
     : (birthInputMode === 'full' ? birthDateValid : birthMonthDayValid);
+
+  // Whether the picked date falls near a solar ingress — gates the optional
+  // birth time/country nudge, since almost all dates don't need either.
+  const birthDateNearIngress = birthInputMode === 'full' && birthDate
+    ? isNearIngress(birthDate.toISOString().split('T')[0])
+    : false;
 
   const handleCalculate = async () => {
     if (!isFormValid) {
@@ -194,6 +209,7 @@ export default function WhoAmICalculator() {
           dobISO,
           birthTimeLocal: birthTimeStr ?? undefined,
           birthTimezone: birthTimeStr ? profile.timezone : undefined,
+          birthCountry: birthCountry ?? undefined,
         });
 
         if (!burjData) {
@@ -208,21 +224,11 @@ export default function WhoAmICalculator() {
           return;
         }
 
-        if (burjData.ambiguous) {
-          const [candidateA, candidateB] = burjData.candidateSigns ?? [];
-          const candidateNames = candidateA && candidateB
-            ? `${language === 'ar' ? candidateA.burjAr : candidateA.burjEn} / ${language === 'ar' ? candidateB.burjAr : candidateB.burjEn}`
-            : '';
-          Alert.alert(
-            language === 'fr' ? 'Date proche d\'un changement de signe' : language === 'ar' ? 'تاريخ قريب من تغيّر البرج' : 'Birth date near a sign change',
-            (language === 'fr'
-              ? `Votre date de naissance se situe près d'une limite de signe zodiacal (${candidateNames}). Sans l'heure de naissance, le signe exact est incertain. Les résultats ci-dessous utilisent notre meilleure estimation — ajoutez une heure de naissance pour plus de précision.`
-              : language === 'ar'
-                ? `يقع تاريخ ميلادك بالقرب من حدود تغيّر البرج (${candidateNames}). بدون وقت الميلاد، البرج الدقيق غير مؤكد. تستخدم النتائج أدناه أفضل تقدير لدينا — أضف وقت الميلاد لمزيد من الدقة.`
-                : `Your birth date falls near a zodiac sign boundary (${candidateNames}). Without a birth time, the exact sign is uncertain. The results below use our best estimate — add a birth time for certainty.`),
-            [{ text: 'OK' }]
-          );
-        }
+        // Ambiguity (if any) is carried as data into the result payload below
+        // (sunSignAmbiguous/sunSignCandidates) and rendered as a dismissible
+        // inline banner on the Results screen — not a blocking alert here,
+        // since the user should be able to see the actual result alongside
+        // the caveat rather than acknowledging a modal before anything renders.
 
         const dobLabelPrefix = language === 'fr' ? 'Date de naissance' : language === 'ar' ? 'تاريخ الميلاد' : 'Birth Date';
 
@@ -271,9 +277,14 @@ export default function WhoAmICalculator() {
                 burjIndex: burjData.burjIndex,
               },
               // True when the birth date fell near a sign boundary and no birth
-              // time was available to resolve it with certainty (see the
-              // "Birth date near a sign change" alert shown at calculation time).
+              // time/country was available to resolve it with certainty. The
+              // sunSign above is still the best estimate — never withheld —
+              // rendered with a caveat banner on the Results screen rather
+              // than blocking calculation on a modal.
               sunSignAmbiguous: burjData.ambiguous,
+              sunSignCandidates: burjData.candidateSigns
+                ? burjData.candidateSigns.map((c) => ({ burjAr: c.burjAr, burjEn: c.burjEn }))
+                : undefined,
             },
           }
         };
@@ -656,6 +667,67 @@ export default function WhoAmICalculator() {
                           maximumDate={new Date()}
                           minimumDate={new Date(1900, 0, 1)}
                         />
+                      )}
+
+                      {/* Birth Country (Optional) — shown only near a sign boundary, and
+                          the primary disambiguator: a much lighter ask than birth time,
+                          and usually enough on its own to resolve the ambiguity. */}
+                      {birthDateNearIngress && (
+                        <View style={styles.birthTimeSection}>
+                          <Text style={styles.birthTimeLabel}>🌍 {t('istikhara.birthDateForm.birthCountry') || 'Birth Country (Optional)'}</Text>
+                          <Text style={styles.birthTimeHint}>
+                            {t('istikhara.birthDateForm.ingressDetectedNote') || 'This date falls near a zodiac sign boundary. Your birth country helps confirm the exact sign.'}
+                          </Text>
+                          <Pressable
+                            style={[styles.datePickerButton, styles.timePickerButton]}
+                            onPress={() => setShowCountryPicker(true)}
+                          >
+                            <Text style={styles.datePickerText}>
+                              {birthCountry ?? (t('istikhara.birthDateForm.tapToSetCountry') || 'Tap to select birth country')}
+                            </Text>
+                            {birthCountry && (
+                              <TouchableOpacity
+                                onPress={(e) => {
+                                  e.stopPropagation();
+                                  setBirthCountry(null);
+                                }}
+                                style={styles.clearTimeButton}
+                              >
+                                <Text style={styles.clearTimeButtonText}>✕</Text>
+                              </TouchableOpacity>
+                            )}
+                          </Pressable>
+
+                          {showCountryPicker && (
+                            <View style={styles.countryPickerBox}>
+                              <TextInput
+                                style={styles.countryPickerInput}
+                                value={countryFilter}
+                                onChangeText={setCountryFilter}
+                                placeholder={t('istikhara.birthDateForm.searchCountry') || 'Search country...'}
+                                placeholderTextColor="#64748b"
+                                autoFocus
+                              />
+                              <ScrollView style={styles.countryPickerList} keyboardShouldPersistTaps="handled">
+                                {COUNTRY_NAMES.filter((c) =>
+                                  c.toLowerCase().includes(countryFilter.trim().toLowerCase())
+                                ).slice(0, 30).map((country) => (
+                                  <TouchableOpacity
+                                    key={country}
+                                    style={styles.countryPickerItem}
+                                    onPress={() => {
+                                      setBirthCountry(country);
+                                      setShowCountryPicker(false);
+                                      setCountryFilter('');
+                                    }}
+                                  >
+                                    <Text style={styles.countryPickerItemText}>{country}</Text>
+                                  </TouchableOpacity>
+                                ))}
+                              </ScrollView>
+                            </View>
+                          )}
+                        </View>
                       )}
 
                       {/* Birth Time Input (Optional) */}
@@ -1489,4 +1561,35 @@ const styles = StyleSheet.create({
     color: '#22c55e',
     fontWeight: '500',
     flex: 1,
-  },});
+  },
+  countryPickerBox: {
+    marginTop: 8,
+    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 12,
+    padding: 8,
+    maxHeight: 260,
+  },
+  countryPickerInput: {
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: '#ffffff',
+    fontSize: 14,
+    marginBottom: 6,
+  },
+  countryPickerList: {
+    maxHeight: 200,
+  },
+  countryPickerItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  countryPickerItemText: {
+    color: '#e5e7eb',
+    fontSize: 14,
+  },
+});

@@ -109,6 +109,11 @@ export default function IstikharaResults() {
   const [showHistory, setShowHistory] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [currentTab, setCurrentTab] = useState('overview');
+  // Tracks which birthProfile.dobISO the ambiguity banner has been dismissed
+  // for, so it shows once per calculation and doesn't reappear on re-renders
+  // of the same profile (e.g. tab switches, language changes) — but does
+  // reappear if the user runs a genuinely new calculation.
+  const [dismissedAmbiguityForDob, setDismissedAmbiguityForDob] = useState<string | null>(null);
 
   useEffect(() => {
     // Parse the data from route params
@@ -207,6 +212,34 @@ export default function IstikharaResults() {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Zodiac sign ambiguity banner — shown once per calculation, dismissible */}
+        {data.birthProfile?.sunSignAmbiguous && dismissedAmbiguityForDob !== data.birthProfile.dobISO && (
+          <View style={styles.ambiguityBanner}>
+            <View style={styles.ambiguityBannerText}>
+              <Text style={styles.ambiguityBannerTitle}>
+                {language === 'fr' ? 'Date proche d\'un changement de signe' : language === 'ar' ? 'تاريخ قريب من تغيّر البرج' : 'Birth date near a sign change'}
+              </Text>
+              <Text style={styles.ambiguityBannerBody}>
+                {(() => {
+                  const usedSign = language === 'ar' ? data.birthProfile.sunSign.burjAr : data.birthProfile.sunSign.burjEn;
+                  return language === 'fr'
+                    ? `Nous avons utilisé ${usedSign}. Ajoutez une heure de naissance ou un pays pour confirmer.`
+                    : language === 'ar'
+                      ? `استخدمنا ${usedSign}. أضف وقت الميلاد أو البلد للتأكيد.`
+                      : `We've used ${usedSign}. Add a birth time or country to confirm.`;
+                })()}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => setDismissedAmbiguityForDob(data.birthProfile!.dobISO)}
+              style={styles.ambiguityBannerDismiss}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.ambiguityBannerDismissText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Tab Navigator */}
         <Tab.Navigator
@@ -450,6 +483,41 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: 'row',
     gap: 8,
+  },
+  ambiguityBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginHorizontal: 16,
+    marginTop: 10,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+  },
+  ambiguityBannerText: {
+    flex: 1,
+  },
+  ambiguityBannerTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#f59e0b',
+    marginBottom: 4,
+  },
+  ambiguityBannerBody: {
+    fontSize: 12,
+    color: '#e5e7eb',
+    lineHeight: 17,
+  },
+  ambiguityBannerDismiss: {
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+  },
+  ambiguityBannerDismissText: {
+    fontSize: 16,
+    color: '#94a3b8',
+    fontWeight: '600',
   },
   actionButton: {
     flexDirection: 'row',

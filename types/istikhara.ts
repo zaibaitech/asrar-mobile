@@ -18,6 +18,12 @@ export interface BirthProfile {
     burjEn: string;
     burjIndex: number;
   };
+  /** True when the birth date fell near a solar ingress and no birth
+   *  time/country was available to resolve it with certainty. sunSign
+   *  above is still the best estimate — never withheld. */
+  sunSignAmbiguous?: boolean;
+  /** The two candidate signs when sunSignAmbiguous is true. */
+  sunSignCandidates?: Array<{ burjAr: string; burjEn: string }>;
 }
 
 export interface IstikharaRequest {

@@ -198,20 +198,38 @@ export function deriveBurjFromDOB(dobISO: string): {
 // ============================================================================
 //
 // deriveBurjFromDOB() above ignores the fact that a birth date's local
-// timezone is unknown. A calendar date, across all world timezones, spans a
-// real-time window of up to ~50 hours (UTC+14 through UTC-12). Near a solar
-// ingress, the Sun's sign can genuinely differ depending on where in that
-// window the birth actually fell. resolveBurjWithIngressGuard() checks both
-// extremes of that window and only claims certainty when they agree.
+// timezone is unknown. A calendar date spans a real-time window that varies
+// with the widest plausible timezone spread; near a solar ingress, the Sun's
+// sign can genuinely differ depending on where in that window the birth
+// actually fell. resolveBurjWithIngressGuard() checks both extremes of that
+// window and only claims certainty when they agree.
+//
+// Detection (is this window straddling an ingress?) and estimation (which
+// single sign do we display when it's ambiguous?) are different questions,
+// answered from different points: detection uses the full window's two
+// extremes; the displayed estimate uses the CENTER of that same window,
+// since most real-world timezones cluster near the middle of any offset
+// range — the extremes (e.g. UTC+14) are the least likely case, not a
+// reasonable default guess.
 //
 // This does not replace deriveBurjFromDOB — existing callers are unaffected.
 // New/migrated callers that render sign-specific content as fact should use
 // this instead.
 
 /** A birth date is treated as ingress-adjacent if within this many days of a
- *  known sign-change boundary (the ~50h timezone-uncertainty window plus a
+ *  known sign-change boundary (the detection window's uncertainty plus a
  *  safety margin for the Sun's ~1°/day motion). */
 const INGRESS_PROXIMITY_DAYS = 1;
+
+/** Default detection window when no birth country is known: UTC-11 through
+ *  UTC+12. Covers the vast majority of real-world births — the full
+ *  UTC-12..+14 extreme range flags roughly 13% of all dates (anyone within
+ *  ~2 days of any of the 12 ingresses); narrowing to the range that actually
+ *  covers nearly all inhabited timezones cuts unnecessary ambiguity prompts
+ *  substantially without meaningfully increasing missed ambiguity, since the
+ *  excluded slivers (UTC+12.75..+14, UTC-12) are sparsely populated. */
+const DEFAULT_MIN_OFFSET = -11;
+const DEFAULT_MAX_OFFSET = 12;
 
 export interface BurjCandidate {
   burjAr: string;
@@ -222,22 +240,32 @@ export interface BurjCandidate {
 export interface BurjResolution extends BurjCandidate {
   ambiguous: boolean;
   candidateSigns?: [BurjCandidate, BurjCandidate];
-  resolvedVia: 'unambiguous-date' | 'birth-time' | 'unresolved-ambiguous';
+  resolvedVia: 'unambiguous-date' | 'birth-time' | 'birth-country' | 'unresolved-ambiguous';
 }
 
 export interface ResolveBurjParams {
   /** YYYY-MM-DD (or any ISO date string) — same input deriveBurjFromDOB takes. */
   dobISO: string;
   /** Optional "HH:mm", 24h, local to birthTimezone. Never defaulted — an
-   *  absent value means "unknown", not noon. */
+   *  absent value means "unknown", not noon. Takes priority over
+   *  birthCountry when both are given (an exact time fully resolves the
+   *  instant; a country only narrows a range). */
   birthTimeLocal?: string;
   /** IANA timezone, required together with birthTimeLocal. */
   birthTimezone?: string;
+  /** Optional birth country name (must match a key in
+   *  data/countryUtcOffsets.ts). Narrows the detection/estimation window to
+   *  that country's UTC offset range — a much smaller ask than birth time,
+   *  and often sufficient to resolve ambiguity entirely on its own. */
+  birthCountry?: string;
 }
 
 /**
  * True if dobISO falls within INGRESS_PROXIMITY_DAYS of any sign-change
  * boundary in BURJ_DATE_RANGES. Pure calendar-date check, no network call.
+ * This is a coarse pre-filter deciding whether any ephemeris call is needed
+ * at all — the actual ambiguity determination happens in
+ * resolveBurjWithIngressGuard() against the real window bounds.
  */
 export function isNearIngress(dobISO: string): boolean {
   const date = new Date(dobISO);
@@ -278,20 +306,42 @@ function isWithinDaysOfMonthDay(
   return circularDiff <= withinDays;
 }
 
-function buildIngressWindowBoundsUTC(dobISO: string): { earliestUTC: Date; latestUTC: Date } {
+interface IngressWindow {
+  earliestUTC: Date;
+  latestUTC: Date;
+  centerUTC: Date;
+}
+
+/**
+ * Build the detection/estimation window for a calendar date, optionally
+ * narrowed to a country's UTC offset range. minOffsetHours/maxOffsetHours
+ * default to the DEFAULT_MIN_OFFSET..DEFAULT_MAX_OFFSET range.
+ */
+function buildIngressWindowBoundsUTC(
+  dobISO: string,
+  minOffsetHours: number = DEFAULT_MIN_OFFSET,
+  maxOffsetHours: number = DEFAULT_MAX_OFFSET
+): IngressWindow {
   const date = new Date(dobISO);
   const year = date.getFullYear();
   const month = date.getMonth(); // 0-indexed
   const day = date.getDate();
 
-  // Earliest possible instant this calendar date could have started, in any
-  // real-world timezone: local midnight in UTC+14 (Kiribati/Line Islands).
-  const earliestUTC = new Date(Date.UTC(year, month, day, 0, 0, 0) - 14 * 3600_000);
-  // Latest possible instant this calendar date could still be in progress:
-  // local 23:59:59 in UTC-12 (Baker/Howland Islands).
-  const latestUTC = new Date(Date.UTC(year, month, day, 23, 59, 59) + 12 * 3600_000);
+  const toMs = (offsetHours: number) => offsetHours * 3_600_000;
 
-  return { earliestUTC, latestUTC };
+  // Earliest possible instant this calendar date could have started, at the
+  // highest offset in range: local midnight, minus that offset.
+  const earliestUTC = new Date(Date.UTC(year, month, day, 0, 0, 0) - toMs(maxOffsetHours));
+  // Latest possible instant this calendar date could still be in progress,
+  // at the lowest offset in range: local 23:59:59, minus that (negative or
+  // smaller) offset.
+  const latestUTC = new Date(Date.UTC(year, month, day, 23, 59, 59) - toMs(minOffsetHours));
+  // Center of the plausible range — the best single estimate when the
+  // window is ambiguous, since most real-world timezones cluster near the
+  // middle of any offset range rather than at its extremes.
+  const centerUTC = new Date((earliestUTC.getTime() + latestUTC.getTime()) / 2);
+
+  return { earliestUTC, latestUTC, centerUTC };
 }
 
 function candidateFromSignIndex(signIndex: number): BurjCandidate {
@@ -304,12 +354,18 @@ function candidateFromSignIndex(signIndex: number): BurjCandidate {
 
 /**
  * Resolve a birth date's Sun sign, accounting for timezone uncertainty near
- * ingress days. For the ~93% of dates safely mid-sign, this returns
- * instantly with zero network calls and is byte-identical to
+ * ingress days. For the large majority of dates safely mid-sign, this
+ * returns instantly with zero network calls and is byte-identical to
  * deriveBurjFromDOB. Near an ingress, it checks the Sun's actual ecliptic
- * longitude at both extremes of the ~50-hour timezone-uncertainty window; if
- * they disagree and no birth time was supplied, it returns both candidates
- * rather than silently guessing one.
+ * longitude at both extremes of the detection window (narrowed by
+ * birthCountry when given); if they disagree and no birth time was
+ * supplied, it returns both candidates plus a best-guess estimate — never
+ * presenting the estimate as confident.
+ *
+ * Detection and estimation are answered from different points in the same
+ * window: detection uses both extremes; the displayed estimate uses the
+ * window's center, not either extreme (the extremes are the least likely
+ * real-world case, not a reasonable default).
  *
  * Never defaults an absent birth time to noon or any other value — absence
  * of a time either resolves unambiguously (the common case) or produces an
@@ -318,7 +374,7 @@ function candidateFromSignIndex(signIndex: number): BurjCandidate {
 export async function resolveBurjWithIngressGuard(
   params: ResolveBurjParams
 ): Promise<BurjResolution | null> {
-  const { dobISO, birthTimeLocal, birthTimezone } = params;
+  const { dobISO, birthTimeLocal, birthTimezone, birthCountry } = params;
 
   const fallback = deriveBurjFromDOB(dobISO);
   if (!fallback) {
@@ -331,7 +387,7 @@ export async function resolveBurjWithIngressGuard(
 
   // Lazy import: EphemerisService pulls in AsyncStorage/NetInfo/fetch, which
   // most callers of this file (and most callers of deriveBurjFromDOB) never
-  // need. Avoids adding that weight to the ~93% network-free fast path above.
+  // need. Avoids adding that weight to the majority network-free fast path above.
   const { getPlanetPositions } = await import('./EphemerisService');
 
   if (birthTimeLocal && birthTimezone) {
@@ -346,14 +402,26 @@ export async function resolveBurjWithIngressGuard(
     // Ephemeris/timezone conversion failed — fall through to window-bound check.
   }
 
-  const { earliestUTC, latestUTC } = buildIngressWindowBoundsUTC(dobISO);
-  const [atEarliest, atLatest] = await Promise.all([
+  // A birth country narrows the offset range but rarely to a single value —
+  // still resolve it through the same window-bound-agreement check below
+  // rather than assuming a single representative offset, since several
+  // countries span multiple zones.
+  const { getCountryOffsetRange } = await import('../data/countryUtcOffsets');
+  const countryRange = birthCountry ? getCountryOffsetRange(birthCountry) : undefined;
+
+  const { earliestUTC, latestUTC, centerUTC } = countryRange
+    ? buildIngressWindowBoundsUTC(dobISO, countryRange.minOffset, countryRange.maxOffset)
+    : buildIngressWindowBoundsUTC(dobISO);
+
+  const [atEarliest, atLatest, atCenter] = await Promise.all([
     getPlanetPositions(earliestUTC),
     getPlanetPositions(latestUTC),
+    getPlanetPositions(centerUTC),
   ]);
 
   const signAtEarliest = atEarliest?.planets.sun?.sign;
   const signAtLatest = atLatest?.planets.sun?.sign;
+  const signAtCenter = atCenter?.planets.sun?.sign;
 
   if (typeof signAtEarliest !== 'number' || typeof signAtLatest !== 'number') {
     // Ephemeris unavailable (offline, etc.) — fall back to the calendar
@@ -362,15 +430,23 @@ export async function resolveBurjWithIngressGuard(
   }
 
   if (signAtEarliest === signAtLatest) {
-    return { ...candidateFromSignIndex(signAtEarliest), ambiguous: false, resolvedVia: 'unambiguous-date' };
+    return {
+      ...candidateFromSignIndex(signAtEarliest),
+      ambiguous: false,
+      resolvedVia: countryRange ? 'birth-country' : 'unambiguous-date',
+    };
   }
+
+  const estimatedSign = typeof signAtCenter === 'number' ? signAtCenter : signAtEarliest;
 
   const candidateA = candidateFromSignIndex(signAtEarliest);
   const candidateB = candidateFromSignIndex(signAtLatest);
   return {
-    // Best-guess fallback so callers that need *a* value don't crash — but
-    // `ambiguous: true` means this value must not be presented as confident.
-    ...candidateA,
+    // Best-guess estimate — the sign at the CENTER of the plausible window,
+    // never one of the extremes — so callers that need *a* value don't
+    // crash, but `ambiguous: true` means this value must not be presented
+    // as confident.
+    ...candidateFromSignIndex(estimatedSign),
     ambiguous: true,
     candidateSigns: [candidateA, candidateB],
     resolvedVia: 'unresolved-ambiguous',
