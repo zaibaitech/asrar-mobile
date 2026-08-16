@@ -37,7 +37,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useProfile } from '../../contexts/ProfileContext';
 import { useIstikhara } from '../../hooks/useIstikhara';
 import { HistoryService } from '../../services/HistoryService';
-import { deriveBurjFromDOB, deriveElementFromBurj } from '../../services/ProfileDerivationService';
+import { deriveElementFromBurj, resolveBurjWithIngressGuard } from '../../services/ProfileDerivationService';
 import { getBurujData } from '../../services/istikhara/calculations';
 
 type CalculationMethod = 'name' | 'birthdate';
@@ -183,7 +183,18 @@ export default function WhoAmICalculator() {
         }
 
         const dobISO = dobDate.toISOString();
-        const burjData = deriveBurjFromDOB(dobISO);
+
+        // Prepare birth time string first so the ingress-aware resolver can use it
+        // (if the user provided one) to resolve an otherwise-ambiguous sign.
+        const birthTimeStr = birthTime
+          ? `${String(birthTime.getHours()).padStart(2, '0')}:${String(birthTime.getMinutes()).padStart(2, '0')}`
+          : null;
+
+        const burjData = await resolveBurjWithIngressGuard({
+          dobISO,
+          birthTimeLocal: birthTimeStr ?? undefined,
+          birthTimezone: birthTimeStr ? profile.timezone : undefined,
+        });
 
         if (!burjData) {
           Alert.alert(
@@ -197,8 +208,24 @@ export default function WhoAmICalculator() {
           return;
         }
 
+        if (burjData.ambiguous) {
+          const [candidateA, candidateB] = burjData.candidateSigns ?? [];
+          const candidateNames = candidateA && candidateB
+            ? `${language === 'ar' ? candidateA.burjAr : candidateA.burjEn} / ${language === 'ar' ? candidateB.burjAr : candidateB.burjEn}`
+            : '';
+          Alert.alert(
+            language === 'fr' ? 'Date proche d\'un changement de signe' : language === 'ar' ? 'تاريخ قريب من تغيّر البرج' : 'Birth date near a sign change',
+            (language === 'fr'
+              ? `Votre date de naissance se situe près d'une limite de signe zodiacal (${candidateNames}). Sans l'heure de naissance, le signe exact est incertain. Les résultats ci-dessous utilisent notre meilleure estimation — ajoutez une heure de naissance pour plus de précision.`
+              : language === 'ar'
+                ? `يقع تاريخ ميلادك بالقرب من حدود تغيّر البرج (${candidateNames}). بدون وقت الميلاد، البرج الدقيق غير مؤكد. تستخدم النتائج أدناه أفضل تقدير لدينا — أضف وقت الميلاد لمزيد من الدقة.`
+                : `Your birth date falls near a zodiac sign boundary (${candidateNames}). Without a birth time, the exact sign is uncertain. The results below use our best estimate — add a birth time for certainty.`),
+            [{ text: 'OK' }]
+          );
+        }
+
         const dobLabelPrefix = language === 'fr' ? 'Date de naissance' : language === 'ar' ? 'تاريخ الميلاد' : 'Birth Date';
-        
+
         // Map tropical zodiac index (0-11) to the existing Istikhara Buruj remainder (1-12)
         // so Results tabs can reuse the full local buruj profile dataset.
         const burujRemainder = burjData.burjIndex + 1;
@@ -207,12 +234,7 @@ export default function WhoAmICalculator() {
         const element = burujProfile.element ?? deriveElementFromBurj(burjData.burjIndex);
         // Year is not required for burj/element. Manazil baseline depends on full DOB year,
         // so we intentionally avoid using it in this quick path.
-        
-        // Prepare birth profile data for ascendant calculation (if time is provided)
-        const birthTimeStr = birthTime 
-          ? `${String(birthTime.getHours()).padStart(2, '0')}:${String(birthTime.getMinutes()).padStart(2, '0')}`
-          : null;
-        
+
         // Use form's birth location if set, otherwise fall back to profile
         const finalBirthLocation = birthLocation ?? profile.birthLocation ?? profile.location;
         
@@ -248,6 +270,10 @@ export default function WhoAmICalculator() {
                 burjEn: burjData.burjEn,
                 burjIndex: burjData.burjIndex,
               },
+              // True when the birth date fell near a sign boundary and no birth
+              // time was available to resolve it with certainty (see the
+              // "Birth date near a sign change" alert shown at calculation time).
+              sunSignAmbiguous: burjData.ambiguous,
             },
           }
         };

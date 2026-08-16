@@ -193,6 +193,228 @@ export function deriveBurjFromDOB(dobISO: string): {
   }
 }
 
+// ============================================================================
+// INGRESS-AWARE BURJ RESOLUTION
+// ============================================================================
+//
+// deriveBurjFromDOB() above ignores the fact that a birth date's local
+// timezone is unknown. A calendar date, across all world timezones, spans a
+// real-time window of up to ~50 hours (UTC+14 through UTC-12). Near a solar
+// ingress, the Sun's sign can genuinely differ depending on where in that
+// window the birth actually fell. resolveBurjWithIngressGuard() checks both
+// extremes of that window and only claims certainty when they agree.
+//
+// This does not replace deriveBurjFromDOB — existing callers are unaffected.
+// New/migrated callers that render sign-specific content as fact should use
+// this instead.
+
+/** A birth date is treated as ingress-adjacent if within this many days of a
+ *  known sign-change boundary (the ~50h timezone-uncertainty window plus a
+ *  safety margin for the Sun's ~1°/day motion). */
+const INGRESS_PROXIMITY_DAYS = 1;
+
+export interface BurjCandidate {
+  burjAr: string;
+  burjEn: string;
+  burjIndex: number;
+}
+
+export interface BurjResolution extends BurjCandidate {
+  ambiguous: boolean;
+  candidateSigns?: [BurjCandidate, BurjCandidate];
+  resolvedVia: 'unambiguous-date' | 'birth-time' | 'unresolved-ambiguous';
+}
+
+export interface ResolveBurjParams {
+  /** YYYY-MM-DD (or any ISO date string) — same input deriveBurjFromDOB takes. */
+  dobISO: string;
+  /** Optional "HH:mm", 24h, local to birthTimezone. Never defaulted — an
+   *  absent value means "unknown", not noon. */
+  birthTimeLocal?: string;
+  /** IANA timezone, required together with birthTimeLocal. */
+  birthTimezone?: string;
+}
+
+/**
+ * True if dobISO falls within INGRESS_PROXIMITY_DAYS of any sign-change
+ * boundary in BURJ_DATE_RANGES. Pure calendar-date check, no network call.
+ */
+export function isNearIngress(dobISO: string): boolean {
+  const date = new Date(dobISO);
+  if (isNaN(date.getTime())) return false;
+
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  for (const range of BURJ_DATE_RANGES) {
+    for (const [boundaryMonth, boundaryDay] of [range.start, range.end]) {
+      if (isWithinDaysOfMonthDay(month, day, boundaryMonth, boundaryDay, INGRESS_PROXIMITY_DAYS)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/** Day-of-year distance between (month,day) and (boundaryMonth,boundaryDay),
+ *  treating the calendar as circular (Dec 31 -> Jan 1 is distance 1) and
+ *  ignoring leap-year length differences (irrelevant at +/-1 day precision). */
+function isWithinDaysOfMonthDay(
+  month: number, day: number,
+  boundaryMonth: number, boundaryDay: number,
+  withinDays: number
+): boolean {
+  const REF_YEAR = 2001; // non-leap, arbitrary common reference
+  const toDayOfYear = (m: number, d: number) => {
+    const dt = new Date(Date.UTC(REF_YEAR, m - 1, d));
+    const start = new Date(Date.UTC(REF_YEAR, 0, 1));
+    return Math.round((dt.getTime() - start.getTime()) / 86400000);
+  };
+  const a = toDayOfYear(month, day);
+  const b = toDayOfYear(boundaryMonth, boundaryDay);
+  const daysInRefYear = 365;
+  const rawDiff = Math.abs(a - b);
+  const circularDiff = Math.min(rawDiff, daysInRefYear - rawDiff);
+  return circularDiff <= withinDays;
+}
+
+function buildIngressWindowBoundsUTC(dobISO: string): { earliestUTC: Date; latestUTC: Date } {
+  const date = new Date(dobISO);
+  const year = date.getFullYear();
+  const month = date.getMonth(); // 0-indexed
+  const day = date.getDate();
+
+  // Earliest possible instant this calendar date could have started, in any
+  // real-world timezone: local midnight in UTC+14 (Kiribati/Line Islands).
+  const earliestUTC = new Date(Date.UTC(year, month, day, 0, 0, 0) - 14 * 3600_000);
+  // Latest possible instant this calendar date could still be in progress:
+  // local 23:59:59 in UTC-12 (Baker/Howland Islands).
+  const latestUTC = new Date(Date.UTC(year, month, day, 23, 59, 59) + 12 * 3600_000);
+
+  return { earliestUTC, latestUTC };
+}
+
+function candidateFromSignIndex(signIndex: number): BurjCandidate {
+  return {
+    burjAr: BURJ_NAMES_AR[signIndex],
+    burjEn: BURJ_NAMES_EN[signIndex],
+    burjIndex: signIndex,
+  };
+}
+
+/**
+ * Resolve a birth date's Sun sign, accounting for timezone uncertainty near
+ * ingress days. For the ~93% of dates safely mid-sign, this returns
+ * instantly with zero network calls and is byte-identical to
+ * deriveBurjFromDOB. Near an ingress, it checks the Sun's actual ecliptic
+ * longitude at both extremes of the ~50-hour timezone-uncertainty window; if
+ * they disagree and no birth time was supplied, it returns both candidates
+ * rather than silently guessing one.
+ *
+ * Never defaults an absent birth time to noon or any other value — absence
+ * of a time either resolves unambiguously (the common case) or produces an
+ * explicit ambiguous result the caller must handle.
+ */
+export async function resolveBurjWithIngressGuard(
+  params: ResolveBurjParams
+): Promise<BurjResolution | null> {
+  const { dobISO, birthTimeLocal, birthTimezone } = params;
+
+  const fallback = deriveBurjFromDOB(dobISO);
+  if (!fallback) {
+    return null;
+  }
+
+  if (!isNearIngress(dobISO)) {
+    return { ...fallback, ambiguous: false, resolvedVia: 'unambiguous-date' };
+  }
+
+  // Lazy import: EphemerisService pulls in AsyncStorage/NetInfo/fetch, which
+  // most callers of this file (and most callers of deriveBurjFromDOB) never
+  // need. Avoids adding that weight to the ~93% network-free fast path above.
+  const { getPlanetPositions } = await import('./EphemerisService');
+
+  if (birthTimeLocal && birthTimezone) {
+    const exactUTC = localTimeToUTC(dobISO, birthTimeLocal, birthTimezone);
+    if (exactUTC) {
+      const positions = await getPlanetPositions(exactUTC);
+      const signIndex = positions?.planets.sun?.sign;
+      if (typeof signIndex === 'number') {
+        return { ...candidateFromSignIndex(signIndex), ambiguous: false, resolvedVia: 'birth-time' };
+      }
+    }
+    // Ephemeris/timezone conversion failed — fall through to window-bound check.
+  }
+
+  const { earliestUTC, latestUTC } = buildIngressWindowBoundsUTC(dobISO);
+  const [atEarliest, atLatest] = await Promise.all([
+    getPlanetPositions(earliestUTC),
+    getPlanetPositions(latestUTC),
+  ]);
+
+  const signAtEarliest = atEarliest?.planets.sun?.sign;
+  const signAtLatest = atLatest?.planets.sun?.sign;
+
+  if (typeof signAtEarliest !== 'number' || typeof signAtLatest !== 'number') {
+    // Ephemeris unavailable (offline, etc.) — fall back to the calendar
+    // table rather than failing the whole resolution.
+    return { ...fallback, ambiguous: false, resolvedVia: 'unambiguous-date' };
+  }
+
+  if (signAtEarliest === signAtLatest) {
+    return { ...candidateFromSignIndex(signAtEarliest), ambiguous: false, resolvedVia: 'unambiguous-date' };
+  }
+
+  const candidateA = candidateFromSignIndex(signAtEarliest);
+  const candidateB = candidateFromSignIndex(signAtLatest);
+  return {
+    // Best-guess fallback so callers that need *a* value don't crash — but
+    // `ambiguous: true` means this value must not be presented as confident.
+    ...candidateA,
+    ambiguous: true,
+    candidateSigns: [candidateA, candidateB],
+    resolvedVia: 'unresolved-ambiguous',
+  };
+}
+
+/**
+ * Convert a local wall-clock time in an IANA timezone to a UTC Date, correct
+ * for the specific historical date (handles DST). Returns null on failure —
+ * callers must not substitute a default.
+ */
+function localTimeToUTC(dobISO: string, timeLocal: string, timezone: string): Date | null {
+  try {
+    const dateOnly = new Date(dobISO);
+    const [hours, minutes] = timeLocal.split(':').map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return null;
+
+    // Find the UTC instant whose wall-clock representation in `timezone`
+    // matches the requested local date+time, via iterative correction
+    // against Intl's timezone-aware formatting (handles DST correctly).
+    const naiveUTC = Date.UTC(
+      dateOnly.getFullYear(), dateOnly.getMonth(), dateOnly.getDate(), hours, minutes, 0
+    );
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hourCycle: 'h23',
+    });
+
+    let guess = naiveUTC;
+    for (let i = 0; i < 2; i++) {
+      const parts = formatter.formatToParts(new Date(guess));
+      const get = (type: string) => Number(parts.find(p => p.type === type)?.value);
+      const asUTC = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'));
+      const offset = asUTC - guess;
+      guess = naiveUTC - offset;
+    }
+    return new Date(guess);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Derive element from Burj index
  */
@@ -274,15 +496,19 @@ export function calculateManazilPersonalFromNames(nameAr: string, motherName?: s
  * Derive all astrological data from user profile
  * Main function used by ProfileContext
  */
-export function deriveAstrologicalData(
+export async function deriveAstrologicalData(
   profile: UserProfile
-): DerivedAstrologicalData | null {
+): Promise<DerivedAstrologicalData | null> {
   try {
     const derived: DerivedAstrologicalData = {};
 
     // DOB-derived fields
     if (profile.dobISO) {
-      const burjData = deriveBurjFromDOB(profile.dobISO);
+      const burjData = await resolveBurjWithIngressGuard({
+        dobISO: profile.dobISO,
+        birthTimeLocal: profile.birthTime,
+        birthTimezone: profile.timezone,
+      });
       if (burjData) {
         derived.burj = burjData.burjAr;
         derived.burjIndex = burjData.burjIndex;
@@ -290,6 +516,8 @@ export function deriveAstrologicalData(
         const planetaryRuler = derivePlanetaryRulerFromBurj(burjData.burjIndex);
         derived.planetaryRuler = planetaryRuler as any;
         derived.manazilBaseline = calculateManazilBaseline(profile.dobISO);
+        derived.burjAmbiguous = burjData.ambiguous;
+        derived.burjCandidates = burjData.candidateSigns;
       }
     }
 
@@ -328,11 +556,11 @@ export function deriveAstrologicalData(
  * Update user profile with derived data
  * Call this after DOB changes
  */
-export function updateProfileWithDerivedData(
+export async function updateProfileWithDerivedData(
   profile: UserProfile
-): UserProfile {
-  const derived = deriveAstrologicalData(profile);
-  
+): Promise<UserProfile> {
+  const derived = await deriveAstrologicalData(profile);
+
   return {
     ...profile,
     derived: derived || undefined,

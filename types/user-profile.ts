@@ -79,6 +79,19 @@ export interface DerivedAstrologicalData {
    * mansion when birthTime + birthLocation are available.
    */
   manazilBirth?: number;
+
+  /**
+   * True when the DOB falls near a solar ingress and no birth time was
+   * available to resolve it — burj/element/planetaryRuler above hold a
+   * best-guess fallback, not a confident value. See burjCandidates.
+   */
+  burjAmbiguous?: boolean;
+
+  /** The two candidate signs when burjAmbiguous is true. */
+  burjCandidates?: [
+    { burjAr: string; burjEn: string; burjIndex: number },
+    { burjAr: string; burjEn: string; burjIndex: number }
+  ];
 }
 
 /**

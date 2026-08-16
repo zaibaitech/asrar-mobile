@@ -128,7 +128,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       // Backfill derived astrological data (incl. Manazil baseline) for profiles
       // that have DOB but were created before derivation existed.
       const ensuredProfile = needsDerivedBackfill(initialProfile)
-        ? updateProfileWithDerivedData(initialProfile)
+        ? await updateProfileWithDerivedData(initialProfile)
         : initialProfile;
       if (ensuredProfile !== initialProfile) {
         await saveProfile(ensuredProfile);
@@ -244,7 +244,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         nameChanged ||
         needsDerivedBackfill(updatedProfile)
       ) {
-        const derivedProfile = updateProfileWithDerivedData(updatedProfile);
+        const derivedProfile = await updateProfileWithDerivedData(updatedProfile);
         await saveProfile(derivedProfile);
         updateProfileState(derivedProfile);
         finalProfile = derivedProfile;
@@ -283,7 +283,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
    */
   const handleRefreshDerived = useCallback(async () => {
     try {
-      const derived = deriveAstrologicalData(profile);
+      const derived = await deriveAstrologicalData(profile);
       
       if (derived) {
         const updatedProfile: UserProfile = {

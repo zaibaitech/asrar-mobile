@@ -58,6 +58,11 @@ export const ARABIC_TERMS = {
   mutadil: 'مُعْتَدِل',       // Muʿtadil (balanced/neutral)
   saab: 'صَعْب',              // Ṣaʿb (difficult)
   mumtaz: 'مُمْتَاز',         // Mumtāz (excellent)
+
+  // Compatibility tiers (تقييم التوافق) — distinct from Saʿd/Naḥs above:
+  // Saʿīd is "fortunate" as applied to a pairing/reading, not a planet's nature.
+  saeed: 'سَعِيد',            // Saʿīd (fortunate/favourable)
+  mahdhur: 'مَحْذُور',        // Maḥdhūr (cautioned)
   
   // Elements (العناصر)
   nar: 'نار',                 // Nār (Fire)
