@@ -49,8 +49,14 @@ export default function WhoAmICalculator() {
   const dateLocale = language === 'fr' ? 'fr-FR' : language === 'ar' ? 'ar' : 'en-US';
   const { recordCalculation, showInterstitialIfReady } = useAds();
   const { profile } = useProfile();
-  const { calculate, loading, error, result } = useIstikhara();
-  
+  const { calculate, loading: nameCalculationLoading, error, result } = useIstikhara();
+  // The DOB path doesn't go through useIstikhara() (it resolves locally via
+  // resolveBurjWithIngressGuard, which can hit the network for dates near a
+  // solar ingress) — tracked separately so the button shows a spinner for
+  // both paths instead of only the name-based one.
+  const [dobCalculationLoading, setDobCalculationLoading] = useState(false);
+  const loading = nameCalculationLoading || dobCalculationLoading;
+
   // Calculation method selection
   const [calculationMethod, setCalculationMethod] = useState<CalculationMethod>('name');
   
@@ -172,6 +178,10 @@ export default function WhoAmICalculator() {
         // data-less results screen on top of it.
         await calculate(personName.trim(), motherName.trim(), 'en');
       } else {
+        // Date-based calculation can hit the network (resolveBurjWithIngressGuard,
+        // for dates near a solar ingress) and otherwise gives no feedback while
+        // the button stays tappable — show the same spinner the name path uses.
+        setDobCalculationLoading(true);
         // Date-based calculation (new logic)
         let dobDate: Date;
         let dobLabel: string;
@@ -308,6 +318,8 @@ export default function WhoAmICalculator() {
       if (shouldShow) showInterstitialIfReady();
     } catch (err) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } finally {
+      setDobCalculationLoading(false);
     }
   };
 
