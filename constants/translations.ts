@@ -6213,6 +6213,92 @@ export const translations = {
               unavailable: "Planetary position data was unavailable for this comparison.",
             },
           },
+          simplified: {
+            advancedAnalysisTitle: "Advanced Analysis",
+            strengthsTitle: "Strengths",
+            challengesTitle: "Challenges",
+            adviceTitle: "Advice",
+            categoryGridTitle: "Compatibility by Area",
+            verdict: {
+              excellent: "Excellent Match",
+              good: "Good Match",
+              mixed: "Mixed Match",
+              challenging: "Challenging Match",
+            },
+            category: {
+              love: "Love",
+              marriage: "Marriage",
+              friendship: "Friendship",
+              business: "Business",
+            },
+            strengths: {
+              layer1: {
+                saeed: "You naturally understand each other's rhythm and energy.",
+                mutadil: "You bring balance to how you relate day to day.",
+                mahdhurGrowth: "There's real potential here once you both invest the effort to understand each other's pace.",
+              },
+              layer2: {
+                saeed: "Your core energies support and fuel each other.",
+                mutadil: "Your energies coexist without pulling in opposite directions.",
+                mahdhurGrowth: "Learning each other's energy style can turn friction into fuel over time.",
+              },
+              layer3: {
+                saeed: "You complement each other — one leads, the other steadies things.",
+                mutadil: "You share a similar approach to starting and sustaining things.",
+                mahdhurGrowth: "Recognizing your different paces is the first step to working with them.",
+              },
+              layer4: {
+                saeed: "Your guiding influences work well together, giving you a shared sense of direction.",
+                mutadil: "You share the same guiding influence — a natural, unspoken rhythm.",
+                mahdhurGrowth: "Your different guiding influences can teach you a lot from each other, with patience.",
+              },
+              layer5: {
+                saeed: "There's real chemistry between you — attraction and ease come naturally.",
+                mutadil: "Your connection has a steady, dependable quality.",
+                mahdhurGrowth: "The spark is there — it may just need more deliberate nurturing.",
+              },
+            },
+            challenges: {
+              layer1: {
+                mahdhur: "Your core temperaments can clash if you're not intentional about communication.",
+                mutadil: "Your day-to-day rhythms don't always sync automatically — a little extra coordination helps.",
+                saeedNurture: "Even easy connections benefit from regularly checking in on how you're each really doing.",
+              },
+              layer2: {
+                mahdhur: "Your core energies can pull against each other, especially under stress.",
+                mutadil: "Your energies don't always reinforce each other — it can take conscious effort to align.",
+                saeedNurture: "Keep making space for each other's different ways of recharging.",
+              },
+              layer3: {
+                mahdhur: "You may clash over who leads or how quickly to adapt to change.",
+                mutadil: "You can both dig in at the same time, so decisions may take longer than expected.",
+                saeedNurture: "Stay mindful that your different paces don't turn into one-sided compromise.",
+              },
+              layer4: {
+                mahdhur: "Your guiding influences create real tension that needs conscious management.",
+                mutadil: "Sharing a guiding influence means you can amplify each other's blind spots, not just your strengths.",
+                saeedNurture: "Keep checking that your shared direction still reflects what you both actually want.",
+              },
+              layer5: {
+                mahdhur: "Attraction and romantic rhythm may take real, sustained effort here.",
+                mutadil: "Chemistry may ebb and flow rather than feel constant — that's normal, not a warning sign.",
+                saeedNurture: "Don't take good chemistry for granted — keep investing in it deliberately.",
+              },
+            },
+            advice: {
+              excellent: "This is a strong pairing across the board. Keep nurturing what already works, and stay open with each other as things evolve.",
+              good: "This is a solid foundation. Focus on open communication and mutual respect to strengthen the relationship further.",
+              mixed: "This pairing has real strengths alongside real friction. Naming the friction honestly, rather than avoiding it, is what will help most.",
+              challenging: "This pairing will take real, sustained effort. That doesn't mean it can't work — it means going in with clear eyes and patience for each other.",
+              layerTip: {
+                layer1: "Pay extra attention to your day-to-day rhythm together — small, consistent check-ins go a long way.",
+                layer2: "Notice how your energy styles differ, and give each other room to recharge differently.",
+                layer3: "Be explicit about who's leading and who's adapting in any given moment — don't leave it unspoken.",
+                layer4: "Talk openly about your shared direction and long-term expectations, rather than assuming you agree.",
+                layer5: "Invest deliberately in your connection's spark — it responds well to attention.",
+              },
+            },
+          },
         },
         overview: {
           overallCompatibility: "Harmony Index",
@@ -17069,6 +17155,92 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
               unavailable: "Les données de position planétaire n'étaient pas disponibles pour cette comparaison.",
             },
           },
+          simplified: {
+            advancedAnalysisTitle: "Analyse Avancée",
+            strengthsTitle: "Points Forts",
+            challengesTitle: "Défis",
+            adviceTitle: "Conseil",
+            categoryGridTitle: "Compatibilité par Domaine",
+            verdict: {
+              excellent: "Excellente Compatibilité",
+              good: "Bonne Compatibilité",
+              mixed: "Compatibilité Mitigée",
+              challenging: "Compatibilité Difficile",
+            },
+            category: {
+              love: "Amour",
+              marriage: "Mariage",
+              friendship: "Amitié",
+              business: "Affaires",
+            },
+            strengths: {
+              layer1: {
+                saeed: "Vous comprenez naturellement le rythme et l'énergie de l'autre.",
+                mutadil: "Vous apportez de l'équilibre dans votre relation au quotidien.",
+                mahdhurGrowth: "Il y a un vrai potentiel ici une fois que vous investissez tous les deux pour comprendre le rythme de l'autre.",
+              },
+              layer2: {
+                saeed: "Vos énergies fondamentales se soutiennent et s'alimentent mutuellement.",
+                mutadil: "Vos énergies coexistent sans tirer dans des directions opposées.",
+                mahdhurGrowth: "Apprendre le style énergétique de l'autre peut transformer la friction en énergie avec le temps.",
+              },
+              layer3: {
+                saeed: "Vous vous complétez — l'un mène, l'autre stabilise les choses.",
+                mutadil: "Vous partagez une approche similaire pour commencer et maintenir les choses.",
+                mahdhurGrowth: "Reconnaître vos rythmes différents est la première étape pour bien les gérer ensemble.",
+              },
+              layer4: {
+                saeed: "Vos influences directrices fonctionnent bien ensemble, vous donnant un sens partagé de la direction.",
+                mutadil: "Vous partagez la même influence directrice — un rythme naturel et tacite.",
+                mahdhurGrowth: "Vos influences directrices différentes peuvent beaucoup vous apprendre l'un de l'autre, avec de la patience.",
+              },
+              layer5: {
+                saeed: "Il y a une vraie alchimie entre vous — l'attirance et la facilité viennent naturellement.",
+                mutadil: "Votre connexion a une qualité stable et fiable.",
+                mahdhurGrowth: "L'étincelle est là — elle a peut-être juste besoin d'être cultivée plus délibérément.",
+              },
+            },
+            challenges: {
+              layer1: {
+                mahdhur: "Vos tempéraments fondamentaux peuvent s'affronter si vous n'êtes pas intentionnels dans la communication.",
+                mutadil: "Vos rythmes quotidiens ne se synchronisent pas toujours automatiquement — un peu de coordination supplémentaire aide.",
+                saeedNurture: "Même les connexions faciles bénéficient de vérifications régulières sur votre état réel à chacun.",
+              },
+              layer2: {
+                mahdhur: "Vos énergies fondamentales peuvent s'opposer, surtout sous stress.",
+                mutadil: "Vos énergies ne se renforcent pas toujours mutuellement — cela peut demander un effort conscient pour s'aligner.",
+                saeedNurture: "Continuez à faire de la place pour les différentes façons de se ressourcer de l'autre.",
+              },
+              layer3: {
+                mahdhur: "Vous pouvez vous affronter sur qui mène ou à quelle vitesse s'adapter au changement.",
+                mutadil: "Vous pouvez tous les deux camper sur vos positions en même temps, donc les décisions peuvent prendre plus de temps que prévu.",
+                saeedNurture: "Restez attentifs à ce que vos rythmes différents ne se transforment pas en compromis à sens unique.",
+              },
+              layer4: {
+                mahdhur: "Vos influences directrices créent une tension réelle qui nécessite une gestion consciente.",
+                mutadil: "Partager une influence directrice signifie que vous pouvez amplifier vos angles morts mutuels, pas seulement vos forces.",
+                saeedNurture: "Continuez à vérifier que votre direction partagée reflète encore ce que vous voulez réellement tous les deux.",
+              },
+              layer5: {
+                mahdhur: "L'attirance et le rythme romantique peuvent nécessiter un effort réel et soutenu ici.",
+                mutadil: "L'alchimie peut fluctuer plutôt que de sembler constante — c'est normal, pas un signal d'alarme.",
+                saeedNurture: "Ne tenez pas la bonne alchimie pour acquise — continuez à y investir délibérément.",
+              },
+            },
+            advice: {
+              excellent: "C'est un couple solide sur tous les plans. Continuez à cultiver ce qui fonctionne déjà, et restez ouverts l'un à l'autre à mesure que les choses évoluent.",
+              good: "C'est une base solide. Concentrez-vous sur une communication ouverte et le respect mutuel pour renforcer davantage la relation.",
+              mixed: "Ce couple a de vraies forces à côté de vraies frictions. Nommer la friction honnêtement, plutôt que de l'éviter, est ce qui aidera le plus.",
+              challenging: "Ce couple demandera un effort réel et soutenu. Cela ne veut pas dire que ça ne peut pas fonctionner — cela veut dire y aller les yeux ouverts et avec de la patience l'un envers l'autre.",
+              layerTip: {
+                layer1: "Portez une attention particulière à votre rythme quotidien ensemble — de petits échanges réguliers font beaucoup.",
+                layer2: "Remarquez comment vos styles énergétiques diffèrent, et laissez-vous de l'espace pour vous ressourcer différemment.",
+                layer3: "Soyez explicites sur qui mène et qui s'adapte à chaque instant — ne laissez pas cela implicite.",
+                layer4: "Parlez ouvertement de votre direction partagée et de vos attentes à long terme, plutôt que de supposer que vous êtes d'accord.",
+                layer5: "Investissez délibérément dans l'étincelle de votre connexion — elle répond bien à l'attention.",
+              },
+            },
+          },
         },
         overview: {
           overallCompatibility: "Indice d'Harmonie",
@@ -22614,6 +22786,92 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
             layer5: {
               title: "النظرات الكوكبية المتقاطعة",
               unavailable: "بيانات المواقع الكوكبية غير متوفرة لهذه المقارنة.",
+            },
+          },
+          simplified: {
+            advancedAnalysisTitle: "تحليل متقدم",
+            strengthsTitle: "نقاط القوة",
+            challengesTitle: "التحديات",
+            adviceTitle: "نصيحة",
+            categoryGridTitle: "التوافق حسب المجال",
+            verdict: {
+              excellent: "توافق ممتاز",
+              good: "توافق جيد",
+              mixed: "توافق متفاوت",
+              challenging: "توافق صعب",
+            },
+            category: {
+              love: "الحب",
+              marriage: "الزواج",
+              friendship: "الصداقة",
+              business: "الأعمال",
+            },
+            strengths: {
+              layer1: {
+                saeed: "تفهمان بشكل طبيعي إيقاع وطاقة بعضكما البعض.",
+                mutadil: "تجلبان توازنًا لعلاقتكما اليومية.",
+                mahdhurGrowth: "هناك إمكانية حقيقية هنا بمجرد أن تستثمرا الجهد لفهم إيقاع بعضكما البعض.",
+              },
+              layer2: {
+                saeed: "طاقتاكما الأساسيتان تدعمان وتغذّيان بعضهما البعض.",
+                mutadil: "تتعايش طاقتاكما دون أن تسحبا في اتجاهين متعاكسين.",
+                mahdhurGrowth: "تعلّم أسلوب طاقة كل منكما يمكن أن يحوّل الاحتكاك إلى وقود مع الوقت.",
+              },
+              layer3: {
+                saeed: "تكمّلان بعضكما البعض — أحدكما يقود والآخر يثبّت الأمور.",
+                mutadil: "تشتركان في نهج متشابه لبدء الأمور والاستمرار فيها.",
+                mahdhurGrowth: "إدراك اختلاف إيقاعيكما هو الخطوة الأولى للتعامل معه.",
+              },
+              layer4: {
+                saeed: "تعمل مؤثراتكما التوجيهية بشكل جيد معًا، مما يمنحكما إحساسًا مشتركًا بالاتجاه.",
+                mutadil: "تشتركان في نفس المؤثر التوجيهي — إيقاع طبيعي وغير معلن.",
+                mahdhurGrowth: "يمكن لمؤثراتكما التوجيهية المختلفة أن تعلّم كل منكما الكثير من الآخر، بالصبر.",
+              },
+              layer5: {
+                saeed: "هناك انسجام حقيقي بينكما — الانجذاب والسهولة يأتيان بشكل طبيعي.",
+                mutadil: "تحمل علاقتكما طابعًا ثابتًا يمكن الاعتماد عليه.",
+                mahdhurGrowth: "الشرارة موجودة — قد تحتاج فقط إلى رعاية أكثر تعمّدًا.",
+              },
+            },
+            challenges: {
+              layer1: {
+                mahdhur: "قد تتصادم طباعكما الأساسية إذا لم تكونا متعمّدين في التواصل.",
+                mutadil: "إيقاعاكما اليوميان لا يتزامنان دائمًا تلقائيًا — القليل من التنسيق الإضافي يساعد.",
+                saeedNurture: "حتى العلاقات السهلة تستفيد من المراجعة المنتظمة لحال كل منكما فعليًا.",
+              },
+              layer2: {
+                mahdhur: "قد تتعارض طاقتاكما الأساسيتان، خصوصًا تحت الضغط.",
+                mutadil: "طاقتاكما لا تعزّزان بعضهما دائمًا — قد يتطلب الأمر جهدًا واعيًا للتوافق.",
+                saeedNurture: "استمرا في إفساح المجال لطرق استعادة الطاقة المختلفة لدى كل منكما.",
+              },
+              layer3: {
+                mahdhur: "قد تتصادمان حول من يقود أو سرعة التكيّف مع التغيير.",
+                mutadil: "قد يتشبث كلاكما بموقفه في آنٍ واحد، فتستغرق القرارات وقتًا أطول من المتوقع.",
+                saeedNurture: "تنبّها إلى ألا يتحوّل اختلاف إيقاعيكما إلى تنازل من جانب واحد.",
+              },
+              layer4: {
+                mahdhur: "تخلق مؤثراتكما التوجيهية توترًا حقيقيًا يتطلب إدارة واعية.",
+                mutadil: "مشاركة مؤثر توجيهي واحد تعني أنكما قد تضخّمان نقاط ضعف بعضكما، لا نقاط قوتكما فقط.",
+                saeedNurture: "استمرا في التأكد من أن اتجاهكما المشترك ما زال يعكس ما تريدانه فعليًا.",
+              },
+              layer5: {
+                mahdhur: "قد يتطلب الانجذاب والإيقاع الرومانسي جهدًا حقيقيًا ومستمرًا هنا.",
+                mutadil: "قد يتذبذب الانسجام بدلًا من أن يبدو ثابتًا — وهذا أمر طبيعي وليس إشارة تحذير.",
+                saeedNurture: "لا تعتبرا الانسجام الجيد أمرًا مسلّمًا به — استمرا في الاستثمار فيه بتعمّد.",
+              },
+            },
+            advice: {
+              excellent: "هذا ارتباط قوي على جميع الأصعدة. استمرا في رعاية ما ينجح بالفعل، وابقيا منفتحَين على بعضكما مع تطور الأمور.",
+              good: "هذا أساس متين. ركّزا على التواصل المفتوح والاحترام المتبادل لتعزيز العلاقة أكثر.",
+              mixed: "يحمل هذا الارتباط نقاط قوة حقيقية إلى جانب احتكاك حقيقي. تسمية الاحتكاك بصراحة، بدلًا من تجنّبه، هو ما سيساعد أكثر.",
+              challenging: "سيتطلب هذا الارتباط جهدًا حقيقيًا ومستمرًا. هذا لا يعني أنه لا يمكن أن ينجح — بل يعني الدخول فيه بوضوح وصبر تجاه بعضكما البعض.",
+              layerTip: {
+                layer1: "انتبها بشكل خاص لإيقاعكما اليومي معًا — التواصل المنتظم البسيط يقطع شوطًا طويلًا.",
+                layer2: "لاحظا كيف يختلف أسلوب طاقة كل منكما، وامنحا بعضكما مساحة لاستعادة الطاقة بطرق مختلفة.",
+                layer3: "كونا واضحَين بشأن من يقود ومن يتكيّف في أي لحظة معينة — لا تتركا ذلك دون قول.",
+                layer4: "تحدّثا بصراحة عن اتجاهكما المشترك وتوقعاتكما طويلة المدى، بدلًا من افتراض أنكما متفقان.",
+                layer5: "استثمرا بتعمّد في شرارة علاقتكما — فهي تستجيب جيدًا للاهتمام.",
+              },
             },
           },
         },

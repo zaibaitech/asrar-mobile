@@ -11,6 +11,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { getCompatibilityTierBadge, type CompatibilityTier } from '../../services/compatibility/compatibilityTier';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface TierBadgeProps {
   tier: CompatibilityTier;
@@ -23,6 +24,11 @@ interface TierBadgeProps {
 
 export function TierBadge({ tier, detailText, large, isRTL }: TierBadgeProps) {
   const badge = getCompatibilityTierBadge(tier);
+  const { language } = useLanguage();
+  // Arabic UI keeps the Arabic label + transliteration (unchanged). English
+  // and French previously always showed the Arabic label regardless of UI
+  // language — TIER_CONFIG's labelEn/labelFr existed but were never read.
+  const primaryLabel = language === 'ar' ? badge.labelAr : language === 'fr' ? badge.labelFr : badge.labelEn;
 
   return (
     <View style={[styles.container, large && styles.containerLarge]}>
@@ -36,9 +42,11 @@ export function TierBadge({ tier, detailText, large, isRTL }: TierBadgeProps) {
         <Text style={[styles.icon, large && styles.iconLarge, { color: badge.color }]}>{badge.icon}</Text>
         <View style={styles.labelColumn}>
           <Text style={[styles.labelAr, large && styles.labelArLarge, { color: badge.color }, isRTL && styles.textRTL]}>
-            {badge.labelAr}
+            {primaryLabel}
           </Text>
-          <Text style={[styles.translit, isRTL && styles.textRTL]}>{badge.translit}</Text>
+          {language === 'ar' && (
+            <Text style={[styles.translit, isRTL && styles.textRTL]}>{badge.translit}</Text>
+          )}
         </View>
       </View>
       {!!detailText && (

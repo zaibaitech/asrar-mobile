@@ -5,10 +5,14 @@
  * so this view surfaces the complementary whole-sign aspect comparison
  * instead.
  *
- * No percentages anywhere: a single calendar date with unknown time and
- * place cannot support numeric precision. Outcomes are one of three tiers
- * (Saʿīd / Muʿtadil / Maḥdhūr), matching the dignity system's existing
- * resolution elsewhere in the app.
+ * The DISPLAYED score is a deterministic transform of the tier system
+ * (services/compatibility/simplifiedScore.ts), never a new calculation —
+ * a single calendar date with unknown time and place cannot support real
+ * percentage precision, which is exactly why the underlying engine outputs
+ * a 3-tier result (Saʿīd / Muʿtadil / Maḥdhūr) in the first place. The full
+ * technical breakdown (whole-sign aspect, triplicity, modality, domicile
+ * rulers, cross-planet aspects) is preserved verbatim inside the optional
+ * "Advanced Analysis" section for anyone who wants it.
  */
 
 import { AdBanner } from '@/components/ads/AdBanner';
@@ -16,10 +20,22 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import CollapsibleSection from '../common/CollapsibleSection';
 import { ElementAccents } from '../../constants/DarkTheme';
 import { useLanguage } from '../../contexts/LanguageContext';
 import type { PersonPersonCompatibility, PersonPersonParticipant } from '../../services/compatibility/types';
+import type { LayerResult } from '../../services/compatibility/aspectEngine';
+import {
+  computeCategoryScore,
+  computeDisplayScore,
+  computeVerdict,
+  extractChallenges,
+  extractStrengths,
+  selectAdviceKeys,
+  type SimplifiedCategory,
+} from '../../services/compatibility/simplifiedScore';
 import { TierBadge } from './TierBadge';
+import { CategoryScoreCard, CompatibilityScoreHero } from './CompatibilityScoreHero';
 
 const RELATIONSHIP_EMOJI: Record<PersonPersonCompatibility['relationshipContext'], string> = {
   marriage: '💕',
@@ -45,6 +61,13 @@ const LAYER_TITLE_KEYS = [
   'compatibility.results.zodiac.aspectEngine.layer3.title',
   'compatibility.results.zodiac.aspectEngine.layer4.title',
   'compatibility.results.zodiac.aspectEngine.layer5.title',
+];
+
+const CATEGORY_LIST: Array<{ category: SimplifiedCategory; emoji: string }> = [
+  { category: 'love', emoji: '❤️' },
+  { category: 'marriage', emoji: '💍' },
+  { category: 'friendship', emoji: '🤝' },
+  { category: 'business', emoji: '💼' },
 ];
 
 function localize(field: { en: string; ar: string }, language: 'en' | 'fr' | 'ar'): string {
@@ -111,6 +134,39 @@ function SoloCard({ participant, language }: { participant: PersonPersonParticip
   );
 }
 
+function FindingList({
+  titleKey,
+  cards,
+  extraCard,
+  isRTL,
+}: {
+  titleKey: string;
+  cards: Array<{ layer: number; copyKey: string }>;
+  extraCard?: { titleKey: string; params?: Record<string, string> };
+  isRTL: boolean;
+}) {
+  const { t } = useLanguage();
+  return (
+    <View style={styles.findingSection}>
+      <Text style={[styles.findingSectionTitle, isRTL && styles.textRTL]}>{t(titleKey)}</Text>
+      {cards.map((card, idx) => (
+        <View key={idx} style={styles.findingRow}>
+          <Text style={styles.findingBullet}>•</Text>
+          <Text style={[styles.findingText, isRTL && styles.textRTL]}>{t(card.copyKey)}</Text>
+        </View>
+      ))}
+      {extraCard && (
+        <View style={styles.findingRow}>
+          <Text style={styles.findingBulletSpecial}>⚖</Text>
+          <Text style={[styles.findingText, isRTL && styles.textRTL]}>
+            {t(extraCard.titleKey, extraCard.params)}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
 export function PersonPersonZodiacResultView({
   result,
   language,
@@ -127,6 +183,15 @@ export function PersonPersonZodiacResultView({
 
   const bothDob = person1.inputMethod === 'dob' && person2.inputMethod === 'dob';
   const mixedPairing = person1.inputMethod !== person2.inputMethod;
+
+  const layers: LayerResult[] = zodiacAspectResult?.layers ?? [];
+  const overallScore = zodiacAspectResult ? computeDisplayScore(zodiacAspectResult.overallTier, layers) : 0;
+  const overallVerdict = zodiacAspectResult ? computeVerdict(zodiacAspectResult.overallTier, layers) : 'mixed';
+  const strengths = zodiacAspectResult ? extractStrengths(layers) : [];
+  const challenges = zodiacAspectResult ? extractChallenges(layers) : [];
+  const adviceKeys = zodiacAspectResult ? selectAdviceKeys(zodiacAspectResult.overallTier, layers) : [];
+
+  const sameSignRulerParams = { ruler: person1.zodiac?.planetaryRuler ?? '' };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -174,73 +239,141 @@ export function PersonPersonZodiacResultView({
         </View>
       )}
 
-      {/* Elemental / Zāhir-Bāṭin / Planetary comparison — always available, no numbers */}
-      <View style={styles.section}>
-        <Text style={[styles.explanationText, isRTL && styles.textRTL]}>
-          {localize(evaluation.elementalRelationship.explanation, language)}
-        </Text>
-        <Text style={[styles.explanationText, isRTL && styles.textRTL]}>
-          {localize(evaluation.zahirBatinInteraction.explanation, language)}
-        </Text>
-        <Text style={[styles.explanationText, isRTL && styles.textRTL]}>
-          {localize(evaluation.planetaryResonance.explanation, language)}
-        </Text>
-      </View>
-
-      {/* Whole-Sign Aspect Analysis — only when both people used DOB */}
       {bothDob && zodiacAspectResult && (
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-            {t('compatibility.results.zodiac.aspectEngine.overallTitle')}
-          </Text>
+        <>
+          {/* Score / Verdict Hero */}
+          <View style={styles.section}>
+            <CompatibilityScoreHero score={overallScore} verdict={overallVerdict} isRTL={isRTL} />
+          </View>
 
-          <TierBadge tier={zodiacAspectResult.overallTier} large isRTL={isRTL} />
-
-          {/* Same-sign double-edge — mandatory, never positive-only */}
-          {zodiacAspectResult.sameSignConjunction && (
-            <View style={styles.doubleEdgeBox}>
-              <Text style={[styles.doubleEdgeTitle, isRTL && styles.textRTL]}>
-                {t('compatibility.results.zodiac.sameSignDoubleEdge.intro', {
-                  sign: (isRTL ? person1.zodiac?.burjAr : person1.zodiac?.burjEn) ?? '',
-                })}
-              </Text>
-              <Text style={[styles.doubleEdgeText, isRTL && styles.textRTL]}>
-                {t('compatibility.results.zodiac.sameSignDoubleEdge.positive', {
-                  ruler: person1.zodiac?.planetaryRuler ?? '',
-                })}
-              </Text>
-              <Text style={[styles.doubleEdgeText, isRTL && styles.textRTL]}>
-                {t('compatibility.results.zodiac.sameSignDoubleEdge.challenge', {
-                  ruler: person1.zodiac?.planetaryRuler ?? '',
-                })}
-              </Text>
+          {/* Category grid */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
+              {t('compatibility.results.zodiac.simplified.categoryGridTitle')}
+            </Text>
+            <View style={styles.categoryGrid}>
+              {CATEGORY_LIST.map(({ category, emoji: catEmoji }) => {
+                const catResult = computeCategoryScore(layers, category);
+                return (
+                  <CategoryScoreCard
+                    key={category}
+                    emoji={catEmoji}
+                    label={t(`compatibility.results.zodiac.simplified.category.${category}`)}
+                    score={catResult.score}
+                    verdict={catResult.verdict}
+                    isRTL={isRTL}
+                  />
+                );
+              })}
             </View>
-          )}
+          </View>
 
-          <View style={styles.layerList}>
-            {zodiacAspectResult.layers.map((layer, idx) => (
-              <View key={layer.layer} style={styles.layerRow}>
-                <Text style={[styles.layerTitle, isRTL && styles.textRTL]}>
-                  {t(LAYER_TITLE_KEYS[idx])}
-                </Text>
-                <TierBadge tier={layer.tier} detailText={t(layer.detailKey)} isRTL={isRTL} />
-              </View>
+          {/* Strengths */}
+          <View style={styles.section}>
+            <FindingList
+              titleKey="compatibility.results.zodiac.simplified.strengthsTitle"
+              cards={strengths}
+              extraCard={
+                zodiacAspectResult.sameSignConjunction
+                  ? { titleKey: 'compatibility.results.zodiac.sameSignDoubleEdge.positive', params: sameSignRulerParams }
+                  : undefined
+              }
+              isRTL={isRTL}
+            />
+          </View>
+
+          {/* Challenges */}
+          <View style={styles.section}>
+            <FindingList
+              titleKey="compatibility.results.zodiac.simplified.challengesTitle"
+              cards={challenges}
+              extraCard={
+                zodiacAspectResult.sameSignConjunction
+                  ? { titleKey: 'compatibility.results.zodiac.sameSignDoubleEdge.challenge', params: sameSignRulerParams }
+                  : undefined
+              }
+              isRTL={isRTL}
+            />
+          </View>
+
+          {/* Advice */}
+          <View style={styles.adviceBox}>
+            <Text style={[styles.adviceTitle, isRTL && styles.textRTL]}>
+              {t('compatibility.results.zodiac.simplified.adviceTitle')}
+            </Text>
+            {adviceKeys.map((key, idx) => (
+              <Text key={idx} style={[styles.adviceText, isRTL && styles.textRTL]}>
+                {t(key)}
+              </Text>
             ))}
           </View>
 
-          {zodiacAspectResult.emphasizedFindings.length > 0 && (
-            <View style={styles.emphasizedBox}>
-              <Text style={[styles.emphasizedTitle, isRTL && styles.textRTL]}>
-                {t('compatibility.results.zodiac.aspectEngine.emphasizedTitle')}
-              </Text>
-              {zodiacAspectResult.emphasizedFindings.map((finding, idx) => (
-                <Text key={idx} style={[styles.emphasizedText, isRTL && styles.textRTL]}>
-                  {t(finding.detailKey)}
+          {/* Advanced Analysis — the full technical breakdown, collapsed by default */}
+          <CollapsibleSection
+            title={t('compatibility.results.zodiac.simplified.advancedAnalysisTitle')}
+            icon="🔬"
+            defaultExpanded={false}
+            containerStyle={styles.advancedContainer}
+          >
+            {/* Relocated evaluation prose (was always-visible) */}
+            <Text style={[styles.explanationText, isRTL && styles.textRTL]}>
+              {localize(evaluation.elementalRelationship.explanation, language)}
+            </Text>
+            <Text style={[styles.explanationText, isRTL && styles.textRTL]}>
+              {localize(evaluation.zahirBatinInteraction.explanation, language)}
+            </Text>
+            <Text style={[styles.explanationText, isRTL && styles.textRTL]}>
+              {localize(evaluation.planetaryResonance.explanation, language)}
+            </Text>
+
+            <Text style={[styles.sectionTitle, styles.advancedSectionSpacing, isRTL && styles.textRTL]}>
+              {t('compatibility.results.zodiac.aspectEngine.overallTitle')}
+            </Text>
+
+            <TierBadge tier={zodiacAspectResult.overallTier} large isRTL={isRTL} />
+
+            {/* Same-sign double-edge — mandatory, never positive-only */}
+            {zodiacAspectResult.sameSignConjunction && (
+              <View style={styles.doubleEdgeBox}>
+                <Text style={[styles.doubleEdgeTitle, isRTL && styles.textRTL]}>
+                  {t('compatibility.results.zodiac.sameSignDoubleEdge.intro', {
+                    sign: (isRTL ? person1.zodiac?.burjAr : person1.zodiac?.burjEn) ?? '',
+                  })}
                 </Text>
+                <Text style={[styles.doubleEdgeText, isRTL && styles.textRTL]}>
+                  {t('compatibility.results.zodiac.sameSignDoubleEdge.positive', sameSignRulerParams)}
+                </Text>
+                <Text style={[styles.doubleEdgeText, isRTL && styles.textRTL]}>
+                  {t('compatibility.results.zodiac.sameSignDoubleEdge.challenge', sameSignRulerParams)}
+                </Text>
+              </View>
+            )}
+
+            <View style={styles.layerList}>
+              {zodiacAspectResult.layers.map((layer, idx) => (
+                <View key={layer.layer} style={styles.layerRow}>
+                  <Text style={[styles.layerTitle, isRTL && styles.textRTL]}>
+                    {t(LAYER_TITLE_KEYS[idx])}
+                  </Text>
+                  <TierBadge tier={layer.tier} detailText={t(layer.detailKey)} isRTL={isRTL} />
+                </View>
               ))}
             </View>
-          )}
-        </View>
+
+            {zodiacAspectResult.emphasizedFindings.length > 0 && (
+              <View style={styles.emphasizedBox}>
+                <Text style={[styles.emphasizedTitle, isRTL && styles.textRTL]}>
+                  {t('compatibility.results.zodiac.aspectEngine.emphasizedTitle')}
+                </Text>
+                {zodiacAspectResult.emphasizedFindings.map((finding, idx) => (
+                  <Text key={idx} style={[styles.emphasizedText, isRTL && styles.textRTL]}>
+                    {t(finding.detailKey)}
+                  </Text>
+                ))}
+              </View>
+            )}
+          </CollapsibleSection>
+        </>
       )}
 
       {/* Persistent scope disclaimer */}
@@ -383,6 +516,68 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 12,
+  },
+  categoryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  findingSection: {
+    gap: 0,
+  },
+  findingSectionTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 10,
+  },
+  findingRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    marginBottom: 8,
+  },
+  findingBullet: {
+    fontSize: 13,
+    color: '#10b981',
+    lineHeight: 19,
+  },
+  findingBulletSpecial: {
+    fontSize: 13,
+    color: '#f59e0b',
+    lineHeight: 19,
+  },
+  findingText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#E5E5E5',
+    lineHeight: 19,
+  },
+  adviceBox: {
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
+  },
+  adviceTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#a78bfa',
+    marginBottom: 6,
+  },
+  adviceText: {
+    fontSize: 13,
+    color: '#E5E5E5',
+    lineHeight: 19,
+    marginBottom: 4,
+  },
+  advancedContainer: {
+    marginBottom: 16,
+  },
+  advancedSectionSpacing: {
+    marginTop: 16,
   },
   explanationText: {
     fontSize: 13,

@@ -88,6 +88,26 @@ export const RELATIONSHIP_WEIGHTING_PROFILES: Record<RelationshipContext, Weight
 };
 
 /**
+ * "Marriage" as a distinct lens from "Love"/RelationshipContext's `marriage`
+ * profile — not a RelationshipContext member (that type is also used by the
+ * up-front form picker and stays at its current 6 values). Same Venus-Mars
+ * attraction base as `marriage`, but weighted further toward Layer 4
+ * (domicile rulers) — the ruler relationship is the classical marker of
+ * whose rhythm a shared household orbits around, extending
+ * computeLayer4DomicileRulers' own "unified rhythm" framing from a single
+ * pairing into a longer-term-stability signal — and slightly down-weights
+ * Layer 3 (modality), which speaks more to day-to-day initiating/adapting
+ * style than to long-term commitment. Used only by the simplified result
+ * screen's category grid (services/compatibility/simplifiedScore.ts) to
+ * give "Love" and "Marriage" genuinely different numbers rather than always
+ * matching the marriage RelationshipContext profile identically.
+ */
+export const MARRIAGE_LONG_TERM_WEIGHTS: WeightingProfile = {
+  layerWeights: { layer1: 1.0, layer2: 1.0, layer3: 0.7, layer4: 1.3, layer5: 1.4 },
+  layer5Emphasis: RELATIONSHIP_WEIGHTING_PROFILES.marriage.layer5Emphasis,
+};
+
+/**
  * Select which findings to highlight in copy for a given relationship
  * context. Does not compute or return an aggregate tier — callers must use
  * aspectEngine's aggregateTiers() for that, so weighting can never soften
