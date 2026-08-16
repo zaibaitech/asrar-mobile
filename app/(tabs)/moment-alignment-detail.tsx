@@ -122,20 +122,12 @@ export default function MomentAlignmentDetailScreen() {
   // Unified timing state - used for deep analysis breakdown sections
   const [timingResult, setTimingResult] = useState<AsrariyaTimingResult | null>(null);
 
-  // ── Header badge: SimpleAlignmentBadge (single source of truth, matches widget) ──
-  const simpleBadge = useMemo(() => {
-    const planet = planetaryData?.currentHour?.planet;
-    if (!planet) return null;
-    const burjIndex = dobZodiacDerived?.burjIndex ?? profile?.derived?.burjIndex;
-    const userRuler = typeof burjIndex === 'number' ? getRulingPlanetFromBurj(burjIndex) : undefined;
-    // Use full dignity score from planetary condition if available
-    const dignityScore = hourPlanetCondition?.dignity?.score ?? alignment?.hourRulerCondition?.dignity?.score;
-    return getAlignmentBadge(planet, userRuler, dignityScore);
-  }, [planetaryData?.currentHour?.planet, dobZodiacDerived?.burjIndex, profile?.derived?.burjIndex, hourPlanetCondition?.dignity?.score, alignment?.hourRulerCondition?.dignity?.score]);
-
   // Real per-planet dignity scores derived from the same transit data (allTransits) that
-  // powers the Planet Transit screen — so Show Timeline reflects each planet's ACTUAL
-  // current sign dignity instead of falling back to a benefic/malefic "nature" guess.
+  // powers the Planet Transit screen — so both the header badge and Show Timeline reflect
+  // each planet's ACTUAL current sign dignity instead of falling back to a benefic/malefic
+  // "nature" guess or PlanetaryConditionService's hourly-cached ephemeris (which can briefly
+  // disagree on which sign a planet occupies and produce a wrong tier, e.g. "Excellent"
+  // when the planet is actually peregrine/Neutral).
   const dignityScoreByPlanet = useMemo(() => {
     const scores: Partial<Record<Planet, number>> = {};
     if (!allTransits) return scores;
@@ -173,6 +165,21 @@ export default function MomentAlignmentDetailScreen() {
 
     return scores;
   }, [allTransits]);
+
+  // ── Header badge: SimpleAlignmentBadge (single source of truth, matches widget) ──
+  const simpleBadge = useMemo(() => {
+    const planet = planetaryData?.currentHour?.planet;
+    if (!planet) return null;
+    const burjIndex = dobZodiacDerived?.burjIndex ?? profile?.derived?.burjIndex;
+    const userRuler = typeof burjIndex === 'number' ? getRulingPlanetFromBurj(burjIndex) : undefined;
+    // Prefer the live-transit dignity score (matches Show Timeline); fall back to
+    // PlanetaryConditionService's hourly-cached condition only if transits haven't loaded yet.
+    const dignityScore =
+      dignityScoreByPlanet[planet] ??
+      hourPlanetCondition?.dignity?.score ??
+      alignment?.hourRulerCondition?.dignity?.score;
+    return getAlignmentBadge(planet, userRuler, dignityScore);
+  }, [planetaryData?.currentHour?.planet, dobZodiacDerived?.burjIndex, profile?.derived?.burjIndex, dignityScoreByPlanet, hourPlanetCondition?.dignity?.score, alignment?.hourRulerCondition?.dignity?.score]);
 
   // Keep legacy badge derivation for deep analysis sections that still reference it
   const unifiedBadge: UnifiedBadge = timingResult

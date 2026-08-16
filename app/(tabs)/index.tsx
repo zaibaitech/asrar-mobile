@@ -51,6 +51,8 @@ import { getBestLocation } from '../../services/LocationCacheService';
 import { getMomentAlignment, MomentAlignment } from '../../services/MomentAlignmentService';
 import { calculatePlanetaryHours, getPlanetaryDayBoundariesForNow, type PlanetaryDayBoundaries, PlanetaryHourData } from '../../services/PlanetaryHoursService';
 import { deriveBurjFromDOB, deriveElementFromBurj } from '../../services/ProfileDerivationService';
+import { getDignityScoreFromTransits } from '../../services/SimpleAlignmentBadge';
+import { getAllTransits } from '../../services/TransitService';
 
 /**
  * Module configuration for all spiritual features
@@ -224,6 +226,7 @@ export default function HomeScreen() {
   const [prayerTimesData, setPrayerTimesData] = useState<any>(null);
   const [planetaryBoundaries, setPlanetaryBoundaries] = useState<PlanetaryDayBoundaries | null>(null);
   const [tomorrowBlessing, setTomorrowBlessing] = useState<any>(null);
+  const [hourPlanetDignityScore, setHourPlanetDignityScore] = useState<number | undefined>(undefined);
 
   // BATTERY OPTIMIZATION: 5-minute ticker for boundary/timing recalculation.
   // Planetary boundaries only change at sunrise/sunset, no need for per-minute updates.
@@ -273,7 +276,34 @@ export default function HomeScreen() {
     );
     setPlanetaryData(planetary);
   }, [planetaryBoundaries, now]);
-  
+
+  // Directly (and cheaply) derive the current hour planet's dignity score from live
+  // transit data — the same real-time JPL Horizons source (getAllTransits) that
+  // Show Timeline uses, rather than PlanetaryConditionService's hourly edge-function-
+  // cached ephemeris, which can briefly disagree on which sign a planet occupies and
+  // produce a wrong tier (e.g. "Excellent" when the planet is actually peregrine/Neutral).
+  useEffect(() => {
+    const planet = planetaryData?.currentHour?.planet;
+    if (!planet) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const transits = await getAllTransits();
+        if (cancelled) return;
+        const score = getDignityScoreFromTransits(planet, transits);
+        setHourPlanetDignityScore(score);
+      } catch (error) {
+        console.warn('[Home] Failed to get transit dignity score:', error);
+        if (!cancelled) setHourPlanetDignityScore(undefined);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [planetaryData?.currentHour?.planet, minuteNow]);
+
   // Planet transits are now personalized inside RightStackWidgets (by user zodiac sign)
   
   // Load real-time daily energy / guidance
@@ -577,6 +607,7 @@ export default function HomeScreen() {
           planetaryData={planetaryData}
           userBurjIndex={profile?.derived?.burjIndex ?? (profile?.dobISO ? deriveBurjFromDOB(profile.dobISO)?.burjIndex : undefined)}
           hourRulerCondition={momentAlignment?.hourRulerCondition}
+          dignityScore={hourPlanetDignityScore}
         />
         
         {/* Action Pills hidden temporarily for V1 launch */}

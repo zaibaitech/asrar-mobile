@@ -13,7 +13,9 @@
  */
 
 import { getCachedEphemerisData } from './EphemerisDataCache';
+import { calculateEnhancedPlanetaryPower } from './PlanetaryStrengthService';
 import type { Planet } from './PlanetaryHoursService';
+import type { AllPlanetTransits } from '@/types/planetary-systems';
 
 // ============================================================================
 // TYPES
@@ -180,6 +182,49 @@ function getQuickDignityScore(planet: string): number | undefined {
   return 50; // Peregrine
 }
 
+/**
+ * Compute a planet's dignity score from live transit data (same source and
+ * logic as the Planet Transit screen / Show Timeline — real-time JPL Horizons
+ * via getAllTransits(), not the hourly edge-function-cached ephemeris that
+ * PlanetaryConditionService uses). This is the authoritative score: prefer
+ * it over PlanetaryConditionService's dignity whenever transits are loaded,
+ * since the two sources can briefly disagree on which sign a planet occupies.
+ */
+export function getDignityScoreFromTransits(
+  planet: Planet | string,
+  transits: AllPlanetTransits | null | undefined,
+): number | undefined {
+  if (!transits) return undefined;
+
+  const key = (planet.charAt(0).toUpperCase() + planet.slice(1).toLowerCase()) as Planet;
+  const transit = transits[key];
+  const sunLongitude = transits.Sun?.longitude;
+  if (!transit || typeof transit.longitude !== 'number' || !transit.sign || typeof sunLongitude !== 'number') {
+    return undefined;
+  }
+
+  const degree = typeof transit.signDegree === 'number'
+    ? transit.signDegree + (transit.signMinute ?? 0) / 60
+    : ((transit.longitude % 30) + 30) % 30;
+
+  const enhanced = calculateEnhancedPlanetaryPower(
+    key,
+    transit.sign,
+    degree,
+    transit.longitude,
+    sunLongitude,
+    !!transit.isRetrograde,
+  );
+
+  switch (enhanced.dignityInfo.status) {
+    case 'Exalted': return 90;
+    case 'Domicile': return 80;
+    case 'Triplicity': return 70;
+    case 'Detriment': return 20;
+    case 'Fall': return 10;
+    default: return 50; // Neutral / peregrine
+  }
+}
 
 // ============================================================================
 // CORE FUNCTION

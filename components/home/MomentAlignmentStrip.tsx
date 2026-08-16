@@ -27,6 +27,13 @@ interface MomentAlignmentStripProps {
   userBurjIndex?: number | null;
   /** Hour ruler planetary condition (includes full dignity calculation) */
   hourRulerCondition?: PlanetaryCondition;
+  /**
+   * Dignity score (0–100) for the current hour planet, derived from live transit
+   * data (getAllTransits) — the same source Show Timeline uses. Takes priority over
+   * hourRulerCondition, which comes from a separate hourly-cached ephemeris path
+   * that can briefly disagree on which sign the planet occupies.
+   */
+  dignityScore?: number;
 }
 
 function getElementLabel(element: Element | undefined, t: (key: string) => string) {
@@ -54,6 +61,7 @@ export function MomentAlignmentStrip({
   planetaryData,
   userBurjIndex,
   hourRulerCondition,
+  dignityScore: dignityScoreProp,
 }: MomentAlignmentStripProps) {
   const router = useRouter();
 
@@ -63,13 +71,17 @@ export function MomentAlignmentStrip({
   const { badgeColor, badgeBg, badgeIcon, badgeLabel } = React.useMemo(() => {
     if (currentPlanet) {
       const userRuler = userBurjIndex ? getRulingPlanetFromBurj(userBurjIndex) : undefined;
-      // Only use the dignity score if it belongs to the currently displayed hour's
-      // planet — hourRulerCondition is fetched separately/async and can still be for
-      // the previous hour right after the planetary hour rolls over.
+      // Prefer the live-transit dignity score (dignityScoreProp) — it's the same
+      // real-time source Show Timeline uses. Only fall back to hourRulerCondition
+      // (hourly-cached ephemeris) if the transit score isn't loaded yet, and only
+      // when it belongs to the currently displayed hour's planet — hourRulerCondition
+      // is fetched separately/async and can still be for the previous hour right
+      // after the planetary hour rolls over.
       const dignityScore =
-        hourRulerCondition?.planet === currentPlanet
+        dignityScoreProp ??
+        (hourRulerCondition?.planet === currentPlanet
           ? hourRulerCondition?.dignity?.score
-          : undefined;
+          : undefined);
       const badge = getAlignmentBadge(currentPlanet, userRuler, dignityScore);
       const labelKey = getAlignmentLabelKey(badge.tier);
       return {
@@ -80,7 +92,7 @@ export function MomentAlignmentStrip({
       };
     }
     return { badgeColor: undefined, badgeBg: undefined, badgeIcon: undefined, badgeLabel: undefined };
-  }, [currentPlanet, userBurjIndex, hourRulerCondition?.planet, hourRulerCondition?.dignity?.score, t]);
+  }, [currentPlanet, userBurjIndex, dignityScoreProp, hourRulerCondition?.planet, hourRulerCondition?.dignity?.score, t]);
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
