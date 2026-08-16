@@ -39,7 +39,6 @@ import { useIstikhara } from '../../hooks/useIstikhara';
 import { HistoryService } from '../../services/HistoryService';
 import { deriveElementFromBurj, isNearIngress, resolveBurjWithIngressGuard } from '../../services/ProfileDerivationService';
 import { getBurujData } from '../../services/istikhara/calculations';
-import { COUNTRY_NAMES } from '../../data/countryUtcOffsets';
 
 type CalculationMethod = 'name' | 'birthdate';
 type BirthInputMode = 'full' | 'monthDay';
@@ -72,20 +71,16 @@ export default function WhoAmICalculator() {
   const [birthTime, setBirthTime] = useState<Date | null>(null);
   const [showTimePicker, setShowTimePicker] = useState(false);
   
-  // Birth location states (optional - for ascendant calculation)
+  // Birth location states (optional - for ascendant calculation, and also
+  // the primary disambiguator for a zodiac sign near a solar ingress: its
+  // longitude narrows the timezone-uncertainty window directly, a much
+  // lighter ask than birth time and usually sufficient on its own).
   const [birthLocationLabel, setBirthLocationLabel] = useState('');
   const [birthLocation, setBirthLocationState] = useState<{
     latitude: number;
     longitude: number;
     label?: string;
   } | null>(null);
-
-  // Birth country (optional — the primary disambiguator for a zodiac sign
-  // near a solar ingress; a much lighter ask than birth time, and usually
-  // sufficient on its own to resolve the ambiguity).
-  const [birthCountry, setBirthCountry] = useState<string | null>(null);
-  const [showCountryPicker, setShowCountryPicker] = useState(false);
-  const [countryFilter, setCountryFilter] = useState('');
 
   // Auto-fill from profile if available
   useEffect(() => {
@@ -199,17 +194,22 @@ export default function WhoAmICalculator() {
 
         const dobISO = dobDate.toISOString();
 
-        // Prepare birth time string first so the ingress-aware resolver can use it
-        // (if the user provided one) to resolve an otherwise-ambiguous sign.
+        // Prepare birth time string and location first so the ingress-aware
+        // resolver can use them (if provided) to resolve an otherwise-
+        // ambiguous sign — birth time takes priority when both are given,
+        // since it fully resolves the instant rather than just narrowing it.
         const birthTimeStr = birthTime
           ? `${String(birthTime.getHours()).padStart(2, '0')}:${String(birthTime.getMinutes()).padStart(2, '0')}`
           : null;
+        const finalBirthLocation = birthLocation ?? profile.birthLocation ?? profile.location;
 
         const burjData = await resolveBurjWithIngressGuard({
           dobISO,
           birthTimeLocal: birthTimeStr ?? undefined,
           birthTimezone: birthTimeStr ? profile.timezone : undefined,
-          birthCountry: birthCountry ?? undefined,
+          birthLocation: finalBirthLocation
+            ? { latitude: finalBirthLocation.latitude, longitude: finalBirthLocation.longitude }
+            : undefined,
         });
 
         if (!burjData) {
@@ -241,9 +241,6 @@ export default function WhoAmICalculator() {
         // Year is not required for burj/element. Manazil baseline depends on full DOB year,
         // so we intentionally avoid using it in this quick path.
 
-        // Use form's birth location if set, otherwise fall back to profile
-        const finalBirthLocation = birthLocation ?? profile.birthLocation ?? profile.location;
-        
         // Create a result object that matches the expected format
         const birthdateResult = {
           success: true,
@@ -669,64 +666,15 @@ export default function WhoAmICalculator() {
                         />
                       )}
 
-                      {/* Birth Country (Optional) — shown only near a sign boundary, and
-                          the primary disambiguator: a much lighter ask than birth time,
-                          and usually enough on its own to resolve the ambiguity. */}
+                      {/* Ingress notice — the date falls near a zodiac sign boundary.
+                          Birth location (below) is the primary disambiguator: its
+                          longitude narrows the timezone-uncertainty window directly,
+                          a much lighter ask than birth time. */}
                       {birthDateNearIngress && (
-                        <View style={styles.birthTimeSection}>
-                          <Text style={styles.birthTimeLabel}>🌍 {t('istikhara.birthDateForm.birthCountry') || 'Birth Country (Optional)'}</Text>
-                          <Text style={styles.birthTimeHint}>
-                            {t('istikhara.birthDateForm.ingressDetectedNote') || 'This date falls near a zodiac sign boundary. Your birth country helps confirm the exact sign.'}
+                        <View style={styles.ingressNoticeBox}>
+                          <Text style={styles.ingressNoticeText}>
+                            {t('istikhara.birthDateForm.ingressDetectedNote') || 'This date falls near a zodiac sign boundary. Your birth location or time below helps confirm the exact sign.'}
                           </Text>
-                          <Pressable
-                            style={[styles.datePickerButton, styles.timePickerButton]}
-                            onPress={() => setShowCountryPicker(true)}
-                          >
-                            <Text style={styles.datePickerText}>
-                              {birthCountry ?? (t('istikhara.birthDateForm.tapToSetCountry') || 'Tap to select birth country')}
-                            </Text>
-                            {birthCountry && (
-                              <TouchableOpacity
-                                onPress={(e) => {
-                                  e.stopPropagation();
-                                  setBirthCountry(null);
-                                }}
-                                style={styles.clearTimeButton}
-                              >
-                                <Text style={styles.clearTimeButtonText}>✕</Text>
-                              </TouchableOpacity>
-                            )}
-                          </Pressable>
-
-                          {showCountryPicker && (
-                            <View style={styles.countryPickerBox}>
-                              <TextInput
-                                style={styles.countryPickerInput}
-                                value={countryFilter}
-                                onChangeText={setCountryFilter}
-                                placeholder={t('istikhara.birthDateForm.searchCountry') || 'Search country...'}
-                                placeholderTextColor="#64748b"
-                                autoFocus
-                              />
-                              <ScrollView style={styles.countryPickerList} keyboardShouldPersistTaps="handled">
-                                {COUNTRY_NAMES.filter((c) =>
-                                  c.toLowerCase().includes(countryFilter.trim().toLowerCase())
-                                ).slice(0, 30).map((country) => (
-                                  <TouchableOpacity
-                                    key={country}
-                                    style={styles.countryPickerItem}
-                                    onPress={() => {
-                                      setBirthCountry(country);
-                                      setShowCountryPicker(false);
-                                      setCountryFilter('');
-                                    }}
-                                  >
-                                    <Text style={styles.countryPickerItemText}>{country}</Text>
-                                  </TouchableOpacity>
-                                ))}
-                              </ScrollView>
-                            </View>
-                          )}
                         </View>
                       )}
 
@@ -1562,34 +1510,17 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     flex: 1,
   },
-  countryPickerBox: {
-    marginTop: 8,
-    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+  ingressNoticeBox: {
+    marginTop: 16,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
-    borderRadius: 12,
-    padding: 8,
-    maxHeight: 260,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
   },
-  countryPickerInput: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    color: '#ffffff',
-    fontSize: 14,
-    marginBottom: 6,
-  },
-  countryPickerList: {
-    maxHeight: 200,
-  },
-  countryPickerItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  countryPickerItemText: {
+  ingressNoticeText: {
+    fontSize: 12,
     color: '#e5e7eb',
-    fontSize: 14,
+    lineHeight: 17,
   },
 });

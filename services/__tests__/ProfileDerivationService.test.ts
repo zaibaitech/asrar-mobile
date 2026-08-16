@@ -231,24 +231,36 @@ describe('resolveBurjWithIngressGuard — narrowed default window (UTC-11..+12)'
   });
 });
 
-describe('resolveBurjWithIngressGuard — birth country narrows or resolves ambiguity', () => {
-  it('resolves via birth-country when the country range agrees at both its bounds', async () => {
-    // France is UTC+1 only — well within one sign either side of the 2022
+describe('resolveBurjWithIngressGuard — birth location (longitude) narrows or resolves ambiguity', () => {
+  it('resolves via birth-location when the geometric+margin range agrees at both its bounds', async () => {
+    // Paris: longitude ~2.35°E -> geometric offset ~0.16h, +/-2h margin gives
+    // roughly [-1.85, 2.15] — well within one sign either side of the 2022
     // Aries ingress window, agrees with itself.
     mockEphemerisAroundIngress(new Date('2022-03-20T15:33:00Z'), 11, 0);
-    const result = await resolveBurjWithIngressGuard({ dobISO: '2022-03-21', birthCountry: 'France' });
+    const result = await resolveBurjWithIngressGuard({
+      dobISO: '2022-03-21',
+      birthLocation: { latitude: 48.8566, longitude: 2.3522 },
+    });
     expect(result?.ambiguous).toBe(false);
-    expect(result?.resolvedVia).toBe('birth-country');
+    expect(result?.resolvedVia).toBe('birth-location');
     expect(result?.burjIndex).toBe(0); // Aries
   });
 
-  it('falls back to the default window when the country is unrecognized', async () => {
+  it('a narrow location range still correctly detects genuine ambiguity when the window still straddles the ingress', async () => {
+    // Tokyo: longitude ~139.7°E -> geometric offset ~9.3h, +/-2h margin gives
+    // roughly [7.3, 11.3]. For calendar date 2022-03-21 that window still
+    // spans Mar 20 12:42 UTC (before the 15:33 UTC ingress, still Pisces)
+    // through Mar 21 16:42 UTC (after it, already Aries) — genuinely
+    // ambiguous, and the location narrowing correctly doesn't manufacture
+    // false certainty here; it should still estimate the center-of-window
+    // sign (Aries) rather than a window extreme.
     mockEphemerisAroundIngress(new Date('2022-03-20T15:33:00Z'), 11, 0);
-    const result = await resolveBurjWithIngressGuard({ dobISO: '2022-03-21', birthCountry: 'Nonexistentland' });
-    expect(result).not.toBeNull();
-    // Should behave identically to no-country-given (still resolves to the
-    // correct center-of-default-window estimate).
-    expect(result?.burjIndex).toBe(0);
+    const result = await resolveBurjWithIngressGuard({
+      dobISO: '2022-03-21',
+      birthLocation: { latitude: 35.6762, longitude: 139.6503 },
+    });
+    expect(result?.ambiguous).toBe(true);
+    expect(result?.burjIndex).toBe(0); // Aries — the center estimate, not Pisces
   });
 });
 

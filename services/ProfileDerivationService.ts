@@ -240,7 +240,7 @@ export interface BurjCandidate {
 export interface BurjResolution extends BurjCandidate {
   ambiguous: boolean;
   candidateSigns?: [BurjCandidate, BurjCandidate];
-  resolvedVia: 'unambiguous-date' | 'birth-time' | 'birth-country' | 'unresolved-ambiguous';
+  resolvedVia: 'unambiguous-date' | 'birth-time' | 'birth-location' | 'unresolved-ambiguous';
 }
 
 export interface ResolveBurjParams {
@@ -248,16 +248,17 @@ export interface ResolveBurjParams {
   dobISO: string;
   /** Optional "HH:mm", 24h, local to birthTimezone. Never defaulted — an
    *  absent value means "unknown", not noon. Takes priority over
-   *  birthCountry when both are given (an exact time fully resolves the
-   *  instant; a country only narrows a range). */
+   *  birthLocation when both are given (an exact time fully resolves the
+   *  instant; a location only narrows a range). */
   birthTimeLocal?: string;
   /** IANA timezone, required together with birthTimeLocal. */
   birthTimezone?: string;
-  /** Optional birth country name (must match a key in
-   *  data/countryUtcOffsets.ts). Narrows the detection/estimation window to
-   *  that country's UTC offset range — a much smaller ask than birth time,
-   *  and often sufficient to resolve ambiguity entirely on its own. */
-  birthCountry?: string;
+  /** Optional birth location (latitude/longitude, e.g. from an existing
+   *  city picker). Narrows the detection/estimation window using
+   *  longitude's direct geometric relationship to local solar time (15°
+   *  of longitude = 1 hour) — no lookup table needed, and more precise
+   *  than a country selection since it's exact rather than a range. */
+  birthLocation?: { latitude: number; longitude: number };
 }
 
 /**
@@ -352,15 +353,35 @@ function candidateFromSignIndex(signIndex: number): BurjCandidate {
   };
 }
 
+/** Real-world civil timezones can differ from a location's pure geometric
+ *  (longitude/15) offset by up to about this many hours, in either
+ *  direction — e.g. China spans ~60° of longitude but uses one zone;
+ *  political boundaries routinely favor a neighbor's offset. Widening the
+ *  geometric estimate by this margin means the location-narrowed window
+ *  is still guaranteed to contain the true civil offset. */
+const LOCATION_OFFSET_MARGIN_HOURS = 2;
+
+/** Derive a conservative UTC offset range from a longitude, using the
+ *  geometric relationship between longitude and local solar time (15° per
+ *  hour), widened by LOCATION_OFFSET_MARGIN_HOURS to cover real-world civil
+ *  timezone deviation from the geometric offset. */
+function offsetRangeFromLongitude(longitude: number): { minOffset: number; maxOffset: number } {
+  const geometricOffset = longitude / 15;
+  return {
+    minOffset: Math.max(-12, geometricOffset - LOCATION_OFFSET_MARGIN_HOURS),
+    maxOffset: Math.min(14, geometricOffset + LOCATION_OFFSET_MARGIN_HOURS),
+  };
+}
+
 /**
  * Resolve a birth date's Sun sign, accounting for timezone uncertainty near
  * ingress days. For the large majority of dates safely mid-sign, this
  * returns instantly with zero network calls and is byte-identical to
  * deriveBurjFromDOB. Near an ingress, it checks the Sun's actual ecliptic
- * longitude at both extremes of the detection window (narrowed by
- * birthCountry when given); if they disagree and no birth time was
- * supplied, it returns both candidates plus a best-guess estimate — never
- * presenting the estimate as confident.
+ * longitude at both extremes of the detection window (narrowed around
+ * birthLocation's longitude when given); if they disagree and no birth time
+ * was supplied, it returns both candidates plus a best-guess estimate —
+ * never presenting the estimate as confident.
  *
  * Detection and estimation are answered from different points in the same
  * window: detection uses both extremes; the displayed estimate uses the
@@ -374,7 +395,7 @@ function candidateFromSignIndex(signIndex: number): BurjCandidate {
 export async function resolveBurjWithIngressGuard(
   params: ResolveBurjParams
 ): Promise<BurjResolution | null> {
-  const { dobISO, birthTimeLocal, birthTimezone, birthCountry } = params;
+  const { dobISO, birthTimeLocal, birthTimezone, birthLocation } = params;
 
   const fallback = deriveBurjFromDOB(dobISO);
   if (!fallback) {
@@ -402,15 +423,14 @@ export async function resolveBurjWithIngressGuard(
     // Ephemeris/timezone conversion failed — fall through to window-bound check.
   }
 
-  // A birth country narrows the offset range but rarely to a single value —
+  // A birth location's longitude narrows the offset range geometrically —
   // still resolve it through the same window-bound-agreement check below
-  // rather than assuming a single representative offset, since several
-  // countries span multiple zones.
-  const { getCountryOffsetRange } = await import('../data/countryUtcOffsets');
-  const countryRange = birthCountry ? getCountryOffsetRange(birthCountry) : undefined;
+  // rather than assuming a single representative offset, since the margin
+  // widening means it rarely collapses to exactly one civil timezone.
+  const locationRange = birthLocation ? offsetRangeFromLongitude(birthLocation.longitude) : undefined;
 
-  const { earliestUTC, latestUTC, centerUTC } = countryRange
-    ? buildIngressWindowBoundsUTC(dobISO, countryRange.minOffset, countryRange.maxOffset)
+  const { earliestUTC, latestUTC, centerUTC } = locationRange
+    ? buildIngressWindowBoundsUTC(dobISO, locationRange.minOffset, locationRange.maxOffset)
     : buildIngressWindowBoundsUTC(dobISO);
 
   const [atEarliest, atLatest, atCenter] = await Promise.all([
@@ -433,7 +453,7 @@ export async function resolveBurjWithIngressGuard(
     return {
       ...candidateFromSignIndex(signAtEarliest),
       ambiguous: false,
-      resolvedVia: countryRange ? 'birth-country' : 'unambiguous-date',
+      resolvedVia: locationRange ? 'birth-location' : 'unambiguous-date',
     };
   }
 
