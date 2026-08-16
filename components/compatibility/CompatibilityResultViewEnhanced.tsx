@@ -76,6 +76,15 @@ const RELATIONSHIP_THEMES = {
     icon: 'briefcase' as const,
     emoji: '💼'
   },
+  // 'business' is only offered on the DOB compatibility form, which never
+  // reaches this name-based (abjad) result view — kept here only so
+  // RELATIONSHIP_THEMES stays exhaustive over RelationshipContext.
+  business: {
+    primary: ['#0ea5e9', '#0284c7'],
+    light: 'rgba(14, 165, 233, 0.15)',
+    icon: 'briefcase' as const,
+    emoji: '🤝'
+  },
   universal: {
     primary: ['#6366f1', '#8b5cf6'],
     light: 'rgba(99, 102, 241, 0.15)',

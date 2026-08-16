@@ -2,23 +2,31 @@
  * Person ↔ Person Zodiac/Elemental Result View
  * Shown whenever either person used a date of birth instead of a name —
  * the abjad 4-method breakdown has no valid input for a DOB-only person,
- * so this view surfaces the complementary burj/elemental comparison instead.
+ * so this view surfaces the complementary whole-sign aspect comparison
+ * instead.
+ *
+ * No percentages anywhere: a single calendar date with unknown time and
+ * place cannot support numeric precision. Outcomes are one of three tiers
+ * (Saʿīd / Muʿtadil / Maḥdhūr), matching the dignity system's existing
+ * resolution elsewhere in the app.
  */
 
 import { AdBanner } from '@/components/ads/AdBanner';
+import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ElementAccents } from '../../constants/DarkTheme';
 import { useLanguage } from '../../contexts/LanguageContext';
 import type { PersonPersonCompatibility, PersonPersonParticipant } from '../../services/compatibility/types';
-import { CompatibilityGauge } from './CompatibilityGauge';
+import { TierBadge } from './TierBadge';
 
 const RELATIONSHIP_EMOJI: Record<PersonPersonCompatibility['relationshipContext'], string> = {
   marriage: '💕',
   friendship: '🤝',
   family: '👨‍👩‍👧',
   work: '💼',
+  business: '🤝‍💼',
   universal: '✨',
 };
 
@@ -27,8 +35,17 @@ const RELATIONSHIP_COLORS: Record<PersonPersonCompatibility['relationshipContext
   friendship: ['#3b82f6', '#2563eb'],
   family: ['#22c55e', '#16a34a'],
   work: ['#8b5cf6', '#7c3aed'],
+  business: ['#0ea5e9', '#0284c7'],
   universal: ['#6366f1', '#8b5cf6'],
 };
+
+const LAYER_TITLE_KEYS = [
+  'compatibility.results.zodiac.aspectEngine.layer1.title',
+  'compatibility.results.zodiac.aspectEngine.layer2.title',
+  'compatibility.results.zodiac.aspectEngine.layer3.title',
+  'compatibility.results.zodiac.aspectEngine.layer4.title',
+  'compatibility.results.zodiac.aspectEngine.layer5.title',
+];
 
 function localize(field: { en: string; ar: string }, language: 'en' | 'fr' | 'ar'): string {
   return language === 'ar' ? field.ar : field.en;
@@ -80,6 +97,7 @@ function SoloCard({ participant, language }: { participant: PersonPersonParticip
       <Text style={[styles.soloCardName, isRTL && styles.textRTL]}>{participant.name}</Text>
       <Text style={[styles.soloCardRow, isRTL && styles.textRTL]}>
         {accent.emoji} {t('compatibility.results.zodiac.burjLabel')}: {isRTL ? zodiac.burjAr : zodiac.burjEn}
+        {zodiac.ambiguous ? ' *' : ''}
       </Text>
       <Text style={[styles.soloCardRow, isRTL && styles.textRTL]}>
         {t('compatibility.results.zodiac.planetaryRulerLabel')}: {zodiac.planetaryRuler.charAt(0).toUpperCase() + zodiac.planetaryRuler.slice(1)}
@@ -101,7 +119,8 @@ export function PersonPersonZodiacResultView({
   language: 'en' | 'fr' | 'ar';
 }) {
   const { t } = useLanguage();
-  const { person1, person2, relationshipContext, evaluation, burjCompatibility } = result;
+  const router = useRouter();
+  const { person1, person2, relationshipContext, evaluation, zodiacAspectResult } = result;
   const isRTL = language === 'ar';
   const emoji = RELATIONSHIP_EMOJI[relationshipContext];
   const colors = RELATIONSHIP_COLORS[relationshipContext];
@@ -138,16 +157,25 @@ export function PersonPersonZodiacResultView({
         <SoloCard participant={person2} language={language} />
       </View>
 
-      {/* Elemental / Zāhir-Bāṭin / Planetary comparison — always available */}
-      <View style={styles.section}>
-        <View style={styles.gaugeRow}>
-          <CompatibilityGauge
-            score={evaluation.resonanceScore}
-            label={t('compatibility.results.zodiac.harmonyScoreLabel')}
-            color={colors[0]}
-            language={language}
-          />
+      {/* Ambiguity warning — either person's Sun sign unresolved */}
+      {zodiacAspectResult?.ambiguityNote && (
+        <View style={styles.ambiguityBox}>
+          <Text style={[styles.ambiguityTitle, isRTL && styles.textRTL]}>
+            {t('compatibility.results.zodiac.ambiguity.title')}
+          </Text>
+          <Text style={[styles.ambiguityText, isRTL && styles.textRTL]}>
+            {t('compatibility.results.zodiac.ambiguity.explanation', {
+              signs: zodiacAspectResult.ambiguityNote.candidateSigns.join(' / '),
+            })}
+          </Text>
+          <Text style={[styles.ambiguityHint, isRTL && styles.textRTL]}>
+            {t('compatibility.results.zodiac.ambiguity.addBirthTimeHint')}
+          </Text>
         </View>
+      )}
+
+      {/* Elemental / Zāhir-Bāṭin / Planetary comparison — always available, no numbers */}
+      <View style={styles.section}>
         <Text style={[styles.explanationText, isRTL && styles.textRTL]}>
           {localize(evaluation.elementalRelationship.explanation, language)}
         </Text>
@@ -157,24 +185,69 @@ export function PersonPersonZodiacResultView({
         <Text style={[styles.explanationText, isRTL && styles.textRTL]}>
           {localize(evaluation.planetaryResonance.explanation, language)}
         </Text>
-        <Text style={[styles.disclaimerText, isRTL && styles.textRTL]}>
-          {localize(evaluation.disclaimer, language)}
-        </Text>
       </View>
 
-      {/* Zodiac Harmony — only when both people used DOB */}
-      {bothDob && burjCompatibility && (
+      {/* Whole-Sign Aspect Analysis — only when both people used DOB */}
+      {bothDob && zodiacAspectResult && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-            {t('compatibility.results.zodiac.burjLabel')}
+            {t('compatibility.results.zodiac.aspectEngine.overallTitle')}
           </Text>
-          <View style={styles.harmonyRow}>
-            <Text style={styles.harmonyScore}>{Math.round(burjCompatibility.harmonyScore)}%</Text>
-            <Text style={[styles.harmonyReason, isRTL && styles.textRTL]}>
-              {t(`compatibility.results.zodiac.burjReasons.${burjCompatibility.reasonKey}`)}
-            </Text>
+
+          <TierBadge tier={zodiacAspectResult.overallTier} large isRTL={isRTL} />
+
+          {/* Same-sign double-edge — mandatory, never positive-only */}
+          {zodiacAspectResult.sameSignConjunction && (
+            <View style={styles.doubleEdgeBox}>
+              <Text style={[styles.doubleEdgeTitle, isRTL && styles.textRTL]}>
+                {t('compatibility.results.zodiac.sameSignDoubleEdge.intro', {
+                  sign: (isRTL ? person1.zodiac?.burjAr : person1.zodiac?.burjEn) ?? '',
+                })}
+              </Text>
+              <Text style={[styles.doubleEdgeText, isRTL && styles.textRTL]}>
+                {t('compatibility.results.zodiac.sameSignDoubleEdge.positive', {
+                  ruler: person1.zodiac?.planetaryRuler ?? '',
+                })}
+              </Text>
+              <Text style={[styles.doubleEdgeText, isRTL && styles.textRTL]}>
+                {t('compatibility.results.zodiac.sameSignDoubleEdge.challenge', {
+                  ruler: person1.zodiac?.planetaryRuler ?? '',
+                })}
+              </Text>
+            </View>
+          )}
+
+          <View style={styles.layerList}>
+            {zodiacAspectResult.layers.map((layer, idx) => (
+              <View key={layer.layer} style={styles.layerRow}>
+                <Text style={[styles.layerTitle, isRTL && styles.textRTL]}>
+                  {t(LAYER_TITLE_KEYS[idx])}
+                </Text>
+                <TierBadge tier={layer.tier} detailText={t(layer.detailKey)} isRTL={isRTL} />
+              </View>
+            ))}
           </View>
+
+          {zodiacAspectResult.emphasizedFindings.length > 0 && (
+            <View style={styles.emphasizedBox}>
+              <Text style={[styles.emphasizedTitle, isRTL && styles.textRTL]}>
+                {t('compatibility.results.zodiac.aspectEngine.emphasizedTitle')}
+              </Text>
+              {zodiacAspectResult.emphasizedFindings.map((finding, idx) => (
+                <Text key={idx} style={[styles.emphasizedText, isRTL && styles.textRTL]}>
+                  {t(finding.detailKey)}
+                </Text>
+              ))}
+            </View>
+          )}
         </View>
+      )}
+
+      {/* Persistent scope disclaimer */}
+      {(bothDob || mixedPairing) && (
+        <Text style={[styles.disclaimerText, isRTL && styles.textRTL]}>
+          {t('compatibility.results.zodiac.scopeDisclaimer')}
+        </Text>
       )}
 
       {/* Mixed pairing note — exactly one DOB */}
@@ -184,6 +257,21 @@ export function PersonPersonZodiacResultView({
             {t('compatibility.results.zodiac.mixedNote')}
           </Text>
         </View>
+      )}
+
+      {/* Best Dates cross-link — marriage context only */}
+      {relationshipContext === 'marriage' && (
+        <Pressable
+          style={styles.crossLinkCard}
+          onPress={() => router.push('/best-dates-check')}
+        >
+          <Text style={[styles.crossLinkTitle, isRTL && styles.textRTL]}>
+            {t('compatibility.results.zodiac.bestDatesCrossLink.title')}
+          </Text>
+          <Text style={[styles.crossLinkCta, isRTL && styles.textRTL]}>
+            {t('compatibility.results.zodiac.bestDatesCrossLink.cta')}
+          </Text>
+        </Pressable>
       )}
 
       <AdBanner />
@@ -294,10 +382,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 10,
-  },
-  gaugeRow: {
-    alignItems: 'center',
     marginBottom: 12,
   },
   explanationText: {
@@ -309,24 +393,86 @@ const styles = StyleSheet.create({
   disclaimerText: {
     fontSize: 11,
     color: '#808080',
-    marginTop: 8,
+    marginBottom: 16,
     fontStyle: 'italic',
     lineHeight: 16,
   },
-  harmonyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+  layerList: {
+    marginTop: 16,
+    gap: 14,
   },
-  harmonyScore: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#FFFFFF',
+  layerRow: {
+    gap: 6,
   },
-  harmonyReason: {
-    flex: 1,
+  layerTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#B0B0B0',
+  },
+  emphasizedBox: {
+    marginTop: 16,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  emphasizedTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#94a3b8',
+    marginBottom: 6,
+    textTransform: 'uppercase',
+  },
+  emphasizedText: {
     fontSize: 13,
     color: '#E5E5E5',
+    marginBottom: 4,
+    lineHeight: 18,
+  },
+  doubleEdgeBox: {
+    marginTop: 14,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: 'rgba(245, 158, 11, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.2)',
+  },
+  doubleEdgeTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#f59e0b',
+    marginBottom: 6,
+  },
+  doubleEdgeText: {
+    fontSize: 13,
+    color: '#E5E5E5',
+    marginBottom: 4,
+    lineHeight: 18,
+  },
+  ambiguityBox: {
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+  },
+  ambiguityTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#f59e0b',
+    marginBottom: 6,
+  },
+  ambiguityText: {
+    fontSize: 12,
+    color: '#E5E5E5',
+    marginBottom: 6,
+    lineHeight: 17,
+  },
+  ambiguityHint: {
+    fontSize: 12,
+    color: '#94a3b8',
+    fontStyle: 'italic',
+    lineHeight: 17,
   },
   noteBox: {
     backgroundColor: 'rgba(255,255,255,0.05)',
@@ -338,5 +484,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#B0B0B0',
     lineHeight: 18,
+  },
+  crossLinkCard: {
+    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.25)',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+  },
+  crossLinkTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#f9a8d4',
+    marginBottom: 4,
+  },
+  crossLinkCta: {
+    fontSize: 12,
+    color: '#E5E5E5',
   },
 });

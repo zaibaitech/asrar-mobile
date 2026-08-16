@@ -10,7 +10,12 @@
 // TYPE DEFINITIONS
 // ============================================================================
 
-export type RelationshipContext = 'universal' | 'marriage' | 'friendship' | 'family' | 'work';
+// 'business' added for the DOB/whole-sign compatibility engine's relationship-
+// weighting profiles (distinct from 'work' = colleague dynamics). Not yet
+// authored into SOUL_CONNECTION_MEANINGS below (Partial<>, so this is safe) —
+// the abjad-path picker intentionally does not offer it, to avoid surfacing
+// an unauthored context there.
+export type RelationshipContext = 'universal' | 'marriage' | 'friendship' | 'family' | 'work' | 'business';
 export type SoulNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 export type Intensity = 'positive' | 'mixed' | 'challenging';
 

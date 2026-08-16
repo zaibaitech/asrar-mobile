@@ -5,6 +5,8 @@
 
 import { RelationshipCompatibility, SpiritualDestinyResult } from '../../types/compatibility';
 import type { BurujProfile } from '../istikhara/types';
+import type { CompatibilityTier } from './compatibilityTier';
+import type { Layer5PairResult, LayerResult } from './aspectEngine';
 
 // ============================================================================
 // COMPATIBILITY TYPES
@@ -172,6 +174,15 @@ export interface PersonZodiacData {
   element: 'fire' | 'water' | 'air' | 'earth';
   planetaryRuler: string;          // e.g. 'mars', from derivePlanetaryRulerFromBurj
   burujProfile?: BurujProfile;     // optional rich profile via getBurujData(burjIndex + 1)
+  /** True when the birth date fell near a solar ingress and no birth time
+   *  was supplied to resolve it — burjIndex/burjEn/burjAr above hold a
+   *  best-guess fallback, not a confident value. */
+  ambiguous: boolean;
+  /** The two candidate signs when ambiguous is true. */
+  candidateSigns?: [string, string];
+  /** True if the user supplied an optional birth time (whether or not it
+   *  was actually needed to resolve ambiguity). */
+  birthTimeProvided: boolean;
 }
 
 export interface PersonPersonParticipant {
@@ -184,7 +195,7 @@ export interface PersonPersonParticipant {
 
 export interface PersonPersonCompatibility {
   type: 'person-person';
-  relationshipContext: 'marriage' | 'friendship' | 'family' | 'work' | 'universal';
+  relationshipContext: 'marriage' | 'friendship' | 'family' | 'work' | 'business' | 'universal';
 
   person1: PersonPersonParticipant;
   person2: PersonPersonParticipant;
@@ -195,13 +206,26 @@ export interface PersonPersonCompatibility {
   // used a name (it has no valid input for a DOB-only person).
   relationshipCompatibility?: RelationshipCompatibility;
 
-  // Zodiac/elemental harmony via burj comparison — only present when BOTH
-  // people used a date of birth.
-  burjCompatibility?: {
-    compatible: boolean;
-    reason: string;      // raw English, kept for logs — do not render directly
-    reasonKey: string;   // stable slug for i18n lookup
-    harmonyScore: number;
+  // Whole-sign aspect analysis (5 layers) — only present when BOTH people
+  // used a date of birth. Replaces the old burjCompatibility percentage.
+  zodiacAspectResult?: PersonPersonZodiacAspectResult;
+}
+
+export interface PersonPersonZodiacAspectResult {
+  layers: [LayerResult, LayerResult, LayerResult, LayerResult, LayerResult]; // layer1..layer5
+  layer5Pairs: Layer5PairResult[];
+  /** Strict floor across all layers — never more favourable than the
+   *  least-favourable component, regardless of relationship weighting. */
+  overallTier: CompatibilityTier;
+  /** Relationship-context-selected highlights for copy (does not affect overallTier). */
+  emphasizedFindings: LayerResult[];
+  /** True when Layer 1's sign distance is 1 (same sign) — gates the
+   *  mandatory double-edge copy in the result view. */
+  sameSignConjunction: boolean;
+  /** Present iff either person's Sun sign resolution was ambiguous. */
+  ambiguityNote?: {
+    person: 1 | 2 | 'both';
+    candidateSigns: [string, string];
   };
 }
 

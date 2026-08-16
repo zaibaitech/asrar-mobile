@@ -5,10 +5,9 @@
  */
 
 import {
-    checkBurjCompatibility,
-    deriveBurjFromDOB,
     deriveElementFromBurj,
-    derivePlanetaryRulerFromBurj
+    derivePlanetaryRulerFromBurj,
+    resolveBurjWithIngressGuard
 } from '../ProfileDerivationService';
 import {
     analyzeRelationshipCompatibility,
@@ -23,10 +22,24 @@ import {
     ModeOfAction,
     PersonPersonCompatibility,
     PersonPersonParticipant,
+    PersonPersonZodiacAspectResult,
     PlanetaryResonance,
     SpiritualDestinyData,
     ZahirBatinInteraction
 } from './types';
+import {
+    computeLayer1WholeSignAspect,
+    computeLayer2Triplicity,
+    computeLayer3Modality,
+    computeLayer4DomicileRulers,
+    computeLayer5CrossPlanetAspects,
+    type LayerResult,
+    type ZodiacSignName
+} from './aspectEngine';
+import { aggregateTiers } from './compatibilityTier';
+import { resolvePersonPlanetSigns } from './planetaryPositionsForCompatibility';
+import { selectEmphasizedFindings } from './relationshipWeighting';
+import type { RelationshipContext } from './soulConnectionMeanings';
 
 // ============================================================================
 // HELPER: Extract Spiritual Destiny Data from NameDestinyResult
@@ -507,7 +520,7 @@ export function calculatePersonPersonCompatibility(
   person2Name: string,
   person2ArabicName: string,
   person2Destiny: NameDestinyResult,
-  relationshipContext: 'marriage' | 'friendship' | 'family' | 'work' | 'universal' = 'universal'
+  relationshipContext: RelationshipContext = 'universal'
 ): PersonPersonCompatibility {
   
   // Extract spiritual destiny data
@@ -577,7 +590,16 @@ export function calculatePersonPersonCompatibility(
 
 export type PersonPersonParticipantInput =
   | { inputMethod: 'name'; name: string; arabicName: string }
-  | { inputMethod: 'dob'; dobISO: string; dobLabel: string };
+  | {
+      inputMethod: 'dob';
+      dobISO: string;
+      dobLabel: string;
+      /** Optional "HH:mm", 24h, local to birthTimezone — only used to
+       *  resolve an otherwise-ambiguous Sun sign near a solar ingress. */
+      birthTimeLocal?: string;
+      /** IANA timezone, required together with birthTimeLocal. */
+      birthTimezone?: string;
+    };
 
 export class DobDerivationError extends Error {
   constructor(dobISO: string) {
@@ -586,7 +608,23 @@ export class DobDerivationError extends Error {
   }
 }
 
-function buildParticipant(input: PersonPersonParticipantInput): PersonPersonParticipant {
+const SIGN_NAME_TO_INDEX: Record<ZodiacSignName, number> = {
+  aries: 0, taurus: 1, gemini: 2, cancer: 3, leo: 4, virgo: 5,
+  libra: 6, scorpio: 7, sagittarius: 8, capricorn: 9, aquarius: 10, pisces: 11,
+};
+const SIGN_INDEX_TO_NAME: ZodiacSignName[] = Object.keys(SIGN_NAME_TO_INDEX) as ZodiacSignName[];
+
+/** The exact UTC instant a Sun-sign resolution used — either the birth-time
+ *  instant when resolved via 'birth-time', or a neutral local-noon estimate
+ *  for the calendar date otherwise. Only used to fetch Layer 5's other
+ *  planets at a matching instant; never presented to the user as a
+ *  confident birth time. */
+function estimatedInstantForDob(dobISO: string): Date {
+  const d = new Date(dobISO);
+  return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0));
+}
+
+async function buildParticipant(input: PersonPersonParticipantInput): Promise<PersonPersonParticipant> {
   if (input.inputMethod === 'name') {
     const destinyRaw = buildDestiny(input.arabicName, undefined, ABJAD_MAGHRIBI);
     const destiny = extractSpiritualDestiny(destinyRaw, input.name);
@@ -598,19 +636,23 @@ function buildParticipant(input: PersonPersonParticipantInput): PersonPersonPart
     };
   }
 
-  const burjData = deriveBurjFromDOB(input.dobISO);
-  if (!burjData) {
+  const resolution = await resolveBurjWithIngressGuard({
+    dobISO: input.dobISO,
+    birthTimeLocal: input.birthTimeLocal,
+    birthTimezone: input.birthTimezone,
+  });
+  if (!resolution) {
     throw new DobDerivationError(input.dobISO);
   }
 
-  const element = deriveElementFromBurj(burjData.burjIndex);
-  const planetaryRuler = derivePlanetaryRulerFromBurj(burjData.burjIndex);
+  const element = deriveElementFromBurj(resolution.burjIndex);
+  const planetaryRuler = derivePlanetaryRulerFromBurj(resolution.burjIndex);
 
   let burujProfile;
   try {
     // ProfileDerivationService's burjIndex is a 0-11 tropical index; getBurujData
     // expects a 1-12 remainder — the +1 conversion matches who-am-i.tsx.
-    burujProfile = getBurujData(burjData.burjIndex + 1);
+    burujProfile = getBurujData(resolution.burjIndex + 1);
   } catch {
     burujProfile = undefined;
   }
@@ -621,12 +663,17 @@ function buildParticipant(input: PersonPersonParticipantInput): PersonPersonPart
     zodiac: {
       dobISO: input.dobISO,
       dobLabel: input.dobLabel,
-      burjIndex: burjData.burjIndex,
-      burjEn: burjData.burjEn,
-      burjAr: burjData.burjAr,
+      burjIndex: resolution.burjIndex,
+      burjEn: resolution.burjEn,
+      burjAr: resolution.burjAr,
       element,
       planetaryRuler,
-      burujProfile
+      burujProfile,
+      ambiguous: resolution.ambiguous,
+      candidateSigns: resolution.candidateSigns
+        ? [resolution.candidateSigns[0].burjEn, resolution.candidateSigns[1].burjEn]
+        : undefined,
+      birthTimeProvided: !!(input.birthTimeLocal && input.birthTimezone),
     }
   };
 }
@@ -653,11 +700,11 @@ function normalizeParticipant(participant: PersonPersonParticipant): {
   };
 }
 
-export function calculatePersonPersonCompatibilityMixed(
+export async function calculatePersonPersonCompatibilityMixed(
   person1Input: PersonPersonParticipantInput,
   person2Input: PersonPersonParticipantInput,
-  relationshipContext: 'marriage' | 'friendship' | 'family' | 'work' | 'universal' = 'universal'
-): PersonPersonCompatibility {
+  relationshipContext: RelationshipContext = 'universal'
+): Promise<PersonPersonCompatibility> {
   if (person1Input.inputMethod === 'name' && person2Input.inputMethod === 'name') {
     const result = calculatePersonPersonCompatibility(
       person1Input.name,
@@ -676,8 +723,10 @@ export function calculatePersonPersonCompatibilityMixed(
     };
   }
 
-  const person1 = buildParticipant(person1Input);
-  const person2 = buildParticipant(person2Input);
+  const [person1, person2] = await Promise.all([
+    buildParticipant(person1Input),
+    buildParticipant(person2Input),
+  ]);
 
   const norm1 = normalizeParticipant(person1);
   const norm2 = normalizeParticipant(person2);
@@ -691,9 +740,15 @@ export function calculatePersonPersonCompatibilityMixed(
     norm2.zahirBatin
   );
 
-  let burjCompatibility: PersonPersonCompatibility['burjCompatibility'];
+  let zodiacAspectResult: PersonPersonZodiacAspectResult | undefined;
   if (person1.inputMethod === 'dob' && person2.inputMethod === 'dob') {
-    burjCompatibility = checkBurjCompatibility(person1.zodiac!.burjIndex, person2.zodiac!.burjIndex);
+    zodiacAspectResult = await computeZodiacAspectResult(
+      person1Input as Extract<PersonPersonParticipantInput, { inputMethod: 'dob' }>,
+      person2Input as Extract<PersonPersonParticipantInput, { inputMethod: 'dob' }>,
+      person1,
+      person2,
+      relationshipContext
+    );
   }
 
   return {
@@ -703,6 +758,71 @@ export function calculatePersonPersonCompatibilityMixed(
     person2,
     evaluation,
     relationshipCompatibility: undefined,
-    burjCompatibility
+    zodiacAspectResult
+  };
+}
+
+/**
+ * Computes the 5-layer whole-sign aspect result for two DOB-based
+ * participants. Layers 1-4 use each person's resolved Sun sign; Layer 5
+ * fetches Venus/Mars/Mercury/Jupiter/Saturn at each person's resolved (or
+ * best-estimate) instant — never at a fabricated noon-default presented as
+ * a birth time, only as an internal instant for the ephemeris lookup.
+ */
+async function computeZodiacAspectResult(
+  person1Input: Extract<PersonPersonParticipantInput, { inputMethod: 'dob' }>,
+  person2Input: Extract<PersonPersonParticipantInput, { inputMethod: 'dob' }>,
+  person1: PersonPersonParticipant,
+  person2: PersonPersonParticipant,
+  relationshipContext: RelationshipContext
+): Promise<PersonPersonZodiacAspectResult> {
+  const zodiac1 = person1.zodiac!;
+  const zodiac2 = person2.zodiac!;
+  const sign1 = SIGN_INDEX_TO_NAME[zodiac1.burjIndex];
+  const sign2 = SIGN_INDEX_TO_NAME[zodiac2.burjIndex];
+
+  // These instants are only used to fetch Layer 5's non-Sun planets at a
+  // reasonable matching moment for the calendar date — the Sun sign itself
+  // was already correctly resolved (with birth time if supplied) by
+  // resolveBurjWithIngressGuard() inside buildParticipant(). Slow-moving
+  // planets (Venus/Mars/Mercury/Jupiter/Saturn) don't need ingress-guard
+  // precision the way the Sun does, so a neutral local-noon estimate is
+  // sufficient here.
+  const instant1 = estimatedInstantForDob(person1Input.dobISO);
+  const instant2 = estimatedInstantForDob(person2Input.dobISO);
+
+  const [planets1, planets2] = await Promise.all([
+    resolvePersonPlanetSigns(sign1, instant1),
+    resolvePersonPlanetSigns(sign2, instant2),
+  ]);
+
+  const layer1 = computeLayer1WholeSignAspect(sign1, sign2);
+  const layer2 = computeLayer2Triplicity(sign1, sign2);
+  const layer3 = computeLayer3Modality(sign1, sign2);
+  const layer4 = computeLayer4DomicileRulers(sign1, sign2);
+  const layer5 = planets1 && planets2
+    ? computeLayer5CrossPlanetAspects(planets1, planets2)
+    : { pairResults: [], layer: { layer: 5 as const, tier: 'mutadil' as const, detailKey: 'compatibility.results.zodiac.aspectEngine.layer5.unavailable' } };
+
+  const layers: [LayerResult, LayerResult, LayerResult, LayerResult, LayerResult] =
+    [layer1, layer2, layer3, layer4, layer5.layer];
+
+  const overallTier = aggregateTiers(layers.map((l) => l.tier));
+  const emphasizedFindings = selectEmphasizedFindings(layers, layer5.pairResults, relationshipContext);
+
+  const ambiguityNote = zodiac1.ambiguous || zodiac2.ambiguous
+    ? {
+        person: (zodiac1.ambiguous && zodiac2.ambiguous ? 'both' : zodiac1.ambiguous ? 1 : 2) as 1 | 2 | 'both',
+        candidateSigns: (zodiac1.ambiguous ? zodiac1.candidateSigns : zodiac2.candidateSigns) as [string, string],
+      }
+    : undefined;
+
+  return {
+    layers,
+    layer5Pairs: layer5.pairResults,
+    overallTier,
+    emphasizedFindings,
+    sameSignConjunction: layer1.metadata?.distance === 1,
+    ambiguityNote,
   };
 }

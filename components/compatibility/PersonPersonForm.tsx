@@ -24,7 +24,9 @@ import {
     DobDerivationError,
     type PersonPersonParticipantInput
 } from '../../services/compatibility/engine';
+import { isNearIngress } from '../../services/ProfileDerivationService';
 import { PersonPersonCompatibility } from '../../services/compatibility/types';
+import type { RelationshipContext } from '../../services/compatibility/soulConnectionMeanings';
 import ArabicKeyboard from '../istikhara/ArabicKeyboard';
 import NameAutocomplete from '../NameAutocomplete';
 
@@ -42,7 +44,7 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
   const [person2Name, setPerson2Name] = useState('');
   const [person2Arabic, setPerson2Arabic] = useState('');
   const [person2Latin, setPerson2Latin] = useState('');
-  const [relationshipType, setRelationshipType] = useState<'marriage' | 'friendship' | 'family' | 'work' | 'universal'>('universal');
+  const [relationshipType, setRelationshipType] = useState<RelationshipContext>('universal');
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState('');
 
@@ -55,6 +57,18 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
   const [person2DOB, setPerson2DOB] = useState<Date | null>(null);
   const [showPerson1DatePicker, setShowPerson1DatePicker] = useState(false);
   const [showPerson2DatePicker, setShowPerson2DatePicker] = useState(false);
+
+  // Optional birth time — only offered once the picked date is flagged as
+  // near a solar ingress (isNearIngress is a cheap, network-free check).
+  // Skippable; ambiguity then surfaces in the result screen instead.
+  const deviceTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  const [person1BirthTime, setPerson1BirthTime] = useState<Date | null>(null);
+  const [person2BirthTime, setPerson2BirthTime] = useState<Date | null>(null);
+  const [showPerson1TimePicker, setShowPerson1TimePicker] = useState(false);
+  const [showPerson2TimePicker, setShowPerson2TimePicker] = useState(false);
+  const person1NearIngress = person1DOB ? isNearIngress(person1DOB.toISOString().split('T')[0]) : false;
+  const person2NearIngress = person2DOB ? isNearIngress(person2DOB.toISOString().split('T')[0]) : false;
+
   const hasPrefilledPerson1 = useRef(false);
   const dateLocale = language === 'fr' ? 'fr-FR' : language === 'ar' ? 'ar' : 'en-US';
 
@@ -87,7 +101,8 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
     { value: 'marriage' },
     { value: 'friendship' },
     { value: 'family' },
-    { value: 'work' }
+    { value: 'work' },
+    { value: 'business' }
   ] as const;
 
   // Keyboard handlers
@@ -138,7 +153,8 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
     method: 'name' | 'dob',
     arabic: string,
     displayName: string,
-    dob: Date | null
+    dob: Date | null,
+    birthTime: Date | null
   ): PersonPersonParticipantInput => {
     if (method === 'name') {
       return { inputMethod: 'name', name: displayName || arabic, arabicName: arabic };
@@ -148,6 +164,10 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
       inputMethod: 'dob',
       dobISO: dobDate.toISOString().split('T')[0],
       dobLabel: dobDate.toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric' }),
+      birthTimeLocal: birthTime
+        ? `${String(birthTime.getHours()).padStart(2, '0')}:${String(birthTime.getMinutes()).padStart(2, '0')}`
+        : undefined,
+      birthTimezone: birthTime ? deviceTimezone : undefined,
     };
   };
 
@@ -163,10 +183,10 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
     setIsCalculating(true);
 
     try {
-      const person1Input = buildParticipantInput(person1InputMethod, person1Arabic, person1Name, person1DOB);
-      const person2Input = buildParticipantInput(person2InputMethod, person2Arabic, person2Name, person2DOB);
+      const person1Input = buildParticipantInput(person1InputMethod, person1Arabic, person1Name, person1DOB, person1BirthTime);
+      const person2Input = buildParticipantInput(person2InputMethod, person2Arabic, person2Name, person2DOB, person2BirthTime);
 
-      const result = calculatePersonPersonCompatibilityMixed(person1Input, person2Input, relationshipType);
+      const result = await calculatePersonPersonCompatibilityMixed(person1Input, person2Input, relationshipType);
 
       onCalculate(result);
     } catch (err) {
@@ -323,6 +343,31 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
                   minimumDate={new Date(1900, 0, 1)}
                 />
               )}
+              {person1NearIngress && (
+                <View style={styles.ingressNote}>
+                  <Text style={[styles.hintText, language === 'ar' && styles.textRTL]}>
+                    {t('compatibility.form.inputMethod.ingressDetectedNote')}
+                  </Text>
+                  <Pressable style={styles.datePickerButton} onPress={() => setShowPerson1TimePicker(true)}>
+                    <Text style={[styles.datePickerText, language === 'ar' && styles.textRTL]}>
+                      {person1BirthTime
+                        ? person1BirthTime.toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' })
+                        : t('compatibility.form.inputMethod.birthTimeLabel')}
+                    </Text>
+                  </Pressable>
+                  {showPerson1TimePicker && (
+                    <DateTimePicker
+                      value={person1BirthTime || new Date()}
+                      mode="time"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      onChange={(event, selectedTime) => {
+                        setShowPerson1TimePicker(Platform.OS === 'ios');
+                        if (selectedTime) setPerson1BirthTime(selectedTime);
+                      }}
+                    />
+                  )}
+                </View>
+              )}
             </View>
           )}
         </LinearGradient>
@@ -440,6 +485,31 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
                   maximumDate={new Date()}
                   minimumDate={new Date(1900, 0, 1)}
                 />
+              )}
+              {person2NearIngress && (
+                <View style={styles.ingressNote}>
+                  <Text style={[styles.hintText, language === 'ar' && styles.textRTL]}>
+                    {t('compatibility.form.inputMethod.ingressDetectedNote')}
+                  </Text>
+                  <Pressable style={styles.datePickerButton} onPress={() => setShowPerson2TimePicker(true)}>
+                    <Text style={[styles.datePickerText, language === 'ar' && styles.textRTL]}>
+                      {person2BirthTime
+                        ? person2BirthTime.toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' })
+                        : t('compatibility.form.inputMethod.birthTimeLabel')}
+                    </Text>
+                  </Pressable>
+                  {showPerson2TimePicker && (
+                    <DateTimePicker
+                      value={person2BirthTime || new Date()}
+                      mode="time"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      onChange={(event, selectedTime) => {
+                        setShowPerson2TimePicker(Platform.OS === 'ios');
+                        if (selectedTime) setPerson2BirthTime(selectedTime);
+                      }}
+                    />
+                  )}
+                </View>
               )}
             </View>
           )}
@@ -569,6 +639,14 @@ const styles = StyleSheet.create({
     color: '#64748b',
     fontSize: 12,
     marginTop: 6,
+  },
+  ingressNote: {
+    marginTop: 10,
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.25)',
   },
   relationshipTypes: {
     flexDirection: 'row',
