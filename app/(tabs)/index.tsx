@@ -88,15 +88,17 @@ const getModules = (t: any): (Omit<ModuleCardProps, 'onPress'> & { id: string })
     element: 'water',
     comingSoon: false,
   },
-  {
+  // Guided Istikhara is dev-only for now (see handleModulePress guard below)
+  // — kept in the array only in __DEV__ so its tile never renders in production.
+  ...(__DEV__ ? [{
     id: 'guidedIstikhara',
     title: t('modules.guidedIstikhara.title'),
     titleArabic: 'الاستخارة الموجهة',
     description: t('modules.guidedIstikhara.description'),
     icon: '🕊️',
-    element: 'earth',
+    element: 'earth' as const,
     comingSoon: false,
-  },
+  }] : []),
   {
     id: 'bestDates',
     title: t('modules.bestDates.title'),
@@ -478,13 +480,15 @@ export default function HomeScreen() {
         router.push('/(tabs)/who-am-i');
         break;
       case 'guidedIstikhara':
-        router.push('/istikhara-sessions');
+        if (__DEV__) {
+          router.push('/istikhara-sessions');
+        }
         break;
       case 'bestDates':
         router.push('/best-dates-check');
         break;
       case 'compatibility':
-        router.push('/universal-compatibility');
+        router.push('/(tabs)/compatibility');
         break;
       case 'nameDestiny':
         router.push('/(tabs)/name-destiny');

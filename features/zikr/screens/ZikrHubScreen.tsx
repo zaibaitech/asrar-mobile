@@ -21,7 +21,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ResponsiveAppHeader from '@/components/AppHeader';
-import BottomTabBar from '@/components/BottomTabBar';
 import { Borders, DarkTheme, Spacing, Typography } from '@/constants/DarkTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -227,8 +226,6 @@ export default function ZikrHubScreen() {
           {/* Bottom Spacing */}
           <View style={styles.bottomSpacer} />
         </ScrollView>
-
-        <BottomTabBar />
 
         {/* Add Challenge Modal */}
         <AddChallengeModal

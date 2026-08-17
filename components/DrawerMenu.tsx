@@ -123,7 +123,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
           id: 'compatibility',
           label: t('drawer.compatibility'),
           icon: 'heart',
-          route: '/compatibility',
+          route: '/(tabs)/compatibility',
         },
         {
           id: 'who-am-i',

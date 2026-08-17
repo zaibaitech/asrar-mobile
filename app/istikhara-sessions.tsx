@@ -5,11 +5,10 @@
  */
 
 import ResponsiveAppHeader from '@/components/AppHeader';
-import BottomTabBar from '@/components/BottomTabBar';
 import Colors from '@/constants/Colors';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
-import { router, Stack } from 'expo-router';
+import { Redirect, router, Stack } from 'expo-router';
 import React from 'react';
 import {
     SafeAreaView,
@@ -25,10 +24,17 @@ export default function IstikharaSessionsScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const { language, setLanguage, t } = useLanguage();
-  
+
+  // Dev-only: Guided Istikhārah isn't wired into production navigation
+  // (see app/(tabs)/index.tsx's Home module grid). Kept for internal
+  // testing, not deleted, but redirects to Home outside __DEV__.
+  if (!__DEV__) {
+    return <Redirect href="/(tabs)" />;
+  }
+
   return (
     <>
-      <Stack.Screen 
+      <Stack.Screen
         options={{
           headerShown: false,
         }}
@@ -144,8 +150,6 @@ export default function IstikharaSessionsScreen() {
         {/* Bottom Padding */}
         <View style={{ height: 40 }} />
       </ScrollView>
-      
-      <BottomTabBar />
       </SafeAreaView>
     </>
   );

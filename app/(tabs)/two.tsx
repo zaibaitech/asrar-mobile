@@ -1,7 +1,7 @@
 import { AdBanner } from '@/components/ads';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import React, { useCallback } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -52,11 +52,11 @@ export default function TabTwoScreen() {
   const { t } = useLanguage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  
+
   const handleModulePress = useCallback((moduleTitle: string) => {
     switch (moduleTitle) {
       case 'Compatibility':
-        router.push('/compatibility');
+        router.push('/(tabs)/compatibility');
         break;
       case 'Name Destiny':
         router.push('/(tabs)/name-destiny');
@@ -97,7 +97,16 @@ export default function TabTwoScreen() {
   );
 
   const keyExtractor = useCallback((item: ModuleCardProps) => item.title, []);
-  
+
+  // Dev-only: this screen duplicates Home's module grid (its own
+  // "Compatibility"/"Guided Istikhārah" tiles point at now-retired routes)
+  // and isn't reachable from any production entry point. Kept for internal
+  // testing, not deleted, but redirects to Home outside __DEV__. Placed
+  // after all hooks so hook call order stays unconditional.
+  if (!__DEV__) {
+    return <Redirect href="/(tabs)" />;
+  }
+
   return (
     <LinearGradient
       colors={[

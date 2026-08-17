@@ -26,7 +26,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 import ResponsiveAppHeader from '../components/AppHeader';
-import BottomTabBar from '../components/BottomTabBar';
 import { DarkTheme, Spacing, Typography } from '../constants/DarkTheme';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -370,8 +369,6 @@ export default function DhikrCounterScreen() {
             </View>
           )}
         </ScrollView>
-
-        <BottomTabBar />
       </SafeAreaView>
     </>
   );

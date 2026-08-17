@@ -125,13 +125,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="istikhara"
-        options={{
-          title: t('nav.advanced'),
-          tabBarIcon: ({ color }) => <TabBarIcon name="moon-o" color={color} size={tabIconSize} />,
-        }}
-      />
-      <Tabs.Screen
         name="calculator"
         options={{
           title: t('nav.calculator'),
