@@ -2824,6 +2824,152 @@ export default function PlanetTransitDetailsScreen() {
               </GlassCard>
             </View>
 
+            {/* All Planet Transits Section — placed right below the hero card so
+                switching planets never requires scrolling through the current
+                planet's full guidance content first. */}
+            {allTransitsDisplay && (
+              <GlassCard style={styles.allTransitsCard}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="planet" size={20} color="#9FA9B3" />
+                  <Text style={styles.cardTitle}>
+                    {t('screens.planetTransit.allTransits.title')}
+                  </Text>
+                </View>
+                <Text style={[styles.bodyText, { marginBottom: Spacing.md }]}>
+                  {t('screens.planetTransit.allTransits.description')}
+                </Text>
+
+                {allTransitsStrengthSummary ? (
+                  <View style={styles.allTransitsSummary}>
+                    <View style={styles.allTransitsSummaryCol}>
+                      <Text style={styles.allTransitsSummaryTitle}>{t('screens.planetTransit.summary.bestNow')}</Text>
+                      {allTransitsStrengthSummary.best.map((item) => {
+                        const planetName = item.planetKey.charAt(0).toUpperCase() + item.planetKey.slice(1);
+                        const color = getStrengthColor(item.finalPower);
+                        return (
+                          <View key={item.planetKey} style={styles.allTransitsSummaryItem}>
+                            <Text style={styles.allTransitsSummaryPlanet} numberOfLines={1}>
+                              {language === 'ar' ? tSafe(`planets.${item.planetKey}Arabic`, planetName) : planetName}
+                            </Text>
+                            <View style={[styles.allTransitsSummaryBadge, { borderColor: `${color}40` }]}>
+                              <Text style={[styles.allTransitsSummaryBadgeText, { color }]}>
+                                {item.finalPower}%
+                              </Text>
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
+                    <View style={styles.allTransitsSummaryCol}>
+                      <Text style={styles.allTransitsSummaryTitle}>{t('screens.planetTransit.summary.weakNow')}</Text>
+                      {allTransitsStrengthSummary.weak.map((item) => {
+                        const planetName = item.planetKey.charAt(0).toUpperCase() + item.planetKey.slice(1);
+                        const color = getStrengthColor(item.finalPower);
+                        return (
+                          <View key={item.planetKey} style={styles.allTransitsSummaryItem}>
+                            <Text style={styles.allTransitsSummaryPlanet} numberOfLines={1}>
+                              {language === 'ar' ? tSafe(`planets.${item.planetKey}Arabic`, planetName) : planetName}
+                            </Text>
+                            <View style={[styles.allTransitsSummaryBadge, { borderColor: `${color}40` }]}>
+                              <Text style={[styles.allTransitsSummaryBadgeText, { color }]}>
+                                {item.finalPower}%
+                              </Text>
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </View>
+                ) : null}
+
+                <View style={styles.allTransitsGrid}>
+                  {Object.entries(allTransitsDisplay).map(([planetKey, transitInfo]: [string, PlanetTransit]) => {
+                    const planetName = planetKey.charAt(0).toUpperCase() + planetKey.slice(1);
+                    const zodiacData = ZODIAC_DATA[transitInfo.sign as ZodiacKey];
+                    const planetGrad = getPlanetGradient(planetKey);
+                    const elementKey = zodiacData?.element || 'earth';
+                    const elementAcc = ElementAccents[elementKey as Element];
+                    const isUserSign = transitInfo.sign === userZodiacKey;
+                    const planetSymbol = PLANET_SYMBOLS[planetKey.toLowerCase()] || '✦';
+
+                    return (
+                      <TouchableOpacity
+                        key={planetKey}
+                        style={[
+                          styles.transitMiniCard,
+                          isUserSign && styles.transitMiniCardHighlight,
+                          { borderColor: isUserSign ? elementAcc.primary + '50' : 'rgba(255,255,255,0.08)' }
+                        ]}
+                        onPress={() => {
+                          // Scroll to top for better UX when viewing new transit
+                          scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+
+                          const legacyFormat = adaptTransitToLegacyFormat(transitInfo);
+                          router.push({
+                            pathname: '/(tabs)/planet-transit-details',
+                            params: {
+                              type: 'transit',
+                              payload: JSON.stringify(legacyFormat),
+                              isPersonal: isUserSign ? 'true' : 'false',
+                            },
+                          });
+                        }}
+                      >
+                        {isUserSign && (
+                          <View style={[styles.yourSignBadge, { backgroundColor: elementAcc.primary + '30' }]}>
+                            <Ionicons name="star" size={10} color={elementAcc.primary} />
+                            <Text style={[styles.yourSignText, { color: elementAcc.primary }]}>
+                              {t('screens.planetTransit.allTransits.yourSign')}
+                            </Text>
+                          </View>
+                        )}
+
+                        <LinearGradient
+                          colors={planetGrad}
+                          style={styles.miniPlanetOrb}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                        >
+                          <Text style={styles.miniPlanetSymbol}>{planetSymbol}</Text>
+                        </LinearGradient>
+
+                        <Text style={styles.miniPlanetName} numberOfLines={1}>
+                          {language === 'ar'
+                            ? (tSafe(`planets.${planetKey}Arabic`, planetName))
+                            : planetName}
+                        </Text>
+
+                        {transitInfo.isRetrograde ? (
+                          <Text style={styles.miniRetrograde}>
+                            ℞ {t('screens.planetTransit.retrograde')}
+                          </Text>
+                        ) : null}
+
+                        <View style={[styles.miniZodiacBadge, { backgroundColor: elementAcc.glow }]}>
+                          <Text style={styles.miniZodiacSymbol}>{zodiacData?.symbol || '✦'}</Text>
+                          <Text style={[styles.miniZodiacName, { color: elementAcc.primary }]} numberOfLines={1}>
+                            {formatZodiacWithArabic(transitInfo.sign as any, language as any)}
+                          </Text>
+                        </View>
+
+                        {transitInfo.signDegree !== undefined && (
+                          <Text style={styles.miniDegree}>
+                            {Math.floor(transitInfo.signDegree)}°
+                          </Text>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                {loadingAllTransits && (
+                  <View style={styles.loadingContainer}>
+                    <Text style={styles.bodyText}>{t('common.loading')}</Text>
+                  </View>
+                )}
+              </GlassCard>
+            )}
+
             <GlassCard style={styles.infoStrip}>
               <Text style={styles.explainerText}>{explainer}</Text>
               <Text style={styles.explainerMeta}>{personalizationLine}</Text>
@@ -4716,150 +4862,6 @@ export default function PlanetTransitDetailsScreen() {
         ) : (
           <GlassCard style={styles.nextDayCard}>
             <Text style={styles.bodyText}>{t('home.planetTransitDetails.error')}</Text>
-          </GlassCard>
-        )}
-
-        {/* All Planet Transits Section */}
-        {detailsType === 'transit' && allTransitsDisplay && (
-          <GlassCard style={styles.allTransitsCard}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="planet" size={20} color="#9FA9B3" />
-              <Text style={styles.cardTitle}>
-                {t('screens.planetTransit.allTransits.title')}
-              </Text>
-            </View>
-            <Text style={[styles.bodyText, { marginBottom: Spacing.md }]}>
-              {t('screens.planetTransit.allTransits.description')}
-            </Text>
-
-            {allTransitsStrengthSummary ? (
-              <View style={styles.allTransitsSummary}>
-                <View style={styles.allTransitsSummaryCol}>
-                  <Text style={styles.allTransitsSummaryTitle}>{t('screens.planetTransit.summary.bestNow')}</Text>
-                  {allTransitsStrengthSummary.best.map((item) => {
-                    const planetName = item.planetKey.charAt(0).toUpperCase() + item.planetKey.slice(1);
-                    const color = getStrengthColor(item.finalPower);
-                    return (
-                      <View key={item.planetKey} style={styles.allTransitsSummaryItem}>
-                        <Text style={styles.allTransitsSummaryPlanet} numberOfLines={1}>
-                          {language === 'ar' ? tSafe(`planets.${item.planetKey}Arabic`, planetName) : planetName}
-                        </Text>
-                        <View style={[styles.allTransitsSummaryBadge, { borderColor: `${color}40` }]}>
-                          <Text style={[styles.allTransitsSummaryBadgeText, { color }]}>
-                            {item.finalPower}%
-                          </Text>
-                        </View>
-                      </View>
-                    );
-                  })}
-                </View>
-                <View style={styles.allTransitsSummaryCol}>
-                  <Text style={styles.allTransitsSummaryTitle}>{t('screens.planetTransit.summary.weakNow')}</Text>
-                  {allTransitsStrengthSummary.weak.map((item) => {
-                    const planetName = item.planetKey.charAt(0).toUpperCase() + item.planetKey.slice(1);
-                    const color = getStrengthColor(item.finalPower);
-                    return (
-                      <View key={item.planetKey} style={styles.allTransitsSummaryItem}>
-                        <Text style={styles.allTransitsSummaryPlanet} numberOfLines={1}>
-                          {language === 'ar' ? tSafe(`planets.${item.planetKey}Arabic`, planetName) : planetName}
-                        </Text>
-                        <View style={[styles.allTransitsSummaryBadge, { borderColor: `${color}40` }]}>
-                          <Text style={[styles.allTransitsSummaryBadgeText, { color }]}>
-                            {item.finalPower}%
-                          </Text>
-                        </View>
-                      </View>
-                    );
-                  })}
-                </View>
-              </View>
-            ) : null}
-            
-            <View style={styles.allTransitsGrid}>
-              {Object.entries(allTransitsDisplay).map(([planetKey, transitInfo]: [string, PlanetTransit]) => {
-                const planetName = planetKey.charAt(0).toUpperCase() + planetKey.slice(1);
-                const zodiacData = ZODIAC_DATA[transitInfo.sign as ZodiacKey];
-                const planetGrad = getPlanetGradient(planetKey);
-                const elementKey = zodiacData?.element || 'earth';
-                const elementAcc = ElementAccents[elementKey as Element];
-                const isUserSign = transitInfo.sign === userZodiacKey;
-                const planetSymbol = PLANET_SYMBOLS[planetKey.toLowerCase()] || '✦';
-                
-                return (
-                  <TouchableOpacity
-                    key={planetKey}
-                    style={[
-                      styles.transitMiniCard,
-                      isUserSign && styles.transitMiniCardHighlight,
-                      { borderColor: isUserSign ? elementAcc.primary + '50' : 'rgba(255,255,255,0.08)' }
-                    ]}
-                    onPress={() => {
-                      // Scroll to top for better UX when viewing new transit
-                      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-                      
-                      const legacyFormat = adaptTransitToLegacyFormat(transitInfo);
-                      router.push({
-                        pathname: '/(tabs)/planet-transit-details',
-                        params: {
-                          type: 'transit',
-                          payload: JSON.stringify(legacyFormat),
-                          isPersonal: isUserSign ? 'true' : 'false',
-                        },
-                      });
-                    }}
-                  >
-                    {isUserSign && (
-                      <View style={[styles.yourSignBadge, { backgroundColor: elementAcc.primary + '30' }]}>
-                        <Ionicons name="star" size={10} color={elementAcc.primary} />
-                        <Text style={[styles.yourSignText, { color: elementAcc.primary }]}>
-                          {t('screens.planetTransit.allTransits.yourSign')}
-                        </Text>
-                      </View>
-                    )}
-                    
-                    <LinearGradient
-                      colors={planetGrad}
-                      style={styles.miniPlanetOrb}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                    >
-                      <Text style={styles.miniPlanetSymbol}>{planetSymbol}</Text>
-                    </LinearGradient>
-                    
-                    <Text style={styles.miniPlanetName} numberOfLines={1}>
-                      {language === 'ar' 
-                        ? (tSafe(`planets.${planetKey}Arabic`, planetName))
-                        : planetName}
-                    </Text>
-
-                    {transitInfo.isRetrograde ? (
-                      <Text style={styles.miniRetrograde}>
-                        ℞ {t('screens.planetTransit.retrograde')}
-                      </Text>
-                    ) : null}
-                    
-                    <View style={[styles.miniZodiacBadge, { backgroundColor: elementAcc.glow }]}>
-                      <Text style={styles.miniZodiacSymbol}>{zodiacData?.symbol || '✦'}</Text>
-                      <Text style={[styles.miniZodiacName, { color: elementAcc.primary }]} numberOfLines={1}>
-                        {formatZodiacWithArabic(transitInfo.sign as any, language as any)}
-                      </Text>
-                    </View>
-                    
-                    {transitInfo.signDegree !== undefined && (
-                      <Text style={styles.miniDegree}>
-                        {Math.floor(transitInfo.signDegree)}°
-                      </Text>
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-            
-            {loadingAllTransits && (
-              <View style={styles.loadingContainer}>
-                <Text style={styles.bodyText}>{t('common.loading')}</Text>
-              </View>
-            )}
           </GlassCard>
         )}
 
