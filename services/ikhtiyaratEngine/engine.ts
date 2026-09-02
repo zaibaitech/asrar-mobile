@@ -258,11 +258,15 @@ export interface NearestBetterDatesResult {
 }
 
 /**
- * Find the nearest dates (searching both forward and backward from the
- * given date, up to searchRadiusDays each direction) that reach at least
- * the 'acceptable' tier — not just "higher score than today," since today
- * could itself be Weak and a marginally-higher-scoring nearby date would
- * still not be a genuinely good recommendation.
+ * Find the nearest upcoming dates (searching forward from the given date,
+ * up to searchRadiusDays) that reach at least the 'acceptable' tier — not
+ * just "higher score than today," since today could itself be Weak and a
+ * marginally-higher-scoring nearby date would still not be a genuinely
+ * good recommendation.
+ *
+ * Deliberately forward-only: this powers "next best date" suggestions for
+ * planning a future event (marriage, travel, business, ...), where a date
+ * before the one being checked is never actionable.
  */
 export function findNearestBetterDates(
   input: ElectionInput,
@@ -274,21 +278,19 @@ export function findNearestBetterDates(
   let bestAvailable: ElectionResult | null = null;
 
   for (let offset = 1; offset <= searchRadiusDays; offset++) {
-    for (const sign of [1, -1] as const) {
-      const candidateDate = new Date(input.datetime.getTime() + sign * offset * 24 * 60 * 60 * 1000);
-      const result = evaluateElection({ ...input, datetime: candidateDate }, config);
-      if (!result.hasHardFail && ACCEPTABLE_OR_BETTER.has(result.tier)) {
-        found.push(result);
-      }
-      if (!bestAvailable || result.score > bestAvailable.score) {
-        bestAvailable = result;
-      }
+    const candidateDate = new Date(input.datetime.getTime() + offset * 24 * 60 * 60 * 1000);
+    const result = evaluateElection({ ...input, datetime: candidateDate }, config);
+    if (!result.hasHardFail && ACCEPTABLE_OR_BETTER.has(result.tier)) {
+      found.push(result);
+    }
+    if (!bestAvailable || result.score > bestAvailable.score) {
+      bestAvailable = result;
     }
   }
 
   const sorted = found.sort((a, b) => {
-    const distanceA = Math.abs(a.date.getTime() - input.datetime.getTime());
-    const distanceB = Math.abs(b.date.getTime() - input.datetime.getTime());
+    const distanceA = a.date.getTime() - input.datetime.getTime();
+    const distanceB = b.date.getTime() - input.datetime.getTime();
     if (distanceA !== distanceB) return distanceA - distanceB;
     // Equidistant: prefer the higher tier, then the higher score.
     if (TIER_RANK[b.tier] !== TIER_RANK[a.tier]) return TIER_RANK[b.tier] - TIER_RANK[a.tier];
