@@ -7,11 +7,12 @@ import {
     CheckCircle,
     ChevronDown,
     ChevronUp,
+    Keyboard as KeyboardIcon,
     Lightbulb,
     Shield,
     Users,
 } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -27,6 +28,7 @@ import {
     View
 } from 'react-native';
 import ResponsiveAppHeader from '../../components/AppHeader';
+import ArabicKeyboard from '../../components/istikhara/ArabicKeyboard';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useIstikhara } from '../../hooks/useIstikhara';
 
@@ -37,15 +39,22 @@ export default function WhoAmIForm() {
   
   const [personName, setPersonName] = useState('');
   const [motherName, setMotherName] = useState('');
-  
+
   // Collapsible section states
   const [educationExpanded, setEducationExpanded] = useState(false);
   const [discoveryExpanded, setDiscoveryExpanded] = useState(false);
   const [examplesExpanded, setExamplesExpanded] = useState(false);
   const [privacyExpanded, setPrivacyExpanded] = useState(false);
-  
+
   // Validation states
   const [touched, setTouched] = useState({ person: false, mother: false });
+
+  // Arabic keyboard state
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [activeInput, setActiveInput] = useState<'person' | 'mother' | null>(null);
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const personInputRef = useRef<TextInput>(null);
+  const motherInputRef = useRef<TextInput>(null);
 
   const validateName = (name: string) => {
     return name.trim().length > 0;
@@ -54,6 +63,44 @@ export default function WhoAmIForm() {
   const personValid = validateName(personName);
   const motherValid = validateName(motherName);
   const isFormValid = personValid && motherValid;
+
+  const handleKeyPress = (key: string) => {
+    if (activeInput === 'person') {
+      const newText = personName.slice(0, cursorPosition) + key + personName.slice(cursorPosition);
+      setPersonName(newText);
+      setCursorPosition(cursorPosition + 1);
+      if (!touched.person) setTouched((prev) => ({ ...prev, person: true }));
+    } else if (activeInput === 'mother') {
+      const newText = motherName.slice(0, cursorPosition) + key + motherName.slice(cursorPosition);
+      setMotherName(newText);
+      setCursorPosition(cursorPosition + 1);
+      if (!touched.mother) setTouched((prev) => ({ ...prev, mother: true }));
+    }
+  };
+
+  const handleBackspace = () => {
+    if (cursorPosition === 0) return;
+
+    if (activeInput === 'person') {
+      const newText = personName.slice(0, cursorPosition - 1) + personName.slice(cursorPosition);
+      setPersonName(newText);
+      setCursorPosition(cursorPosition - 1);
+    } else if (activeInput === 'mother') {
+      const newText = motherName.slice(0, cursorPosition - 1) + motherName.slice(cursorPosition);
+      setMotherName(newText);
+      setCursorPosition(cursorPosition - 1);
+    }
+  };
+
+  const handleSpace = () => {
+    handleKeyPress(' ');
+  };
+
+  const openKeyboard = (inputType: 'person' | 'mother') => {
+    setActiveInput(inputType);
+    setCursorPosition(inputType === 'person' ? personName.length : motherName.length);
+    setShowKeyboard(true);
+  };
 
   const handleCalculate = async () => {
     if (!isFormValid) {
@@ -314,8 +361,18 @@ export default function WhoAmIForm() {
                   </View>
 
                   <View style={styles.inputWrapper}>
-                    <Text style={styles.inputLabel}>Arabic Name *</Text>
+                    <View style={styles.labelWithButton}>
+                      <Text style={styles.inputLabel}>Arabic Name *</Text>
+                      <TouchableOpacity
+                        style={styles.keyboardButton}
+                        onPress={() => openKeyboard('person')}
+                      >
+                        <KeyboardIcon size={14} color="#e0e7ff" strokeWidth={2} />
+                        <Text style={styles.keyboardButtonText}>Keyboard</Text>
+                      </TouchableOpacity>
+                    </View>
                     <TextInput
+                      ref={personInputRef}
                       style={[
                         styles.input,
                         touched.person && !personValid && styles.inputError,
@@ -326,10 +383,12 @@ export default function WhoAmIForm() {
                       value={personName}
                       onChangeText={(text) => {
                         setPersonName(text);
+                        setCursorPosition(text.length);
                         if (!touched.person) setTouched({ ...touched, person: true });
                       }}
+                      onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
                       textAlign="right"
-                      editable={!loading}
+                      editable={!loading && (!showKeyboard || activeInput !== 'person')}
                       autoCapitalize="none"
                       autoCorrect={false}
                       returnKeyType="next"
@@ -362,8 +421,18 @@ export default function WhoAmIForm() {
                   </View>
 
                   <View style={styles.inputWrapper}>
-                    <Text style={styles.inputLabel}>Arabic Name *</Text>
+                    <View style={styles.labelWithButton}>
+                      <Text style={styles.inputLabel}>Arabic Name *</Text>
+                      <TouchableOpacity
+                        style={styles.keyboardButton}
+                        onPress={() => openKeyboard('mother')}
+                      >
+                        <KeyboardIcon size={14} color="#e0e7ff" strokeWidth={2} />
+                        <Text style={styles.keyboardButtonText}>Keyboard</Text>
+                      </TouchableOpacity>
+                    </View>
                     <TextInput
+                      ref={motherInputRef}
                       style={[
                         styles.input,
                         touched.mother && !motherValid && styles.inputError,
@@ -374,10 +443,12 @@ export default function WhoAmIForm() {
                       value={motherName}
                       onChangeText={(text) => {
                         setMotherName(text);
+                        setCursorPosition(text.length);
                         if (!touched.mother) setTouched({ ...touched, mother: true });
                       }}
+                      onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
                       textAlign="right"
-                      editable={!loading}
+                      editable={!loading && (!showKeyboard || activeInput !== 'mother')}
                       autoCapitalize="none"
                       autoCorrect={false}
                       returnKeyType="done"
@@ -442,6 +513,15 @@ export default function WhoAmIForm() {
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
+
+      {/* Arabic Keyboard */}
+      <ArabicKeyboard
+        visible={showKeyboard}
+        onClose={() => setShowKeyboard(false)}
+        onKeyPress={handleKeyPress}
+        onBackspace={handleBackspace}
+        onSpace={handleSpace}
+      />
     </SafeAreaView>
   );
 }
@@ -614,6 +694,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#ffffff',
+  },
+  labelWithButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  keyboardButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.3)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.4)',
+  },
+  keyboardButtonText: {
+    fontSize: 11,
+    color: '#e0e7ff',
+    fontWeight: '600',
   },
   input: {
     backgroundColor: 'rgba(15, 23, 42, 0.5)',
