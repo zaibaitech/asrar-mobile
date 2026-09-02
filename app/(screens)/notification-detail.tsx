@@ -75,7 +75,7 @@ export default function NotificationDetailScreen() {
       case 'momentAlignment':
         return {
           route: '/moment-alignment-details',
-          label: tSafe('notifications.detail.openMomentAlignment', 'Open Moment Alignment'),
+          label: tSafe('notifications.detail.openMomentAlignment', 'Open Planetary Hour'),
         };
       case 'dailyGuidance':
         return {

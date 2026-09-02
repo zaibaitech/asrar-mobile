@@ -824,7 +824,7 @@ export default function DailyGuidanceDetailsScreen() {
           ) : dailySynthesis ? (
             // Fallback - No DOB or name in profile
             <View style={styles.genericCard}>
-              <Text style={styles.genericTitle}>Daily Energy Overview</Text>
+              <Text style={styles.genericTitle}>Day Ruler Overview</Text>
               <Text style={styles.genericText}>{dailySynthesis.summaryText}</Text>
               <Text style={styles.genericNote}>
                 Add your date of birth to unlock personalized alignment guidance

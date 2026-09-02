@@ -80,9 +80,9 @@ export const translations = {
       staticNeverChanges: "Static - never changes",
       needTimingGuidanceTitle: "⏰ Need Timing Analysis?",
       needTimingGuidanceSubtitle: "Check these screens for spiritual timing:",
-      dailyEnergyLinkTitle: "Daily Energy",
+      dailyEnergyLinkTitle: "Day Ruler",
       dailyEnergyLinkSubtitle: "See the overall timing for today.",
-      momentAlignmentLinkTitle: "Moment Alignment",
+      momentAlignmentLinkTitle: "Planetary Hour",
       momentAlignmentLinkSubtitle: "See timing for right now (hour-by-hour).",
       timingGuidanceNote: "Scores update every few minutes.",
       elementalStatus: {
@@ -145,8 +145,8 @@ export const translations = {
         delicateTitle: "⚠️ Gentle Timing",
         updateTitle: "⏰ Timing Update",
         personalNoteAligned: "Aligned with your {element} element.",
-        favorableBody: "A favorable hour is beginning for {activity}. {planet} hour • {element}.{personalNote} Open Moment Alignment for what’s supported now.",
-        transformativeBody: "A transformative hour is beginning for {activity}. {planet} hour • {element}.{personalNote} Open Moment Alignment for what’s supported now.",
+        favorableBody: "A favorable hour is beginning for {activity}. {planet} hour • {element}.{personalNote} Open Planetary Hour for what’s supported now.",
+        transformativeBody: "A transformative hour is beginning for {activity}. {planet} hour • {element}.{personalNote} Open Planetary Hour for what’s supported now.",
         delicateBody: "A delicate hour is beginning. Move gently and stay mindful. {planet} hour • {element}.{personalNote}",
       },
       timing: {
@@ -167,7 +167,7 @@ export const translations = {
         quality: "Quality",
         whyThisTiming: "Why This Timing?",
         elementHarmony: "Element Harmony",
-        momentAlignment: "Moment Alignment",
+        momentAlignment: "Planetary Hour",
         planetaryResonance: "Planetary Resonance",
         whatThisMeans: "What This Means",
         // Legacy translations
@@ -178,7 +178,7 @@ export const translations = {
         morningTitle: "{emoji} Morning Briefing — {dayName}",
         morningBody: "Today carries {elementName} energy with {harmonyText}. Current hour: {planet}.{personalNote} Open Daily Guidance for personalized recommendations.",
         alignmentTitle: "✨ Alignment Peak — {elementUpper}",
-        alignmentBody: "Strong {element} alignment right now. Best for {activity}. Open Moment Alignment for your next step.",
+        alignmentBody: "Strong {element} alignment right now. Best for {activity}. Open Planetary Hour for your next step.",
       },
       prayer: {
         prayerTitle: "🕌 {prayerName} Prayer",
@@ -202,8 +202,8 @@ export const translations = {
         openPrayerGuidance: "Open Prayer Guidance",
         openDivineTiming: "Open Divine Timing",
         openDailyCheckIn: "Open Daily Check-In",
-        openMomentAlignment: "Open Moment Alignment",
-        openDailyGuidance: "Open Daily Energy",
+        openMomentAlignment: "Open Planetary Hour",
+        openDailyGuidance: "Open Day Ruler",
       },
     },
 
@@ -401,14 +401,14 @@ export const translations = {
         },
       },
       dailyEnergy: {
-        title: "Daily Energy",
+        title: "Day Ruler",
         todaysElement: "Today's Element",
         dayRuler: "Day Ruler",
         bestFor: "BEST FOR",
         todaysFocus: "Today's Focus",
         forReflection: "For reflection",
         viewDetails: "View details",
-        peakHours: "{planet} hours (check Moment Alignment for specific times)",
+        peakHours: "{planet} hours (check Planetary Hour for specific times)",
         windows: {
           neutral: "Neutral Window",
           favorable: "Favorable Window",
@@ -1242,7 +1242,7 @@ export const translations = {
         bestFor: "Routine tasks",
       },
       moment: {
-        title: "Moment Alignment",
+        title: "Planetary Hour",
         addNamePrompt: "Add name to enable",
         addDobPrompt: "Add your date of birth to unlock personalized alignment.",
         details: "DETAILS",
@@ -1314,7 +1314,7 @@ export const translations = {
           disclaimer: "For reflection only • Not a ruling",
         },
         momentAlignment: {
-          title: "Moment Alignment",
+          title: "Planetary Hour",
           nowLabel: "Now",
           cta: "See details →",
           tapForDetails: "Tap for details",
@@ -2373,7 +2373,7 @@ export const translations = {
       
       // Daily Guidance Details Screen
       dailyGuidanceDetails: {
-        title: "Daily Energy",
+        title: "Day Ruler",
         sections: {
           dayRuler: "Day Ruler",
           dailyWindow: "Daily Window",
@@ -2725,7 +2725,7 @@ export const translations = {
       
       sections: {
         momentAlignment: {
-          title: "Moment Alignment",
+          title: "Planetary Hour",
           details: "DETAILS",
           you: "You",
           now: "Now",
@@ -2779,9 +2779,9 @@ export const translations = {
       peakWindowsAiUnavailable: "AI enhancement unavailable",
     },
 
-    // Daily Energy (shared keys)
+    // Day Ruler (shared keys)
     dailyEnergy: {
-      // Classical Day Status (distinct from Moment Alignment's hourly "Time")
+      // Classical Day Status (distinct from Planetary Hour's hourly "Time")
       status: {
         favorable: "Favorable Day",
         neutral: "Balanced Day",
@@ -3748,9 +3748,9 @@ export const translations = {
         },
       },
       
-      // Moment Alignment Screen (System 3 - Hourly)
+      // Planetary Hour Screen (System 3 - Hourly)
       momentAlignment: {
-        title: "Moment Alignment",
+        title: "Planetary Hour",
         headerSubtitle: "Current Hour",
         explanation: "Shows the active planetary hour (changes through the day) and how it interacts with your spiritual nature.",
         
@@ -3840,9 +3840,9 @@ export const translations = {
       },
     },
     
-    // Moment Alignment Detail
+    // Planetary Hour Detail
     momentDetail: {
-      title: "Moment Alignment",
+      title: "Planetary Hour",
       noName: "No Name Set",
       noDob: "Date of Birth Required",
       addNameMessage: "Add your name in Name Destiny to unlock moment alignment guidance.",
@@ -9120,7 +9120,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         title: "AI Guidance",
         description: "Get personalized spiritual guidance",
       },
-      // Moment Alignment Detail
+      // Planetary Hour Detail
       personalGuidance: {
         title: "Personal Guidance",
         description: "Discover what actions are favored now",
@@ -9415,13 +9415,13 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       // Screen 1: Advanced Timing Analysis - Home/Intro
       home: {
         title: "Advanced Timing Analysis",
-        subtitle: "Receive comprehensive guidance by integrating all timing systems: Moment Alignment, Daily Guidance, and Planetary Hours.",
+        subtitle: "Receive comprehensive guidance by integrating all timing systems: Planetary Hour, Daily Guidance, and Planetary Hours.",
         cards: {
           currentHour: {
             label: "Current Hour",
           },
           dailyEnergy: {
-            label: "Daily Energy",
+            label: "Day Ruler",
           },
         },
         features: {
@@ -9783,7 +9783,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         position: "Position",
         recommendedDhikr: "Recommended Dhikr",
         source: "Source",
-        energyFlowChart: "Daily Energy Flow",
+        energyFlowChart: "Day Ruler Flow",
         currentHour: "Current Hour",
         excellentHours: "Excellent Hours",
         goodHours: "Good Hours",
@@ -10786,9 +10786,9 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       staticNeverChanges: "Statique - ne change jamais",
       needTimingGuidanceTitle: "⏰ Besoin d'analyse du timing ?",
       needTimingGuidanceSubtitle: "Consultez ces écrans pour le timing spirituel :",
-      dailyEnergyLinkTitle: "Énergie du jour",
+      dailyEnergyLinkTitle: "Maître du Jour",
       dailyEnergyLinkSubtitle: "Voir le timing global pour aujourd'hui.",
-      momentAlignmentLinkTitle: "Alignement du moment",
+      momentAlignmentLinkTitle: "Heure planétaire",
       momentAlignmentLinkSubtitle: "Voir le timing pour l'instant présent (heure par heure).",
       timingGuidanceNote: "Les scores se mettent à jour toutes les quelques minutes.",
       elementalStatus: {
@@ -10851,8 +10851,8 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         delicateTitle: "⚠️ Période délicate à venir",
         updateTitle: "⏰ Mise à jour du timing",
         personalNoteAligned: "Votre élément {element} est aligné.",
-        favorableBody: "Une heure favorable commence pour {activity}. Heure de {planet} • {element}.{personalNote} Ouvrez Alignement du moment pour voir ce qui est soutenu maintenant.",
-        transformativeBody: "Une fenêtre transformatrice commence pour {activity}. Heure de {planet} • {element}.{personalNote} Ouvrez Alignement du moment pour voir ce qui est soutenu maintenant.",
+        favorableBody: "Une heure favorable commence pour {activity}. Heure de {planet} • {element}.{personalNote} Ouvrez Heure planétaire pour voir ce qui est soutenu maintenant.",
+        transformativeBody: "Une fenêtre transformatrice commence pour {activity}. Heure de {planet} • {element}.{personalNote} Ouvrez Heure planétaire pour voir ce qui est soutenu maintenant.",
         delicateBody: "Une heure délicate commence. Avancez avec douceur et présence. Heure de {planet} • {element}.{personalNote}",
       },
       timing: {
@@ -10873,7 +10873,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         quality: "Qualité",
         whyThisTiming: "Pourquoi ce timing?",
         elementHarmony: "Harmonie élémentaire",
-        momentAlignment: "Alignement du moment",
+        momentAlignment: "Heure planétaire",
         planetaryResonance: "Résonance planétaire",
         whatThisMeans: "Que cela signifie",
         // Legacy translations
@@ -10884,7 +10884,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         morningTitle: "{emoji} Briefing du matin — {dayName}",
         morningBody: "Aujourd'hui porte une énergie {elementName} avec {harmonyText}. Heure actuelle : {planet}.{personalNote} Ouvrez Guidance pour des recommandations personnalisées.",
         alignmentTitle: "✨ Pic d'alignement — {elementUpper}",
-        alignmentBody: "Fort alignement {element} maintenant. Idéal pour {activity}. Ouvrez Alignement du moment pour votre prochaine étape.",
+        alignmentBody: "Fort alignement {element} maintenant. Idéal pour {activity}. Ouvrez Heure planétaire pour votre prochaine étape.",
       },
       prayer: {
         prayerTitle: "🕌 Prière de {prayerName}",
@@ -10908,8 +10908,8 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         openPrayerGuidance: "Ouvrir Guidance de prière",
         openDivineTiming: "Ouvrir Moment Divin",
         openDailyCheckIn: "Ouvrir Bilan Quotidien",
-        openMomentAlignment: "Ouvrir Alignement du moment",
-        openDailyGuidance: "Ouvrir Énergie du Jour",
+        openMomentAlignment: "Ouvrir Heure planétaire",
+        openDailyGuidance: "Ouvrir Maître du Jour",
       },
     },
 
@@ -11107,14 +11107,14 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         },
       },
       dailyEnergy: {
-        title: "Énergie du Jour",
+        title: "Maître du Jour",
         todaysElement: "Élément du Jour",
         dayRuler: "Maître du Jour",
         bestFor: "IDÉAL POUR",
         todaysFocus: "Focus du Jour",
         forReflection: "Pour réflexion",
         viewDetails: "Voir détails",
-        peakHours: "Heures de {planet} (vérifier Alignement du Moment pour les heures spécifiques)",
+        peakHours: "Heures de {planet} (vérifier Heure planétaire pour les heures spécifiques)",
         windows: {
           neutral: "Fenêtre neutre",
           favorable: "Fenêtre favorable",
@@ -11950,7 +11950,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
         bestFor: "Tâches routinières",
       },
       moment: {
-        title: "Alignement du moment",
+        title: "Heure planétaire",
         addNamePrompt: "Ajoutez un nom pour activer",
         addDobPrompt: "Ajoutez votre date de naissance pour débloquer l'alignement personnalisé.",
         details: "DÉTAILS",
@@ -11999,7 +11999,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
           disclaimer: "Pour réflexion • Pas un avis religieux",
         },
         momentAlignment: {
-          title: "Alignement du moment",
+          title: "Heure planétaire",
           nowLabel: "Maintenant",
           cta: "Voir les détails →",
           tapForDetails: "Appuyez pour détails",
@@ -13054,7 +13054,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       
       // Daily Guidance Details Screen  
       dailyGuidanceDetails: {
-        title: "Énergie du Jour",
+        title: "Planète du jour",
         sections: {
           dayRuler: "Planète du jour",
           dailyWindow: "Fenêtre quotidienne",
@@ -13424,7 +13424,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       
       sections: {
         momentAlignment: {
-          title: "Alignement du moment",
+          title: "Heure planétaire",
           nowLabel: "Maintenant",
           cta: "Voir les détails →",
           tapForDetails: "Touchez pour les détails",
@@ -14441,7 +14441,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       
       // Écran d'Alignement du Moment (Système 3 - Horaire)
       momentAlignment: {
-        title: "Alignement du Moment",
+        title: "Heure planétaire",
         headerSubtitle: "Heure Actuelle",
         explanation: "Indique l'heure planétaire active (change tout au long de la journée) et comment elle interagit avec votre nature spirituelle.",
         
@@ -14531,9 +14531,9 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       },
     },
     
-    // Moment Alignment Detail
+    // Planetary Hour Detail
     momentDetail: {
-      title: "Alignement du Moment",
+      title: "Heure planétaire",
       noName: "Aucun Nom Défini",
       noDob: "Date de Naissance Requise",
       addNameMessage: "Ajoutez votre nom dans Destinée du Nom pour débloquer l'alignement du moment.",
@@ -20115,7 +20115,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         title: "Guidance IA",
         description: "Obtenez une guidance spirituelle personnalisée",
       },
-      // Moment Alignment Detail
+      // Planetary Hour Detail
       personalGuidance: {
         title: "Guidance personnelle",
         description: "Découvrez quelles actions sont favorisées maintenant",
@@ -20410,13 +20410,13 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       // Screen 1: Advanced Timing Analysis - Home/Intro
       home: {
         title: "Analyse avancée des timings",
-        subtitle: "Recevez une guidance complète en intégrant tous les systèmes de timing : Alignement du moment, Guidance du jour et Heures planétaires.",
+        subtitle: "Recevez une guidance complète en intégrant tous les systèmes de timing : Heure planétaire, Guidance du jour et Heures planétaires.",
         cards: {
           currentHour: {
             label: "Heure actuelle",
           },
           dailyEnergy: {
-            label: "Énergie du jour",
+            label: "Maître du Jour",
           },
         },
         features: {
@@ -20778,7 +20778,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         position: "Position",
         recommendedDhikr: "Dhikr Recommandé",
         source: "Source",
-        energyFlowChart: "Flux d'Énergie Quotidien",
+        energyFlowChart: "Flux du Maître du Jour",
         currentHour: "Heure Actuelle",
         excellentHours: "Heures Excellentes",
         goodHours: "Bonnes Heures",
@@ -21654,7 +21654,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     },
   },
   ar: {
-        // Moment Alignment Screen (Hourly)
+        // Planetary Hour Screen (Hourly)
         momentAlignment: {
           currentHourPlanet: {
             title: "كوكب الساعة الحالية",
@@ -23940,9 +23940,9 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       staticNeverChanges: "ثابت - لا يتغير أبداً",
       needTimingGuidanceTitle: "⏰ تحتاج تحليل التوقيت؟",
       needTimingGuidanceSubtitle: "اطّلع على هذه الشاشات للتوقيت الروحي:",
-      dailyEnergyLinkTitle: "طاقة اليوم",
+      dailyEnergyLinkTitle: "حاكم اليوم",
       dailyEnergyLinkSubtitle: "اعرض التوقيت العام لليوم.",
-      momentAlignmentLinkTitle: "محاذاة اللحظة",
+      momentAlignmentLinkTitle: "الساعة الكوكبية",
       momentAlignmentLinkSubtitle: "اعرض التوقيت لهذه اللحظة (ساعة بساعة).",
       timingGuidanceNote: "تتحدّث الدرجات كل بضع دقائق.",
       elementalStatus: {
@@ -24005,8 +24005,8 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         delicateTitle: "⚠️ توقيت لطيف",
         updateTitle: "⏰ تحديث التوقيت",
         personalNoteAligned: "متوافق مع عنصرك {element}.",
-        favorableBody: "تبدأ ساعة مؤاتية لـ {activity}. ساعة {planet} • {element}.{personalNote} افتح محاذاة اللحظة لمعرفة ما هو مدعوم الآن.",
-        transformativeBody: "تبدأ ساعة تحويلية لـ {activity}. ساعة {planet} • {element}.{personalNote} افتح محاذاة اللحظة لمعرفة ما هو مدعوم الآن.",
+        favorableBody: "تبدأ ساعة مؤاتية لـ {activity}. ساعة {planet} • {element}.{personalNote} افتح الساعة الكوكبية لمعرفة ما هو مدعوم الآن.",
+        transformativeBody: "تبدأ ساعة تحويلية لـ {activity}. ساعة {planet} • {element}.{personalNote} افتح الساعة الكوكبية لمعرفة ما هو مدعوم الآن.",
         delicateBody: "تبدأ ساعة دقيقة. تحرك برفق وابقَ واعيًا. ساعة {planet} • {element}.{personalNote}",
       },
       // Timing section for notifications and cards (TimingGuidanceCard, TodayDetailsCard, CollapsibleEducationalSection)
@@ -24027,7 +24027,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         quality: "الجودة",
         whyThisTiming: "لماذا هذا التوقيت؟",
         elementHarmony: "الانسجام العنصري",
-        momentAlignment: "محاذاة اللحظة",
+        momentAlignment: "الساعة الكوكبية",
         planetaryResonance: "الرنين الكوكبي",
         whatThisMeans: "ما يعني هذا",
         harmonyHigh: "طاقات مؤاتية جدًا",
@@ -24037,7 +24037,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         morningTitle: "{emoji} إحاطة الصباح — {dayName}",
         morningBody: "يحمل اليوم طاقة {elementName} مع {harmonyText}. الساعة الحالية: {planet}.{personalNote} افتح التوجيه اليومي للتوصيات الشخصية.",
         alignmentTitle: "✨ ذروة المحاذاة — {elementUpper}",
-        alignmentBody: "توافق {element} قوي الآن. الأفضل لـ {activity}. افتح محاذاة اللحظة لخطوتك التالية.",
+        alignmentBody: "توافق {element} قوي الآن. الأفضل لـ {activity}. افتح الساعة الكوكبية لخطوتك التالية.",
       },
       prayer: {
         prayerTitle: "🕌 صلاة {prayerName}",
@@ -24061,8 +24061,8 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         openPrayerGuidance: "فتح إرشاد الصلاة",
         openDivineTiming: "فتح التوقيت الإلهي",
         openDailyCheckIn: "فتح التسجيل اليومي",
-        openMomentAlignment: "فتح محاذاة اللحظة",
-        openDailyGuidance: "فتح طاقة اليوم",
+        openMomentAlignment: "فتح الساعة الكوكبية",
+        openDailyGuidance: "فتح حاكم اليوم",
       },
     },
 
@@ -25032,7 +25032,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       },
 
       momentAlignment: {
-        title: "محاذاة اللحظة",
+        title: "الساعة الكوكبية",
         headerSubtitle: "الساعة الحالية",
         explanation: "يعرض الساعة الكوكبية النشطة (تتغير خلال اليوم) وكيف تتفاعل مع طبيعتك الروحية.",
 
@@ -25301,13 +25301,13 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     divineTiming: {
       home: {
         title: "تحليل التوقيت المتقدم",
-        subtitle: "احصل على إرشاد شامل من خلال دمج جميع أنظمة التوقيت: محاذاة اللحظة، التوجيه اليومي، والساعات الكوكبية.",
+        subtitle: "احصل على إرشاد شامل من خلال دمج جميع أنظمة التوقيت: الساعة الكوكبية، التوجيه اليومي، والساعات الكوكبية.",
         cards: {
           currentHour: {
             label: "الساعة الحالية",
           },
           dailyEnergy: {
-            label: "طاقة اليوم",
+            label: "حاكم اليوم",
           },
         },
         features: {
@@ -25641,7 +25641,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         position: "الموضع",
         recommendedDhikr: "الذكر الموصى به",
         source: "المصدر",
-        energyFlowChart: "تدفق الطاقة اليومي",
+        energyFlowChart: "تدفق حاكم اليوم",
         currentHour: "الساعة الحالية",
         excellentHours: "ساعات ممتازة",
         goodHours: "ساعات جيدة",
@@ -26728,7 +26728,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         title: "إرشاد الذكاء الاصطناعي",
         description: "احصل على إرشاد روحي مخصص",
       },
-      // Moment Alignment Detail
+      // Planetary Hour Detail
       personalGuidance: {
         title: "إرشاد شخصي",
         description: "اكتشف الأعمال المفضلة الآن",
@@ -26888,7 +26888,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       peakWindowsTitle: "نوافذك المثلى",
       peakWindowsAiUnavailable: "تحسين الذكاء الاصطناعي غير متاح",
       moment: {
-        title: "محاذاة اللحظة",
+        title: "الساعة الكوكبية",
         addNamePrompt: "أضف الاسم للتفعيل",
         addDobPrompt: "أضف تاريخ ميلادك لتفعيل المحاذاة الشخصية.",
         details: "التفاصيل",
@@ -26953,7 +26953,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           disclaimer: "للتأمل فقط • ليس حكمًا شرعيًا",
         },
         momentAlignment: {
-          title: "محاذاة اللحظة",
+          title: "الساعة الكوكبية",
           nowLabel: "الآن",
           cta: "عرض التفاصيل ←",
           tapForDetails: "اضغط لعرض التفاصيل",
@@ -27966,7 +27966,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
 
       // شاشة تفاصيل التوجيه اليومي
       dailyGuidanceDetails: {
-        title: "طاقة اليوم",
+        title: "حاكم اليوم",
         sections: {
           dayRuler: "حاكم اليوم",
           dailyWindow: "نافذة اليوم",
@@ -28317,7 +28317,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
 
       sections: {
         momentAlignment: {
-          title: "محاذاة اللحظة",
+          title: "الساعة الكوكبية",
           details: "التفاصيل",
           you: "أنت",
           now: "الآن",
@@ -28404,7 +28404,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       noDob: "تاريخ الميلاد مطلوب",
       addDobMessage: "أضف تاريخ ميلادك لتفعيل محاذاة اللحظة الشخصية.",
       goToProfile: "الذهاب إلى الملف الشخصي",
-      title: "محاذاة اللحظة",
+      title: "الساعة الكوكبية",
       noName: "لم يتم إدخال الاسم",
       addNameMessage: "أضف اسمك في قسم قدر الاسم لفتح إرشاد محاذاة اللحظة.",
       goToNameDestiny: "اذهب إلى قدر الاسم",
@@ -28659,14 +28659,14 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         },
       },
       dailyEnergy: {
-        title: "طاقة اليوم",
+        title: "حاكم اليوم",
         todaysElement: "عنصر اليوم",
         dayRuler: "حاكم اليوم",
         bestFor: "الأفضل لـ",
         todaysFocus: "تركيز اليوم",
         forReflection: "للتأمل",
         viewDetails: "عرض التفاصيل",
-        peakHours: "ساعات {planet} (راجع محاذاة اللحظة لأوقات محددة)",
+        peakHours: "ساعات {planet} (راجع الساعة الكوكبية لأوقات محددة)",
         windows: {
           neutral: "فترة متوازنة",
           favorable: "نافذة ملائمة",
@@ -30528,7 +30528,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       },
     },
 
-    // Daily Energy - نظام السرد الجديد
+    // Day Ruler - نظام السرد الجديد
     dailyEnergy: {
       // حالة اليوم الكلاسيكية (مختلفة عن "الوقت" في محاذاة اللحظة)
       status: {

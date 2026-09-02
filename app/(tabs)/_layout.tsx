@@ -170,7 +170,7 @@ export default function TabLayout() {
         name="moment-alignment-detail"
         options={{
           href: null, // Hide from tab bar
-          title: 'Moment Alignment',
+          title: 'Planetary Hour',
         }}
       />
       <Tabs.Screen
