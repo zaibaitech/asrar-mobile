@@ -191,9 +191,7 @@ export default function PlanetTransitWidget({ transitData, nextDayBlessing, comp
       : tSafe('widgets.planetTransit.labels.skyNow', 'Sky Now');
   }
 
-  const subtitleText = hasTransit
-    ? `${transitTypeLabel} • ${t('widgets.planetTransit.subtitle')}`
-    : fallbackMessage;
+  const subtitleText = hasTransit ? transitTypeLabel : fallbackMessage;
 
   const planetName = transitData?.planetName ?? fallbackMessage;
   const planetNameAr = transitData?.planetNameAr ?? '';

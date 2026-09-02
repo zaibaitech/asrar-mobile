@@ -259,6 +259,14 @@ describe('findNearestBetterDates', () => {
     }
   }, SCAN_TEST_TIMEOUT);
 
+  it('never suggests a date before the one being checked — a past date is not actionable for planning', () => {
+    const input = inputFor('2026-07-13T12:00:00+01:00');
+    const { dates } = findNearestBetterDates(input, marriageElectionConfig, 3, TEST_RADIUS_DAYS);
+    for (const d of dates) {
+      expect(d.date.getTime()).toBeGreaterThan(input.datetime.getTime());
+    }
+  }, SCAN_TEST_TIMEOUT);
+
   it('reports radiusExhausted and provides bestAvailable when no acceptable date exists within a tiny radius', () => {
     const input = inputFor('2026-07-13T12:00:00+01:00');
     const { dates, radiusExhausted, bestAvailable } = findNearestBetterDates(input, marriageElectionConfig, 3, 0);
