@@ -13,14 +13,16 @@ import {
     ChevronDown,
     ChevronUp,
     FileText,
+    Keyboard as KeyboardIcon,
     Lightbulb,
     Shield,
     Users
 } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
+    Keyboard,
     KeyboardAvoidingView,
     Platform,
     Pressable,
@@ -31,6 +33,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import ArabicKeyboard from '../../components/istikhara/ArabicKeyboard';
 import LocationAutocomplete from '../../components/LocationAutocomplete';
 import NameAutocomplete from '../../components/NameAutocomplete';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -65,7 +68,14 @@ export default function WhoAmICalculator() {
   const [motherName, setMotherName] = useState('');
   const [personLatin, setPersonLatin] = useState('');
   const [motherLatin, setMotherLatin] = useState('');
-  
+
+  // Arabic on-screen keyboard state
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [activeInput, setActiveInput] = useState<'person' | 'mother' | null>(null);
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const personInputRef = useRef<TextInput>(null);
+  const motherInputRef = useRef<TextInput>(null);
+
   // Date-based calculation states
   const [birthDate, setBirthDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -129,6 +139,47 @@ export default function WhoAmICalculator() {
 
   const validateName = (name: string) => {
     return name.trim().length > 0;
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (activeInput === 'person') {
+      const newText = personName.slice(0, cursorPosition) + key + personName.slice(cursorPosition);
+      setPersonName(newText);
+      setCursorPosition(cursorPosition + 1);
+      if (!touched.person) setTouched({ ...touched, person: true });
+    } else if (activeInput === 'mother') {
+      const newText = motherName.slice(0, cursorPosition) + key + motherName.slice(cursorPosition);
+      setMotherName(newText);
+      setCursorPosition(cursorPosition + 1);
+      if (!touched.mother) setTouched({ ...touched, mother: true });
+    }
+  };
+
+  const handleBackspace = () => {
+    if (cursorPosition === 0) return;
+
+    if (activeInput === 'person') {
+      const newText = personName.slice(0, cursorPosition - 1) + personName.slice(cursorPosition);
+      setPersonName(newText);
+      setCursorPosition(cursorPosition - 1);
+    } else if (activeInput === 'mother') {
+      const newText = motherName.slice(0, cursorPosition - 1) + motherName.slice(cursorPosition);
+      setMotherName(newText);
+      setCursorPosition(cursorPosition - 1);
+    }
+  };
+
+  const handleSpace = () => {
+    handleKeyPress(' ');
+  };
+
+  const openKeyboard = (inputType: 'person' | 'mother') => {
+    Keyboard.dismiss();
+    personInputRef.current?.blur();
+    motherInputRef.current?.blur();
+    setActiveInput(inputType);
+    setCursorPosition(inputType === 'person' ? personName.length : motherName.length);
+    setShowKeyboard(true);
   };
 
   const personValid = validateName(personName);
@@ -367,6 +418,7 @@ export default function WhoAmICalculator() {
   }, [result, loading, error]);
 
   return (
+    <>
     <LinearGradient
       colors={['#0f172a', '#1e1b4b', '#312e81']}
       style={styles.container}
@@ -526,20 +578,33 @@ export default function WhoAmICalculator() {
                       showHelper={true}
                       language={language}
                     />
-                    <Text style={styles.nameLabel}>{t('istikhara.arabicName')} *</Text>
+                    <View style={styles.labelWithButton}>
+                      <Text style={styles.nameLabel}>{t('istikhara.arabicName')} *</Text>
+                      <TouchableOpacity
+                        style={styles.keyboardButton}
+                        onPress={() => openKeyboard('person')}
+                      >
+                        <KeyboardIcon size={14} color="#e0e7ff" strokeWidth={2} />
+                        <Text style={styles.keyboardButtonText}>{t('common.showKeyboard') || 'Show Keyboard'}</Text>
+                      </TouchableOpacity>
+                    </View>
                     <View style={styles.arabicInputWrapper}>
                       <TextInput
+                        ref={personInputRef}
                         value={personName}
                         onChangeText={(text) => {
                           setPersonName(text);
+                          setCursorPosition(text.length);
                           if (!touched.person) setTouched({ ...touched, person: true });
                         }}
+                        onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
                         placeholder="أدخل الاسم بالعربية"
                         placeholderTextColor="rgba(255, 255, 255, 0.4)"
                         style={styles.arabicInput}
                         textAlign="right"
                         autoCorrect={false}
                         autoCapitalize="none"
+                        editable={!showKeyboard || activeInput !== 'person'}
                       />
                     </View>
                     {!personValid && touched.person && (
@@ -569,20 +634,33 @@ export default function WhoAmICalculator() {
                       showHelper={true}
                       language={language}
                     />
-                    <Text style={styles.nameLabel}>{t('istikhara.arabicName')} *</Text>
+                    <View style={styles.labelWithButton}>
+                      <Text style={styles.nameLabel}>{t('istikhara.arabicName')} *</Text>
+                      <TouchableOpacity
+                        style={styles.keyboardButton}
+                        onPress={() => openKeyboard('mother')}
+                      >
+                        <KeyboardIcon size={14} color="#e0e7ff" strokeWidth={2} />
+                        <Text style={styles.keyboardButtonText}>{t('common.showKeyboard') || 'Show Keyboard'}</Text>
+                      </TouchableOpacity>
+                    </View>
                     <View style={styles.arabicInputWrapper}>
                       <TextInput
+                        ref={motherInputRef}
                         value={motherName}
                         onChangeText={(text) => {
                           setMotherName(text);
+                          setCursorPosition(text.length);
                           if (!touched.mother) setTouched({ ...touched, mother: true });
                         }}
+                        onSelectionChange={(e) => setCursorPosition(e.nativeEvent.selection.start)}
                         placeholder="أدخل الاسم بالعربية"
                         placeholderTextColor="rgba(255, 255, 255, 0.4)"
                         style={styles.arabicInput}
                         textAlign="right"
                         autoCorrect={false}
                         autoCapitalize="none"
+                        editable={!showKeyboard || activeInput !== 'mother'}
                       />
                     </View>
                     {!motherValid && touched.mother && (
@@ -1013,6 +1091,15 @@ export default function WhoAmICalculator() {
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
+
+    <ArabicKeyboard
+      visible={showKeyboard}
+      onClose={() => setShowKeyboard(false)}
+      onKeyPress={handleKeyPress}
+      onBackspace={handleBackspace}
+      onSpace={handleSpace}
+    />
+    </>
   );
 }
 
@@ -1228,6 +1315,27 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.7)',
     marginBottom: 8,
     marginTop: 8,
+  },
+  labelWithButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  keyboardButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.3)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.4)',
+  },
+  keyboardButtonText: {
+    fontSize: 11,
+    color: '#e0e7ff',
+    fontWeight: '600',
   },
   arabicInputWrapper: {
     backgroundColor: 'rgba(15, 23, 42, 0.6)',
