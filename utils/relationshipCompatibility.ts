@@ -396,7 +396,7 @@ export function analyzeRelationshipCompatibility(
     'excellent': {
       en: `${person1Name} and ${person2Name} share exceptional compatibility across spiritual, elemental, and cosmic dimensions. This pairing has strong potential for harmony and mutual growth.`,
       fr: `${person1Name} et ${person2Name} partagent une compatibilité exceptionnelle à travers les dimensions spirituelle, élémentaire et cosmique. Ce duo a un fort potentiel d'harmonie et de croissance mutuelle.`,
-      ar: `${person1Name} و ${person2Name} يتشاركان توافقاً استثنائياً عبر الأبعاد الروحانية والعنصرية والكونية. هذا الثنائي لديه إمكانات قوية للانسجام والنمو المتبادل.`
+      ar: `${person1Name} و ${person2Name} يتشاركان توافقاً استثنائياً عبر الأبعاد الروحانية وتوازن العناصر والأبعاد الكونية. هذا الثنائي لديه إمكانات قوية للانسجام والنمو المتبادل.`
     },
     'very-good': {
       en: `${person1Name} and ${person2Name} demonstrate strong compatibility with excellent alignment in most areas. Minor differences can be easily harmonized.`,
@@ -837,7 +837,7 @@ export function analyzeDailyInteraction(
   const desc = descriptions[pairKey] || descriptions[`${dom1}-${dom2}`] || {
     en: `${dom1.charAt(0).toUpperCase() + dom1.slice(1)} and ${dom2.charAt(0).toUpperCase() + dom2.slice(1)} interaction. This unique combination brings together different elemental energies in daily life.`,
     fr: `Interaction ${elementNames[dom1].fr} et ${elementNames[dom2].fr}. Cette combinaison unique rassemble différentes énergies élémentaires dans la vie quotidienne.`,
-    ar: `تفاعل ${elementNames[dom1].ar} و ${elementNames[dom2].ar}. هذا المزيج الفريد يجمع طاقات عنصرية مختلفة في الحياة اليومية.`
+    ar: `تفاعل ${elementNames[dom1].ar} و ${elementNames[dom2].ar}. هذا المزيج الفريد يجمع طاقات عناصر مختلفة في الحياة اليومية.`
   };
   
   const colors = {

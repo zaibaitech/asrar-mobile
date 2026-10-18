@@ -215,7 +215,7 @@ export const COMPATIBILITY_TERMS = {
     },
     
     elementalTemperament: {
-      jargon: 'المزاج العنصري',
+      jargon: 'مزاج العناصر',
       simple: 'توازن الشخصية',
       tooltip: 'كيف تعمل طباعكما الطبيعية معًا',
       emoji: '🎨'

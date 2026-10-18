@@ -310,7 +310,7 @@ export default function BlessedDayTab({ data, elementColor }: BlessedDayTabProps
                 </View>
                 <Text style={styles.tipText}>
                   {language === 'ar'
-                    ? `حدد موعد أهم قراراتك وممارساتك الروحية يوم ${blessedDay.day.ar || blessedDay.day.en}. هذا اليوم يحمل طاقة خاصة متوافقة مع طبيعتك العنصرية.`
+                    ? `حدد موعد أهم قراراتك وممارساتك الروحية يوم ${blessedDay.day.ar || blessedDay.day.en}. هذا اليوم يحمل طاقة خاصة متوافقة مع طبيعة عناصرك.`
                     : language === 'fr'
                     ? `Planifiez vos décisions les plus importantes et vos pratiques spirituelles le ${blessedDay.day.fr}. Ce jour porte une énergie spéciale alignée avec votre nature élémentaire.`
                     : `Schedule your most important decisions and spiritual practices on ${blessedDay.day.en}. This day carries special energy aligned with your elemental nature.`}

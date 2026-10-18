@@ -259,7 +259,7 @@ function PersonDivineNameResultView({ result, language }: { result: PersonDivine
 
       {/* Standard Evaluation Cards */}
       <EvaluationCard
-        title={language === 'en' ? 'Elemental Relationship' : 'العلاقة العنصرية'}
+        title={language === 'en' ? 'Elemental Relationship' : 'علاقة العناصر'}
         type={evaluation.elementalRelationship.type}
         explanation={language === 'en' 
           ? evaluation.elementalRelationship.explanation.en 

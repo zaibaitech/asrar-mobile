@@ -522,7 +522,7 @@ export default function ResultsScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
               {language === 'ar'
-                ? 'التكوين العنصري'
+                ? 'تركيب العناصر'
                 : language === 'fr'
                 ? 'Composition Élémentaire'
                 : 'Elemental Composition'}
