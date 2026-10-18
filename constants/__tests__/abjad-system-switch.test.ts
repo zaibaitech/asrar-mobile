@@ -292,8 +292,19 @@ describe('inventory guards', () => {
 
   it('the note is translated in EN/FR/AR', () => {
     const { translations } = require('../translations');
-    expect(translations.en.calculator.abjad.systemNote).toBe('Maghribi (North & West Africa) · Mashriqi (Middle East & Asia)');
-    expect(translations.fr.calculator.abjad.systemNote).toMatch(/Afrique du Nord/);
-    expect(translations.ar.calculator.abjad.systemNote).toMatch(/المغربي/);
+    expect(translations.en.calculator.abjad.systemNote).toBe('Maghribi (the Maghreb, al-Andalus & West Africa) · Mashriqi (Egypt, the Middle East & Asia)');
+    expect(translations.fr.calculator.abjad.systemNote).toMatch(/Maghreb, al-Andalus/);
+    expect(translations.ar.calculator.abjad.systemNote).toBe('المغربي (المغرب العربي والأندلس وغرب أفريقيا) · المشرقي (مصر والمشرق وسائر آسيا)');
+    // Maghribi is the Maghreb / al-Andalus / West Africa, never "North Africa"
+    const found: string[] = [];
+    const walk = (o: any) => {
+      for (const [k, v] of Object.entries(o ?? {})) {
+        if (typeof v === 'string' && /^(systemNote|maghribiDesc|mashriqiDesc)$/.test(k)) found.push(v);
+        else if (v && typeof v === 'object') walk(v);
+      }
+    };
+    for (const lang of ['en', 'fr', 'ar'] as const) walk(translations[lang]);
+    expect(found.length).toBeGreaterThanOrEqual(9);
+    for (const s of found) expect(s).not.toMatch(/North|Nord|شمال/);
   });
 });

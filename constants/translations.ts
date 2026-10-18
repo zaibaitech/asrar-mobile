@@ -4751,7 +4751,7 @@ export const translations = {
       abjad: {
         maghribi: "Maghribi",
         mashriqi: "Mashriqi",
-        systemNote: "Maghribi (North & West Africa) · Mashriqi (Middle East & Asia)",
+        systemNote: "Maghribi (the Maghreb, al-Andalus & West Africa) · Mashriqi (Egypt, the Middle East & Asia)",
       },
       
       // Input Fields
@@ -10608,9 +10608,9 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       advancedOptions: "Advanced Options",
       abjadSystem: "Abjad System",
       mashriqi: "Mashriqi",
-      mashriqiDesc: "Used in the Eastern Arab world",
+      mashriqiDesc: "Used in Egypt, the Middle East and Asia",
       maghribi: "Maghribi",
-      maghribiDesc: "Used in North Africa",
+      maghribiDesc: "Used in the Maghreb, al-Andalus and West Africa",
     },
 
     // Elemental relationship descriptions
@@ -15437,7 +15437,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       abjad: {
         maghribi: "Maghribi",
         mashriqi: "Mashriqi",
-        systemNote: "Maghribi (Afrique du Nord et de l'Ouest) · Mashriqi (Moyen-Orient et Asie)",
+        systemNote: "Maghribi (Maghreb, al-Andalus et Afrique de l'Ouest) · Mashriqi (Égypte, Moyen-Orient et Asie)",
       },
       
       // Input Fields
@@ -21581,9 +21581,9 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       advancedOptions: "Options avancées",
       abjadSystem: "Système Abjad",
       mashriqi: "Mashriqi",
-      mashriqiDesc: "Utilisé dans le monde arabe oriental",
+      mashriqiDesc: "Utilisé en Égypte, au Moyen-Orient et en Asie",
       maghribi: "Maghribi",
-      maghribiDesc: "Utilisé en Afrique du Nord",
+      maghribiDesc: "Utilisé au Maghreb, en al-Andalus et en Afrique de l'Ouest",
     },
 
     // Relations élémentaires (French - simplified)
@@ -21751,8 +21751,8 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       abjad: {
         maghribi: "مغربي",
         mashriqi: "مشرقي",
-        // TODO(Language Reviewer): new string, see docs/i18n/ar-review.md
-        systemNote: "المغربي (شمال أفريقيا وغربها) · المشرقي (الشرق الأوسط وآسيا)",
+        // Language Reviewer batch 5 wording (same as web src/lib/i18n/ar.ts)
+        systemNote: "المغربي (المغرب العربي والأندلس وغرب أفريقيا) · المشرقي (مصر والمشرق وسائر آسيا)",
       },
       inputs: {
         latinName: "الاسم اللاتيني (إنجليزي/فرنسي)",
@@ -31066,9 +31066,9 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       advancedOptions: "خيارات متقدمة",
       abjadSystem: "نظام الأبجد",
       mashriqi: "مشرقي",
-      mashriqiDesc: "يُستخدم في المشرق العربي",
+      mashriqiDesc: "يُستخدم في مصر والمشرق وسائر آسيا",
       maghribi: "مغربي",
-      maghribiDesc: "يُستخدم في شمال أفريقيا",
+      maghribiDesc: "يُستخدم في المغرب العربي والأندلس وغرب أفريقيا",
     },
 
     // العلاقات العنصرية (العربية - مبسطة)

@@ -611,7 +611,7 @@ export function getElementFromAbjadTotal(abjadTotal: number): 'fire' | 'water' |
 // HELPER: Letter-to-Element Distribution (Classical Method)
 // ============================================================================
 
-// MAGHRIBI SYSTEM - Authentic West/North African tradition (7 letters per element)
+// MAGHRIBI SYSTEM - tradition of the Maghreb and West Africa (7 letters per element)
 const LETTER_ELEMENTS: Record<string, 'fire' | 'air' | 'water' | 'earth'> = {
   // 🔥 Fire (Nār/نار) - Hot & Dry - 7 letters
   'ا': 'fire', 'ه': 'fire', 'ط': 'fire', 'م': 'fire', 'ف': 'fire', 'ش': 'fire', 'ذ': 'fire',
