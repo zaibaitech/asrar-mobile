@@ -15,3 +15,7 @@ Region wording: Maghribi = the Maghreb (Morocco to Libya), al-Andalus and West A
 | `calculator.abjad.systemNote` | AR | المغربي (المغرب العربي والأندلس وغرب أفريقيا) · المشرقي (مصر والمشرق وسائر آسيا) (reviewer wording) |
 | `*.maghribiDesc` | EN / FR / AR | Used in the Maghreb and West Africa, and historically in al-Andalus / Utilisé au Maghreb et en Afrique de l'Ouest, et jadis en al-Andalus / يُستعمل في المغرب العربي وغرب أفريقيا، واستُعمل قديمًا في الأندلس (Arabic review M4-1..3: al-Andalus is historical) |
 | `*.mashriqiDesc` | EN / FR / AR | Used in Egypt, the Middle East and Asia / Utilisé en Égypte, au Moyen-Orient et en Asie / يُستخدم في مصر والمشرق وسائر آسيا (reviewed, M4-4/5: no change) |
+
+### «عنصري» rule (Language Reviewer batch 5, web E00–E15)
+
+"Elemental" is never «عنصري/عنصرية» (it reads as "racist"): the 20 strings shared with the web catalog now use the reviewer's wording (توازن العناصر، انسجام العناصر، تركيب العناصر، قوى العناصر، مزاج العناصر، طبيعة عنصرك …), 27 literals in `constants/translations.ts`. Still open (not in the reviewed list): 33 more occurrences in `constants/translations.ts` and ~20 in screens/services (ResultsScreen, AsrariyaTimingEngine/layers.ts, PlanetaryInfluenceService, compatibility engine, relationshipCompatibility, burujData.json …).
