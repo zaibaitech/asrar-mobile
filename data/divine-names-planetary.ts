@@ -6,7 +6,8 @@
  * - ʿIlm al-Nujūm (Science of Celestial Influences)
  * - Traditional Sufi practices (Tijani, Shadhili, Qadiri lineages)
  * 
- * Abjad values use Maghribi system
+ * Stored abjadValue fields use the Mashriqi table; getDivineNamesPlanetary()
+ * returns them in the app-wide system (Maghribi by default).
  * Planetary correspondences based on classical sources
  * 
  * Translation keys for benefits are in constants/translations.ts:
@@ -14,6 +15,7 @@
  */
 
 import type { Planet, DayOfWeek } from './classical-hour-practices';
+import { abjadSystemOfMap, getAbjadMap, getActiveAbjadMap, storedMashriqiValueForSystem } from '../constants/abjad-maps';
 
 export type Element = 'Fire' | 'Earth' | 'Air' | 'Water';
 export type Temperament = 'hot' | 'cold' | 'moist' | 'dry' | 'balanced';
@@ -1084,11 +1086,32 @@ export const DIVINE_NAMES_PLANETARY: DivineNamePlanetary[] = [
   },
 ];
 
+const planetaryNamesBySystem: Partial<Record<'maghribi' | 'mashriqi', DivineNamePlanetary[]>> = {};
+
+/**
+ * The planetary Names with abjadValue in the given system (default: the
+ * app-wide system). When the value changes, its reduction (digit sum to 1-9)
+ * and any recommended count equal to the value follow it.
+ */
+export function getDivineNamesPlanetary(abjad: Record<string, number> = getActiveAbjadMap()): DivineNamePlanetary[] {
+  const key = abjadSystemOfMap(abjad);
+  return (planetaryNamesBySystem[key] ??= DIVINE_NAMES_PLANETARY.map((name) => {
+    const value = storedMashriqiValueForSystem(name.abjadValue, name.arabic, getAbjadMap(key));
+    if (value === name.abjadValue) return name;
+    return {
+      ...name,
+      abjadValue: value,
+      reduction: ((value - 1) % 9) + 1,
+      recommendedCounts: name.recommendedCounts.map((c) => (c === name.abjadValue ? value : c)),
+    };
+  }));
+}
+
 /**
  * Get Divine Names by Planet
  */
 export function getDivineNamesByPlanet(planet: Planet): DivineNamePlanetary[] {
-  return DIVINE_NAMES_PLANETARY.filter(
+  return getDivineNamesPlanetary().filter(
     name => name.primaryPlanet === planet || name.secondaryPlanets.includes(planet)
   );
 }
@@ -1097,21 +1120,21 @@ export function getDivineNamesByPlanet(planet: Planet): DivineNamePlanetary[] {
  * Get Divine Names by Element
  */
 export function getDivineNamesByElement(element: Element): DivineNamePlanetary[] {
-  return DIVINE_NAMES_PLANETARY.filter(name => name.element === element);
+  return getDivineNamesPlanetary().filter(name => name.element === element);
 }
 
 /**
  * Get Divine Name by Number
  */
 export function getDivineNameByNumber(number: number): DivineNamePlanetary | undefined {
-  return DIVINE_NAMES_PLANETARY.find(name => name.number === number);
+  return getDivineNamesPlanetary().find(name => name.number === number);
 }
 
 /**
  * Get Divine Names suitable for current day of week
  */
 export function getDivineNamesForDay(day: DayOfWeek): DivineNamePlanetary[] {
-  return DIVINE_NAMES_PLANETARY.filter(name => 
+  return getDivineNamesPlanetary().filter(name => 
     name.bestTimes.daysOfWeek.includes(day)
   );
 }
@@ -1120,7 +1143,7 @@ export function getDivineNamesForDay(day: DayOfWeek): DivineNamePlanetary[] {
  * Get Divine Names suitable for a specific prayer time
  */
 export function getDivineNamesForPrayer(prayer: Prayer): DivineNamePlanetary[] {
-  return DIVINE_NAMES_PLANETARY.filter(name =>
+  return getDivineNamesPlanetary().filter(name =>
     name.bestTimes.prayers.includes(prayer)
   );
 }

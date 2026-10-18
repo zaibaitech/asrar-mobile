@@ -6,7 +6,7 @@
  * DO NOT duplicate this logic elsewhere
  */
 
-import { ABJAD_MAGHRIBI } from '../constants/abjad-maps';
+import { getActiveAbjadMap } from '../constants/abjad-maps';
 
 /**
  * Normalize Arabic text (remove diacritics and extra spaces)
@@ -30,7 +30,7 @@ export function normalizeArabic(text: string): string {
  */
 export function calculateHadadKabir(
   text: string,
-  abjad: Record<string, number> = ABJAD_MAGHRIBI
+  abjad: Record<string, number> = getActiveAbjadMap()
 ): number {
   if (!text) return 0;
   
@@ -106,7 +106,7 @@ export function modIndex(value: number, base: number): number {
 export function calculateDestiny(
   personName: string,
   motherName: string = '',
-  abjad: Record<string, number> = ABJAD_MAGHRIBI
+  abjad: Record<string, number> = getActiveAbjadMap()
 ) {
   // Calculate individual totals
   const personKabir = calculateHadadKabir(personName, abjad);
@@ -143,7 +143,7 @@ export function calculateDestiny(
 export function debugCalculation(
   personName: string,
   motherName: string = '',
-  abjad: Record<string, number> = ABJAD_MAGHRIBI
+  abjad: Record<string, number> = getActiveAbjadMap()
 ): void {
   if (!__DEV__) return;
   

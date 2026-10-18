@@ -13,7 +13,7 @@
  * 4. Results are deterministic and reproducible
  */
 
-import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI } from '../constants/abjad-maps';
+import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI, getActiveAbjadSystem } from '../constants/abjad-maps';
 import { calculateBurj } from '../constants/buruj';
 import { elementOfLetter, hadathRemainder, hadathToElement, LETTER_ELEMENTS } from './hadad-core';
 import { ElementType } from './types';
@@ -393,7 +393,7 @@ export function computeAbjadProfile(
  * @param system - Abjad system
  * @returns Kabīr value
  */
-export function quickKabir(normalizedText: string, system: AbjadSystem = 'maghribi'): number {
+export function quickKabir(normalizedText: string, system: AbjadSystem = getActiveAbjadSystem()): number {
   return calculateKabir(normalizedText, system);
 }
 

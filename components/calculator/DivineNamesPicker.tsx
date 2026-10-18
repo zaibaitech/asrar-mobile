@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { DivineName, getAllDivineNames } from '../../data/divine-names';
+import { useAbjadSystem } from '../../hooks/useAbjadSystem';
 
 interface DivineNamesPickerProps {
   onSelect: (name: DivineName) => void;
@@ -19,7 +20,8 @@ export const DivineNamesPicker: React.FC<DivineNamesPickerProps> = ({
 }) => {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
-  const allNames = getAllDivineNames();
+  const { abjad } = useAbjadSystem();
+  const allNames = getAllDivineNames(abjad);
   
   const filteredNames = allNames.filter(name => 
     name.arabic.includes(searchQuery) ||

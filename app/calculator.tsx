@@ -10,6 +10,7 @@ import { EnhancedResultsDisplay } from '../components/calculator/EnhancedResults
 import { BirthProfileResults } from '../components/calculator/results/BirthResultSection';
 import { CalculatorColors } from '../constants/CalculatorColors';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAbjadSystem } from '../hooks/useAbjadSystem';
 import { calculateBirthProfile, validateBirthInput } from '../services/BirthProfileService';
 import { EnhancedCalculatorEngine } from '../services/EnhancedCalculatorEngine';
 import { BirthInsights, CalculationType, EnhancedCalculationResult } from '../types/calculator-enhanced';
@@ -21,7 +22,10 @@ export default function CalculatorScreen() {
 
   // Enhanced Calculator State
   const [calculationType, setCalculationType] = useState<CalculationType>('name');
-  const [system, setSystem] = useState<'maghribi' | 'mashriqi'>('maghribi');
+  // App-wide Abjad system (Maghribi default, persisted); switching it re-runs the shown result.
+  const { system, setSystem } = useAbjadSystem();
+  const silentRecalcRef = useRef(false);
+  const lastSystemRef = useRef(system);
   const [isLoading, setIsLoading] = useState(false);
   const [currentResult, setCurrentResult] = useState<EnhancedCalculationResult | null>(null);
   const [activeTab, setActiveTab] = useState<'input' | 'results'>('input');
@@ -181,9 +185,9 @@ export default function CalculatorScreen() {
           });
 
           setBirthInsights(insights);
-          setActiveTab('results');
+          if (!silentRecalcRef.current) setActiveTab('results');
           setIsLoading(false);
-          { const s = recordCalculation(); if (s) showInterstitialIfReady(); }
+          if (!silentRecalcRef.current) { const s = recordCalculation(); if (s) showInterstitialIfReady(); }
           return;
 
         default:
@@ -191,15 +195,15 @@ export default function CalculatorScreen() {
       }
 
       setCurrentResult(result);
-      setActiveTab('results');
+      if (!silentRecalcRef.current) setActiveTab('results');
       if (calculationType === 'quran' && selectedSurah && selectedAyah) {
         lastQuranSelectionRef.current = `${selectedSurah}:${selectedAyah}:${system}`;
       }
-      { const s = recordCalculation(); if (s) showInterstitialIfReady(); }
+      if (!silentRecalcRef.current) { const s = recordCalculation(); if (s) showInterstitialIfReady(); }
     } catch (error) {
       console.error('Calculation error:', error);
       setCurrentResult(null);
-      setActiveTab('results');
+      if (!silentRecalcRef.current) setActiveTab('results');
 
       if (error instanceof Error && error.message === 'EMPTY_SOURCE_TEXT') {
         setCalculationWarning('No text to calculate. Please select a verse or provide Arabic text.');
@@ -213,6 +217,24 @@ export default function CalculatorScreen() {
   };
 
   handleCalculateRef.current = handleCalculate;
+
+  // When the user switches the Abjad system, recompute the result on screen
+  // with the new table (no ad count, no tab change).
+  useEffect(() => {
+    if (lastSystemRef.current === system) {
+      return;
+    }
+    lastSystemRef.current = system;
+    // Qur'an verses picked from the list are re-run by the effect below (its key includes the system).
+    // The birth profile does not use letter values.
+    if (!currentResult || calculationType === 'birth' || (calculationType === 'quran' && selectedSurah && selectedAyah)) {
+      return;
+    }
+    silentRecalcRef.current = true;
+    handleCalculateRef.current().finally(() => {
+      silentRecalcRef.current = false;
+    });
+  }, [system, currentResult, calculationType, selectedSurah, selectedAyah]);
 
   useEffect(() => {
     if (calculationType !== 'quran') {

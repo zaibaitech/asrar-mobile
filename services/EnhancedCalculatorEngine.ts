@@ -8,6 +8,7 @@
  * - Deterministic results across all input types
  */
 
+import { getAbjadMap } from '../constants/abjad-maps';
 import { getDivineNameByNumber } from '../data/divine-names';
 import { getSurahByNumber } from '../data/quran-surahs';
 import {
@@ -333,7 +334,7 @@ export class EnhancedCalculatorEngine {
     // Route to type-specific adapter
     switch (request.type) {
       case 'name':
-        result.nameInsights = computeNameInsights(core, analytics);
+        result.nameInsights = computeNameInsights(core, analytics, getAbjadMap(request.system));
         break;
       
       case 'lineage':

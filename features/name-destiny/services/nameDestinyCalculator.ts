@@ -12,7 +12,8 @@ import {
     calculateTabElement,
     normalizeArabic,
 } from '@/utils/coreCalculations';
-import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI } from '../constants/abjadMaps';
+import { abjadSystemOfMap, getActiveAbjadMap } from '../../../constants/abjad-maps';
+import { ABJAD_MAGHRIBI } from '../constants/abjadMaps';
 import { BURUJ, ELEMENTS } from '../constants/elements';
 import { NameDestinyResult, PlanetaryHour } from '../types';
 import { computeDivineResonance } from './divineResonance';
@@ -37,7 +38,7 @@ export function modIndex(num: number, length: number): number {
  */
 export function calculateAbjadValue(
   text: string,
-  abjad: Record<string, number> = ABJAD_MAGHRIBI
+  abjad: Record<string, number> = getActiveAbjadMap()
 ): number {
   return calculateHadadKabir(text, abjad);
 }
@@ -165,7 +166,7 @@ function getPlanetaryHour(saghir: number): PlanetaryHour {
 export function buildDestiny(
   personName: string,
   motherName?: string,
-  abjad: Record<string, number> = ABJAD_MAGHRIBI
+  abjad: Record<string, number> = getActiveAbjadMap()
 ): NameDestinyResult {
   const sanitizedPerson = normalizeArabic(personName);
   const sanitizedMother = motherName ? normalizeArabic(motherName) : '';
@@ -211,7 +212,7 @@ export function buildDestiny(
     burjIndex,
     divineResonance,
     timestamp: Date.now(),
-    abjadSystem: abjad === ABJAD_MASHRIQI ? 'mashriqi' : 'maghribi',
+    abjadSystem: abjadSystemOfMap(abjad),
   };
 }
 

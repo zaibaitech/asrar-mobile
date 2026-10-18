@@ -4751,6 +4751,7 @@ export const translations = {
       abjad: {
         maghribi: "Maghribi",
         mashriqi: "Mashriqi",
+        systemNote: "Maghribi (North & West Africa) · Mashriqi (Middle East & Asia)",
       },
       
       // Input Fields
@@ -15436,6 +15437,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       abjad: {
         maghribi: "Maghribi",
         mashriqi: "Mashriqi",
+        systemNote: "Maghribi (Afrique du Nord et de l'Ouest) · Mashriqi (Moyen-Orient et Asie)",
       },
       
       // Input Fields
@@ -21749,6 +21751,8 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       abjad: {
         maghribi: "مغربي",
         mashriqi: "مشرقي",
+        // TODO(Language Reviewer): new string, see docs/i18n/ar-review.md
+        systemNote: "المغربي (شمال أفريقيا وغربها) · المشرقي (الشرق الأوسط وآسيا)",
       },
       inputs: {
         latinName: "الاسم اللاتيني (إنجليزي/فرنسي)",

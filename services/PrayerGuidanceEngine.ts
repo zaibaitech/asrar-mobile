@@ -16,7 +16,7 @@
 import type { DayOfWeek, HourNumber, Planet } from '@/data/classical-hour-practices';
 import { getHourPractice, PLANETARY_HOUR_SEQUENCE } from '@/data/classical-hour-practices';
 import type { DivineNamePlanetary, Element, Prayer, Temperament } from '@/data/divine-names-planetary';
-import { DIVINE_NAMES_PLANETARY, getDivineNamesByPlanet, getDivineNamesForPrayer } from '@/data/divine-names-planetary';
+import { getDivineNamesByPlanet, getDivineNamesForPrayer, getDivineNamesPlanetary } from '@/data/divine-names-planetary';
 import type { Dhikr } from '@/data/prayer-adhkar';
 import { getAdhkarForPrayer, getSunnahAdhkarForPrayer } from '@/data/prayer-adhkar';
 import { getAlignmentBadge, getRulingPlanetFromBurj, type AlignmentTier } from './SimpleAlignmentBadge';
@@ -601,7 +601,7 @@ export class PrayerGuidanceEngine {
    */
   private static getDefaultDivineName(prayer: Prayer, userElement: Element) {
     // Default to Al-Rahman (The Most Merciful) - universal and always appropriate
-    const defaultName = DIVINE_NAMES_PLANETARY.find(n => n.number === 1);
+    const defaultName = getDivineNamesPlanetary().find(n => n.number === 1);
     
     if (!defaultName) {
       throw new Error('Divine Names database not loaded');

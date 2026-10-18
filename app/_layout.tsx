@@ -19,6 +19,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ProfileProvider, useProfile } from '@/contexts/ProfileContext';
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 import { ZikrProvider } from '@/features/zikr';
+import { hydrateAbjadSystem } from '@/services/AbjadSystemPreference';
 import { prefetchCoreCaches } from '@/services/AppPrefetchService';
 import { handleAuthCallback } from '@/services/AuthService';
 import { getOnboardingCompleted } from '@/services/OnboardingService';
@@ -147,6 +148,12 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
   const [showAnimatedSplash, setShowAnimatedSplash] = useState(true);
+
+  // App-wide Abjad system (Maghribi default): load the saved choice early so
+  // every calculation uses it from the first screen.
+  useEffect(() => {
+    void hydrateAbjadSystem();
+  }, []);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {

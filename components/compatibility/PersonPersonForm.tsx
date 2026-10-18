@@ -32,7 +32,8 @@ import NameAutocomplete from '../NameAutocomplete';
 
 interface PersonPersonFormProps {
   language: 'en' | 'fr' | 'ar';
-  onCalculate: (result: PersonPersonCompatibility) => void;
+  /** recalculate re-runs the same inputs with the app-wide Abjad system (used when it is switched). */
+  onCalculate: (result: PersonPersonCompatibility, recalculate?: () => Promise<PersonPersonCompatibility>) => void;
 }
 
 export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProps) {
@@ -186,9 +187,11 @@ export function PersonPersonForm({ language, onCalculate }: PersonPersonFormProp
       const person1Input = buildParticipantInput(person1InputMethod, person1Arabic, person1Name, person1DOB, person1BirthTime);
       const person2Input = buildParticipantInput(person2InputMethod, person2Arabic, person2Name, person2DOB, person2BirthTime);
 
-      const result = await calculatePersonPersonCompatibilityMixed(person1Input, person2Input, relationshipType);
+      const context = relationshipType;
+      const compute = () => calculatePersonPersonCompatibilityMixed(person1Input, person2Input, context);
+      const result = await compute();
 
-      onCalculate(result);
+      onCalculate(result, compute);
     } catch (err) {
       if (err instanceof DobDerivationError) {
         setError(t('compatibility.form.inputMethod.dobDerivationFailed'));

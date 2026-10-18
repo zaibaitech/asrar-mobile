@@ -12,6 +12,7 @@
 
 import { calculateSpiritualDestiny } from '../../utils/relationshipCompatibility';
 import { NameDestinyResult } from '../ilm-huruf/core';
+import { getActiveAbjadMap } from '../../constants/abjad-maps';
 import { getNormalizedAbjadValue } from './divineNamesData';
 import {
     buildCompatibilityEvaluation,
@@ -32,13 +33,14 @@ export function calculatePersonDivineNameCompatibility(
   personName: string,
   personArabicName: string,
   personDestiny: NameDestinyResult,
-  divineName: DivineNameMetadata
+  divineName: DivineNameMetadata,
+  abjad: Record<string, number> = getActiveAbjadMap()
 ): PersonDivineNameCompatibility {
   
   const destiny = extractSpiritualDestiny(personDestiny, personName);
   
   // Get normalized abjad value for Divine Name (without Al- prefix)
-  const divineNameAbjadValue = getNormalizedAbjadValue(divineName.arabic);
+  const divineNameAbjadValue = getNormalizedAbjadValue(divineName.arabic, abjad);
   
   // Calculate Spiritual Destiny (mod-9) - most important compatibility metric
   const spiritualDestiny = calculateSpiritualDestiny(

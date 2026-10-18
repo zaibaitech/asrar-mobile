@@ -1,6 +1,7 @@
 import { CollapsibleSection, DestinyHeader, ModeSelector } from '@/components/nameDestiny';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI } from '@/features/name-destiny/constants/abjadMaps';
+import { getAbjadMap } from '@/constants/abjad-maps';
+import { AbjadSystemSelector } from '@/components/calculator/AbjadSystemSelector';
 import { useAbjad } from '@/features/name-destiny/contexts/AbjadContext';
 import { buildDestiny } from '@/features/name-destiny/services/nameDestinyCalculator';
 import { InputType, UnderstandingLevel } from '@/features/name-destiny/types/enums';
@@ -68,7 +69,7 @@ export default function NameDestinyForm() {
     try {
       const trimmedPerson = personName.trim();
       const trimmedMother = motherName.trim();
-      const abjadMap = abjadSystem === 'mashriqi' ? ABJAD_MASHRIQI : ABJAD_MAGHRIBI;
+      const abjadMap = getAbjadMap(abjadSystem);
 
       const result = buildDestiny(trimmedPerson, trimmedMother, abjadMap);
 
@@ -227,6 +228,9 @@ export default function NameDestinyForm() {
                   </View>
                 )}
               </LinearGradient>
+
+              {/* Abjad system (app-wide) */}
+              <AbjadSystemSelector />
 
               {/* Calculate Button */}
               <TouchableOpacity

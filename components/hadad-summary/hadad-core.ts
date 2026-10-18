@@ -1,5 +1,6 @@
 // hadad-core.ts - Pure calculation helpers
 
+import { ABJAD_MAGHRIBI, abjadSystemOfMap, getAbjadMap, getActiveAbjadMap, storedMashriqiValueForSystem } from '../../constants/abjad-maps';
 import {
     getPlanetByHour,
     PlanetarySignature
@@ -10,11 +11,10 @@ import { ElementType, RuhHadad, SacredResonance, UmHadad } from './types';
 // ABJAD MAPPING (Maghrib standard)
 // ============================================================================
 
-export const ABJAD: Record<string, number> = {
-  'ا': 1, 'ب': 2, 'ج': 3, 'د': 4, 'ه': 5, 'و': 6, 'ز': 7, 'ح': 8, 'ط': 9,
-  'ي': 10, 'ك': 20, 'ل': 30, 'م': 40, 'ن': 50, 'س': 60, 'ع': 70, 'ف': 80, 'ص': 90,
-  'ق': 100, 'ر': 200, 'ش': 300, 'ت': 400, 'ث': 500, 'خ': 600, 'ذ': 700, 'ض': 800, 'ظ': 900, 'غ': 1000
-};
+// The one shared table (constants/abjad-maps.ts): Maghribi by default; use
+// getActiveAbjadMap() / getAbjadMap(system) for the user's chosen system.
+export const ABJAD: Record<string, number> = ABJAD_MAGHRIBI;
+export { getAbjadMap, getActiveAbjadMap };
 
 // MAGHRIBI SYSTEM - Authentic West/North African tradition (7 letters per element)
 export const LETTER_ELEMENTS: Record<string, ElementType> = {
@@ -217,6 +217,22 @@ export const ASMA_LIST = [
   { ar: 'يَا مَتِين', transliteration: 'Yā Matīn', en: 'The Firm', abjad: 500, element: 'Earth' as ElementType, counts: [500, 1000] },
   { ar: 'يَا قَيُّوم', transliteration: 'Yā Qayyūm', en: 'The Sustainer', abjad: 156, element: 'Earth' as ElementType, counts: [156, 300] }
 ];
+
+type AsmaEntry = (typeof ASMA_LIST)[number];
+const asmaListBySystem: Partial<Record<'maghribi' | 'mashriqi', AsmaEntry[]>> = {};
+
+/**
+ * ASMA_LIST with each Name's value in the given system (default: the app-wide
+ * system). The stored abjad fields are Mashriqi; a dhikr count equal to the
+ * stored value follows it.
+ */
+export function getAsmaList(abjad: Record<string, number> = getActiveAbjadMap()): AsmaEntry[] {
+  const key = abjadSystemOfMap(abjad);
+  return (asmaListBySystem[key] ??= ASMA_LIST.map((n) => {
+    const value = storedMashriqiValueForSystem(n.abjad, n.ar, getAbjadMap(key));
+    return { ...n, abjad: value, counts: n.counts.map((c) => (c === n.abjad ? value : c)) };
+  }));
+}
 
 // ============================================================================
 // VERSES BY ELEMENT

@@ -7,7 +7,7 @@
  * e.g., "Al-Laṭīf" → calculate "Laṭīf" (ل ط ي ف) only
  */
 
-import { ABJAD_MAGHRIBI } from '../../constants/abjad-maps';
+import { ABJAD_MAGHRIBI, abjadSystemOfMap, getActiveAbjadMap } from '../../constants/abjad-maps';
 import { DIVINE_NAMES, DivineName } from '../../data/divine-names';
 import { DivineNameMetadata, IntentionCategory } from './types';
 
@@ -129,20 +129,21 @@ function normalizeName(arabic: string): string {
 }
 
 // Function to calculate Abjad total from Arabic text
-function calculateAbjadTotal(text: string): number {
+function calculateAbjadTotal(text: string, abjad: Record<string, number> = getActiveAbjadMap()): number {
   // Normalize: remove diacritics and spaces
   const normalized = text.replace(/[ًٌٍَُِّْ\s]/g, '');
-  return [...normalized].reduce((sum, char) => sum + (ABJAD_MAGHRIBI[char] || 0), 0);
+  return [...normalized].reduce((sum, char) => sum + (abjad[char] || 0), 0);
 }
 
 // Function to get normalized abjad value for Divine Name
-export function getNormalizedAbjadValue(arabic: string): number {
+export function getNormalizedAbjadValue(arabic: string, abjad: Record<string, number> = getActiveAbjadMap()): number {
   const normalizedName = normalizeName(arabic);
-  return calculateAbjadTotal(normalizedName);
+  return calculateAbjadTotal(normalizedName, abjad);
 }
 
 // Convert existing Divine Names to compatibility format
-export const DIVINE_NAMES_COMPATIBILITY: DivineNameMetadata[] = DIVINE_NAMES.map((name: DivineName): DivineNameMetadata => {
+function buildCompatibilityDivineNames(abjad: Record<string, number>): DivineNameMetadata[] {
+  return DIVINE_NAMES.map((name: DivineName): DivineNameMetadata => {
   const metadata = COMPATIBILITY_METADATA[name.number];
   
   if (!metadata) {
@@ -153,7 +154,7 @@ export const DIVINE_NAMES_COMPATIBILITY: DivineNameMetadata[] = DIVINE_NAMES.map
     number: name.number,
     arabic: name.arabic,
     transliteration: name.transliteration,
-    abjadValue: getNormalizedAbjadValue(name.arabic), // Recalculated without Al- prefix
+    abjadValue: getNormalizedAbjadValue(name.arabic, abjad), // Recalculated without Al- prefix, selected system
     element: metadata.element,
     planet: metadata.planet,
     modeOfAction: metadata.modeOfAction,
@@ -167,21 +168,33 @@ export const DIVINE_NAMES_COMPATIBILITY: DivineNameMetadata[] = DIVINE_NAMES.map
       ar: name.spiritualInfluence.en // Using English for Arabic field for now
     }
   };
-});
-
-// Helper functions
-export function getDivineNameByNumber(number: number): DivineNameMetadata | undefined {
-  return DIVINE_NAMES_COMPATIBILITY.find(n => n.number === number);
+  });
 }
 
-export function getDivineNamesByIntention(intention: IntentionCategory): DivineNameMetadata[] {
-  return DIVINE_NAMES_COMPATIBILITY.filter(n => 
+const compatibilityNamesBySystem: Partial<Record<'maghribi' | 'mashriqi', DivineNameMetadata[]>> = {};
+
+/** The 99 Names with their (prefix-less) value in the given system (default: the app-wide system). */
+export function getCompatibilityDivineNamesForSystem(abjad: Record<string, number> = getActiveAbjadMap()): DivineNameMetadata[] {
+  const key = abjadSystemOfMap(abjad);
+  return (compatibilityNamesBySystem[key] ??= buildCompatibilityDivineNames(abjad));
+}
+
+/** Maghribi values (the default system). */
+export const DIVINE_NAMES_COMPATIBILITY: DivineNameMetadata[] = getCompatibilityDivineNamesForSystem(ABJAD_MAGHRIBI);
+
+// Helper functions
+export function getDivineNameByNumber(number: number, abjad: Record<string, number> = getActiveAbjadMap()): DivineNameMetadata | undefined {
+  return getCompatibilityDivineNamesForSystem(abjad).find(n => n.number === number);
+}
+
+export function getDivineNamesByIntention(intention: IntentionCategory, abjad: Record<string, number> = getActiveAbjadMap()): DivineNameMetadata[] {
+  return getCompatibilityDivineNamesForSystem(abjad).filter(n => 
     n.classicalFunction.includes(intention)
   );
 }
 
-export function getAllCompatibilityDivineNames(): DivineNameMetadata[] {
-  return DIVINE_NAMES_COMPATIBILITY;
+export function getAllCompatibilityDivineNames(abjad: Record<string, number> = getActiveAbjadMap()): DivineNameMetadata[] {
+  return getCompatibilityDivineNamesForSystem(abjad);
 }
 
 // Function to get normalized name for calculation

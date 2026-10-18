@@ -38,6 +38,7 @@ import LocationAutocomplete from '../../components/LocationAutocomplete';
 import NameAutocomplete from '../../components/NameAutocomplete';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useProfile } from '../../contexts/ProfileContext';
+import { AbjadSystemSelector } from '../../components/calculator/AbjadSystemSelector';
 import { useIstikhara } from '../../hooks/useIstikhara';
 import { HistoryService } from '../../services/HistoryService';
 import { deriveElementFromBurj, isNearIngress, resolveBurjWithIngressGuard } from '../../services/ProfileDerivationService';
@@ -913,6 +914,9 @@ export default function WhoAmICalculator() {
                   </View>
                 </View>
               )}
+
+              {/* Abjad system (app-wide; name method only) */}
+              {calculationMethod === 'name' && <AbjadSystemSelector />}
 
               {/* Calculate Button */}
               <TouchableOpacity

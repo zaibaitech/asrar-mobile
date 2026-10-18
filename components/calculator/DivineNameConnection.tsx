@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { ASMA_LIST } from '../../utils/hadad-core';
+import { useAbjadSystem } from '../../hooks/useAbjadSystem';
+import { getAsmaList } from '../../utils/hadad-core';
 
 interface DivineNameConnectionProps {
   kabir: number;
@@ -8,7 +9,8 @@ interface DivineNameConnectionProps {
 
 export const DivineNameConnection: React.FC<DivineNameConnectionProps> = ({ kabir }) => {
   // Find 3 divine names with closest numerical values
-  const namesWithDistance = ASMA_LIST.map(name => ({
+  const { abjad } = useAbjadSystem();
+  const namesWithDistance = getAsmaList(abjad).map(name => ({
     ...name,
     distance: Math.abs(name.abjad - kabir),
   }));

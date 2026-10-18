@@ -7,7 +7,9 @@
 import { useAds } from '@/contexts/AdContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { AbjadSystemSelector } from '../../components/calculator/AbjadSystemSelector';
+import { useAbjadSystem } from '../../hooks/useAbjadSystem';
 import {
     ScrollView,
     StyleSheet,
@@ -34,7 +36,26 @@ export default function CompatibilityTabScreen() {
   const router = useRouter();
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const handleCalculate = (calculationResult: UniversalCompatibilityResult) => {
+  // Results follow the app-wide Abjad system: keep a way to re-run the same inputs.
+  const { system: abjadSystem } = useAbjadSystem();
+  const recalculateRef = useRef<(() => UniversalCompatibilityResult | Promise<UniversalCompatibilityResult>) | null>(null);
+  const lastSystemRef = useRef(abjadSystem);
+  useEffect(() => {
+    if (lastSystemRef.current === abjadSystem) return;
+    lastSystemRef.current = abjadSystem;
+    const recalc = recalculateRef.current;
+    if (!recalc) return;
+    Promise.resolve()
+      .then(recalc)
+      .then((next) => setResult((prev) => (prev ? next : prev)))
+      .catch((error) => console.warn('[compatibility] recalculation for the new Abjad system failed', error));
+  }, [abjadSystem]);
+
+  const handleCalculate = (
+    calculationResult: UniversalCompatibilityResult,
+    recalculate?: () => UniversalCompatibilityResult | Promise<UniversalCompatibilityResult>
+  ) => {
+    recalculateRef.current = recalculate ?? null;
     setResult(calculationResult);
     setActiveTab('results');
     // Scroll to top when showing results
@@ -47,6 +68,7 @@ export default function CompatibilityTabScreen() {
   };
 
   const handleReset = () => {
+    recalculateRef.current = null;
     setResult(null);
     setActiveTab('input');
     // Scroll to top when resetting to input
@@ -114,6 +136,13 @@ export default function CompatibilityTabScreen() {
               onSelectType={setSelectedType}
               language={language}
             />
+
+            {/* Abjad system (app-wide); the intention match does not use letter values */}
+            {selectedType !== 'divine-intention' && (
+              <View style={styles.abjadSystem}>
+                <AbjadSystemSelector />
+              </View>
+            )}
 
             {/* Dynamic Form based on selected type */}
             {selectedType === 'person-person' && (
@@ -205,6 +234,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+  },
+  abjadSystem: {
+    marginBottom: 24,
   },
   disclaimerCard: {
     backgroundColor: 'rgba(251, 191, 36, 0.1)',

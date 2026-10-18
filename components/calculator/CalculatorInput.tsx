@@ -5,6 +5,7 @@ import { CalculatorColors } from '../../constants/CalculatorColors';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { CalculationType } from '../../types/calculator-enhanced';
 import NameAutocomplete from '../NameAutocomplete';
+import { AbjadSystemSelector } from './AbjadSystemSelector';
 import ArabicKeyboard from './ArabicKeyboard';
 import { DivineNamesPicker } from './DivineNamesPicker';
 import { SurahAyahSelector } from './SurahAyahSelector';
@@ -482,51 +483,8 @@ export const CalculatorInput: React.FC<CalculatorInputProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* System Selector */}
-      <View style={styles.selectorContainer}>
-        <Text style={styles.selectorLabel}>🎯 {t('calculator.form.abjadSystem')}</Text>
-        <View style={styles.systemSelector}>
-          <TouchableOpacity
-            style={styles.systemButtonWrapper}
-            onPress={() => onSystemChange('maghribi')}
-          >
-            {system === 'maghribi' ? (
-              <LinearGradient
-                colors={['#6366f1', '#8b5cf6']}
-                style={styles.systemButton}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <Text style={styles.systemTextActive}>🌙 {t('calculator.abjad.maghribi')}</Text>
-              </LinearGradient>
-            ) : (
-              <View style={[styles.systemButton, styles.systemButtonInactive]}>
-                <Text style={styles.systemTextInactive}>{t('calculator.abjad.maghribi')}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.systemButtonWrapper}
-            onPress={() => onSystemChange('mashriqi')}
-          >
-            {system === 'mashriqi' ? (
-              <LinearGradient
-                colors={['#6366f1', '#8b5cf6']}
-                style={styles.systemButton}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <Text style={styles.systemTextActive}>☀️ {t('calculator.abjad.mashriqi')}</Text>
-              </LinearGradient>
-            ) : (
-              <View style={[styles.systemButton, styles.systemButtonInactive]}>
-                <Text style={styles.systemTextInactive}>{t('calculator.abjad.mashriqi')}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
+      {/* System Selector (shared, app-wide) */}
+      <AbjadSystemSelector system={system} onSystemChange={onSystemChange} />
 
       {/* Type-Specific Inputs */}
       {renderTypeSpecificInputs()}
@@ -567,51 +525,6 @@ const styles = StyleSheet.create({
     padding: 20, 
     gap: 20,
     backgroundColor: '#0f172a',
-  },
-  
-  // System Selector
-  selectorContainer: {
-    gap: 12,
-  },
-  selectorLabel: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#f1f5f9',
-    textAlign: 'center',
-  },
-  systemSelector: { 
-    flexDirection: 'row', 
-    gap: 12,
-  },
-  systemButtonWrapper: {
-    flex: 1,
-  },
-  systemButton: { 
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 16,
-    alignItems: 'center',
-    elevation: 6,
-    shadowColor: '#6366f1',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-  },
-  systemButtonInactive: {
-    backgroundColor: '#1e293b',
-    borderWidth: 2,
-    borderColor: '#334155',
-    elevation: 0,
-  },
-  systemTextActive: { 
-    fontSize: 16, 
-    fontWeight: '800',
-    color: '#fff',
-  },
-  systemTextInactive: { 
-    fontSize: 16, 
-    fontWeight: '700',
-    color: '#94a3b8',
   },
   
   // Input Cards

@@ -4,7 +4,7 @@
  */
 
 import { digitalRoot, hadathRemainder } from '../../components/hadad-summary/hadad-core';
-import { ABJAD_MAGHRIBI, validateAndWarnAboutHamza } from '../../contexts/AbjadContext';
+import { getActiveAbjadMap, validateAndWarnAboutHamza } from '../../contexts/AbjadContext';
 import { computeQuranResonance } from './quranResonance';
 
 // ============================================================================
@@ -131,7 +131,7 @@ export function modIndex(n: number, base: 4 | 12): number {
  */
 export function calculateAbjadValue(
   text: string,
-  abjad: Record<string, number> = ABJAD_MAGHRIBI
+  abjad: Record<string, number> = getActiveAbjadMap()
 ): number {
   if (!text || text.trim().length === 0) {
     return 0;
@@ -520,7 +520,7 @@ export function calculateLifePath(birthDate: Date): {
 /**
  * Name destiny - What your name reveals about your life purpose
  */
-export function analyzeNameDestiny(name: string, abjad: Record<string, number> = ABJAD_MAGHRIBI) {
+export function analyzeNameDestiny(name: string, abjad: Record<string, number> = getActiveAbjadMap()) {
   // Check for hamza and warn if present
   validateAndWarnAboutHamza(name);
   
@@ -653,7 +653,7 @@ function getElementArabic(element: ElementType): string {
  * Analyze mother's name to reveal spiritual origin (Um Ḥadad)
  * Uses same Ḥadad calculation as main name analysis
  */
-export function analyzeMotherName(arabicName: string, abjad: Record<string, number> = ABJAD_MAGHRIBI): MotherAnalysis {
+export function analyzeMotherName(arabicName: string, abjad: Record<string, number> = getActiveAbjadMap()): MotherAnalysis {
   const normalized = arabicName.replace(/[ًٌٍَُِّْ]/g, '').replace(/\s+/g, '');
   const letters = [...normalized];
   
@@ -727,7 +727,7 @@ export interface NameDestinyResult {
 function abjadTotalWithMother(
   personName: string,
   motherName: string | undefined,
-  abjad: Record<string, number> = ABJAD_MAGHRIBI
+  abjad: Record<string, number> = getActiveAbjadMap()
 ): { p: number; m: number; total: number } {
   const normalized = personName.replace(/[ًٌٍَُِّْ]/g, '').replace(/\s+/g, '');
   const letters = [...normalized];
@@ -757,7 +757,7 @@ function abjadTotalWithMother(
 export function buildDestiny(
   personName: string,
   motherName?: string,
-  abjad: Record<string, number> = ABJAD_MAGHRIBI
+  abjad: Record<string, number> = getActiveAbjadMap()
 ): NameDestinyResult {
   // Calculate totals
   const { p: personKabir, m: motherKabir, total: totalKabir } = abjadTotalWithMother(personName, motherName, abjad);
@@ -1612,7 +1612,7 @@ export function getElementArabicName(element: ElementType): string {
 /**
  * Compatibility analysis between two souls
  */
-export function analyzeCompatibility(name1: string, name2: string, abjad: Record<string, number> = ABJAD_MAGHRIBI) {
+export function analyzeCompatibility(name1: string, name2: string, abjad: Record<string, number> = getActiveAbjadMap()) {
   const person1 = analyzeNameDestiny(name1, abjad);
   const person2 = analyzeNameDestiny(name2, abjad);
   
@@ -2916,7 +2916,7 @@ export function calculateUserProfile(
   nameArabic: string,
   birthDate?: Date,
   motherName?: string,
-  abjad: Record<string, number> = ABJAD_MAGHRIBI
+  abjad: Record<string, number> = getActiveAbjadMap()
 ): UserProfile {
   const destiny = analyzeNameDestiny(nameArabic, abjad);
   

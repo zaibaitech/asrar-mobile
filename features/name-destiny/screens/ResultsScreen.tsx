@@ -23,6 +23,9 @@ import { PremiumSection } from '@/components/subscription/PremiumSection';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 import { DivineResonanceCard, ZodiacStonesCard } from '@/features/name-destiny/components';
+import { getAbjadMap } from '@/constants/abjad-maps';
+import { useAbjad } from '@/features/name-destiny/contexts/AbjadContext';
+import { buildDestiny } from '@/features/name-destiny/services/nameDestinyCalculator';
 import type { NameDestinyResult } from '@/features/name-destiny/types';
 import { InputType, UnderstandingLevel } from '@/features/name-destiny/types/enums';
 import { generateKeyTakeaways } from '@/features/name-destiny/utils/takeawayGenerator';
@@ -34,7 +37,7 @@ import { calculateLetterElementDistribution, getDominantElement } from '@/utils/
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { AlertCircle, Calendar, Clock, HelpCircle, Sparkles, Star } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -179,9 +182,22 @@ export default function ResultsScreen() {
   const [aiPersonalizedInsight, setAiPersonalizedInsight] = useState<string | undefined>();
   const [aiAvailable, setAiAvailable] = useState(false);
 
-  const result: NameDestinyResult | null = params.data ? JSON.parse(params.data as string) : null;
   const personName = params.personName as string;
   const motherName = params.motherName as string;
+  // The reading follows the app-wide Abjad system: if it was switched after this
+  // result was calculated, recompute it from the same names with the new table.
+  const { abjadSystem } = useAbjad();
+  const result: NameDestinyResult | null = useMemo(() => {
+    const parsed: NameDestinyResult | null = params.data ? JSON.parse(params.data as string) : null;
+    if (parsed && personName && (parsed.abjadSystem ?? 'maghribi') !== abjadSystem) {
+      try {
+        return buildDestiny(personName, motherName || undefined, getAbjadMap(abjadSystem));
+      } catch {
+        return parsed;
+      }
+    }
+    return parsed;
+  }, [params.data, personName, motherName, abjadSystem]);
   const inputType = (params.inputType as InputType) || InputType.NAME_MOTHER_PAIR;
   const understandingLevel =
     (params.understandingLevel as UnderstandingLevel) || UnderstandingLevel.BEGINNER;
