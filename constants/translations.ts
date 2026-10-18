@@ -10610,7 +10610,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       mashriqi: "Mashriqi",
       mashriqiDesc: "Used in Egypt, the Middle East and Asia",
       maghribi: "Maghribi",
-      maghribiDesc: "Used in the Maghreb, al-Andalus and West Africa",
+      maghribiDesc: "Used in the Maghreb and West Africa, and historically in al-Andalus",
     },
 
     // Elemental relationship descriptions
@@ -21583,7 +21583,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       mashriqi: "Mashriqi",
       mashriqiDesc: "Utilisé en Égypte, au Moyen-Orient et en Asie",
       maghribi: "Maghribi",
-      maghribiDesc: "Utilisé au Maghreb, en al-Andalus et en Afrique de l'Ouest",
+      maghribiDesc: "Utilisé au Maghreb et en Afrique de l'Ouest, et jadis en al-Andalus",
     },
 
     // Relations élémentaires (French - simplified)
@@ -31068,7 +31068,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       mashriqi: "مشرقي",
       mashriqiDesc: "يُستخدم في مصر والمشرق وسائر آسيا",
       maghribi: "مغربي",
-      maghribiDesc: "يُستخدم في المغرب العربي والأندلس وغرب أفريقيا",
+      maghribiDesc: "يُستعمل في المغرب العربي وغرب أفريقيا، واستُعمل قديمًا في الأندلس",
     },
 
     // العلاقات العنصرية (العربية - مبسطة)
