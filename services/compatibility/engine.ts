@@ -390,7 +390,7 @@ export function generateGuidanceSummary(
   if (elementalRel === 'opposing' || elementalRel === 'transformative') {
     requiresPatience = {
       en: 'Elemental tensions require conscious navigation and patience to integrate differences.',
-      ar: 'التوترات العنصرية تتطلب ملاحة واعية وصبراً لدمج الاختلافات.'
+      ar: 'توترات العناصر تتطلب ملاحة واعية وصبراً لدمج الاختلافات.'
     };
   } else if (planetaryRes === 'tense') {
     requiresPatience = {

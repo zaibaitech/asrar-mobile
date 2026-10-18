@@ -497,7 +497,7 @@ function generateCautions(
       language === 'fr'
         ? 'Tension élémentaire — gardez l’équilibre intérieur et ne forcez pas les résultats.'
         : language === 'ar'
-          ? 'هناك توتر عنصري — حافظ على توازنك الداخلي ولا تُجبر النتائج.'
+          ? 'هناك توتر بين العناصر — حافظ على توازنك الداخلي ولا تُجبر النتائج.'
           : 'Elemental tension present — maintain inner balance and don\'t force outcomes.'
     );
   }

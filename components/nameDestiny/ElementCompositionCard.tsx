@@ -42,7 +42,7 @@ export function ElementCompositionCard({
       balancing: 'Actions d\'Équilibrage',
     },
     ar: {
-      main: 'التركيب العنصري',
+      main: 'تركيب العناصر',
       subtitle: 'بناءً على حروف اسمك',
       interpretation: 'ماذا يعني هذا',
       balancing: 'إجراءات التوازن',

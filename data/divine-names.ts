@@ -1655,7 +1655,7 @@ export const DIVINE_NAMES: DivineName[] = [
   },
   {
     "number": 91,
-    "arabic": "الضَّارَّ",
+    "arabic": "الضَّارُّ",
     "transliteration": "Ad Daaarr",
     "abjadValue": 1032,
     "meaning": {

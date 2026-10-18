@@ -184,7 +184,7 @@ export default function CareerTabAdvanced({ result }: CareerTabAdvancedProps) {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     
     const shareText = language === 'ar'
-      ? `اكتشفت مساري المهني من خلال استخارة الأسماء! يتوافق عنصري ${profile.element} مع صناعات ${categories?.[0]?.category || 'متنوعة'}.`
+      ? `اكتشفت مساري المهني من خلال استخارة الأسماء! يتوافق عنصر ${profile.element} لديّ مع صناعات ${categories?.[0]?.category || 'متنوعة'}.`
       : language === 'en'
         ? `Discovered my career path through Istikhara al-Asmāʾ! My ${profile.element} element aligns with ${categories?.[0]?.category || 'various'} industries.`
         : `J'ai découvert ma voie professionnelle avec Istikhara al-Asmāʾ! Mon élément ${profile.element} s'aligne avec ${categories?.[0]?.category || 'diverses'} industries.`;

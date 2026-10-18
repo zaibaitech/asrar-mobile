@@ -21790,7 +21790,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           quranResonance: "الرنين القرآني",
           dhikrPractice: "ممارسة الذكر",
           generalInsights: "رؤى عامة",
-          elementalAnalysis: "التحليل العنصري",
+          elementalAnalysis: "تحليل العناصر",
           advancedMethods: "الطرق المتقدمة",
         },
         core: {
@@ -21923,7 +21923,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
 
         elementalComposition: {
           title: "تركيب العناصر",
-          balanceScore: "درجة التوازن العنصري",
+          balanceScore: "درجة توازن العناصر",
           balanceStatus: {
             harmonious: "منسجم",
             moderate: "معتدل",
@@ -21933,7 +21933,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           letterCount: "{{count}} حرف",
           letterCount_plural: "{{count}} أحرف",
           recommendations: {
-            harmonious: "توازنك العنصري منسجم. حافظ على التوازن من خلال ممارسات متزنة.",
+            harmonious: "توازن عناصرك منسجم. حافظ على التوازن من خلال ممارسات متزنة.",
             waterWeak: "عنصر الماء لديك (0%) يحتاج إلى مزيد من الاهتمام. جرّب: نمِّ العمق العاطفي والحدس والتدفق. مارس الذكر قرب الماء أو أثناء الوضوء.",
             fireWeak: "عنصر النار لديك (0%) يحتاج إلى مزيد من الاهتمام. جرّب: مارس ممارسات روحية شغوفة. الذكر عند الفجر أو الشروق لإشعال النور الداخلي.",
             airWeak: "عنصر الهواء لديك (0%) يحتاج إلى مزيد من الاهتمام. جرّب: ركّز على المعرفة والتواصل. مارس الذكر مع وعي التنفس (حبس النفس).",
@@ -21952,7 +21952,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           bestPracticeTimes: "أفضل أوقات الممارسة",
           bestTimeWindow: "أفضل نافذة زمنية",
           powerDays: "أيام القوة",
-          timingNote: "يوم القوة = الكوكب الحاكم للبرج. أفضل نافذة زمنية = ذروة الرنين العنصري.",
+          timingNote: "يوم القوة = الكوكب الحاكم للبرج. أفضل نافذة زمنية = ذروة رنين العناصر.",
           bestTime: {
             fire: "الفجر والشروق (وقت الفجر) - عندما تكون طاقة النار في أقوى حالاتها",
             water: "الليل وقبل النوم (وقت العشاء) - عندما تتدفق طاقة الماء",
@@ -22054,12 +22054,12 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
             airair: "الهواء المضاعف يعزز التواصل والوضوح",
             airearth: "الهواء فوق الأرض - الأفكار تلتقي بالواقع",
             earthearth: "الأرض المضاعفة توفر أساسًا وثباتًا قويين",
-            balanced: "تفاعل عنصري متوازن",
+            balanced: "تفاعل متوازن بين العناصر",
           },
 
           takeaways: {
             lineageNumber: "رقم نسبك هو {{kabir}}، متجذر في طاقة {{element}}",
-            elementalRelationship: "العلاقة العنصرية: {{interaction}}",
+            elementalRelationship: "علاقة العناصر: {{interaction}}",
             spiritualRoot: "الجذر الروحي المشترك (الصغير): {{saghir}}",
           },
 
@@ -22704,7 +22704,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           overview: "نظرة عامة",
           soulConnection: "الارتباط الروحي",
           harmony: "الانسجام",
-          elemental: "عنصري",
+          elemental: "العناصر",
           planetary: "كوكبي",
           daily: "يومي",
           advice: "نصائح",
@@ -22717,7 +22717,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           dob: "تاريخ الميلاد",
         },
         zodiac: {
-          title: "التوافق الفلكي والعنصري",
+          title: "التوافق الفلكي وتوازن العناصر",
           subtitle: "بُعد مكمّل يعتمد على بيانات الميلاد المتاحة",
           soloCardTitleName: "القدر الروحي (قائم على الاسم)",
           soloCardTitleDob: "الملف الفلكي (تاريخ الميلاد)",
@@ -22725,7 +22725,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           elementLabel: "العنصر",
           planetaryRulerLabel: "الكوكب الحاكم",
           harmonyScoreLabel: "درجة الانسجام",
-          mixedNote: "تتطلب مقارنة البرجين الكاملة تاريخ ميلاد كلا الشخصين. تستخدم المقارنة العنصرية والكوكبية أعلاه ما هو متاح لهذا الاقتران.",
+          mixedNote: "تتطلب مقارنة البرجين الكاملة تاريخ ميلاد كلا الشخصين. تستخدم مقارنة العناصر والكواكب أعلاه ما هو متاح لهذا الاقتران.",
           scopeDisclaimer: "مُحسَب من تاريخ الميلاد فقط. القمر والطالع والبيوت الفلكية تتطلب وقت ميلاد دقيق وغير مُدرَجة هنا.",
           burjReasons: {
             scorpioFire: "العقرب والنار — شغف يغذّيه المريخ",
@@ -22897,7 +22897,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           quality: "الجودة",
           sacredNumber: "الرقم المقدس",
           spiritual: "الارتباط الروحي",
-          elemental: "عنصري",
+          elemental: "العناصر",
           planetary: "كوكبي",
           daily: "يومي",
           harmony: "الانسجام",
@@ -22933,7 +22933,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         harmony: {
           title: "مؤشر الانسجام",
           subtitle: "التوافق العملي في الديناميكيات المعاشة",
-          description: "يعكس هذا كيف تسير الحياة اليومية عادةً بناءً على التوازن العنصري والتأثيرات الكوكبية والإيقاعات اليومية.",
+          description: "يعكس هذا كيف تسير الحياة اليومية عادةً بناءً على توازن العناصر والتأثيرات الكوكبية والإيقاعات اليومية.",
           components: "مكونات الانسجام",
         },
         elemental: {
@@ -23508,7 +23508,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           nameIntentionAlignment: "توافق الاسم مع النية",
           resonanceScore: "درجة الرنين",
 
-          elementalRelationship: "العلاقة العنصرية",
+          elementalRelationship: "علاقة العناصر",
           zahirBatinDynamics: "ديناميكيات الظاهر والباطن",
           planetaryResonance: "الرنين الكوكبي",
           modeOfAction: "نمط الفعل",
@@ -23544,7 +23544,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       resultsView: {
         overview: "نظرة عامة",
         spiritual: "روحي",
-        elemental: "عنصري",
+        elemental: "العناصر",
         planetary: "كوكبي",
         advice: "نصائح",
         compatibilityOverview: "نظرة عامة على التوافق",
@@ -23554,7 +23554,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         personalizeAnalysis: "✨ خصّص التحليل",
         yourPersonalInsight: "💫 رؤيتك الشخصية",
         spiritualLabel: "روحي",
-        elementalLabel: "عنصري",
+        elementalLabel: "العناصر",
         planetaryLabel: "كوكبي",
         spiritualDestiny: "القدر الروحي",
         spiritualDestinyDesc: "المسار الروحي والانسجام",
@@ -23565,7 +23565,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         cosmicHarmony: "الانسجام الكوني",
         cosmicHarmonyDesc: "التأثيرات الكوكبية",
         recommendations: "التوصيات",
-        elementalRelationship: "العلاقة العنصرية",
+        elementalRelationship: "علاقة العناصر",
         enterTwoNames: "أدخل اسمين",
         enterTwoNamesSubtitle: "احسب التوافق باستخدام علم الأعداد الإسلامي التقليدي",
         abjadSystem: "نظام الأبجد",
@@ -24427,7 +24427,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         title: "عبور الكواكب",
         headerSubtitle: "طويل المدى",
         explanation: "يعرض موقع الكوكب في الأبراج — وهو موضع طويل المدى يتغير خلال أسابيع أو أشهر أو سنوات.",
-        personalizedNote: "مُخصّص حسب طبيعتك العنصرية",
+        personalizedNote: "مُخصّص حسب طبيعة عناصرك",
         approximationUnreliable: "تقريب (غير موثوق)",
         transitType: {
           personal: "في برجك",
@@ -24619,7 +24619,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
             neutral: "تَوَازُن",
             challenging: "تَحَوُّل",
           },
-          context: "استنادًا إلى العلاقات العنصرية في علم الفلك الروحي التقليدي.",
+          context: "استنادًا إلى علاقات العناصر في علم الفلك الروحي التقليدي.",
         },
 
         quickImpact: {
@@ -24629,7 +24629,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
 
         why: {
           title: "لماذا تشعر بهذا الشكل",
-          body: "يمزج هذا العبور بين طبيعتك العنصرية ونبرة البرج، فيؤثر على التواصل والمزاج والزخم اليوم.",
+          body: "يمزج هذا العبور بين طبيعة عناصرك ونبرة البرج، فيؤثر على التواصل والمزاج والزخم اليوم.",
           show: "لماذا تشعر بهذا الشكل",
           hide: "إخفاء التفاصيل",
         },
@@ -25269,7 +25269,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       },
       compatibility: {
         title: "التوافق",
-        description: "تحليل انسجام العلاقات من خلال التوازن العنصري والعددي",
+        description: "تحليل انسجام العلاقات من خلال توازن العناصر والأعداد",
       },
       divineTiming: {
         title: "التوقيت الإلهي",
@@ -25402,7 +25402,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         labels: {
           timingQuality: "جودة التوقيت",
           cycleState: "حالة الدورة",
-          elementalTone: "النبرة العنصرية",
+          elementalTone: "نبرة العناصر",
           reflectiveGuidance: "إرشاد تأملي",
           harmony: "الانسجام",
           hourlyStatus: "حالة اللحظة",
@@ -25943,7 +25943,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         calculationError: "خطأ في الحساب",
         calculationErrorMessage: "حدث خطأ ما أثناء إنشاء رؤى القدر.",
         educationTitle: "ما هو قدر الاسم؟",
-        educationContent: "يكشف قدر الأسماء المخطط الروحي المشفّر داخل اسمك واسم والدتك. باستخدام علم الأعداد الأبجدي، نكتشف الأرقام المقدسة والتوازن العنصري والتأثيرات الفلكية الموجهة لمسار حياتك.",
+        educationContent: "يكشف قدر الأسماء المخطط الروحي المشفّر داخل اسمك واسم والدتك. باستخدام علم الأعداد الأبجدي، نكتشف الأرقام المقدسة وتوازن العناصر والتأثيرات الفلكية الموجهة لمسار حياتك.",
         discoveryTitle: "ما ستكتشفه",
         discoveryItems: {
           numbers: { icon: "🔢", title: "الأرقام المقدسة", desc: "الكبير (المجموع الكلي) والصغير (الجوهر)" },
@@ -26470,7 +26470,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         perfectAlignment: "انسجام تام",
         supportiveFlow: "تدفق داعم",
         neutral: "طاقة محايدة",
-        minorTension: "توتر عنصري طفيف",
+        minorTension: "توتر بين العناصر طفيف",
       },
 
       guidance: {
@@ -26654,7 +26654,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         showReasoning: "▶ عرض السبب",
         hideReasoning: "▼ إخفاء السبب",
         planetaryAlignment: "🪐 توافق كوكبي:",
-        elementalResonance: "💫 رنين عنصري:",
+        elementalResonance: "💫 رنين العناصر:",
         numerologicalSignificance: "🔢 دلالة عددية:",
         classicalSource: "📚 مصدر كلاسيكي:",
         spiritualBenefits: "✨ فوائد روحية:",
@@ -26704,7 +26704,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       },
       harmonyAnalysis: {
         title: "تحليل الانسجام",
-        description: "اكتشف الانسجام العنصري والكوني",
+        description: "اكتشف انسجام العناصر والكوني",
       },
       personalizedAdvice: {
         title: "نصائح مخصصة",
@@ -26807,7 +26807,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       // Planet Transit Details additional
       personalizedImpact: {
         title: "التأثير المخصص",
-        description: "اكتشف كيف يؤثر هذا العبور على طبيعتك العنصرية",
+        description: "اكتشف كيف يؤثر هذا العبور على طبيعة عناصرك",
       },
       personalizedInsights: {
         title: "رؤى مخصصة",
@@ -26828,7 +26828,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         description: "استكشف الرابطة الروحية العميقة",
       },
       elementalAnalysis: {
-        title: "التحليل العنصري",
+        title: "تحليل العناصر",
         description: "افهم انسجام الطاقات الطبيعية",
       },
       planetaryAnalysis: {
@@ -26838,7 +26838,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       // Calculator Enhanced Results additional
       deepNumerologicalAnalysis: {
         title: "تحليل عددي معمق",
-        description: "افتح رؤى الذكاء الاصطناعي، التركيب العنصري، وطرق الحساب المتقدمة",
+        description: "افتح رؤى الذكاء الاصطناعي، تركيب العناصر، وطرق الحساب المتقدمة",
       },
       // AI Guidance (Divine Timing)
       aiSpiritualGuidance: {
@@ -27006,7 +27006,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           tomorrowRuler: "حاكم يوم الغد",
           yourNature: "طبيعتك",
           resonance: "الرنين",
-          context: "بناءً على العلاقات العنصرية في علم الفلك الروحي التقليدي.",
+          context: "بناءً على علاقات العناصر في علم الفلك الروحي التقليدي.",
         },
         hints: {
           currentHour: "هذه هي الساعة الكوكبية النشطة (تتغير خلال اليوم).",
@@ -27433,7 +27433,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           showReasoning: "▶ عرض السبب",
           hideReasoning: "▼ إخفاء السبب",
           planetaryAlignment: "🪐 التوافق الكوكبي:",
-          elementalResonance: "💫 الرنين العنصري:",
+          elementalResonance: "💫 رنين العناصر:",
           numerologicalSignificance: "🔢 الدلالة العددية:",
           classicalSource: "📚 المصدر الكلاسيكي:",
           spiritualBenefits: "✨ الفوائد الروحية:",
@@ -28490,7 +28490,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       authenticTiming: {
         title: "التوقيت الأصيل",
         hourRuler: "قوة حاكم الساعة",
-        elemental: "العلاقة العنصرية",
+        elemental: "علاقة العناصر",
         opening: "إرشاد ساعة {planet} (للتأمل).",
         nextHour: "الساعة التالية: يبدأ {planet} بعد {minutes} د.",
 
@@ -29652,7 +29652,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       hadathDef: "الجوهر العددي × مجموع قيم جميع الحروف في الاسم باستخدام نظام الأبجد. يكشف هذا الرقم الجوهر الروحي وأنماط القدر.",
 
       hadathDiv4: "الحدث ÷ 4",
-      hadathDiv4Def: `الطريقة الكلاسيكية لتحديد المزاج العنصري (النظام المغربي). يشير باقي قسمة الحدث على 4 إلى العنصر الغالب:
+      hadathDiv4Def: `الطريقة الكلاسيكية لتحديد مزاج العناصر (النظام المغربي). يشير باقي قسمة الحدث على 4 إلى العنصر الغالب:
 • الباقي 1 = النار
 • الباقي 2 = الأرض
 • الباقي 3 = الهواء
@@ -31071,7 +31071,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       maghribiDesc: "يُستعمل في المغرب العربي وغرب أفريقيا، واستُعمل قديمًا في الأندلس",
     },
 
-    // العلاقات العنصرية (العربية - مبسطة)
+    // علاقات العناصر (العربية - مبسطة)
     elementalRelations: {
       "Fire-Fire": "النار تقوي النار — عاطفة مضخمة",
       "Fire-Air": "الهواء يؤجج النار — ديناميكية إبداعية",

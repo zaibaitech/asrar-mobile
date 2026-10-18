@@ -414,7 +414,7 @@ export function analyzeElementCompatibility(
     modifierScore += 25; // Strong boost
     modifierReason = 'Your ruling planet governs today  -  powerful alignment. Element effects are secondary. ';
     modifierReasonFr = 'Votre planete dominante gouverne aujourd hui - alignement puissant. Les effets elementaires sont secondaires. ';
-    modifierReasonAr = 'كوكبك الحاكم يحكم اليوم  -  توافق قوي. التأثيرات العنصرية ثانوية. ';
+    modifierReasonAr = 'كوكبك الحاكم يحكم اليوم  -  توافق قوي. تأثيرات العناصر ثانوية. ';
   }
   
   // If user's burj element matches their name element (internal harmony)
@@ -424,7 +424,7 @@ export function analyzeElementCompatibility(
       modifierScore += 10;
       modifierReason += 'Internal elemental harmony is strong. ';
       modifierReasonFr += 'L’harmonie élémentaire intérieure est forte. ';
-      modifierReasonAr += 'الانسجام العنصري الداخلي قوي. ';
+      modifierReasonAr += 'انسجام العناصر الداخلي قوي. ';
     }
   }
   
@@ -623,16 +623,16 @@ function generateElementReasoningAr(
   let base = '';
   switch (relationship) {
     case 'same':
-      base = `تناغم عنصري كامل! طبيعتك (${user}) منسجمة مع طاقة (${hour}) الحالية.`;
+      base = `تناغم العناصر كامل! طبيعتك (${user}) منسجمة مع طاقة (${hour}) الحالية.`;
       break;
     case 'complementary':
-      base = `تدفق عنصري داعم. عنصر (${user}) يُكمل طاقة (${hour}) الحالية.`;
+      base = `تدفق العناصر داعم. عنصر (${user}) يُكمل طاقة (${hour}) الحالية.`;
       break;
     case 'neutral':
-      base = `ظروف عنصرية محايدة. يمكن لطبيعتك (${user}) أن تعمل مع طاقة (${hour}) الحالية مع الوعي.`;
+      base = `ظروف العناصر محايدة. يمكن لطبيعتك (${user}) أن تعمل مع طاقة (${hour}) الحالية مع الوعي.`;
       break;
     case 'tension':
-      base = `هناك توتر عنصري. طبيعتك (${user}) تواجه طاقة (${hour})  -  تابع بتوازن.`;
+      base = `هناك توتر بين العناصر. طبيعتك (${user}) تواجه طاقة (${hour})  -  تابع بتوازن.`;
       break;
   }
 
@@ -1236,7 +1236,7 @@ function checkDivineNameTiming(
       bonus: 10,
       reason: `${divineName}'s elemental quality aligns with current timing.`,
       reasonFr: `La qualité élémentaire de ${divineName} s’aligne avec le timing actuel.`,
-      reasonAr: `الصفة العنصرية لـ ${divineName} متوافقة مع التوقيت الحالي.`,
+      reasonAr: `صفة العناصر لـ ${divineName} متوافقة مع التوقيت الحالي.`,
     };
   }
   
