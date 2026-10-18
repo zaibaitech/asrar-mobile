@@ -3,7 +3,7 @@
  * Complete calculation library for API routes
  */
 
-import { ABJAD_MAGHRIBI } from '../constants/abjad-maps';
+import { getActiveAbjadMap } from '../constants/abjad-maps';
 // import {
 //   calculateDivineNameResonance,
 //   computeQuranResonance,
@@ -96,7 +96,7 @@ function modIndex(n: number, mod: number): number {
  */
 export function calculateAbjadTotal(
   text: string,
-  abjadMap: Record<string, number> = ABJAD_MAGHRIBI
+  abjadMap: Record<string, number> = getActiveAbjadMap()
 ): number {
   // Normalize: remove diacritics and spaces
   const normalized = text.replace(/[ًٌٍَُِّْ\s]/g, '');
@@ -160,7 +160,7 @@ export function getBurj(total: number): {
 export function calculateSimpleDestiny(
   personName: string,
   motherName?: string,
-  abjadMap: Record<string, number> = ABJAD_MAGHRIBI
+  abjadMap: Record<string, number> = getActiveAbjadMap()
 ) {
   // Convert to Arabic if needed (simplified - just use as-is for now)
   const personArabic = personName;
@@ -208,7 +208,7 @@ export function calculateSimpleDestiny(
 // export function calculateCompleteDestiny(
 //   personName: string,
 //   motherName?: string,
-//   abjadMap: Record<string, number> = ABJAD_MAGHRIBI
+//   abjadMap: Record<string, number> = getActiveAbjadMap()
 // ) {
 //   const basic = calculateSimpleDestiny(personName, motherName, abjadMap);
   

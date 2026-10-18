@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { AbjadSystemKey, getAbjadMap, getActiveAbjadSystem } from '../constants/abjad-maps';
+import { calculateIstikhara } from '../services/istikhara/calculations';
 import { IstikharaService } from '../services/IstikharaService';
 
 // Legacy response format for compatibility with existing components
@@ -14,7 +16,35 @@ interface IstikharaResponse {
     element: 'fire' | 'earth' | 'air' | 'water';
     burujProfile: any;
     repetitionCount: number;
+    /** Abjad system the totals were calculated with (app-wide choice). */
+    abjadSystem?: AbjadSystemKey;
   };
+}
+
+type IstikharaResultLike = ReturnType<typeof calculateIstikhara>;
+
+function toResponseData(localResult: IstikharaResultLike, abjadSystem: AbjadSystemKey): IstikharaResponse['data'] {
+  return {
+    personName: localResult.personName,
+    motherName: localResult.motherName,
+    personTotal: localResult.personTotal,
+    motherTotal: localResult.motherTotal,
+    combinedTotal: localResult.combinedTotal,
+    burujRemainder: localResult.burujRemainder,
+    element: localResult.burujProfile.element,
+    burujProfile: localResult.burujProfile,
+    repetitionCount: localResult.repetitionCount,
+    abjadSystem,
+  };
+}
+
+/**
+ * Recalculate a name-based result with another Abjad system (same names, same
+ * formula; used by the results screen when the user switches the system).
+ * Not saved to history.
+ */
+export function recalculateIstikharaData(personName: string, motherName: string, abjadSystem: AbjadSystemKey): IstikharaResponse['data'] {
+  return toResponseData(calculateIstikhara(personName.trim(), motherName.trim(), getAbjadMap(abjadSystem)), abjadSystem);
 }
 
 interface UseIstikharaReturn {
@@ -45,22 +75,13 @@ export function useIstikhara(): UseIstikharaReturn {
 
     try {
       // Use local calculation service (synchronous, no await needed)
-      const localResult = IstikharaService.calculate(personName, motherName);
+      const abjadSystem = getActiveAbjadSystem();
+      const localResult = IstikharaService.calculate(personName, motherName, getAbjadMap(abjadSystem));
       
       // Transform to legacy response format for compatibility
       const response: IstikharaResponse = {
         success: true,
-        data: {
-          personName: localResult.personName,
-          motherName: localResult.motherName,
-          personTotal: localResult.personTotal,
-          motherTotal: localResult.motherTotal,
-          combinedTotal: localResult.combinedTotal,
-          burujRemainder: localResult.burujRemainder,
-          element: localResult.burujProfile.element,
-          burujProfile: localResult.burujProfile,
-          repetitionCount: localResult.repetitionCount,
-        }
+        data: toResponseData(localResult, abjadSystem),
       };
       
       console.log('✅ Local calculation successful:', response);

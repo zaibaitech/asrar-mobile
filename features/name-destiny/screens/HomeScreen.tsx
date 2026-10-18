@@ -9,7 +9,7 @@ import { DarkTheme, ElementAccents, Spacing, Typography } from '@/constants/Dark
 import { useAds } from '@/contexts/AdContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     Keyboard,
     KeyboardAvoidingView,
@@ -25,7 +25,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DivineResonanceCard } from '../components/DivineResonanceCard';
-import { ABJAD_MAGHRIBI, ABJAD_MASHRIQI } from '../constants/abjadMaps';
+import { AbjadSystemSelector } from '../../../components/calculator/AbjadSystemSelector';
+import { getAbjadMap } from '../constants/abjadMaps';
 import { useAbjad } from '../contexts/AbjadContext';
 import { buildDestiny } from '../services/nameDestinyCalculator';
 import { NameDestinyResult } from '../types';
@@ -69,6 +70,14 @@ export default function NameDestinyHomeScreen() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // When the app-wide Abjad system changes, recompute the reading on screen.
+  const lastInputsRef = useRef<{ name: string; mother?: string } | null>(null);
+  useEffect(() => {
+    const inputs = lastInputsRef.current;
+    if (!inputs) return;
+    setResult((prev) => (prev && prev.abjadSystem !== abjadSystem ? buildDestiny(inputs.name, inputs.mother, getAbjadMap(abjadSystem)) : prev));
+  }, [abjadSystem]);
+
   // Handle analysis
   const handleAnalyze = () => {
     Keyboard.dismiss();
@@ -84,10 +93,11 @@ export default function NameDestinyHomeScreen() {
       : undefined;
 
     // Get the correct abjad map based on system
-    const abjadMap = abjadSystem === 'mashriqi' ? ABJAD_MASHRIQI : ABJAD_MAGHRIBI;
+    const abjadMap = getAbjadMap(abjadSystem);
 
     // Calculate destiny
     const calculatedResult = buildDestiny(finalName, finalMotherName, abjadMap);
+    lastInputsRef.current = { name: finalName, mother: finalMotherName };
     setResult(calculatedResult);
 
     // Show interstitial ad (throttled)
@@ -316,6 +326,11 @@ export default function NameDestinyHomeScreen() {
               </View>
             </View>
           )}
+
+          {/* Abjad system (app-wide) */}
+          <View style={styles.section}>
+            <AbjadSystemSelector />
+          </View>
 
           {/* Results Section - Guided Spiritual Insight */}
           {result && (

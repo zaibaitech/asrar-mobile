@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { ASMA_LIST } from '../../utils/hadad-core';
+import { useAbjadSystem } from '../../hooks/useAbjadSystem';
+import { getAsmaList } from '../../utils/hadad-core';
 
 interface DhikrRecommendationProps {
   kabir: number;
@@ -9,7 +10,8 @@ interface DhikrRecommendationProps {
 
 export const DhikrRecommendation: React.FC<DhikrRecommendationProps> = ({ kabir, saghir }) => {
   // Find the divine name closest to kabir value
-  const closestName = ASMA_LIST.reduce((prev, curr) => 
+  const { abjad } = useAbjadSystem();
+  const closestName = getAsmaList(abjad).reduce((prev, curr) => 
     Math.abs(curr.abjad - kabir) < Math.abs(prev.abjad - kabir) ? curr : prev
   );
   

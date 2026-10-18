@@ -8,17 +8,17 @@
  * If you want full ilm-huruf functionality, copy core.ts instead.
  */
 
-import { ABJAD_MAGHRIBI } from '../../constants/abjad-maps';
+import { getActiveAbjadMap } from '../../constants/abjad-maps';
 
 /**
  * Calculate Abjad value of Arabic text
  */
-export function calculateAbjadValue(text: string): number {
+export function calculateAbjadValue(text: string, abjad: Record<string, number> = getActiveAbjadMap()): number {
   if (!text) return 0;
   
   let total = 0;
   for (const char of text) {
-    const value = ABJAD_MAGHRIBI[char];
+    const value = abjad[char];
     if (value) {
       total += value;
     }

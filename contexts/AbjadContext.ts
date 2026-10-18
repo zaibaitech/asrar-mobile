@@ -10,16 +10,9 @@ export { ABJAD_MAGHRIBI };
 
 export type AbjadSystem = 'Maghribi' | 'Mashriqi';
 
-/**
- * Mashriqi (Eastern) Abjad - Traditional Middle Eastern system
- * Standard Abjad Hawwaz order (most common)
- */
-export const ABJAD_MASHRIQI: Record<string, number> = {
-  'ا': 1, 'ب': 2, 'ج': 3, 'د': 4, 'ه': 5, 'و': 6, 'ز': 7, 'ح': 8, 'ط': 9,
-  'ي': 10, 'ك': 20, 'ل': 30, 'م': 40, 'ن': 50, 'س': 60, 'ع': 70, 'ف': 80, 'ص': 90,
-  'ق': 100, 'ر': 200, 'ش': 300, 'ت': 400, 'ث': 500, 'خ': 600, 'ذ': 700, 'ض': 800, 'ظ': 900, 'غ': 1000,
-  'ة': 5  // Tā' marbūṭa (feminine ending) = same as ه (5), not ت (400)
-};
+// Mashriqi (Eastern) table: the one shared table in constants/abjad-maps.ts
+// (same letter forms as Maghribi: أإآ=1, ؤ=6, ئى=10, ة=5).
+export { ABJAD_MASHRIQI, getAbjadMap, getActiveAbjadMap } from '../constants/abjad-maps';
 
 // ============================================================================
 // HAMZA HANDLING

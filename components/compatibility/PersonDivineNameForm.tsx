@@ -15,7 +15,8 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { ABJAD_MAGHRIBI } from '../../constants/abjad-maps';
+import { getActiveAbjadMap } from '../../constants/abjad-maps';
+import { useAbjadSystem } from '../../hooks/useAbjadSystem';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { calculatePersonDivineNameCompatibility } from '../../services/compatibility/divineNameCompatibility';
 import {
@@ -30,7 +31,8 @@ import ArabicKeyboard from '../istikhara/ArabicKeyboard';
 import NameAutocomplete from '../NameAutocomplete';
 
 interface PersonDivineNameFormProps {
-  onCalculate: (result: PersonDivineNameCompatibility) => void;
+  /** recalculate re-runs the same inputs with the app-wide Abjad system (used when it is switched). */
+  onCalculate: (result: PersonDivineNameCompatibility, recalculate?: () => PersonDivineNameCompatibility) => void;
 }
 
 export function PersonDivineNameForm({ onCalculate }: PersonDivineNameFormProps) {
@@ -48,7 +50,8 @@ export function PersonDivineNameForm({ onCalculate }: PersonDivineNameFormProps)
   const [cursorPosition, setCursorPosition] = useState(0);
   const personInputRef = useRef<TextInput>(null);
 
-  const divineNames = getAllCompatibilityDivineNames();
+  const { abjad } = useAbjadSystem();
+  const divineNames = getAllCompatibilityDivineNames(abjad);
 
   // Keyboard handlers
   const handleKeyPress = (key: string) => {
@@ -89,16 +92,17 @@ export function PersonDivineNameForm({ onCalculate }: PersonDivineNameFormProps)
     setIsCalculating(true);
 
     try {
-      const destiny = buildDestiny(personArabic, undefined, ABJAD_MAGHRIBI);
+      const arabic = personArabic;
+      const displayName = personName || personArabic;
+      const divineNumber = selectedDivineName.number;
+      const compute = () => {
+        const table = getActiveAbjadMap();
+        const destiny = buildDestiny(arabic, undefined, table);
+        const divineName = getAllCompatibilityDivineNames(table).find((n) => n.number === divineNumber) ?? selectedDivineName;
+        return calculatePersonDivineNameCompatibility(displayName, arabic, destiny, divineName, table);
+      };
 
-      const result = calculatePersonDivineNameCompatibility(
-        personName || personArabic,
-        personArabic,
-        destiny,
-        selectedDivineName
-      );
-
-      onCalculate(result);
+      onCalculate(compute(), compute);
     } catch (err) {
       console.error('Compatibility calculation error:', err);
       setError(t('compatibility.form.errors.calculationFailed'));

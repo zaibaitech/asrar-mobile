@@ -1,8 +1,17 @@
 /**
  * Complete 99 Divine Names Database
  * Generated from Al Aladhan API
- * Abjad values calculated using Maghribi system
+ * Stored abjadValue fields use the Mashriqi table; use the helpers at the end
+ * of this file for values in the app-wide system (Maghribi by default).
  */
+
+import {
+  AbjadSystemKey,
+  abjadSystemOfMap,
+  getAbjadMap,
+  getActiveAbjadMap,
+  storedMashriqiValueForSystem,
+} from '../constants/abjad-maps';
 
 export interface DivineName {
   number: number;
@@ -1809,15 +1818,29 @@ export const DIVINE_NAMES: DivineName[] = [
 ];
 
 // Helper functions
-export function getDivineNameByNumber(number: number): DivineName | undefined {
-  return DIVINE_NAMES.find(n => n.number === number);
+//
+// The abjadValue fields above are the stored (Mashriqi) values. The helpers
+// return the Names with abjadValue in the app-wide system (Maghribi by default),
+// so every tool that shows or matches a Name's value follows the user's choice.
+
+const divineNamesBySystem: Partial<Record<AbjadSystemKey, DivineName[]>> = {};
+
+export function getDivineNamesForSystem(abjad: Record<string, number> = getActiveAbjadMap()): DivineName[] {
+  const key = abjadSystemOfMap(abjad);
+  return (divineNamesBySystem[key] ??= DIVINE_NAMES.map((n) => ({
+    ...n,
+    abjadValue: storedMashriqiValueForSystem(n.abjadValue, n.arabic, getAbjadMap(key)),
+  })));
 }
 
-export function findDivineNamesByValue(abjadValue: number, tolerance = 0): DivineName[] {
-  return DIVINE_NAMES.filter(n => Math.abs(n.abjadValue - abjadValue) <= tolerance);
+export function getDivineNameByNumber(number: number, abjad: Record<string, number> = getActiveAbjadMap()): DivineName | undefined {
+  return getDivineNamesForSystem(abjad).find(n => n.number === number);
 }
 
-export function getAllDivineNames(): DivineName[] {
-  return DIVINE_NAMES;
+export function findDivineNamesByValue(abjadValue: number, tolerance = 0, abjad: Record<string, number> = getActiveAbjadMap()): DivineName[] {
+  return getDivineNamesForSystem(abjad).filter(n => Math.abs(n.abjadValue - abjadValue) <= tolerance);
 }
 
+export function getAllDivineNames(abjad: Record<string, number> = getActiveAbjadMap()): DivineName[] {
+  return getDivineNamesForSystem(abjad);
+}

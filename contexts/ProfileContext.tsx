@@ -16,6 +16,7 @@
  * - Optional cloud sync (future - account mode)
  */
 
+import { subscribeAbjadSystem } from '@/constants/abjad-maps';
 import { getSession, syncProfileToCloud } from '@/services/AuthService';
 import {
     deriveAstrologicalData,
@@ -37,7 +38,7 @@ import {
     ProfileCompletionStatus,
     UserProfile,
 } from '@/types/user-profile';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 // ============================================================================
 // CONTEXT TYPE
@@ -307,6 +308,20 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     }
   }, [profile, updateProfileState]);
   
+  // The app-wide Abjad system changes name-based derived data (personal manzil):
+  // re-derive when the user switches, so every screen using the profile updates.
+  const refreshDerivedRef = useRef(handleRefreshDerived);
+  refreshDerivedRef.current = handleRefreshDerived;
+  const hasNameRef = useRef(false);
+  hasNameRef.current = !!profile.nameAr;
+  useEffect(() => {
+    return subscribeAbjadSystem(() => {
+      if (hasNameRef.current) {
+        void refreshDerivedRef.current();
+      }
+    });
+  }, []);
+
   /**
    * Reset profile to default (guest mode)
    * USE WITH CAUTION - deletes all personalization

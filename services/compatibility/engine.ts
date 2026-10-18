@@ -14,7 +14,7 @@ import {
     getElementFromAbjadTotal
 } from '../../utils/relationshipCompatibility';
 import { getBurujData } from '../istikhara/calculations';
-import { ABJAD_MAGHRIBI } from '../../constants/abjad-maps';
+import { getActiveAbjadMap } from '../../constants/abjad-maps';
 import { buildDestiny, NameDestinyResult } from '../ilm-huruf/core';
 import {
     CompatibilityEvaluation,
@@ -626,7 +626,7 @@ function estimatedInstantForDob(dobISO: string): Date {
 
 async function buildParticipant(input: PersonPersonParticipantInput): Promise<PersonPersonParticipant> {
   if (input.inputMethod === 'name') {
-    const destinyRaw = buildDestiny(input.arabicName, undefined, ABJAD_MAGHRIBI);
+    const destinyRaw = buildDestiny(input.arabicName, undefined, getActiveAbjadMap());
     const destiny = extractSpiritualDestiny(destinyRaw, input.name);
     return {
       inputMethod: 'name',
@@ -709,10 +709,10 @@ export async function calculatePersonPersonCompatibilityMixed(
     const result = calculatePersonPersonCompatibility(
       person1Input.name,
       person1Input.arabicName,
-      buildDestiny(person1Input.arabicName, undefined, ABJAD_MAGHRIBI),
+      buildDestiny(person1Input.arabicName, undefined, getActiveAbjadMap()),
       person2Input.name,
       person2Input.arabicName,
-      buildDestiny(person2Input.arabicName, undefined, ABJAD_MAGHRIBI),
+      buildDestiny(person2Input.arabicName, undefined, getActiveAbjadMap()),
       relationshipContext
     );
 

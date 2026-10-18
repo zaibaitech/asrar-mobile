@@ -25,7 +25,8 @@ export class IstikharaService {
    */
   static calculate(
     personName: string,
-    motherName: string
+    motherName: string,
+    abjad?: Record<string, number>
   ): IstikharaCalculationResult {
     try {
       // Validate
@@ -36,7 +37,8 @@ export class IstikharaService {
       // Calculate locally
       const result = calculateIstikhara(
         personName.trim(),
-        motherName.trim()
+        motherName.trim(),
+        abjad
       );
 
       // Save to history (async, don't wait)

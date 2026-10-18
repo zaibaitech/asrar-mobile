@@ -4,6 +4,7 @@
  * Phase 2: Enhanced with rich content and datasets
  */
 
+import { getActiveAbjadMap } from '../constants/abjad-maps';
 import { findDivineNamesByValue } from '../data/divine-names';
 import { generateQuranLink, getSurahByNumber } from '../data/quran-surahs';
 import {
@@ -59,7 +60,8 @@ const ELEMENT_POWER_DAY_KEYS: Record<ElementType, string> = {
 
 export function computeNameInsights(
   core: CoreResults,
-  analytics: ElementalAnalytics
+  analytics: ElementalAnalytics,
+  abjad: Record<string, number> = getActiveAbjadMap()
 ): NameInsights {
   const archetype = NAME_ARCHETYPE_KEYS[core.saghir] || 'calculator.results.archetypes.1.title';
   
@@ -71,7 +73,7 @@ export function computeNameInsights(
   const powerDay = ELEMENT_POWER_DAY_KEYS[core.element];
   
   // Enhanced: Find divine names with matching or near values
-  const matchingNames = findDivineNamesByValue(core.kabir, 50)
+  const matchingNames = findDivineNamesByValue(core.kabir, 50, abjad)
     .slice(0, 3)
     .map(name => ({
       name: name.transliteration,

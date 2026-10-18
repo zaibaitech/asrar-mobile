@@ -3,38 +3,10 @@
  * Source: Free Islamic API
  */
 
-// Abjad Maghribi mapping (inlined to avoid import issues).
-// Must match ABJAD_MAGHRIBI in constants/abjad-maps.ts (true Maghribi values).
-const ABJAD_MAGHRIBI: Record<string, number> = {
-  'ا': 1, 'أ': 1, 'إ': 1, 'آ': 1,
-  'ب': 2,
-  'ج': 3,
-  'د': 4,
-  'ه': 5, 'ة': 5,
-  'و': 6, 'ؤ': 6,
-  'ز': 7,
-  'ح': 8,
-  'ط': 9,
-  'ي': 10, 'ى': 10, 'ئ': 10,
-  'ك': 20,
-  'ل': 30,
-  'م': 40,
-  'ن': 50,
-  'ص': 60,
-  'ع': 70,
-  'ف': 80,
-  'ض': 90,
-  'ق': 100,
-  'ر': 200,
-  'س': 300,
-  'ت': 400,
-  'ث': 500,
-  'خ': 600,
-  'ذ': 700,
-  'ظ': 800,
-  'غ': 900,
-  'ش': 1000,
-};
+// The stored abjadValue fields in data/divine-names.ts use the Mashriqi table
+// (the shared one in constants/abjad-maps.ts); the helpers in that file convert
+// them to the app-wide system (Maghribi by default) at runtime.
+import { ABJAD_MASHRIQI } from '../constants/abjad-maps';
 
 interface ApiDivineName {
   number: number;
@@ -51,8 +23,8 @@ const API_URL = 'https://api.aladhan.com/v1/asmaAlHusna';
 function calculateAbjadValue(arabic: string): number {
   let total = 0;
   for (const char of arabic) {
-    if (ABJAD_MAGHRIBI[char]) {
-      total += ABJAD_MAGHRIBI[char];
+    if (ABJAD_MASHRIQI[char]) {
+      total += ABJAD_MASHRIQI[char];
     }
   }
   return total;
@@ -130,8 +102,17 @@ function generateTypeScriptFile(names: any[]): string {
   const header = `/**
  * Complete 99 Divine Names Database
  * Generated from Al Aladhan API
- * Abjad values calculated using Maghribi system
+ * Stored abjadValue fields use the Mashriqi table; use the helpers at the end
+ * of this file for values in the app-wide system (Maghribi by default).
  */
+
+import {
+  AbjadSystemKey,
+  abjadSystemOfMap,
+  getAbjadMap,
+  getActiveAbjadMap,
+  storedMashriqiValueForSystem,
+} from '../constants/abjad-maps';
 
 export interface DivineName {
   number: number;
@@ -159,16 +140,31 @@ export const DIVINE_NAMES: DivineName[] = `;
   const helpers = `;
 
 // Helper functions
-export function getDivineNameByNumber(number: number): DivineName | undefined {
-  return DIVINE_NAMES.find(n => n.number === number);
+//
+// The abjadValue fields above are the stored (Mashriqi) values. The helpers
+// return the Names with abjadValue in the app-wide system (Maghribi by default),
+// so every tool that shows or matches a Name's value follows the user's choice.
+
+const divineNamesBySystem: Partial<Record<AbjadSystemKey, DivineName[]>> = {};
+
+export function getDivineNamesForSystem(abjad: Record<string, number> = getActiveAbjadMap()): DivineName[] {
+  const key = abjadSystemOfMap(abjad);
+  return (divineNamesBySystem[key] ??= DIVINE_NAMES.map((n) => ({
+    ...n,
+    abjadValue: storedMashriqiValueForSystem(n.abjadValue, n.arabic, getAbjadMap(key)),
+  })));
 }
 
-export function findDivineNamesByValue(abjadValue: number, tolerance = 0): DivineName[] {
-  return DIVINE_NAMES.filter(n => Math.abs(n.abjadValue - abjadValue) <= tolerance);
+export function getDivineNameByNumber(number: number, abjad: Record<string, number> = getActiveAbjadMap()): DivineName | undefined {
+  return getDivineNamesForSystem(abjad).find(n => n.number === number);
 }
 
-export function getAllDivineNames(): DivineName[] {
-  return DIVINE_NAMES;
+export function findDivineNamesByValue(abjadValue: number, tolerance = 0, abjad: Record<string, number> = getActiveAbjadMap()): DivineName[] {
+  return getDivineNamesForSystem(abjad).filter(n => Math.abs(n.abjadValue - abjadValue) <= tolerance);
+}
+
+export function getAllDivineNames(abjad: Record<string, number> = getActiveAbjadMap()): DivineName[] {
+  return getDivineNamesForSystem(abjad);
 }
 `;
 

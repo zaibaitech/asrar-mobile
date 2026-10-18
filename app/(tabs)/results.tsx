@@ -12,6 +12,8 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import * as Haptics from 'expo-haptics';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+import { useAbjadSystem } from '../../hooks/useAbjadSystem';
+import { recalculateIstikharaData } from '../../hooks/useIstikhara';
 import {
     Alert,
     Dimensions,
@@ -150,6 +152,21 @@ export default function IstikharaResults() {
       console.log('No data in params yet, waiting...');
     }
   }, [params.data]);
+
+  // Name-based results follow the app-wide Abjad system: when it is switched,
+  // recompute from the same two names (birth-date results don't use letters).
+  const { system: abjadSystem } = useAbjadSystem();
+  useEffect(() => {
+    const current = data as (IstikharaData & { abjadSystem?: string }) | null;
+    const person = params.personName as string | undefined;
+    const mother = params.motherName as string | undefined;
+    if (!current || !current.abjadSystem || current.abjadSystem === abjadSystem || !person || !mother) return;
+    try {
+      setData({ ...current, ...recalculateIstikharaData(person, mother, abjadSystem) } as IstikharaData);
+    } catch (error) {
+      console.warn('[results] could not recalculate for the new Abjad system', error);
+    }
+  }, [abjadSystem, data, params.personName, params.motherName]);
 
   if (!data) {
     return (

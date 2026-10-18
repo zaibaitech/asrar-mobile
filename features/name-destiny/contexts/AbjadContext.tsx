@@ -1,9 +1,14 @@
 /**
- * Abjad Context - Manage Abjad System Selection
+ * Abjad Context - Name Destiny view of the app-wide Abjad system.
  * Mobile Implementation - Expo Go 54
+ *
+ * The system is app-wide (hooks/useAbjadSystem, persisted in AsyncStorage) so a
+ * switch here also switches every other calculator. The provider is kept so the
+ * existing layouts keep working.
  */
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
+import { useAbjadSystem } from '../../../hooks/useAbjadSystem';
 
 type AbjadSystem = 'maghribi' | 'mashriqi';
 
@@ -13,36 +18,19 @@ interface AbjadContextType {
   toggleAbjadSystem: () => void;
 }
 
-const AbjadContext = createContext<AbjadContextType | undefined>(undefined);
-
 interface AbjadProviderProps {
   children: ReactNode;
 }
 
 export function AbjadProvider({ children }: AbjadProviderProps) {
-  const [abjadSystem, setAbjadSystem] = useState<AbjadSystem>('maghribi');
-
-  const toggleAbjadSystem = () => {
-    setAbjadSystem((prev) => (prev === 'maghribi' ? 'mashriqi' : 'maghribi'));
-  };
-
-  return (
-    <AbjadContext.Provider
-      value={{
-        abjadSystem,
-        setAbjadSystem,
-        toggleAbjadSystem,
-      }}
-    >
-      {children}
-    </AbjadContext.Provider>
-  );
+  return <>{children}</>;
 }
 
 export function useAbjad(): AbjadContextType {
-  const context = useContext(AbjadContext);
-  if (!context) {
-    throw new Error('useAbjad must be used within AbjadProvider');
-  }
-  return context;
+  const { system, setSystem } = useAbjadSystem();
+  return {
+    abjadSystem: system,
+    setAbjadSystem: setSystem,
+    toggleAbjadSystem: () => setSystem(system === 'maghribi' ? 'mashriqi' : 'maghribi'),
+  };
 }

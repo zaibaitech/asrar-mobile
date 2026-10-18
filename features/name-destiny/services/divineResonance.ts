@@ -3,7 +3,7 @@
  * Calculates Divine Name based on Abjad Kabir values
  */
 
-import { ABJAD_MAGHRIBI } from '../constants/abjadMaps';
+import { getActiveAbjadMap } from '../../../constants/abjad-maps';
 
 export interface LetterBreakdown {
   ch: string;
@@ -300,7 +300,7 @@ export function normalizeArabicForResonance(text: string): string {
  */
 export function computeDivineResonance(
   name: string,
-  abjadMap: Record<string, number> = ABJAD_MAGHRIBI
+  abjadMap: Record<string, number> = getActiveAbjadMap()
 ): DivineResonanceResult {
   // Normalize the input
   const normalized = normalizeArabicForResonance(name);
@@ -377,7 +377,7 @@ export function getResonanceExplanation(total: number, index: number): string {
  */
 export function computeDivineNameAbjad(
   arabicText: string,
-  abjadMap: Record<string, number> = ABJAD_MAGHRIBI
+  abjadMap: Record<string, number> = getActiveAbjadMap()
 ): { total: number; letters: LetterBreakdown[] } {
   // Normalize: remove tashkeel (diacritics), tatweel, spaces, punctuation
   const normalized = arabicText
