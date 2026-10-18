@@ -18,7 +18,7 @@ import { ElementType, RuhHadad, SacredResonance, UmHadad } from './types';
 export const ABJAD: Record<string, number> = ABJAD_MAGHRIBI;
 export { getAbjadMap, getActiveAbjadMap };
 
-// MAGHRIBI SYSTEM - Authentic West/North African tradition (7 letters per element)
+// MAGHRIBI SYSTEM - tradition of the Maghreb and West Africa (7 letters per element)
 export const LETTER_ELEMENTS: Record<string, ElementType> = {
   // 🔥 Fire (Nār/نار) - Hot & Dry - 7 letters
   'ا': 'fire', 'ه': 'fire', 'ط': 'fire', 'م': 'fire', 'ف': 'fire', 'ش': 'fire', 'ذ': 'fire',

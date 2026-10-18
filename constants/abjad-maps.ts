@@ -2,7 +2,7 @@
  * Server-side Abjad Maps
  * Extracted from client contexts for use in API routes
  *
- * ABJAD_MAGHRIBI uses the true Maghribi (Western / North-African) values,
+ * ABJAD_MAGHRIBI uses the true Maghribi values (the Maghreb, al-Andalus and West Africa),
  * which differ from the Mashriqi (Eastern) table in six letters only:
  *
  *   letter   Maghribi   Mashriqi

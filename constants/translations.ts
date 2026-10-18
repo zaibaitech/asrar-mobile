@@ -4751,7 +4751,7 @@ export const translations = {
       abjad: {
         maghribi: "Maghribi",
         mashriqi: "Mashriqi",
-        systemNote: "Maghribi (North & West Africa) · Mashriqi (Middle East & Asia)",
+        systemNote: "Maghribi (the Maghreb, al-Andalus & West Africa) · Mashriqi (Egypt, the Middle East & Asia)",
       },
       
       // Input Fields
@@ -10608,9 +10608,9 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       advancedOptions: "Advanced Options",
       abjadSystem: "Abjad System",
       mashriqi: "Mashriqi",
-      mashriqiDesc: "Used in the Eastern Arab world",
+      mashriqiDesc: "Used in Egypt, the Middle East and Asia",
       maghribi: "Maghribi",
-      maghribiDesc: "Used in North Africa",
+      maghribiDesc: "Used in the Maghreb and West Africa, and historically in al-Andalus",
     },
 
     // Elemental relationship descriptions
@@ -15437,7 +15437,7 @@ WITH this knowledge, they understand: "We're both trying to feel safe×just in d
       abjad: {
         maghribi: "Maghribi",
         mashriqi: "Mashriqi",
-        systemNote: "Maghribi (Afrique du Nord et de l'Ouest) · Mashriqi (Moyen-Orient et Asie)",
+        systemNote: "Maghribi (Maghreb, al-Andalus et Afrique de l'Ouest) · Mashriqi (Égypte, Moyen-Orient et Asie)",
       },
       
       // Input Fields
@@ -21581,9 +21581,9 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       advancedOptions: "Options avancées",
       abjadSystem: "Système Abjad",
       mashriqi: "Mashriqi",
-      mashriqiDesc: "Utilisé dans le monde arabe oriental",
+      mashriqiDesc: "Utilisé en Égypte, au Moyen-Orient et en Asie",
       maghribi: "Maghribi",
-      maghribiDesc: "Utilisé en Afrique du Nord",
+      maghribiDesc: "Utilisé au Maghreb et en Afrique de l'Ouest, et jadis en al-Andalus",
     },
 
     // Relations élémentaires (French - simplified)
@@ -21751,8 +21751,8 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       abjad: {
         maghribi: "مغربي",
         mashriqi: "مشرقي",
-        // TODO(Language Reviewer): new string, see docs/i18n/ar-review.md
-        systemNote: "المغربي (شمال أفريقيا وغربها) · المشرقي (الشرق الأوسط وآسيا)",
+        // Language Reviewer batch 5 wording (same as web src/lib/i18n/ar.ts)
+        systemNote: "المغربي (المغرب العربي والأندلس وغرب أفريقيا) · المشرقي (مصر والمشرق وسائر آسيا)",
       },
       inputs: {
         latinName: "الاسم اللاتيني (إنجليزي/فرنسي)",
@@ -21922,7 +21922,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         },
 
         elementalComposition: {
-          title: "التركيب العنصري",
+          title: "تركيب العناصر",
           balanceScore: "درجة التوازن العنصري",
           balanceStatus: {
             harmonious: "منسجم",
@@ -22199,7 +22199,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
             value: "القيمة",
           },
           elementalBalance: {
-            title: "التوازن العنصري",
+            title: "توازن العناصر",
           },
           sacredResonance: {
             title: "الرنين المقدس",
@@ -22245,7 +22245,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       discoverSignificance: "اكتشف الدلالة العددية لاسمك من خلال العلوم الإسلامية التقليدية",
       numericalValues: "القيم العددية",
       numericalValuesDesc: "كيف يتحول كل حرف عربي إلى أرقام مقدسة",
-      elementalForces: "القوى العنصرية",
+      elementalForces: "قوى العناصر",
       elementalForcesDesc: "العناصر الأربعة الكلاسيكية وتركيبتك الروحية",
       hiddenPatterns: "الأنماط الخفية",
       hiddenPatternsDesc: "الروابط المقدسة والرنينات الإلهية في أرقامك",
@@ -22325,7 +22325,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       harmonyExplanation: "يصف الانسجام كيفية سير الحياة اليومية عملياً",
       metricsNote: "قد يتطلب الارتباط الروحي القوي مجهوداً لتحقيق الانسجام",
       spiritualHarmony: "الانسجام الروحي",
-      elementalHarmony: "الانسجام العنصري",
+      elementalHarmony: "انسجام العناصر",
       planetaryCompatibility: "التوافق الكوكبي",
       coreCompatibility: "التوافق الأساسي (الأسماء الشخصية)",
       coreCompatibilityDesc: "كيف تتفاعل شخصياتكم الواعية",
@@ -22937,7 +22937,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           components: "مكونات الانسجام",
         },
         elemental: {
-          title: "المزاج العنصري",
+          title: "مزاج العناصر",
           subtitle: "توازن الطاقة الطبيعية",
           shortDesc: "التوازن الطاقي الطبيعي",
           balanceType: "نوع التوازن",
@@ -23560,7 +23560,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         spiritualDestinyDesc: "المسار الروحي والانسجام",
         quality: "الجودة",
         sacredNumber: "الرقم المقدس",
-        elementalTemperament: "المزاج العنصري",
+        elementalTemperament: "مزاج العناصر",
         elementalTemperamentDesc: "توازن الطاقات الطبيعية",
         cosmicHarmony: "الانسجام الكوني",
         cosmicHarmonyDesc: "التأثيرات الكوكبية",
@@ -24030,7 +24030,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         element: "العنصر",
         quality: "الجودة",
         whyThisTiming: "لماذا هذا التوقيت؟",
-        elementHarmony: "الانسجام العنصري",
+        elementHarmony: "انسجام العناصر",
         momentAlignment: "الساعة الكوكبية",
         planetaryResonance: "الرنين الكوكبي",
         whatThisMeans: "ما يعني هذا",
@@ -25614,7 +25614,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       alignment: {
         personalAlignment: "المحاذاة الشخصية",
         alignmentBreakdown: "تفصيل المحاذاة",
-        elementalHarmony: "الانسجام العنصري",
+        elementalHarmony: "انسجام العناصر",
         planetaryResonance: "الرنين الكوكبي",
         numericalAlignment: "التوافق العددي",
         sacredConnection: "الاتصال المقدس",
@@ -25694,7 +25694,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         day: "اليوم",
         hour: "رقم الساعة الكوكبية",
         hourTip: "الساعة رقم كذا بعد شروق الشمس المحلي. الترتيب: الشمس، الزهرة، عطارد، القمر، زحل، المشتري، المريخ.",
-        elementHarmony: "الانسجام العنصري",
+        elementHarmony: "انسجام العناصر",
         harmonious: "✨ منسجم",
         nourishing: "🌱 مغذٍّ",
         transformative: "⚡ تحويلي",
@@ -25764,7 +25764,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       },
       elementChart: {
         title: "مخطط عنصر الاسم",
-        subtitle: "التركيب العنصري والتوازن",
+        subtitle: "تركيب العناصر وتوازنها",
         dominant: "العنصر الغالب",
         personality: "انعكاس الشخصية",
         balancingDhikr: "ذكر الموازنة",
@@ -25856,7 +25856,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         personalizedInsight: "💫 رؤية شخصية",
         divineNameResonance: "رنين الاسم الإلهي",
         divineNameResonanceSubtitle: "الاسم الإلهي المتناغم مع اسمك",
-        elementalComposition: "التركيب العنصري",
+        elementalComposition: "تركيب العناصر",
         elementalCompositionSubtitle: "بناءً على الحروف في اسمك (التعبير الظاهر).",
         dominantExpression: "التعبير الغالب: ",
         weakElement: "العنصر الضعيف: ",
@@ -25998,7 +25998,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         ingressDetectedNote: "يقع هذا التاريخ بالقرب من حدود تغيّر البرج. يساعد مكان أو وقت ميلادك أدناه في تأكيد البرج الدقيق.",
         whatYouDiscover: "ما ستكتشفه:",
         sunSign: "برجك الشمسي",
-        elementalNature: "طبيعتك العنصرية",
+        elementalNature: "طبيعة عنصرك",
         moonSign: "برج القمر (الموضع القمري)",
         ascendant: "الطالع (البرج الصاعد)",
         descendant: "الغارب",
@@ -27974,7 +27974,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         sections: {
           dayRuler: "حاكم اليوم",
           dailyWindow: "نافذة اليوم",
-          elementalHarmony: "الانسجام العنصري",
+          elementalHarmony: "انسجام العناصر",
           manazil: "المنازل (منزلة القمر)",
           bestFor: "الأفضل لـ",
           whyThis: "لماذا هذا؟",
@@ -28467,7 +28467,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
           planetaryResonance: "الرنين الكوكبي",
           samePlanet: "نفس الكوكب",
           highIntensity: "كثافة عالية",
-          elementalHarmony: "الانسجام العنصري",
+          elementalHarmony: "انسجام العناصر",
           transitStrength: "قوة الساعة الحالية",
           strong: "قوية",
           moderate: "متوسطة",
@@ -28510,7 +28510,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         personalPlanetLabel: "كوكبك",
         personalElementLabel: "عنصرك",
         factors: {
-          elementCompatibility: "الانسجام العنصري",
+          elementCompatibility: "انسجام العناصر",
           planetaryResonance: "الرنين الكوكبي",
           manazilAlignment: "محاذاة المنازل",
           practiceMapping: "مطابقة الممارسة",
@@ -29294,10 +29294,10 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
         personalMonth: "الطاقة والتركيز الشهري",
       },
 
-      elementalComposition: "تركيبتك العنصرية",
-      elementalCompositionDesc: "بناءً على أرقامك الأساسية الأربعة، إليك التوازن العنصري في مسار حياتك:",
+      elementalComposition: "تركيبة عناصرك",
+      elementalCompositionDesc: "بناءً على أرقامك الأساسية الأربعة، إليك توازن العناصر في مسار حياتك:",
       dominantElement: "العنصر الغالب",
-      elementalBalance: "التوازن العنصري",
+      elementalBalance: "توازن العناصر",
 
       elementDescriptions: {
         fire: "تجلب النار الشغف والمبادرة والدافع. أنت مدفوع لاتخاذ الفعل والقيادة.",
@@ -29551,7 +29551,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
 
       difficult: "صعب جدًا",
       difficultRange: "0-39%",
-      difficultMeaning: "تعارضات عنصرية كبيرة. رغم أنه ليس مستحيلًا، يواجه هذا الاقتران تحديات جوهرية تتطلب التزامًا عميقًا لتجاوزها.",
+      difficultMeaning: "تعارضات كبيرة بين العناصر. رغم أنه ليس مستحيلًا، يواجه هذا الاقتران تحديات جوهرية تتطلب التزامًا عميقًا لتجاوزها.",
 
       layer1Title: "توافق الحياة اليومية",
       layer1TitleArabic: "التوافق اليومي",
@@ -29573,11 +29573,11 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       whyItMatters: "💡 لماذا يهم:",
 
       layer1WhatItMeans: "كيف تتفاعل شخصيتاكما الواعيتان يوميًا. هذه هي الطاقة التي تجلبانها فعليًا للمحادثات والقرارات والأنشطة المشتركة. إنها ما يراه الناس عندما ينظرون إلى علاقتكما.",
-      layer1BasedOn: "المزاجات العنصرية من كلا اسميكما (محسوبة باستخدام طريقة الحدث ÷ 4)",
+      layer1BasedOn: "أمزجة العناصر من كلا اسميكما (محسوبة باستخدام طريقة الحدث ÷ 4)",
       layer1WhyItMatters: "يحدد هذا أسلوب تواصلكما، وحل النزاعات، وما إذا كنتما 'تفهمان' بعضكما طبيعيًا في اللحظات اليومية. الدرجات العالية هنا تعني تدفقًا سهلًا وطبيعيًا في الحياة اليومية.",
 
       layer2WhatItMeans: "التوافق العاطفي اللاواعي الموروث من والدتيكما. هذا هو 'شعور المنزل' الذي تخلقانه معًا × الراحة والأمان والرابطة العميقة غير المعلنة التي إما موجودة طبيعيًا أو يجب بناؤها.",
-      layer2BasedOn: "المزاجات العنصرية من اسمي والدتيكما (محسوبة باستخدام طريقة الحدث ÷ 4)",
+      layer2BasedOn: "أمزجة العناصر من اسمي والدتيكما (محسوبة باستخدام طريقة الحدث ÷ 4)",
       layer2WhyItMatters: `هذه هي الطبقة الأهم للزواج والشراكة طويلة الأمد. إليك السبب:
 
 • شكّلت أنماط والدتك العاطفية كيف تعطي وتتلقى الحب
@@ -29634,10 +29634,10 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       challengesDesc: "تحتاج هذه المجالات انتباهًا واعيًا، لكن الوعي نصف الحل:",
 
       specificPractices: "🛠️ ممارسات محددة",
-      practicesDesc: "جرّبا هذه الأنشطة لموازنة ديناميكياتكما العنصرية:",
+      practicesDesc: "جرّبا هذه الأنشطة لموازنة حركية عناصركما:",
 
       spiritualBalancing: "🤲 التوازن الروحي",
-      dhikrDesc: "تساعد هذه العبارات المقدسة على مواءمة طاقاتكما العنصرية:",
+      dhikrDesc: "تساعد هذه العبارات المقدسة على التوفيق بين طاقات عناصركما:",
 
       understandingTheTerms: "[ℹ️ فهم المصطلحات]",
       glossaryTitle: "📚 مسرد علم الحروف",
@@ -29660,7 +29660,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
 
       zawajAlHuruf: "زواج الحروف",
       zawajAlHurufArabic: "زواج الحروف",
-      zawajAlHurufDef: "زواج الحروف × تحليل التوافق بين اسمين بناءً على انسجامهما العنصري. كيف 'تتزوج' الحروف أو تتفاعل بين شخصين.",
+      zawajAlHurufDef: "زواج الحروف × تحليل التوافق بين اسمين بناءً على انسجام عناصرهما. كيف 'تتزوج' الحروف أو تتفاعل بين شخصين.",
 
       showCalculation: "[📊 عرض كيفية حسابنا لهذا]",
       calculationBreakdown: "🔢 تفصيل الحساب",
@@ -30046,7 +30046,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
 
         section1: {
           title: "المبدأ: بصمة روحك الفريدة",
-          text: "في التقليد السنغالي لعلم الحروف، تتشكل هويتك الروحية الكاملة (الأصل الروحاني) من اسمك + اسم والدتك. يخلق هذا بصمة عددية وعنصرية فريدة لك وحدك.",
+          text: "في التقليد السنغالي لعلم الحروف، تتشكل هويتك الروحية الكاملة (الأصل الروحاني) من اسمك + اسم والدتك. ويصنع ذلك بصمةً فريدة لك وحدك في الأعداد والعناصر.",
         },
 
         section2: {
@@ -30153,7 +30153,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
     dailyGuidance: {
       title: "التوجيه اليومي",
       todaysFlow: "تدفق اليوم",
-      elementHarmony: "الانسجام العنصري",
+      elementHarmony: "انسجام العناصر",
       dayElement: "عنصر اليوم",
       yourElement: "عنصرك",
       noElement: "لا يوجد عنصر",
@@ -30615,7 +30615,7 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       // عوامل التوافق
       factors: {
         planetaryFriendship: "الصداقة الكوكبية",
-        elementalHarmony: "الانسجام العنصري",
+        elementalHarmony: "انسجام العناصر",
         dailyStrength: "القوة اليومية",
       },
 
@@ -31066,9 +31066,9 @@ AVEC cette connaissance, ils comprennent : "Nous essayons tous les deux de nous 
       advancedOptions: "خيارات متقدمة",
       abjadSystem: "نظام الأبجد",
       mashriqi: "مشرقي",
-      mashriqiDesc: "يُستخدم في المشرق العربي",
+      mashriqiDesc: "يُستخدم في مصر والمشرق وسائر آسيا",
       maghribi: "مغربي",
-      maghribiDesc: "يُستخدم في شمال أفريقيا",
+      maghribiDesc: "يُستعمل في المغرب العربي وغرب أفريقيا، واستُعمل قديمًا في الأندلس",
     },
 
     // العلاقات العنصرية (العربية - مبسطة)
